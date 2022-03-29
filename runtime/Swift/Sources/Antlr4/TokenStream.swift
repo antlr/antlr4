@@ -133,5 +133,5 @@ public protocol TokenStream: IntStream {
     /// and `stop` tokens.
     /// 
     /// 
-    func getText(_ start: Token?, _ stop: Token?) throws -> String
+    func getText(_ start: Token, _ stop: Token) throws -> String
 }

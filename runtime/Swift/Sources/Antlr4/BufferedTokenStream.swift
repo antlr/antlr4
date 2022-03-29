@@ -472,12 +472,8 @@ public class BufferedTokenStream: TokenStream {
     }
 
 
-    public func getText(_ start: Token?, _ stop: Token?) throws -> String {
-        if let start = start, let stop = stop {
-            return try getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()))
-        }
-
-        return ""
+    public func getText(_ start: Token, _ stop: Token) throws -> String {
+        return try getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()))
     }
 
     /// 

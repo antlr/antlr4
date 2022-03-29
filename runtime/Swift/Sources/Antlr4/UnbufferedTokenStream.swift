@@ -116,8 +116,8 @@ public class UnbufferedTokenStream: TokenStream {
     }
 
 
-    public func getText(_ start: Token?, _ stop: Token?) throws -> String {
-        return try getText(Interval.of(start!.getTokenIndex(), stop!.getTokenIndex()))
+    public func getText(_ start: Token, _ stop: Token) throws -> String {
+        return try getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()))
     }
 
 
