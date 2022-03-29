@@ -46,7 +46,7 @@ namespace atn {
 
     ATNConfigSet(const ATNConfigSet &other);
 
-    ATNConfigSet(ATNConfigSet &&) = delete;
+    ATNConfigSet(ATNConfigSet&&) = delete;
 
     explicit ATNConfigSet(bool fullCtx);
 
@@ -68,7 +68,7 @@ namespace atn {
 
     bool addAll(const ATNConfigSet &other);
 
-    std::vector<ATNState *> getStates() const;
+    std::vector<ATNState*> getStates() const;
 
     /**
      * Gets the complete set of represented alternatives for the configuration
