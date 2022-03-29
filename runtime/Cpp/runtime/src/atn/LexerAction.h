@@ -27,7 +27,7 @@ namespace atn {
     /// Gets the serialization type of the lexer action.
     /// </summary>
     /// <returns> The serialization type of the lexer action. </returns>
-    virtual LexerActionType getActionType() const = 0;
+    LexerActionType getActionType() const { return _actionType; }
 
     /// <summary>
     /// Gets whether the lexer action is position-dependent. Position-dependent
@@ -60,6 +60,12 @@ namespace atn {
     }
 
     virtual std::string toString() const = 0;
+
+  protected:
+    explicit LexerAction(LexerActionType actionType) : _actionType(actionType) {}
+
+  private:
+    const LexerActionType _actionType;
   };
 
 } // namespace atn

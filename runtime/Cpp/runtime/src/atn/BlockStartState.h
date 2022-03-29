@@ -14,6 +14,9 @@ namespace atn {
   class ANTLR4CPP_PUBLIC BlockStartState : public DecisionState {
   public:
     BlockEndState *endState = nullptr;
+
+  protected:
+    using DecisionState::DecisionState;
   };
 
 } // namespace atn

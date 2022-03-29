@@ -16,14 +16,15 @@ namespace atn {
   public:
     const misc::IntervalSet set;
 
-    SetTransition(ATNState *target, misc::IntervalSet set);
-
-    TransitionType getTransitionType() const override;
+    SetTransition(ATNState *target, misc::IntervalSet set) : SetTransition(TransitionType::SET, target, std::move(set)) {}
 
     virtual misc::IntervalSet label() const override;
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
+
+  protected:
+    SetTransition(TransitionType transitionType, ATNState *target, misc::IntervalSet set);
   };
 
 } // namespace atn

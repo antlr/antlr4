@@ -12,9 +12,7 @@ namespace tree {
 
   class ANTLR4CPP_PUBLIC TerminalNode : public ParseTree {
   public:
-    ~TerminalNode() override;
-
-    virtual Token* getSymbol() = 0;
+    virtual Token* getSymbol() const = 0;
 
     /** Set the parent for this leaf node.
      *
@@ -27,7 +25,8 @@ namespace tree {
      */
     virtual void setParent(RuleContext *parent) = 0;
 
-    ParseTreeType getTreeType() const override;
+  protected:
+    using ParseTree::ParseTree;
   };
 
 } // namespace tree

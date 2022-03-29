@@ -32,11 +32,7 @@ namespace atn {
 
     virtual ~Transition() = default;
 
-  protected:
-    explicit Transition(ATNState *target);
-
-  public:
-    virtual TransitionType getTransitionType() const = 0;
+    TransitionType getTransitionType() const { return _transitionType; }
 
     /**
      * Determines if the transition is an "epsilon" transition.
@@ -55,6 +51,12 @@ namespace atn {
 
     Transition(Transition const&) = delete;
     Transition& operator=(Transition const&) = delete;
+
+  protected:
+    Transition(TransitionType transitionType, ATNState *target);
+
+  private:
+    const TransitionType _transitionType;
   };
 
   using ConstTransitionPtr = std::unique_ptr<const Transition>;

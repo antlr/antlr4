@@ -27,11 +27,6 @@ namespace atn {
 
     /// <summary>
     /// {@inheritDoc} </summary>
-    /// <returns> This method returns <seealso cref="LexerActionType#SKIP"/>. </returns>
-    virtual LexerActionType getActionType() const override;
-
-    /// <summary>
-    /// {@inheritDoc} </summary>
     /// <returns> This method returns {@code false}. </returns>
     virtual bool isPositionDependent() const override;
 
@@ -48,7 +43,7 @@ namespace atn {
 
   private:
     /// Constructs the singleton instance of the lexer {@code skip} command.
-    LexerSkipAction() = default;
+    LexerSkipAction() : LexerAction(LexerActionType::SKIP) {}
   };
 
 } // namespace atn

@@ -91,11 +91,7 @@ namespace {
 //------------------ Predicate -----------------------------------------------------------------------------------------
 
 SemanticContext::Predicate::Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent)
-    : ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {}
-
-SemanticContextType SemanticContext::Predicate::getContextType() const {
-  return SemanticContextType::PREDICATE;
-}
+    : SemanticContext(SemanticContextType::PREDICATE), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {}
 
 bool SemanticContext::Predicate::eval(Recognizer *parser, RuleContext *parserCallStack) const {
   RuleContext *localctx = nullptr;
@@ -132,11 +128,7 @@ std::string SemanticContext::Predicate::toString() const {
 
 //------------------ PrecedencePredicate -------------------------------------------------------------------------------
 
-SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : precedence(precedence) {}
-
-SemanticContextType SemanticContext::PrecedencePredicate::getContextType() const {
-  return SemanticContextType::PRECEDENCE;
-}
+SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : SemanticContext(SemanticContextType::PRECEDENCE), precedence(precedence) {}
 
 bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, RuleContext *parserCallStack) const {
   return parser->precpred(parserCallStack, precedence);
@@ -174,7 +166,7 @@ std::string SemanticContext::PrecedencePredicate::toString() const {
 
 //------------------ AND -----------------------------------------------------------------------------------------------
 
-SemanticContext::AND::AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) {
+SemanticContext::AND::AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) : Operator(SemanticContextType::AND) {
   std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> operands;
   Ref<const SemanticContext::PrecedencePredicate> precedencePredicate;
 
@@ -207,10 +199,6 @@ SemanticContext::AND::AND(Ref<const SemanticContext> a, Ref<const SemanticContex
 
 const std::vector<Ref<const SemanticContext>>& SemanticContext::AND::getOperands() const {
   return _opnds;
-}
-
-SemanticContextType SemanticContext::AND::getContextType() const {
-  return SemanticContextType::AND;
 }
 
 bool SemanticContext::AND::equals(const SemanticContext &other) const {
@@ -282,7 +270,7 @@ std::string SemanticContext::AND::toString() const {
 
 //------------------ OR ------------------------------------------------------------------------------------------------
 
-SemanticContext::OR::OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b) {
+SemanticContext::OR::OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b) : Operator(SemanticContextType::OR) {
   std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> operands;
   Ref<const SemanticContext::PrecedencePredicate> precedencePredicate;
 
@@ -315,10 +303,6 @@ SemanticContext::OR::OR(Ref<const SemanticContext> a, Ref<const SemanticContext>
 
 const std::vector<Ref<const SemanticContext>>& SemanticContext::OR::getOperands() const {
   return _opnds;
-}
-
-SemanticContextType SemanticContext::OR::getContextType() const {
-  return SemanticContextType::OR;
 }
 
 bool SemanticContext::OR::equals(const SemanticContext &other) const {

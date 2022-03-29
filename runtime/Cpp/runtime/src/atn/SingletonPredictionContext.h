@@ -25,8 +25,6 @@ namespace atn {
 
     static Ref<const SingletonPredictionContext> create(Ref<const PredictionContext> parent, size_t returnState);
 
-    PredictionContextType getContextType() const override;
-
     virtual bool isEmpty() const override;
     virtual size_t size() const override;
     virtual Ref<const PredictionContext> getParent(size_t index) const override;

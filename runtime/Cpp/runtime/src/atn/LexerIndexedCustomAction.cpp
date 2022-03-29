@@ -14,7 +14,7 @@ using namespace antlr4::atn;
 using namespace antlr4::misc;
 
 LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> action)
-  : _offset(offset), _action(std::move(action)) {
+  : LexerAction(action->getActionType()), _offset(offset), _action(std::move(action)) {
 }
 
 int LexerIndexedCustomAction::getOffset() const {
@@ -23,10 +23,6 @@ int LexerIndexedCustomAction::getOffset() const {
 
 Ref<LexerAction> LexerIndexedCustomAction::getAction() const {
   return _action;
-}
-
-LexerActionType LexerIndexedCustomAction::getActionType() const {
-  return _action->getActionType();
 }
 
 bool LexerIndexedCustomAction::isPositionDependent() const {

@@ -19,8 +19,6 @@ namespace atn {
 
     AtomTransition(ATNState *target, size_t label);
 
-    TransitionType getTransitionType() const override;
-
     virtual misc::IntervalSet label() const override;
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 

@@ -16,8 +16,7 @@ namespace atn {
   /// error handling.
   class ANTLR4CPP_PUBLIC RuleStopState final : public ATNState {
   public:
-    virtual ATNStateType getStateType() const override;
-
+    RuleStopState() : ATNState(ATNStateType::RULE_STOP) {}
   };
 
 } // namespace atn

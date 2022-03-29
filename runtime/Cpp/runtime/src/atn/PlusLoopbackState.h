@@ -14,7 +14,7 @@ namespace atn {
   /// one to the loop back to start of the block and one to exit.
   class ANTLR4CPP_PUBLIC PlusLoopbackState final : public DecisionState {
   public:
-    virtual ATNStateType getStateType() const override;
+    PlusLoopbackState() : DecisionState(ATNStateType::PLUS_LOOP_BACK) {}
   };
 
 } // namespace atn

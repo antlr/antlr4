@@ -28,8 +28,6 @@ namespace atn {
     RuleTransition(RuleTransition const&) = delete;
     RuleTransition& operator=(RuleTransition const&) = delete;
 
-    TransitionType getTransitionType() const override;
-
     virtual bool isEpsilon() const override;
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 

@@ -14,8 +14,6 @@ namespace atn {
   public:
     explicit WildcardTransition(ATNState *target);
 
-    TransitionType getTransitionType() const override;
-
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;

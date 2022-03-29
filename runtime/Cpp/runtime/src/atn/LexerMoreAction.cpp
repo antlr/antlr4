@@ -17,10 +17,6 @@ const Ref<LexerMoreAction>& LexerMoreAction::getInstance() {
   return instance;
 }
 
-LexerActionType LexerMoreAction::getActionType() const {
-  return LexerActionType::MORE;
-}
-
 bool LexerMoreAction::isPositionDependent() const {
   return false;
 }

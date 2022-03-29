@@ -13,10 +13,7 @@
 using namespace antlr4;
 using namespace antlr4::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(Token *symbol_) : symbol(symbol_) {
-}
-
-Token* TerminalNodeImpl::getSymbol() {
+Token* TerminalNodeImpl::getSymbol() const {
   return symbol;
 }
 

@@ -13,8 +13,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC BasicBlockStartState final : public BlockStartState {
   public:
-    virtual ATNStateType getStateType() const override;
-
+    BasicBlockStartState() : BlockStartState(ATNStateType::BLOCK_START) {}
   };
 
 } // namespace atn
