@@ -633,7 +633,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         while true {
             if word != 0 {
-                let bit = (u * BitSet.BITS_PER_WORD) + BitSet.numberOfTrailingZeros(word)
+                let bit = (u * BitSet.BITS_PER_WORD) + word.trailingZeroBitCount
                 return bit
             }
             u += 1
@@ -642,10 +642,6 @@ public class BitSet: Hashable, CustomStringConvertible {
             }
             word = words[u]
         }
-    }
-
-    public static func numberOfTrailingZeros(_ i: Int64) -> Int {
-        return i.trailingZeroBitCount
     }
 
     /// 
@@ -674,7 +670,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         while true {
             if word != 0 {
-                return (u * BitSet.BITS_PER_WORD) + BitSet.numberOfTrailingZeros(word)
+                return (u * BitSet.BITS_PER_WORD) + word.trailingZeroBitCount
             }
             u += 1
             if u == wordsInUse {
@@ -725,7 +721,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         var word: Int64 = words[u] & (BitSet.WORD_MASK >>> Int64(-(fromIndex + 1)))
         while true {
             if word != 0 {
-                return (u + 1) * BitSet.BITS_PER_WORD - 1 - BitSet.numberOfLeadingZeros(word)
+                return (u + 1) * BitSet.BITS_PER_WORD - 1 - word.leadingZeroBitCount
             }
             if u == 0 {
                 return -1
@@ -769,7 +765,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         while true {
             if word != 0 {
-                return (u + 1) * BitSet.BITS_PER_WORD - 1 - BitSet.numberOfLeadingZeros(word)
+                return (u + 1) * BitSet.BITS_PER_WORD - 1 - word.leadingZeroBitCount
             }
             if u == 0 {
                 return -1
@@ -777,10 +773,6 @@ public class BitSet: Hashable, CustomStringConvertible {
             u -= 1
             word = ~words[u]
         }
-    }
-
-    public static func numberOfLeadingZeros(_ i: Int64) -> Int {
-        return i.leadingZeroBitCount
     }
     /// 
     /// Returns the "logical size" of this `BitSet`: the index of
@@ -795,7 +787,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
 
         return BitSet.BITS_PER_WORD * (wordsInUse - 1) +
-                (BitSet.BITS_PER_WORD - BitSet.numberOfLeadingZeros(words[wordsInUse - 1]))
+                (BitSet.BITS_PER_WORD - words[wordsInUse - 1].leadingZeroBitCount)
     }
 
     /// 
@@ -835,13 +827,9 @@ public class BitSet: Hashable, CustomStringConvertible {
     public func cardinality() -> Int {
         var sum: Int = 0
         for i in 0..<wordsInUse {
-            sum += BitSet.bitCount(words[i])
+            sum += words[i].nonzeroBitCount
         }
         return sum
-    }
-
-    public static func bitCount(_ i: Int64) -> Int {
-        return i.nonzeroBitCount
     }
 
     /// 
