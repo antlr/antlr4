@@ -7,7 +7,6 @@
 #include "atn/Transition.h"
 #include "atn/RuleTransition.h"
 #include "atn/SingletonPredictionContext.h"
-#include "atn/AbstractPredicateTransition.h"
 #include "atn/WildcardTransition.h"
 #include "atn/NotSetTransition.h"
 #include "misc/IntervalSet.h"

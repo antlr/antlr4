@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "atn/AbstractPredicateTransition.h"
-#include "SemanticContext.h"
+#include "atn/Transition.h"
+#include "atn/SemanticContext.h"
 
 namespace antlr4 {
 namespace atn {
@@ -16,23 +16,31 @@ namespace atn {
   ///  In the ATN, labels will always be exactly one predicate, but the DFA
   ///  may have to combine a bunch of them as it collects predicates from
   ///  multiple ATN configurations into a single DFA state.
-  class ANTLR4CPP_PUBLIC PredicateTransition final : public AbstractPredicateTransition {
+  class ANTLR4CPP_PUBLIC PredicateTransition final : public Transition {
   public:
-    const size_t ruleIndex;
-    const size_t predIndex;
-    const bool isCtxDependent; // e.g., $i ref in pred
-
     PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
+    size_t getRuleIndex() const {
+      return _predicate->ruleIndex;
+    }
+
+    size_t getPredIndex() const {
+      return _predicate->predIndex;
+    }
+
+    bool isCtxDependent() const {
+      return _predicate->isCtxDependent;
+    }
+
     TransitionType getTransitionType() const override;
+    bool isEpsilon() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    std::string toString() const override;
 
-    virtual bool isEpsilon() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    const Ref<const SemanticContext::Predicate>& getPredicate() const { return _predicate; }
 
-    Ref<SemanticContext::Predicate> getPredicate() const;
-
-    virtual std::string toString() const override;
-
+  private:
+    const std::shared_ptr<const SemanticContext::Predicate> _predicate;
   };
 
 } // namespace atn
