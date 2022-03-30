@@ -14,6 +14,13 @@ namespace atn {
   /// A transition containing a set of values. </summary>
   class ANTLR4CPP_PUBLIC SetTransition : public Transition {
   public:
+    static bool is(const Transition &transition) {
+      const auto transitionType = transition.getTransitionType();
+      return transitionType == TransitionType::SET || transitionType == TransitionType::NOT_SET;
+    }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     const misc::IntervalSet set;
 
     SetTransition(ATNState *target, misc::IntervalSet set) : SetTransition(TransitionType::SET, target, std::move(set)) {}

@@ -67,7 +67,6 @@ namespace antlr4 {
 
     ParserRuleContext();
     ParserRuleContext(ParserRuleContext *parent, size_t invokingStateNumber);
-    virtual ~ParserRuleContext() {}
 
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
      *  confusion with creating node with parent. Does not copy children
@@ -88,23 +87,22 @@ namespace antlr4 {
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
-    virtual void removeLastChild();
+    void removeLastChild();
 
-    virtual tree::TerminalNode* getToken(size_t ttype, std::size_t i);
+    tree::TerminalNode* getToken(size_t ttype, std::size_t i) const;
 
-    virtual std::vector<tree::TerminalNode *> getTokens(size_t ttype);
+    std::vector<tree::TerminalNode*> getTokens(size_t ttype) const;
 
     template<typename T>
-    T* getRuleContext(size_t i) {
-      if (children.empty()) {
-        return nullptr;
-      }
-
+    T* getRuleContext(size_t i) const {
+      static_assert(std::is_base_of_v<RuleContext, T>, "T must be derived from RuleContext");
       size_t j = 0; // what element have we found with ctxType?
-      for (auto &child : children) {
-        if (antlrcpp::is<T *>(child)) {
-          if (j++ == i) {
-            return dynamic_cast<T *>(child);
+      for (auto *child : children) {
+        if (RuleContext::is(child)) {
+          if (auto *typedChild = dynamic_cast<T*>(child); typedChild != nullptr) {
+            if (j++ == i) {
+              return typedChild;
+            }
           }
         }
       }
@@ -112,14 +110,16 @@ namespace antlr4 {
     }
 
     template<typename T>
-    std::vector<T *> getRuleContexts() {
-      std::vector<T *> contexts;
+    std::vector<T*> getRuleContexts() const {
+      static_assert(std::is_base_of_v<RuleContext, T>, "T must be derived from RuleContext");
+      std::vector<T*> contexts;
       for (auto *child : children) {
-        if (antlrcpp::is<T *>(child)) {
-          contexts.push_back(dynamic_cast<T *>(child));
+        if (RuleContext::is(child)) {
+          if (auto *typedChild = dynamic_cast<T*>(child); typedChild != nullptr) {
+            contexts.push_back(typedChild);
+          }
         }
       }
-
       return contexts;
     }
 
@@ -130,14 +130,14 @@ namespace antlr4 {
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may exceed stop.
      */
-    virtual Token *getStart();
+    Token* getStart() const;
 
     /**
      * Get the final token in this context.
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may precede start.
      */
-    virtual Token *getStop();
+    Token* getStop() const;
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>

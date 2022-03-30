@@ -12,6 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RangeTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::RANGE; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     const size_t from;
     const size_t to;
 

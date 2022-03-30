@@ -15,6 +15,10 @@ namespace atn {
   /// with the assigned type.
   class ANTLR4CPP_PUBLIC LexerTypeAction : public LexerAction {
   public:
+    static bool is(const LexerAction &lexerAction) { return lexerAction.getActionType() == LexerActionType::TYPE; }
+
+    static bool is(const LexerAction *lexerAction) { return lexerAction != nullptr && is(*lexerAction); }
+
     /// <summary>
     /// Constructs a new {@code type} action with the specified token type value. </summary>
     /// <param name="type"> The type to assign to the token using <seealso cref="Lexer#setType"/>. </param>

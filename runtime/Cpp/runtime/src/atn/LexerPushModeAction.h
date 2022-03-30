@@ -20,6 +20,10 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerPushModeAction final : public LexerAction {
   public:
+    static bool is(const LexerAction &lexerAction) { return lexerAction.getActionType() == LexerActionType::PUSH_MODE; }
+
+    static bool is(const LexerAction *lexerAction) { return lexerAction != nullptr && is(*lexerAction); }
+
     /// <summary>
     /// Constructs a new {@code pushMode} action with the specified mode value. </summary>
     /// <param name="mode"> The mode value to pass to <seealso cref="Lexer#pushMode"/>. </param>

@@ -15,6 +15,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ArrayPredictionContext final : public PredictionContext {
   public:
+    static bool is(const PredictionContext &predictionContext) { return predictionContext.getContextType() == PredictionContextType::ARRAY; }
+
+    static bool is(const PredictionContext *predictionContext) { return predictionContext != nullptr && is(*predictionContext); }
+
     /// Parent can be empty only if full ctx mode and we make an array
     /// from EMPTY and non-empty. We merge EMPTY by using null parent and
     /// returnState == EMPTY_RETURN_STATE.

@@ -18,6 +18,10 @@ namespace atn {
   ///  multiple ATN configurations into a single DFA state.
   class ANTLR4CPP_PUBLIC PredicateTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::PREDICATE; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
     size_t getRuleIndex() const {

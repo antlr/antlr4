@@ -99,6 +99,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC SemanticContext::Predicate final : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::PREDICATE; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     const size_t ruleIndex;
     const size_t predIndex;
     const bool isCtxDependent; // e.g., $i ref in pred
@@ -113,6 +117,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC SemanticContext::PrecedencePredicate final : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::PRECEDENCE; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     const int precedence;
 
     explicit PrecedencePredicate(int precedence);
@@ -132,6 +140,13 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::Operator : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) {
+      const auto contextType = semanticContext.getContextType();
+      return contextType == SemanticContextType::AND || contextType == SemanticContextType::OR;
+    }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     /**
      * Gets the operands for the semantic context operator.
      *
@@ -153,6 +168,10 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::AND final : public SemanticContext::Operator {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::AND; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) ;
 
     const std::vector<Ref<const SemanticContext>>& getOperands() const override;
@@ -177,6 +196,10 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::OR final : public SemanticContext::Operator {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::OR; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
 
     const std::vector<Ref<const SemanticContext>>& getOperands() const override;

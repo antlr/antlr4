@@ -61,6 +61,10 @@ namespace antlr4 {
    */
   class ANTLR4CPP_PUBLIC RuleContext : public tree::ParseTree {
   public:
+    static bool is(const tree::ParseTree &parseTree) { return parseTree.getTreeType() == tree::ParseTreeType::RULE; }
+
+    static bool is(const tree::ParseTree *parseTree) { return parseTree != nullptr && is(*parseTree); }
+
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
     /// If parent is null, this should be -1 and this context object represents the start rule.

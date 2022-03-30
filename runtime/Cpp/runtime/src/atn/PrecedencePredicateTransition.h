@@ -13,6 +13,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC PrecedencePredicateTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::PRECEDENCE; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     PrecedencePredicateTransition(ATNState *target, int precedence);
 
     int getPrecedence() const { return _predicate->precedence; }

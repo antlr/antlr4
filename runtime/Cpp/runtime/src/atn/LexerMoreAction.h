@@ -22,6 +22,10 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerMoreAction final : public LexerAction {
   public:
+    static bool is(const LexerAction &lexerAction) { return lexerAction.getActionType() == LexerActionType::MORE; }
+
+    static bool is(const LexerAction *lexerAction) { return lexerAction != nullptr && is(*lexerAction); }
+
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.
     /// </summary>

@@ -12,6 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RuleTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::RULE; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     /// Ptr to the rule definition object for this rule ref.
     const size_t ruleIndex; // no Rule object at runtime
 

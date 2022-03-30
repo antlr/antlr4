@@ -14,8 +14,8 @@ namespace tree {
   public:
     static ParseTreeWalker &DEFAULT;
 
-    virtual ~ParseTreeWalker();
-    
+    virtual ~ParseTreeWalker() = default;
+
     /**
     * <summary>
     * Performs a walk on the given parse tree starting at the root and going down recursively
@@ -29,7 +29,7 @@ namespace tree {
     virtual void walk(ParseTreeListener *listener, ParseTree *t) const;
 
   protected:
-    
+
     /**
     * <summary>
     * Enters a grammar rule by first triggering the generic event <seealso cref="ParseTreeListener#enterEveryRule"/>
@@ -39,7 +39,7 @@ namespace tree {
 	* <param name='r'> The grammar rule containing the rule context </param>
     */
     virtual void enterRule(ParseTreeListener *listener, ParseTree *r) const;
-    
+
     /**
     * <summary>
     * Exits a grammar rule by first triggering the event specific to the given parse tree node
