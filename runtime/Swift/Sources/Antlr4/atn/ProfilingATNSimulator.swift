@@ -119,7 +119,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     }
 
     override
-    internal func computeReachSet(_ closure: ATNConfigSet, _ t: Int, _ fullCtx: Bool) throws -> ATNConfigSet? {
+    internal func computeReachSet(_ closure: ATNConfigSet, _ t: Int, _ fullCtx: Bool) throws -> ATNConfigSet {
         if fullCtx {
             // this method is called after each time the input position advances
             // during full context prediction
@@ -129,8 +129,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         let reachConfigs = try super.computeReachSet(closure, t, fullCtx)
         if fullCtx {
             decisions[currentDecision].LL_ATNTransitions += 1 // count computation even if error
-            if reachConfigs != nil {
-            } else {
+            if reachConfigs.isEmpty() {
                 // no reach on current lookahead symbol. ERROR.
                 // TODO: does not handle delayed errors per getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule()
                 decisions[currentDecision].errors.append(
@@ -139,8 +138,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
             }
         } else {
             decisions[currentDecision].SLL_ATNTransitions += 1
-            if reachConfigs != nil {
-            } else {
+            if reachConfigs.isEmpty() {
                 // no reach on current lookahead symbol. ERROR.
                 decisions[currentDecision].errors.append(
                 ErrorInfo(currentDecision, closure, _input, _startIndex, _sllStopIndex, false)

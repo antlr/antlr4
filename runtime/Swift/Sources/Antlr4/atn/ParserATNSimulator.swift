@@ -571,7 +571,8 @@ open class ParserATNSimulator: ATNSimulator {
     /// 
    func computeTargetState(_ dfa: DFA, _ previousD: DFAState, _ t: Int) throws -> DFAState {
 
-        guard let reach = try computeReachSet(previousD.configs, t, false) else {
+        let reach = try computeReachSet(previousD.configs, t, false)
+        guard !reach.isEmpty() else {
             addDFAEdge(dfa, previousD, t, ATNSimulator.ERROR)
             return ATNSimulator.ERROR
         }
@@ -649,7 +650,8 @@ open class ParserATNSimulator: ATNSimulator {
         var predictedAlt = ATN.INVALID_ALT_NUMBER
         while true {
             // while more work
-            if let computeReach = try computeReachSet(previous, t, fullCtx) {
+            let computeReach = try computeReachSet(previous, t, fullCtx)
+            if !computeReach.isEmpty() {
                 reach = computeReach
             } else {
                 // if any configs in previous dipped into outer context, that
@@ -752,7 +754,7 @@ open class ParserATNSimulator: ATNSimulator {
     }
 
     func computeReachSet(_ closureConfigSet: ATNConfigSet, _ t: Int,
-                         _ fullCtx: Bool) throws -> ATNConfigSet? {
+                         _ fullCtx: Bool) throws -> ATNConfigSet {
 
         if debug {
             print("in computeReachSet, starting closure: \(closureConfigSet)")
@@ -775,7 +777,7 @@ open class ParserATNSimulator: ATNSimulator {
         /// ensure that the alternative matching the longest overall sequence is
         /// chosen when multiple such configurations can match the input.
         /// 
-        var skippedStopStates: [ATNConfig]? = nil
+        var skippedStopStates: [ATNConfig] = []
 
         // First figure out where we can reach on input t
         let configs = closureConfigSet.configs
@@ -787,10 +789,7 @@ open class ParserATNSimulator: ATNSimulator {
             if config.state is RuleStopState {
                 assert(config.context!.isEmpty(), "Expected: c.context.isEmpty()")
                 if fullCtx || t == BufferedTokenStream.EOF {
-                    if skippedStopStates == nil {
-                        skippedStopStates = [ATNConfig]()
-                    }
-                    skippedStopStates!.append(config)
+                    skippedStopStates.append(config)
                 }
 
                 continue
@@ -808,7 +807,7 @@ open class ParserATNSimulator: ATNSimulator {
 
         // Now figure out where the reach operation can take us...
 
-        var reach: ATNConfigSet? = nil
+        var prepReach: ATNConfigSet? = nil
 
         /// 
         /// This block optimizes the reach operation for intermediate sets which
@@ -820,18 +819,18 @@ open class ParserATNSimulator: ATNSimulator {
         /// condition is not true when one or more configurations have been
         /// withheld in skippedStopStates, or when the current symbol is EOF.
         /// 
-        if skippedStopStates == nil && t != CommonToken.EOF {
+        if skippedStopStates.isEmpty && t != CommonToken.EOF {
             if intermediate.size() == 1 {
                 // Don't pursue the closure if there is just one state.
                 // It can only have one alternative; just add to result
                 // Also don't pursue the closure if there is unique alternative
                 // among the configurations.
-                reach = intermediate
+                prepReach = intermediate
             } else {
                 if ParserATNSimulator.getUniqueAlt(intermediate) != ATN.INVALID_ALT_NUMBER {
                     // Also don't pursue the closure if there is unique alternative
                     // among the configurations.
-                    reach = intermediate
+                    prepReach = intermediate
                 }
             }
         }
@@ -840,12 +839,15 @@ open class ParserATNSimulator: ATNSimulator {
         /// If the reach set could not be trivially determined, perform a closure
         /// operation on the intermediate set to compute its initial value.
         /// 
-        if reach == nil {
+        var reach: ATNConfigSet
+        if let r = prepReach {
+            reach = r
+        } else {
             reach = ATNConfigSet(fullCtx)
             var closureBusy = Set<ATNConfig>()
             let treatEofAsEpsilon = (t == CommonToken.EOF)
             for config in intermediate.configs {
-                try closure(config, reach!, &closureBusy, false, fullCtx, treatEofAsEpsilon)
+                try closure(config, reach, &closureBusy, false, fullCtx, treatEofAsEpsilon)
             }
         }
 
@@ -868,11 +870,11 @@ open class ParserATNSimulator: ATNSimulator {
             /// already guaranteed to meet this condition whether or not it's
             /// required.
             /// 
-            reach = removeAllConfigsNotInRuleStopState(reach!, reach! === intermediate)
+            reach = removeAllConfigsNotInRuleStopState(reach, reach === intermediate)
         }
 
         /// 
-        /// If skippedStopStates is not null, then it contains at least one
+        /// If skippedStopStates is not empty, then it contains at least one
         /// configuration. For full-context reach operations, these
         /// configurations reached the end of the start rule, in which case we
         /// only add them back to reach if no configuration during the current
@@ -880,16 +882,9 @@ open class ParserATNSimulator: ATNSimulator {
         /// chooses an alternative matching the longest overall sequence when
         /// multiple alternatives are viable.
         /// 
-        if let reach = reach {
-            if let skippedStopStates = skippedStopStates, (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach)) {
-                assert(!skippedStopStates.isEmpty, "Expected: !skippedStopStates.isEmpty()")
-                for c in skippedStopStates {
-                    try! reach.add(c, &mergeCache)
-                }
-            }
-
-            if reach.isEmpty() {
-                return nil
+        if !skippedStopStates.isEmpty, (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach)) {
+            for c in skippedStopStates {
+                try! reach.add(c, &mergeCache)
             }
         }
         return reach
