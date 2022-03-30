@@ -18,7 +18,7 @@ namespace atn {
   public:
     PlusLoopbackState *loopBackState = nullptr;
 
-    virtual ATNStateType getStateType() const override;
+    PlusBlockStartState() : BlockStartState(ATNStateType::PLUS_BLOCK_START) {}
   };
 
 } // namespace atn

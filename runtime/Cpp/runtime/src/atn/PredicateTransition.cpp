@@ -8,11 +8,7 @@
 using namespace antlr4::atn;
 
 PredicateTransition::PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent)
-    : Transition(target), _predicate(std::make_shared<SemanticContext::Predicate>(ruleIndex, predIndex, isCtxDependent)) {}
-
-TransitionType PredicateTransition::getTransitionType() const {
-  return TransitionType::PREDICATE;
-}
+    : Transition(TransitionType::PREDICATE, target), _predicate(std::make_shared<SemanticContext::Predicate>(ruleIndex, predIndex, isCtxDependent)) {}
 
 bool PredicateTransition::isEpsilon() const {
   return true;

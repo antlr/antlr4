@@ -26,7 +26,7 @@ namespace atn {
 
     StarLoopbackState *loopBackState = nullptr;
 
-    virtual ATNStateType getStateType() const override;
+    StarLoopEntryState() : DecisionState(ATNStateType::STAR_LOOP_ENTRY) {}
   };
 
 } // namespace atn

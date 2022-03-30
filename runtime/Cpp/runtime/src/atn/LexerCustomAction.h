@@ -49,12 +49,6 @@ namespace atn {
     size_t getActionIndex() const;
 
     /// <summary>
-    /// {@inheritDoc}
-    /// </summary>
-    /// <returns> This method returns <seealso cref="LexerActionType#CUSTOM"/>. </returns>
-    virtual LexerActionType getActionType() const override;
-
-    /// <summary>
     /// Gets whether the lexer action is position-dependent. Position-dependent
     /// actions may have different semantics depending on the <seealso cref="CharStream"/>
     /// index at the time the action is executed.

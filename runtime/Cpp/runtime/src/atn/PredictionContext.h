@@ -65,13 +65,10 @@ namespace atn {
     /// </summary>
     const size_t cachedHashCode;
 
-  protected:
-    explicit PredictionContext(size_t cachedHashCode);
-
   public:
     virtual ~PredictionContext() = default;
 
-    virtual PredictionContextType getContextType() const = 0;
+    PredictionContextType getContextType() const { return _contextType; }
 
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.
@@ -89,6 +86,8 @@ namespace atn {
     virtual size_t hashCode() const;
 
   protected:
+    PredictionContext(PredictionContextType contextType, size_t cachedHashCode);
+
     static size_t calculateEmptyHashCode();
     static size_t calculateHashCode(Ref<const PredictionContext> parent, size_t returnState);
     static size_t calculateHashCode(const std::vector<Ref<const PredictionContext>> &parents,
@@ -221,6 +220,9 @@ namespace atn {
 
     std::vector<std::string> toStrings(Recognizer *recognizer, int currentState);
     std::vector<std::string> toStrings(Recognizer *recognizer, const Ref<const PredictionContext> &stop, int currentState);
+
+  private:
+    PredictionContextType _contextType;
   };
 
   struct PredictionContextHasher {

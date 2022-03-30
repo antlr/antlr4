@@ -24,7 +24,6 @@ namespace atn {
      * @since 4.4.1
      */
     size_t outermostPrecedenceReturn() const;
-    TransitionType getTransitionType() const override;
 
     virtual bool isEpsilon() const override;
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;

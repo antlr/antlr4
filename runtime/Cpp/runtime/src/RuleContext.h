@@ -128,8 +128,6 @@ namespace antlr4 {
 
     virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop);
 
-    tree::ParseTreeType getTreeType() const final;
-
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
 
   private:

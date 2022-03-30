@@ -15,7 +15,7 @@ namespace atn {
   public:
     ATNState *loopBackState = nullptr;
 
-    virtual ATNStateType getStateType() const override;
+    LoopEndState() : ATNState(ATNStateType::LOOP_END) {}
   };
 
 } // namespace atn

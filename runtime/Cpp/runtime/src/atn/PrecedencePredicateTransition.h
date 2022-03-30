@@ -17,7 +17,6 @@ namespace atn {
 
     int getPrecedence() const { return _predicate->precedence; }
 
-    TransitionType getTransitionType() const override;
     bool isEpsilon() const override;
     bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
     std::string toString() const override;

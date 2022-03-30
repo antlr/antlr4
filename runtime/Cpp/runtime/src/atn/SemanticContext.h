@@ -28,7 +28,7 @@ namespace atn {
 
     virtual ~SemanticContext() = default;
 
-    virtual SemanticContextType getContextType() const = 0;
+    SemanticContextType getContextType() const { return _contextType; }
 
     /// <summary>
     /// For context independent predicates, we evaluate them without a local
@@ -81,6 +81,12 @@ namespace atn {
     class Operator;
     class AND;
     class OR;
+
+  protected:
+    explicit SemanticContext(SemanticContextType contextType) : _contextType(contextType) {}
+
+  private:
+    const SemanticContextType _contextType;
   };
 
   inline bool operator==(const SemanticContext &lhs, const SemanticContext &rhs) {
@@ -99,7 +105,6 @@ namespace atn {
 
     Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
-    SemanticContextType getContextType() const override;
     bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
     size_t hashCode() const override;
     bool equals(const SemanticContext &other) const override;
@@ -112,7 +117,6 @@ namespace atn {
 
     explicit PrecedencePredicate(int precedence);
 
-    SemanticContextType getContextType() const override;
     bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
     Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
     size_t hashCode() const override;
@@ -138,6 +142,9 @@ namespace atn {
      */
 
     virtual const std::vector<Ref<const SemanticContext>>& getOperands() const = 0;
+
+  protected:
+    using SemanticContext::SemanticContext;
   };
 
   /**
@@ -149,7 +156,6 @@ namespace atn {
     AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) ;
 
     const std::vector<Ref<const SemanticContext>>& getOperands() const override;
-    SemanticContextType getContextType() const override;
 
     /**
      * The evaluation of predicates by this context is short-circuiting, but
@@ -174,7 +180,6 @@ namespace atn {
     OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
 
     const std::vector<Ref<const SemanticContext>>& getOperands() const override;
-    SemanticContextType getContextType() const override;
 
     /**
      * The evaluation of predicates by this context is short-circuiting, but

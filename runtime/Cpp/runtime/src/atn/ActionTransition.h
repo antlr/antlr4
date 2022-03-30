@@ -20,8 +20,6 @@ namespace atn {
 
     ActionTransition(ATNState *target, size_t ruleIndex, size_t actionIndex, bool isCtxDependent);
 
-    TransitionType getTransitionType() const override;
-
     virtual bool isEpsilon() const override;
 
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;

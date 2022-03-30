@@ -11,15 +11,11 @@
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerChannelAction::LexerChannelAction(int channel) : _channel(channel) {
+LexerChannelAction::LexerChannelAction(int channel) : LexerAction(LexerActionType::CHANNEL), _channel(channel) {
 }
 
 int LexerChannelAction::getChannel() const {
   return _channel;
-}
-
-LexerActionType LexerChannelAction::getActionType() const {
-  return LexerActionType::CHANNEL;
 }
 
 bool LexerChannelAction::isPositionDependent() const {

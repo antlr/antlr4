@@ -12,15 +12,11 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerPushModeAction::LexerPushModeAction(int mode) : _mode(mode) {
+LexerPushModeAction::LexerPushModeAction(int mode) : LexerAction(LexerActionType::PUSH_MODE), _mode(mode) {
 }
 
 int LexerPushModeAction::getMode() const {
   return _mode;
-}
-
-LexerActionType LexerPushModeAction::getActionType() const {
-  return LexerActionType::PUSH_MODE;
 }
 
 bool LexerPushModeAction::isPositionDependent() const {

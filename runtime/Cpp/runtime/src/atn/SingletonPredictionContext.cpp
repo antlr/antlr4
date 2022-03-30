@@ -8,7 +8,7 @@
 using namespace antlr4::atn;
 
 SingletonPredictionContext::SingletonPredictionContext(Ref<const PredictionContext> parent, size_t returnState)
-  : PredictionContext(parent ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
+  : PredictionContext(PredictionContextType::SINGLETON, parent ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
     parent(std::move(parent)), returnState(returnState) {
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
@@ -20,10 +20,6 @@ Ref<const SingletonPredictionContext> SingletonPredictionContext::create(Ref<con
     return std::dynamic_pointer_cast<const SingletonPredictionContext>(EMPTY);
   }
   return std::make_shared<SingletonPredictionContext>(std::move(parent), returnState);
-}
-
-PredictionContextType SingletonPredictionContext::getContextType() const {
-  return PredictionContextType::SINGLETON;
 }
 
 bool SingletonPredictionContext::isEmpty() const {

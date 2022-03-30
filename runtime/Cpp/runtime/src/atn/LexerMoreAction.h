@@ -29,11 +29,6 @@ namespace atn {
 
     /// <summary>
     /// {@inheritDoc} </summary>
-    /// <returns> This method returns <seealso cref="LexerActionType#MORE"/>. </returns>
-    virtual LexerActionType getActionType() const override;
-
-    /// <summary>
-    /// {@inheritDoc} </summary>
     /// <returns> This method returns {@code false}. </returns>
     virtual bool isPositionDependent() const override;
 
@@ -50,7 +45,7 @@ namespace atn {
 
   private:
     /// Constructs the singleton instance of the lexer {@code more} command.
-    LexerMoreAction() = default;
+    LexerMoreAction() : LexerAction(LexerActionType::MORE) {}
   };
 
 } // namespace atn

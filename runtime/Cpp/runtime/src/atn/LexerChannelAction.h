@@ -35,11 +35,6 @@ namespace atn {
 
     /// <summary>
     /// {@inheritDoc} </summary>
-    /// <returns> This method returns <seealso cref="LexerActionType#CHANNEL"/>. </returns>
-    virtual LexerActionType getActionType() const override;
-
-    /// <summary>
-    /// {@inheritDoc} </summary>
     /// <returns> This method returns {@code false}. </returns>
     virtual bool isPositionDependent() const override;
 

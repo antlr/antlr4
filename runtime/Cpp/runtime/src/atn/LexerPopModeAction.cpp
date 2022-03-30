@@ -17,10 +17,6 @@ const Ref<LexerPopModeAction>& LexerPopModeAction::getInstance() {
   return instance;
 }
 
-LexerActionType LexerPopModeAction::getActionType() const {
-  return LexerActionType::POP_MODE;
-}
-
 bool LexerPopModeAction::isPositionDependent() const {
   return false;
 }

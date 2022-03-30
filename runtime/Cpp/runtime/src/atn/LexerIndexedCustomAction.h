@@ -56,13 +56,6 @@ namespace atn {
     Ref<LexerAction> getAction() const;
 
     /// <summary>
-    /// {@inheritDoc}
-    /// </summary>
-    /// <returns> This method returns the result of calling <seealso cref="#getActionType"/>
-    /// on the <seealso cref="LexerAction"/> returned by <seealso cref="#getAction"/>. </returns>
-    virtual LexerActionType getActionType() const override;
-
-    /// <summary>
     /// {@inheritDoc} </summary>
     /// <returns> This method returns {@code true}. </returns>
     virtual bool isPositionDependent() const override;

@@ -12,7 +12,7 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-Transition::Transition(ATNState *target) {
+Transition::Transition(TransitionType transitionType, ATNState *target) : _transitionType(transitionType) {
   if (target == nullptr) {
     throw NullPointerException("target cannot be null.");
   }

@@ -13,7 +13,7 @@ namespace atn {
   /// The Tokens rule start state linking to each lexer rule start state.
   class ANTLR4CPP_PUBLIC TokensStartState final : public DecisionState {
   public:
-    virtual ATNStateType getStateType() const override;
+    TokensStartState() : DecisionState(ATNStateType::TOKEN_START) {}
   };
 
 } // namespace atn

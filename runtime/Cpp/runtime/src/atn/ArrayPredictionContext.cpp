@@ -16,13 +16,9 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<const SingletonPredictionCont
 
 ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<const PredictionContext>> parents,
                                                std::vector<size_t> returnStates)
-  : PredictionContext(calculateHashCode(parents, returnStates)), parents(std::move(parents)), returnStates(std::move(returnStates)) {
+  : PredictionContext(PredictionContextType::ARRAY, calculateHashCode(parents, returnStates)), parents(std::move(parents)), returnStates(std::move(returnStates)) {
     assert(this->parents.size() > 0);
     assert(this->returnStates.size() > 0);
-}
-
-PredictionContextType ArrayPredictionContext::getContextType() const {
-  return PredictionContextType::ARRAY;
 }
 
 bool ArrayPredictionContext::isEmpty() const {

@@ -17,10 +17,6 @@ const Ref<LexerSkipAction>& LexerSkipAction::getInstance() {
   return instance;
 }
 
-LexerActionType LexerSkipAction::getActionType() const {
-  return LexerActionType::SKIP;
-}
-
 bool LexerSkipAction::isPositionDependent() const {
   return false;
 }

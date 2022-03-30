@@ -15,8 +15,7 @@ namespace atn {
     RuleStopState *stopState = nullptr;
     bool isLeftRecursiveRule = false;
 
-    virtual ATNStateType getStateType() const override;
-
+    RuleStartState() : ATNState(ATNStateType::RULE_START) {}
   };
 
 } // namespace atn

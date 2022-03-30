@@ -15,9 +15,10 @@ namespace atn {
     int decision = -1;
     bool nonGreedy = false;
 
-    DecisionState() = default;
-
     virtual std::string toString() const override;
+
+  protected:
+    using ATNState::ATNState;
   };
 
 } // namespace atn

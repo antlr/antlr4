@@ -13,7 +13,7 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerCustomAction::LexerCustomAction(size_t ruleIndex, size_t actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
+LexerCustomAction::LexerCustomAction(size_t ruleIndex, size_t actionIndex) : LexerAction(LexerActionType::CUSTOM), _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
 }
 
 size_t LexerCustomAction::getRuleIndex() const {
@@ -22,10 +22,6 @@ size_t LexerCustomAction::getRuleIndex() const {
 
 size_t LexerCustomAction::getActionIndex() const {
   return _actionIndex;
-}
-
-LexerActionType LexerCustomAction::getActionType() const {
-  return LexerActionType::CUSTOM;
 }
 
 bool LexerCustomAction::isPositionDependent() const {

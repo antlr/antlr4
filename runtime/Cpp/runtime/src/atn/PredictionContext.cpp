@@ -26,7 +26,7 @@ const Ref<const PredictionContext> PredictionContext::EMPTY = std::make_shared<S
 
 //----------------- PredictionContext ----------------------------------------------------------------------------------
 
-PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount.fetch_add(1, std::memory_order_relaxed)), cachedHashCode(cachedHashCode)  {
+PredictionContext::PredictionContext(PredictionContextType contextType, size_t cachedHashCode) : id(globalNodeCount.fetch_add(1, std::memory_order_relaxed)), cachedHashCode(cachedHashCode), _contextType(contextType)  {
 }
 
 Ref<const PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, RuleContext *outerContext) {
