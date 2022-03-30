@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -6,6 +6,7 @@
 #pragma once
 
 #include "RuleContext.h"
+#include "support/Casts.h"
 #include "support/CPPUtils.h"
 
 namespace antlr4 {
@@ -102,9 +103,9 @@ namespace antlr4 {
 
       size_t j = 0; // what element have we found with ctxType?
       for (auto &child : children) {
-        if (antlrcpp::is<T *>(child)) {
+        if (antlrcpp::is<T *>(child)) {  // TODO: avoid slow is<> call.
           if (j++ == i) {
-            return dynamic_cast<T *>(child);
+            return antlrcpp::downCast<T *>(child);
           }
         }
       }
@@ -115,8 +116,8 @@ namespace antlr4 {
     std::vector<T *> getRuleContexts() {
       std::vector<T *> contexts;
       for (auto *child : children) {
-        if (antlrcpp::is<T *>(child)) {
-          contexts.push_back(dynamic_cast<T *>(child));
+        if (antlrcpp::is<T *>(child)) {  // TODO: avoid slow is<> call
+          contexts.push_back(antlrcpp::downCast<T *>(child));
         }
       }
 
