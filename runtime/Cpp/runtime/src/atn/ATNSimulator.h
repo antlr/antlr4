@@ -37,8 +37,9 @@ namespace atn {
      * @since 4.3
      */
     virtual void clearDFA();
-    virtual PredictionContextCache& getSharedContextCache();
-    virtual Ref<const PredictionContext> getCachedContext(Ref<const PredictionContext> const& context);
+
+    PredictionContextCache& getSharedContextCache() const;
+    Ref<const PredictionContext> getCachedContext(const Ref<const PredictionContext> &context);
 
   protected:
     /// <summary>

@@ -425,7 +425,7 @@ namespace atn {
     /// cref="ATNConfig#alt alt"/>
     /// </pre>
     /// </summary>
-    static std::map<ATNState*, antlrcpp::BitSet> getStateToAltMap(ATNConfigSet *configs);
+    static std::unordered_map<ATNState*, antlrcpp::BitSet> getStateToAltMap(ATNConfigSet *configs);
 
     static bool hasStateAssociatedWithOneAlt(ATNConfigSet *configs);
 
