@@ -7,6 +7,7 @@
 
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
+#include "atn/SerializedATNView.h"
 
 namespace antlr4 {
 
@@ -53,7 +54,7 @@ namespace antlr4 {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// </summary>
-    virtual const std::vector<int32_t>& getSerializedATN() const {
+    virtual atn::SerializedATNView getSerializedATN() const {
       throw "there is no serialized ATN";
     }
 

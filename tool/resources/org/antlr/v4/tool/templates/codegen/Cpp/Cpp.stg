@@ -79,8 +79,9 @@ public:
 
   const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  virtual const std::vector\<int32_t>& getSerializedATN() const override;
-  virtual const antlr4::atn::ATN& getATN() const override;
+  antlr4::atn::SerializedATNView getSerializedATN() const override;
+
+  const antlr4::atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
   void action(antlr4::RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
@@ -138,7 +139,7 @@ struct <lexer.name; format = "cap">StaticData final {
   const std::vector\<std::string> literalNames;
   const std::vector\<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector\<int32_t> serializedATN;
+  antlr4::atn::SerializedATNView serializedATN;
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
@@ -199,7 +200,7 @@ const dfa::Vocabulary& <lexer.name>::getVocabulary() const {
   return <lexer.grammarName; format = "lower">LexerStaticData->vocabulary;
 }
 
-const std::vector\<int32_t>& <lexer.name>::getSerializedATN() const {
+antlr4::atn::SerializedATNView <lexer.name>::getSerializedATN() const {
   return <lexer.grammarName; format = "lower">LexerStaticData->serializedATN;
 }
 
@@ -307,7 +308,7 @@ public:
 
   const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  const std::vector\<int32_t>& getSerializedATN() const override;
+  antlr4::atn::SerializedATNView getSerializedATN() const override;
 
   <namedActions.members>
 
@@ -356,7 +357,7 @@ struct <parser.name; format = "cap">StaticData final {
   const std::vector\<std::string> literalNames;
   const std::vector\<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector\<int32_t> serializedATN;
+  antlr4::atn::SerializedATNView serializedATN;
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
@@ -407,7 +408,7 @@ const dfa::Vocabulary& <parser.name>::getVocabulary() const {
   return <parser.grammarName; format = "lower">ParserStaticData->vocabulary;
 }
 
-const std::vector\<int32_t>& <parser.name>::getSerializedATN() const {
+antlr4::atn::SerializedATNView <parser.name>::getSerializedATN() const {
   return <parser.grammarName; format = "lower">ParserStaticData->serializedATN;
 }
 
@@ -441,9 +442,7 @@ SerializedATN(model) ::= <<
 static const int32_t serializedATNSegment[] = {
 	<model.serialized: {s | <s>}; separator=",", wrap>
 };
-staticData->serializedATN.reserve(sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
-staticData->serializedATN.insert(staticData->serializedATN.end(), serializedATNSegment,
-  serializedATNSegment + sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
+staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
 antlr4::atn::ATNDeserializer deserializer;
 staticData->atn = deserializer.deserialize(staticData->serializedATN);

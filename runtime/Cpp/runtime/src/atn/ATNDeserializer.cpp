@@ -221,12 +221,12 @@ namespace {
     return s;
   }
 
-  ssize_t readUnicodeInt32(const std::vector<int32_t>& data, int& p) {
+  ssize_t readUnicodeInt32(SerializedATNView data, int& p) {
     return static_cast<ssize_t>(data[p++]);
   }
 
   void deserializeSets(
-    const std::vector<int32_t>& data,
+    SerializedATNView data,
     int& p,
     std::vector<misc::IntervalSet>& sets) {
     size_t nsets = data[p++];
@@ -255,7 +255,7 @@ ATNDeserializer::ATNDeserializer() : ATNDeserializer(ATNDeserializationOptions::
 
 ATNDeserializer::ATNDeserializer(ATNDeserializationOptions deserializationOptions) : _deserializationOptions(std::move(deserializationOptions)) {}
 
-std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& data) const {
+std::unique_ptr<ATN> ATNDeserializer::deserialize(SerializedATNView data) const {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {
