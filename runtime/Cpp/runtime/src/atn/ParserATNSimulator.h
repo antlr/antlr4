@@ -651,8 +651,8 @@ namespace atn {
     virtual std::vector<Ref<const SemanticContext>> getPredsForAmbigAlts(const antlrcpp::BitSet &ambigAlts,
                                                                    ATNConfigSet *configs, size_t nalts);
 
-    virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-                                                                                std::vector<Ref<const SemanticContext>> const& altToPred);
+    std::vector<dfa::DFAState::PredPrediction> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
+                                                                       const std::vector<Ref<const SemanticContext>> &altToPred);
 
     /**
      * This method is used to improve the localization of error messages by
@@ -724,8 +724,8 @@ namespace atn {
     ///  then we stop at the first predicate that evaluates to true. This
     ///  includes pairs with null predicates.
     /// </summary>
-    virtual antlrcpp::BitSet evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
-                                                 ParserRuleContext *outerContext, bool complete);
+    antlrcpp::BitSet evalSemanticContext(const std::vector<dfa::DFAState::PredPrediction> &predPredictions,
+                                         ParserRuleContext *outerContext, bool complete);
 
     /**
      * Evaluate a semantic context within a specific parser context.

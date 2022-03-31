@@ -33,12 +33,7 @@ namespace atn {
     /// Get the lexer mode this action should transition the lexer to.
     /// </summary>
     /// <returns> The lexer mode for this {@code pushMode} command. </returns>
-    int getMode() const;
-
-    /// <summary>
-    /// {@inheritDoc} </summary>
-    /// <returns> This method returns {@code false}. </returns>
-    virtual bool isPositionDependent() const override;
+    int getMode() const { return _mode; }
 
     /// <summary>
     /// {@inheritDoc}
@@ -46,11 +41,13 @@ namespace atn {
     /// <para>This action is implemented by calling <seealso cref="Lexer#pushMode"/> with the
     /// value provided by <seealso cref="#getMode"/>.</para>
     /// </summary>
-    virtual void execute(Lexer *lexer) override;
+    void execute(Lexer *lexer) const override;
 
-    virtual size_t hashCode() const override;
-    virtual bool operator==(const LexerAction &obj) const override;
-    virtual std::string toString() const override;
+    bool equals(const LexerAction &obj) const override;
+    std::string toString() const override;
+
+  protected:
+    size_t hashCodeImpl() const override;
 
   private:
     const int _mode;

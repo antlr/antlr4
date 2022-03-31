@@ -11,13 +11,26 @@ namespace antlr4 {
 namespace dfa {
 
   class ANTLR4CPP_PUBLIC DFA final {
+  private:
+    struct DFAStateHasher final {
+      size_t operator()(const DFAState *dfaState) const {
+        return dfaState->hashCode();
+      }
+    };
+
+    struct DFAStateComparer final {
+      bool operator()(const DFAState *lhs, const DFAState *rhs) const {
+        return lhs == rhs || *lhs == *rhs;
+      }
+    };
+
   public:
     /// A set of all DFA states. Use a map so we can get old state back.
     /// Set only allows you to see if it's there.
 
     /// From which ATN state did we create this DFA?
     atn::DecisionState *atnStartState;
-    std::unordered_set<DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
+    std::unordered_set<DFAState*, DFAStateHasher, DFAStateComparer> states; // States are owned by this class.
     DFAState *s0;
     size_t decision;
 

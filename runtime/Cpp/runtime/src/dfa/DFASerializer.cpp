@@ -48,7 +48,7 @@ std::string DFASerializer::getStateString(DFAState *s) const {
     if (!s->predicates.empty()) {
       std::string buf;
       for (size_t i = 0; i < s->predicates.size(); i++) {
-        buf.append(s->predicates[i]->toString());
+        buf.append(s->predicates[i].toString());
       }
       return baseStateStr + "=>" + buf;
     } else {

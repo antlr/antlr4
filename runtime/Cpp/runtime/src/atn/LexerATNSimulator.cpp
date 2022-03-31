@@ -207,8 +207,7 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
 
 size_t LexerATNSimulator::failOrAccept(CharStream *input, ATNConfigSet *reach, size_t t) {
   if (_prevAccept.dfaState != nullptr) {
-    Ref<LexerActionExecutor> lexerActionExecutor = _prevAccept.dfaState->lexerActionExecutor;
-    accept(input, lexerActionExecutor, _startIndex, _prevAccept.index, _prevAccept.line, _prevAccept.charPos);
+    accept(input, _prevAccept.dfaState->lexerActionExecutor, _startIndex, _prevAccept.index, _prevAccept.line, _prevAccept.charPos);
     return _prevAccept.dfaState->prediction;
   } else {
     // if no accept and EOF is first char, return EOF
@@ -240,13 +239,13 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
       const Transition *trans = c->state->transitions[ti].get();
       ATNState *target = getReachableTarget(trans, (int)t);
       if (target != nullptr) {
-        Ref<LexerActionExecutor> lexerActionExecutor = std::static_pointer_cast<LexerATNConfig>(c)->getLexerActionExecutor();
+        auto lexerActionExecutor = downCast<const LexerATNConfig&>(*c).getLexerActionExecutor();
         if (lexerActionExecutor != nullptr) {
           lexerActionExecutor = lexerActionExecutor->fixOffsetBeforeMatch((int)input->index() - (int)_startIndex);
         }
 
         bool treatEofAsEpsilon = t == Token::EOF;
-        Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(*std::static_pointer_cast<LexerATNConfig>(c),
+        Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(downCast<const LexerATNConfig&>(*c),
           target, std::move(lexerActionExecutor));
 
         if (closure(input, config, reach, currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
@@ -260,7 +259,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
   }
 }
 
-void LexerATNSimulator::accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, size_t /*startIndex*/,
+void LexerATNSimulator::accept(CharStream *input, const Ref<const LexerActionExecutor> &lexerActionExecutor, size_t /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
 #if DEBUG_ATN == 1
     std::cout << "ACTION ";
@@ -416,9 +415,9 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
         // getEpsilonTarget to return two configurations, so
         // additional modifications are needed before we can support
         // the split operation.
-        Ref<LexerActionExecutor> lexerActionExecutor = LexerActionExecutor::append(config->getLexerActionExecutor(),
+        auto lexerActionExecutor = LexerActionExecutor::append(config->getLexerActionExecutor(),
           atn.lexerActions[static_cast<const ActionTransition *>(t)->actionIndex]);
-        c = std::make_shared<LexerATNConfig>(*config, t->target, lexerActionExecutor);
+        c = std::make_shared<LexerATNConfig>(*config, t->target, std::move(lexerActionExecutor));
         break;
       }
       else {
@@ -531,7 +530,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
   dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
   for (const auto &c : configs->configs) {
-    if (c->state != nullptr && c->state->getStateType() == ATNStateType::RULE_STOP) {
+    if (RuleStopState::is(c->state)) {
       firstConfigWithRuleStopState = c;
       break;
     }
@@ -539,7 +538,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
 
   if (firstConfigWithRuleStopState != nullptr) {
     proposed->isAcceptState = true;
-    proposed->lexerActionExecutor = std::dynamic_pointer_cast<LexerATNConfig>(firstConfigWithRuleStopState)->getLexerActionExecutor();
+    proposed->lexerActionExecutor = downCast<const LexerATNConfig&>(*firstConfigWithRuleStopState).getLexerActionExecutor();
     proposed->prediction = atn.ruleToTokenType[firstConfigWithRuleStopState->state->ruleIndex];
   }
 

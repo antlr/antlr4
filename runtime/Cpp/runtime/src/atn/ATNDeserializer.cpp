@@ -101,7 +101,7 @@ namespace {
     }
   }
 
-  Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2) {
+  Ref<const LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2) {
     switch (type) {
       case LexerActionType::CHANNEL:
         return std::make_shared<LexerChannelAction>(data1);

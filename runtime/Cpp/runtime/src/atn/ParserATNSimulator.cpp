@@ -702,21 +702,19 @@ std::vector<Ref<const SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts
   return altToPred;
 }
 
-std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-  std::vector<Ref<const SemanticContext>> const& altToPred) {
-  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](Ref<const SemanticContext> const context) {
+std::vector<dfa::DFAState::PredPrediction> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
+                                                                                       const std::vector<Ref<const SemanticContext>> &altToPred) {
+  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](const Ref<const SemanticContext> &context) {
     return context != SemanticContext::NONE;
   }) != altToPred.end();
-  if (!containsPredicate)
-    return {};
-
-  std::vector<dfa::DFAState::PredPrediction*> pairs;
-  for (size_t i = 1; i < altToPred.size(); ++i) {
-    Ref<const SemanticContext> const& pred = altToPred[i];
-    assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
-
-    if (ambigAlts.test(i)) {
-      pairs.push_back(new dfa::DFAState::PredPrediction(pred, (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
+  std::vector<dfa::DFAState::PredPrediction> pairs;
+  if (containsPredicate) {
+    for (size_t i = 0; i < altToPred.size(); i++) {
+      const auto &pred = altToPred[i];
+      assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
+      if (ambigAlts.test(i)) {
+        pairs.emplace_back(pred, static_cast<int>(i));
+      }
     }
   }
   return pairs;
@@ -776,12 +774,12 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
   return { succeeded, failed };
 }
 
-BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
+BitSet ParserATNSimulator::evalSemanticContext(const std::vector<dfa::DFAState::PredPrediction> &predPredictions,
                                                ParserRuleContext *outerContext, bool complete) {
   BitSet predictions;
-  for (auto *prediction : predPredictions) {
-    if (prediction->pred == SemanticContext::NONE) {
-      predictions.set(prediction->alt);
+  for (const auto &prediction : predPredictions) {
+    if (prediction.pred == SemanticContext::NONE) {
+      predictions.set(prediction.alt);
       if (!complete) {
         break;
       }
@@ -789,17 +787,17 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
     }
 
     bool fullCtx = false; // in dfa
-    bool predicateEvaluationResult = evalSemanticContext(prediction->pred, outerContext, prediction->alt, fullCtx);
+    bool predicateEvaluationResult = evalSemanticContext(prediction.pred, outerContext, prediction.alt, fullCtx);
 #if DEBUG_ATN == 1 || DEBUG_DFA == 1
-      std::cout << "eval pred " << prediction->toString() << " = " << predicateEvaluationResult << std::endl;
+      std::cout << "eval pred " << prediction.toString() << " = " << predicateEvaluationResult << std::endl;
 #endif
 
     if (predicateEvaluationResult) {
 #if DEBUG_ATN == 1 || DEBUG_DFA == 1
-        std::cout << "PREDICT " << prediction->alt << std::endl;
+        std::cout << "PREDICT " << prediction.alt << std::endl;
 #endif
 
-      predictions.set(prediction->alt);
+      predictions.set(prediction.alt);
       if (!complete) {
         break;
       }
