@@ -108,6 +108,7 @@
 #include "atn/RuleStopState.h"
 #include "atn/RuleTransition.h"
 #include "atn/SemanticContext.h"
+#include "atn/SerializedATNView.h"
 #include "atn/SetTransition.h"
 #include "atn/SingletonPredictionContext.h"
 #include "atn/StarBlockStartState.h"

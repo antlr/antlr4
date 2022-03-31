@@ -33,7 +33,7 @@ struct XPathLexerStaticData final {
   const std::vector<std::string> literalNames;
   const std::vector<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector<int32_t> serializedATN;
+  antlr4::atn::SerializedATNView serializedATN;
   std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
@@ -61,7 +61,7 @@ void xpathLexerInitialize() {
       "STRING"
     }
   );
-  static const int32_t serializedATNSegment0[] = {
+  static const int32_t serializedATNSegment[] = {
     0x4, 0x0, 0x8, 0x32, 0x6, -1, 0x2, 0x0, 0x7, 0x0, 0x2, 0x1, 0x7,
        0x1, 0x2, 0x2, 0x7, 0x2, 0x2, 0x3, 0x7, 0x3, 0x2, 0x4, 0x7, 0x4,
        0x2, 0x5, 0x7, 0x5, 0x2, 0x6, 0x7, 0x6, 0x2, 0x7, 0x7, 0x7, 0x1,
@@ -102,12 +102,7 @@ void xpathLexerInitialize() {
        0x1, 0x0, 0x0, 0x0, 0x4, 0x0, 0x1e, 0x25, 0x2d, 0x1, 0x1, 0x4, 0x0,
   };
 
-  size_t serializedATNSize = 0;
-  serializedATNSize += sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]);
-  staticData->serializedATN.reserve(serializedATNSize);
-
-  staticData->serializedATN.insert(staticData->serializedATN.end(), serializedATNSegment0,
-    serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
+  staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
   atn::ATNDeserializer deserializer;
   staticData->atn = deserializer.deserialize(staticData->serializedATN);
@@ -151,7 +146,7 @@ const dfa::Vocabulary& XPathLexer::getVocabulary() const {
   return xpathLexerStaticData->vocabulary;
 }
 
-const std::vector<int32_t>& XPathLexer::getSerializedATN() const {
+antlr4::atn::SerializedATNView XPathLexer::getSerializedATN() const {
   return xpathLexerStaticData->serializedATN;
 }
 
