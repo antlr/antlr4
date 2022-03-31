@@ -13,6 +13,10 @@ namespace atn {
   /// Mark the end of a * or + loop.
   class ANTLR4CPP_PUBLIC LoopEndState final : public ATNState {
   public:
+    static bool is(const ATNState &atnState) { return atnState.getStateType() == ATNStateType::LOOP_END; }
+
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
     ATNState *loopBackState = nullptr;
 
     LoopEndState() : ATNState(ATNStateType::LOOP_END) {}

@@ -12,6 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC StarLoopEntryState final : public DecisionState {
   public:
+    static bool is(const ATNState &atnState) { return atnState.getStateType() == ATNStateType::STAR_LOOP_ENTRY; }
+
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
     /**
      * Indicates whether this state can benefit from a precedence DFA during SLL
      * decision making.

@@ -77,39 +77,36 @@ void ParserRuleContext::removeLastChild() {
   }
 }
 
-tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {
+tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) const {
   if (i >= children.size()) {
     return nullptr;
   }
-
   size_t j = 0; // what token with ttype have we found?
-  for (auto *o : children) {
-    if (o->getTreeType() == ParseTreeType::TERMINAL || o->getTreeType() == ParseTreeType::ERROR) {
-      tree::TerminalNode *tnode = downCast<tree::TerminalNode *>(o);
-      Token *symbol = tnode->getSymbol();
+  for (auto *child : children) {
+    if (TerminalNode::is(child)) {
+      tree::TerminalNode *typedChild = downCast<tree::TerminalNode*>(child);
+      Token *symbol = typedChild->getSymbol();
       if (symbol->getType() == ttype) {
         if (j++ == i) {
-          return tnode;
+          return typedChild;
         }
       }
     }
   }
-
   return nullptr;
 }
 
-std::vector<tree::TerminalNode *> ParserRuleContext::getTokens(size_t ttype) {
-  std::vector<tree::TerminalNode *> tokens;
-  for (auto &o : children) {
-    if (o->getTreeType() == ParseTreeType::TERMINAL || o->getTreeType() == ParseTreeType::ERROR) {
-      tree::TerminalNode *tnode = downCast<tree::TerminalNode *>(o);
-      Token *symbol = tnode->getSymbol();
+std::vector<tree::TerminalNode *> ParserRuleContext::getTokens(size_t ttype) const {
+  std::vector<tree::TerminalNode*> tokens;
+  for (auto *child : children) {
+    if (TerminalNode::is(child)) {
+      tree::TerminalNode *typedChild = downCast<tree::TerminalNode*>(child);
+      Token *symbol = typedChild->getSymbol();
       if (symbol->getType() == ttype) {
-        tokens.push_back(tnode);
+        tokens.push_back(typedChild);
       }
     }
   }
-
   return tokens;
 }
 
@@ -124,11 +121,11 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
-Token* ParserRuleContext::getStart() {
+Token* ParserRuleContext::getStart() const {
   return start;
 }
 
-Token* ParserRuleContext::getStop() {
+Token* ParserRuleContext::getStop() const {
   return stop;
 }
 

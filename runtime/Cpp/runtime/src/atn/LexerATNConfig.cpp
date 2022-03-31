@@ -10,6 +10,7 @@
 #include "atn/LexerActionExecutor.h"
 
 #include "support/CPPUtils.h"
+#include "support/Casts.h"
 
 #include "atn/LexerATNConfig.h"
 
@@ -62,5 +63,5 @@ bool LexerATNConfig::operator==(const LexerATNConfig& other) const
 
 bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig const& source, ATNState *target) {
   return source._passedThroughNonGreedyDecision ||
-    (is<DecisionState*>(target) && (static_cast<DecisionState*>(target))->nonGreedy);
+    (DecisionState::is(target) && downCast<DecisionState*>(target)->nonGreedy);
 }

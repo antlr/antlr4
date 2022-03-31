@@ -22,6 +22,10 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerChannelAction final : public LexerAction {
   public:
+    static bool is(const LexerAction &lexerAction) { return lexerAction.getActionType() == LexerActionType::CHANNEL; }
+
+    static bool is(const LexerAction *lexerAction) { return lexerAction != nullptr && is(*lexerAction); }
+
     /// <summary>
     /// Constructs a new {@code channel} action with the specified channel value. </summary>
     /// <param name="channel"> The channel value to pass to <seealso cref="Lexer#setChannel"/>. </param>

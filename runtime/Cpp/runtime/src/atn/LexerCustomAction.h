@@ -26,6 +26,10 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerCustomAction final : public LexerAction {
   public:
+    static bool is(const LexerAction &lexerAction) { return lexerAction.getActionType() == LexerActionType::CUSTOM; }
+
+    static bool is(const LexerAction *lexerAction) { return lexerAction != nullptr && is(*lexerAction); }
+
     /// <summary>
     /// Constructs a custom lexer action with the specified rule and action
     /// indexes.

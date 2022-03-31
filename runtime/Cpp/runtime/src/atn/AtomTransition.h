@@ -13,6 +13,10 @@ namespace atn {
   /// TODO: make all transitions sets? no, should remove set edges.
   class ANTLR4CPP_PUBLIC AtomTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::ATOM; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     /// The token type or character value; or, signifies special label.
     /// TODO: rename this to label
     const size_t _label;
