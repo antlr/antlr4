@@ -7,6 +7,7 @@ sudo apt-get update -qq
 
 sudo apt update
 
+sudo apt list php
 sudo apt install php
 php -v
 
