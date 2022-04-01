@@ -73,7 +73,7 @@ def find_remaining(ROOT, before):
 if __name__ == '__main__':
     # This is where parrt puts antlr
     ROOT = f"{os.path.expanduser('~')}/antlr/code/antlr4"
-    ROOT = f"/tmp/antlr4" # for testing, it's nice to have diff target
+    # ROOT = f"/tmp/antlr4" # for testing, it's nice to have diff target
 
     before = sys.argv[1]
     after = sys.argv[2]
