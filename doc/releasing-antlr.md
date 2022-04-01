@@ -37,52 +37,26 @@ It seems that [Go needs a `v` in the release git tag](https://go.dev/ref/mod#glo
 
 ## Bump version in code and other files
 
-Edit the repository looking for 4.10 or whatever and update it. Bump version in the following files:
+There are a number of files that require inversion number be updated.
 
- * runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
- * runtime/Python2/setup.py
- * runtime/Python2/src/antlr4/Recognizer.py
- * runtime/Python3/setup.py
- * runtime/Python3/src/antlr4/Recognizer.py
- * runtime/CSharp/src/Antlr4.csproj
- * runtime/PHP/src/RuntimeMetaData.php
- * runtime/JavaScript/package.json
- * runtime/JavaScript/src/antlr4/Recognizer.js
- * runtime/JavaScript/package-lock.json
- * runtime/Cpp/VERSION
- * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
- * runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
- * runtime/Cpp/demo/generate.cmd
- * runtime/Go/antlr/recognizer.go
- * runtime/Swift/Antlr4/org/antlr/v4/runtime/RuntimeMetaData.swift
- * runtime/Dart/lib/src/runtime_meta_data.dart
- * runtime/Dart/pubspec.yaml
- * runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift
- * runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
- * runtime/CSharp/src/Tree/Xpath/XPathLexer.cs
- * runtime/CSharp/src/README.md
- * runtime/CSharp/src/Properties/AssemblyInfo.cs
- * tool/src/org/antlr/v4/codegen/target/GoTarget.java
- * tool/src/org/antlr/v4/codegen/target/CppTarget.java
- * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
- * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
- * tool/src/org/antlr/v4/codegen/target/Python2Target.java
- * tool/src/org/antlr/v4/codegen/target/Python3Target.java
- * tool/src/org/antlr/v4/codegen/target/SwiftTarget.java
- * tool/src/org/antlr/v4/codegen/target/PHPTarget.java
- * tool/src/org/antlr/v4/codegen/Target.java
- * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
- 
-Here is a simple script to display any line from the critical files with, say, `4.10` in it:
+
+Here is a simple script to display any line from the critical files with, say, `4.10` in it.  Here's an example run of the script:
+
+```bash
+~/antlr/code/antlr4 $ python scripts/update_antlr_version.py 4.9.3 4.10
+Updating ANTLR version from 4.9.3 to 4.10
+Set ANTLR repo root (default ~/antlr/code/antlr4): 
+Perform antlr4 `mvn clean` and wipe build dirs Y/N? (default no): 
+Ok, not cleaning antlr4 dir
+4.9.3 appears on 2 lines so _not_ updating /tmp/antlr4/runtime/JavaScript/package-lock.json
+4.9.3 not in /tmp/antlr4/doc/releasing-antlr.md
+```
+
+It's also worth doing a quick check to see if you find any other references to a version:
 
 ```bash
 mvn clean
-rm -rf runtime/CSharp/src/bin
-rm -rf runtime/CSharp/src/obj
-rm -rf runtime/Cpp/runtime/build
-rm -rf runtime/gen
-rm -rf runtime/JavaScript/dist
-find tool runtime -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml'
+find . -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
 ```
 
 Commit to repository.

@@ -31,7 +31,7 @@ runtime/JavaScript/src/antlr4/Recognizer.js
 # Allow doc files to have multiple values updated
 * doc/swift-target.md
 * doc/dart-target.md
-* doc/releasing-antlr.md
+# doc/releasing-antlr.md  # Do this one manually
 * doc/getting-started.md
 * doc/swift-target.md
 * doc/getting-started.md
