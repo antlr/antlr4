@@ -7,7 +7,7 @@ sudo apt-get update -qq
 
 sudo apt update
 
-sudo apt install php-all-dev
+sudo apt install php8-all-dev
 php -v
 
 sudo apt install composer
