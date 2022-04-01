@@ -7,6 +7,8 @@
 
 #include "antlr4-common.h"
 
+#include "atn/ATNConfigSet.h"
+
 namespace antlr4 {
 namespace dfa {
 
@@ -37,17 +39,23 @@ namespace dfa {
   /// </summary>
   class ANTLR4CPP_PUBLIC DFAState final {
   public:
-    class ANTLR4CPP_PUBLIC PredPrediction final {
+    struct ANTLR4CPP_PUBLIC PredPrediction final {
     public:
       Ref<const atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
 
-      PredPrediction(Ref<const atn::SemanticContext> pred, int alt);
+      PredPrediction() = delete;
+
+      PredPrediction(const PredPrediction&) = default;
+      PredPrediction(PredPrediction&&) = default;
+
+      PredPrediction(Ref<const atn::SemanticContext> pred, int alt) : pred(std::move(pred)), alt(alt) {}
+
+      PredPrediction& operator=(const PredPrediction&) = default;
+      PredPrediction& operator=(PredPrediction&&) = default;
 
       std::string toString() const;
     };
-
-    int stateNumber;
 
     std::unique_ptr<atn::ATNConfigSet> configs;
 
@@ -55,24 +63,14 @@ namespace dfa {
     ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
     // ml: this is a sparse list, so we use a map instead of a vector.
     //     Watch out: we no longer have the -1 offset, as it isn't needed anymore.
-    std::unordered_map<size_t, DFAState *> edges;
-
-    bool isAcceptState;
+    std::unordered_map<size_t, DFAState*> edges;
 
     /// if accept state, what ttype do we match or alt do we predict?
     /// This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
     /// <seealso cref="#requiresFullContext"/>.
-    size_t prediction;
+    size_t prediction = 0;
 
-    Ref<atn::LexerActionExecutor> lexerActionExecutor;
-
-    /// <summary>
-    /// Indicates that this state was created during SLL prediction that
-    /// discovered a conflict between the configurations in the state. Future
-    /// <seealso cref="ParserATNSimulator#execATN"/> invocations immediately jumped doing
-    /// full context prediction if this field is true.
-    /// </summary>
-    bool requiresFullContext;
+    Ref<const atn::LexerActionExecutor> lexerActionExecutor;
 
     /// <summary>
     /// During SLL parsing, this is a list of predicates associated with the
@@ -87,13 +85,26 @@ namespace dfa {
     /// <p/>
     ///  This list is computed by <seealso cref="ParserATNSimulator#predicateDFAState"/>.
     /// </summary>
-    std::vector<PredPrediction *> predicates;
+    std::vector<PredPrediction> predicates;
+
+    int stateNumber = -1;
+
+    bool isAcceptState = false;
+
+    /// <summary>
+    /// Indicates that this state was created during SLL prediction that
+    /// discovered a conflict between the configurations in the state. Future
+    /// <seealso cref="ParserATNSimulator#execATN"/> invocations immediately jumped doing
+    /// full context prediction if this field is true.
+    /// </summary>
+    bool requiresFullContext = false;
 
     /// Map a predicate to a predicted alternative.
-    DFAState();
-    explicit DFAState(int state);
-    explicit DFAState(std::unique_ptr<atn::ATNConfigSet> configs);
-    ~DFAState();
+    DFAState() = default;
+
+    explicit DFAState(int stateNumber) : stateNumber(stateNumber) {}
+
+    explicit DFAState(std::unique_ptr<atn::ATNConfigSet> configs) : configs(std::move(configs)) {}
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this
@@ -114,27 +125,29 @@ namespace dfa {
     /// ParserATNSimulator#addDFAState we need to know if any other state
     /// exists that has this exact set of ATN configurations. The
     /// stateNumber is irrelevant.
-    bool operator==(const DFAState &o) const;
+    bool equals(const DFAState &other) const;
 
     std::string toString() const;
-
-    struct Hasher
-    {
-      size_t operator()(const DFAState *k) const {
-        return k->hashCode();
-      }
-    };
-
-    struct Comparer {
-      bool operator()(const DFAState *lhs, const DFAState *rhs) const
-      {
-        return *lhs == *rhs;
-      }
-    };
-
-  private:
-    void InitializeInstanceFields();
   };
 
-} // namespace atn
-} // namespace antlr4
+  inline bool operator==(const DFAState &lhs, const DFAState &rhs) {
+    return lhs.equals(rhs);
+  }
+
+  inline bool operator!=(const DFAState &lhs, const DFAState &rhs) {
+    return !operator==(lhs, rhs);
+  }
+
+}  // namespace dfa
+}  // namespace antlr4
+
+namespace std {
+
+  template <>
+  struct hash<::antlr4::dfa::DFAState> {
+    size_t operator()(const ::antlr4::dfa::DFAState &dfaState) const {
+      return dfaState.hashCode();
+    }
+  };
+
+}  // namespace std

@@ -35,12 +35,7 @@ namespace atn {
     /// Gets the channel to use for the <seealso cref="Token"/> created by the lexer.
     /// </summary>
     /// <returns> The channel to use for the <seealso cref="Token"/> created by the lexer. </returns>
-    int getChannel() const;
-
-    /// <summary>
-    /// {@inheritDoc} </summary>
-    /// <returns> This method returns {@code false}. </returns>
-    virtual bool isPositionDependent() const override;
+    int getChannel() const { return _channel; }
 
     /// <summary>
     /// {@inheritDoc}
@@ -48,11 +43,13 @@ namespace atn {
     /// <para>This action is implemented by calling <seealso cref="Lexer#setChannel"/> with the
     /// value provided by <seealso cref="#getChannel"/>.</para>
     /// </summary>
-    virtual void execute(Lexer *lexer) override;
+    void execute(Lexer *lexer) const override;
 
-    virtual size_t hashCode() const override;
-    virtual bool operator==(const LexerAction &obj) const override;
-    virtual std::string toString() const override;
+    bool equals(const LexerAction &other) const override;
+    std::string toString() const override;
+
+  protected:
+    size_t hashCodeImpl() const override;
 
   private:
     const int _channel;

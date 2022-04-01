@@ -13,28 +13,8 @@
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
-DFAState::PredPrediction::PredPrediction(Ref<const SemanticContext> pred, int alt) : pred(std::move(pred)), alt(alt) {}
-
 std::string DFAState::PredPrediction::toString() const {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
-}
-
-DFAState::DFAState() {
-  InitializeInstanceFields();
-}
-
-DFAState::DFAState(int state) : DFAState() {
-  stateNumber = state;
-}
-
-DFAState::DFAState(std::unique_ptr<ATNConfigSet> configs_) : DFAState() {
-  configs = std::move(configs_);
-}
-
-DFAState::~DFAState() {
-  for (auto *predicate : predicates) {
-    delete predicate;
-  }
 }
 
 std::set<size_t> DFAState::getAltSet() const {
@@ -48,19 +28,15 @@ std::set<size_t> DFAState::getAltSet() const {
 }
 
 size_t DFAState::hashCode() const {
-  size_t hash = misc::MurmurHash::initialize(7);
-  hash = misc::MurmurHash::update(hash, configs->hashCode());
-  hash = misc::MurmurHash::finish(hash, 1);
-  return hash;
+  return configs != nullptr ? configs->hashCode() : 0;
 }
 
-bool DFAState::operator == (const DFAState &o) const {
-  // compare set of ATN configurations in this set with other
-  if (this == &o) {
+bool DFAState::equals(const DFAState &other) const {
+  if (this == std::addressof(other)) {
     return true;
   }
-
-  return *configs == *o.configs;
+  return configs == other.configs ||
+         (configs != nullptr && other.configs != nullptr && *configs == *other.configs);
 }
 
 std::string DFAState::toString() const {
@@ -73,18 +49,11 @@ std::string DFAState::toString() const {
     ss << " => ";
     if (!predicates.empty()) {
       for (size_t i = 0; i < predicates.size(); i++) {
-        ss << predicates[i]->toString();
+        ss << predicates[i].toString();
       }
     } else {
       ss << prediction;
     }
   }
   return ss.str();
-}
-
-void DFAState::InitializeInstanceFields() {
-  stateNumber = -1;
-  isAcceptState = false;
-  prediction = 0;
-  requiresFullContext = false;
 }

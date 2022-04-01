@@ -120,7 +120,7 @@ namespace atn {
     void getReachableConfigSet(CharStream *input, ATNConfigSet *closure_, // closure_ as we have a closure() already
                                ATNConfigSet *reach, size_t t);
 
-    virtual void accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, size_t startIndex, size_t index,
+    virtual void accept(CharStream *input, const Ref<const LexerActionExecutor> &lexerActionExecutor, size_t startIndex, size_t index,
                         size_t line, size_t charPos);
 
     virtual ATNState *getReachableTarget(const Transition *trans, size_t t);
