@@ -10,7 +10,7 @@
 #
 from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
 from antlr4.tree.Tree import ParseTree
-from antlr4.xpath.XPath import XPath
+from antlr4.xpath.XPathLexer import XPathLexer
 
 
 class ParseTreePattern(object):
