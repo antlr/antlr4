@@ -28,7 +28,20 @@ runtime/JavaScript/package-lock.json
 runtime/JavaScript/package.json
 runtime/JavaScript/src/antlr4/Recognizer.js
 
-doc/swift-target.md
+# Allow doc files to have multiple values updated
+* doc/swift-target.md
+* doc/dart-target.md
+* doc/releasing-antlr.md
+* doc/getting-started.md
+* doc/swift-target.md
 * doc/getting-started.md
 
 #runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
+
+# Just documenting that these are generated...
+
+# runtime/Python3/src/antlr4/xpath/XPathLexer.py
+# runtime/Python2/src/antlr4/xpath/XPathLexer.py
+# runtime/Cpp/runtime/src/tree/xpath/XPathLexer.cpp
+# runtime/Cpp/runtime/src/tree/xpath/XPathLexer.h
+# runtime/CSharp/src/Tree/Xpath/XPathLexer.cs
