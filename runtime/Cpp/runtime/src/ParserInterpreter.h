@@ -29,18 +29,18 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC ParserInterpreter : public Parser {
   public:
-    ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-                      const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input);
+    ParserInterpreter(std::string_view grammarFileName, const Vocabulary &vocabulary,
+                      antlrcpp::Span<const std::string_view> ruleNames, const atn::ATN &atn, TokenStream *input);
     ~ParserInterpreter();
 
     virtual void reset() override;
 
     virtual const atn::ATN& getATN() const override;
 
-    virtual const dfa::Vocabulary& getVocabulary() const override;
+    virtual const Vocabulary& getVocabulary() const override;
 
-    virtual const std::vector<std::string>& getRuleNames() const override;
-    virtual std::string getGrammarFileName() const override;
+    virtual antlrcpp::Span<const std::string_view> getRuleNames() const override;
+    virtual std::string_view getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
     virtual ParserRuleContext* parse(size_t startRuleIndex);
@@ -103,10 +103,10 @@ namespace antlr4 {
     InterpreterRuleContext* getRootContext();
 
   protected:
-    const std::string _grammarFileName;
+    const std::string_view _grammarFileName;
     const atn::ATN &_atn;
 
-    std::vector<std::string> _ruleNames;
+    antlrcpp::Span<const std::string_view> _ruleNames;
 
     std::vector<dfa::DFA> _decisionToDFA; // not shared like it is for generated parsers
     atn::PredictionContextCache _sharedContextCache;
@@ -165,7 +165,7 @@ namespace antlr4 {
     Token* recoverInline();
 
   private:
-    const dfa::Vocabulary &_vocabulary;
+    const Vocabulary &_vocabulary;
     std::unique_ptr<Token> _errorToken;
   };
 

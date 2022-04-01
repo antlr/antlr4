@@ -28,9 +28,9 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames, bool pretty = false);
+    static std::string toStringTree(ParseTree *t, antlrcpp::Span<const std::string_view> ruleNames, bool pretty = false);
     static std::string getNodeText(ParseTree *t, Parser *recog);
-    static std::string getNodeText(ParseTree *t, const std::vector<std::string> &ruleNames);
+    static std::string getNodeText(ParseTree *t, antlrcpp::Span<const std::string_view> ruleNames);
 
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.

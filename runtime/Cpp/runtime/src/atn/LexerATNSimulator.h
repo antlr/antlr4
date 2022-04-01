@@ -10,6 +10,7 @@
 #include "atn/ATNSimulator.h"
 #include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
+#include "support/Span.h"
 
 namespace antlr4 {
 namespace atn {
@@ -62,7 +63,7 @@ namespace atn {
     size_t _charPositionInLine;
 
   public:
-    std::vector<dfa::DFA> &_decisionToDFA;
+    antlrcpp::Span<dfa::DFA> _decisionToDFA;
 
   protected:
     size_t _mode;
@@ -71,8 +72,8 @@ namespace atn {
     SimState _prevAccept;
 
   public:
-    LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
+    LexerATNSimulator(const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA, PredictionContextCache &sharedContextCache);
+    LexerATNSimulator(Lexer *recog, const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA, PredictionContextCache &sharedContextCache);
     virtual ~LexerATNSimulator() = default;
 
     virtual void copyState(LexerATNSimulator *simulator);

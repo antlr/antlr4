@@ -7,10 +7,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 
 #include "antlr4-common.h"
+#include "support/InlinedVector.h"
 
 namespace antlrcpp {
 
@@ -45,17 +47,15 @@ namespace antlrcpp {
   // std::vector<bool>, but only implements featured needed by ANTLR.
   class ANTLR4CPP_PUBLIC BitSet final {
   public:
-    constexpr BitSet() = default;
+    BitSet() = default;
 
-    BitSet(const BitSet &other);
+    BitSet(const BitSet&) = default;
 
-    BitSet(BitSet &&other) noexcept;
+    BitSet(BitSet&&) = default;
 
-    ~BitSet();
+    BitSet& operator=(const BitSet&) = default;
 
-    BitSet &operator=(const BitSet &other);
-
-    BitSet &operator=(BitSet &&other) noexcept;
+    BitSet& operator=(BitSet&&) = default;
 
     bool operator[](size_t bit) const noexcept { return test(bit); }
 
@@ -81,31 +81,29 @@ namespace antlrcpp {
 
     void reset();
 
+    size_t hashCode() const;
+
+    bool equals(const BitSet &other) const;
+
     std::string toString() const;
 
-    bool operator==(const BitSet &other) const noexcept;
-
-    bool operator!=(const BitSet &other) const noexcept { return !operator==(other); }
-
   private:
-    uintptr_t *data() noexcept {
-      return _capacity == 1 ? &_storage : reinterpret_cast<uintptr_t *>(_storage);
-    }
+    uintptr_t* data() noexcept { return _storage.data(); }
 
-    const uintptr_t *data() const noexcept {
-      return _capacity == 1 ? &_storage : reinterpret_cast<uintptr_t *>(_storage);
-    }
+    const uintptr_t* data() const noexcept { return _storage.data(); }
 
-    constexpr size_t size() const noexcept { return _capacity; }
+    size_t size() const noexcept { return _storage.size(); }
 
-    void resize(size_t newSize);
-
-    // When _capacity is 1, the BitSet is stored inline in _storage. When the _capacity is not 1,
-    // then _storage is actually a pointer to a continugous block of uintptr_t that has _capacity
-    // elements. _capacity should never be 0.
-    uintptr_t _storage = 0;
-    size_t _capacity = 1;
+    InlinedVector<uintptr_t> _storage;
   };
+
+  inline bool operator==(const BitSet &lhs, const BitSet &rhs) {
+    return lhs.equals(rhs);
+  }
+
+  inline bool operator!=(const BitSet &lhs, const BitSet &rhs) {
+    return !operator==(lhs, rhs);
+  }
 
   inline BitReference &BitReference::operator=(const BitReference &other) noexcept {
     _bits->set(_bit, static_cast<bool>(other));
@@ -120,3 +118,14 @@ namespace antlrcpp {
   inline BitReference::operator bool() const noexcept { return _bits->test(_bit); }
 
 } // namespace antlrcpp
+
+namespace std {
+
+  template <>
+  struct hash<::antlrcpp::BitSet> {
+    size_t operator()(const ::antlrcpp::BitSet &bitSet) const {
+      return bitSet.hashCode();
+    }
+  };
+
+}  // namespace std

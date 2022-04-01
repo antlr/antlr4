@@ -29,16 +29,26 @@ namespace dfa {
     /// Set only allows you to see if it's there.
 
     /// From which ATN state did we create this DFA?
-    atn::DecisionState *atnStartState;
+    atn::DecisionState *atnStartState = nullptr;
     std::unordered_set<DFAState*, DFAStateHasher, DFAStateComparer> states; // States are owned by this class.
-    DFAState *s0;
-    size_t decision;
+    DFAState *s0 = nullptr;
+    size_t decision = 0;
+
+    DFA() = default;
 
     explicit DFA(atn::DecisionState *atnStartState);
+
     DFA(atn::DecisionState *atnStartState, size_t decision);
-    DFA(const DFA &other) = delete;
+
+    DFA(const DFA&) = delete;
+
     DFA(DFA &&other);
+
     ~DFA();
+
+    DFA& operator=(const DFA&) = delete;
+
+    DFA& operator=(DFA &&other);
 
     /**
      * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
@@ -83,6 +93,8 @@ namespace dfa {
     std::string toString(const Vocabulary &vocabulary) const;
 
     std::string toLexerString() const;
+
+    void clear();
 
   private:
     /**

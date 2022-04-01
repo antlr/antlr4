@@ -7,7 +7,8 @@
 
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
-#include "atn/SerializedATNView.h"
+#include "support/Span.h"
+#include "atn/ATNState.h"
 
 namespace antlr4 {
 
@@ -17,11 +18,11 @@ namespace antlr4 {
 
     Recognizer();
     Recognizer(Recognizer const&) = delete;
-    virtual ~Recognizer();
+    virtual ~Recognizer() = default;
 
     Recognizer& operator=(Recognizer const&) = delete;
 
-    virtual std::vector<std::string> const& getRuleNames() const = 0;
+    virtual antlrcpp::Span<const std::string_view> getRuleNames() const = 0;
 
     /**
      * Get the vocabulary used by the recognizer.
@@ -29,23 +30,26 @@ namespace antlr4 {
      * @return A {@link Vocabulary} instance providing information about the
      * vocabulary used by the grammar.
      */
-    virtual dfa::Vocabulary const& getVocabulary() const = 0;
+    virtual const Vocabulary& getVocabulary() const = 0;
 
     /// <summary>
     /// Get a map from token names to token types.
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::string_view, size_t> getTokenTypeMap();
+    const std::unordered_map<std::string_view, size_t>& getTokenTypeMap() const;
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::string, size_t> getRuleIndexMap();
+    const std::unordered_map<std::string_view, size_t>& getRuleIndexMap() const;
 
-    virtual size_t getTokenType(std::string_view tokenName);
+    size_t getTokenType(std::string_view tokenName) const;
+
+    /// Get a rule's index (i.e., {@code RULE_ruleName} field) or INVALID_INDEX if not found.
+    size_t getRuleIndex(std::string_view ruleName) const;
 
     /// <summary>
     /// If this recognizer was generated, it will have a serialized ATN
@@ -54,15 +58,13 @@ namespace antlr4 {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// </summary>
-    virtual atn::SerializedATNView getSerializedATN() const {
-      throw "there is no serialized ATN";
-    }
+    virtual antlrcpp::Span<const int32_t> getSerializedATN() const { return {}; }
 
     /// <summary>
     /// For debugging and other purposes, might want the grammar name.
     ///  Have ANTLR generate an implementation for this method.
     /// </summary>
-    virtual std::string getGrammarFileName() const = 0;
+    virtual std::string_view getGrammarFileName() const = 0;
 
     /// Get the ATN interpreter (in fact one of it's descendants) used by the recognizer for prediction.
     /// @returns The ATN interpreter used by the recognizer for prediction.
@@ -139,21 +141,16 @@ namespace antlr4 {
     void setTokenFactory(TokenFactory<T1> *input);
 
   protected:
-    atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
-
-    // Mutex to manage synchronized access for multithreading.
-    std::mutex _mutex;
+    atn::ATNSimulator *_interpreter = nullptr; // Set and deleted in descendants (or the profiler).
 
   private:
-    static std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> _tokenTypeMapCache;
-    static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
-
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
 
-    size_t _stateNumber;
-
-    void InitializeInstanceFields();
-
+    size_t _stateNumber = atn::ATNState::INVALID_STATE_NUMBER;
+    mutable std::once_flag _tokenTypeMapOnce;
+    mutable std::unordered_map<std::string_view, size_t> _tokenTypeMap;
+    mutable std::once_flag _ruleIndexMapOnce;
+    mutable std::unordered_map<std::string_view, size_t> _ruleIndexMap;
   };
 
 } // namespace antlr4

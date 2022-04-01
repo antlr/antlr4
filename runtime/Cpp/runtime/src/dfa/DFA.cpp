@@ -22,7 +22,7 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
   : atnStartState(atnStartState), s0(nullptr), decision(decision) {
 
   _precedenceDfa = false;
-  if (is<atn::StarLoopEntryState *>(atnStartState)) {
+  if (atn::StarLoopEntryState::is(atnStartState)) {
     if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
       s0 = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet()));
@@ -54,6 +54,14 @@ DFA::~DFA() {
   if (!s0InList) {
     delete s0;
   }
+}
+
+DFA& DFA::operator=(DFA &&other) {
+  if (this != std::addressof(other)) {
+    this->~DFA();
+    ::new (static_cast<void*>(this)) DFA(std::forward<DFA>(other));
+  }
+  return *this;
 }
 
 bool DFA::isPrecedenceDfa() const {
@@ -112,3 +120,28 @@ std::string DFA::toLexerString() const {
   return serializer.toString();
 }
 
+void DFA::clear() {
+  bool s0InList = (s0 == nullptr);
+  for (auto *state : states) {
+    if (state == s0)
+      s0InList = true;
+    delete state;
+  }
+
+  if (!s0InList) {
+    delete s0;
+  }
+
+  s0 = nullptr;
+  std::unordered_set<DFAState*, DFAStateHasher, DFAStateComparer>().swap(states);
+
+  _precedenceDfa = false;
+  if (atn::StarLoopEntryState::is(atnStartState)) {
+    if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
+      _precedenceDfa = true;
+      s0 = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet()));
+      s0->isAcceptState = false;
+      s0->requiresFullContext = false;
+    }
+  }
+}

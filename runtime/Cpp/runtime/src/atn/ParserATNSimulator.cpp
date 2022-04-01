@@ -46,12 +46,12 @@ using namespace antlrcpp;
 
 const bool ParserATNSimulator::TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = ParserATNSimulator::getLrLoopSetting();
 
-ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+ParserATNSimulator::ParserATNSimulator(const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
 : ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
-ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser) {
   InitializeInstanceFields();
@@ -61,10 +61,8 @@ void ParserATNSimulator::reset() {
 }
 
 void ParserATNSimulator::clearDFA() {
-  int size = (int)decisionToDFA.size();
-  decisionToDFA.clear();
-  for (int d = 0; d < size; ++d) {
-    decisionToDFA.push_back(dfa::DFA(atn.getDecisionState(d), d));
+  for (auto &dfa : decisionToDFA) {
+    dfa.clear();
   }
 }
 
@@ -1034,7 +1032,7 @@ bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *conf
 
 std::string ParserATNSimulator::getRuleName(size_t index) {
   if (parser != nullptr) {
-    return parser->getRuleNames()[index];
+    return std::string(parser->getRuleNames()[index]);
   }
   return "<rule " + std::to_string(index) + ">";
 }
@@ -1192,7 +1190,7 @@ std::string ParserATNSimulator::getTokenName(size_t t) {
     return "EOF";
   }
 
-  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary();
+  const Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : Vocabulary::empty();
   std::string displayName = vocabulary.getDisplayName(t);
   if (displayName == std::to_string(t)) {
     return displayName;

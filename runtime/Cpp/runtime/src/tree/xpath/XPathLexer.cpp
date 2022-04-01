@@ -10,15 +10,15 @@ using namespace antlr4;
 namespace {
 
 struct XPathLexerStaticData final {
-  XPathLexerStaticData(std::vector<std::string> ruleNames,
-                        std::vector<std::string> channelNames,
-                        std::vector<std::string> modeNames,
-                        std::vector<std::string> literalNames,
-                        std::vector<std::string> symbolicNames)
-      : ruleNames(std::move(ruleNames)), channelNames(std::move(channelNames)),
-        modeNames(std::move(modeNames)), literalNames(std::move(literalNames)),
-        symbolicNames(std::move(symbolicNames)),
-        vocabulary(this->literalNames, this->symbolicNames) {}
+  XPathLexerStaticData(antlrcpp::Span<const std::string_view> ruleNames,
+                       antlrcpp::Span<const std::string_view> channelNames,
+                       antlrcpp::Span<const std::string_view> modeNames,
+                       antlrcpp::Span<const std::string_view> literalNames,
+                       antlrcpp::Span<const std::string_view> symbolicNames)
+      : ruleNames(ruleNames), channelNames(channelNames),
+        modeNames(modeNames), literalNames(literalNames),
+        symbolicNames(symbolicNames),
+        vocabulary(literalNames, symbolicNames) {}
 
   XPathLexerStaticData(const XPathLexerStaticData&) = delete;
   XPathLexerStaticData(XPathLexerStaticData&&) = delete;
@@ -27,40 +27,45 @@ struct XPathLexerStaticData final {
 
   std::vector<antlr4::dfa::DFA> decisionToDFA;
   antlr4::atn::PredictionContextCache sharedContextCache;
-  const std::vector<std::string> ruleNames;
-  const std::vector<std::string> channelNames;
-  const std::vector<std::string> modeNames;
-  const std::vector<std::string> literalNames;
-  const std::vector<std::string> symbolicNames;
-  const antlr4::dfa::Vocabulary vocabulary;
-  antlr4::atn::SerializedATNView serializedATN;
+  antlrcpp::Span<const std::string_view> ruleNames;
+  antlrcpp::Span<const std::string_view> channelNames;
+  antlrcpp::Span<const std::string_view> modeNames;
+  antlrcpp::Span<const std::string_view> literalNames;
+  antlrcpp::Span<const std::string_view> symbolicNames;
+  antlr4::VocabularyImpl vocabulary;
+  antlrcpp::Span<const int32_t> serializedATN;
   std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
 std::once_flag xpathLexerOnceFlag;
-XPathLexerStaticData *xpathLexerStaticData = nullptr;
+alignas(XPathLexerStaticData) uint8_t xpathLexerStaticData[sizeof(XPathLexerStaticData)];
 
 void xpathLexerInitialize() {
-  assert(xpathLexerStaticData == nullptr);
-  auto staticData = std::make_unique<XPathLexerStaticData>(
-    std::vector<std::string>{
+  static const std::string_view ruleNames[] = {
       "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar", "NameStartChar",
       "STRING"
-    },
-    std::vector<std::string>{
+  };
+  static const std::string_view channelNames[] = {
       "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
-    },
-    std::vector<std::string>{
+  };
+  static const std::string_view modeNames[] = {
       "DEFAULT_MODE"
-    },
-    std::vector<std::string>{
+  };
+  static const std::string_view literalNames[] = {
       "", "", "", "'//'", "'/'", "'*'", "'!'"
-    },
-    std::vector<std::string>{
+  };
+  static const std::string_view symbolicNames[] = {
       "", "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID",
       "STRING"
-    }
+  };
+  ::new (static_cast<void*>(&xpathLexerStaticData[0])) XPathLexerStaticData(
+    antlrcpp::Span<const std::string_view>(ruleNames),
+    antlrcpp::Span<const std::string_view>(channelNames),
+    antlrcpp::Span<const std::string_view>(modeNames),
+    antlrcpp::Span<const std::string_view>(literalNames),
+    antlrcpp::Span<const std::string_view>(symbolicNames)
   );
+  auto *staticData = reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0]);
   static const int32_t serializedATNSegment[] = {
     0x4, 0x0, 0x8, 0x32, 0x6, -1, 0x2, 0x0, 0x7, 0x0, 0x2, 0x1, 0x7,
        0x1, 0x2, 0x2, 0x7, 0x2, 0x2, 0x3, 0x7, 0x3, 0x2, 0x4, 0x7, 0x4,
@@ -102,7 +107,7 @@ void xpathLexerInitialize() {
        0x1, 0x0, 0x0, 0x0, 0x4, 0x0, 0x1e, 0x25, 0x2d, 0x1, 0x1, 0x4, 0x0,
   };
 
-  staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
+  staticData->serializedATN = antlrcpp::Span<const int32_t>(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
   atn::ATNDeserializer deserializer;
   staticData->atn = deserializer.deserialize(staticData->serializedATN);
@@ -112,46 +117,45 @@ void xpathLexerInitialize() {
   for (size_t i = 0; i < count; i++) {
     staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
   }
-  xpathLexerStaticData = staticData.release();
 }
 
 }
 
 XPathLexer::XPathLexer(CharStream *input) : Lexer(input) {
   XPathLexer::initialize();
-  _interpreter = new atn::LexerATNSimulator(this, *xpathLexerStaticData->atn, xpathLexerStaticData->decisionToDFA, xpathLexerStaticData->sharedContextCache);
+  _interpreter = new atn::LexerATNSimulator(this, *reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->atn, antlrcpp::Span<antlr4::dfa::DFA>(reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->decisionToDFA), reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->sharedContextCache);
 }
 
 XPathLexer::~XPathLexer() {
   delete _interpreter;
 }
 
-std::string XPathLexer::getGrammarFileName() const {
+std::string_view XPathLexer::getGrammarFileName() const {
   return "XPathLexer.g4";
 }
 
-const std::vector<std::string>& XPathLexer::getRuleNames() const {
-  return xpathLexerStaticData->ruleNames;
+antlrcpp::Span<const std::string_view> XPathLexer::getRuleNames() const {
+  return reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->ruleNames;
 }
 
-const std::vector<std::string>& XPathLexer::getChannelNames() const {
-  return xpathLexerStaticData->channelNames;
+antlrcpp::Span<const std::string_view> XPathLexer::getChannelNames() const {
+  return reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->channelNames;
 }
 
-const std::vector<std::string>& XPathLexer::getModeNames() const {
-  return xpathLexerStaticData->modeNames;
+antlrcpp::Span<const std::string_view> XPathLexer::getModeNames() const {
+  return reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->modeNames;
 }
 
 const dfa::Vocabulary& XPathLexer::getVocabulary() const {
-  return xpathLexerStaticData->vocabulary;
+  return reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->vocabulary;
 }
 
-antlr4::atn::SerializedATNView XPathLexer::getSerializedATN() const {
-  return xpathLexerStaticData->serializedATN;
+antlrcpp::Span<const int32_t> XPathLexer::getSerializedATN() const {
+  return reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->serializedATN;
 }
 
 const atn::ATN& XPathLexer::getATN() const {
-  return *xpathLexerStaticData->atn;
+  return *reinterpret_cast<XPathLexerStaticData*>(&xpathLexerStaticData[0])->atn;
 }
 
 void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {

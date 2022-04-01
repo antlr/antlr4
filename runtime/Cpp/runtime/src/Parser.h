@@ -327,9 +327,6 @@ namespace antlr4 {
 
     virtual misc::IntervalSet getExpectedTokensWithinCurrentRule();
 
-    /// Get a rule's index (i.e., {@code RULE_ruleName} field) or INVALID_INDEX if not found.
-    virtual size_t getRuleIndex(const std::string &ruleName);
-
     virtual ParserRuleContext* getRuleContext();
 
     /// <summary>

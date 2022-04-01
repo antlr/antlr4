@@ -50,6 +50,7 @@ namespace antlr4 {
   class UnbufferedCharStream;
   class UnbufferedTokenStream;
   class WritableToken;
+  class Vocabulary;
 
   namespace misc {
     class InterpreterDataReader;
@@ -118,7 +119,7 @@ namespace antlr4 {
     class DFASerializer;
     class DFAState;
     class LexerDFASerializer;
-    class Vocabulary;
+    using Vocabulary = antlr4::Vocabulary;
   }
   namespace tree {
     class AbstractParseTreeVisitor;

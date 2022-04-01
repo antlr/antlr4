@@ -534,15 +534,6 @@ misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
   return atn.nextTokens(s);
 }
 
-size_t Parser::getRuleIndex(const std::string &ruleName) {
-  const std::map<std::string, size_t> &m = getRuleIndexMap();
-  auto iterator = m.find(ruleName);
-  if (iterator == m.end()) {
-    return INVALID_INDEX;
-  }
-  return iterator->second;
-}
-
 ParserRuleContext* Parser::getRuleContext() {
   return _ctx;
 }
@@ -552,7 +543,7 @@ std::vector<std::string> Parser::getRuleInvocationStack() {
 }
 
 std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
-  std::vector<std::string> const& ruleNames = getRuleNames();
+  auto ruleNames = getRuleNames();
   std::vector<std::string> stack;
   RuleContext *run = p;
   while (run != nullptr) {
@@ -561,7 +552,7 @@ std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
     if (ruleIndex == INVALID_INDEX ) {
       stack.push_back("n/a");
     } else {
-      stack.push_back(ruleNames[ruleIndex]);
+      stack.push_back(std::string(ruleNames[ruleIndex]));
     }
     if (p->parent == nullptr)
       break;
@@ -573,8 +564,6 @@ std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
 std::vector<std::string> Parser::getDFAStrings() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::mutex> lck(_mutex);
-
     std::vector<std::string> s;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
       dfa::DFA &dfa = simulator->decisionToDFA[d];
@@ -588,7 +577,6 @@ std::vector<std::string> Parser::getDFAStrings() {
 void Parser::dumpDFA() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::mutex> lck(_mutex);
     bool seenOne = false;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
       dfa::DFA &dfa = simulator->decisionToDFA[d];

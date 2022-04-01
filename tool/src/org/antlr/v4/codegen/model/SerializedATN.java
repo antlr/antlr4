@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.misc.IntegerList;
  */
 public class SerializedATN extends OutputModelObject {
 	public int[] serialized;
+  public int decisions;
 
 	public SerializedATN(OutputModelFactory factory) {
 		super(factory);
@@ -26,7 +27,10 @@ public class SerializedATN extends OutputModelObject {
 		super(factory);
 		IntegerList data = ATNSerializer.getSerialized(atn);
 		serialized = data.toArray();
+    decisions = atn.getNumberOfDecisions();
 	}
 
 	public Object getSerialized() { return serialized; }
+
+  public Object getDecisions() { return decisions; }
 }
