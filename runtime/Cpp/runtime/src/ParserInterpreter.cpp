@@ -199,7 +199,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::TransitionType::PREDICATE:
     {
       const atn::PredicateTransition *predicateTransition = static_cast<const atn::PredicateTransition*>(transition);
-      if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
+      if (!sempred(_ctx, predicateTransition->getRuleIndex(), predicateTransition->getPredIndex())) {
         throw FailedPredicateException(this);
       }
     }
@@ -214,8 +214,8 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::TransitionType::PRECEDENCE:
     {
-      if (!precpred(_ctx, static_cast<const atn::PrecedencePredicateTransition*>(transition)->precedence)) {
-        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(static_cast<const atn::PrecedencePredicateTransition*>(transition)->precedence) +  ")");
+      if (!precpred(_ctx, static_cast<const atn::PrecedencePredicateTransition*>(transition)->getPrecedence())) {
+        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(static_cast<const atn::PrecedencePredicateTransition*>(transition)->getPrecedence()) +  ")");
       }
     }
       break;

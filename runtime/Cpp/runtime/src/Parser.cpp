@@ -38,7 +38,7 @@ struct BypassAltsAtnCache final {
   /// bypass alternatives.
   ///
   /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
-  std::map<std::vector<int32_t>, std::unique_ptr<const atn::ATN>> map;
+  std::map<std::vector<int32_t>, std::unique_ptr<const atn::ATN>, std::less<>> map;
 };
 
 BypassAltsAtnCache* getBypassAltsAtnCache() {
@@ -227,9 +227,8 @@ TokenFactory<CommonToken>* Parser::getTokenFactory() {
   return _input->getTokenSource()->getTokenFactory();
 }
 
-
 const atn::ATN& Parser::getATNWithBypassAlts() {
-  const std::vector<int32_t> &serializedAtn = getSerializedATN();
+  auto serializedAtn = getSerializedATN();
   if (serializedAtn.empty()) {
     throw UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
   }
@@ -244,15 +243,16 @@ const atn::ATN& Parser::getATNWithBypassAlts() {
     }
   }
 
+  std::unique_lock<std::shared_mutex> lock(cache->mutex);
+  auto existing = cache->map.find(serializedAtn);
+  if (existing != cache->map.end()) {
+    return *existing->second;
+  }
   atn::ATNDeserializationOptions deserializationOptions;
   deserializationOptions.setGenerateRuleBypassTransitions(true);
   atn::ATNDeserializer deserializer(deserializationOptions);
   auto atn = deserializer.deserialize(serializedAtn);
-
-  {
-    std::unique_lock<std::shared_mutex> lock(cache->mutex);
-    return *cache->map.insert(std::make_pair(serializedAtn, std::move(atn))).first->second;
-  }
+  return *cache->map.insert(std::make_pair(std::vector<int32_t>(serializedAtn.begin(), serializedAtn.end()), std::move(atn))).first->second;
 }
 
 tree::pattern::ParseTreePattern Parser::compileParseTreePattern(const std::string &pattern, int patternRuleIndex) {

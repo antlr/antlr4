@@ -23,12 +23,11 @@ void ATNSimulator::clearDFA() {
   throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
 }
 
-PredictionContextCache& ATNSimulator::getSharedContextCache() {
+PredictionContextCache& ATNSimulator::getSharedContextCache() const {
   return _sharedContextCache;
 }
 
-Ref<const PredictionContext> ATNSimulator::getCachedContext(Ref<const PredictionContext> const& context) {
+Ref<const PredictionContext> ATNSimulator::getCachedContext(const Ref<const PredictionContext> &context) {
   // This function must only be called with an active state lock, as we are going to change a shared structure.
-  std::map<Ref<const PredictionContext>, Ref<const PredictionContext>> visited;
-  return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
+  return PredictionContext::getCachedContext(context, getSharedContextCache());
 }

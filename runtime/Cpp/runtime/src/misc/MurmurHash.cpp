@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 
 #include "misc/MurmurHash.h"
 
@@ -59,6 +60,23 @@ size_t MurmurHash::update(size_t hash, size_t value) {
   hash = ROTL64(hash, 27);
   hash = hash * 5 + UINT64_C(0x52dce729);
 
+  return hash;
+}
+
+size_t MurmurHash::update(size_t hash, const void *data, size_t size) {
+  size_t value;
+  const uint8_t *bytes = static_cast<const uint8_t*>(data);
+  while (size >= sizeof(size_t)) {
+    std::memcpy(&value, bytes, sizeof(size_t));
+    hash = update(hash, value);
+    bytes += sizeof(size_t);
+    size -= sizeof(size_t);
+  }
+  if (size != 0) {
+    value = 0;
+    std::memcpy(&value, bytes, size);
+    hash = update(hash, value);
+  }
   return hash;
 }
 

@@ -265,18 +265,13 @@ bool IntervalSet::contains(size_t el) const {
 }
 
 bool IntervalSet::contains(ssize_t el) const {
-  if (_intervals.empty())
+  if (_intervals.empty() || el < _intervals.front().a || el > _intervals.back().b) {
     return false;
-
-  if (el < _intervals[0].a) // list is sorted and el is before first interval; not here
-    return false;
-
-  for (const auto &interval : _intervals) {
-    if (el >= interval.a && el <= interval.b) {
-      return true; // found in this interval
-    }
   }
-  return false;
+
+  return std::binary_search(_intervals.begin(), _intervals.end(), Interval(el, el), [](const Interval &lhs, const Interval &rhs) {
+    return lhs.b < rhs.a;
+  });
 }
 
 bool IntervalSet::isEmpty() const {
@@ -306,7 +301,7 @@ ssize_t IntervalSet::getMinElement() const {
     return Token::INVALID_TYPE;
   }
 
-  return _intervals[0].a;
+  return _intervals.front().a;
 }
 
 std::vector<Interval> const& IntervalSet::getIntervals() const {

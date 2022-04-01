@@ -12,9 +12,13 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC StarLoopbackState final : public ATNState {
   public:
-    StarLoopEntryState *getLoopEntryState() const;
+    static bool is(const ATNState &atnState) { return atnState.getStateType() == ATNStateType::STAR_LOOP_BACK; }
 
-    virtual ATNStateType getStateType() const override;
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
+    StarLoopbackState() : ATNState(ATNStateType::STAR_LOOP_BACK) {}
+
+    StarLoopEntryState *getLoopEntryState() const;
   };
 
 } // namespace atn

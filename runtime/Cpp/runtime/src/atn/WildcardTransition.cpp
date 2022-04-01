@@ -9,11 +9,7 @@
 
 using namespace antlr4::atn;
 
-WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
-}
-
-TransitionType WildcardTransition::getTransitionType() const {
-  return TransitionType::WILDCARD;
+WildcardTransition::WildcardTransition(ATNState *target) : Transition(TransitionType::WILDCARD, target) {
 }
 
 bool WildcardTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {

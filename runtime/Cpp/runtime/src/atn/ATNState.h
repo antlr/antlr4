@@ -93,7 +93,7 @@ namespace atn {
     /// Track the transitions emanating from this ATN state.
     std::vector<ConstTransitionPtr> transitions;
 
-    ATNState() = default;
+    ATNState() = delete;
 
     ATNState(ATNState const&) = delete;
 
@@ -114,13 +114,19 @@ namespace atn {
 
     virtual bool isNonGreedyExitState() const;
     virtual std::string toString() const;
-    virtual ATNStateType getStateType() const = 0;
+
+    ATNStateType getStateType() const { return _stateType; }
+
+  protected:
+    explicit ATNState(ATNStateType stateType) : _stateType(stateType) {}
 
   private:
     /// Used to cache lookahead during parsing, not used during construction.
 
     misc::IntervalSet _nextTokenWithinRule;
     std::atomic<bool> _nextTokenUpdated { false };
+
+    const ATNStateType _stateType;
 
     friend class ATN;
   };

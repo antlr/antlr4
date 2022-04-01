@@ -10,13 +10,13 @@
 namespace antlr4 {
 namespace tree {
 
-  class ANTLR4CPP_PUBLIC TerminalNodeImpl : public virtual TerminalNode {
+  class ANTLR4CPP_PUBLIC TerminalNodeImpl : public TerminalNode {
   public:
     Token *symbol;
 
-    TerminalNodeImpl(Token *symbol);
+    explicit TerminalNodeImpl(Token *symbol) : TerminalNode(ParseTreeType::TERMINAL), symbol(symbol) {}
 
-    virtual Token* getSymbol() override;
+    virtual Token* getSymbol() const override;
     virtual void setParent(RuleContext *parent) override;
     virtual misc::Interval getSourceInterval() override;
 
@@ -26,7 +26,6 @@ namespace tree {
     virtual std::string toStringTree(Parser *parser, bool pretty = false) override;
     virtual std::string toString() override;
     virtual std::string toStringTree(bool pretty = false) override;
-
   };
 
 } // namespace tree

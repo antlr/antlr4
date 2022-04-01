@@ -6,6 +6,7 @@
 #pragma once
 
 #include "atn/ATNDeserializationOptions.h"
+#include "atn/SerializedATNView.h"
 #include "atn/LexerAction.h"
 #include "atn/Transition.h"
 
@@ -20,7 +21,7 @@ namespace atn {
 
     explicit ATNDeserializer(ATNDeserializationOptions deserializationOptions);
 
-    std::unique_ptr<ATN> deserialize(const std::vector<int32_t> &input) const;
+    std::unique_ptr<ATN> deserialize(SerializedATNView input) const;
     void verifyATN(const ATN &atn) const;
 
   private:

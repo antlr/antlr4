@@ -12,8 +12,11 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC BasicState final : public ATNState {
   public:
-    virtual ATNStateType getStateType() const override;
+    static bool is(const ATNState &atnState) { return atnState.getStateType() == ATNStateType::BASIC; }
 
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
+    BasicState() : ATNState(ATNStateType::BASIC) {}
   };
 
 } // namespace atn

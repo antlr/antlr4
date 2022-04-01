@@ -12,6 +12,12 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC SingletonPredictionContext final : public PredictionContext {
   public:
+    static bool is(const PredictionContext &predictionContext) { return predictionContext.getContextType() == PredictionContextType::SINGLETON; }
+
+    static bool is(const PredictionContext *predictionContext) { return predictionContext != nullptr && is(*predictionContext); }
+
+    static Ref<const SingletonPredictionContext> create(Ref<const PredictionContext> parent, size_t returnState);
+
     // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
     // There are no child contexts stored here and often the parent context is left dangling when it's
     // owning ATNState is released. In order to avoid having this context released as well (leaving all other contexts
@@ -21,18 +27,16 @@ namespace atn {
     const size_t returnState;
 
     SingletonPredictionContext(Ref<const PredictionContext> parent, size_t returnState);
-    virtual ~SingletonPredictionContext() = default;
 
-    static Ref<const SingletonPredictionContext> create(Ref<const PredictionContext> parent, size_t returnState);
+    bool isEmpty() const override;
+    size_t size() const override;
+    const Ref<const PredictionContext>& getParent(size_t index) const override;
+    size_t getReturnState(size_t index) const override;
+    bool equals(const PredictionContext &other) const override;
+    std::string toString() const override;
 
-    PredictionContextType getContextType() const override;
-
-    virtual bool isEmpty() const override;
-    virtual size_t size() const override;
-    virtual Ref<const PredictionContext> getParent(size_t index) const override;
-    virtual size_t getReturnState(size_t index) const override;
-    virtual bool operator == (const PredictionContext &o) const override;
-    virtual std::string toString() const override;
+  protected:
+    size_t hashCodeImpl() const override;
   };
 
 } // namespace atn

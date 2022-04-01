@@ -193,14 +193,14 @@ func <parser.grammarName; format="lower">ParserInit() {
 // static state used to implement the parser is lazily initialized during the first call to
 // New<parser.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
-func <parser.name>Init() {
+func <parser.name; format="cap">Init() {
   staticData := &<parser.grammarName; format="lower">ParserStaticData
   staticData.once.Do(<parser.grammarName; format="lower">ParserInit)
 }
 
 // New<parser.name> produces a new parser instance for the optional input antlr.TokenStream.
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
-  <parser.name>Init()
+	<parser.name; format="cap">Init()
 	this := new(<parser.name>)
 	this.BaseParser = antlr.NewBaseParser(input)
   staticData := &<parser.grammarName; format="lower">ParserStaticData
@@ -1474,14 +1474,14 @@ func <lexer.grammarName; format="lower">LexerInit() {
 // static state used to implement the lexer is lazily initialized during the first call to
 // New<lexer.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
-func <lexer.name>Init() {
+func <lexer.name; format="cap">Init() {
   staticData := &<lexer.grammarName; format="lower">LexerStaticData
   staticData.once.Do(<lexer.grammarName; format="lower">LexerInit)
 }
 
 // New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
 func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
-  <lexer.name>Init()
+  <lexer.name; format="cap">Init()
 	l := new(<lexer.name>)
 	l.BaseLexer = antlr.NewBaseLexer(input)
   staticData := &<lexer.grammarName; format="lower">LexerStaticData

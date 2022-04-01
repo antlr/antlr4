@@ -7,6 +7,7 @@
 
 #include "Recognizer.h"
 #include "support/CPPUtils.h"
+#include "atn/SemanticContextType.h"
 
 namespace antlr4 {
 namespace atn {
@@ -27,10 +28,7 @@ namespace atn {
 
     virtual ~SemanticContext() = default;
 
-    virtual size_t hashCode() const = 0;
-    virtual std::string toString() const = 0;
-    virtual bool operator==(const SemanticContext &other) const = 0;
-    virtual bool operator!=(const SemanticContext &other) const;
+    SemanticContextType getContextType() const { return _contextType; }
 
     /// <summary>
     /// For context independent predicates, we evaluate them without a local
@@ -67,52 +65,71 @@ namespace atn {
      */
     virtual Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const;
 
-    static Ref<const SemanticContext> And(Ref<const SemanticContext> const& a, Ref<const SemanticContext> const& b);
+    virtual size_t hashCode() const = 0;
+
+    virtual bool equals(const SemanticContext &other) const = 0;
+
+    virtual std::string toString() const = 0;
+
+    static Ref<const SemanticContext> And(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
 
     /// See also: ParserATNSimulator::getPredsForAmbigAlts.
-    static Ref<const SemanticContext> Or(Ref<const SemanticContext> const& a, Ref<const SemanticContext> const& b);
+    static Ref<const SemanticContext> Or(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
 
     class Predicate;
     class PrecedencePredicate;
     class Operator;
     class AND;
     class OR;
+
+  protected:
+    explicit SemanticContext(SemanticContextType contextType) : _contextType(contextType) {}
+
+  private:
+    const SemanticContextType _contextType;
   };
 
-  class ANTLR4CPP_PUBLIC SemanticContext::Predicate : public SemanticContext {
+  inline bool operator==(const SemanticContext &lhs, const SemanticContext &rhs) {
+    return lhs.equals(rhs);
+  }
+
+  inline bool operator!=(const SemanticContext &lhs, const SemanticContext &rhs) {
+    return !operator==(lhs, rhs);
+  }
+
+  class ANTLR4CPP_PUBLIC SemanticContext::Predicate final : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::PREDICATE; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     const size_t ruleIndex;
     const size_t predIndex;
     const bool isCtxDependent; // e.g., $i ref in pred
 
-  protected:
-    Predicate();
-
-  public:
     Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
-    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual size_t hashCode() const override;
-    virtual bool operator == (const SemanticContext &other) const override;
-    virtual std::string toString() const override;
+    bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
+    size_t hashCode() const override;
+    bool equals(const SemanticContext &other) const override;
+    std::string toString() const override;
   };
 
-  class ANTLR4CPP_PUBLIC SemanticContext::PrecedencePredicate : public SemanticContext {
+  class ANTLR4CPP_PUBLIC SemanticContext::PrecedencePredicate final : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::PRECEDENCE; }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     const int precedence;
 
-  protected:
-    PrecedencePredicate();
-
-  public:
     explicit PrecedencePredicate(int precedence);
 
-    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual int compareTo(PrecedencePredicate *o);
-    virtual size_t hashCode() const override;
-    virtual bool operator == (const SemanticContext &other) const override;
-    virtual std::string toString() const override;
+    bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
+    Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
+    size_t hashCode() const override;
+    bool equals(const SemanticContext &other) const override;
+    std::string toString() const override;
   };
 
   /**
@@ -123,6 +140,13 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::Operator : public SemanticContext {
   public:
+    static bool is(const SemanticContext &semanticContext) {
+      const auto contextType = semanticContext.getContextType();
+      return contextType == SemanticContextType::AND || contextType == SemanticContextType::OR;
+    }
+
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
+
     /**
      * Gets the operands for the semantic context operator.
      *
@@ -133,67 +157,77 @@ namespace atn {
      */
 
     virtual const std::vector<Ref<const SemanticContext>>& getOperands() const = 0;
+
+  protected:
+    using SemanticContext::SemanticContext;
   };
 
   /**
    * A semantic context which is true whenever none of the contained contexts
    * is false.
    */
-  class ANTLR4CPP_PUBLIC SemanticContext::AND : public SemanticContext::Operator {
+  class ANTLR4CPP_PUBLIC SemanticContext::AND final : public SemanticContext::Operator {
   public:
-    std::vector<Ref<const SemanticContext>> opnds;
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::AND; }
 
-    AND(Ref<const SemanticContext> const& a, Ref<const SemanticContext> const& b) ;
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
 
-    virtual const std::vector<Ref<const SemanticContext>>& getOperands() const override;
-    virtual bool operator==(const SemanticContext &other) const override;
-    virtual size_t hashCode() const override;
+    AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) ;
+
+    const std::vector<Ref<const SemanticContext>>& getOperands() const override;
 
     /**
      * The evaluation of predicates by this context is short-circuiting, but
      * unordered.</p>
      */
-    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual std::string toString() const override;
+    bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
+    Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
+    size_t hashCode() const override;
+    bool equals(const SemanticContext &other) const override;
+    std::string toString() const override;
+
+  private:
+    std::vector<Ref<const SemanticContext>> _opnds;
   };
 
   /**
    * A semantic context which is true whenever at least one of the contained
    * contexts is true.
    */
-  class ANTLR4CPP_PUBLIC SemanticContext::OR : public SemanticContext::Operator {
+  class ANTLR4CPP_PUBLIC SemanticContext::OR final : public SemanticContext::Operator {
   public:
-    std::vector<Ref<const SemanticContext>> opnds;
+    static bool is(const SemanticContext &semanticContext) { return semanticContext.getContextType() == SemanticContextType::OR; }
 
-    OR(Ref<const SemanticContext> const& a, Ref<const SemanticContext> const& b);
+    static bool is(const SemanticContext *semanticContext) { return semanticContext != nullptr && is(*semanticContext); }
 
-    virtual const std::vector<Ref<const SemanticContext>>& getOperands() const override;
-    virtual bool operator==(const SemanticContext &other) const override;
-    virtual size_t hashCode() const override;
+    OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
+
+    const std::vector<Ref<const SemanticContext>>& getOperands() const override;
 
     /**
      * The evaluation of predicates by this context is short-circuiting, but
      * unordered.
      */
-    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
-    virtual std::string toString() const override;
+    bool eval(Recognizer *parser, RuleContext *parserCallStack) const override;
+    Ref<const SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) const override;
+    size_t hashCode() const override;
+    bool equals(const SemanticContext &other) const override;
+    std::string toString() const override;
+
+  private:
+    std::vector<Ref<const SemanticContext>> _opnds;
   };
 
-} // namespace atn
-} // namespace antlr4
-
-// Hash function for SemanticContext, used in the MurmurHash::update function
+}  // namespace atn
+}  // namespace antlr4
 
 namespace std {
-  using antlr4::atn::SemanticContext;
 
-  template <> struct hash<SemanticContext>
-  {
-    size_t operator () (const SemanticContext &x) const
-    {
-      return x.hashCode();
+  template <>
+  struct hash<::antlr4::atn::SemanticContext> {
+    size_t operator()(const ::antlr4::atn::SemanticContext &semanticContext) const {
+      return semanticContext.hashCode();
     }
   };
-}
+
+}  // namespace std

@@ -702,21 +702,19 @@ std::vector<Ref<const SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts
   return altToPred;
 }
 
-std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-  std::vector<Ref<const SemanticContext>> const& altToPred) {
-  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](Ref<const SemanticContext> const context) {
+std::vector<dfa::DFAState::PredPrediction> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
+                                                                                       const std::vector<Ref<const SemanticContext>> &altToPred) {
+  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](const Ref<const SemanticContext> &context) {
     return context != SemanticContext::NONE;
   }) != altToPred.end();
-  if (!containsPredicate)
-    return {};
-
-  std::vector<dfa::DFAState::PredPrediction*> pairs;
-  for (size_t i = 1; i < altToPred.size(); ++i) {
-    Ref<const SemanticContext> const& pred = altToPred[i];
-    assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
-
-    if (ambigAlts.test(i)) {
-      pairs.push_back(new dfa::DFAState::PredPrediction(pred, (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
+  std::vector<dfa::DFAState::PredPrediction> pairs;
+  if (containsPredicate) {
+    for (size_t i = 0; i < altToPred.size(); i++) {
+      const auto &pred = altToPred[i];
+      assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
+      if (ambigAlts.test(i)) {
+        pairs.emplace_back(pred, static_cast<int>(i));
+      }
     }
   }
   return pairs;
@@ -776,12 +774,12 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
   return { succeeded, failed };
 }
 
-BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
+BitSet ParserATNSimulator::evalSemanticContext(const std::vector<dfa::DFAState::PredPrediction> &predPredictions,
                                                ParserRuleContext *outerContext, bool complete) {
   BitSet predictions;
-  for (auto *prediction : predPredictions) {
-    if (prediction->pred == SemanticContext::NONE) {
-      predictions.set(prediction->alt);
+  for (const auto &prediction : predPredictions) {
+    if (prediction.pred == SemanticContext::NONE) {
+      predictions.set(prediction.alt);
       if (!complete) {
         break;
       }
@@ -789,17 +787,17 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
     }
 
     bool fullCtx = false; // in dfa
-    bool predicateEvaluationResult = evalSemanticContext(prediction->pred, outerContext, prediction->alt, fullCtx);
+    bool predicateEvaluationResult = evalSemanticContext(prediction.pred, outerContext, prediction.alt, fullCtx);
 #if DEBUG_ATN == 1 || DEBUG_DFA == 1
-      std::cout << "eval pred " << prediction->toString() << " = " << predicateEvaluationResult << std::endl;
+      std::cout << "eval pred " << prediction.toString() << " = " << predicateEvaluationResult << std::endl;
 #endif
 
     if (predicateEvaluationResult) {
 #if DEBUG_ATN == 1 || DEBUG_DFA == 1
-        std::cout << "PREDICT " << prediction->alt << std::endl;
+        std::cout << "PREDICT " << prediction.alt << std::endl;
 #endif
 
-      predictions.set(prediction->alt);
+      predictions.set(prediction.alt);
       if (!complete) {
         break;
       }
@@ -1088,7 +1086,7 @@ Ref<ATNConfig> ParserATNSimulator::actionTransition(Ref<ATNConfig> const& config
 Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& config, const PrecedencePredicateTransition *pt,
     bool collectPredicates, bool inContext, bool fullCtx) {
 #if DEBUG_DFA == 1
-    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->precedence << ">=_p" << ", ctx dependent=true" << std::endl;
+    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->getPrecedence() << ">=_p" << ", ctx dependent=true" << std::endl;
     if (parser != nullptr) {
       std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
@@ -1096,7 +1094,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
 
   Ref<ATNConfig> c;
   if (collectPredicates && inContext) {
-    Ref<SemanticContext::PrecedencePredicate> predicate = pt->getPredicate();
+    const auto &predicate = pt->getPredicate();
 
     if (fullCtx) {
       // In full context mode, we can evaluate predicates on-the-fly
@@ -1105,14 +1103,14 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
       // later during conflict resolution.
       size_t currentPosition = _input->index();
       _input->seek(_startIndex);
-      bool predSucceeds = evalSemanticContext(pt->getPredicate(), _outerContext, config->alt, fullCtx);
+      bool predSucceeds = evalSemanticContext(predicate, _outerContext, config->alt, fullCtx);
       _input->seek(currentPosition);
       if (predSucceeds) {
         c = std::make_shared<ATNConfig>(*config, pt->target); // no pred context
       }
     } else {
       Ref<const SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
-      c = std::make_shared<ATNConfig>(*config, pt->target, newSemCtx);
+      c = std::make_shared<ATNConfig>(*config, pt->target, std::move(newSemCtx));
     }
   } else {
     c = std::make_shared<ATNConfig>(*config, pt->target);
@@ -1128,15 +1126,15 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
 Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> const& config, const PredicateTransition *pt,
   bool collectPredicates, bool inContext, bool fullCtx) {
 #if DEBUG_DFA == 1
-    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->ruleIndex << ":" << pt->predIndex << ", ctx dependent=" << pt->isCtxDependent << std::endl;
+    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->getRuleIndex() << ":" << pt->getPredIndex() << ", ctx dependent=" << pt->isCtxDependent() << std::endl;
     if (parser != nullptr) {
       std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
 #endif
 
   Ref<ATNConfig> c = nullptr;
-  if (collectPredicates && (!pt->isCtxDependent || (pt->isCtxDependent && inContext))) {
-    Ref<SemanticContext::Predicate> predicate = pt->getPredicate();
+  if (collectPredicates && (!pt->isCtxDependent() || (pt->isCtxDependent() && inContext))) {
+    const auto &predicate = pt->getPredicate();
     if (fullCtx) {
       // In full context mode, we can evaluate predicates on-the-fly
       // during closure, which dramatically reduces the size of
@@ -1144,14 +1142,14 @@ Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> const& config, 
       // later during conflict resolution.
       size_t currentPosition = _input->index();
       _input->seek(_startIndex);
-      bool predSucceeds = evalSemanticContext(pt->getPredicate(), _outerContext, config->alt, fullCtx);
+      bool predSucceeds = evalSemanticContext(predicate, _outerContext, config->alt, fullCtx);
       _input->seek(currentPosition);
       if (predSucceeds) {
         c = std::make_shared<ATNConfig>(*config, pt->target); // no pred context
       }
     } else {
       Ref<const SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
-      c = std::make_shared<ATNConfig>(*config, pt->target, newSemCtx);
+      c = std::make_shared<ATNConfig>(*config, pt->target, std::move(newSemCtx));
     }
   } else {
     c = std::make_shared<ATNConfig>(*config, pt->target);

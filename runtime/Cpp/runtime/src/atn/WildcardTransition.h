@@ -12,9 +12,11 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC WildcardTransition final : public Transition {
   public:
-    explicit WildcardTransition(ATNState *target);
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::WILDCARD; }
 
-    TransitionType getTransitionType() const override;
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
+    explicit WildcardTransition(ATNState *target);
 
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 

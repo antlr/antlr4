@@ -123,13 +123,11 @@ public class PredictionContext: Hashable, CustomStringConvertible {
 
     static func calculateHashCode(_ parents: [PredictionContext?], _ returnStates: [Int]) -> Int {
         var hash = MurmurHash.initialize(INITIAL_HASH)
-        var length = parents.count
-        for i in 0..<length {
-            hash = MurmurHash.update(hash, parents[i])
+        for parent in parents {
+            hash = MurmurHash.update(hash, parent)
         }
-        length = returnStates.count
-        for i in 0..<length {
-            hash = MurmurHash.update(hash, returnStates[i])
+        for state in returnStates {
+            hash = MurmurHash.update(hash, state)
         }
 
         return  MurmurHash.finish(hash, 2 * parents.count)
