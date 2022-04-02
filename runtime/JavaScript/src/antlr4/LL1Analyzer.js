@@ -1,17 +1,23 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Set, BitSet} = require('./Utils');
-const {Token} = require('./Token');
-const {ATNConfig} = require('./atn/ATNConfig');
-const {IntervalSet} = require('./IntervalSet');
-const {RuleStopState} = require('./atn/ATNState');
-const {RuleTransition, NotSetTransition, WildcardTransition, AbstractPredicateTransition} = require('./atn/Transition');
-const {predictionContextFromRuleContext, PredictionContext, SingletonPredictionContext} = require('./PredictionContext');
+import Token from './Token.js';
+import ATNConfig from './atn/ATNConfig.js';
+import IntervalSet from './IntervalSet.js';
+import RuleStopState from './atn/RuleStopState.js';
+import RuleTransition from './atn/RuleTransition.js';
+import NotSetTransition from './atn/NotSetTransition.js';
+import WildcardTransition from './atn/WildcardTransition.js';
+import AbstractPredicateTransition from './atn/AbstractPredicateTransition.js';
+import { predictionContextFromRuleContext } from './PredictionContextUtils.js';
+import PredictionContext from './PredictionContext.js';
+import SingletonPredictionContext from './SingletonPredictionContext.js';
+import BitSet from "./utils/BitSet.js";
+import CustomizedSet from "./utils/CustomizedSet.js";
 
-class LL1Analyzer {
+export default class LL1Analyzer {
     constructor(atn) {
         this.atn = atn;
     }
@@ -34,7 +40,7 @@ class LL1Analyzer {
         const look = [];
         for(let alt=0; alt< count; alt++) {
             look[alt] = new IntervalSet();
-            const lookBusy = new Set();
+            const lookBusy = new CustomizedSet();
             const seeThruPreds = false; // fail to get lookahead upon pred
             this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
                   look[alt], lookBusy, new BitSet(), seeThruPreds, false);
@@ -70,7 +76,7 @@ class LL1Analyzer {
         const seeThruPreds = true; // ignore preds; get all lookahead
         ctx = ctx || null;
         const lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null;
-        this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
+        this._LOOK(s, stopState, lookContext, r, new CustomizedSet(), new BitSet(), seeThruPreds, true);
         return r;
     }
 
@@ -92,7 +98,7 @@ class LL1Analyzer {
      * @param look The result lookahead set.
      * @param lookBusy A set used for preventing epsilon closures in the ATN
      * from causing a stack overflow. Outside code should pass
-     * {@code new Set<ATNConfig>} for this argument.
+     * {@code new CustomizedSet<ATNConfig>} for this argument.
      * @param calledRuleStack A set used for preventing left recursion in the
      * ATN from causing a stack overflow. Outside code should pass
      * {@code new BitSet()} for this argument.
@@ -185,6 +191,3 @@ class LL1Analyzer {
  * a predicate during analysis if {@code seeThruPreds==false}.
  */
 LL1Analyzer.HIT_PRED = Token.INVALID_TYPE;
-
-module.exports = LL1Analyzer;
-

@@ -1,58 +1,53 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Token} = require('./../Token');
-const ATN = require('./ATN');
-const ATNType = require('./ATNType');
+import Token from '../Token.js';
+import ATN from './ATN.js';
+import ATNType from './ATNType.js';
 
-const {
-    ATNState,
-    BasicState,
-    DecisionState,
-    BlockStartState,
-    BlockEndState,
-    LoopEndState,
-    RuleStartState,
-    RuleStopState,
-    TokensStartState,
-    PlusLoopbackState,
-    StarLoopbackState,
-    StarLoopEntryState,
-    PlusBlockStartState,
-    StarBlockStartState,
-    BasicBlockStartState
-} = require('./ATNState');
+import ATNState from './ATNState.js'; 
+import BasicState from './BasicState.js'; 
+import DecisionState from './DecisionState.js'; 
+import BlockStartState from './BlockStartState.js'; 
+import BlockEndState from './BlockEndState.js'; 
+import LoopEndState from './LoopEndState.js'; 
+import RuleStartState from './RuleStartState.js'; 
+import RuleStopState from './RuleStopState.js'; 
+import TokensStartState from './TokensStartState.js'; 
+import PlusLoopbackState from './PlusLoopbackState.js'; 
+import StarLoopbackState from './StarLoopbackState.js'; 
+import StarLoopEntryState from './StarLoopEntryState.js'; 
+import PlusBlockStartState from './PlusBlockStartState.js'; 
+import StarBlockStartState from './StarBlockStartState.js'; 
+import BasicBlockStartState from './BasicBlockStartState.js'; 
 
-const {
-    Transition,
-    AtomTransition,
-    SetTransition,
-    NotSetTransition,
-    RuleTransition,
-    RangeTransition,
-    ActionTransition,
-    EpsilonTransition,
-    WildcardTransition,
-    PredicateTransition,
-    PrecedencePredicateTransition
-} = require('./Transition')
+import Transition from './Transition.js'; 
+import AtomTransition from './AtomTransition.js'; 
+import SetTransition from './SetTransition.js'; 
+import NotSetTransition from './NotSetTransition.js'; 
+import RuleTransition from './RuleTransition.js'; 
+import RangeTransition from './RangeTransition.js'; 
+import ActionTransition from './ActionTransition.js'; 
+import EpsilonTransition from './EpsilonTransition.js'; 
+import WildcardTransition from './WildcardTransition.js'; 
+import PredicateTransition from './PredicateTransition.js'; 
+import PrecedencePredicateTransition from './PrecedencePredicateTransition.js'; 
 
-const {IntervalSet} = require('./../IntervalSet');
-const ATNDeserializationOptions = require('./ATNDeserializationOptions');
 
-const {
-    LexerActionType,
-    LexerSkipAction,
-    LexerChannelAction,
-    LexerCustomAction,
-    LexerMoreAction,
-    LexerTypeAction,
-    LexerPushModeAction,
-    LexerPopModeAction,
-    LexerModeAction,
-} = require('./LexerAction');
+import IntervalSet from '../IntervalSet.js';
+import ATNDeserializationOptions from './ATNDeserializationOptions.js';
+
+import LexerActionType from './LexerActionType.js';
+import LexerSkipAction from './LexerSkipAction.js'; 
+import LexerChannelAction from './LexerChannelAction.js'; 
+import LexerCustomAction from './LexerCustomAction.js'; 
+import LexerMoreAction from './LexerMoreAction.js'; 
+import LexerTypeAction from './LexerTypeAction.js'; 
+import LexerPushModeAction from './LexerPushModeAction.js'; 
+import LexerPopModeAction from './LexerPopModeAction.js'; 
+import LexerModeAction from './LexerModeAction.js'; 
 
 const SERIALIZED_VERSION = 4;
 
@@ -62,7 +57,7 @@ function initArray( length, value) {
 	return tmp.map(function(i) {return value;});
 }
 
-class ATNDeserializer {
+export default class ATNDeserializer {
     constructor(options) {
 
         if ( options=== undefined || options === null ) {
@@ -559,4 +554,3 @@ class ATNDeserializer {
     }
 }
 
-module.exports = ATNDeserializer;

@@ -1,41 +1,12 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Token} = require('./Token');
+import Token from './Token.js';
+import Interval from "./Interval.js";
 
-/* stop is not included! */
-class Interval {
-
-	constructor(start, stop) {
-		this.start = start;
-		this.stop = stop;
-	}
-
-	clone() {
-		return new Interval(this.start, this.stop);
-	}
-
-	contains(item) {
-		return item >= this.start && item < this.stop;
-	}
-
-	toString() {
-		if(this.start===this.stop-1) {
-			return this.start.toString();
-		} else {
-			return this.start.toString() + ".." + (this.stop-1).toString();
-		}
-	}
-
-	get length(){
-		return this.stop - this.start;
-	}
-}
-
-
-class IntervalSet {
+export default class IntervalSet {
 	constructor() {
 		this.intervals = null;
 		this.readOnly = false;
@@ -287,8 +258,3 @@ class IntervalSet {
 		return this.intervals.map( interval => interval.length ).reduce((acc, val) => acc + val);
 	}
 }
-
-module.exports = {
-	Interval,
-	IntervalSet
-};

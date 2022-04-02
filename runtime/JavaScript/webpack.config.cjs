@@ -1,4 +1,5 @@
 const path = require('path');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
     mode: "production",
@@ -10,7 +11,7 @@ module.exports = {
         library: "antlr4",
         libraryTarget: 'window'
     },
-    node: {
+    externals: {
         module: "empty",
         net: "empty",
         fs: "empty"
@@ -20,9 +21,11 @@ module.exports = {
         rules: [{
             test: /\.js$/,
             exclude: /node_modules/,
-            use: {
-                loader: 'babel-loader',
-            }
+            use: [ 'babel-loader' ]
         }]
-    }
+    },
+    performance: {
+        maxAssetSize: 512000
+    },
+    plugins: [ new ESLintPlugin() ]
 };

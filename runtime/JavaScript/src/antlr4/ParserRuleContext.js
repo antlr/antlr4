@@ -1,15 +1,13 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const RuleContext = require('./RuleContext');
-const Tree = require('./tree/Tree');
-const INVALID_INTERVAL = Tree.INVALID_INTERVAL;
-const TerminalNode = Tree.TerminalNode;
-const TerminalNodeImpl = Tree.TerminalNodeImpl;
-const ErrorNodeImpl = Tree.ErrorNodeImpl;
-const Interval = require("./IntervalSet").Interval;
+import RuleContext from './RuleContext.js';
+import TerminalNode from './tree/TerminalNode.js';
+import TerminalNodeImpl from './tree/TerminalNodeImpl.js';
+import ErrorNodeImpl from './tree/ErrorNodeImpl.js';
+import Interval from "./Interval.js";
 
 /**
  * A rule invocation record for parsing.
@@ -35,7 +33,7 @@ const Interval = require("./IntervalSet").Interval;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-class ParserRuleContext extends RuleContext {
+export default class ParserRuleContext extends RuleContext {
 	constructor(parent, invokingStateNumber) {
 		parent = parent || null;
 		invokingStateNumber = invokingStateNumber || null;
@@ -206,7 +204,7 @@ class ParserRuleContext extends RuleContext {
 
 	getSourceInterval() {
 		if( this.start === null || this.stop === null) {
-			return INVALID_INTERVAL;
+			return Interval.INVALID_INTERVAL;
 		} else {
 			return new Interval(this.start.tokenIndex, this.stop.tokenIndex);
 		}
@@ -215,11 +213,4 @@ class ParserRuleContext extends RuleContext {
 
 RuleContext.EMPTY = new ParserRuleContext();
 
-class InterpreterRuleContext extends ParserRuleContext {
-	constructor(parent, invokingStateNumber, ruleIndex) {
-		super(parent, invokingStateNumber);
-		this.ruleIndex = ruleIndex;
-	}
-}
 
-module.exports = ParserRuleContext;

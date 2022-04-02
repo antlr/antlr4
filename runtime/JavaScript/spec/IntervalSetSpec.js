@@ -1,4 +1,5 @@
-const {IntervalSet} = require("../src/antlr4/index.js");
+import { default as antlr } from "../src/antlr4/index.js";
+const IntervalSet = antlr.IntervalSet;
 
 describe('IntervalSet', () => {
   it("computes interval set length", () => {

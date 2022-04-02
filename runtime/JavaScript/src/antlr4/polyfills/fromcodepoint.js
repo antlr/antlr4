@@ -8,7 +8,9 @@ if (!String.fromCodePoint) {
 				const object = {};
 				const $defineProperty = Object.defineProperty;
 				result = $defineProperty(object, object, object) && $defineProperty;
-			} catch(error) {}
+			} catch(error) {
+				/* eslint no-empty: [ "off" ] */
+			}
 			return result;
 		}());
 		const stringFromCharCode = String.fromCharCode;
