@@ -223,13 +223,13 @@ Ref<const PredictionContext> PredictionContext::mergeSingletons(Ref<const Single
   auto rootMerge = mergeRoot(a, b, rootIsWildcard);
   if (rootMerge) {
     if (mergeCache) {
-      return mergeCache->put(a, b, rootMerge);
+      return mergeCache->put(a, b, std::move(rootMerge));
     }
     return rootMerge;
   }
 
-  auto parentA = a->parent;
-  auto parentB = b->parent;
+  const auto& parentA = a->parent;
+  const auto& parentB = b->parent;
   if (a->returnState == b->returnState) { // a == b
     auto parent = merge(parentA, parentB, rootIsWildcard, mergeCache);
 
@@ -343,8 +343,8 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
 
   // walk and merge to yield mergedParents, mergedReturnStates
   while (i < a->returnStates.size() && j < b->returnStates.size()) {
-    auto parentA = a->parents[i];
-    auto parentB = b->parents[j];
+    const auto& parentA = a->parents[i];
+    const auto& parentB = b->parents[j];
     if (a->returnStates[i] == b->returnStates[j]) {
       // same payload (stack tops are equal), must yield merged singleton
       size_t payload = a->returnStates[i];
@@ -352,20 +352,20 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
       bool both$ = payload == EMPTY_RETURN_STATE && !parentA && !parentB;
       bool ax_ax = (parentA && parentB) && *parentA == *parentB; // ax+ax -> ax
       if (both$ || ax_ax) {
-        mergedParents[k] = std::move(parentA); // choose left
+        mergedParents[k] = parentA; // choose left
         mergedReturnStates[k] = payload;
       } else { // ax+ay -> a'[x,y]
-        mergedParents[k] = merge(std::move(parentA), std::move(parentB), rootIsWildcard, mergeCache);
+        mergedParents[k] = merge(parentA, parentB, rootIsWildcard, mergeCache);
         mergedReturnStates[k] = payload;
       }
       i++; // hop over left one as usual
       j++; // but also skip one in right side since we merge
     } else if (a->returnStates[i] < b->returnStates[j]) { // copy a[i] to M
-      mergedParents[k] = std::move(parentA);
+      mergedParents[k] = parentA;
       mergedReturnStates[k] = a->returnStates[i];
       i++;
     } else { // b > a, copy b[j] to M
-      mergedParents[k] = std::move(parentB);
+      mergedParents[k] = parentB;
       mergedReturnStates[k] = b->returnStates[j];
       j++;
     }

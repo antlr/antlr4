@@ -34,10 +34,7 @@ public struct DoubleKeyMap<Key1: Hashable, Key2: Hashable, Value> {
     }
 
     public func get(_ k1: Key1, _ k2: Key2) -> Value? {
-        if let data2 = data[k1] {
-            return data2[k2]
-        }
-        return nil
+        return data[k1]?[k2]
     }
 
     public func get(_ k1: Key1) -> [Key2: Value]? {
