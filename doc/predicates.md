@@ -136,7 +136,7 @@ If, on the other hand, the next character after input `enum` is a letter, then o
 
 Predicates come into play by pruning the set of viable lexer rules. When the lexer encounters a false predicate, it deactivates that rule just like parsers deactivate alternatives with false predicates.
 
-Like parser predicates, lexer predicates can't depend on side effects from lexer actions. That's because actions can only execute after the lexer positively identifies the rule to match. Since predicates are part of the rule selection process, they can't rely on action side effects. Lexer actions must appear after predicates in lexer rules. As an example, here's another way to match enum as a keyword in the lexer:
+Like parser predicates, lexer predicates can't depend on side effects from lexer actions. That said, the predicate can depend on a side effect of an action that occured during the recognition of the previous token. That's because actions can only execute after the lexer positively identifies the rule to match. Since predicates are part of the rule selection process, they can't rely on action side effects created by actions in currently-prospective rules. Lexer actions must appear after predicates in lexer rules. As an example, here's another way to match enum as a keyword in the lexer:
 
 ```
 ENUM: [a-z]+ {getText().equals("enum")}?
@@ -162,3 +162,17 @@ That works great, but it's really just for instructional purposes. It's easier t
 ```
 ENUM : 'enum' ;
 ```
+
+Here's another example of a predicate.  It's important to note that the predicate is evaluated before the action because actions are only executed if the lexer rule matches. The actions are not executed in line; they are collected and executed en mass later.
+
+```
+INDENT : [ \t]+ {System.out.println("INDENT")>} {this.getCharPositionInLine()==0}? ;
+```
+
+For more information on how actions and predicates operate in the lexer, see [Lexer actions and semantic predicates are executed out of order](https://github.com/antlr/antlr4/issues/3611) and [Lexer.getCharIndex() return value not behaving as expected](https://github.com/antlr/antlr4/issues/3606). The lexer rule that will not work as expected is:
+
+```
+Stuff : ( 'a'+ {count++;} | 'b') 'c' 'd' {count == 3}? ;
+```
+
+The `count++` code we'll not execute until after `Stuff` has been recognized (assuming count!=3).

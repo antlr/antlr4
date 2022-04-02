@@ -419,15 +419,15 @@ open class LexerATNSimulator: ATNSimulator {
 
         if config.state is RuleStopState {
             if LexerATNSimulator.debug {
-                if recog != nil {
-                    print("closure at \(recog!.getRuleNames()[config.state.ruleIndex!]) rule stop \(config)\n")
+                if let recog = recog {
+                    print("closure at \(recog.getRuleNames()[config.state.ruleIndex!]) rule stop \(config)\n")
                 } else {
                     print("closure at rule stop \(config)\n")
                 }
             }
 
-            if config.context == nil || config.context!.hasEmptyPath() {
-                if config.context == nil || config.context!.isEmpty() {
+            if config.context?.hasEmptyPath() ?? true {
+                if config.context?.isEmpty() ?? true {
                     try configs.add(config)
                     return true
                 } else {
