@@ -296,9 +296,7 @@ public class BufferedTokenStream: TokenStream {
         var filteredTokens = [Token]()
         for i in start...stop {
             let t = tokens[i]
-            if let types = types, !types.contains(t.getType()) {
-            }
-            else {
+            if types?.contains(t.getType()) ?? true {
                 filteredTokens.append(t)
             }
         }

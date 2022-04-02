@@ -223,8 +223,8 @@ public class ParseTreePatternMatcher {
                     let tokenTagToken: TokenTagToken = t2.getSymbol() as! TokenTagToken
                     // track label->list-of-nodes for both token name and label (if any)
                     labels.map(tokenTagToken.getTokenName(), tree)
-                    if tokenTagToken.getLabel() != nil {
-                        labels.map(tokenTagToken.getLabel()!, tree)
+                    if let label = tokenTagToken.getLabel() {
+                        labels.map(label, tree)
                     }
                 } else {
                     if t1.getText() == t2.getText() {

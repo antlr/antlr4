@@ -18,7 +18,7 @@ public class SingletonPredictionContext: PredictionContext {
         self.returnState = returnState
 
 
-        super.init(parent != nil ? PredictionContext.calculateHashCode(parent!, returnState) : PredictionContext.calculateEmptyHashCode())
+        super.init(parent.map { PredictionContext.calculateHashCode($0, returnState) } ?? PredictionContext.calculateEmptyHashCode())
     }
 
     public static func create(_ parent: PredictionContext?, _ returnState: Int) -> SingletonPredictionContext {
