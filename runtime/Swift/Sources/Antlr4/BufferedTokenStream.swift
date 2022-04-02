@@ -171,7 +171,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func get(_ i: Int) throws -> Token {
-        if i < 0 || i >= tokens.count {
+        guard tokens.indices.contains(i) else {
             throw ANTLRError.indexOutOfBounds(msg: "token index \(i) out of range 0 ..< \(tokens.count)")
         }
         return tokens[i]
@@ -284,8 +284,8 @@ public class BufferedTokenStream: TokenStream {
     /// 
     public func getTokens(_ start: Int, _ stop: Int, _ types: Set<Int>?) throws -> [Token]? {
         try lazyInit()
-        if start < 0 || start >= tokens.count ||
-            stop < 0 || stop >= tokens.count {
+        guard tokens.indices.contains(start),
+              tokens.indices.contains(stop) else {
             throw ANTLRError.indexOutOfBounds(msg: "start \(start) or stop \(stop) not in 0 ..< \(tokens.count)")
 
         }
@@ -309,9 +309,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func getTokens(_ start: Int, _ stop: Int, _ ttype: Int) throws -> [Token]? {
-        var s = Set<Int>()
-        s.insert(ttype)
-        return try getTokens(start, stop, s)
+        return try getTokens(start, stop, [ttype])
     }
 
     /// 
@@ -378,7 +376,7 @@ public class BufferedTokenStream: TokenStream {
     /// 
     public func getHiddenTokensToRight(_ tokenIndex: Int, _ channel: Int = -1) throws -> [Token]? {
         try lazyInit()
-        if tokenIndex < 0 || tokenIndex >= tokens.count {
+        guard tokens.indices.contains(tokenIndex) else {
             throw ANTLRError.indexOutOfBounds(msg: "\(tokenIndex) not in 0 ..< \(tokens.count)")
         }
 
@@ -403,7 +401,7 @@ public class BufferedTokenStream: TokenStream {
     /// 
     public func getHiddenTokensToLeft(_ tokenIndex: Int, _ channel: Int = -1) throws -> [Token]? {
         try lazyInit()
-        if tokenIndex < 0 || tokenIndex >= tokens.count {
+        guard tokens.indices.contains(tokenIndex) else {
             throw ANTLRError.indexOutOfBounds(msg: "\(tokenIndex) not in 0 ..< \(tokens.count)")
         }
 

@@ -613,10 +613,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         for interval in intervals {
             let a = interval.a
             let b = interval.b
-
-            for v in a...b  {
-                values.append(v)
-            }
+            values.append(contentsOf: a...b)
         }
         return values
     }
