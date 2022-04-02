@@ -153,7 +153,7 @@ Here is the file template
 
 ## Maven deploy snapshot
 
-The goal is to get a snapshot, such as `4.10-SNAPSHOT`, to the staging server: [antlr4 tool](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4) and [antlr4 java runtime](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-runtime).
+The goal is to get a snapshot, such as `4.10-SNAPSHOT`, to the staging server: [antlr4 tool](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4/4.10-SNAPSHOT/) and [antlr4 java runtime](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-runtime/4.10-SNAPSHOT/).
 
 Do this:
 
@@ -198,42 +198,29 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 The maven deploy lifecycle phased deploys the artifacts and the poms for the ANTLR project to the [sonatype remote staging server](https://oss.sonatype.org/content/repositories/snapshots/).
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn deploy -DskipTests
+mvn deploy -DskipTests
 ```
 
-With JDK 1.7 (not 6 or 8), do this:
+Make sure `gpg` is installed (`brew install gpg` on mac). Also must [create a key and publish it](https://blog.sonatype.com/2010/01/how-to-generate-pgp-signatures-with-maven/) then update `.m2/settings` to use that public key.
+
+Then:
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn release:prepare -Darguments="-DskipTests"
+mvn release:prepare -Darguments="-DskipTests"
 ```
 
-Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
+Hmm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
 
 ```bash
 export GPG_TTY=$(tty)
 ```
 
-Side note to set jdk 1.7 on os x:
+You should see 0x37 in generated .class files after 0xCAFEBABE; see [Java SE 11 = 55 (0x37 hex)](https://en.wikipedia.org/wiki/Java_class_file):
 
 ```bash
-alias java="`/usr/libexec/java_home -v 1.7`/bin/java"
-alias javac="`/usr/libexec/java_home -v 1.7`/bin/javac"
-alias javadoc="`/usr/libexec/java_home -v 1.7`/bin/javadoc"
-alias jar="`/usr/libexec/java_home -v 1.7`/bin/jar"
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
-```
-
-But I think just this on front of mvn works:
-
-```
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn ...
-```
-
-You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
-
-```bash
-beast:/tmp/org/antlr/v4 $ od -h Tool.class |head -1
-0000000      feca    beba    0000    3300    fa04    0207    0ab8    0100
+~/antlr/code/antlr4 $ od -h tool/target/classes/org/antlr/v4/Tool.class |head -1
+0000000      feca    beba    0000    3700    ed04    0207    0a9d    0100
+                                     ^^
 ```
 
 It will start out by asking you the version number:
@@ -265,9 +252,9 @@ Now, go here:
 
 and on the left click "Staging Repositories". You click the staging repo and close it, then you refresh, click it and release it. It's done when you see it here:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.10-1/antlr4-runtime-4.10-1.jar](https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.10-1/antlr4-runtime-4.10-1.jar)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.10/antlr4-runtime-4.10.jar](https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.10/antlr4-runtime-4.10.jar)
 
-All releases should be here: https://repo1.maven.org/maven2/org/antlr/antlr4-runtime/
+All releases should be here: [https://repo1.maven.org/maven2/org/antlr/antlr4-runtime](https://repo1.maven.org/maven2/org/antlr/antlr4-runtime).
 
 Copy the jars to antlr.org site and update download/index.html
 
