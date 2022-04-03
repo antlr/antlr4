@@ -69,15 +69,18 @@ export default class ATNDeserializer {
     }
 
     deserialize(data) {
-        this.data = data
-        this.pos = 0;
-        this.checkVersion();
+        const legacy = this.reset(data);
+        this.checkVersion(legacy);
+        if(legacy)
+            this.skipUUID();
         const atn = this.readATN();
-        this.readStates(atn);
-        this.readRules(atn);
+        this.readStates(atn, legacy);
+        this.readRules(atn, legacy);
         this.readModes(atn);
         const sets = [];
-        this.readSets(atn, sets);
+        this.readSets(atn, sets, this.readInt.bind(this));
+        if(legacy)
+            this.readSets(atn, sets, this.readInt32.bind(this));
         this.readEdges(atn, sets);
         this.readDecisions(atn);
         this.readLexerActions(atn);
@@ -91,9 +94,35 @@ export default class ATNDeserializer {
         return atn;
     }
 
-    checkVersion() {
+    reset(data) {
+        const version = data.charCodeAt(0);
+        if(version === SERIALIZED_VERSION - 1) {
+            const adjust = function (c) {
+                const v = c.charCodeAt(0);
+                return v > 1 ? v - 2 : v + 65534;
+            };
+            const temp = data.split("").map(adjust);
+            // don't adjust the first value since that's the version number
+            temp[0] = data.charCodeAt(0);
+            this.data = temp;
+            this.pos = 0;
+            return true;
+        } else {
+            this.data = data
+            this.pos = 0;
+            return false;
+        }
+    }
+
+    skipUUID() {
+        let count = 0;
+        while(count++ < 8)
+            this.readInt();
+    }
+
+    checkVersion(legacy) {
         const version = this.readInt();
-        if ( version !== SERIALIZED_VERSION ) {
+        if ( !legacy && version !== SERIALIZED_VERSION ) {
             throw ("Could not deserialize ATN with version " + version + " (expected " + SERIALIZED_VERSION + ").");
         }
     }
@@ -104,7 +133,7 @@ export default class ATNDeserializer {
         return new ATN(grammarType, maxTokenType);
     }
 
-    readStates(atn) {
+    readStates(atn, legacy) {
         let j, pair, stateNumber;
         const  loopBackStateNumbers = [];
         const  endStateNumbers = [];
@@ -117,6 +146,9 @@ export default class ATNDeserializer {
                 continue;
             }
             let ruleIndex = this.readInt();
+            if (legacy && ruleIndex === 0xFFFF) {
+                ruleIndex = -1;
+            }
             const  s = this.stateFactory(stype, ruleIndex);
             if (stype === ATNState.LOOP_END) { // special case
                 const  loopBackStateNumber = this.readInt();
@@ -152,7 +184,7 @@ export default class ATNDeserializer {
         }
     }
 
-    readRules(atn) {
+    readRules(atn, legacy) {
         let i;
         const nrules = this.readInt();
         if (atn.grammarType === ATNType.LEXER ) {
@@ -164,6 +196,9 @@ export default class ATNDeserializer {
             atn.ruleToStartState[i] = atn.states[s];
             if ( atn.grammarType === ATNType.LEXER ) {
                 let tokenType = this.readInt();
+                if (legacy && tokenType === 0xFFFF) {
+                    tokenType = Token.EOF;
+                }
                 atn.ruleToTokenType[i] = tokenType;
             }
         }
@@ -186,7 +221,7 @@ export default class ATNDeserializer {
         }
     }
 
-    readSets(atn, sets) {
+    readSets(atn, sets, reader) {
         const m = this.readInt();
         for (let i=0; i<m; i++) {
             const iset = new IntervalSet();
@@ -197,8 +232,8 @@ export default class ATNDeserializer {
                 iset.addOne(-1);
             }
             for (let j=0; j<n; j++) {
-                const i1 = this.readInt();
-                const i2 = this.readInt();
+                const i1 = reader();
+                const i2 = reader();
                 iset.addRange(i1, i2);
             }
         }
@@ -287,7 +322,13 @@ export default class ATNDeserializer {
             for (let i=0; i<count; i++) {
                 const actionType = this.readInt();
                 let data1 = this.readInt();
+                if (data1 === 0xFFFF) {
+                    data1 = -1;
+                }
                 let data2 = this.readInt();
+                if (data2 === 0xFFFF) {
+                    data2 = -1;
+                }
                 atn.lexerActions[i] = this.lexerActionFactory(actionType, data1, data2);
             }
         }
@@ -474,6 +515,12 @@ export default class ATNDeserializer {
 
     readInt() {
         return this.data[this.pos++];
+    }
+
+    readInt32() {
+        const low = this.readInt();
+        const high = this.readInt();
+        return low | (high << 16);
     }
 
     edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets) {
