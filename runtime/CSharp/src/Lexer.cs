@@ -246,11 +246,16 @@ outer_continue: ;
         {
             if (_modeStack.Count == 0)
             {
-                throw new InvalidOperationException();
+                var type = _input.GetType();
+                NotifyListeners(new LexerEmptyModeStackException(this, _input,
+                    _tokenStartCharIndex, _input.Index - _tokenStartCharIndex - 1));
+            }
+            else
+            {
+                int mode = _modeStack.Pop();
+                Mode(mode);
             }
 
-            int mode = _modeStack.Pop();
-            Mode(mode);
             return _mode;
         }
 
@@ -553,12 +558,13 @@ outer_continue: ;
             }
         }
 
-        public virtual void NotifyListeners(LexerNoViableAltException e)
+        public virtual void NotifyListeners(LexerException e)
         {
-            string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
-            string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
-            IAntlrErrorListener<int> listener = ErrorListenerDispatch;
-            listener.SyntaxError(ErrorOutput, this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
+            Interval inputInterval = Interval.Of(e.StartIndex, e.StartIndex + e.Length);
+            String input = GetErrorDisplay(_input.GetText(inputInterval));
+            String errorMessage = e.GetErrorMessage(input);
+            ErrorListenerDispatch.SyntaxError(ErrorOutput, this,
+                0, _tokenStartLine, _tokenStartColumn, errorMessage, e);
         }
 
         public virtual string GetErrorDisplay(string s)

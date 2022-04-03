@@ -165,7 +165,7 @@ func (b *BaseLexer) setTokenFactory(f TokenFactory) {
 func (b *BaseLexer) safeMatch() (ret int) {
 	defer func() {
 		if e := recover(); e != nil {
-			if re, ok := e.(RecognitionException); ok {
+			if re, ok := e.(LexerException); ok {
 				b.notifyListeners(re) // Report error
 				b.Recover(re)
 				ret = LexerSkip // default
@@ -264,13 +264,15 @@ func (b *BaseLexer) PushMode(m int) {
 
 func (b *BaseLexer) PopMode() int {
 	if len(b.modeStack) == 0 {
-		panic("Empty Stack")
+		b.notifyListeners(NewLexerEmptyModeStackException(b, b.input,
+			b.TokenStartCharIndex, b.input.Index() - b.TokenStartCharIndex - 1))
+	} else {
+		if LexerATNSimulatorDebug {
+			fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
+		}
+		i, _ := b.modeStack.Pop()
+		b.mode = i
 	}
-	if LexerATNSimulatorDebug {
-		fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
-	}
-	i, _ := b.modeStack.Pop()
-	b.mode = i
 	return b.mode
 }
 
@@ -373,13 +375,12 @@ func (b *BaseLexer) GetAllTokens() []Token {
 	return tokens
 }
 
-func (b *BaseLexer) notifyListeners(e RecognitionException) {
-	start := b.TokenStartCharIndex
-	stop := b.input.Index()
-	text := b.input.GetTextFromInterval(NewInterval(start, stop))
-	msg := "token recognition error at: '" + text + "'"
+func (b *BaseLexer) notifyListeners(e LexerException) {
+	startIndex := e.GetStartIndex()
+	input := b.input.GetTextFromInterval(NewInterval(startIndex, startIndex + e.GetLength()))
+	errorMessage := e.GetErrorMessage(input)
 	listener := b.GetErrorListenerDispatch()
-	listener.SyntaxError(b, nil, b.TokenStartLine, b.TokenStartColumn, msg, e)
+	listener.SyntaxError(b, nil, b.TokenStartLine, b.TokenStartColumn, errorMessage, e.(RecognitionException))
 }
 
 func (b *BaseLexer) getErrorDisplayForChar(c rune) string {
@@ -405,7 +406,7 @@ func (b *BaseLexer) getCharErrorDisplay(c rune) string {
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
-func (b *BaseLexer) Recover(re RecognitionException) {
+func (b *BaseLexer) Recover(re LexerException) {
 	if b.input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// Skip a char and try again

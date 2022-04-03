@@ -307,7 +307,8 @@ open class LexerATNSimulator: ATNSimulator {
                 if t == BufferedTokenStream.EOF && input.index() == startIndex {
                     return CommonToken.EOF
                 }
-                throw ANTLRException.recognition(e: LexerNoViableAltException(recog, input, startIndex, reach))
+                throw ANTLRException.recognition(e: LexerNoViableAltException(recog, input,
+                    startIndex, input.index() - startIndex, reach))
             }
     }
 

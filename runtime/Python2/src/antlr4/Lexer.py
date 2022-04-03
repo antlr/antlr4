@@ -14,7 +14,7 @@ import sys
 from antlr4.CommonTokenFactory import CommonTokenFactory
 from antlr4.Recognizer import Recognizer
 from antlr4.Token import Token
-from antlr4.error.Errors import IllegalStateException, LexerNoViableAltException
+from antlr4.error.Errors import IllegalStateException, LexerException, LexerNoViableAltException, LexerEmptyModeStackException
 
 class TokenSource(object):
 
@@ -168,11 +168,13 @@ class Lexer(Recognizer, TokenSource):
         self.mode(m)
 
     def popMode(self):
-        if len(self._modeStack)==0:
-            raise Exception("Empty Stack")
-        if self._interp.debug:
-            print("popMode back to "+ self._modeStack[:-1], file=self._output)
-        self.mode( self._modeStack.pop() )
+        if len(self._modeStack) == 0:
+            self.notifyListeners(LexerEmptyModeStackException(self, self._input,
+                self._tokenStartCharIndex, self._input.index - self._tokenStartCharIndex - 1))
+        else:
+            if self._interp.debug:
+                print("popMode back to " + self._modeStack[:-1], file=self._output)
+            self.mode(self._modeStack.pop())
         return self._mode
 
     # Set the char stream and reset the lexer#/
@@ -275,12 +277,10 @@ class Lexer(Recognizer, TokenSource):
         return tokens
 
     def notifyListeners(self, e):
-        start = self._tokenStartCharIndex
-        stop = self._input.index
-        text = self._input.getText(start, stop)
-        msg = u"token recognition error at: '" + self.getErrorDisplay(text) + u"'"
+        input = self.getErrorDisplay(self._input.getText(e.startIndex, e.startIndex + e.length))
+        errorMessage = e.getErrorMessage(input)
         listener = self.getErrorListenerDispatch()
-        listener.syntaxError(self, None, self._tokenStartLine, self._tokenStartColumn, msg, e)
+        listener.syntaxError(self, None, self._tokenStartLine, self._tokenStartColumn, errorMessage, e)
 
     def getErrorDisplay(self, s):
         with StringIO() as buf:

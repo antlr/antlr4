@@ -189,9 +189,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public int popMode() {
-		if ( _modeStack.isEmpty() ) throw new EmptyStackException();
-		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+ _modeStack.peek());
-		mode( _modeStack.pop() );
+		if (_modeStack.isEmpty()) {
+			notifyListeners(new LexerEmptyModeStackException(this, _input,
+					_tokenStartCharIndex, _input.index() - _tokenStartCharIndex - 1));
+		}
+		else {
+			if (LexerATNSimulator.debug) System.out.println("popMode back to " + _modeStack.peek());
+			mode(_modeStack.pop());
+		}
 		return _mode;
 	}
 
@@ -356,12 +361,12 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		}
 	}
 
-	public void notifyListeners(LexerNoViableAltException e) {
-		String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
-		String msg = "token recognition error at: '"+ getErrorDisplay(text) + "'";
-
+	public void notifyListeners(LexerException e) {
+		Interval inputInterval = Interval.of(e.startIndex, e.startIndex + e.length);
+		String input = getErrorDisplay(_input.getText(inputInterval));
+		String errorMessage = e.getErrorMessage(input);
 		ANTLRErrorListener listener = getErrorListenerDispatch();
-		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, errorMessage, e);
 	}
 
 	public String getErrorDisplay(String s) {

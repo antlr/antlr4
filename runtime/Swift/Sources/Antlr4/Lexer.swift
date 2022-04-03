@@ -212,13 +212,14 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     @discardableResult
     open func popMode() throws -> Int {
         if _modeStack.isEmpty {
-            throw ANTLRError.unsupportedOperation(msg: " EmptyStackException")
+            notifyListeners(LexerEmptyModeStackException(self, _input!,
+                _tokenStartCharIndex, _input!.index() - _tokenStartCharIndex - 1), recognizer: self)
+        } else {
+            if LexerATNSimulator.debug {
+                print("popMode back to \(String(describing: _modeStack.peek()))")
+            }
+            mode(_modeStack.pop())
         }
-
-        if LexerATNSimulator.debug {
-            print("popMode back to \(String(describing: _modeStack.peek()))")
-        }
-        mode(_modeStack.pop())
         return _mode
     }
 
@@ -397,19 +398,21 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
         }
     }
 
-    open func notifyListeners<T>(_ e: LexerNoViableAltException, recognizer: Recognizer<T>) {
+    open func notifyListeners<T>(_ e: LexerException, recognizer: Recognizer<T>) {
 
-        let text: String
+        let errorMessage: String
         do {
-            text = try _input!.getText(Interval.of(_tokenStartCharIndex, _input!.index()))
+            let startIndex = e.getStartIndex()
+            let inputInterval = Interval.of(startIndex, startIndex + e.getLength())
+            let input = try getErrorDisplay(_input!.getText(inputInterval))
+            errorMessage = e.getErrorMessage(input)
         }
         catch {
-            text = "<unknown>"
+            errorMessage = "<unknown>"
         }
-        let msg = "token recognition error at: '\(getErrorDisplay(text))'"
 
         let listener = getErrorListenerDispatch()
-        listener.syntaxError(recognizer, nil, _tokenStartLine, _tokenStartCharPositionInLine, msg, e)
+        listener.syntaxError(recognizer, nil, _tokenStartLine, _tokenStartCharPositionInLine, errorMessage, e)
     }
 
     open func getErrorDisplay(_ s: String) -> String {

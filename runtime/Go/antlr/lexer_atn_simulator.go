@@ -262,7 +262,7 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 		return TokenEOF
 	}
 
-	panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, reach))
+	panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, input.Index() - l.startIndex, reach))
 }
 
 // Given a starting configuration set, figure out all ATN configurations

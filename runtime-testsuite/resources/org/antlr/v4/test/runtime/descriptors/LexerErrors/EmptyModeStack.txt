@@ -1,0 +1,21 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar T;
+A: 'aa';
+B: 'bb' -> popMode;
+C: 'cc';
+
+[input]
+aabbcc
+
+[output]
+[@0,0:1='aa',<1>,1:0]
+[@1,2:3='bb',<2>,1:2]
+[@2,4:5='cc',<3>,1:4]
+[@3,6:5='<EOF>',<-1>,1:6]
+
+[errors]
+"""line 1:2 Unable to pop mode because mode stack is empty at: 'bb'
+"""

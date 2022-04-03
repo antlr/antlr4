@@ -12,26 +12,22 @@ import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Locale;
 
-public class LexerNoViableAltException extends RecognitionException {
-	/** Matching attempted at what input index? */
-	private final int startIndex;
-
+public class LexerNoViableAltException extends LexerException {
 	/** Which configurations did we try at input.index() that couldn't match input.LA(1)? */
 	private final ATNConfigSet deadEndConfigs;
 
-	public LexerNoViableAltException(Lexer lexer,
-									 CharStream input,
-									 int startIndex,
-									 ATNConfigSet deadEndConfigs) {
-		super(lexer, input, null);
-		this.startIndex = startIndex;
+	@Deprecated
+	public LexerNoViableAltException(Lexer lexer, CharStream input, int startIndex, ATNConfigSet deadEndConfigs) {
+		this(lexer, input, startIndex, 1, deadEndConfigs);
+	}
+
+	public LexerNoViableAltException(Lexer lexer, CharStream input, int startIndex, int length, ATNConfigSet deadEndConfigs) {
+		super(lexer, input, startIndex, length);
 		this.deadEndConfigs = deadEndConfigs;
 	}
 
-	public int getStartIndex() {
-		return startIndex;
-	}
-
+	@Deprecated
+	public int getStartIndex() { return startIndex; }
 
 	public ATNConfigSet getDeadEndConfigs() {
 		return deadEndConfigs;
@@ -40,6 +36,11 @@ public class LexerNoViableAltException extends RecognitionException {
 	@Override
 	public CharStream getInputStream() {
 		return (CharStream)super.getInputStream();
+	}
+
+	@Override
+	public String getErrorMessage(String input) {
+		return "token recognition error at: '" + input + "'";
 	}
 
 	@Override

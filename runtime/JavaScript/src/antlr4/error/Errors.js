@@ -69,11 +69,22 @@ class RecognitionException extends Error {
     }
 }
 
-class LexerNoViableAltException extends RecognitionException {
-    constructor(lexer, input, startIndex, deadEndConfigs) {
+class LexerException extends RecognitionException {
+    constructor(lexer, input, startIndex, length) {
         super({message: "", recognizer: lexer, input: input, ctx: null});
         this.startIndex = startIndex;
+        this.length = length;
+    }
+}
+
+class LexerNoViableAltException extends LexerException {
+    constructor(lexer, input, startIndex, length, deadEndConfigs) {
+        super(lexer, input, startIndex, length);
         this.deadEndConfigs = deadEndConfigs;
+    }
+
+    getErrorMessage(token) {
+        return "token recognition error at: '" + token + "'";
     }
 
     toString() {
@@ -85,6 +96,15 @@ class LexerNoViableAltException extends RecognitionException {
     }
 }
 
+class LexerEmptyModeStackException extends LexerException {
+    constructor(lexer, input, startIndex, length) {
+        super(lexer, input, startIndex, length);
+    }
+
+    getErrorMessage(token) {
+        return "Unable to pop mode because mode stack is empty at: '" + token + "'";
+    }
+}
 
 /**
  * Indicates that the parser could not decide which of two or more paths
@@ -167,7 +187,9 @@ class ParseCancellationException extends Error{
 module.exports = {
     RecognitionException,
     NoViableAltException,
+    LexerException,
     LexerNoViableAltException,
+    LexerEmptyModeStackException,
     InputMismatchException,
     FailedPredicateException,
     ParseCancellationException

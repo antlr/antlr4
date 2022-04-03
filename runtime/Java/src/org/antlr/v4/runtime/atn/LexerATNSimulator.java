@@ -306,7 +306,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				return Token.EOF;
 			}
 
-			throw new LexerNoViableAltException(recog, input, startIndex, reach);
+			throw new LexerNoViableAltException(recog, input, startIndex, input.index() - startIndex, reach);
 		}
 	}
 
