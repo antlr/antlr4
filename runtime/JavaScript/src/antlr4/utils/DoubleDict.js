@@ -16,9 +16,9 @@ export default class DoubleDict {
         let d = this.cacheMap.get(a) || null;
         if (d === null) {
             d = new this.defaultMapCtor();
-            this.cacheMap.put(a, d);
+            this.cacheMap.set(a, d);
         }
-        d.put(b, o);
+        d.set(b, o);
     }
 
 }

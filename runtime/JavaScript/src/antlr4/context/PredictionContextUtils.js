@@ -36,7 +36,7 @@ export function getCachedPredictionContext(context, contextCache, visited) {
     }
     existing = contextCache.get(context);
     if (existing !== null) {
-        visited.put(context, existing);
+        visited.set(context, existing);
         return existing;
     }
     let changed = false;
@@ -56,7 +56,7 @@ export function getCachedPredictionContext(context, contextCache, visited) {
     }
     if (!changed) {
         contextCache.add(context);
-        visited.put(context, context);
+        visited.set(context, context);
         return context;
     }
     let updated = null;
@@ -69,8 +69,8 @@ export function getCachedPredictionContext(context, contextCache, visited) {
         updated = new ArrayPredictionContext(parents, context.returnStates);
     }
     contextCache.add(updated);
-    visited.put(updated, updated);
-    visited.put(context, updated);
+    visited.set(updated, updated);
+    visited.set(context, updated);
 
     return updated;
 }
@@ -238,7 +238,7 @@ function combineCommonParents(parents) {
     for (let p = 0; p < parents.length; p++) {
         const parent = parents[p];
         if (!(uniqueParents.containsKey(parent))) {
-            uniqueParents.put(parent, parent);
+            uniqueParents.set(parent, parent);
         }
     }
     for (let q = 0; q < parents.length; q++) {
@@ -433,7 +433,7 @@ export function getAllContextNodes(context, nodes, visited) {
         if (context === null || visited.containsKey(context)) {
             return nodes;
         }
-        visited.put(context, context);
+        visited.set(context, context);
         nodes.push(context);
         for (let i = 0; i < context.length; i++) {
             getAllContextNodes(context.getParent(i), nodes, visited);

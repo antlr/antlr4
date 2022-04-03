@@ -1,6 +1,8 @@
 import HashCode from "./HashCode.js";
+import equalArrays from "../utils/equalArrays.js";
 
 export default class BitSet {
+
     constructor() {
         this.data = [];
     }
@@ -10,10 +12,7 @@ export default class BitSet {
     }
 
     or(set) {
-        const bits = this;
-        Object.keys(set.data).map(function (alt) {
-            bits.add(alt);
-        });
+        Object.keys(set.data).map(alt => this.add(alt), this);
     }
 
     remove(value) {
@@ -33,16 +32,11 @@ export default class BitSet {
     }
 
     hashCode() {
-        const hash = new HashCode();
-        hash.update(this.values());
-        return hash.finish();
+        return HashCode.hashStuff(this.values());
     }
 
     equals(other) {
-        if (!(other instanceof BitSet)) {
-            return false;
-        }
-        return this.hashCode() === other.hashCode();
+        return other instanceof BitSet && equalArrays(this.data, other.data);
     }
 
     toString() {

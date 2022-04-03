@@ -25,7 +25,7 @@ export default class PredictionContextCache {
         if (existing !== null) {
             return existing;
         }
-        this.cache.put(ctx, ctx);
+        this.cache.set(ctx, ctx);
         return ctx;
     }
 

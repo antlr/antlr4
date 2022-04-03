@@ -3,6 +3,7 @@ import standardEqualsFunction from "../utils/standardEqualsFunction.js";
 import arrayToString from "../utils/arrayToString.js";
 
 export default class HashSet {
+
     constructor(hashFunction, equalsFunction) {
         this.data = {};
         this.hashFunction = hashFunction || standardHashCodeFunction;

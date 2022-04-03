@@ -1,15 +1,18 @@
 import standardEqualsFunction from "../utils/standardEqualsFunction.js";
 import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
 
+const HASH_KEY_PREFIX = "h-";
+
 export default class HashMap {
+
     constructor(hashFunction, equalsFunction) {
         this.data = {};
         this.hashFunction = hashFunction || standardHashCodeFunction;
         this.equalsFunction = equalsFunction || standardEqualsFunction;
     }
 
-    put(key, value) {
-        const hashKey = "hash_" + this.hashFunction(key);
+    set(key, value) {
+        const hashKey = HASH_KEY_PREFIX + this.hashFunction(key);
         if (hashKey in this.data) {
             const entries = this.data[hashKey];
             for (let i = 0; i < entries.length; i++) {
@@ -29,7 +32,7 @@ export default class HashMap {
     }
 
     containsKey(key) {
-        const hashKey = "hash_" + this.hashFunction(key);
+        const hashKey = HASH_KEY_PREFIX + this.hashFunction(key);
         if(hashKey in this.data) {
             const entries = this.data[hashKey];
             for (let i = 0; i < entries.length; i++) {
@@ -42,7 +45,7 @@ export default class HashMap {
     }
 
     get(key) {
-        const hashKey = "hash_" + this.hashFunction(key);
+        const hashKey = HASH_KEY_PREFIX + this.hashFunction(key);
         if(hashKey in this.data) {
             const entries = this.data[hashKey];
             for (let i = 0; i < entries.length; i++) {
@@ -55,41 +58,23 @@ export default class HashMap {
     }
 
     entries() {
-        let l = [];
-        for (const key in this.data) {
-            if (key.indexOf("hash_") === 0) {
-                l = l.concat(this.data[key]);
-            }
-        }
-        return l;
+        return Object.keys(this.data).filter(key => key.startsWith(HASH_KEY_PREFIX)).flatMap(key => this.data[key], this);
     }
 
     getKeys() {
-        return this.entries().map(function(e) {
-            return e.key;
-        });
+        return this.entries().map(e => e.key);
     }
 
     getValues() {
-        return this.entries().map(function(e) {
-            return e.value;
-        });
+        return this.entries().map(e => e.value);
     }
 
     toString() {
-        const ss = this.entries().map(function(entry) {
-            return '{' + entry.key + ':' + entry.value + '}';
-        });
+        const ss = this.entries().map(e => '{' + e.key + ':' + e.value + '}');
         return '[' + ss.join(", ") + ']';
     }
 
-    get length(){
-        let l = 0;
-        for (const hashKey in this.data) {
-            if (hashKey.indexOf("hash_") === 0) {
-                l = l + this.data[hashKey].length;
-            }
-        }
-        return l;
+    get length() {
+        return Object.keys(this.data).filter(key => key.startsWith(HASH_KEY_PREFIX)).map(key => this.data[key].length, this).reduce((accum, item) => accum + item, 0);
     }
 }

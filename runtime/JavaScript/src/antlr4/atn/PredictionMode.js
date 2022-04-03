@@ -509,7 +509,7 @@ const PredictionMode = {
             let alts = configToAlts.get(cfg);
             if (alts === null) {
                 alts = new BitSet();
-                configToAlts.put(cfg, alts);
+                configToAlts.set(cfg, alts);
             }
             alts.add(cfg.alt);
         });
@@ -530,7 +530,7 @@ const PredictionMode = {
             let alts = m.get(c.state);
             if (alts === null) {
                 alts = new BitSet();
-                m.put(c.state, alts);
+                m.set(c.state, alts);
             }
             alts.add(c.alt);
         });
