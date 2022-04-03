@@ -1,6 +1,6 @@
-import PrecedencePredicate from "./PrecedencePredicate.js";
+import PrecedencePredicate from "../atn/PrecedencePredicate.js";
 import Transition from "./Transition.js";
-import AbstractPredicateTransition from "./AbstractPredicateTransition.js";
+import AbstractPredicateTransition from "../atn/AbstractPredicateTransition.js";
 
 export default class PrecedencePredicateTransition extends AbstractPredicateTransition {
     constructor(target, precedence) {

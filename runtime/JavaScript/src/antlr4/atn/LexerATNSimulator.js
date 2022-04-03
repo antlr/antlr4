@@ -9,11 +9,11 @@ import ATN from './ATN.js';
 import ATNSimulator from './ATNSimulator.js';
 import DFAState from '../dfa/DFAState.js';
 import OrderedATNConfigSet from './OrderedATNConfigSet.js';
-import PredictionContext from '../PredictionContext.js';
-import SingletonPredictionContext from '../SingletonPredictionContext.js';
-import RuleStopState from './RuleStopState.js';
-import LexerATNConfig from './ATNConfig.js';
-import Transition from './Transition.js';
+import PredictionContext from '../context/PredictionContext.js';
+import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
+import RuleStopState from '../state/RuleStopState.js';
+import LexerATNConfig from './LexerATNConfig.js';
+import Transition from '../transition/Transition.js';
 import LexerActionExecutor from './LexerActionExecutor.js';
 import LexerNoViableAltException from '../error/LexerNoViableAltException.js';
 
@@ -274,8 +274,7 @@ export default class LexerATNSimulator extends ATNSimulator {
      * we can reach upon input {@code t}. Parameter {@code reach} is a return
      * parameter.
      */
-    getReachableConfigSet(input, closure,
-                          reach, t) {
+    getReachableConfigSet(input, closure, reach, t) {
         // this is used to skip processing for configs which have a lower priority
         // than a config that already reached an accept state for the same rule
         let skipAlt = ATN.INVALID_ALT_NUMBER;

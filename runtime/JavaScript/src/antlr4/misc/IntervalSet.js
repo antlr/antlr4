@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import Token from './Token.js';
+import Token from '../Token.js';
 import Interval from "./Interval.js";
 
 export default class IntervalSet {

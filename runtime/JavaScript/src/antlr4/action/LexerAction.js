@@ -1,4 +1,4 @@
-import Hash from "../utils/Hash.js";
+import HashCode from "../misc/HashCode.js";
 
 /* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
@@ -13,7 +13,7 @@ export default class LexerAction {
     }
 
     hashCode() {
-        const hash = new Hash();
+        const hash = new HashCode();
         this.updateHashCode(hash);
         return hash.finish()
     }

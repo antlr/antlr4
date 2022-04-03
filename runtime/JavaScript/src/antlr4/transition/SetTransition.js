@@ -1,5 +1,5 @@
 // A transition containing a set of values.
-import IntervalSet from "../IntervalSet.js";
+import IntervalSet from "../misc/IntervalSet.js";
 import Token from '../Token.js';
 import Transition from "./Transition.js";
 

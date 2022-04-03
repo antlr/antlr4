@@ -1,5 +1,5 @@
-import PredictionContext from "./PredictionContext.js";
-import CustomizedMap from "./utils/CustomizedMap.js";
+import PredictionContext from "../context/PredictionContext.js";
+import HashMap from "../misc/HashMap.js";
 
 /**
  * Used to cache {@link PredictionContext} objects. Its used for the shared
@@ -9,7 +9,7 @@ import CustomizedMap from "./utils/CustomizedMap.js";
 export default class PredictionContextCache {
 
     constructor() {
-        this.cache = new CustomizedMap();
+        this.cache = new HashMap();
     }
 
     /**

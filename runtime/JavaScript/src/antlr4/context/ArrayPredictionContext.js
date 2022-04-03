@@ -1,6 +1,6 @@
 import PredictionContext from "./PredictionContext.js";
-import equalArrays from "./utils/equalArrays.js";
-import Hash from "./utils/Hash.js";
+import equalArrays from "../utils/equalArrays.js";
+import HashCode from "../misc/HashCode.js";
 
 export default class ArrayPredictionContext extends PredictionContext {
 
@@ -11,7 +11,7 @@ export default class ArrayPredictionContext extends PredictionContext {
          * null parent and
          * returnState == {@link //EMPTY_RETURN_STATE}.
          */
-        const h = new Hash();
+        const h = new HashCode();
         h.update(parents, returnStates);
         const hashCode = h.finish();
         super(hashCode);

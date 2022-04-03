@@ -4,10 +4,10 @@
  */
 
 import RuleContext from './RuleContext.js';
-import TerminalNode from './tree/TerminalNode.js';
-import TerminalNodeImpl from './tree/TerminalNodeImpl.js';
-import ErrorNodeImpl from './tree/ErrorNodeImpl.js';
-import Interval from "./Interval.js";
+import TerminalNode from '../tree/TerminalNode.js';
+import TerminalNodeImpl from '../tree/TerminalNodeImpl.js';
+import ErrorNodeImpl from '../tree/ErrorNodeImpl.js';
+import Interval from "../misc/Interval.js";
 
 /**
  * A rule invocation record for parsing.

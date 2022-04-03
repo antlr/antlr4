@@ -1,6 +1,9 @@
+import HashMap from "../misc/HashMap.js";
+
 export default class DoubleDict {
+
     constructor(defaultMapCtor) {
-        this.defaultMapCtor = defaultMapCtor || Map;
+        this.defaultMapCtor = defaultMapCtor || HashMap;
         this.cacheMap = new this.defaultMapCtor();
     }
 
@@ -17,4 +20,5 @@ export default class DoubleDict {
         }
         d.put(b, o);
     }
+
 }

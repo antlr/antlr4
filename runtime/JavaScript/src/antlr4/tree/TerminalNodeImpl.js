@@ -1,4 +1,4 @@
-import Interval from "../Interval.js";
+import Interval from "../misc/Interval.js";
 import Token from '../Token.js';
 import TerminalNode from "./TerminalNode.js";
 

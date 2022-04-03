@@ -4,8 +4,8 @@
  */
 
 import equalArrays from "../utils/equalArrays.js";
-import Hash from "../utils/Hash.js";
-import CustomizedSet from "../utils/CustomizedSet.js";
+import HashCode from "../misc/HashCode.js";
+import HashSet from "../misc/HashSet.js";
 
 /**
  * A tree structure used to record the semantic context in which
@@ -18,7 +18,7 @@ import CustomizedSet from "../utils/CustomizedSet.js";
 export default class SemanticContext {
 
 	hashCode() {
-		const hash = new Hash();
+		const hash = new HashCode();
 		this.updateHashCode(hash);
 		return hash.finish();
 	}
@@ -103,7 +103,7 @@ class AND extends SemanticContext {
 	 */
 	constructor(a, b) {
 		super();
-		const operands = new CustomizedSet();
+		const operands = new HashSet();
 		if (a instanceof AND) {
 			a.opnds.map(function(o) {
 				operands.add(o);
@@ -205,7 +205,7 @@ class OR extends SemanticContext {
 	 */
 	constructor(a, b) {
 		super();
-		const operands = new CustomizedSet();
+		const operands = new HashSet();
 		if (a instanceof OR) {
 			a.opnds.map(function(o) {
 				operands.add(o);

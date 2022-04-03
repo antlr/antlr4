@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import LL1Analyzer from '../LL1Analyzer.js';
-import IntervalSet from '../IntervalSet.js';
+import LL1Analyzer from './LL1Analyzer.js';
+import IntervalSet from '../misc/IntervalSet.js';
 import Token from '../Token.js';
 
 export default class ATN {

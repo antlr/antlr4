@@ -1,4 +1,4 @@
-import Transition from "./Transition.js";
+import Transition from "../transition/Transition.js";
 
 export default class AbstractPredicateTransition extends Transition {
     constructor(target) {

@@ -1,4 +1,4 @@
-import Hash from "./Hash.js";
+import HashCode from "./HashCode.js";
 
 export default class BitSet {
     constructor() {
@@ -33,7 +33,7 @@ export default class BitSet {
     }
 
     hashCode() {
-        const hash = new Hash();
+        const hash = new HashCode();
         hash.update(this.values());
         return hash.finish();
     }

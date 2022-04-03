@@ -1,4 +1,4 @@
-import Interval from "../Interval.js";
+import Interval from "../misc/Interval.js";
 import RecognitionException from "./RecognitionException.js";
 
 export default class LexerNoViableAltException extends RecognitionException {

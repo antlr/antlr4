@@ -1,4 +1,4 @@
-import PredicateTransition from "../atn/PredicateTransition.js";
+import PredicateTransition from "../transition/PredicateTransition.js";
 import RecognitionException from "./RecognitionException.js";
 
 /**

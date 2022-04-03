@@ -25,7 +25,8 @@ module.exports = {
         }]
     },
     performance: {
-        maxAssetSize: 512000
+        maxAssetSize: 512000,
+        maxEntrypointSize: 512000
     },
     plugins: [ new ESLintPlugin() ]
 };

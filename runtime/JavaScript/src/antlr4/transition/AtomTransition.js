@@ -1,4 +1,4 @@
-import IntervalSet from "../IntervalSet.js";
+import IntervalSet from "../misc/IntervalSet.js";
 import Transition from "./Transition.js";
 
 export default class AtomTransition extends Transition {

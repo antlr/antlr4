@@ -5,7 +5,7 @@
 
 import Token from './Token.js';
 import Lexer from './Lexer.js';
-import Interval from './Interval.js';
+import Interval from './misc/Interval.js';
 import TokenStream from "./TokenStream.js";
 
 /**

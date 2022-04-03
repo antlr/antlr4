@@ -1,9 +1,9 @@
 import ATNConfigSet from "./ATNConfigSet.js";
-import CustomizedSet from "../utils/CustomizedSet.js";
+import HashSet from "../misc/HashSet.js";
 
 export default class OrderedATNConfigSet extends ATNConfigSet {
     constructor() {
         super();
-        this.configLookup = new CustomizedSet();
+        this.configLookup = new HashSet();
     }
 }

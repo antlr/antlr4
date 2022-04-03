@@ -4,7 +4,7 @@
  */
 
 import SemanticContext from './SemanticContext.js';
-import Hash from "../utils/Hash.js";
+import HashCode from "../misc/HashCode.js";
 
 function checkParams(params, isCfg) {
 	if(params===null) {
@@ -75,7 +75,7 @@ export default class ATNConfig {
     }
 
     hashCode() {
-        const hash = new Hash();
+        const hash = new HashCode();
         this.updateHashCode(hash);
         return hash.finish();
     }
@@ -104,7 +104,7 @@ export default class ATNConfig {
     }
 
     hashCodeForConfigSet() {
-        const hash = new Hash();
+        const hash = new HashCode();
         hash.update(this.state.stateNumber, this.alt, this.semanticContext);
         return hash.finish();
     }

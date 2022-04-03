@@ -1,7 +1,7 @@
-import standardEqualsFunction from "./standardEqualsFunction.js";
-import standardHashCodeFunction from "./standardHashCodeFunction.js";
+import standardEqualsFunction from "../utils/standardEqualsFunction.js";
+import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
 
-export default class CustomizedMap {
+export default class HashMap {
     constructor(hashFunction, equalsFunction) {
         this.data = {};
         this.hashFunction = hashFunction || standardHashCodeFunction;

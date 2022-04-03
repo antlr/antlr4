@@ -3,19 +3,19 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import Token from './Token.js';
-import ATNConfig from './atn/ATNConfig.js';
-import IntervalSet from './IntervalSet.js';
-import RuleStopState from './atn/RuleStopState.js';
-import RuleTransition from './atn/RuleTransition.js';
-import NotSetTransition from './atn/NotSetTransition.js';
-import WildcardTransition from './atn/WildcardTransition.js';
-import AbstractPredicateTransition from './atn/AbstractPredicateTransition.js';
-import { predictionContextFromRuleContext } from './PredictionContextUtils.js';
-import PredictionContext from './PredictionContext.js';
-import SingletonPredictionContext from './SingletonPredictionContext.js';
-import BitSet from "./utils/BitSet.js";
-import CustomizedSet from "./utils/CustomizedSet.js";
+import Token from '../Token.js';
+import ATNConfig from './ATNConfig.js';
+import IntervalSet from '../misc/IntervalSet.js';
+import RuleStopState from '../state/RuleStopState.js';
+import RuleTransition from '../transition/RuleTransition.js';
+import NotSetTransition from '../transition/NotSetTransition.js';
+import WildcardTransition from '../transition/WildcardTransition.js';
+import AbstractPredicateTransition from './AbstractPredicateTransition.js';
+import { predictionContextFromRuleContext } from '../context/PredictionContextUtils.js';
+import PredictionContext from '../context/PredictionContext.js';
+import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
+import BitSet from "../misc/BitSet.js";
+import HashSet from "../misc/HashSet.js";
 
 export default class LL1Analyzer {
     constructor(atn) {
@@ -40,7 +40,7 @@ export default class LL1Analyzer {
         const look = [];
         for(let alt=0; alt< count; alt++) {
             look[alt] = new IntervalSet();
-            const lookBusy = new CustomizedSet();
+            const lookBusy = new HashSet();
             const seeThruPreds = false; // fail to get lookahead upon pred
             this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
                   look[alt], lookBusy, new BitSet(), seeThruPreds, false);
@@ -76,7 +76,7 @@ export default class LL1Analyzer {
         const seeThruPreds = true; // ignore preds; get all lookahead
         ctx = ctx || null;
         const lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null;
-        this._LOOK(s, stopState, lookContext, r, new CustomizedSet(), new BitSet(), seeThruPreds, true);
+        this._LOOK(s, stopState, lookContext, r, new HashSet(), new BitSet(), seeThruPreds, true);
         return r;
     }
 

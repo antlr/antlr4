@@ -1,8 +1,8 @@
-import standardHashCodeFunction from "./standardHashCodeFunction.js";
-import standardEqualsFunction from "./standardEqualsFunction.js";
-import arrayToString from "./arrayToString.js";
+import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
+import standardEqualsFunction from "../utils/standardEqualsFunction.js";
+import arrayToString from "../utils/arrayToString.js";
 
-export default class CustomizedSet {
+export default class HashSet {
     constructor(hashFunction, equalsFunction) {
         this.data = {};
         this.hashFunction = hashFunction || standardHashCodeFunction;

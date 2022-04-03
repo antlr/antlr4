@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import RuleNode from './tree/RuleNode.js';
-import Interval from './Interval.js';
-import Trees from './tree/Trees.js';
+import RuleNode from '../tree/RuleNode.js';
+import Interval from '../misc/Interval.js';
+import Trees from '../tree/Trees.js';
 
 export default class RuleContext extends RuleNode {
     /** A rule context is a record of a single rule invocation. It knows

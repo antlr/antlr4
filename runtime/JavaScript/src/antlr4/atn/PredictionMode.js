@@ -4,14 +4,14 @@
  */
 
 import ATN from './ATN.js';
-import RuleStopState from './RuleStopState.js';
+import RuleStopState from '../state/RuleStopState.js';
 import ATNConfigSet from './ATNConfigSet.js';
 import ATNConfig from './ATNConfig.js';
 import SemanticContext from './SemanticContext.js';
-import BitSet from "../utils/BitSet.js";
-import AltDict from "../utils/AltDict.js";
-import Hash from "../utils/Hash.js";
-import CustomizedMap from "../utils/CustomizedMap.js";
+import BitSet from "../misc/BitSet.js";
+import AltDict from "../misc/AltDict.js";
+import HashCode from "../misc/HashCode.js";
+import HashMap from "../misc/HashMap.js";
 
 /**
  * This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -502,8 +502,8 @@ const PredictionMode = {
      * </pre>
      */
     getConflictingAltSubsets: function(configs) {
-        const configToAlts = new CustomizedMap();
-        configToAlts.hashFunction = function(cfg) { Hash.hashStuff(cfg.state.stateNumber, cfg.context); };
+        const configToAlts = new HashMap();
+        configToAlts.hashFunction = function(cfg) { HashCode.hashStuff(cfg.state.stateNumber, cfg.context); };
         configToAlts.equalsFunction = function(c1, c2) { return c1.state.stateNumber === c2.state.stateNumber && c1.context.equals(c2.context);};
         configs.items.map(function(cfg) {
             let alts = configToAlts.get(cfg);

@@ -5,8 +5,8 @@
 
 import DFAState from '../dfa/DFAState.js';
 import ATNConfigSet from './ATNConfigSet.js';
-import { getCachedPredictionContext } from '../PredictionContextUtils.js';
-import CustomizedMap from "../utils/CustomizedMap.js";
+import { getCachedPredictionContext } from '../context/PredictionContextUtils.js';
+import HashMap from "../misc/HashMap.js";
 
 export default class ATNSimulator {
     constructor(atn, sharedContextCache) {
@@ -40,7 +40,7 @@ export default class ATNSimulator {
         if (this.sharedContextCache ===null) {
             return context;
         }
-        const visited = new CustomizedMap();
+        const visited = new HashMap();
         return getCachedPredictionContext(context, this.sharedContextCache, visited);
     }
 }

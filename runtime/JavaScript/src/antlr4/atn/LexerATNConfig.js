@@ -1,4 +1,4 @@
-import DecisionState from "./DecisionState.js";
+import DecisionState from "../state/DecisionState.js";
 import ATNConfig from "./ATNConfig.js";
 
 export default class LexerATNConfig extends ATNConfig {

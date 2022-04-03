@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import LexerIndexedCustomAction from './LexerIndexedCustomAction.js';
-import Hash from "../utils/Hash.js";
+import LexerIndexedCustomAction from '../action/LexerIndexedCustomAction.js';
+import HashCode from "../misc/HashCode.js";
 
 export default class LexerActionExecutor {
 	/**
@@ -21,7 +21,7 @@ export default class LexerActionExecutor {
 		 * Caches the result of {@link //hashCode} since the hash code is an element
 		 * of the performance-critical {@link LexerATNConfig//hashCode} operation
 		 */
-		this.cachedHashCode = Hash.hashStuff(lexerActions); // "".join([str(la) for la in
+		this.cachedHashCode = HashCode.hashStuff(lexerActions); // "".join([str(la) for la in
 		// lexerActions]))
 		return this;
 	}

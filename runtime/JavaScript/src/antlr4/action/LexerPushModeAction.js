@@ -1,4 +1,4 @@
-import {default as LexerActionType } from "./LexerActionType.js";
+import {default as LexerActionType } from "../atn/LexerActionType.js";
 import LexerAction from "./LexerAction.js";
 
 /**

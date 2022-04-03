@@ -4,11 +4,11 @@
  */
 
 import DFAState from './DFAState.js';
-import StarLoopEntryState from '../atn/StarLoopEntryState.js';
+import StarLoopEntryState from '../state/StarLoopEntryState.js';
 import ATNConfigSet from './../atn/ATNConfigSet.js';
 import DFASerializer from './DFASerializer.js';
-import LexerDFASerializer from './DFASerializer.js';
-import CustomizedSet from "../utils/CustomizedSet.js";
+import LexerDFASerializer from './LexerDFASerializer.js';
+import HashSet from "../misc/HashSet.js";
 
 export default class DFA {
 	constructor(atnStartState, decision) {
@@ -24,7 +24,7 @@ export default class DFA {
 		 * A set of all DFA states. Use {@link Map} so we can get old state back
 		 * ({@link Set} only allows you to see if it's there).
 		 */
-		this._states = new CustomizedSet();
+		this._states = new HashSet();
 		this.s0 = null;
 		/**
 		 * {@code true} if this DFA is for a precedence decision; otherwise,
@@ -111,7 +111,7 @@ export default class DFA {
 	 */
 	setPrecedenceDfa(precedenceDfa) {
 		if (this.precedenceDfa!==precedenceDfa) {
-			this._states = new CustomizedSet();
+			this._states = new HashSet();
 			if (precedenceDfa) {
 				const precedenceState = new DFAState(null, new ATNConfigSet());
 				precedenceState.edges = [];

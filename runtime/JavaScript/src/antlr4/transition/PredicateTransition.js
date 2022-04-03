@@ -1,6 +1,6 @@
-import Predicate from "./Predicate.js";
+import Predicate from "../atn/Predicate.js";
 import Transition from "./Transition.js";
-import AbstractPredicateTransition from "./AbstractPredicateTransition.js";
+import AbstractPredicateTransition from "../atn/AbstractPredicateTransition.js";
 
 export default class PredicateTransition extends AbstractPredicateTransition {
     constructor(target, ruleIndex, predIndex, isCtxDependent) {

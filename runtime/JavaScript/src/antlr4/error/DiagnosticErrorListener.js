@@ -4,8 +4,8 @@
  */
 
 import ErrorListener from './ErrorListener.js';
-import Interval from '../Interval.js';
-import BitSet from "../utils/BitSet.js";
+import Interval from '../misc/Interval.js';
+import BitSet from "../misc/BitSet.js";
 
 
 /**

@@ -1,4 +1,4 @@
-export default class Hash {
+export default class HashCode {
 
     constructor() {
         this.count = 0;
@@ -55,7 +55,7 @@ export default class Hash {
     }
 
     static hashStuff() {
-        const hash = new Hash();
+        const hash = new HashCode();
         hash.update.apply(hash, arguments);
         return hash.finish();
     }

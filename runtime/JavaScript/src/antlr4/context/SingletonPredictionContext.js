@@ -1,11 +1,11 @@
 import PredictionContext from './PredictionContext.js';
-import Hash from "./utils/Hash.js";
+import HashCode from "../misc/HashCode.js";
 
 export default class SingletonPredictionContext extends PredictionContext {
 
     constructor(parent, returnState) {
         let hashCode = 0;
-        const hash = new Hash();
+        const hash = new HashCode();
         if(parent !== null) {
             hash.update(parent, returnState);
         } else {

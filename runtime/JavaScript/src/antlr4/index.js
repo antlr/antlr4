@@ -17,13 +17,14 @@ import FileStream from './FileStream.js';
 import CommonTokenStream from './CommonTokenStream.js';
 import Lexer from './Lexer.js';
 import Parser from './Parser.js';
-import PredictionContextCache from './PredictionContextCache.js';
-import ParserRuleContext from './ParserRuleContext.js';
-import Interval from './Interval.js';
-import IntervalSet from './IntervalSet.js';
-import LL1Analyzer from './LL1Analyzer.js';
+import PredictionContextCache from './atn/PredictionContextCache.js';
+import ParserRuleContext from './context/ParserRuleContext.js';
+import Interval from './misc/Interval.js';
+import IntervalSet from './misc/IntervalSet.js';
+import LL1Analyzer from './atn/LL1Analyzer.js';
+import { default as Utils } from './utils/index.js';
 
 export default {
     atn, dfa, tree, error, Token, CommonToken, CharStreams, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
-    PredictionContextCache, ParserRuleContext, Interval, IntervalSet, LL1Analyzer
+    PredictionContextCache, ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
 }

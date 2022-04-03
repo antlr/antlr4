@@ -4,8 +4,8 @@
  */
 
 import ATN from './ATN.js';
-import ATNState from './ATNState.js';
-import RuleStopState from './RuleStopState.js';
+import ATNState from '../state/ATNState.js';
+import RuleStopState from '../state/RuleStopState.js';
 import ATNConfig from './ATNConfig.js';
 import ATNConfigSet from './ATNConfigSet.js';
 import Token from '../Token.js';
@@ -13,23 +13,23 @@ import DFAState from '../dfa/DFAState.js';
 import PredPrediction from '../dfa/PredPrediction.js';
 import ATNSimulator from './ATNSimulator.js';
 import PredictionMode from './PredictionMode.js';
-import RuleContext from './../RuleContext.js';
+import RuleContext from '../context/RuleContext.js';
 import SemanticContext from './SemanticContext.js';
-import PredictionContext from '../PredictionContext.js';
-import Interval from '../Interval.js';
-import Transition from './Transition.js';
-import SetTransition from './SetTransition.js';
-import NotSetTransition from './NotSetTransition.js';
-import RuleTransition from './RuleTransition.js';
-import ActionTransition from './ActionTransition.js';
+import PredictionContext from '../context/PredictionContext.js';
+import Interval from '../misc/Interval.js';
+import Transition from '../transition/Transition.js';
+import SetTransition from '../transition/SetTransition.js';
+import NotSetTransition from '../transition/NotSetTransition.js';
+import RuleTransition from '../transition/RuleTransition.js';
+import ActionTransition from '../transition/ActionTransition.js';
 import NoViableAltException from '../error/NoViableAltException.js';
-import SingletonPredictionContext from '../SingletonPredictionContext.js';
-import { predictionContextFromRuleContext } from '../PredictionContextUtils.js';
-import AtomTransition from "./AtomTransition.js";
+import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
+import { predictionContextFromRuleContext } from '../context/PredictionContextUtils.js';
+import AtomTransition from "../transition/AtomTransition.js";
 import arrayToString from "../utils/arrayToString.js";
-import BitSet from "../utils/BitSet.js";
+import BitSet from "../misc/BitSet.js";
 import DoubleDict from "../utils/DoubleDict.js";
-import CustomizedSet from "../utils/CustomizedSet.js";
+import HashSet from "../misc/HashSet.js";
 
 /**
  * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -775,7 +775,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         //
         if (reach===null) {
             reach = new ATNConfigSet(fullCtx);
-            const closureBusy = new CustomizedSet();
+            const closureBusy = new HashSet();
             const treatEofAsEpsilon = t === Token.EOF;
             for (let k=0; k<intermediate.items.length;k++) {
                 this.closure(intermediate.items[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon);
@@ -870,7 +870,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         for(let i=0;i<p.transitions.length;i++) {
             const target = p.transitions[i].target;
             const c = new ATNConfig({ state:target, alt:i+1, context:initialContext }, null);
-            const closureBusy = new CustomizedSet();
+            const closureBusy = new HashSet();
             this.closure(c, configs, closureBusy, true, fullCtx, false);
         }
         return configs;

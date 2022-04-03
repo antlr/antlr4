@@ -3,7 +3,7 @@ import PredictionContext from "./PredictionContext.js";
 import ArrayPredictionContext from "./ArrayPredictionContext.js";
 import SingletonPredictionContext from "./SingletonPredictionContext.js";
 import EmptyPredictionContext from "./EmptyPredictionContext.js";
-import CustomizedMap from "./utils/CustomizedMap.js";
+import HashMap from "../misc/HashMap.js";
 
 /**
  * Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
@@ -233,7 +233,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
  * ones.
  */
 function combineCommonParents(parents) {
-    const uniqueParents = new CustomizedMap();
+    const uniqueParents = new HashMap();
 
     for (let p = 0; p < parents.length; p++) {
         const parent = parents[p];
@@ -427,7 +427,7 @@ export function getAllContextNodes(context, nodes, visited) {
         nodes = [];
         return getAllContextNodes(context, nodes, visited);
     } else if (visited === null) {
-        visited = new CustomizedMap();
+        visited = new HashMap();
         return getAllContextNodes(context, nodes, visited);
     } else {
         if (context === null || visited.containsKey(context)) {

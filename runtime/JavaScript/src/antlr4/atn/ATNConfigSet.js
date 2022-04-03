@@ -5,11 +5,11 @@
 
 import ATN from './ATN.js';
 import SemanticContext from './SemanticContext.js';
-import { merge } from '../PredictionContextUtils.js';
+import { merge } from '../context/PredictionContextUtils.js';
 import arrayToString from "../utils/arrayToString.js";
-import CustomizedSet from "../utils/CustomizedSet.js";
+import HashSet from "../misc/HashSet.js";
 import equalArrays from "../utils/equalArrays.js";
-import Hash from "../utils/Hash.js";
+import HashCode from "../misc/HashCode.js";
 
 function hashATNConfig(c) {
 	return c.hashCodeForConfigSet();
@@ -43,7 +43,7 @@ export default class ATNConfigSet {
 		 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
 		 * when we go readonly as this set becomes a DFA state
 		 */
-		this.configLookup = new CustomizedSet(hashATNConfig, equalATNConfigs);
+		this.configLookup = new HashSet(hashATNConfig, equalATNConfigs);
 		/**
 		 * Indicates that this configuration set is part of a full context
 		 * LL prediction. It will be used to determine how to merge $. With SLL
@@ -125,7 +125,7 @@ export default class ATNConfigSet {
 	}
 
 	getStates() {
-		const states = new CustomizedSet();
+		const states = new HashSet();
 		for (let i = 0; i < this.configs.length; i++) {
 			states.add(this.configs[i].state);
 		}
@@ -175,7 +175,7 @@ export default class ATNConfigSet {
 	}
 
 	hashCode() {
-		const hash = new Hash();
+		const hash = new HashCode();
 		hash.update(this.configs);
 		return hash.finish();
 	}
@@ -215,7 +215,7 @@ export default class ATNConfigSet {
 		}
 		this.configs = [];
 		this.cachedHashCode = -1;
-		this.configLookup = new CustomizedSet();
+		this.configLookup = new HashSet();
 	}
 
 	setReadonly(readOnly) {

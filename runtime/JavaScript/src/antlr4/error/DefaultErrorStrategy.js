@@ -1,10 +1,10 @@
 import FailedPredicateException from "./FailedPredicateException.js";
 import InputMismatchException from "./InputMismatchException.js";
 import NoViableAltException from "./NoViableAltException.js";
-import ATNState from "../atn/ATNState.js";
+import ATNState from "../state/ATNState.js";
 import Token from '../Token.js';
-import Interval from "../Interval.js";
-import IntervalSet from "../IntervalSet.js";
+import Interval from "../misc/Interval.js";
+import IntervalSet from "../misc/IntervalSet.js";
 import ErrorStrategy from "./ErrorStrategy.js";
 
 /**

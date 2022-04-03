@@ -4,8 +4,8 @@
  */
 
 import ATNConfigSet from '../atn/ATNConfigSet.js';
-import Hash from "../utils/Hash.js";
-import CustomizedSet from "../utils/CustomizedSet.js";
+import HashCode from "../misc/HashCode.js";
+import HashSet from "../misc/HashSet.js";
 
 
 /**
@@ -88,7 +88,7 @@ export default class DFAState {
 	 * DFA state.
 	 */
 	getAltSet() {
-		const alts = new CustomizedSet();
+		const alts = new HashSet();
 		if (this.configs !== null) {
 			for (let i = 0; i < this.configs.length; i++) {
 				const c = this.configs[i];
@@ -135,7 +135,7 @@ export default class DFAState {
 	}
 
 	hashCode() {
-		const hash = new Hash();
+		const hash = new HashCode();
 		hash.update(this.configs);
 		return hash.finish();
 	}
