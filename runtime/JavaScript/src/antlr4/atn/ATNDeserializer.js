@@ -83,7 +83,7 @@ export default class ATNDeserializer {
             this.readSets(atn, sets, this.readInt32.bind(this));
         this.readEdges(atn, sets);
         this.readDecisions(atn);
-        this.readLexerActions(atn);
+        this.readLexerActions(atn, legacy);
         this.markPrecedenceDecisions(atn);
         this.verifyATN(atn);
         if (this.deserializationOptions.generateRuleBypassTransitions && atn.grammarType === ATNType.PARSER ) {
@@ -95,7 +95,7 @@ export default class ATNDeserializer {
     }
 
     reset(data) {
-        const version = data.charCodeAt(0);
+        const version = data.charCodeAt ? data.charCodeAt(0) : data[0];
         if(version === SERIALIZED_VERSION - 1) {
             const adjust = function (c) {
                 const v = c.charCodeAt(0);
@@ -315,18 +315,18 @@ export default class ATNDeserializer {
         }
     }
 
-    readLexerActions(atn) {
+    readLexerActions(atn, legacy) {
         if (atn.grammarType === ATNType.LEXER) {
             const count = this.readInt();
             atn.lexerActions = initArray(count, null);
             for (let i=0; i<count; i++) {
                 const actionType = this.readInt();
                 let data1 = this.readInt();
-                if (data1 === 0xFFFF) {
+                if (legacy && data1 === 0xFFFF) {
                     data1 = -1;
                 }
                 let data2 = this.readInt();
-                if (data2 === 0xFFFF) {
+                if (legacy && data2 === 0xFFFF) {
                     data2 = -1;
                 }
                 atn.lexerActions[i] = this.lexerActionFactory(actionType, data1, data2);
