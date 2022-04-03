@@ -24,7 +24,10 @@ import IntervalSet from './misc/IntervalSet.js';
 import LL1Analyzer from './atn/LL1Analyzer.js';
 import { default as Utils } from './utils/index.js';
 
-export default {
+const antlr4 = {
     atn, dfa, tree, error, Token, CommonToken, CharStreams, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     PredictionContextCache, ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
-}
+};
+
+export default antlr4;
+module.exports = antlr4;
