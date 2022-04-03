@@ -30,4 +30,3 @@ const antlr4 = {
 };
 
 export default antlr4;
-module.exports = antlr4;
