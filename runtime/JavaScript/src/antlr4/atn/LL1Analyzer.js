@@ -112,7 +112,7 @@ export default class LL1Analyzer {
      */
     _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
         const c = new ATNConfig({state:s, alt:0, context: ctx}, null);
-        if (lookBusy.contains(c)) {
+        if (lookBusy.has(c)) {
             return;
         }
         lookBusy.add(c);
@@ -134,7 +134,7 @@ export default class LL1Analyzer {
                 return;
             }
             if (ctx !== PredictionContext.EMPTY) {
-                const removed = calledRuleStack.contains(s.ruleIndex);
+                const removed = calledRuleStack.has(s.ruleIndex);
                 try {
                     calledRuleStack.remove(s.ruleIndex);
                     // run thru all possible stack tops in ctx
@@ -153,7 +153,7 @@ export default class LL1Analyzer {
         for(let j=0; j<s.transitions.length; j++) {
             const t = s.transitions[j];
             if (t.constructor === RuleTransition) {
-                if (calledRuleStack.contains(t.target.ruleIndex)) {
+                if (calledRuleStack.has(t.target.ruleIndex)) {
                     continue;
                 }
                 const newContext = SingletonPredictionContext.create(ctx, t.followState.stateNumber);

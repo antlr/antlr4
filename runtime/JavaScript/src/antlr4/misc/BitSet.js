@@ -19,7 +19,7 @@ export default class BitSet {
         delete this.data[value];
     }
 
-    contains(value) {
+    has(value) {
         return this.data[value] === true;
     }
 

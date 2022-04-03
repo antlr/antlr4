@@ -2,6 +2,8 @@ import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
 import standardEqualsFunction from "../utils/standardEqualsFunction.js";
 import arrayToString from "../utils/arrayToString.js";
 
+const HASH_KEY_PREFIX = "h-";
+
 export default class HashSet {
 
     constructor(hashFunction, equalsFunction) {
@@ -11,8 +13,7 @@ export default class HashSet {
     }
 
     add(value) {
-        const hash = this.hashFunction(value);
-        const key = "hash_" + hash;
+        const key = HASH_KEY_PREFIX + this.hashFunction(value);
         if (key in this.data) {
             const values = this.data[key];
             for (let i = 0; i < values.length; i++) {
@@ -28,13 +29,12 @@ export default class HashSet {
         }
     }
 
-    contains(value) {
+    has(value) {
         return this.get(value) != null;
     }
 
     get(value) {
-        const hash = this.hashFunction(value);
-        const key = "hash_" + hash;
+        const key = HASH_KEY_PREFIX + this.hashFunction(value);
         if (key in this.data) {
             const values = this.data[key];
             for (let i = 0; i < values.length; i++) {
@@ -47,26 +47,14 @@ export default class HashSet {
     }
 
     values() {
-        let l = [];
-        for (const key in this.data) {
-            if (key.indexOf("hash_") === 0) {
-                l = l.concat(this.data[key]);
-            }
-        }
-        return l;
+        return Object.keys(this.data).filter(key => key.startsWith(HASH_KEY_PREFIX)).flatMap(key => this.data[key], this);
     }
 
     toString() {
         return arrayToString(this.values());
     }
 
-    get length(){
-        let l = 0;
-        for (const key in this.data) {
-            if (key.indexOf("hash_") === 0) {
-                l = l + this.data[key].length;
-            }
-        }
-        return l;
+    get length() {
+        return Object.keys(this.data).filter(key => key.startsWith(HASH_KEY_PREFIX)).map(key => this.data[key].length, this).reduce((accum, item) => accum + item, 0);
     }
 }
