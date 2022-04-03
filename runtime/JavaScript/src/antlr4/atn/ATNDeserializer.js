@@ -1,58 +1,53 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Token} = require('./../Token');
-const ATN = require('./ATN');
-const ATNType = require('./ATNType');
+import Token from '../Token.js';
+import ATN from './ATN.js';
+import ATNType from './ATNType.js';
 
-const {
-    ATNState,
-    BasicState,
-    DecisionState,
-    BlockStartState,
-    BlockEndState,
-    LoopEndState,
-    RuleStartState,
-    RuleStopState,
-    TokensStartState,
-    PlusLoopbackState,
-    StarLoopbackState,
-    StarLoopEntryState,
-    PlusBlockStartState,
-    StarBlockStartState,
-    BasicBlockStartState
-} = require('./ATNState');
+import ATNState from '../state/ATNState.js';
+import BasicState from '../state/BasicState.js';
+import DecisionState from '../state/DecisionState.js';
+import BlockStartState from '../state/BlockStartState.js';
+import BlockEndState from '../state/BlockEndState.js';
+import LoopEndState from '../state/LoopEndState.js';
+import RuleStartState from '../state/RuleStartState.js';
+import RuleStopState from '../state/RuleStopState.js';
+import TokensStartState from '../state/TokensStartState.js';
+import PlusLoopbackState from '../state/PlusLoopbackState.js';
+import StarLoopbackState from '../state/StarLoopbackState.js';
+import StarLoopEntryState from '../state/StarLoopEntryState.js';
+import PlusBlockStartState from '../state/PlusBlockStartState.js';
+import StarBlockStartState from '../state/StarBlockStartState.js';
+import BasicBlockStartState from '../state/BasicBlockStartState.js';
 
-const {
-    Transition,
-    AtomTransition,
-    SetTransition,
-    NotSetTransition,
-    RuleTransition,
-    RangeTransition,
-    ActionTransition,
-    EpsilonTransition,
-    WildcardTransition,
-    PredicateTransition,
-    PrecedencePredicateTransition
-} = require('./Transition')
+import Transition from '../transition/Transition.js';
+import AtomTransition from '../transition/AtomTransition.js';
+import SetTransition from '../transition/SetTransition.js';
+import NotSetTransition from '../transition/NotSetTransition.js';
+import RuleTransition from '../transition/RuleTransition.js';
+import RangeTransition from '../transition/RangeTransition.js';
+import ActionTransition from '../transition/ActionTransition.js';
+import EpsilonTransition from '../transition/EpsilonTransition.js';
+import WildcardTransition from '../transition/WildcardTransition.js';
+import PredicateTransition from '../transition/PredicateTransition.js';
+import PrecedencePredicateTransition from '../transition/PrecedencePredicateTransition.js';
 
-const {IntervalSet} = require('./../IntervalSet');
-const ATNDeserializationOptions = require('./ATNDeserializationOptions');
 
-const {
-    LexerActionType,
-    LexerSkipAction,
-    LexerChannelAction,
-    LexerCustomAction,
-    LexerMoreAction,
-    LexerTypeAction,
-    LexerPushModeAction,
-    LexerPopModeAction,
-    LexerModeAction,
-} = require('./LexerAction');
+import IntervalSet from '../misc/IntervalSet.js';
+import ATNDeserializationOptions from './ATNDeserializationOptions.js';
+
+import LexerActionType from './LexerActionType.js';
+import LexerSkipAction from '../action/LexerSkipAction.js';
+import LexerChannelAction from '../action/LexerChannelAction.js';
+import LexerCustomAction from '../action/LexerCustomAction.js';
+import LexerMoreAction from '../action/LexerMoreAction.js';
+import LexerTypeAction from '../action/LexerTypeAction.js';
+import LexerPushModeAction from '../action/LexerPushModeAction.js';
+import LexerPopModeAction from '../action/LexerPopModeAction.js';
+import LexerModeAction from '../action/LexerModeAction.js';
 
 const SERIALIZED_VERSION = 4;
 
@@ -62,7 +57,7 @@ function initArray( length, value) {
 	return tmp.map(function(i) {return value;});
 }
 
-class ATNDeserializer {
+export default class ATNDeserializer {
     constructor(options) {
 
         if ( options=== undefined || options === null ) {
@@ -74,18 +69,21 @@ class ATNDeserializer {
     }
 
     deserialize(data) {
-        this.data = data
-        this.pos = 0;
-        this.checkVersion();
+        const legacy = this.reset(data);
+        this.checkVersion(legacy);
+        if(legacy)
+            this.skipUUID();
         const atn = this.readATN();
-        this.readStates(atn);
-        this.readRules(atn);
+        this.readStates(atn, legacy);
+        this.readRules(atn, legacy);
         this.readModes(atn);
         const sets = [];
-        this.readSets(atn, sets);
+        this.readSets(atn, sets, this.readInt.bind(this));
+        if(legacy)
+            this.readSets(atn, sets, this.readInt32.bind(this));
         this.readEdges(atn, sets);
         this.readDecisions(atn);
-        this.readLexerActions(atn);
+        this.readLexerActions(atn, legacy);
         this.markPrecedenceDecisions(atn);
         this.verifyATN(atn);
         if (this.deserializationOptions.generateRuleBypassTransitions && atn.grammarType === ATNType.PARSER ) {
@@ -96,9 +94,35 @@ class ATNDeserializer {
         return atn;
     }
 
-    checkVersion() {
+    reset(data) {
+        const version = data.charCodeAt ? data.charCodeAt(0) : data[0];
+        if(version === SERIALIZED_VERSION - 1) {
+            const adjust = function (c) {
+                const v = c.charCodeAt(0);
+                return v > 1 ? v - 2 : v + 65534;
+            };
+            const temp = data.split("").map(adjust);
+            // don't adjust the first value since that's the version number
+            temp[0] = data.charCodeAt(0);
+            this.data = temp;
+            this.pos = 0;
+            return true;
+        } else {
+            this.data = data
+            this.pos = 0;
+            return false;
+        }
+    }
+
+    skipUUID() {
+        let count = 0;
+        while(count++ < 8)
+            this.readInt();
+    }
+
+    checkVersion(legacy) {
         const version = this.readInt();
-        if ( version !== SERIALIZED_VERSION ) {
+        if ( !legacy && version !== SERIALIZED_VERSION ) {
             throw ("Could not deserialize ATN with version " + version + " (expected " + SERIALIZED_VERSION + ").");
         }
     }
@@ -109,7 +133,7 @@ class ATNDeserializer {
         return new ATN(grammarType, maxTokenType);
     }
 
-    readStates(atn) {
+    readStates(atn, legacy) {
         let j, pair, stateNumber;
         const  loopBackStateNumbers = [];
         const  endStateNumbers = [];
@@ -122,6 +146,9 @@ class ATNDeserializer {
                 continue;
             }
             let ruleIndex = this.readInt();
+            if (legacy && ruleIndex === 0xFFFF) {
+                ruleIndex = -1;
+            }
             const  s = this.stateFactory(stype, ruleIndex);
             if (stype === ATNState.LOOP_END) { // special case
                 const  loopBackStateNumber = this.readInt();
@@ -157,7 +184,7 @@ class ATNDeserializer {
         }
     }
 
-    readRules(atn) {
+    readRules(atn, legacy) {
         let i;
         const nrules = this.readInt();
         if (atn.grammarType === ATNType.LEXER ) {
@@ -169,6 +196,9 @@ class ATNDeserializer {
             atn.ruleToStartState[i] = atn.states[s];
             if ( atn.grammarType === ATNType.LEXER ) {
                 let tokenType = this.readInt();
+                if (legacy && tokenType === 0xFFFF) {
+                    tokenType = Token.EOF;
+                }
                 atn.ruleToTokenType[i] = tokenType;
             }
         }
@@ -191,7 +221,7 @@ class ATNDeserializer {
         }
     }
 
-    readSets(atn, sets) {
+    readSets(atn, sets, reader) {
         const m = this.readInt();
         for (let i=0; i<m; i++) {
             const iset = new IntervalSet();
@@ -202,8 +232,8 @@ class ATNDeserializer {
                 iset.addOne(-1);
             }
             for (let j=0; j<n; j++) {
-                const i1 = this.readInt();
-                const i2 = this.readInt();
+                const i1 = reader();
+                const i2 = reader();
                 iset.addRange(i1, i2);
             }
         }
@@ -285,14 +315,20 @@ class ATNDeserializer {
         }
     }
 
-    readLexerActions(atn) {
+    readLexerActions(atn, legacy) {
         if (atn.grammarType === ATNType.LEXER) {
             const count = this.readInt();
             atn.lexerActions = initArray(count, null);
             for (let i=0; i<count; i++) {
                 const actionType = this.readInt();
                 let data1 = this.readInt();
+                if (legacy && data1 === 0xFFFF) {
+                    data1 = -1;
+                }
                 let data2 = this.readInt();
+                if (legacy && data2 === 0xFFFF) {
+                    data2 = -1;
+                }
                 atn.lexerActions[i] = this.lexerActionFactory(actionType, data1, data2);
             }
         }
@@ -481,6 +517,12 @@ class ATNDeserializer {
         return this.data[this.pos++];
     }
 
+    readInt32() {
+        const low = this.readInt();
+        const high = this.readInt();
+        return low | (high << 16);
+    }
+
     edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets) {
         const target = atn.states[trg];
         switch(type) {
@@ -559,4 +601,3 @@ class ATNDeserializer {
     }
 }
 
-module.exports = ATNDeserializer;
