@@ -1,9 +1,9 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const CommonToken = require('./Token').CommonToken;
+import CommonToken from './CommonToken.js';
 
 class TokenFactory {}
 
@@ -11,7 +11,7 @@ class TokenFactory {}
  * This default implementation of {@link TokenFactory} creates
  * {@link CommonToken} objects.
  */
-class CommonTokenFactory extends TokenFactory {
+export default class CommonTokenFactory extends TokenFactory {
     constructor(copyText) {
         super();
         /**
@@ -59,5 +59,3 @@ class CommonTokenFactory extends TokenFactory {
  * tokens.</p>
  */
 CommonTokenFactory.DEFAULT = new CommonTokenFactory();
-
-module.exports = CommonTokenFactory;

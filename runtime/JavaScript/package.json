@@ -1,6 +1,7 @@
 {
   "name": "antlr4",
   "version": "4.9.3",
+  "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "main": "src/antlr4/index.js",
   "repository": "antlr/antlr4.git",
@@ -17,6 +18,10 @@
   },
   "homepage": "https://github.com/antlr/antlr4",
   "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "babel-loader": "^8.2.4",
+    "eslint-plugin-es5": "^1.5.0",
+    "eslint-webpack-plugin": "^3.1.1",
     "glob-parent": "^6.0.2",
     "jasmine": "^4.0.2",
     "jasmine-spec-reporter": "^7.0.0",
@@ -32,6 +37,8 @@
     "node": ">=14"
   },
   "browser": {
-    "fs": false
+    "fs": false,
+    "net": false,
+    "module": false
   }
 }

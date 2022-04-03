@@ -1,24 +1,12 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {ATNConfigSet} = require('./../atn/ATNConfigSet');
-const {Hash, Set} = require('./../Utils');
+import ATNConfigSet from '../atn/ATNConfigSet.js';
+import HashCode from "../misc/HashCode.js";
+import HashSet from "../misc/HashSet.js";
 
-/**
- * Map a predicate to a predicted alternative.
- */
-class PredPrediction {
-	constructor(pred, alt) {
-		this.alt = alt;
-		this.pred = pred;
-	}
-
-	toString() {
-		return "(" + this.pred + ", " + this.alt + ")";
-	}
-}
 
 /**
  * A DFA state represents a set of possible ATN configurations.
@@ -45,7 +33,7 @@ class PredPrediction {
  * but with different ATN contexts (with same or different alts)
  * meaning that state was reached via a different set of rule invocations.</p>
  */
-class DFAState {
+export default class DFAState {
 	constructor(stateNumber, configs) {
 		if (stateNumber === null) {
 			stateNumber = -1;
@@ -100,7 +88,7 @@ class DFAState {
 	 * DFA state.
 	 */
 	getAltSet() {
-		const alts = new Set();
+		const alts = new HashSet();
 		if (this.configs !== null) {
 			for (let i = 0; i < this.configs.length; i++) {
 				const c = this.configs[i];
@@ -147,10 +135,8 @@ class DFAState {
 	}
 
 	hashCode() {
-		const hash = new Hash();
+		const hash = new HashCode();
 		hash.update(this.configs);
 		return hash.finish();
 	}
 }
-
-module.exports = { DFAState, PredPrediction };

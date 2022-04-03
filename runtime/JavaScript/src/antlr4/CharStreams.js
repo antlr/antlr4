@@ -1,10 +1,10 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const InputStream = require('./InputStream');
-const fs = require("fs");
+import InputStream from './InputStream.js';
+import fs from "fs";
 
 /**
  * Utility functions to create InputStreams from various sources.
@@ -13,7 +13,7 @@ const fs = require("fs");
  * up to U+10FFFF (the default behavior of InputStream only supports
  * code points up to U+FFFF).
  */
-const CharStreams = {
+export default {
   // Creates an InputStream from a string.
   fromString: function(str) {
     return new InputStream(str, true);
@@ -72,5 +72,3 @@ const CharStreams = {
     return new InputStream(data, true);
   }
 };
-
-module.exports = CharStreams;
