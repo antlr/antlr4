@@ -23,7 +23,6 @@ namespace atn {
   public:
     static constexpr size_t INVALID_ALT_NUMBER = 0;
 
-    /// Used for runtime deserialization of ATNs from strings.
     ATN();
 
     ATN(ATNType grammarType, size_t maxTokenType);
@@ -38,18 +37,18 @@ namespace atn {
 
     ATN& operator=(ATN&&) = delete;
 
-    std::vector<ATNState *> states;
+    std::vector<ATNState*> states;
 
     /// Each subrule/rule is a decision point and we must track them so we
     /// can go back later and build DFA predictors for them.  This includes
     /// all the rules, subrules, optional blocks, ()+, ()* etc...
-    std::vector<DecisionState *> decisionToState;
+    std::vector<DecisionState*> decisionToState;
 
     /// Maps from rule index to starting state number.
-    std::vector<RuleStartState *> ruleToStartState;
+    std::vector<RuleStartState*> ruleToStartState;
 
     /// Maps from rule index to stop state number.
-    std::vector<RuleStopState *> ruleToStopState;
+    std::vector<RuleStopState*> ruleToStopState;
 
     /// The type of the ATN.
     ATNType grammarType;
@@ -70,7 +69,7 @@ namespace atn {
     /// be referenced by action transitions in the ATN.
     std::vector<Ref<const LexerAction>> lexerActions;
 
-    std::vector<TokensStartState *> modeToStartState;
+    std::vector<TokensStartState*> modeToStartState;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in state {@code s}.
@@ -85,7 +84,7 @@ namespace atn {
     /// staying in same rule. <seealso cref="Token#EPSILON"/> is in set if we reach end of
     /// rule.
     /// </summary>
-    misc::IntervalSet const& nextTokens(ATNState *s) const;
+    const misc::IntervalSet& nextTokens(ATNState *s) const;
 
     void addState(ATNState *state);
 
@@ -93,7 +92,7 @@ namespace atn {
 
     int defineDecisionState(DecisionState *s);
 
-    DecisionState *getDecisionState(size_t decision) const;
+    DecisionState* getDecisionState(size_t decision) const;
 
     size_t getNumberOfDecisions() const;
 

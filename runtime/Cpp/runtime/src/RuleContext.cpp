@@ -80,7 +80,7 @@ std::string RuleContext::toStringTree(Parser *recog, bool pretty) {
   return tree::Trees::toStringTree(this, recog, pretty);
 }
 
-std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames, bool pretty) {
+std::string RuleContext::toStringTree(antlrcpp::Span<const std::string_view> ruleNames, bool pretty) {
   return tree::Trees::toStringTree(this, ruleNames, pretty);
 }
 
@@ -89,12 +89,12 @@ std::string RuleContext::toStringTree(bool pretty) {
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
+std::string RuleContext::toString(antlrcpp::Span<const std::string_view> ruleNames) {
   return toString(ruleNames, nullptr);
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames, RuleContext *stop) {
+std::string RuleContext::toString(antlrcpp::Span<const std::string_view> ruleNames, RuleContext *stop) {
   std::stringstream ss;
 
   RuleContext *currentParent = this;
@@ -107,7 +107,7 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Rul
     } else {
       size_t ruleIndex = currentParent->getRuleIndex();
 
-      std::string ruleName = (ruleIndex < ruleNames.size()) ? ruleNames[ruleIndex] : std::to_string(ruleIndex);
+      std::string ruleName = (ruleIndex < ruleNames.size()) ? std::string(ruleNames[ruleIndex]) : std::to_string(ruleIndex);
       ss << ruleName;
     }
 
@@ -134,7 +134,7 @@ std::string RuleContext::toString(Recognizer *recog) {
 
 std::string RuleContext::toString(Recognizer *recog, RuleContext *stop) {
   if (recog == nullptr)
-    return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
+    return toString(antlrcpp::Span<const std::string_view>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);
 }
 

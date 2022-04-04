@@ -13,8 +13,8 @@
 
 using namespace antlr4;
 
-LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-  const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames, const std::vector<std::string> &modeNames,
+LexerInterpreter::LexerInterpreter(std::string_view grammarFileName, const dfa::Vocabulary &vocabulary,
+  antlrcpp::Span<const std::string_view> ruleNames, antlrcpp::Span<const std::string_view> channelNames, antlrcpp::Span<const std::string_view> modeNames,
   const atn::ATN &atn, CharStream *input)
   : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames),
                   _channelNames(channelNames), _modeNames(modeNames),
@@ -27,7 +27,7 @@ LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa
   for (size_t i = 0; i < atn.getNumberOfDecisions(); ++i) {
     _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
   }
-  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
+  _interpreter = new atn::LexerATNSimulator(this, _atn, antlrcpp::Span<antlr4::dfa::DFA>(_decisionToDFA), _sharedContextCache); /* mem-check: deleted in d-tor */
 }
 
 LexerInterpreter::~LexerInterpreter()
@@ -39,22 +39,22 @@ const atn::ATN& LexerInterpreter::getATN() const {
   return _atn;
 }
 
-std::string LexerInterpreter::getGrammarFileName() const {
+std::string_view LexerInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 
-const std::vector<std::string>& LexerInterpreter::getRuleNames() const {
+antlrcpp::Span<const std::string_view> LexerInterpreter::getRuleNames() const {
   return _ruleNames;
 }
 
-const std::vector<std::string>& LexerInterpreter::getChannelNames() const {
+antlrcpp::Span<const std::string_view> LexerInterpreter::getChannelNames() const {
   return _channelNames;
 }
 
-const std::vector<std::string>& LexerInterpreter::getModeNames() const {
+antlrcpp::Span<const std::string_view> LexerInterpreter::getModeNames() const {
   return _modeNames;
 }
 
-const dfa::Vocabulary& LexerInterpreter::getVocabulary() const {
+const Vocabulary& LexerInterpreter::getVocabulary() const {
   return _vocabulary;
 }

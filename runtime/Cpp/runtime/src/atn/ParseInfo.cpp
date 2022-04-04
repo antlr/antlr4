@@ -89,8 +89,7 @@ long long ParseInfo::getTotalATNLookaheadOps() {
 
 size_t ParseInfo::getDFASize() {
   size_t n = 0;
-  std::vector<dfa::DFA> &decisionToDFA = _atnSimulator->decisionToDFA;
-  for (size_t i = 0; i < decisionToDFA.size(); ++i) {
+  for (size_t i = 0; i < _atnSimulator->decisionToDFA.size(); ++i) {
     n += getDFASize(i);
   }
   return n;

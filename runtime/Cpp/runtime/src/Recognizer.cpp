@@ -19,67 +19,52 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> Recognizer::_tokenTypeMapCache;
-std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
-
 Recognizer::Recognizer() {
-  InitializeInstanceFields();
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
-Recognizer::~Recognizer() {
-}
-
-std::map<std::string_view, size_t> Recognizer::getTokenTypeMap() {
-  const dfa::Vocabulary& vocabulary = getVocabulary();
-
-  std::lock_guard<std::mutex> lck(_mutex);
-  std::map<std::string_view, size_t> result;
-  auto iterator = _tokenTypeMapCache.find(&vocabulary);
-  if (iterator != _tokenTypeMapCache.end()) {
-    result = iterator->second;
-  } else {
+const std::unordered_map<std::string_view, size_t>& Recognizer::getTokenTypeMap() const {
+  std::call_once(_tokenTypeMapOnce, [this]() mutable {
+    const auto& vocabulary = getVocabulary();
     for (size_t i = 0; i <= getATN().maxTokenType; ++i) {
       std::string_view literalName = vocabulary.getLiteralName(i);
       if (!literalName.empty()) {
-        result[literalName] = i;
+        _tokenTypeMap[literalName] = i;
       }
 
       std::string_view symbolicName = vocabulary.getSymbolicName(i);
       if (!symbolicName.empty()) {
-        result[symbolicName] = i;
+        _tokenTypeMap[symbolicName] = i;
       }
     }
-    result["EOF"] = EOF;
-    _tokenTypeMapCache[&vocabulary] = result;
-  }
-
-  return result;
+  });
+  return _tokenTypeMap;
 }
 
-std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
-  const std::vector<std::string>& ruleNames = getRuleNames();
-  if (ruleNames.empty()) {
-    throw "The current recognizer does not provide a list of rule names.";
-  }
-
-  std::lock_guard<std::mutex> lck(_mutex);
-  std::map<std::string, size_t> result;
-  auto iterator = _ruleIndexMapCache.find(ruleNames);
-  if (iterator != _ruleIndexMapCache.end()) {
-    result = iterator->second;
-  } else {
-    result = antlrcpp::toMap(ruleNames);
-    _ruleIndexMapCache[ruleNames] = result;
-  }
-  return result;
+const std::unordered_map<std::string_view, size_t>& Recognizer::getRuleIndexMap() const {
+  std::call_once(_ruleIndexMapOnce, [this]() mutable {
+    auto ruleNames = getRuleNames();
+    for (size_t i = 0; i < ruleNames.size(); ++i) {
+      _ruleIndexMap[ruleNames[i]] = i;
+    }
+  });
+  return _ruleIndexMap;
 }
 
-size_t Recognizer::getTokenType(std::string_view tokenName) {
-  const std::map<std::string_view, size_t> &map = getTokenTypeMap();
+size_t Recognizer::getTokenType(std::string_view tokenName) const {
+  const auto &map = getTokenTypeMap();
   auto iterator = map.find(tokenName);
   if (iterator == map.end())
     return Token::INVALID_TYPE;
+
+  return iterator->second;
+}
+
+size_t Recognizer::getRuleIndex(std::string_view ruleName) const {
+  const auto &map = getRuleIndexMap();
+  auto iterator = map.find(ruleName);
+  if (iterator == map.end())
+    return INVALID_INDEX;
 
   return iterator->second;
 }
@@ -148,9 +133,3 @@ bool Recognizer::precpred(RuleContext * /*localctx*/, int /*precedence*/) {
 
 void Recognizer::action(RuleContext * /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
 }
-
-void Recognizer::InitializeInstanceFields() {
-  _stateNumber = ATNState::INVALID_STATE_NUMBER;
-  _interpreter = nullptr;
-}
-

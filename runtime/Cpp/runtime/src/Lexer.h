@@ -9,6 +9,7 @@
 #include "TokenSource.h"
 #include "CharStream.h"
 #include "Token.h"
+#include "support/Span.h"
 
 namespace antlr4 {
 
@@ -156,9 +157,9 @@ namespace antlr4 {
 
     virtual size_t getChannel();
 
-    virtual const std::vector<std::string>& getChannelNames() const = 0;
+    virtual antlrcpp::Span<const std::string_view> getChannelNames() const = 0;
 
-    virtual const std::vector<std::string>& getModeNames() const = 0;
+    virtual antlrcpp::Span<const std::string_view> getModeNames() const = 0;
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.

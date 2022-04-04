@@ -35,8 +35,8 @@ using namespace antlr4::misc;
 
 using namespace antlrcpp;
 
-ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-  const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input)
+ParserInterpreter::ParserInterpreter(std::string_view grammarFileName, const Vocabulary &vocabulary,
+  antlrcpp::Span<const std::string_view> ruleNames, const atn::ATN &atn, TokenStream *input)
   : Parser(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _vocabulary(vocabulary) {
 
   // init decision DFA
@@ -46,7 +46,7 @@ ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const d
   }
 
   // get atn simulator that knows how to do predictions
-  _interpreter = new atn::ParserATNSimulator(this, atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
+  _interpreter = new atn::ParserATNSimulator(this, atn, antlrcpp::Span<antlr4::dfa::DFA>(_decisionToDFA), _sharedContextCache); /* mem-check: deleted in d-tor */
 }
 
 ParserInterpreter::~ParserInterpreter() {
@@ -63,15 +63,15 @@ const atn::ATN& ParserInterpreter::getATN() const {
   return _atn;
 }
 
-const dfa::Vocabulary& ParserInterpreter::getVocabulary() const {
+const Vocabulary& ParserInterpreter::getVocabulary() const {
   return _vocabulary;
 }
 
-const std::vector<std::string>& ParserInterpreter::getRuleNames() const {
+antlrcpp::Span<const std::string_view> ParserInterpreter::getRuleNames() const {
   return _ruleNames;
 }
 
-std::string ParserInterpreter::getGrammarFileName() const {
+std::string_view ParserInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 

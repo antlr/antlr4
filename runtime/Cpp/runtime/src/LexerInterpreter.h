@@ -13,33 +13,33 @@ namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC LexerInterpreter : public Lexer {
   public:
-    LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames,
-                     const std::vector<std::string> &modeNames, const atn::ATN &atn, CharStream *input);
+    LexerInterpreter(std::string_view grammarFileName, const Vocabulary &vocabulary,
+                     antlrcpp::Span<const std::string_view> ruleNames, antlrcpp::Span<const std::string_view> channelNames,
+                     antlrcpp::Span<const std::string_view> modeNames, const atn::ATN &atn, CharStream *input);
 
     ~LexerInterpreter();
 
     virtual const atn::ATN& getATN() const override;
-    virtual std::string getGrammarFileName() const override;
-    virtual const std::vector<std::string>& getRuleNames() const override;
-    virtual const std::vector<std::string>& getChannelNames() const override;
-    virtual const std::vector<std::string>& getModeNames() const override;
+    virtual std::string_view getGrammarFileName() const override;
+    virtual antlrcpp::Span<const std::string_view> getRuleNames() const override;
+    virtual antlrcpp::Span<const std::string_view> getChannelNames() const override;
+    virtual antlrcpp::Span<const std::string_view> getModeNames() const override;
 
-    virtual const dfa::Vocabulary& getVocabulary() const override;
+    virtual const Vocabulary& getVocabulary() const override;
 
   protected:
-    const std::string _grammarFileName;
+    const std::string_view _grammarFileName;
     const atn::ATN &_atn;
 
-    const std::vector<std::string> &_ruleNames;
-    const std::vector<std::string> &_channelNames;
-    const std::vector<std::string> &_modeNames;
+    const antlrcpp::Span<const std::string_view> _ruleNames;
+    const antlrcpp::Span<const std::string_view> _channelNames;
+    const antlrcpp::Span<const std::string_view> _modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 
     atn::PredictionContextCache _sharedContextCache;
 
   private:
-    dfa::Vocabulary _vocabulary;
+    const Vocabulary &_vocabulary;
   };
 
 } // namespace antlr4

@@ -135,7 +135,7 @@ bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet>& a
 size_t PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet>& altsets) {
   antlrcpp::BitSet all = getAlts(altsets);
   if (all.count() == 1) {
-    return all.nextSetBit(0);
+    return all.find().value_or(INVALID_INDEX);
   }
   return ATN::INVALID_ALT_NUMBER;
 }
@@ -189,7 +189,7 @@ bool PredictionModeClass::hasStateAssociatedWithOneAlt(ATNConfigSet *configs) {
 size_t PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
   antlrcpp::BitSet viableAlts;
   for (const auto &alts : altsets) {
-    size_t minAlt = alts.nextSetBit(0);
+    size_t minAlt = alts.find().value_or(INVALID_INDEX);
 
     viableAlts.set(minAlt);
     if (viableAlts.count() > 1)  // more than 1 viable alt
@@ -198,5 +198,5 @@ size_t PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSe
     }
   }
 
-  return viableAlts.nextSetBit(0);
+  return viableAlts.find().value_or(INVALID_INDEX);
 }

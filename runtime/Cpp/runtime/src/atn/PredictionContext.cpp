@@ -544,7 +544,7 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
 
         const ATN &atn = recognizer->getATN();
         ATNState *s = atn.states[stateNumber];
-        std::string ruleName = recognizer->getRuleNames()[s->ruleIndex];
+        std::string ruleName = std::string(recognizer->getRuleNames()[s->ruleIndex]);
         ss << ruleName;
       } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
         if (!p->isEmpty()) {

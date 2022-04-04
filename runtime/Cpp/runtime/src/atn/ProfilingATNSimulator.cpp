@@ -128,9 +128,9 @@ bool ProfilingATNSimulator::evalSemanticContext(Ref<const SemanticContext> const
 void ProfilingATNSimulator::reportAttemptingFullContext(DFA &dfa, const BitSet &conflictingAlts, ATNConfigSet *configs,
                                                         size_t startIndex, size_t stopIndex) {
   if (conflictingAlts.count() > 0) {
-    conflictingAltResolvedBySLL = conflictingAlts.nextSetBit(0);
+    conflictingAltResolvedBySLL = conflictingAlts.find().value_or(INVALID_INDEX);
   } else {
-    conflictingAltResolvedBySLL = configs->getAlts().nextSetBit(0);
+    conflictingAltResolvedBySLL = configs->getAlts().find().value_or(INVALID_INDEX);
   }
   _decisions[_currentDecision].LL_Fallback++;
   ParserATNSimulator::reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex);
@@ -150,9 +150,9 @@ void ProfilingATNSimulator::reportAmbiguity(DFA &dfa, DFAState *D, size_t startI
                                             const BitSet &ambigAlts, ATNConfigSet *configs) {
   size_t prediction;
   if (ambigAlts.count() > 0) {
-    prediction = ambigAlts.nextSetBit(0);
+    prediction = ambigAlts.find().value_or(INVALID_INDEX);
   } else {
-    prediction = configs->getAlts().nextSetBit(0);
+    prediction = configs->getAlts().find().value_or(INVALID_INDEX);
   }
   if (configs->fullCtx && prediction != conflictingAltResolvedBySLL) {
     // Even though this is an ambiguity we are reporting, we can

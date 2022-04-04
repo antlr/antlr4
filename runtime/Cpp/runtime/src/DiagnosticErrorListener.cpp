@@ -55,17 +55,17 @@ std::string DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, 
   size_t decision = dfa.decision;
   size_t ruleIndex = (reinterpret_cast<atn::ATNState*>(dfa.atnStartState))->ruleIndex;
 
-  const std::vector<std::string>& ruleNames = recognizer->getRuleNames();
+  auto ruleNames = recognizer->getRuleNames();
   if (ruleIndex == INVALID_INDEX || ruleIndex >= ruleNames.size()) {
     return std::to_string(decision);
   }
 
-  std::string ruleName = ruleNames[ruleIndex];
+  auto ruleName = ruleNames[ruleIndex];
   if (ruleName == "" || ruleName.empty())  {
     return std::to_string(decision);
   }
 
-  return std::to_string(decision) + " (" + ruleName + ")";
+  return std::to_string(decision) + " (" + std::string(ruleName) + ")";
 }
 
 antlrcpp::BitSet DiagnosticErrorListener::getConflictingAlts(const antlrcpp::BitSet &reportedAlts,

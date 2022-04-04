@@ -8,55 +8,14 @@
 #include "antlr4-common.h"
 
 namespace antlr4 {
-namespace dfa {
 
   /// This class provides a default implementation of the <seealso cref="Vocabulary"/>
   /// interface.
-  class ANTLR4CPP_PUBLIC Vocabulary final {
+  class ANTLR4CPP_PUBLIC Vocabulary {
   public:
-    /// Gets an empty <seealso cref="Vocabulary"/> instance.
-    ///
-    /// <para>
-    /// No literal or symbol names are assigned to token types, so
-    /// <seealso cref="#getDisplayName(int)"/> returns the numeric value for all tokens
-    /// except <seealso cref="Token#EOF"/>.</para>
-    [[deprecated("Use the default constructor of Vocabulary instead.")]] static const Vocabulary EMPTY_VOCABULARY;
+    static const Vocabulary& empty();
 
-    Vocabulary() {}
-
-    Vocabulary(const Vocabulary&) = default;
-
-    /// <summary>
-    /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
-    /// literal and symbolic token names.
-    /// </summary>
-    /// <param name="literalNames"> The literal names assigned to tokens, or {@code null}
-    /// if no literal names are assigned. </param>
-    /// <param name="symbolicNames"> The symbolic names assigned to tokens, or
-    /// {@code null} if no symbolic names are assigned.
-    /// </param>
-    /// <seealso cref= #getLiteralName(int) </seealso>
-    /// <seealso cref= #getSymbolicName(int) </seealso>
-    Vocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames);
-
-    /// <summary>
-    /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
-    /// literal, symbolic, and display token names.
-    /// </summary>
-    /// <param name="literalNames"> The literal names assigned to tokens, or {@code null}
-    /// if no literal names are assigned. </param>
-    /// <param name="symbolicNames"> The symbolic names assigned to tokens, or
-    /// {@code null} if no symbolic names are assigned. </param>
-    /// <param name="displayNames"> The display names assigned to tokens, or {@code null}
-    /// to use the values in {@code literalNames} and {@code symbolicNames} as
-    /// the source of display names, as described in
-    /// <seealso cref="#getDisplayName(int)"/>.
-    /// </param>
-    /// <seealso cref= #getLiteralName(int) </seealso>
-    /// <seealso cref= #getSymbolicName(int) </seealso>
-    /// <seealso cref= #getDisplayName(int) </seealso>
-    Vocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames,
-               std::vector<std::string> displayNames);
+    virtual ~Vocabulary() = default;
 
     /// <summary>
     /// Returns the highest token type value. It can be used to iterate from
@@ -99,7 +58,7 @@ namespace dfa {
     /// </param>
     /// <returns> The string literal associated with the specified token type, or
     /// {@code null} if no string literal is associated with the type. </returns>
-    std::string_view getLiteralName(size_t tokenType) const;
+    virtual std::string_view getLiteralName(size_t tokenType) const = 0;
 
     /// <summary>
     /// Gets the symbolic name associated with a token type. The string returned
@@ -143,7 +102,7 @@ namespace dfa {
     /// </param>
     /// <returns> The symbolic name associated with the specified token type, or
     /// {@code null} if no symbolic name is associated with the type. </returns>
-    std::string_view getSymbolicName(size_t tokenType) const;
+    virtual std::string_view getSymbolicName(size_t tokenType) const = 0;
 
     /// <summary>
     /// Gets the display name of a token type.
@@ -164,14 +123,22 @@ namespace dfa {
     /// </param>
     /// <returns> The display name of the token type, for use in error reporting or
     /// other user-visible messages which reference specific token types. </returns>
-    std::string getDisplayName(size_t tokenType) const;
+    virtual std::string getDisplayName(size_t tokenType) const = 0;
+
+  protected:
+    explicit Vocabulary(size_t maxTokenType) : _maxTokenType(maxTokenType) {}
 
   private:
-    std::vector<std::string> const _literalNames;
-    std::vector<std::string> const _symbolicNames;
-    std::vector<std::string> const _displayNames;
-    const size_t _maxTokenType = 0;
+    size_t _maxTokenType = 0;
   };
 
-} // namespace atn
-} // namespace antlr4
+namespace dfa {
+
+  // For some reason this was initially defined in antlr4::dfa, instead of antlr4. That was a
+  // mistake, so we moved it to antlr4. The alias is here to keep source compatibility and will
+  // be removed in a future version.
+  using Vocabulary = antlr4::Vocabulary;
+
+}  // namespace dfa
+
+}  // namespace antlr4

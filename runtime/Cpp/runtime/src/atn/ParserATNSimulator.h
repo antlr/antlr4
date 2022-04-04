@@ -11,6 +11,7 @@
 #include "atn/PredictionContext.h"
 #include "SemanticContext.h"
 #include "atn/ATNConfig.h"
+#include "support/Span.h"
 
 namespace antlr4 {
 namespace atn {
@@ -245,10 +246,10 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ParserATNSimulator : public ATNSimulator {
   public:
     /// Testing only!
-    ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+    ParserATNSimulator(const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                        PredictionContextCache &sharedContextCache);
 
-    ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+    ParserATNSimulator(Parser *parser, const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                        PredictionContextCache &sharedContextCache);
 
     virtual void reset() override;
@@ -257,7 +258,7 @@ namespace atn {
 
     static const bool TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT;
 
-    std::vector<dfa::DFA> &decisionToDFA;
+    antlrcpp::Span<dfa::DFA> decisionToDFA;
 
     /** Implements first-edge (loop entry) elimination as an optimization
      *  during closure operations.  See antlr/antlr4#1398.

@@ -6,15 +6,52 @@
 #include "atn/ATN.h"
 #include "atn/ATNDeserializer.h"
 #include "Vocabulary.h"
+#include "VocabularyImpl.h"
 
 #include "misc/InterpreterDataReader.h"
 
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
+using namespace antlr4;
 
-InterpreterData::InterpreterData(std::vector<std::string> const& literalNames, std::vector<std::string> const& symbolicNames)
-: vocabulary(literalNames, symbolicNames) {
+namespace {
+
+  class InterpreterDataVocabulary final : public Vocabulary {
+  public:
+    InterpreterDataVocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames)
+        : Vocabulary(std::max(literalNames.size(), symbolicNames.size()) - 1),
+          literalNames(std::move(literalNames)), symbolicNames(std::move(symbolicNames)),
+          literalNamesView(this->literalNames.size()), symbolicNamesView(this->symbolicNames.size()),
+          _impl(antlrcpp::Span<const std::string_view>(literalNamesView.data(), literalNamesView.size()), antlrcpp::Span<const std::string_view>(symbolicNamesView.data(), symbolicNamesView.size())) {
+      for (size_t index = 0; index < this->literalNames.size(); index++) {
+        literalNamesView[index] = this->literalNames[index];
+      }
+      for (size_t index = 0; index < this->symbolicNames.size(); index++) {
+        symbolicNamesView[index] = this->symbolicNames[index];
+      }
+    }
+
+    std::string_view getLiteralName(size_t tokenType) const override {
+      return _impl.getLiteralName(tokenType);
+    }
+
+    std::string_view getSymbolicName(size_t tokenType) const override {
+      return _impl.getSymbolicName(tokenType);
+    }
+
+    std::string getDisplayName(size_t tokenType) const override {
+      return _impl.getDisplayName(tokenType);
+    }
+
+  private:
+    std::vector<std::string> literalNames;
+    std::vector<std::string> symbolicNames;
+    std::vector<std::string_view> literalNamesView;
+    std::vector<std::string_view> symbolicNamesView;
+    VocabularyImpl _impl;
+  };
+
 }
 
 InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
@@ -68,7 +105,8 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
 
     symbolicNames.push_back(line == "null" ? "" : line);
   };
-  InterpreterData result(literalNames, symbolicNames);
+  InterpreterData result;
+  result.vocabulary = std::make_unique<InterpreterDataVocabulary>(std::move(literalNames), std::move(symbolicNames));
 
   std::getline(input, line, '\n');
   assert(line == "rule names:");
@@ -101,8 +139,6 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
     };
   }
 
-  std::vector<int32_t> serializedATN;
-
   std::getline(input, line, '\n');
   assert(line == "atn:");
   std::getline(input, line, '\n');
@@ -115,10 +151,11 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
       number = std::strtoul(&value[1], nullptr, 10);
     else
       number = std::strtoul(value.c_str(), nullptr, 10);
-    serializedATN.push_back(static_cast<int32_t>(number));
+    result.serializedATN.push_back(static_cast<int32_t>(number));
   }
 
+
   ATNDeserializer deserializer;
-  result.atn = deserializer.deserialize(serializedATN);
+  result.atn = deserializer.deserialize(antlrcpp::Span<const int32_t>(result.serializedATN.data(), result.serializedATN.size()));
   return result;
 }

@@ -18,17 +18,17 @@ public:
 
   ~XPathLexer() override;
 
-  virtual std::string getGrammarFileName() const override;
+  virtual std::string_view getGrammarFileName() const override;
 
-  virtual const std::vector<std::string>& getRuleNames() const override;
+  virtual antlrcpp::Span<const std::string_view> getRuleNames() const override;
 
-  virtual const std::vector<std::string>& getChannelNames() const override;
+  virtual antlrcpp::Span<const std::string_view> getChannelNames() const override;
 
-  virtual const std::vector<std::string>& getModeNames() const override;
+  virtual antlrcpp::Span<const std::string_view> getModeNames() const override;
 
-  virtual const antlr4::dfa::Vocabulary& getVocabulary() const override;
+  virtual const antlr4::Vocabulary& getVocabulary() const override;
 
-  virtual antlr4::atn::SerializedATNView getSerializedATN() const override;
+  virtual antlrcpp::Span<const int32_t> getSerializedATN() const override;
 
   virtual const antlr4::atn::ATN& getATN() const override;
 

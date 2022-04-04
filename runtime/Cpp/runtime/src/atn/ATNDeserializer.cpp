@@ -221,12 +221,12 @@ namespace {
     return s;
   }
 
-  ssize_t readUnicodeInt32(SerializedATNView data, int& p) {
+  ssize_t readUnicodeInt32(antlrcpp::Span<const int32_t> data, int& p) {
     return static_cast<ssize_t>(data[p++]);
   }
 
   void deserializeSets(
-    SerializedATNView data,
+    antlrcpp::Span<const int32_t> data,
     int& p,
     std::vector<misc::IntervalSet>& sets) {
     size_t nsets = data[p++];
@@ -255,7 +255,13 @@ ATNDeserializer::ATNDeserializer() : ATNDeserializer(ATNDeserializationOptions::
 
 ATNDeserializer::ATNDeserializer(ATNDeserializationOptions deserializationOptions) : _deserializationOptions(std::move(deserializationOptions)) {}
 
-std::unique_ptr<ATN> ATNDeserializer::deserialize(SerializedATNView data) const {
+std::unique_ptr<ATN> ATNDeserializer::deserialize(antlrcpp::Span<const int32_t> data) const {
+  auto atn = std::make_unique<ATN>();
+  deserialize(data, atn.get());
+  return atn;
+}
+
+void ATNDeserializer::deserialize(antlrcpp::Span<const int32_t> data, ATN *atn) const {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {
@@ -266,7 +272,8 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(SerializedATNView data) const 
 
   ATNType grammarType = (ATNType)data[p++];
   size_t maxTokenType = data[p++];
-  auto atn = std::make_unique<ATN>(grammarType, maxTokenType);
+  atn->grammarType = grammarType;
+  atn->maxTokenType = maxTokenType;
 
   //
   // STATES
@@ -565,8 +572,6 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(SerializedATNView data) const 
       verifyATN(*atn);
     }
   }
-
-  return atn;
 }
 
 void ATNDeserializer::verifyATN(const ATN &atn) const {

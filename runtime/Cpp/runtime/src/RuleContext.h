@@ -6,6 +6,7 @@
 #pragma once
 
 #include "tree/ParseTree.h"
+#include "support/Span.h"
 
 namespace antlr4 {
 
@@ -120,17 +121,17 @@ namespace antlr4 {
     /// Print out a whole tree, not just a node, in LISP format
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     /// </summary>
-    virtual std::string toStringTree(std::vector<std::string> &ruleNames, bool pretty = false);
+    virtual std::string toStringTree(antlrcpp::Span<const std::string_view> ruleNames, bool pretty = false);
 
     virtual std::string toStringTree(bool pretty = false) override;
     virtual std::string toString() override;
     std::string toString(Recognizer *recog);
-    std::string toString(const std::vector<std::string> &ruleNames);
+    std::string toString(antlrcpp::Span<const std::string_view> ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
     std::string toString(Recognizer *recog, RuleContext *stop);
 
-    virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop);
+    virtual std::string toString(antlrcpp::Span<const std::string_view> ruleNames, RuleContext *stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
 

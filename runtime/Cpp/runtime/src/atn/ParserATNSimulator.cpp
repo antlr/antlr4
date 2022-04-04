@@ -46,12 +46,12 @@ using namespace antlrcpp;
 
 const bool ParserATNSimulator::TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = ParserATNSimulator::getLrLoopSetting();
 
-ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+ParserATNSimulator::ParserATNSimulator(const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
 : ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
-ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, antlrcpp::Span<dfa::DFA> decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser) {
   InitializeInstanceFields();
@@ -61,10 +61,8 @@ void ParserATNSimulator::reset() {
 }
 
 void ParserATNSimulator::clearDFA() {
-  int size = (int)decisionToDFA.size();
-  decisionToDFA.clear();
-  for (int d = 0; d < size; ++d) {
-    decisionToDFA.push_back(dfa::DFA(atn.getDecisionState(d), d));
+  for (auto &dfa : decisionToDFA) {
+    dfa.clear();
   }
 }
 
@@ -211,7 +209,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
             std::cout << "Full LL avoided" << std::endl;
 #endif
 
-          return conflictingAlts.nextSetBit(0);
+          return conflictingAlts.find().value_or(INVALID_INDEX);
         }
 
         if (conflictIndex != startIndex) {
@@ -245,13 +243,13 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
           throw noViableAlt(input, outerContext, D->configs.get(), startIndex, false);
 
         case 1:
-          return alts.nextSetBit(0);
+          return alts.find().value_or(INVALID_INDEX);
 
         default:
           // report ambiguity after predicate evaluation to make sure the correct
           // set of ambig alts is reported.
           reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D->configs.get());
-          return alts.nextSetBit(0);
+          return alts.find().value_or(INVALID_INDEX);
       }
     }
 
@@ -294,7 +292,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFASta
     D->requiresFullContext = true;
     // in SLL-only mode, we will stop at this state and return the minimum alt
     D->isAcceptState = true;
-    D->prediction = D->configs->conflictingAlts.nextSetBit(0);
+    D->prediction = D->configs->conflictingAlts.find().value_or(INVALID_INDEX);
   }
 
   if (D->isAcceptState && D->configs->hasSemanticContext) {
@@ -328,7 +326,7 @@ void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionStat
     // There are preds in configs but they might go away
     // when OR'd together like {p}? || NONE == NONE. If neither
     // alt has preds, resolve to min alt
-    dfaState->prediction = altsToCollectPredsFrom.nextSetBit(0);
+    dfaState->prediction = altsToCollectPredsFrom.find().value_or(INVALID_INDEX);
   }
 }
 
@@ -1034,7 +1032,7 @@ bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *conf
 
 std::string ParserATNSimulator::getRuleName(size_t index) {
   if (parser != nullptr) {
-    return parser->getRuleNames()[index];
+    return std::string(parser->getRuleNames()[index]);
   }
   return "<rule " + std::to_string(index) + ">";
 }
@@ -1192,7 +1190,7 @@ std::string ParserATNSimulator::getTokenName(size_t t) {
     return "EOF";
   }
 
-  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary();
+  const Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : Vocabulary::empty();
   std::string displayName = vocabulary.getDisplayName(t);
   if (displayName == std::to_string(t)) {
     return displayName;
