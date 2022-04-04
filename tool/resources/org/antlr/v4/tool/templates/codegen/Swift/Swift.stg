@@ -945,7 +945,7 @@ _prevctx = _localctx
 >>
 
 recRuleSetPrevCtx() ::= <<
-if _parseListeners != nil {
+if !_parseListeners.isEmpty {
    try triggerExitRuleEvent()
 }
 _prevctx = _localctx
