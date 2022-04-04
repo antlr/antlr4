@@ -74,3 +74,14 @@ namespace antlrcpp {
 
   };
 }
+
+namespace std {
+
+  template <>
+  struct hash<::antlrcpp::BitSet> {
+    size_t operator()(const ::antlrcpp::BitSet& bitSet) const {
+      return std::hash<std::bitset<2048>>{}(bitSet);
+    }
+  };
+
+}

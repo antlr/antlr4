@@ -10,13 +10,14 @@
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
 #include "atn/ATNConfig.h"
+#include "atn/ATNType.h"
 
 namespace antlr4 {
 namespace atn {
 
   /// Specialized set that can track info about the set, with support for combining similar configurations using a
   /// graph-structured stack.
-  class ANTLR4CPP_PUBLIC ATNConfigSet {
+  class ANTLR4CPP_PUBLIC ATNConfigSet final {
   public:
     /// Track the elements as they are added to the set; supports get(i)
     std::vector<Ref<ATNConfig>> configs;
@@ -44,15 +45,20 @@ namespace atn {
 
     ATNConfigSet();
 
+    explicit ATNConfigSet(ATNType type);
+
+    explicit ATNConfigSet(bool fullCtx);
+
     ATNConfigSet(const ATNConfigSet &other);
 
     ATNConfigSet(ATNConfigSet&&) = delete;
 
-    explicit ATNConfigSet(bool fullCtx);
+    ATNConfigSet(ATNType type, bool fullCtx);
 
-    virtual ~ATNConfigSet() = default;
+    ATNConfigSet& operator=(const ATNConfigSet&) = delete;
+    ATNConfigSet& operator=(ATNConfigSet&&) = delete;
 
-    bool add(const Ref<ATNConfig> &config);
+    void add(const Ref<ATNConfig> &config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -64,9 +70,9 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
+    void add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
 
-    bool addAll(const ATNConfigSet &other);
+    void addAll(const ATNConfigSet &other);
 
     std::vector<ATNState*> getStates() const;
 
@@ -91,33 +97,24 @@ namespace atn {
     bool isReadonly() const;
     void setReadonly(bool readonly);
 
-    virtual size_t hashCode() const;
+    size_t hashCode() const;
 
-    virtual bool equals(const ATNConfigSet &other) const;
+    bool equals(const ATNConfigSet &other) const;
 
-    virtual std::string toString() const;
+    std::string toString() const;
 
   private:
     struct ATNConfigHasher final {
-      const ATNConfigSet* atnConfigSet;
+      ATNType type;
 
-      size_t operator()(const ATNConfig *other) const {
-        assert(other != nullptr);
-        return atnConfigSet->hashCode(*other);
-      }
+      size_t operator()(const ATNConfig *other) const;
     };
 
     struct ATNConfigComparer final {
-      const ATNConfigSet* atnConfigSet;
+      ATNType type;
 
-      bool operator()(const ATNConfig *lhs, const ATNConfig *rhs) const {
-        assert(lhs != nullptr);
-        assert(rhs != nullptr);
-        return atnConfigSet->equals(*lhs, *rhs);
-      }
+      bool operator()(const ATNConfig *lhs, const ATNConfig *rhs) const;
     };
-
-    mutable std::atomic<size_t> _cachedHashCode = 0;
 
     /// Indicates that the set of configurations is read-only. Do not
     /// allow any code to manipulate the set; DFA states will point at
@@ -126,29 +123,31 @@ namespace atn {
     /// we've made this readonly.
     bool _readonly = false;
 
-    virtual size_t hashCode(const ATNConfig &atnConfig) const;
+    ATNType _type;
 
-    virtual bool equals(const ATNConfig &lhs, const ATNConfig &rhs) const;
+    mutable std::atomic<size_t> _cachedHashCode = 0;
+
+    using Container = std::unordered_set<ATNConfig*, ATNConfigHasher, ATNConfigComparer>;
 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
-    std::unordered_set<ATNConfig*, ATNConfigHasher, ATNConfigComparer> _configLookup;
+    Container _configLookup;
   };
 
   inline bool operator==(const ATNConfigSet &lhs, const ATNConfigSet &rhs) { return lhs.equals(rhs); }
 
   inline bool operator!=(const ATNConfigSet &lhs, const ATNConfigSet &rhs) { return !operator==(lhs, rhs); }
 
-} // namespace atn
-} // namespace antlr4
+}  // namespace atn
+}  // namespace antlr4
 
 namespace std {
 
-template <>
-struct hash<::antlr4::atn::ATNConfigSet> {
-  size_t operator()(const ::antlr4::atn::ATNConfigSet &atnConfigSet) const {
-    return atnConfigSet.hashCode();
-  }
-};
+  template <>
+  struct hash<::antlr4::atn::ATNConfigSet> {
+    size_t operator()(const ::antlr4::atn::ATNConfigSet &atnConfigSet) const {
+      return atnConfigSet.hashCode();
+    }
+  };
 
 } // namespace std

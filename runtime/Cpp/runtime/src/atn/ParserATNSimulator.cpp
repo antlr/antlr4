@@ -440,7 +440,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
   return predictedAlt;
 }
 
-std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *closure_, size_t t, bool fullCtx) {
+std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx) {
 
   std::unique_ptr<ATNConfigSet> intermediate(new ATNConfigSet(fullCtx));
 
@@ -457,7 +457,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
   std::vector<Ref<ATNConfig>> skippedStopStates;
 
   // First figure out where we can reach on input t
-  for (const auto &c : closure_->configs) {
+  for (const auto &c : closure->configs) {
     if (c->state != nullptr && c->state->getStateType() == ATNStateType::RULE_STOP) {
       assert(c->context->isEmpty());
 
@@ -509,11 +509,11 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
    */
   if (reach == nullptr) {
     reach.reset(new ATNConfigSet(fullCtx));
-    ATNConfig::Set closureBusy;
+    std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> closureBusy;
 
     bool treatEofAsEpsilon = t == Token::EOF;
     for (const auto &c : intermediate->configs) {
-      closure(c, reach.get(), closureBusy, false, fullCtx, treatEofAsEpsilon);
+      this->closure(c, reach.get(), closureBusy, false, fullCtx, treatEofAsEpsilon);
     }
   }
 
@@ -596,7 +596,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p,
   for (size_t i = 0; i < p->transitions.size(); i++) {
     ATNState *target = p->transitions[i]->target;
     Ref<ATNConfig> c = std::make_shared<ATNConfig>(target, (int)i + 1, initialContext);
-    ATNConfig::Set closureBusy;
+    std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> closureBusy;
     closure(c, configs.get(), closureBusy, true, fullCtx, false);
   }
 
@@ -812,7 +812,8 @@ bool ParserATNSimulator::evalSemanticContext(Ref<const SemanticContext> const& p
   return pred->eval(parser, parserCallStack);
 }
 
-void ParserATNSimulator::closure(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
+void ParserATNSimulator::closure(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                                 std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
                                  bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon) {
   const int initialDepth = 0;
   closureCheckingStopState(config, configs, closureBusy, collectPredicates, fullCtx, initialDepth, treatEofAsEpsilon);
@@ -820,8 +821,9 @@ void ParserATNSimulator::closure(Ref<ATNConfig> const& config, ATNConfigSet *con
   assert(!fullCtx || !configs->dipsIntoOuterContext);
 }
 
-void ParserATNSimulator::closureCheckingStopState(Ref<ATNConfig> const& config, ATNConfigSet *configs,
-  ATNConfig::Set &closureBusy, bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
+void ParserATNSimulator::closureCheckingStopState(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                                                  std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
+                                                  bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
 
 #if DEBUG_ATN == 1
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
@@ -841,7 +843,7 @@ void ParserATNSimulator::closureCheckingStopState(Ref<ATNConfig> const& config, 
 #if DEBUG_ATN == 1
               std::cout << "FALLING off rule " << getRuleName(config->state->ruleIndex) << std::endl;
 #endif
-            closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
+            closure(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
           }
           continue;
         }
@@ -870,11 +872,12 @@ void ParserATNSimulator::closureCheckingStopState(Ref<ATNConfig> const& config, 
     }
   }
 
-  closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
+  closure(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
 }
 
-void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
-                                  bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
+void ParserATNSimulator::closure(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                                 std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
+                                 bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
   ATNState *p = config->state;
   // optimization
   if (!p->epsilonOnlyTransitions) {
@@ -908,7 +911,7 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
         closureBusy.insert(c);
 
         if (_dfa != nullptr && _dfa->isPrecedenceDfa()) {
-          size_t outermostPrecedenceReturn = dynamic_cast<const EpsilonTransition *>(t)->outermostPrecedenceReturn();
+          size_t outermostPrecedenceReturn = downCast<const EpsilonTransition&>(*t).outermostPrecedenceReturn();
           if (outermostPrecedenceReturn == _dfa->atnStartState->ruleIndex) {
             c->setPrecedenceFilterSuppressed(true);
           }

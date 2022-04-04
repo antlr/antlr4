@@ -242,11 +242,12 @@ namespace atn {
       }
     };
 
-    std::unordered_map<Ref<const PredictionContext>,
+    using Container = std::unordered_map<Ref<const PredictionContext>,
       std::unordered_map<Ref<const PredictionContext>, Ref<const PredictionContext>,
         PredictionContextHasher, PredictionContextComparer>,
-      PredictionContextHasher, PredictionContextComparer> _data;
+      PredictionContextHasher, PredictionContextComparer>;
 
+    Container _data;
   };
 
 }  // namespace atn
