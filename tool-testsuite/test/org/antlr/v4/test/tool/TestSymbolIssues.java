@@ -560,4 +560,64 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	// ISSUE: https://github.com/antlr/antlr4/issues/3611
+	@Test public void testActionShouldBePlacedAfterAllPredicates() {
+		String grammar =
+				"lexer grammar T;\n" +
+				"@members {String s = \"\";\n" +
+				"\n" +
+				"// Action\n" +
+				"void a(String x) {\n" +
+				"    s += x;\n" +
+				"}\n" +
+				"\n" +
+				"// Predicate\n" +
+				"boolean p() {\n" +
+				"    return !s.equals(\"\");\n" +
+				"}}\n" +
+				"\n" +
+				"// No warnings\n" +
+				"OR: 'or1' {p()}? {a(\"or1\");} | 'or2' {p()}? {a(\"or2\");};\n" +
+				"NO_PREDICATE: 'no_predicate' {a(\"no_predicate\");};\n" +
+				"PREDICATE: 'predicate' {p()}? {a(\"predicate\");};\n" +
+				"ACTIONS: 'actions' {a(\"action1\");} {a(\"action2\");};\n" +
+				"CLOSURE: ('closure' {a(\"closure\");})+;\n" +
+				"OPTIONAL: 'optional' ('_' {a(\"optional\");})?;\n" +
+				"USE_FRAGMENT: 'f1_' FRAGMENT {a(\"fragment\");};\n" +
+				"RECURSIVE : '/*' {p()}? (RECURSIVE | .)*?  {a(\"recursive\");}'*/';" +
+				"\n" +
+				"// Warnings\n" +
+				"OR_W: 'or1' {a(\"or1_w\");} {p()}? | 'or2' {a(\"or2_w\");} {p()}?;\n" +
+				"PREDICATE_W: 'predicate_w' {a(\"predicate_w\");} {p()}?;\n" +
+				"CLOSURE_W1: ('closure_w1' {a(\"closure_w1\");} {p()}?)+;\n" +
+				"CLOSURE_W2: ('closure_w2' {p()}? {a(\"closure_w2\");})+;\n" +
+				"OPTIONAL_W: 'optional_w' ('_' {a(\"optional_w\");})? {p()}?;\n" +
+				"USE_FRAGMENT_W: 'f2_' {a(\"fragment_w\");} FRAGMENT;\n" +
+				"HIERARCHY_W: 'hierarchy_w' {a(\"hierarchy_w\");} ('_1' {p()}? | '_2');\n" +
+				"RECURSIVE_W : '/*' {a(\"recursive_w\");} (RECURSIVE_W | .)*? {p()}? '*/';" +
+				"\n" +
+				"fragment FRAGMENT: 'fragment' {p()}?;\n" +
+				"\n" +
+				"WS: [ \\r\\n]+;";
+
+		int code = ErrorType.ACTION_SHOULD_BE_PLACED_AFTER_PREDICATES.code;
+		String expected =
+				"warning(" + code + "): T.g4:24:12: Action {a(\"or1_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:24:41: Action {a(\"or2_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:25:27: Action {a(\"predicate_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:26:26: Action {a(\"closure_w1\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:27:33: Action {a(\"closure_w2\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:28:30: Action {a(\"optional_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:29:22: Action {a(\"fragment_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:30:27: Action {a(\"hierarchy_w\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:31:19: Action {a(\"recursive_w\");} should be placed after all predicates because it's always executed after them\n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		testErrors(pair, true);
+	}
 }

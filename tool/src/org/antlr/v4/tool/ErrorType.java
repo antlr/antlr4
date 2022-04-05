@@ -1137,6 +1137,20 @@ public enum ErrorType {
 			ErrorSeverity.WARNING
 	),
 
+	/**
+	 * <p>Action is always performed after semantics predicate execution</p>
+	 *
+	 * <pre>
+	 * ACTION_BEFORE_PREDICATE: {action();} 'value' {predicate()}? // warning
+	 * ACTION_AFTER_PREDICATE: {predicate()}? 'value' {action();} // ok
+	 * <pre>
+	 */
+	ACTION_SHOULD_BE_PLACED_AFTER_PREDICATES(
+			188,
+			"Action <arg> should be placed after all predicates because it's always executed after them",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */

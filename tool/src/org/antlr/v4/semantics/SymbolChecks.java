@@ -23,9 +23,7 @@ import org.antlr.v4.tool.LabelType;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.AltAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,12 +68,14 @@ public class SymbolChecks {
 		// methods affect fields, but no side-effects outside this object
 		// So, call order sensitive
 		// First collect all rules for later use in checkForLabelConflict()
-		if (g.rules != null) {
-			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
-		}
-		checkReservedNames(g.rules.values());
+		Collection<Rule> rules = g.rules.values();
+		for (Rule r : rules) nameToRuleMap.put(r.name, r);
+		checkReservedNames(rules);
 		checkActionRedefinitions(collector.namedActions);
-		checkForLabelConflicts(g.rules.values());
+		checkForLabelConflicts(rules);
+		if (g instanceof LexerGrammar) {
+			checkActionLocation(rules);
+		}
 	}
 
 	public void checkActionRedefinitions(List<GrammarAST> actions) {
@@ -478,5 +478,87 @@ public class SymbolChecks {
 				}
 			}
 		}
+	}
+
+	private void checkActionLocation(Collection<Rule> rules) {
+		HashMap<RuleAST, Boolean> calculatedRules = new HashMap<>();
+		for (Rule rule : rules) {
+			checkActionLocation(rule.ast, calculatedRules, false);
+		}
+	}
+
+	private void checkActionLocation(GrammarAST node, HashMap<RuleAST, Boolean> calculatedRules, boolean isPredicateDetected) {
+		if (node instanceof RuleAST) {
+			RuleAST ruleAST = (RuleAST) node;
+			checkActionLocation((GrammarAST) ruleAST.getChild(ruleAST.getChildCount() - 1), calculatedRules, isPredicateDetected);
+		}
+		else if (node instanceof BlockAST) {
+			for (Object child : node.getChildren()) {
+				checkActionLocation((GrammarAST)child, calculatedRules, isPredicateDetected);
+			}
+		}
+		else if (node instanceof AltAST) {
+			List<?> children = node.getChildren();
+			boolean isPredicateDetectedInSequence = isPredicateDetected;
+			for (int i = children.size() - 1; i >= 0; i--) {
+				GrammarAST child = (GrammarAST)children.get(i);
+				checkActionLocation(child, calculatedRules, isPredicateDetectedInSequence);
+				if (!isPredicateDetectedInSequence && containsSemanticsPredicate(child, calculatedRules)) {
+					isPredicateDetectedInSequence = true;
+				}
+			}
+		}
+		else if (node instanceof PlusBlockAST || node instanceof StarBlockAST) {
+			GrammarAST firstChild = (GrammarAST) node.getChild(0);
+			// Warn about action in closure if there is predicate inside closure
+			checkActionLocation(firstChild, calculatedRules,
+					isPredicateDetected || containsSemanticsPredicate(firstChild, calculatedRules));
+		}
+		else if (node instanceof OptionalBlockAST) {
+			checkActionLocation((GrammarAST) node.getChild(0), calculatedRules, isPredicateDetected);
+		}
+		else if (node instanceof ActionAST && !(node instanceof PredAST)) {
+			if (isPredicateDetected) {
+				ActionAST actionAST = (ActionAST) node;
+				errMgr.grammarError(ErrorType.ACTION_SHOULD_BE_PLACED_AFTER_PREDICATES, g.fileName, actionAST.token, actionAST.token.getText());
+			}
+		}
+	}
+
+	private boolean containsSemanticsPredicate(GrammarAST node, HashMap<RuleAST, Boolean> calculatedRules) {
+		if (node instanceof RuleAST) {
+			RuleAST ruleAST = (RuleAST) node;
+			Boolean calculatedValue = calculatedRules.get(ruleAST);
+			if (calculatedValue != null) {
+				return calculatedValue;
+			}
+
+			calculatedRules.put(ruleAST, false); // Prevent endless recursion
+			boolean result = containsSemanticsPredicate((GrammarAST) ruleAST.getChild(ruleAST.getChildCount() - 1), calculatedRules);
+			calculatedRules.put(ruleAST, result);
+		}
+		else if (node instanceof PredAST) {
+			return true;
+		}
+		else if (node instanceof TerminalAST) {
+			if (node.token.getType() == ANTLRLexer.TOKEN_REF) {
+				Rule refRule = nameToRuleMap.get(node.token.getText());
+				if (refRule != null) {
+					return containsSemanticsPredicate(refRule.ast, calculatedRules);
+				}
+			}
+		}
+		else {
+			List<?> children = node.getChildren();
+			if (children != null) {
+				for (Object child : children) {
+					if (containsSemanticsPredicate((GrammarAST) child, calculatedRules)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }
