@@ -9,6 +9,7 @@
 #include "atn/ATN.h"
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
+#include "atn/PredictionContextCache.h"
 #include "Vocabulary.h"
 
 namespace antlr4 {

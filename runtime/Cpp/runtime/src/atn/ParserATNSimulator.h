@@ -9,6 +9,8 @@
 #include "dfa/DFAState.h"
 #include "atn/ATNSimulator.h"
 #include "atn/PredictionContext.h"
+#include "atn/PredictionContextMergeCache.h"
+#include "atn/ParserATNSimulatorOptions.h"
 #include "SemanticContext.h"
 #include "atn/ATNConfig.h"
 
@@ -251,6 +253,10 @@ namespace atn {
     ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                        PredictionContextCache &sharedContextCache);
 
+    ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+                       PredictionContextCache &sharedContextCache,
+                       const ParserATNSimulatorOptions &options);
+
     virtual void reset() override;
     virtual void clearDFA() override;
     virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext);
@@ -380,6 +386,7 @@ namespace atn {
     /// also be examined during cache lookup.
     /// </summary>
     PredictionContextMergeCache mergeCache;
+    size_t _mergeCacheCounter = 0;
 
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     TokenStream *_input;

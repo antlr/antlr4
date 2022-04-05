@@ -53,7 +53,13 @@ ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &de
 
 ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
-: ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser) {
+: ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache, ParserATNSimulatorOptions()) {}
+
+ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+                                       PredictionContextCache &sharedContextCache,
+                                       const ParserATNSimulatorOptions &options)
+: ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser),
+  mergeCache(options.getPredictionContextMergeCacheOptions()) {
   InitializeInstanceFields();
 }
 
@@ -87,7 +93,12 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   // Now we are certain to have a specific decision's DFA
   // But, do we still need an initial state?
   auto onExit = finally([this, input, index, m] {
-    mergeCache.clear(); // wack cache after each prediction
+    if (mergeCache.getOptions().getClearEveryN() != 0) {
+      if (++_mergeCacheCounter == mergeCache.getOptions().getClearEveryN()) {
+        mergeCache.clear();
+        _mergeCacheCounter = 0;
+      }
+    }
     _dfa = nullptr;
     input->seek(index);
     input->release(m);
@@ -108,10 +119,9 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   }
 
   if (s0 == nullptr) {
-    bool fullCtx = false;
-    std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(dfa.atnStartState,
-                                                                 &ParserRuleContext::EMPTY, fullCtx);
-
+    auto s0_closure = computeStartState(dfa.atnStartState, &ParserRuleContext::EMPTY, false);
+    std::unique_ptr<dfa::DFAState> newState;
+    std::unique_ptr<dfa::DFAState> oldState;
     std::unique_lock<std::shared_mutex> stateLock(atn._stateMutex);
     dfa::DFAState* ds0 = dfa.s0;
     if (dfa.isPrecedenceDfa()) {
@@ -122,25 +132,20 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
        * than simply setting DFA.s0.
        */
       ds0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
-      dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(ds0->configs.get())); /* mem-check: managed by the DFA or deleted below */
-      s0 = addDFAState(dfa, newState);
+      newState = std::make_unique<dfa::DFAState>(applyPrecedenceFilter(ds0->configs.get()));
+      s0 = addDFAState(dfa, newState.get());
       std::unique_lock<std::shared_mutex> edgeLock(atn._edgeMutex);
       dfa.setPrecedenceStartState(parser->getPrecedence(), s0);
-      if (s0 != newState) {
-        delete newState; // If there was already a state with this config set we don't need the new one.
-      }
     } else {
-      dfa::DFAState *newState = new dfa::DFAState(std::move(s0_closure)); /* mem-check: managed by the DFA or deleted below */
-      s0 = addDFAState(dfa, newState);
-
+      newState = std::make_unique<dfa::DFAState>(std::move(s0_closure));
+      s0 = addDFAState(dfa, newState.get());
       if (ds0 != s0) {
-        delete ds0; // Delete existing s0 DFA state, if there's any.
-        ds0 = nullptr;
+        oldState.reset(ds0);
         dfa.s0 = s0;
       }
-      if (s0 != newState) {
-        delete newState; // If there was already a state with this config set we don't need the new one.
-      }
+    }
+    if (s0 == newState.get()) {
+      newState.release();
     }
   }
 
@@ -458,7 +463,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
 
   // First figure out where we can reach on input t
   for (const auto &c : closure_->configs) {
-    if (c->state != nullptr && c->state->getStateType() == ATNStateType::RULE_STOP) {
+    if (RuleStopState::is(c->state)) {
       assert(c->context->isEmpty());
 
       if (fullCtx || t == Token::EOF) {
