@@ -1355,10 +1355,9 @@ namespace Antlr4.Runtime.Atn
 		protected int GetSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet configs,
 																			  ParserRuleContext outerContext)
 		{
-			Pair<ATNConfigSet, ATNConfigSet> sets =
-				SplitAccordingToSemanticValidity(configs, outerContext);
-			ATNConfigSet semValidConfigs = sets.a;
-			ATNConfigSet semInvalidConfigs = sets.b;
+			var sets = SplitAccordingToSemanticValidity(configs, outerContext);
+			ATNConfigSet semValidConfigs = sets.Key;
+			ATNConfigSet semInvalidConfigs = sets.Value;
 			int alt = getAltThatFinishedDecisionEntryRule(semValidConfigs);
 			if (alt != ATN.INVALID_ALT_NUMBER)
 			{ // semantically/syntactically viable path exists
@@ -1399,7 +1398,7 @@ namespace Antlr4.Runtime.Atn
 		 *  Assumption: the input stream has been restored to the starting point
 		 *  prediction, which is where predicates need to evaluate.
 		 */
-		protected Pair<ATNConfigSet, ATNConfigSet> SplitAccordingToSemanticValidity(
+		protected KeyValuePair<ATNConfigSet, ATNConfigSet> SplitAccordingToSemanticValidity(
 												  ATNConfigSet configSet,
 			ParserRuleContext outerContext)
 		{
@@ -1422,7 +1421,7 @@ namespace Antlr4.Runtime.Atn
 					succeeded.Add(c);
 				}
 			}
-			return new Pair<ATNConfigSet, ATNConfigSet>(succeeded, failed);
+			return new KeyValuePair<ATNConfigSet, ATNConfigSet>(succeeded, failed);
 		}
 
 		/** Look through a list of predicate/alt pairs, returning alts for the
