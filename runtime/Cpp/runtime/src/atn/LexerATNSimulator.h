@@ -8,7 +8,6 @@
 #include <atomic>
 
 #include "atn/ATNSimulator.h"
-#include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
 
 namespace antlr4 {
@@ -136,11 +135,11 @@ namespace atn {
     /// </summary>
     /// <returns> {@code true} if an accept state is reached, otherwise
     /// {@code false}. </returns>
-    virtual bool closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
+    virtual bool closure(CharStream *input, const Ref<ATNConfig> &config, ATNConfigSet *configs,
                          bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, const Transition *t,
+    virtual Ref<ATNConfig> getEpsilonTarget(CharStream *input, const Ref<ATNConfig> &config, const Transition *t,
       ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>

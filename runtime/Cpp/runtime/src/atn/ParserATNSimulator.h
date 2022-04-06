@@ -760,22 +760,6 @@ namespace atn {
     virtual bool evalSemanticContext(Ref<const SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                      size_t alt, bool fullCtx);
 
-    /* TODO: If we are doing predicates, there is no point in pursuing
-     closure operations if we reach a DFA state that uniquely predicts
-     alternative. We will not be caching that DFA state and it is a
-     waste to pursue the closure. Might have to advance when we do
-     ambig detection thought :(
-     */
-    virtual void closure(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
-                         bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
-
-    virtual void closureCheckingStopState(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
-                                          bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
-
-    /// Do the actual work of walking epsilon edges.
-    virtual void closure_(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
-                          bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
-
     virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> const& config, const Transition *t, bool collectPredicates,
                                             bool inContext, bool fullCtx, bool treatEofAsEpsilon);
     virtual Ref<ATNConfig> actionTransition(Ref<ATNConfig> const& config, const ActionTransition *t);
@@ -892,6 +876,37 @@ namespace atn {
                                  ATNConfigSet *configs); // configs that LL not SLL considered conflicting
 
   private:
+    struct ATNConfigHasher final {
+      size_t operator()(const Ref<ATNConfig> &atnConfig) const {
+        return atnConfig->hashCode();
+      }
+    };
+
+    struct ATNConfigComparer final {
+      bool operator()(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const {
+        return *lhs == *rhs;
+      }
+    };
+
+    /* TODO: If we are doing predicates, there is no point in pursuing
+     closure operations if we reach a DFA state that uniquely predicts
+     alternative. We will not be caching that DFA state and it is a
+     waste to pursue the closure. Might have to advance when we do
+     ambig detection thought :(
+     */
+    void closure(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                 std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
+                 bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
+
+    void closureCheckingStopState(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                                  std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
+                                  bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
+
+    /// Do the actual work of walking epsilon edges.
+    void closure(const Ref<ATNConfig> &config, ATNConfigSet *configs,
+                 std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer> &closureBusy,
+                 bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
+
     // SLL, LL, or LL + exact ambig detection?
     PredictionMode _mode;
 

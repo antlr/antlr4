@@ -81,7 +81,6 @@ namespace antlr4 {
     class LL1Analyzer;
     class LexerAction;
     class LexerActionExecutor;
-    class LexerATNConfig;
     class LexerATNSimulator;
     class LexerMoreAction;
     class LexerPopModeAction;
@@ -89,7 +88,6 @@ namespace antlr4 {
     class LookaheadEventInfo;
     class LoopEndState;
     class NotSetTransition;
-    class OrderedATNConfigSet;
     class ParseInfo;
     class ParserATNSimulator;
     class PlusBlockStartState;

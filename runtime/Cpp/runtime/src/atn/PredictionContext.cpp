@@ -622,5 +622,5 @@ Ref<const PredictionContext> PredictionContextMergeCache::get(const Ref<const Pr
 }
 
 void PredictionContextMergeCache::clear() {
-  _data.clear();
+  Container().swap(_data);
 }

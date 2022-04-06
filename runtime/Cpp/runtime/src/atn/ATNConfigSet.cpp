@@ -8,21 +8,32 @@
 #include "atn/ATNSimulator.h"
 #include "Exceptions.h"
 #include "atn/SemanticContext.h"
+#include "misc/MurmurHash.h"
 #include "support/Arrays.h"
 
 #include "atn/ATNConfigSet.h"
 
 using namespace antlr4::atn;
+using namespace antlr4::misc;
 using namespace antlrcpp;
 
 namespace {
 
+  bool atnConfigEqual(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) {
+    return *lhs == *rhs;
+  }
+
 }
 
-ATNConfigSet::ATNConfigSet() : ATNConfigSet(true) {}
+ATNConfigSet::ATNConfigSet() : ATNConfigSet(ATNType::PARSER, true) {}
+
+ATNConfigSet::ATNConfigSet(ATNType type) : ATNConfigSet(type, true) {}
+
+ATNConfigSet::ATNConfigSet(bool fullCtx) : ATNConfigSet(ATNType::PARSER, fullCtx) {}
 
 ATNConfigSet::ATNConfigSet(const ATNConfigSet &other)
-    : fullCtx(other.fullCtx), _configLookup(other._configLookup.bucket_count(), ATNConfigHasher{this}, ATNConfigComparer{this}) {
+    : fullCtx(other.fullCtx), _type(other._type),
+      _configLookup(std::unordered_set<ATNConfig*>().bucket_count(), ATNConfigHasher{_type}, ATNConfigComparer{_type}) {
   addAll(other);
   uniqueAlt = other.uniqueAlt;
   conflictingAlts = other.conflictingAlts;
@@ -30,14 +41,15 @@ ATNConfigSet::ATNConfigSet(const ATNConfigSet &other)
   dipsIntoOuterContext = other.dipsIntoOuterContext;
 }
 
-ATNConfigSet::ATNConfigSet(bool fullCtx)
-    : fullCtx(fullCtx), _configLookup(std::unordered_set<ATNConfig*, ATNConfigHasher, ATNConfigComparer>().bucket_count(), ATNConfigHasher{this}, ATNConfigComparer{this}) {}
+ATNConfigSet::ATNConfigSet(ATNType type, bool fullCtx)
+    : fullCtx(fullCtx), _type(type),
+      _configLookup(std::unordered_set<ATNConfig*>().bucket_count(), ATNConfigHasher{_type}, ATNConfigComparer{_type}) {}
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
-  return add(config, nullptr);
+void ATNConfigSet::add(const Ref<ATNConfig> &config) {
+  add(config, nullptr);
 }
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
+void ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
   assert(config);
 
   if (_readonly) {
@@ -50,13 +62,11 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
     dipsIntoOuterContext = true;
   }
 
-  auto existing = _configLookup.find(config.get());
-  if (existing == _configLookup.end()) {
-    _configLookup.insert(config.get());
+  auto [existing, inserted] = _configLookup.insert(config.get());
+  if (inserted) {
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
-
-    return true;
+    return;
   }
 
   // a previous (s,i,pi,_), merge with it and save result
@@ -73,15 +83,12 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
   }
 
   (*existing)->context = std::move(merged); // replace context; no need to alt mapping
-
-  return true;
 }
 
-bool ATNConfigSet::addAll(const ATNConfigSet &other) {
-  for (const auto &c : other.configs) {
-    add(c);
+void ATNConfigSet::addAll(const ATNConfigSet &other) {
+  for (const auto &config : other.configs) {
+    add(config);
   }
-  return false;
 }
 
 std::vector<ATNState*> ATNConfigSet::getStates() const {
@@ -131,40 +138,50 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
-  if (_configLookup.empty())
+  if (_configLookup.empty()) {
     return;
-
+  }
   for (const auto &config : configs) {
     config->context = interpreter->getCachedContext(config->context);
   }
 }
 
 bool ATNConfigSet::equals(const ATNConfigSet &other) const {
-  if (&other == this) {
+  if (this == std::addressof(other)) {
     return true;
   }
-
-  if (configs.size() != other.configs.size())
+  if (configs.size() != other.configs.size()) {
     return false;
-
-  if (fullCtx != other.fullCtx || uniqueAlt != other.uniqueAlt ||
-      conflictingAlts != other.conflictingAlts || hasSemanticContext != other.hasSemanticContext ||
-      dipsIntoOuterContext != other.dipsIntoOuterContext) // includes stack context
-    return false;
-
-  return Arrays::equals(configs, other.configs);
+  }
+  return fullCtx == other.fullCtx && uniqueAlt == other.uniqueAlt &&
+         hasSemanticContext == other.hasSemanticContext &&
+         dipsIntoOuterContext == other.dipsIntoOuterContext &&
+         conflictingAlts == other.conflictingAlts &&
+         std::equal(configs.begin(), configs.end(), other.configs.begin(), atnConfigEqual);
 }
 
 size_t ATNConfigSet::hashCode() const {
-  size_t cachedHashCode = _cachedHashCode.load(std::memory_order_relaxed);
-  if (!isReadonly() || cachedHashCode == 0) {
-    cachedHashCode = 1;
-    for (const auto &i : configs) {
-      cachedHashCode = 31 * cachedHashCode + i->hashCode(); // Same as Java's list hashCode impl.
+  bool readOnly = isReadonly();
+  size_t hash = readOnly ? _cachedHashCode.load(std::memory_order_relaxed) : 0;
+  if (hash == 0) {
+    hash = MurmurHash::initialize();
+    hash = MurmurHash::update(hash, fullCtx ? 1 : 0);
+    hash = MurmurHash::update(hash, uniqueAlt);
+    hash = MurmurHash::update(hash, std::hash<antlrcpp::BitSet>{}(conflictingAlts));
+    hash = MurmurHash::update(hash, hasSemanticContext ? 1 : 0);
+    hash = MurmurHash::update(hash, dipsIntoOuterContext ? 1 : 0);
+    for (const auto &config : configs) {
+      hash = MurmurHash::update(hash, config);
     }
-    _cachedHashCode.store(cachedHashCode, std::memory_order_relaxed);
+    hash = MurmurHash::finish(hash, 5 + configs.size());
+    if (hash == 0) {
+      hash = std::numeric_limits<size_t>::max();
+    }
+    if (readOnly) {
+      _cachedHashCode.store(hash, std::memory_order_relaxed);
+    }
   }
-  return cachedHashCode;
+  return hash;
 }
 
 size_t ATNConfigSet::size() const {
@@ -190,7 +207,7 @@ bool ATNConfigSet::isReadonly() const {
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
-  _configLookup.clear();
+  Container(std::unordered_set<ATNConfig*>().bucket_count(), ATNConfigHasher{_type}, ATNConfigComparer{_type}).swap(_configLookup);
 }
 
 std::string ATNConfigSet::toString() const {
@@ -219,14 +236,35 @@ std::string ATNConfigSet::toString() const {
   return ss.str();
 }
 
-size_t ATNConfigSet::hashCode(const ATNConfig &other) const {
-  size_t hashCode = 7;
-  hashCode = 31 * hashCode + other.state->stateNumber;
-  hashCode = 31 * hashCode + other.alt;
-  hashCode = 31 * hashCode + other.semanticContext->hashCode();
-  return hashCode;
+size_t ATNConfigSet::ATNConfigHasher::operator()(const ATNConfig *atnConfig) const {
+  assert(atnConfig != nullptr);
+  switch (type) {
+    case ATNType::LEXER:
+      return atnConfig->hashCode();
+    case ATNType::PARSER: {
+      size_t hash = MurmurHash::initialize();
+      hash = MurmurHash::update(hash, atnConfig->state->stateNumber);
+      hash = MurmurHash::update(hash, atnConfig->alt);
+      hash = MurmurHash::update(hash, atnConfig->semanticContext);
+      return MurmurHash::finish(hash, 3);
+    }
+  }
+  throw IllegalStateException("unreachable");
 }
 
-bool ATNConfigSet::equals(const ATNConfig &lhs, const ATNConfig &rhs) const {
-  return lhs.state->stateNumber == rhs.state->stateNumber && lhs.alt == rhs.alt && *lhs.semanticContext == *rhs.semanticContext;
+bool ATNConfigSet::ATNConfigComparer::operator()(const ATNConfig *lhs, const ATNConfig *rhs) const {
+  assert(lhs != nullptr);
+  assert(rhs != nullptr);
+  if (lhs == rhs) {
+    return true;
+  }
+  switch (type) {
+    case ATNType::LEXER:
+      return *lhs == *rhs;
+    case ATNType::PARSER:
+      return lhs->state->stateNumber == rhs->state->stateNumber &&
+             lhs->alt == rhs->alt &&
+             *lhs->semanticContext == *rhs->semanticContext;
+  }
+  throw IllegalStateException("unreachable");
 }
