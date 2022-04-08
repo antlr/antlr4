@@ -13,6 +13,7 @@
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
 #include "support/StringUtils.h"
+#include "support/Casts.h"
 #include "Parser.h"
 #include "CommonToken.h"
 #include "Vocabulary.h"
@@ -308,7 +309,7 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
   while (ctx->invokingState != ATNState::INVALID_STATE_NUMBER) {
     // compute what follows who invoked us
     atn::ATNState *invokingState = atn.states[ctx->invokingState];
-    const atn::RuleTransition *rt = dynamic_cast<const atn::RuleTransition*>(invokingState->transitions[0].get());
+    const atn::RuleTransition *rt = downCast<const atn::RuleTransition*>(invokingState->transitions[0].get());
     misc::IntervalSet follow = atn.nextTokens(rt->followState);
     recoverSet.addAll(follow);
 

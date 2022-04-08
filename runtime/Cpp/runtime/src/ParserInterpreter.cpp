@@ -26,6 +26,7 @@
 #include "tree/ErrorNode.h"
 
 #include "support/CPPUtils.h"
+#include "support/Casts.h"
 
 #include "ParserInterpreter.h"
 
@@ -148,16 +149,16 @@ atn::ATNState* ParserInterpreter::getATNState() {
 
 void ParserInterpreter::visitState(atn::ATNState *p) {
   size_t predictedAlt = 1;
-  if (is<DecisionState *>(p)) {
-    predictedAlt = visitDecisionState(dynamic_cast<DecisionState *>(p));
+  if (DecisionState::is(p)) {
+    predictedAlt = visitDecisionState(downCast<DecisionState*>(p));
   }
 
   const atn::Transition *transition = p->transitions[predictedAlt - 1].get();
   switch (transition->getTransitionType()) {
     case atn::TransitionType::EPSILON:
       if (p->getStateType() == ATNStateType::STAR_LOOP_ENTRY &&
-        (dynamic_cast<StarLoopEntryState *>(p))->isPrecedenceDecision &&
-        !is<LoopEndState *>(transition->target)) {
+        (downCast<StarLoopEntryState *>(p))->isPrecedenceDecision &&
+        !LoopEndState::is(transition->target)) {
         // We are at the start of a left recursive rule's (...)* loop
         // and we're not taking the exit branch of loop.
         InterpreterRuleContext *localctx = createInterpreterRuleContext(_parentContextStack.top().first,

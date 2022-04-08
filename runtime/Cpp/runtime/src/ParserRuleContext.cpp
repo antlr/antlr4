@@ -40,10 +40,9 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
   // copy any error nodes to alt label node
   if (!ctx->children.empty()) {
     for (auto *child : ctx->children) {
-      auto *errorNode = dynamic_cast<ErrorNode *>(child);
-      if (errorNode != nullptr) {
-        errorNode->setParent(this);
-        children.push_back(errorNode);
+      if (ErrorNode::is(child)) {
+        downCast<ErrorNode*>(child)->setParent(this);
+        children.push_back(child);
       }
     }
 
