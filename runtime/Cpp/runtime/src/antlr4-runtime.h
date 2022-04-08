@@ -49,6 +49,7 @@
 #include "TokenStreamRewriter.h"
 #include "UnbufferedCharStream.h"
 #include "UnbufferedTokenStream.h"
+#include "Version.h"
 #include "Vocabulary.h"
 #include "Vocabulary.h"
 #include "WritableToken.h"

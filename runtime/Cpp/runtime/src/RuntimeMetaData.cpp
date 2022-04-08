@@ -4,10 +4,11 @@
  */
 
 #include "RuntimeMetaData.h"
+#include "Version.h"
 
 using namespace antlr4;
 
-const std::string RuntimeMetaData::VERSION = "4.9.3";
+const std::string RuntimeMetaData::VERSION = ANTLRCPP_VERSION_STRING;
 
 std::string RuntimeMetaData::getRuntimeVersion() {
   return VERSION;

@@ -83,6 +83,9 @@
 #define ANTLR4CPP_HAVE_BUILTIN(x) 0
 #endif
 
+#define ANTLR4CPP_INTERNAL_STRINGIFY(x) #x
+#define ANTLR4CPP_STRINGIFY(x) ANTLR4CPP_INTERNAL_STRINGIFY(x)
+
 #include "support/Declarations.h"
 
 // We have to undefine this symbol as ANTLR will use this name for own members and even
