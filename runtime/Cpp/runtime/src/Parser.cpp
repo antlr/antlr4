@@ -348,8 +348,7 @@ void Parser::addContextToParseTree() {
   if (_ctx->parent == nullptr)
     return;
 
-  ParserRuleContext *parent = dynamic_cast<ParserRuleContext *>(_ctx->parent);
-  parent->addChild(_ctx);
+  downCast<ParserRuleContext*>(_ctx->parent)->addChild(_ctx);
 }
 
 void Parser::enterRule(ParserRuleContext *localctx, size_t state, size_t /*ruleIndex*/) {
@@ -377,7 +376,7 @@ void Parser::exitRule() {
     triggerExitRuleEvent();
   }
   setState(_ctx->invokingState);
-  _ctx = dynamic_cast<ParserRuleContext *>(_ctx->parent);
+  _ctx = downCast<ParserRuleContext*>(_ctx->parent);
 }
 
 void Parser::enterOuterAlt(ParserRuleContext *localctx, size_t altNum) {
@@ -387,7 +386,7 @@ void Parser::enterOuterAlt(ParserRuleContext *localctx, size_t altNum) {
   // that is previous child of parse tree
   if (_buildParseTrees && _ctx != localctx) {
     if (_ctx->parent != nullptr) {
-      ParserRuleContext *parent = dynamic_cast<ParserRuleContext *>(_ctx->parent);
+      ParserRuleContext *parent = downCast<ParserRuleContext*>(_ctx->parent);
       parent->removeLastChild();
       parent->addChild(localctx);
     }
@@ -443,7 +442,7 @@ void Parser::unrollRecursionContexts(ParserRuleContext *parentctx) {
   if (_parseListeners.size() > 0) {
     while (_ctx != parentctx) {
       triggerExitRuleEvent();
-      _ctx = dynamic_cast<ParserRuleContext *>(_ctx->parent);
+      _ctx = downCast<ParserRuleContext*>(_ctx->parent);
     }
   } else {
     _ctx = parentctx;
@@ -466,7 +465,7 @@ ParserRuleContext* Parser::getInvokingContext(size_t ruleIndex) {
     }
     if (p->parent == nullptr)
       break;
-    p = dynamic_cast<ParserRuleContext *>(p->parent);
+    p = downCast<ParserRuleContext*>(p->parent);
   }
   return nullptr;
 }
@@ -510,7 +509,7 @@ bool Parser::isExpectedToken(size_t symbol) {
       return true;
     }
 
-    ctx = dynamic_cast<ParserRuleContext *>(ctx->parent);
+    ctx = downCast<ParserRuleContext*>(ctx->parent);
   }
 
   if (following.contains(Token::EPSILON) && symbol == EOF) {
@@ -563,9 +562,10 @@ std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
     } else {
       stack.push_back(ruleNames[ruleIndex]);
     }
-    if (p->parent == nullptr)
+    if (!RuleContext::is(run->parent)) {
       break;
-    run = dynamic_cast<RuleContext *>(run->parent);
+    }
+    run = downCast<RuleContext*>(run->parent);
   }
   return stack;
 }
