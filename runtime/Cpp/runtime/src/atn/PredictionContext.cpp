@@ -6,6 +6,8 @@
 #include "atn/SingletonPredictionContext.h"
 #include "misc/MurmurHash.h"
 #include "atn/ArrayPredictionContext.h"
+#include "atn/PredictionContextCache.h"
+#include "atn/PredictionContextMergeCache.h"
 #include "RuleContext.h"
 #include "ParserRuleContext.h"
 #include "atn/RuleTransition.h"
@@ -35,7 +37,8 @@ namespace {
 
   Ref<const PredictionContext> getCachedContextImpl(const Ref<const PredictionContext> &context,
                                                     PredictionContextCache &contextCache,
-                                                    std::unordered_map<Ref<const PredictionContext>, Ref<const PredictionContext>> &visited) {
+                                                    std::unordered_map<Ref<const PredictionContext>,
+                                                    Ref<const PredictionContext>> &visited) {
     if (context->isEmpty()) {
       return context;
     }
@@ -95,7 +98,8 @@ namespace {
     return updated;
   }
 
-  void getAllContextNodesImpl(const Ref<const PredictionContext> &context, std::vector<Ref<const PredictionContext>> &nodes,
+  void getAllContextNodesImpl(const Ref<const PredictionContext> &context,
+                              std::vector<Ref<const PredictionContext>> &nodes,
                               std::unordered_set<const PredictionContext*> &visited) {
 
     if (visited.find(context.get()) != visited.end()) {
@@ -572,55 +576,4 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
   }
 
   return result;
-}
-
-//----------------- PredictionContextCache ------------------------------------------------------------------------
-
-void PredictionContextCache::put(const Ref<const PredictionContext> &value) {
-  assert(value);
-
-  _data.insert(value);
-}
-
-Ref<const PredictionContext> PredictionContextCache::get(const Ref<const PredictionContext> &value) const {
-  assert(value);
-
-  auto iterator = _data.find(value);
-  if (iterator == _data.end()) {
-    return nullptr;
-  }
-  return *iterator;
-}
-
-//----------------- PredictionContextMergeCache ------------------------------------------------------------------------
-
-Ref<const PredictionContext> PredictionContextMergeCache::put(const Ref<const PredictionContext> &key1,
-                                                              const Ref<const PredictionContext> &key2,
-                                                              Ref<const PredictionContext> value) {
-  assert(key1);
-  assert(key2);
-
-  return _data.try_emplace(key1).first->second.insert_or_assign(key2, std::move(value)).first->second;
-}
-
-Ref<const PredictionContext> PredictionContextMergeCache::get(const Ref<const PredictionContext> &key1,
-                                                              const Ref<const PredictionContext> &key2) const {
-  assert(key1);
-  assert(key2);
-
-  auto iterator1 = _data.find(key1);
-  if (iterator1 == _data.end()) {
-    return nullptr;
-  }
-
-  auto iterator2 = iterator1->second.find(key2);
-  if (iterator2 == iterator1->second.end()) {
-    return nullptr;
-  }
-
-  return iterator2->second;
-}
-
-void PredictionContextMergeCache::clear() {
-  _data.clear();
 }

@@ -298,6 +298,8 @@ public:
 
   explicit <parser.name>(antlr4::TokenStream *input);
 
+  <parser.name>(antlr4::TokenStream *input, const antlr4::atn::ParserATNSimulatorOptions &options);
+
   ~<parser.name>() override;
 
   std::string getGrammarFileName() const override;
@@ -383,9 +385,11 @@ void <parser.grammarName; format = "lower">ParserInitialize() {
 
 }
 
-<parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
+<parser.name>::<parser.name>(TokenStream *input) : <parser.name>(input, antlr4::atn::ParserATNSimulatorOptions()) {}
+
+<parser.name>::<parser.name>(TokenStream *input, const antlr4::atn::ParserATNSimulatorOptions &options) : <superClass>(input) {
   <parser.name>::initialize();
-  _interpreter = new atn::ParserATNSimulator(this, *<parser.grammarName; format = "lower">ParserStaticData->atn, <parser.grammarName; format = "lower">ParserStaticData->decisionToDFA, <parser.grammarName; format = "lower">ParserStaticData->sharedContextCache);
+  _interpreter = new atn::ParserATNSimulator(this, *<parser.grammarName; format = "lower">ParserStaticData->atn, <parser.grammarName; format = "lower">ParserStaticData->decisionToDFA, <parser.grammarName; format = "lower">ParserStaticData->sharedContextCache, options);
 }
 
 <parser.name>::~<parser.name>() {
