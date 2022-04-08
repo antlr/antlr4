@@ -7,7 +7,6 @@ sudo apt-get update -qq
 
 #sudo apt update
 
-# Installed now as part of docker image
 sudo apt install php
 php -v
 
