@@ -33,7 +33,7 @@ jobs:
         default: java
     docker:
       - image: cimg/openjdk:11.0
-      - image: cimg/php:8.1.4 # can't find another way to get php 8
+#      - image: cimg/php:8.1.4 # can't find another way to get php 8
         environment:
           MAVEN_OPTS: -Xmx512m
     resource_class: large
