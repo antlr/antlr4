@@ -283,11 +283,6 @@ git push origin gh-pages
 
 ### JavaScript
 
-```bash
-cd runtime/JavaScript
-# git add, commit, push
-```
-
 **Push to npm**
 
 ```bash
