@@ -14,6 +14,7 @@ sudo apt-get update -qq
 sudo apt install composer
 
 git clone https://github.com/antlr/antlr-php-runtime.git runtime/PHP
+git checkout dev
 composer install -d runtime/PHP
 
 mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
