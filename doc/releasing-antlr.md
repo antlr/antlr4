@@ -290,7 +290,7 @@ cd runtime/JavaScript
 npm update
 npm install
 npm run build 
-npm login
+npm login     # asks for username/password/2FA (npmjs.com)
 npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
 ```
 
@@ -303,50 +303,60 @@ zip -r ~/antlr/sites/website-antlr4/download/antlr-javascript-runtime-4.10.zip .
 
 ### CSharp
 
-Now we have [appveyor create artifact](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). Go to [nuget](https://www.nuget.org/packages/manage/upload) to upload the `.nupkg`.
-
-### Publishing to Nuget from Windows
-
 **Install the pre-requisites**
 
-Of course you need Mono and `nuget` to be installed. On mac:
+You need Mono and `nuget` to be installed. On mac:
 
 - .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/) (I need dotnet 5 and 3.1 versions)
 - nuget - download [nuget.exe](https://www.nuget.org/downloads)
 - dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
 
-From @kvanTTT: Install `dotnet` on any platform (see https://dotnet.microsoft.com/download) and run the following command on any OS (Win, Linux, macOS):
-
-* building: `dotnet build runtime/CSharp/src/Antlr4.csproj -c Release`
-  Output `.dll` will be in `runtime/CSharp/src/bin/Release/netstandard2.0` or in `runtime/CSharp/src/bin/Release/netstandard2.1`
-* packing: `dotnet pack runtime/CSharp/src/Antlr4.csproj -c Release`
-  Output `.nupkg` will be in `runtime/CSharp/src/bin/Release/Antlr4.Runtime.Standard.4.10.nupkg`
-
 Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
 
 You also need to enable .NET Framework 3.5 support in Windows "Programs and Features".
 
-If everything is ok, the following command will restore nuget packages, build Antlr for .NET Standard and .NET 3.5 and create nuget package:
+**Creating the signed assembly**
 
-```PS
-msbuild /target:restore /target:rebuild /target:pack /property:Configuration=Release .\Antlr4.dotnet.sln /verbosity:minimal
-```
+From Mac:
 
-This should display something like this: 
-
-**Creating and packaging the assembly**
-
-```
-Microsoft (R) Build Engine version 15.4.8.50001 for .NET Framework
+```bash
+critter:~ $ cd ~/antlr/code/antlr4/runtime/CSharp/src
+critter:~/antlr/code/antlr4/runtime/CSharp/src $ dotnet build -c Release Antlr4.csproj
+Microsoft (R) Build Engine version 16.7.2+b60ddb6f4 for .NET
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-  Restoring packages for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj...
-  Generating MSBuild file C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\obj\Antlr4.Runtime.dotnet.csproj.nuget.g.props.
-  Generating MSBuild file C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\obj\Antlr4.Runtime.dotnet.csproj.nuget.g.targets.
-  Restore completed in 427.62 ms for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj.
-  Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\netstandard1.3\Antlr4.Runtime.Standard.dll
-  Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\net35\Antlr4.Runtime.Standard.dll
-  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.10.nupkg'.
+  Determining projects to restore...
+  Restored /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/Antlr4.csproj (in 340 ms).
+  Antlr4 -> /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll
+  Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/Antlr4.Runtime.Standard.4.10.0.nupkg'.
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.77
+critter:~/antlr/code/antlr4/runtime/CSharp/src $ /Library/Frameworks/Mono.framework/Versions/Current/Commands/sn -R bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll Antlr4.snk
+Mono StrongName - version 6.12.0.0
+StrongName utility for signing assemblies
+Copyright 2002, 2003 Motus Technologies. Copyright 2004-2008 Novell. BSD licensed.
+
+Assembly bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll signed.
+critter:~/antlr/code/antlr4/runtime/CSharp/src $ /Library/Frameworks/Mono.framework/Versions/Current/Commands/sn -v bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll
+Mono StrongName - version 6.12.0.0
+StrongName utility for signing assemblies
+Copyright 2002, 2003 Motus Technologies. Copyright 2004-2008 Novell. BSD licensed.
+
+Assembly bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll is strongnamed.
+$ tree /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/
+/Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/
+├── Antlr4.Runtime.Standard.4.10.0.nupkg
+└── netstandard2.0
+    ├── Antlr4.Runtime.Standard.deps.json
+    ├── Antlr4.Runtime.Standard.dll
+    ├── Antlr4.Runtime.Standard.pdb
+    └── Antlr4.Runtime.Standard.xml
+
+1 directory, 5 files
 ```
 
 **Publishing to NuGet**
@@ -361,6 +371,7 @@ nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://ww
 ```
 
 Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). 
+
 
 ### Python
 
