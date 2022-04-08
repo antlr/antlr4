@@ -7,8 +7,9 @@ sudo apt-get update -qq
 
 sudo apt update
 
-sudo apt install php
-php -v
+# Installed now as part of docker image
+#sudo apt install php
+#php -v
 
 sudo apt install composer
 
