@@ -472,12 +472,21 @@ public class ParserATNFactory implements ATNFactory {
             if ( el.left.getNumberOfTransitions()==1 ) tr = el.left.transition(0);
             boolean isRuleTrans = tr instanceof RuleTransition;
             if ( el.left.getStateType() == ATNState.BASIC &&
+				el.right != null &&
 				el.right.getStateType()== ATNState.BASIC &&
-				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) )
-			{
+				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) ) {
 				// we can avoid epsilon edge to next el
-				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;
-                else tr.target = els.get(i+1).left;
+				Handle handle = null;
+				if (i + 1 < els.size()) {
+					handle = els.get(i + 1);
+				}
+				if (handle != null) {
+					if (isRuleTrans) {
+						((RuleTransition) tr).followState = handle.left;
+					} else {
+						tr.target = handle.left;
+					}
+				}
 				atn.removeState(el.right); // we skipped over this state
 			}
 			else { // need epsilon if previous block's right end node is complicated
@@ -485,11 +494,16 @@ public class ParserATNFactory implements ATNFactory {
 			}
 		}
 		Handle first = els.get(0);
-		Handle last = els.get(n -1);
-		if ( first==null || last==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "element list has first|last == null");
+		Handle last = els.get(n - 1);
+		ATNState left = null;
+		if (first != null) {
+			left = first.left;
 		}
-		return new Handle(first.left, last.right);
+		ATNState right = null;
+		if (last != null) {
+			right = last.right;
+		}
+		return new Handle(left, right);
 	}
 
 	/**
