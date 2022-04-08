@@ -7,6 +7,7 @@
 
 #include "atn/ATN.h"
 #include "atn/PredictionContext.h"
+#include "atn/PredictionContextCache.h"
 #include "misc/IntervalSet.h"
 #include "support/CPPUtils.h"
 

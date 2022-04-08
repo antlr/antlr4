@@ -13,8 +13,14 @@
 #include "atn/PredictionContextType.h"
 
 namespace antlr4 {
+
+  class RuleContext;
+
 namespace atn {
 
+  class ATN;
+  class ArrayPredictionContext;
+  class SingletonPredictionContext;
   class PredictionContextCache;
   class PredictionContextMergeCache;
 
@@ -33,8 +39,10 @@ namespace atn {
     static constexpr size_t EMPTY_RETURN_STATE = std::numeric_limits<size_t>::max() - 9;
 
     // dispatch
-    static Ref<const PredictionContext> merge(Ref<const PredictionContext> a, Ref<const PredictionContext> b,
-                                              bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+    static Ref<const PredictionContext> merge(Ref<const PredictionContext> a,
+                                              Ref<const PredictionContext> b,
+                                              bool rootIsWildcard,
+                                              PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Merge two <seealso cref="SingletonPredictionContext"/> instances.
@@ -70,8 +78,10 @@ namespace atn {
     /// <param name="rootIsWildcard"> {@code true} if this is a local-context merge,
     /// otherwise false to indicate a full-context merge </param>
     /// <param name="mergeCache"> </param>
-    static Ref<const PredictionContext> mergeSingletons(Ref<const SingletonPredictionContext> a, Ref<const SingletonPredictionContext> b,
-                                                        bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+    static Ref<const PredictionContext> mergeSingletons(Ref<const SingletonPredictionContext> a,
+                                                        Ref<const SingletonPredictionContext> b,
+                                                        bool rootIsWildcard,
+                                                        PredictionContextMergeCache *mergeCache);
 
     /**
      * Handle case where at least one of {@code a} or {@code b} is
@@ -111,7 +121,8 @@ namespace atn {
      * @param rootIsWildcard {@code true} if this is a local-context merge,
      * otherwise false to indicate a full-context merge
      */
-    static Ref<const PredictionContext> mergeRoot(Ref<const SingletonPredictionContext> a, Ref<const SingletonPredictionContext> b,
+    static Ref<const PredictionContext> mergeRoot(Ref<const SingletonPredictionContext> a,
+                                                  Ref<const SingletonPredictionContext> b,
                                                   bool rootIsWildcard);
 
     /**
@@ -133,16 +144,21 @@ namespace atn {
      * {@link SingletonPredictionContext}.<br>
      * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
      */
-    static Ref<const PredictionContext> mergeArrays(Ref<const ArrayPredictionContext> a, Ref<const ArrayPredictionContext> b,
-                                                    bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+    static Ref<const PredictionContext> mergeArrays(Ref<const ArrayPredictionContext> a,
+                                                    Ref<const ArrayPredictionContext> b,
+                                                    bool rootIsWildcard,
+                                                    PredictionContextMergeCache *mergeCache);
 
     static std::string toDOTString(const Ref<const PredictionContext> &context);
 
     static Ref<const PredictionContext> getCachedContext(const Ref<const PredictionContext> &context,
                                                          PredictionContextCache &contextCache);
 
-    // ter's recursive version of Sam's getAllNodes()
     static std::vector<Ref<const PredictionContext>> getAllContextNodes(const Ref<const PredictionContext> &context);
+
+    /// Convert a RuleContext tree to a PredictionContext graph.
+    /// Return EMPTY if outerContext is empty.
+    static Ref<const PredictionContext> fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
     PredictionContext(const PredictionContext&) = delete;
 
@@ -152,10 +168,6 @@ namespace atn {
     PredictionContext& operator=(PredictionContext&&) = delete;
 
     PredictionContextType getContextType() const { return _contextType; }
-
-    /// Convert a RuleContext tree to a PredictionContext graph.
-    /// Return EMPTY if outerContext is empty.
-    static Ref<const PredictionContext> fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
     virtual size_t size() const = 0;
     virtual const Ref<const PredictionContext>& getParent(size_t index) const = 0;
@@ -172,7 +184,9 @@ namespace atn {
     virtual std::string toString() const = 0;
 
     std::vector<std::string> toStrings(Recognizer *recognizer, int currentState) const;
-    std::vector<std::string> toStrings(Recognizer *recognizer, const Ref<const PredictionContext> &stop, int currentState) const;
+    std::vector<std::string> toStrings(Recognizer *recognizer,
+                                       const Ref<const PredictionContext> &stop,
+                                       int currentState) const;
 
   protected:
     explicit PredictionContext(PredictionContextType contextType);
@@ -195,59 +209,6 @@ namespace atn {
   inline bool operator!=(const PredictionContext &lhs, const PredictionContext &rhs) {
     return !operator==(lhs, rhs);
   }
-
-  class ANTLR4CPP_PUBLIC PredictionContextCache final {
-  public:
-    void put(const Ref<const PredictionContext> &value);
-
-    Ref<const PredictionContext> get(const Ref<const PredictionContext> &value) const;
-
-  private:
-    struct PredictionContextHasher final {
-      size_t operator()(const Ref<const PredictionContext> &predictionContext) const {
-        return predictionContext->hashCode();
-      }
-    };
-
-    struct PredictionContextComparer final {
-      bool operator()(const Ref<const PredictionContext> &lhs, const Ref<const PredictionContext> &rhs) const {
-        return *lhs == *rhs;
-      }
-    };
-
-    std::unordered_set<Ref<const PredictionContext>, PredictionContextHasher, PredictionContextComparer> _data;
-  };
-
-  class ANTLR4CPP_PUBLIC PredictionContextMergeCache final {
-  public:
-    Ref<const PredictionContext> put(const Ref<const PredictionContext> &key1,
-                                     const Ref<const PredictionContext> &key2,
-                                     Ref<const PredictionContext> value);
-
-    Ref<const PredictionContext> get(const Ref<const PredictionContext> &key1,
-                                     const Ref<const PredictionContext> &key2) const;
-
-    void clear();
-
-  private:
-    struct PredictionContextHasher final {
-      size_t operator()(const Ref<const PredictionContext> &predictionContext) const {
-        return predictionContext->hashCode();
-      }
-    };
-
-    struct PredictionContextComparer final {
-      bool operator()(const Ref<const PredictionContext> &lhs, const Ref<const PredictionContext> &rhs) const {
-        return *lhs == *rhs;
-      }
-    };
-
-    std::unordered_map<Ref<const PredictionContext>,
-      std::unordered_map<Ref<const PredictionContext>, Ref<const PredictionContext>,
-        PredictionContextHasher, PredictionContextComparer>,
-      PredictionContextHasher, PredictionContextComparer> _data;
-
-  };
 
 }  // namespace atn
 }  // namespace antlr4

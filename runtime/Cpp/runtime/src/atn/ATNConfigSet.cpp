@@ -31,7 +31,7 @@ ATNConfigSet::ATNConfigSet(const ATNConfigSet &other)
 }
 
 ATNConfigSet::ATNConfigSet(bool fullCtx)
-    : fullCtx(fullCtx), _configLookup(std::unordered_set<ATNConfig*, ATNConfigHasher, ATNConfigComparer>().bucket_count(), ATNConfigHasher{this}, ATNConfigComparer{this}) {}
+    : fullCtx(fullCtx), _configLookup(0, ATNConfigHasher{this}, ATNConfigComparer{this}) {}
 
 bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
   return add(config, nullptr);
@@ -190,7 +190,7 @@ bool ATNConfigSet::isReadonly() const {
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
-  _configLookup.clear();
+  LookupContainer(0, ATNConfigHasher{this}, ATNConfigComparer{this}).swap(_configLookup);
 }
 
 std::string ATNConfigSet::toString() const {
