@@ -7,9 +7,11 @@ sudo apt-get update -qq
 
 sudo apt update
 
+sudo apt-get remove php-all-dev
 sudo apt install php-all-dev
 php -v
 
+sudo apt-get remove composer
 sudo apt install composer
 
 git clone https://github.com/antlr/antlr-php-runtime.git runtime/PHP
