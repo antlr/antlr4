@@ -1151,6 +1151,22 @@ public enum ErrorType {
 			ErrorSeverity.WARNING
 	),
 
+	/**
+	 * <p>Predicate at the beginning of lexer rule significantly degrades performance</p>
+	 *
+	 * <p>See docs and https://tomassetti.me/improving-the-performance-of-an-antlr-parser/ for more details</p>
+	 *
+	 * <pre>
+	 * TOKEN: {predicate()}? 'TOKEN'; // warning
+	 * TOKEN: 'TOKEN' {predicate()}?; // ok
+	 * </pre>
+	 */
+	PREDICATE_AT_THE_BEGINNING_OF_LEXER_RULE_DEGRADES_PERFORMANCE(
+			189,
+			"Predicate <arg> at the beginning of lexer rule significantly degrades performance",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */

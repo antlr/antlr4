@@ -620,4 +620,75 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(pair, true);
 	}
+
+	// ISSUE: https://github.com/antlr/antlr4/issues/3633
+	@Test public void testPredicateAtTheBeginningOfLexerRule() {
+		String grammar =
+				"lexer grammar T;\n" +
+				"\n" +
+				"@members {int pCount = 0;\n" +
+				"int aCount = 0;\n" +
+				"\n" +
+				"boolean p(String s) {\n" +
+				"    System.out.println(\"predicate(\" + s + \", \" + pCount++ + \"); \");\n" +
+				"    return true;\n" +
+				"}\n" +
+				"\n" +
+				"void a(String s) {\n" +
+				"    System.out.println(\"action(\" + s + \", \" + aCount++ + \"); \");\n" +
+				"}}\n" +
+				"\n" +
+				"// No warnings\n" +
+				"SIMPLE_OK: 'SIMPLE_OK' {p(\"SIMPLE_OK\")}?;\n" +
+				"PREDICATES_OK: 'PREDICATES_' {p(\"PREDICATES_OK_1\")}? {p(\"PREDICATES_OK_2\")}?;\n" +
+				"HIERARCHY_OK: ('HIERARCHY_OK_1' {p(\"HIERARCHY_OK_1\")}? | 'HIERARCHY_OK_2' {p(\"HIERARCHY_OK_2\")}?) '_';\n" +
+				"USE_FRAGMENT_OK: 'USE_' FRAGMENT {p(\"USE_FRAGMENT_OK\")}? '_FRAGMENT_OK_';\n" +
+				"USE_FRAGMENT_2_OK: FRAGMENT_2 {p(\"USE_FRAGMENT_2_OK\")}? '_';\n" +
+				"RECURSIVE_OK: '/*' {p(\"RECURSIVE_OK\")}? (RECURSIVE_OK | .)*? '*/';\n" +
+				"MUTUALLY_RECURSIVE: MUTUALLY_RECURSIVE '_'; // Prevent endless recursion\n" +
+				"\n" +
+				"// Warnings\n" +
+				"SIMPLE: {p(\"SIMPLE\")}? 'SIMPLE_';\n" +
+				"OR: {p(\"OR_1\")}? 'OR_1_' | {p(\"OR_2\")}? 'OR_2_';\n" +
+				"CLOSURE: ({p(\"CLOSURE\")}? 'CLOSURE_')+;\n" +
+				"ACTION: {a(\"ACTION\");} {p(\"ACTION\")}? 'ACTION'; // Warning since actions are executed after all predicates\n" +
+				"PREDICATES: {p(\"PREDICATES_1\")}? {p(\"PREDICATES_2\")}? 'PREDICATES_'; // Two warnings\n" +
+				"OPTIONAL: ({p(\"OPTIONAL\")}?)? 'OPTIONAL_';\n" +
+				"HIERARCHY: ('HIERARCHY_1' | {p(\"HIERARCHY_2\")}? 'HIERARCHY_2') '_';\n" +
+				"USE_FRAGMENT: FRAGMENT {p(\"USE_FRAGMENT\")}? '_'; // Warn about predicate in fragment but not about predicate in rule\n" +
+				"USE_FRAGMENT_2: FRAGMENT {p(\"USE_FRAGMENT_2\")}? '_';\n" +
+				"RECURSIVE: {p(\"RECURSIVE\")}? '/*' (RECURSIVE | .)*? '*/';\n" +
+				"USE_RULE: {p(\"USE_RULE\")}? SUB_RULE;\n" +
+				"SUB_RULE: {p(\"SUB_RULE\")}? 'SUB_RULE_';\n" +
+				"\n" +
+				"fragment FRAGMENT: {p(\"FRAGMENT\")}? 'FRAGMENT';\n" +
+				"fragment FRAGMENT_2: 'FRAGMENT_2' {p(\"FRAGMENT_2\")}?;";
+
+		int code = ErrorType.PREDICATE_AT_THE_BEGINNING_OF_LEXER_RULE_DEGRADES_PERFORMANCE.code;
+		String expected =
+				"warning(" + ErrorType.ACTION_SHOULD_BE_PLACED_AFTER_PREDICATES.code + "): T.g4:28:8: Action {a(\"ACTION\");} should be placed after all predicates because it's always executed after them\n" +
+				"warning(" + code + "): T.g4:25:8: Predicate {p(\"SIMPLE\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:26:4: Predicate {p(\"OR_1\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:26:27: Predicate {p(\"OR_2\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:27:10: Predicate {p(\"CLOSURE\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:28:23: Predicate {p(\"ACTION\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:29:12: Predicate {p(\"PREDICATES_1\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:29:33: Predicate {p(\"PREDICATES_2\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:30:11: Predicate {p(\"OPTIONAL\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:31:28: Predicate {p(\"HIERARCHY_2\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:32:14: Predicate of FRAGMENT at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:33:16: Predicate of FRAGMENT at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:34:11: Predicate {p(\"RECURSIVE\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:35:10: Predicate {p(\"USE_RULE\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:36:10: Predicate {p(\"SUB_RULE\")}? at the beginning of lexer rule significantly degrades performance\n" +
+				"warning(" + code + "): T.g4:35:27: Predicate of SUB_RULE at the beginning of lexer rule significantly degrades performance\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4::: The following sets of rules are mutually left-recursive [MUTUALLY_RECURSIVE]\n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		testErrors(pair, true);
+	}
 }
