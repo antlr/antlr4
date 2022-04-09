@@ -7,6 +7,8 @@ sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 
 sudo apt install php8.0
+sudo apt install php8.0-mbstring
+sudo apt install php8.0-xml
 php -v
 
 sudo apt install composer
