@@ -7,7 +7,7 @@ sudo apt-get update -qq
 
 sudo apt update
 
-sudo apt-get remove php-all-dev
+# sudo apt-get remove php-all-dev
 sudo apt install php-all-dev
 php -v
 
