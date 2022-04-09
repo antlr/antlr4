@@ -2,11 +2,12 @@
 
 set -euo pipefail
 
-sudo apt install composer
-composer self-update
 sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
+
+sudo apt install composer
+composer self-update
 
 sudo apt install php8.0
 sudo apt install php8.0-mbstring
