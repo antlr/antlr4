@@ -21,7 +21,7 @@ public class ErrorManager {
 
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
 
-	public Tool tool;
+	public final Tool tool;
 	public int errors;
 	public int warnings;
 

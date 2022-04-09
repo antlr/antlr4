@@ -12,8 +12,7 @@ import java.util.Collection;
 
 public class LeftRecursionCyclesMessage extends ANTLRMessage {
 	public LeftRecursionCyclesMessage(String fileName, Collection<? extends Collection<Rule>> cycles) {
-		super(ErrorType.LEFT_RECURSION_CYCLES, getStartTokenOfFirstRule(cycles), cycles);
-		this.fileName = fileName;
+		super(ErrorType.LEFT_RECURSION_CYCLES, fileName, getStartTokenOfFirstRule(cycles), cycles);
 	}
 
 	protected static Token getStartTokenOfFirstRule(Collection<? extends Collection<Rule>> cycles) {
