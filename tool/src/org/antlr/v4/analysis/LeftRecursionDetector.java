@@ -22,16 +22,16 @@ import java.util.List;
 import java.util.Set;
 
 public class LeftRecursionDetector {
-	Grammar g;
-	public ATN atn;
+	final Grammar g;
+	public final ATN atn;
 
 	/** Holds a list of cycles (sets of rule names). */
-	public List<Set<Rule>> listOfRecursiveCycles = new ArrayList<Set<Rule>>();
+	public final List<Set<Rule>> listOfRecursiveCycles = new ArrayList<Set<Rule>>();
 
 	/** Which rule start states have we visited while looking for a single
 	 * 	left-recursion check?
 	 */
-	Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
+	final Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
 
 	public LeftRecursionDetector(Grammar g, ATN atn) {
 		this.g = g;

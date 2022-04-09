@@ -164,9 +164,12 @@ public class ErrorManager {
 	}
 
 	public void leftRecursionCycles(String fileName, Collection<? extends Collection<Rule>> cycles) {
-		errors++;
-		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, cycles);
-		tool.error(msg);
+		for (Collection<Rule> cycle : cycles) {
+			for (Rule rule : cycle) {
+				tool.error(new LeftRecursionCyclesMessage(fileName, rule, cycle));
+				errors++;
+			}
+		}
 	}
 
     public int getNumErrors() {
