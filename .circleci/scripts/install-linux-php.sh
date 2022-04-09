@@ -2,12 +2,11 @@
 
 set -euo pipefail
 
-#sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-sudo apt-get update -qq
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
 
-#sudo apt update
-
-sudo apt install php
+sudo apt install php8.0
 php -v
 
 sudo apt install composer
