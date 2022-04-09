@@ -8,6 +8,8 @@ sudo apt-get update -qq
 sudo apt update
 
 sudo apt upgrade
+sudo apt install ca-certificates apt-transport-https software-properties-common -y
+sudo add-apt-repository ppa:ondrej/php -y
 sudo apt install php-all-dev
 php -v
 
