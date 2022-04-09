@@ -8,6 +8,7 @@
 #include "support/CPPUtils.h"
 #include "atn/StarLoopEntryState.h"
 #include "atn/ATNConfigSet.h"
+#include "support/Casts.h"
 
 #include "dfa/DFA.h"
 
@@ -22,8 +23,8 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
   : atnStartState(atnStartState), s0(nullptr), decision(decision) {
 
   _precedenceDfa = false;
-  if (is<atn::StarLoopEntryState *>(atnStartState)) {
-    if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
+  if (atn::StarLoopEntryState::is(atnStartState)) {
+    if (downCast<atn::StarLoopEntryState*>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
       s0 = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet()));
       s0->isAcceptState = false;

@@ -31,6 +31,7 @@
 
 #include "Vocabulary.h"
 #include "support/Arrays.h"
+#include "support/Casts.h"
 
 #include "atn/ParserATNSimulator.h"
 
@@ -913,7 +914,7 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
         closureBusy.insert(c);
 
         if (_dfa != nullptr && _dfa->isPrecedenceDfa()) {
-          size_t outermostPrecedenceReturn = dynamic_cast<const EpsilonTransition *>(t)->outermostPrecedenceReturn();
+          size_t outermostPrecedenceReturn = downCast<const EpsilonTransition *>(t)->outermostPrecedenceReturn();
           if (outermostPrecedenceReturn == _dfa->atnStartState->ruleIndex) {
             c->setPrecedenceFilterSuppressed(true);
           }
