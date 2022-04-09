@@ -1,3 +1,7 @@
+/* Copyright (c) 2012-2022 The ANTLR Project Contributors. All rights reserved.
+ * Use is of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 /**
  * This implementation of {@link LexerAction} is used for tracking input offsets
  * for position-dependent actions within a {@link LexerActionExecutor}.
