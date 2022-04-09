@@ -6,8 +6,9 @@ sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 
-sudo apt install composer
-composer self-update
+sudo apt install wget php8.0-cli php8.0-zip unzip
+wget -O composer-setup.php https://getcomposer.org/installer
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 sudo apt install php8.0
 sudo apt install php8.0-mbstring
