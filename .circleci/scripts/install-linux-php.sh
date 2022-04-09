@@ -7,7 +7,9 @@ sudo apt-get update -qq
 
 sudo apt update
 
-sudo apt install php8.0 php8.0-gd php8.0-soap php8.0-mbstring
+sudo apt install lsb-release ca-certificates apt-transport-https software-properties-common -y
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt install php8.0-gd php8.0-xml php8.0-soap php8.0-mbstring
 php -v
 
 sudo apt install composer
