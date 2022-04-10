@@ -22,7 +22,7 @@ public final class RangeTransition: Transition, CustomStringConvertible {
     }
 
     override
-    public func labelIntervalSet() -> IntervalSet? {
+    public func labelIntervalSet() -> IntervalSet {
         return IntervalSet.of(from, to)
     }
 

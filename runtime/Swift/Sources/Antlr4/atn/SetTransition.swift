@@ -26,7 +26,7 @@ public class SetTransition: Transition, CustomStringConvertible {
     }
 
     override
-    public func labelIntervalSet() -> IntervalSet? {
+    public func labelIntervalSet() -> IntervalSet {
         return set
     }
 
