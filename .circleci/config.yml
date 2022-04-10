@@ -35,6 +35,7 @@ jobs:
       - image: cimg/openjdk:11.0
         environment:
           MAVEN_OPTS: -Xmx512m
+    parallelism: 4
     resource_class: large
     environment:
       TARGET: << parameters.target >>
