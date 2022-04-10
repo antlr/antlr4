@@ -39,7 +39,7 @@ def update_file(qfname, multi, before, after):
 
 
 def copy_javadoc(release_version):
-    release_version = release_version+"-SNAPSHOT" # testing
+    # release_version = release_version+"-SNAPSHOT" # testing
     os.chdir(WEBSITE_ROOT+"/api/Java")
     print("Javadoc copied:")
     runme(f"jar xf {ANTLR_M2_ROOT}/antlr4-runtime/{release_version}/antlr4-runtime-{release_version}-javadoc.jar")
@@ -50,7 +50,7 @@ def copy_javadoc(release_version):
 
 
 def copy_jars(release_version):
-    release_version = release_version+"-SNAPSHOT" # testing
+    # release_version = release_version+"-SNAPSHOT" # testing
     print("Jars copied:")
     runme(f"cp {ANTLR_M2_ROOT}/antlr4-runtime/{release_version}/antlr4-runtime-{release_version}.jar {WEBSITE_ROOT}/download/antlr-runtime-{release_version}.jar")
     runme(f"cp {ANTLR_M2_ROOT}/antlr4/{release_version}/antlr4-{release_version}.jar {WEBSITE_ROOT}/download/antlr-{release_version}-complete.jar")
