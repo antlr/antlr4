@@ -7,35 +7,7 @@
 
 using namespace antlr4::misc;
 
-size_t antlr4::misc::numericToSymbol(ssize_t v) {
-  return static_cast<size_t>(v);
-}
-
-ssize_t antlr4::misc::symbolToNumeric(size_t v) {
-  return static_cast<ssize_t>(v);
-}
-
-Interval const Interval::INVALID;
-
-Interval::Interval() : Interval(static_cast<ssize_t>(-1), -2) { // Need an explicit cast here for VS.
-}
-
-Interval::Interval(size_t a_, size_t b_) : Interval(symbolToNumeric(a_), symbolToNumeric(b_)) {
-}
-
-Interval::Interval(ssize_t a_, ssize_t b_) : a(a_), b(b_) {
-}
-
-size_t Interval::length() const {
-  if (b < a) {
-    return 0;
-  }
-  return size_t(b - a + 1);
-}
-
-bool Interval::operator == (const Interval &other) const {
-  return a == other.a && b == other.b;
-}
+const Interval Interval::INVALID;
 
 size_t Interval::hashCode() const {
   size_t hash = 23;

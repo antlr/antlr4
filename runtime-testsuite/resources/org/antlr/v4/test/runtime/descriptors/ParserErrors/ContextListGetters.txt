@@ -1,0 +1,26 @@
+[notes]
+Regression test for "Getter for context is not a list when it should be".
+https://github.com/antlr/antlr4/issues/19
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+@parser::members{
+<DeclareContextListGettersFunction()>
+}
+s : (a | b)+;
+a : 'a' {<write("\"a\"")>};
+b : 'b' {<write("\"b\"")>};
+
+[start]
+s
+
+[input]
+abab
+
+[output]
+"""abab
+"""
+

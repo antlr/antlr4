@@ -134,7 +134,7 @@ Edit the pom.xml file. Now we need to extensively modify the pom.xml file. The f
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.5</version>
+      <version>4.9.3</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -150,8 +150,8 @@ Edit the pom.xml file. Now we need to extensively modify the pom.xml file. The f
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <!-- Plugin to compile the g4 files ahead of the java files
@@ -164,7 +164,7 @@ Edit the pom.xml file. Now we need to extensively modify the pom.xml file. The f
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.5</version>
+        <version>4.9.3</version>
         <executions>
           <execution>
             <goals>

@@ -6,7 +6,7 @@
 
 package org.antlr.v4.misc;
 
-public class MutableInt extends Number implements Comparable<Number> {
+public class MutableInt extends Number implements Comparable<MutableInt> {
 	public int v;
 
 	public MutableInt(int v) { this.v = v; }
@@ -19,7 +19,7 @@ public class MutableInt extends Number implements Comparable<Number> {
 
 	@Override public int hashCode() { return v; }
 
-	@Override public int compareTo(Number o) { return v-o.intValue(); }
+	@Override public int compareTo(MutableInt o) { return v-o.intValue(); }
 	@Override public int intValue() { return v; }
 	@Override public long longValue() { return v; }
 	@Override public float floatValue() { return v; }

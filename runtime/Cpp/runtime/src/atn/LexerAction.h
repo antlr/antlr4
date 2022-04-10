@@ -21,13 +21,17 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerAction {
   public:
-    virtual ~LexerAction();
+    virtual ~LexerAction() = default;
 
     /// <summary>
     /// Gets the serialization type of the lexer action.
     /// </summary>
     /// <returns> The serialization type of the lexer action. </returns>
-    virtual LexerActionType getActionType() const = 0;
+    ///
+    /// IMPORTANT: Unlike Java, this returns LexerActionType::INDEXED_CUSTOM for instances of
+    /// LexerIndexedCustomAction. If you need the wrapped action type, use
+    /// LexerIndexedCustomAction::getAction()->getActionType().
+    LexerActionType getActionType() const { return _actionType; }
 
     /// <summary>
     /// Gets whether the lexer action is position-dependent. Position-dependent
@@ -42,7 +46,7 @@ namespace atn {
     /// <returns> {@code true} if the lexer action semantics can be affected by the
     /// position of the input <seealso cref="CharStream"/> at the time it is executed;
     /// otherwise, {@code false}. </returns>
-    virtual bool isPositionDependent() const = 0;
+    bool isPositionDependent() const { return _positionDependent; }
 
     /// <summary>
     /// Execute the lexer action in the context of the specified <seealso cref="Lexer"/>.
@@ -51,16 +55,46 @@ namespace atn {
     /// positioned correctly prior to calling this method.</para>
     /// </summary>
     /// <param name="lexer"> The lexer instance. </param>
-    virtual void execute(Lexer *lexer) = 0;
+    virtual void execute(Lexer *lexer) const = 0;
 
-    virtual size_t hashCode() const = 0;
-    virtual bool operator == (const LexerAction &obj) const = 0;
-    virtual bool operator != (const LexerAction &obj) const {
-      return !(*this == obj);
-    }
+    size_t hashCode() const;
+
+    virtual bool equals(const LexerAction &other) const = 0;
 
     virtual std::string toString() const = 0;
+
+  protected:
+    LexerAction(LexerActionType actionType, bool positionDependent)
+        : _actionType(actionType), _hashCode(0), _positionDependent(positionDependent) {}
+
+    virtual size_t hashCodeImpl() const = 0;
+
+    size_t cachedHashCode() const { return _hashCode.load(std::memory_order_relaxed); }
+
+  private:
+    const LexerActionType _actionType;
+    mutable std::atomic<size_t> _hashCode;
+    const bool _positionDependent;
   };
 
-} // namespace atn
-} // namespace antlr4
+  inline bool operator==(const LexerAction &lhs, const LexerAction &rhs) {
+    return lhs.equals(rhs);
+  }
+
+  inline bool operator!=(const LexerAction &lhs, const LexerAction &rhs) {
+    return !operator==(lhs, rhs);
+  }
+
+}  // namespace atn
+}  // namespace antlr4
+
+namespace std {
+
+  template <>
+  struct hash<::antlr4::atn::LexerAction> {
+    size_t operator()(const ::antlr4::atn::LexerAction &lexerAction) const {
+      return lexerAction.hashCode();
+    }
+  };
+
+}  // namespace std

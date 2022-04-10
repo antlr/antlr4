@@ -13,8 +13,17 @@ namespace atn {
   ///  The start of a regular {@code (...)} block.
   class ANTLR4CPP_PUBLIC BlockStartState : public DecisionState {
   public:
-    ~BlockStartState();
+    static bool is(const ATNState &atnState) {
+      const auto stateType = atnState.getStateType();
+      return stateType >= ATNStateType::BLOCK_START && stateType <= ATNStateType::STAR_BLOCK_START;
+    }
+
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
     BlockEndState *endState = nullptr;
+
+  protected:
+    using DecisionState::DecisionState;
   };
 
 } // namespace atn

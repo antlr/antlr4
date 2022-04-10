@@ -23,7 +23,7 @@ namespace misc {
    * the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
    * (inclusive).</p>
    */
-  class ANTLR4CPP_PUBLIC IntervalSet {
+  class ANTLR4CPP_PUBLIC IntervalSet final {
   public:
     static IntervalSet const COMPLETE_CHAR_SET;
     static IntervalSet const EMPTY_SET;
@@ -151,17 +151,9 @@ namespace misc {
     std::string toString() const;
     std::string toString(bool elemAreChar) const;
 
-    /**
-     * @deprecated Use {@link #toString(Vocabulary)} instead.
-     */
-    std::string toString(const std::vector<std::string> &tokenNames) const;
     std::string toString(const dfa::Vocabulary &vocabulary) const;
 
   protected:
-    /**
-     * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
-     */
-    std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
     std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
 
   public:

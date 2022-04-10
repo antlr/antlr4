@@ -1,0 +1,16 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+start : expr EOF;
+expr : 'x'
+     | expr expr
+     ;
+
+[start]
+start
+
+[input]
+xxx
+

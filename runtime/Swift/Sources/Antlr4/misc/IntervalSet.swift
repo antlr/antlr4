@@ -613,10 +613,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         for interval in intervals {
             let a = interval.a
             let b = interval.b
-
-            for v in a...b  {
-                values.append(v)
-            }
+            values.append(contentsOf: a...b)
         }
         return values
     }
@@ -657,7 +654,17 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         if readonly {
             throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
         }
-        for interval in intervals {
+        var idx = intervals.startIndex
+        while idx < intervals.endIndex {
+            defer { intervals.formIndex(after: &idx) }
+            var interval: Interval {
+                get {
+                    return intervals[idx]
+                }
+                set {
+                    intervals[idx] = newValue
+                }
+            } 
             let a = interval.a
             let b = interval.b
             if el < a {
@@ -665,7 +672,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             }
             // if whole interval x..x, rm
             if el == a && el == b {
-                intervals.removeObject(interval)
+                intervals.remove(at: idx)
                 break
             }
             // if on left edge x..b, adjust left

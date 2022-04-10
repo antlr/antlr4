@@ -285,9 +285,6 @@
     <ClInclude Include="src\atn\ATNDeserializer.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="src\atn\ATNSerializer.h">
-      <Filter>Header Files\atn</Filter>
-    </ClInclude>
     <ClInclude Include="src\atn\ATNSimulator.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>

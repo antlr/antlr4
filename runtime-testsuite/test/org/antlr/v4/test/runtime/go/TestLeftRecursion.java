@@ -8,12 +8,10 @@ package org.antlr.v4.test.runtime.go;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.descriptors.LeftRecursionDescriptors;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 @RunWith(Parameterized.class)
 public class TestLeftRecursion extends BaseRuntimeTest {
 	public TestLeftRecursion(RuntimeTestDescriptor descriptor) {
@@ -28,6 +26,6 @@ public class TestLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LeftRecursionDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LeftRecursion", "Go");
 	}
 }

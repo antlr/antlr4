@@ -8,8 +8,6 @@ package org.antlr.v4.test.runtime.dart;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
-import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.stringtemplate.v4.ST;
 
 import java.io.*;
@@ -22,11 +20,6 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 
 public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
-
-	private static final List<String> AOT_COMPILE_TESTS = Arrays.asList(
-		new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input,
-		new LexerExecDescriptors.LargeLexer().input
-	);
 
 	private static String cacheDartPackages;
 	private static String cacheDartPackageConfig;
@@ -48,7 +41,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execClass("Test", AOT_COMPILE_TESTS.contains(input));
+		String output = execClass("Test", false);
 		return output;
 	}
 
@@ -88,7 +81,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			startRuleName,
 			showDiagnosticErrors,
 			profile,
-			AOT_COMPILE_TESTS.contains(input));
+			false);
 	}
 
 	/**
@@ -167,7 +160,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				stderrVacuum.join();
 				String stderrDuringPubGet = stderrVacuum.toString();
 				if (!stderrDuringPubGet.isEmpty()) {
-					System.out.println("Pub Get error: " + stderrVacuum.toString());
+					System.out.println("Pub Get error: " + stderrVacuum);
 				}
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
@@ -193,7 +186,8 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		setParseErrors(null);
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
-		} else {
+		}
+		else {
 			writeTestFile(parserName,
 				lexerName,
 				parserStartRuleName,
@@ -232,7 +226,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				timer.cancel();
 				if (result != 0) {
 					stderrVacuum.join();
-					System.err.print("Error compiling dart file: " + stderrVacuum.toString());
+					System.err.print("Error compiling dart file: " + stderrVacuum);
 				}
 			}
 
@@ -302,7 +296,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 		final String[] roots = isWindows()
 				? new String[]{"C:\\tools\\dart-sdk\\bin\\"}
-				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/", "/usr/local/opt/dart/libexec"};
+				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/opt/homebrew/bin/", "/usr/bin/", "/usr/lib/dart/bin/", "/usr/local/opt/dart/libexec"};
 
 		for (String root : roots) {
 			for (String t : tools) {

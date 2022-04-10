@@ -5,29 +5,25 @@
 
 #pragma once
 
+#include <cstdint>
+#include <type_traits>
+
 #include "antlr4-common.h"
 
 namespace antlr4 {
 namespace misc {
 
-  class ANTLR4CPP_PUBLIC MurmurHash {
-
+  class ANTLR4CPP_PUBLIC MurmurHash final {
   private:
-#if __cplusplus >= 201703L
     static constexpr size_t DEFAULT_SEED = 0;
-#else
-    enum : size_t {
-      DEFAULT_SEED = 0,
-    };
-#endif
 
     /// Initialize the hash using the default seed value.
     /// Returns the intermediate hash value.
   public:
-    static size_t initialize();
+    static size_t initialize() { return initialize(DEFAULT_SEED); }
 
     /// Initialize the hash using the specified seed.
-    static size_t initialize(size_t seed);
+    static size_t initialize(size_t seed) { return seed; }
 
     /// Update the intermediate hash value for the next input {@code value}.
     /// <param name="hash"> the intermediate hash value </param>
@@ -52,6 +48,13 @@ namespace misc {
       return update(hash, value != nullptr ? value->hashCode() : 0);
     }
 
+    static size_t update(size_t hash, const void *data, size_t size);
+
+    template <typename T>
+    static size_t update(size_t hash, const T *data, size_t size) {
+      return update(hash, static_cast<const void*>(data), size * sizeof(std::remove_reference_t<T>));
+    }
+
     /// <summary>
     /// Apply the final computation steps to the intermediate value {@code hash}
     /// to form the final result of the MurmurHash 3 hash function.
@@ -68,14 +71,31 @@ namespace misc {
     /// <param name="seed"> the seed for the MurmurHash algorithm </param>
     /// <returns> the hash code of the data </returns>
     template<typename T> // where T is C array type
-    static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed) {
+    static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed = DEFAULT_SEED) {
       size_t hash = initialize(seed);
-      for (auto entry : data) {
-        hash = update(hash, entry->hashCode());
+      for (auto &entry : data) {
+        hash = update(hash, entry);
       }
-
       return finish(hash, data.size());
     }
+
+    static size_t hashCode(const void *data, size_t size, size_t seed = DEFAULT_SEED) {
+      size_t hash = initialize(seed);
+      hash = update(hash, data, size);
+      return finish(hash, size);
+    }
+
+    template <typename T>
+    static size_t hashCode(const T *data, size_t size, size_t seed = DEFAULT_SEED) {
+      return hashCode(static_cast<const void*>(data), size * sizeof(std::remove_reference_t<T>), seed);
+    }
+
+  private:
+    MurmurHash() = delete;
+
+    MurmurHash(const MurmurHash&) = delete;
+
+    MurmurHash& operator=(const MurmurHash&) = delete;
   };
 
 } // namespace atn

@@ -22,7 +22,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   /// The ATN interpreter used by the recognizer for prediction.
   ATNInterpreter? interpreter;
-  int _stateNumber = -1;
+  int state = -1;
 
   List<String> get ruleNames;
 
@@ -85,7 +85,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>For interpreters, we don't know their serialized ATN despite having
   /// created the interpreter from it.</p>
-  String? get serializedATN {
+  List<int> get serializedATN {
     throw UnsupportedError('there is no serialized ATN');
   }
 
@@ -146,22 +146,6 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   }
 
   void action(RuleContext? _localctx, int ruleIndex, int actionIndex) {}
-
-  int get state {
-    return _stateNumber;
-  }
-
-  /// Indicate that the recognizer has changed internal state that is
-  ///  consistent with the ATN state passed in.  This way we always know
-  ///  where we are in the ATN as the parser goes along. The rule
-  ///  context objects form a stack that lets us see the stack of
-  ///  invoking rules. Combine this and we have complete ATN
-  ///  configuration information.
-  set state(int atnState) {
-//		System.err.println("setState "+atnState);
-    _stateNumber = atnState;
-//		if ( traceATNStates ) _ctx.trace(atnState);
-  }
 
   IntStream get inputStream;
 

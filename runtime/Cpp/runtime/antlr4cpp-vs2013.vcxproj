@@ -179,6 +179,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -196,6 +197,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -213,6 +215,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -230,6 +233,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -249,6 +253,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -270,6 +275,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -291,6 +297,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -312,6 +319,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -430,7 +438,7 @@
     <ClCompile Include="src\support\Any.cpp" />
     <ClCompile Include="src\support\Arrays.cpp" />
     <ClCompile Include="src\support\CPPUtils.cpp" />
-    <ClCompile Include="src\support\guid.cpp" />
+    <ClCompile Include="src\support\Guid.cpp" />
     <ClCompile Include="src\support\StringUtils.cpp" />
     <ClCompile Include="src\Token.cpp" />
     <ClCompile Include="src\TokenSource.cpp" />
@@ -485,8 +493,6 @@
     <ClInclude Include="src\atn\ATNConfigSet.h" />
     <ClInclude Include="src\atn\ATNDeserializationOptions.h" />
     <ClInclude Include="src\atn\ATNDeserializer.h" />
-    <ClInclude Include="src\atn\ATNSerializer.h" />
-    <ClInclude Include="src\atn\ATNSimulator.h" />
     <ClInclude Include="src\atn\ATNState.h" />
     <ClInclude Include="src\atn\ATNType.h" />
     <ClInclude Include="src\atn\AtomTransition.h" />
@@ -586,7 +592,7 @@
     <ClInclude Include="src\support\BitSet.h" />
     <ClInclude Include="src\support\CPPUtils.h" />
     <ClInclude Include="src\support\Declarations.h" />
-    <ClInclude Include="src\support\guid.h" />
+    <ClInclude Include="src\support\Guid.h" />
     <ClInclude Include="src\support\StringUtils.h" />
     <ClInclude Include="src\Token.h" />
     <ClInclude Include="src\TokenFactory.h" />

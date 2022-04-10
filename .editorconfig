@@ -8,3 +8,11 @@ charset = utf-8
 insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = tab
+ij_java_else_on_new_line = true
+
+[*.{h,cpp}]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2

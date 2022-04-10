@@ -1,12 +1,12 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {hashStuff} = require("../Utils");
-const {LexerIndexedCustomAction} = require('./LexerAction');
+import LexerIndexedCustomAction from '../action/LexerIndexedCustomAction.js';
+import HashCode from "../misc/HashCode.js";
 
-class LexerActionExecutor {
+export default class LexerActionExecutor {
 	/**
 	 * Represents an executor for a sequence of lexer actions which traversed during
 	 * the matching operation of a lexer rule (token).
@@ -21,7 +21,7 @@ class LexerActionExecutor {
 		 * Caches the result of {@link //hashCode} since the hash code is an element
 		 * of the performance-critical {@link LexerATNConfig//hashCode} operation
 		 */
-		this.cachedHashCode = hashStuff(lexerActions); // "".join([str(la) for la in
+		this.cachedHashCode = HashCode.hashStuff(lexerActions); // "".join([str(la) for la in
 		// lexerActions]))
 		return this;
 	}
@@ -168,6 +168,3 @@ class LexerActionExecutor {
 		return new LexerActionExecutor(lexerActions);
 	}
 }
-
-
-module.exports = LexerActionExecutor;

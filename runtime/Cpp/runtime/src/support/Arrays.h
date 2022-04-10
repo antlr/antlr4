@@ -32,8 +32,13 @@ namespace antlrcpp {
         return false;
 
       for (size_t i = 0; i < a.size(); ++i) {
+        if (!a[i] && !b[i])
+          continue;
+        if (!a[i] || !b[i])
+          return false;
         if (a[i] == b[i])
           continue;
+
         if (!(*a[i] == *b[i]))
           return false;
       }
@@ -43,6 +48,26 @@ namespace antlrcpp {
 
     template <typename T>
     static bool equals(const std::vector<Ref<T>> &a, const std::vector<Ref<T>> &b) {
+      if (a.size() != b.size())
+        return false;
+
+      for (size_t i = 0; i < a.size(); ++i) {
+        if (!a[i] && !b[i])
+          continue;
+        if (!a[i] || !b[i])
+          return false;
+        if (a[i] == b[i])
+          continue;
+
+        if (!(*a[i] == *b[i]))
+          return false;
+      }
+
+      return true;
+    }
+
+    template <typename T>
+    static bool equals(const std::vector<std::unique_ptr<T>> &a, const std::vector<std::unique_ptr<T>> &b) {
       if (a.size() != b.size())
         return false;
 
@@ -77,6 +102,20 @@ namespace antlrcpp {
 
     template <typename T>
     static std::string toString(const std::vector<Ref<T>> &source) {
+      std::string result = "[";
+      bool firstEntry = true;
+      for (auto &value : source) {
+        result += value->toString();
+        if (firstEntry) {
+          result += ", ";
+          firstEntry = false;
+        }
+      }
+      return result + "]";
+    }
+
+    template <typename T>
+    static std::string toString(const std::vector<std::unique_ptr<T>> &source) {
       std::string result = "[";
       bool firstEntry = true;
       for (auto &value : source) {

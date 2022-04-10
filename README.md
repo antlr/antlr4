@@ -25,8 +25,6 @@ Targets such as Go that pull directly from the repository can use the default `m
 $ go get github.com/antlr/antlr4/runtime/Go/antlr@dev
 ```
 
-
-
 ## Authors and major contributors
 
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu

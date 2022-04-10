@@ -1,3 +1,7 @@
+/* Copyright (c) 2012-2022 The ANTLR Project Contributors. All rights reserved.
+ * Use is of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 /*! https://mths.be/fromcodepoint v0.2.1 by @mathias */
 if (!String.fromCodePoint) {
 	(function() {
@@ -8,7 +12,9 @@ if (!String.fromCodePoint) {
 				const object = {};
 				const $defineProperty = Object.defineProperty;
 				result = $defineProperty(object, object, object) && $defineProperty;
-			} catch(error) {}
+			} catch(error) {
+				/* eslint no-empty: [ "off" ] */
+			}
 			return result;
 		}());
 		const stringFromCharCode = String.fromCharCode;

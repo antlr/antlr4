@@ -1,0 +1,23 @@
+[notes]
+https://github.com/antlr/antlr4/issues/1070
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+
+channels { break }
+
+A: 'a' -> mode(for);
+
+mode for;
+B: 'b' -> channel(break);
+
+[input]
+ab
+
+[output]
+[@0,0:0='a',<1>,1:0]
+[@1,1:1='b',<2>,channel=2,1:1]
+[@2,2:1='<EOF>',<-1>,1:2]

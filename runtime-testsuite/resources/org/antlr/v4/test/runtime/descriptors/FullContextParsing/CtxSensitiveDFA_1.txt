@@ -1,0 +1,32 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<DumpDFA()>}
+  : '$' a | '@' b ;
+a : e ID ;
+b : e INT ID ;
+e : INT | ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\t'|'\n')+ -> skip ;
+
+[start]
+s
+
+[input]
+$ 34 abc
+
+[output]
+Decision 1:
+s0-INT->s1
+s1-ID->:s2^=>1
+
+[errors]
+line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'
+line 1:2 reportContextSensitivity d=1 (e), input='34'
+
+[flags]
+showDiagnosticErrors
+

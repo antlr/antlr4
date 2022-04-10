@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 
   /**
@@ -86,15 +88,8 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC TokenStreamRewriter {
   public:
     static const std::string DEFAULT_PROGRAM_NAME;
-#if __cplusplus >= 201703L
     static constexpr size_t PROGRAM_INIT_SIZE = 100;
     static constexpr size_t MIN_TOKEN_INDEX = 0;
-#else
-    enum : size_t {
-      PROGRAM_INIT_SIZE = 100,
-      MIN_TOKEN_INDEX = 0,
-    };
-#endif
 
     TokenStreamRewriter(TokenStream *tokens);
     virtual ~TokenStreamRewriter();

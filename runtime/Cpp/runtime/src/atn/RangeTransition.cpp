@@ -10,11 +10,7 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {
-}
-
-Transition::SerializationType RangeTransition::getSerializationType() const {
-  return RANGE;
+RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(TransitionType::RANGE, target), from(from), to(to) {
 }
 
 misc::IntervalSet RangeTransition::label() const {

@@ -10,7 +10,7 @@ using namespace antlr4;
 RuntimeException::RuntimeException(const std::string &msg) : std::exception(), _message(msg) {
 }
 
-const char* RuntimeException::what() const NOEXCEPT {
+const char* RuntimeException::what() const noexcept {
   return _message.c_str();
 }
 
@@ -19,7 +19,7 @@ const char* RuntimeException::what() const NOEXCEPT {
 IOException::IOException(const std::string &msg) : std::exception(), _message(msg) {
 }
 
-const char* IOException::what() const NOEXCEPT {
+const char* IOException::what() const noexcept {
   return _message.c_str();
 }
 

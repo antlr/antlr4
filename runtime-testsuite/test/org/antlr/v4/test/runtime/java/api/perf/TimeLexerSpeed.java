@@ -55,7 +55,7 @@ Warming up Java compiler....
  *
  *  Sample output on OS X with 4 GHz Intel Core i7 (us == microseconds, 1/1000 of a millisecond):
  *
- Java VM args: -Xms2G -Xmx2G
+ Java VM args: -Xms2G -Xmx8g
  Warming up Java compiler....
  load_legacy_java_ascii_file average time    53us size  58384b over 3500 loads of 29038 symbols from Parser.java
  load_legacy_java_ascii_file average time    27us size  15568b over 3500 loads of  7625 symbols from RuleContext.java
@@ -381,7 +381,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public void lex_new_java_utf8(int n, boolean clearLexerDFACache) throws Exception {
 		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
-		try (InputStream is = loader.getResourceAsStream(Parser_java_file);) {
+		try (InputStream is = loader.getResourceAsStream(Parser_java_file)) {
 			long size = getResourceSize(loader, Parser_java_file);
 			CharStream input = CharStreams.fromStream(is, StandardCharsets.UTF_8, size);
 			JavaLexer lexer = new JavaLexer(input);
@@ -490,7 +490,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		return path.getName(0).toString();
 	}
 
-	public static final long getResourceSize(ClassLoader loader, String resourceName) throws IOException {
+	public static long getResourceSize(ClassLoader loader, String resourceName) throws IOException {
 		URLConnection uc = null;
 		try {
 			// Sadly, URLConnection is not AutoCloseable, but it leaks resources if

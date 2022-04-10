@@ -67,7 +67,7 @@ interface <file.grammarName>Listener extends ParseTreeListener {
 <endif>
  * @param $context The parse tree.
  */
-public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void;
+public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context): void;
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the `<lname>` labeled alternative
@@ -77,7 +77,7 @@ public function enter<lname; format="cap">(Context\\<lname; format="cap">Context
 <endif>
  * @param $context The parse tree.
  */
-public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void;}; separator="\n">
+public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context): void;}; separator="\n">
 }
 >>
 
@@ -105,42 +105,42 @@ class <file.grammarName>BaseListener implements <file.grammarName>Listener
  *
  * The default implementation does nothing.
  */
-public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void {\}
+public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context): void {\}
 
 /**
  * {@inheritdoc\}
  *
  * The default implementation does nothing.
  */
-public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void {\}}; separator="\n">
+public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context): void {\}}; separator="\n">
 
 	/**
 	 * {@inheritdoc\}
 	 *
 	 * The default implementation does nothing.
 	 */
-	public function enterEveryRule(ParserRuleContext $context) : void {}
+	public function enterEveryRule(ParserRuleContext $context): void {}
 
 	/**
 	 * {@inheritdoc\}
 	 *
 	 * The default implementation does nothing.
 	 */
-	public function exitEveryRule(ParserRuleContext $context) : void {}
+	public function exitEveryRule(ParserRuleContext $context): void {}
 
 	/**
 	 * {@inheritdoc\}
 	 *
 	 * The default implementation does nothing.
 	 */
-	public function visitTerminal(TerminalNode $node) : void {}
+	public function visitTerminal(TerminalNode $node): void {}
 
 	/**
 	 * {@inheritdoc\}
 	 *
 	 * The default implementation does nothing.
 	 */
-	public function visitErrorNode(ErrorNode $node) : void {}
+	public function visitErrorNode(ErrorNode $node): void {}
 }
 >>
 
@@ -267,7 +267,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 
 		<parser:(ctor)()>
 
-		private static function initialize() : void
+		private static function initialize(): void
 		{
 			if (self::$atn !== null) {
 				return;
@@ -287,27 +287,27 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 			self::$sharedContextCache = new PredictionContextCache();
 		}
 
-		public function getGrammarFileName() : string
+		public function getGrammarFileName(): string
 		{
 			return "<parser.grammarFileName>";
 		}
 
-		public function getRuleNames() : array
+		public function getRuleNames(): array
 		{
 			return self::RULE_NAMES;
 		}
 
-		public function getSerializedATN() : string
+		public function getSerializedATN(): array
 		{
 			return self::SERIALIZED_ATN;
 		}
 
-		public function getATN() : ATN
+		public function getATN(): ATN
 		{
 			return self::$atn;
 		}
 
-		public function getVocabulary() : Vocabulary
+		public function getVocabulary(): Vocabulary
         {
             static $vocabulary;
 
@@ -319,7 +319,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 <endif>
 <if(sempredFuncs)>
 
-		public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex) : bool
+		public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex): bool
 		{
 			switch ($ruleIndex) {
 			<parser.sempredFuncs.values:{f|
@@ -372,7 +372,7 @@ private const SYMBOLIC_NAMES = [
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 
-public function action(?RuleContext $localContext, int $ruleIndex, int $actionIndex) : void
+public function action(?RuleContext $localContext, int $ruleIndex, int $actionIndex): void
 {
 	switch ($ruleIndex) {
 	<recog.actionFuncs.values:{f|
@@ -386,7 +386,7 @@ public function action(?RuleContext $localContext, int $ruleIndex, int $actionIn
 <endif>
 <if(sempredFuncs)>
 
-public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex) : bool
+public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex): bool
 {
 	switch ($ruleIndex) {
 	<recog.sempredFuncs.values:{f|
@@ -416,7 +416,7 @@ public function __construct(TokenStream $input)
  * an overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-private function action<r.name; format="cap">(?<r.ctxType> $localContext, int $actionIndex) : void
+private function action<r.name; format="cap">(?<r.ctxType> $localContext, int $actionIndex): void
 {
 	switch ($actionIndex) {
 	<actions:{index|
@@ -433,7 +433,7 @@ private function action<r.name; format="cap">(?<r.ctxType> $localContext, int $a
  * an overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private function sempred<r.name; format="cap">(?Context\\<r.ctxType> $localContext, int $predicateIndex) : bool
+private function sempred<r.name; format="cap">(?Context\\<r.ctxType> $localContext, int $predicateIndex): bool
 {
 	switch ($predicateIndex) {
 	<actions:{index|
@@ -449,7 +449,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 /**
  * @throws RecognitionException
  */
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=",">) : Context\\<currentRule.ctxType>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=",">): Context\\<currentRule.ctxType>
 {
     $localContext = new Context\\<currentRule.ctxType>($this->ctx, $this->getState()<currentRule.args:{a | , $<a.name>}>);
 
@@ -478,7 +478,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,name
 /**
  * @throws RecognitionException
  */
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=", ">) : Context\\<currentRule.ctxType>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=", ">): Context\\<currentRule.ctxType>
 {
 	return $this->recursive<currentRule.name; format="cap">(0<currentRule.args:{a | , <a.name>}>);
 }
@@ -486,7 +486,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,name
 /**
  * @throws RecognitionException
  */
-private function recursive<currentRule.name; format="cap">(int $precedence<args:{a | , <a>}>) : Context\\<currentRule.ctxType>
+private function recursive<currentRule.name; format="cap">(int $precedence<args:{a | , <a>}>): Context\\<currentRule.ctxType>
 {
 	$parentContext = $this->ctx;
 	$parentState = $this->getState();
@@ -863,7 +863,7 @@ public $<d.name><if(d.initValue)> = <d.initValue><endif>;}; separator="\n\n">
 >>
 
 ContextTokenGetterDecl(t) ::= <<
-public function <t.name>() : ?TerminalNode
+public function <t.name>(): ?TerminalNode
 {
     return $this->getToken(<parser.name>::<t.name>, 0);
 }
@@ -887,7 +887,7 @@ public function <t.name>(?int $index = null)
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-public function <r.name>() : ?<r.ctxName>
+public function <r.name>(): ?<r.ctxName>
 {
 	return $this->getTypedRuleContext(<r.ctxName>::class, 0);
 }
@@ -938,7 +938,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
 <endif>
 	}
 
-	public function getRuleIndex() : int
+	public function getRuleIndex(): int
 	{
 	    return <parser.name>::RULE_<struct.derivedFromName>;
     }
@@ -947,7 +947,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
     <getters:{g | <g>}; separator="\n\n">
 <endif>
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	public function copyFrom(ParserRuleContext $context) : void
+	public function copyFrom(ParserRuleContext $context): void
 	{
 		parent::copyFrom($context);
 
@@ -987,7 +987,7 @@ class <struct.name> extends <struct.parentRule; format="cap">Context
 >>
 
 ListenerDispatchMethod(method) ::= <<
-public function <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener $listener) : void
+public function <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener $listener): void
 {
 	if ($listener instanceof <parser.grammarName>Listener) {
 	    $listener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">($this);
@@ -996,7 +996,7 @@ public function <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener
 >>
 
 VisitorDispatchMethod(method) ::= <<
-public function accept(ParseTreeVisitor $visitor)
+public function accept(ParseTreeVisitor $visitor): mixed
 {
 	if ($visitor instanceof <parser.grammarName>Visitor) {
 	    return $visitor->visit<struct.derivedFromName; format="cap">($this);
@@ -1087,19 +1087,19 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		public const <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(lexer.channels)>
-		public const <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
+		<if(lexer.escapedChannels)>
+		public const <lexer.escapedChannels:{c | <c> = <lexer.escapedChannels.(c)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(rest(lexer.modes))>
-		public const <rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+		<if(rest(lexer.escapedModeNames))>
+		public const <rest(lexer.escapedModeNames):{m | <m>=<i>}; separator=", ", wrap, anchor>;
 		<endif>
 
 		/**
 		 * @var array\<string>
 		 */
 		public const CHANNEL_NAMES = [
-			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
 		];
 
 		/**
@@ -1136,7 +1136,7 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 			$this->interp = new LexerATNSimulator($this, self::$atn, self::$decisionToDFA, self::$sharedContextCache);
 		}
 
-		private static function initialize() : void
+		private static function initialize(): void
 		{
 			if (self::$atn !== null) {
 				return;
@@ -1156,24 +1156,24 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 			self::$sharedContextCache = new PredictionContextCache();
 		}
 
-		public static function vocabulary() : Vocabulary
+		public static function vocabulary(): Vocabulary
 		{
 			static $vocabulary;
 
 			return $vocabulary = $vocabulary ?? new VocabularyImpl(self::LITERAL_NAMES, self::SYMBOLIC_NAMES);
 		}
 
-		public function getGrammarFileName() : string
+		public function getGrammarFileName(): string
 		{
 			return '<lexer.grammarFileName>';
 		}
 
-		public function getRuleNames() : array
+		public function getRuleNames(): array
 		{
 			return self::RULE_NAMES;
 		}
 
-		public function getSerializedATN() : string
+		public function getSerializedATN(): array
 		{
 			return self::SERIALIZED_ATN;
 		}
@@ -1181,7 +1181,7 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		/**
 		 * @return array\<string>
 		 */
-		public function getChannelNames() : array
+		public function getChannelNames(): array
 		{
 			return self::CHANNEL_NAMES;
 		}
@@ -1189,17 +1189,17 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		/**
 		 * @return array\<string>
 		 */
-		public function getModeNames() : array
+		public function getModeNames(): array
 		{
 			return self::MODE_NAMES;
 		}
 
-		public function getATN() : ATN
+		public function getATN(): ATN
 		{
 			return self::$atn;
 		}
 
-		public function getVocabulary() : Vocabulary
+		public function getVocabulary(): Vocabulary
 		{
 			return self::vocabulary();
 		}
@@ -1209,19 +1209,8 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 >>
 
 SerializedATN(model) ::= <<
-<if(rest(model.segments))>
-/**
- * @var string
- */
 private const SERIALIZED_ATN =
-	<model.segments:{segment| "<segment; wrap={" .<\n>"}>"}; separator=" .\n">;
-<else>
-/**
- * @var string
- */
-private const SERIALIZED_ATN =
-	"<model.serialized; wrap={" .<\n>    "}>";
-<endif>
+	[<model.serialized: {s | <s>}; separator=", ", wrap={<\n>    }>];
 >>
 
 /**

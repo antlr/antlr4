@@ -1,0 +1,15 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ACTION : '{' (ACTION | ~[{}])* '}';
+WS : [ \r\n\t]+ -> skip;
+
+[input]
+{ { } }
+
+[output]
+[@0,0:6='{ { } }',<1>,1:0]
+[@1,7:6='<EOF>',<-1>,1:7]
+

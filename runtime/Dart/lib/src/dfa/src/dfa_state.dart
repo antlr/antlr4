@@ -10,8 +10,8 @@ import '../../util/utils.dart';
 
 /// Map a predicate to a predicted alternative. */
 class PredPrediction {
-  final alt;
-  final pred;
+  final SemanticContext pred;
+  final int alt;
 
   PredPrediction(this.pred, this.alt);
 

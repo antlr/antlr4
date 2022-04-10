@@ -1,12 +1,15 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const ATN = require('./ATN');
-const Utils = require('./../Utils');
-const {SemanticContext} = require('./SemanticContext');
-const {merge} = require('./../PredictionContext');
+import ATN from './ATN.js';
+import SemanticContext from './SemanticContext.js';
+import { merge } from '../context/PredictionContextUtils.js';
+import arrayToString from "../utils/arrayToString.js";
+import HashSet from "../misc/HashSet.js";
+import equalArrays from "../utils/equalArrays.js";
+import HashCode from "../misc/HashCode.js";
 
 function hashATNConfig(c) {
 	return c.hashCodeForConfigSet();
@@ -26,7 +29,7 @@ function equalATNConfigs(a, b) {
  * info about the set, with support for combining similar configurations using a
  * graph-structured stack
  */
-class ATNConfigSet {
+export default class ATNConfigSet {
 	constructor(fullCtx) {
 		/**
 		 * The reason that we need this is because we don't want the hash map to use
@@ -40,7 +43,7 @@ class ATNConfigSet {
 		 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
 		 * when we go readonly as this set becomes a DFA state
 		 */
-		this.configLookup = new Utils.Set(hashATNConfig, equalATNConfigs);
+		this.configLookup = new HashSet(hashATNConfig, equalATNConfigs);
 		/**
 		 * Indicates that this configuration set is part of a full context
 		 * LL prediction. It will be used to determine how to merge $. With SLL
@@ -122,7 +125,7 @@ class ATNConfigSet {
 	}
 
 	getStates() {
-		const states = new Utils.Set();
+		const states = new HashSet();
 		for (let i = 0; i < this.configs.length; i++) {
 			states.add(this.configs[i].state);
 		}
@@ -163,7 +166,7 @@ class ATNConfigSet {
 	equals(other) {
 		return this === other ||
 			(other instanceof ATNConfigSet &&
-			Utils.equalArrays(this.configs, other.configs) &&
+			equalArrays(this.configs, other.configs) &&
 			this.fullCtx === other.fullCtx &&
 			this.uniqueAlt === other.uniqueAlt &&
 			this.conflictingAlts === other.conflictingAlts &&
@@ -172,7 +175,7 @@ class ATNConfigSet {
 	}
 
 	hashCode() {
-		const hash = new Utils.Hash();
+		const hash = new HashCode();
 		hash.update(this.configs);
 		return hash.finish();
 	}
@@ -212,7 +215,7 @@ class ATNConfigSet {
 		}
 		this.configs = [];
 		this.cachedHashCode = -1;
-		this.configLookup = new Utils.Set();
+		this.configLookup = new HashSet();
 	}
 
 	setReadonly(readOnly) {
@@ -223,7 +226,7 @@ class ATNConfigSet {
 	}
 
 	toString() {
-		return Utils.arrayToString(this.configs) +
+		return arrayToString(this.configs) +
 			(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
 			(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
 			(this.conflictingAlts !== null ? ",conflictingAlts=" + this.conflictingAlts : "") +
@@ -239,15 +242,3 @@ class ATNConfigSet {
 	}
 }
 
-
-class OrderedATNConfigSet extends ATNConfigSet {
-	constructor() {
-		super();
-		this.configLookup = new Utils.Set();
-	}
-}
-
-module.exports = {
-	ATNConfigSet,
-	OrderedATNConfigSet
-}

@@ -1,13 +1,15 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-const Utils = require('./../Utils');
+
+
+import arrayToString from "../utils/arrayToString.js";
 
 /**
  * A DFA walker that knows how to dump them to serialized strings.
  */
-class DFASerializer {
+export default class DFASerializer {
     constructor(dfa, literalNames, symbolicNames) {
         this.dfa = dfa;
         this.literalNames = literalNames || [];
@@ -54,7 +56,7 @@ class DFASerializer {
         const baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
         if(s.isAcceptState) {
             if (s.predicates !== null) {
-                return baseStateStr + "=>" + Utils.arrayToString(s.predicates);
+                return baseStateStr + "=>" + arrayToString(s.predicates);
             } else {
                 return baseStateStr + "=>" + s.prediction.toString();
             }
@@ -64,15 +66,4 @@ class DFASerializer {
     }
 }
 
-class LexerDFASerializer extends DFASerializer {
-    constructor(dfa) {
-        super(dfa, null);
-    }
-
-    getEdgeLabel(i) {
-        return "'" + String.fromCharCode(i) + "'";
-    }
-}
-
-module.exports = { DFASerializer , LexerDFASerializer };
 

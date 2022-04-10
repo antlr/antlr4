@@ -1,0 +1,22 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+myset: ('b'|'c') ;
+a: 'a' myset 'd' {<writeln(Append("\"\"","$myset.stop"))>} ; <! bit complicated because of the JavaScript target !>
+
+[start]
+a
+
+[input]
+aabd
+
+[output]
+"""[@2,2:2='b',<1>,1:2]
+"""
+
+[errors]
+"""line 1:1 extraneous input 'a' expecting {'b', 'c'}
+"""
+

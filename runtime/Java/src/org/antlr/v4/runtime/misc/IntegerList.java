@@ -5,9 +5,11 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  *
@@ -274,8 +276,9 @@ public class IntegerList {
 		_data = Arrays.copyOf(_data, newLength);
 	}
 
-	/** Convert the list to a UTF-16 encoded char array. If all values are less
-	 *  than the 0xFFFF 16-bit code point limit then this is just a char array
+	/** Convert the int list to a char array where values > 0x7FFFF take 2 bytes. TODO?????
+	 *  If all values are less
+	 *  than the 0x7FFF 16-bit code point limit (1 bit taken to indicatethen this is just a char array
 	 *  of 16-bit char as usual. For values in the supplementary range, encode
 	 * them as two UTF-16 code units.
 	 */

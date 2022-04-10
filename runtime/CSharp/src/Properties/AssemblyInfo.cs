@@ -6,4 +6,4 @@ using System;
 using System.Reflection;
 
 [assembly: CLSCompliant(true)]
-[assembly: AssemblyVersion("4.9.3")]
+[assembly: AssemblyVersion("4.10")]

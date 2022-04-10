@@ -1,29 +1,35 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const Utils = require('./../Utils');
-const {Set, BitSet, DoubleDict} = Utils;
-
-const ATN = require('./ATN');
-const {ATNState, RuleStopState} = require('./ATNState');
-
-const {ATNConfig} = require('./ATNConfig');
-const {ATNConfigSet} = require('./ATNConfigSet');
-const {Token} = require('./../Token');
-const {DFAState, PredPrediction} = require('./../dfa/DFAState');
-const ATNSimulator = require('./ATNSimulator');
-const PredictionMode = require('./PredictionMode');
-const RuleContext = require('./../RuleContext');
-const ParserRuleContext = require('./../ParserRuleContext');
-const {SemanticContext} = require('./SemanticContext');
-const {PredictionContext} = require('./../PredictionContext');
-const {Interval} = require('./../IntervalSet');
-const {Transition, SetTransition, NotSetTransition, RuleTransition, ActionTransition} = require('./Transition');
-const {NoViableAltException} = require('./../error/Errors');
-const {SingletonPredictionContext, predictionContextFromRuleContext} = require('./../PredictionContext');
-
+import ATN from './ATN.js';
+import ATNState from '../state/ATNState.js';
+import RuleStopState from '../state/RuleStopState.js';
+import ATNConfig from './ATNConfig.js';
+import ATNConfigSet from './ATNConfigSet.js';
+import Token from '../Token.js';
+import DFAState from '../dfa/DFAState.js';
+import PredPrediction from '../dfa/PredPrediction.js';
+import ATNSimulator from './ATNSimulator.js';
+import PredictionMode from './PredictionMode.js';
+import RuleContext from '../context/RuleContext.js';
+import SemanticContext from './SemanticContext.js';
+import PredictionContext from '../context/PredictionContext.js';
+import Interval from '../misc/Interval.js';
+import Transition from '../transition/Transition.js';
+import SetTransition from '../transition/SetTransition.js';
+import NotSetTransition from '../transition/NotSetTransition.js';
+import RuleTransition from '../transition/RuleTransition.js';
+import ActionTransition from '../transition/ActionTransition.js';
+import NoViableAltException from '../error/NoViableAltException.js';
+import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
+import { predictionContextFromRuleContext } from '../context/PredictionContextUtils.js';
+import AtomTransition from "../transition/AtomTransition.js";
+import arrayToString from "../utils/arrayToString.js";
+import BitSet from "../misc/BitSet.js";
+import DoubleDict from "../utils/DoubleDict.js";
+import HashSet from "../misc/HashSet.js";
 
 /**
  * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -252,7 +258,7 @@ const {SingletonPredictionContext, predictionContextFromRuleContext} = require('
  * both SLL and LL parsing. Erroneous input will therefore require 2 passes over
  * the input.</p>
  */
-class ParserATNSimulator extends ATNSimulator {
+export default class ParserATNSimulator extends ATNSimulator {
     constructor(parser, atn, decisionToDFA, sharedContextCache) {
         super(atn, sharedContextCache);
         this.parser = parser;
@@ -399,7 +405,7 @@ class ParserATNSimulator extends ATNSimulator {
             console.log("s0 = " + s0);
         }
         let t = input.LA(1);
-        while(true) { // while more work
+        for(;;) { // while more work
             let D = this.getExistingTargetState(previousD, t);
             if(D===null) {
                 D = this.computeTargetState(dfa, previousD, t);
@@ -527,7 +533,7 @@ class ParserATNSimulator extends ATNSimulator {
 
         if (this.debug) {
             const altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-            console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) +
+            console.log("SLL altSubSets=" + arrayToString(altSubSets) +
                         /*", previous=" + previousD.configs + */
                         ", configs=" + reach +
                         ", predict=" + predictedAlt +
@@ -594,7 +600,7 @@ class ParserATNSimulator extends ATNSimulator {
         input.seek(startIndex);
         let t = input.LA(1);
         let predictedAlt = -1;
-        while (true) { // while more work
+        for (;;) { // while more work
             reach = this.computeReachSet(previous, t, fullCtx);
             if (reach===null) {
                 // if any configs in previous dipped into outer context, that
@@ -769,7 +775,7 @@ class ParserATNSimulator extends ATNSimulator {
         //
         if (reach===null) {
             reach = new ATNConfigSet(fullCtx);
-            const closureBusy = new Set();
+            const closureBusy = new HashSet();
             const treatEofAsEpsilon = t === Token.EOF;
             for (let k=0; k<intermediate.items.length;k++) {
                 this.closure(intermediate.items[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon);
@@ -864,7 +870,7 @@ class ParserATNSimulator extends ATNSimulator {
         for(let i=0;i<p.transitions.length;i++) {
             const target = p.transitions[i].target;
             const c = new ATNConfig({ state:target, alt:i+1, context:initialContext }, null);
-            const closureBusy = new Set();
+            const closureBusy = new HashSet();
             this.closure(c, configs, closureBusy, true, fullCtx, false);
         }
         return configs;
@@ -993,7 +999,7 @@ class ParserATNSimulator extends ATNSimulator {
         let altToPred = [];
         for(let i=0;i<configs.items.length;i++) {
             const c = configs.items[i];
-            if(ambigAlts.contains( c.alt )) {
+            if(ambigAlts.has( c.alt )) {
                 altToPred[c.alt] = SemanticContext.orContext(altToPred[c.alt] || null, c.semanticContext);
             }
         }
@@ -1011,7 +1017,7 @@ class ParserATNSimulator extends ATNSimulator {
             altToPred = null;
         }
         if (this.debug) {
-            console.log("getPredsForAmbigAlts result " + Utils.arrayToString(altToPred));
+            console.log("getPredsForAmbigAlts result " + arrayToString(altToPred));
         }
         return altToPred;
     }
@@ -1022,7 +1028,7 @@ class ParserATNSimulator extends ATNSimulator {
         for (let i=1; i<altToPred.length;i++) {
             const pred = altToPred[i];
             // unpredicated is indicated by SemanticContext.NONE
-            if( ambigAlts!==null && ambigAlts.contains( i )) {
+            if( ambigAlts!==null && ambigAlts.has( i )) {
                 pairs.push(new PredPrediction(pred, i));
             }
             if (pred !== SemanticContext.NONE) {
@@ -1412,7 +1418,7 @@ class ParserATNSimulator extends ATNSimulator {
             console.log("PRED (collectPredicates=" + collectPredicates + ") " +
                     pt.precedence + ">=_p, ctx dependent=true");
             if (this.parser!==null) {
-                console.log("context surrounding pred is " + Utils.arrayToString(this.parser.getRuleInvocationStack()));
+                console.log("context surrounding pred is " + arrayToString(this.parser.getRuleInvocationStack()));
             }
         }
         let c = null;
@@ -1447,7 +1453,7 @@ class ParserATNSimulator extends ATNSimulator {
             console.log("PRED (collectPredicates=" + collectPredicates + ") " + pt.ruleIndex +
                     ":" + pt.predIndex + ", ctx dependent=" + pt.isCtxDependent);
             if (this.parser!==null) {
-                console.log("context surrounding pred is " + Utils.arrayToString(this.parser.getRuleInvocationStack()));
+                console.log("context surrounding pred is " + arrayToString(this.parser.getRuleInvocationStack()));
             }
         }
         let c = null;
@@ -1713,5 +1719,3 @@ class ParserATNSimulator extends ATNSimulator {
         }
     }
 }
-
-module.exports = ParserATNSimulator;

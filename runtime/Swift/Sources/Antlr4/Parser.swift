@@ -14,7 +14,7 @@ import Foundation
 ///
 /// - SeeAlso: `ATNDeserializationOptions.generateRuleBypassTransitions`
 ///
-private var bypassAltsAtnCache = [String: ATN]()
+private var bypassAltsAtnCache : ATN? = nil
 
 ///
 /// mutex for bypassAltsAtnCache updates
@@ -142,9 +142,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     /// reset the parser's state
     public func reset() throws {
-        if (getInputStream() != nil) {
-            try getInputStream()!.seek(0)
-        }
+        try getInputStream()?.seek(0)
         _errHandler.reset(self)
         _ctx = nil
         _syntaxErrors = 0
@@ -378,12 +376,9 @@ open class Parser: Recognizer<ParserATNSimulator> {
     public func triggerExitRuleEvent() throws {
         // reverse order walk of listeners
         if let _parseListeners = _parseListeners, let _ctx = _ctx {
-            var i = _parseListeners.count - 1
-            while i >= 0 {
-                let listener = _parseListeners[i]
+            for listener in _parseListeners.reversed() {
                 _ctx.exitRule(listener)
                 try listener.exitEveryRule(_ctx)
-                i -= 1
             }
         }
     }
@@ -417,15 +412,15 @@ open class Parser: Recognizer<ParserATNSimulator> {
         let serializedAtn = getSerializedATN()
 
         return bypassAltsAtnCacheMutex.synchronized {
-            if let cachedResult = bypassAltsAtnCache[serializedAtn] {
+            if let cachedResult = bypassAltsAtnCache {
                 return cachedResult
             }
 
             var opts = ATNDeserializationOptions()
             opts.generateRuleBypassTransitions = true
-            let result = try! ATNDeserializer(opts).deserialize(Array(serializedAtn))
-            bypassAltsAtnCache[serializedAtn] = result
-            return result
+            let result = try! ATNDeserializer(opts).deserialize(serializedAtn)
+            bypassAltsAtnCache = result
+            return bypassAltsAtnCache!
         }
     }
 

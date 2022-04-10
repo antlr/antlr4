@@ -7,6 +7,7 @@
 #include "ParserRuleContext.h"
 #include "tree/ParseTreeListener.h"
 #include "support/CPPUtils.h"
+#include "support/Casts.h"
 
 #include "tree/IterativeParseTreeWalker.h"
 #include "tree/ParseTreeWalker.h"
@@ -17,15 +18,13 @@ using namespace antlrcpp;
 static IterativeParseTreeWalker defaultWalker;
 ParseTreeWalker &ParseTreeWalker::DEFAULT = defaultWalker;
 
-ParseTreeWalker::~ParseTreeWalker() {
-}
-
 void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
-  if (is<ErrorNode *>(t)) {
-    listener->visitErrorNode(dynamic_cast<ErrorNode *>(t));
+  if (ErrorNode::is(*t)) {
+    listener->visitErrorNode(downCast<ErrorNode*>(t));
     return;
-  } else if (is<TerminalNode *>(t)) {
-    listener->visitTerminal(dynamic_cast<TerminalNode *>(t));
+  }
+  if (TerminalNode::is(*t)) {
+    listener->visitTerminal(downCast<TerminalNode*>(t));
     return;
   }
 
@@ -37,13 +36,13 @@ void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
 }
 
 void ParseTreeWalker::enterRule(ParseTreeListener *listener, ParseTree *r) const {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
+  auto *ctx = downCast<ParserRuleContext*>(r);
   listener->enterEveryRule(ctx);
   ctx->enterRule(listener);
 }
 
 void ParseTreeWalker::exitRule(ParseTreeListener *listener, ParseTree *r) const {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
+  auto *ctx = downCast<ParserRuleContext*>(r);
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx);
 }

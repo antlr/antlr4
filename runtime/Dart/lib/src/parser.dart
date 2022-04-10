@@ -27,7 +27,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// bypass alternatives.
   ///
   /// @see ATNDeserializationOptions#isGenerateRuleBypassTransitions()
-  static final Map<String, ATN> bypassAltsAtnCache = {};
+  ATN? bypassAltsAtnCache;
 
   /// The error handling strategy for the parser. The default value is a new
   /// instance of [DefaultErrorStrategy].
@@ -51,10 +51,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
   /// Specifies whether or not the parser should construct a parse tree during
   /// the parsing process. The default value is [true].
-  ///
-  /// @see #getBuildParseTree
-  /// @see #setBuildParseTree
-  bool _buildParseTrees = true;
+  bool buildParseTree = true;
 
   /// When {@link #setTrace}{@code (true)} is called, a reference to the
   /// [TraceListener] is stored here so it can be easily removed in a
@@ -120,7 +117,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       consume();
     } else {
       t = errorHandler.recoverInline(this);
-      if (_buildParseTrees && t.tokenIndex == -1) {
+      if (buildParseTree && t.tokenIndex == -1) {
         // we must have conjured up a new token during single token insertion
         // if it's not the current symbol
         context!.addErrorNode(createErrorNode(context!, t));
@@ -152,7 +149,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       consume();
     } else {
       t = errorHandler.recoverInline(this);
-      if (_buildParseTrees && t.tokenIndex == -1) {
+      if (buildParseTree && t.tokenIndex == -1) {
         // we must have conjured up a new token during single token insertion
         // if it's not the current symbol
         context!.addErrorNode(createErrorNode(context!, t));
@@ -160,32 +157,6 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     }
 
     return t;
-  }
-
-  /// Track the [ParserRuleContext] objects during the parse and hook
-  /// them up using the {@link ParserRuleContext#children} list so that it
-  /// forms a parse tree. The [ParserRuleContext] returned from the start
-  /// rule represents the root of the parse tree.
-  ///
-  /// <p>Note that if we are not building parse trees, rule contexts only point
-  /// upwards. When a rule exits, it returns the context but that gets garbage
-  /// collected if nobody holds a reference. It points upwards but nobody
-  /// points at it.</p>
-  ///
-  /// <p>When we build parse trees, we are adding all of these contexts to
-  /// {@link ParserRuleContext#children} list. Contexts are then not candidates
-  /// for garbage collection.</p>
-  set buildParseTree(bool buildParseTrees) {
-    _buildParseTrees = buildParseTrees;
-  }
-
-  /// Gets whether or not a complete parse tree will be constructed while
-  /// parsing. This property is [true] for a newly constructed parser.
-  ///
-  /// @return [true] if a complete parse tree will be constructed while
-  /// parsing, otherwise [false]
-  bool get buildParseTree {
-    return _buildParseTrees;
   }
 
   /// Trim the internal lists of the parse tree during parsing to conserve memory.
@@ -324,16 +295,13 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
           'The current parser does not support an ATN with bypass alternatives.');
     }
 
-    var result = bypassAltsAtnCache[serializedATN];
-    if (result == null) {
+    if (bypassAltsAtnCache == null) {
       final deserializationOptions = ATNDeserializationOptions(false);
       deserializationOptions.setGenerateRuleBypassTransitions(true);
-      result = ATNDeserializer(deserializationOptions)
-          .deserialize(serializedATN!.codeUnits);
-      bypassAltsAtnCache[serializedATN!] = result;
+      bypassAltsAtnCache = ATNDeserializer(deserializationOptions).deserialize(serializedATN);
     }
 
-    return result;
+    return bypassAltsAtnCache!;
   }
 
   /// The preferred method of getting a tree pattern. For example, here's a
@@ -433,7 +401,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       inputStream.consume();
     }
     final hasListener = _parseListeners != null && _parseListeners!.isNotEmpty;
-    if (_buildParseTrees || hasListener) {
+    if (buildParseTree || hasListener) {
       if (errorHandler.inErrorRecoveryMode(this)) {
         final node = context!.addErrorNode(createErrorNode(context!, o));
         if (_parseListeners != null) {
@@ -483,7 +451,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     this.state = state;
     context = localctx;
     context!.start = _input.LT(1)!;
-    if (_buildParseTrees) addContextToParseTree();
+    if (buildParseTree) addContextToParseTree();
     if (_parseListeners != null) triggerEnterRuleEvent();
   }
 
@@ -506,7 +474,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     localctx.altNumber = altNum;
     // if we have new localctx, make sure we replace existing ctx
     // that is previous child of parse tree
-    if (_buildParseTrees && context != localctx) {
+    if (buildParseTree && context != localctx) {
       final parent = context!.parent;
       if (parent != null) {
         parent.removeLastChild();
@@ -554,7 +522,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
     context = localctx;
     context!.start = previous.start;
-    if (_buildParseTrees) {
+    if (buildParseTree) {
       context!.addAnyChild(previous);
     }
 
@@ -582,7 +550,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     // hook into tree
     retctx.parent = _parentctx;
 
-    if (_buildParseTrees && _parentctx != null) {
+    if (buildParseTree && _parentctx != null) {
       // add return ctx into invoking rule's tree
       _parentctx.addAnyChild(retctx);
     }
@@ -749,7 +717,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     final interp = interpreter!;
     final saveMode = interp.predictionMode;
     if (profile) {
-      if (!(interp is ProfilingATNSimulator)) {
+      if (interp is! ProfilingATNSimulator) {
         interpreter = ProfilingATNSimulator(this);
       }
     } else if (interp is ProfilingATNSimulator) {

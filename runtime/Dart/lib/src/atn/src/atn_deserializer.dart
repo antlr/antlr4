@@ -66,90 +66,27 @@ class ATNDeserializationOptions {
 }
 
 class ATNDeserializer {
-  /// This value should never change. Updates following this version are
-  /// reflected as change in the unique ID SERIALIZED_UUID.
-  static final SERIALIZED_VERSION = 3;
-
-  /** WARNING: DO NOT MERGE THESE LINES. If UUIDs differ during a merge,
-   * resolve the conflict by generating a new ID!
-   */
-
-  /// This is the earliest supported serialized UUID.
-  static final BASE_SERIALIZED_UUID = '33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3';
-
-  /// This UUID indicates an extension of {@link BASE_SERIALIZED_UUID} for the
-  /// addition of precedence predicates.
-  static final ADDED_PRECEDENCE_TRANSITIONS =
-      '1DA0C57D-6C06-438A-9B27-10BCB3CE0F61';
-
-  /// This UUID indicates an extension of {@link #ADDED_PRECEDENCE_TRANSITIONS}
-  /// for the addition of lexer actions encoded as a sequence of
-  /// [LexerAction] instances.
-  static final ADDED_LEXER_ACTIONS = 'AADB8D7E-AEEF-4415-AD2B-8204D6CF042E';
-
-  /// This UUID indicates the serialized ATN contains two sets of
-  /// IntervalSets, where the second set's values are encoded as
-  /// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-  static final ADDED_UNICODE_SMP = '59627784-3BE5-417A-B9EB-8131A7286089';
-
-  /// This list contains all of the currently supported UUIDs, ordered by when
-  /// the feature first appeared in this branch.
-  static final SUPPORTED_UUIDS = [
-    BASE_SERIALIZED_UUID,
-    ADDED_PRECEDENCE_TRANSITIONS,
-    ADDED_LEXER_ACTIONS,
-    ADDED_UNICODE_SMP
-  ];
-
-  /// This is the current serialized UUID.
-  static final SERIALIZED_UUID = ADDED_UNICODE_SMP;
+  static final SERIALIZED_VERSION = 4;
 
   late final ATNDeserializationOptions deserializationOptions;
   late List<int> data;
   int pos = 0;
-  late String uuid;
 
   ATNDeserializer([ATNDeserializationOptions? options]) {
     deserializationOptions =
         options ?? ATNDeserializationOptions.defaultOptions;
   }
 
-  /// Determines if a particular serialized representation of an ATN supports
-  /// a particular feature, identified by the [UUID] used for serializing
-  /// the ATN at the time the feature was first introduced.
-  ///
-  /// @param feature The [UUID] marking the first time the feature was
-  /// supported in the serialized ATN.
-  /// @param actualUuid The [UUID] of the actual serialized ATN which is
-  /// currently being deserialized.
-  /// @return [true] if the [actualUuid] value represents a
-  /// serialized ATN at or after the feature identified by [feature] was
-  /// introduced; otherwise, [false].
-  bool isFeatureSupported(feature, actualUuid) {
-    final idx1 = SUPPORTED_UUIDS.indexOf(feature);
-    if (idx1 < 0) {
-      return false;
-    }
-    final idx2 = SUPPORTED_UUIDS.indexOf(actualUuid);
-    return idx2 >= idx1;
-  }
-
   ATN deserialize(List<int> data) {
-    reset(data);
+    this.data = data;
+    this.pos = 0;
     checkVersion();
-    checkUUID();
     final atn = readATN();
     readStates(atn);
     readRules(atn);
     readModes(atn);
     final sets = <IntervalSet>[];
-    // First, deserialize sets with 16-bit arguments <= U+FFFF.
-    readSets(atn, sets, () => readInt());
-    // Next, if the ATN was serialized with the Unicode SMP feature,
-    // deserialize sets with 32-bit arguments <= U+10FFFF.
-    if (isFeatureSupported(ADDED_UNICODE_SMP, uuid)) {
-      readSets(atn, sets, () => readInt32());
-    }
+    readSets(atn, sets);
     readEdges(atn, sets);
     readDecisions(atn);
     readLexerActions(atn);
@@ -164,46 +101,11 @@ class ATNDeserializer {
     return atn;
   }
 
-  /// Each char value in data is shifted by +2 at the entry to this method.
-  /// This is an encoding optimization targeting the serialized values 0
-  /// and -1 (serialized to 0xFFFF), each of which are very common in the
-  /// serialized form of the ATN. In the modified UTF-8 that Java uses for
-  /// compiled string literals, these two character values have multi-byte
-  /// forms. By shifting each value by +2, they become characters 2 and 1
-  /// prior to writing the string, each of which have single-byte
-  /// representations. Since the shift occurs in the tool during ATN
-  /// serialization, each target is responsible for adjusting the values
-  /// during deserialization.
-  ///
-  /// As a special case, note that the first element of data is not
-  /// adjusted because it contains the major version number of the
-  /// serialized ATN, which was fixed at 3 at the time the value shifting
-  /// was implemented.
-  void reset(List<int> data) {
-    final adjust = (int c) {
-      final v = c;
-      return v > 1 ? v - 2 : v + 65534;
-    };
-    final temp = data.map(adjust).toList();
-    // don't adjust the first value since that's the version number
-    temp[0] = data[0];
-    this.data = temp;
-    pos = 0;
-  }
-
   void checkVersion() {
     final version = readInt();
     if (version != SERIALIZED_VERSION) {
       throw ('Could not deserialize ATN with version $version (expected $SERIALIZED_VERSION).');
     }
-  }
-
-  void checkUUID() {
-    final uuid = readUUID();
-    if (!SUPPORTED_UUIDS.contains(uuid)) {
-      throw ('Could not deserialize ATN with UUID: $uuid (expected $SERIALIZED_UUID or a legacy UUID).');
-    }
-    this.uuid = uuid;
   }
 
   ATN readATN() {
@@ -225,9 +127,6 @@ class ATNDeserializer {
       }
 
       var ruleIndex = readInt();
-      if (ruleIndex == 0xFFFF) {
-        ruleIndex = -1;
-      }
 
       final s = stateFactory(stype, ruleIndex);
       if (s is LoopEndState) {
@@ -255,12 +154,11 @@ class ATNDeserializer {
       final stateNumber = readInt();
       (atn.states[stateNumber] as DecisionState).nonGreedy = true;
     }
-    if (isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS, uuid)) {
-      final numPrecedenceStates = readInt();
-      for (var i = 0; i < numPrecedenceStates; i++) {
-        final stateNumber = readInt();
-        (atn.states[stateNumber] as RuleStartState).isLeftRecursiveRule = true;
-      }
+
+    final numPrecedenceStates = readInt();
+    for (var i = 0; i < numPrecedenceStates; i++) {
+      final stateNumber = readInt();
+      (atn.states[stateNumber] as RuleStartState).isLeftRecursiveRule = true;
     }
   }
 
@@ -276,17 +174,8 @@ class ATNDeserializer {
       atn.ruleToStartState.add(startState);
       if (atn.grammarType == ATNType.LEXER) {
         var tokenType = readInt();
-        if (tokenType == 0xFFFF) {
-          tokenType = Token.EOF;
-        }
 
         atn.ruleToTokenType.add(tokenType);
-
-        if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
-          // this piece of unused metadata was serialized prior to the
-          // addition of LexerAction
-          readInt();
-        }
       }
     }
 
@@ -310,7 +199,7 @@ class ATNDeserializer {
     }
   }
 
-  void readSets(ATN atn, List<IntervalSet> sets, readUnicode) {
+  void readSets(ATN atn, List<IntervalSet> sets) {
     final nsets = readInt();
     for (var i = 0; i < nsets; i++) {
       final nintervals = readInt();
@@ -323,8 +212,8 @@ class ATNDeserializer {
       }
 
       for (var j = 0; j < nintervals; j++) {
-        int a = readUnicode();
-        int b = readUnicode();
+        int a = readInt();
+        int b = readInt();
         set.addRange(a, b);
       }
     }
@@ -420,48 +309,14 @@ class ATNDeserializer {
 
   void readLexerActions(ATN atn) {
     if (atn.grammarType == ATNType.LEXER) {
-      if (isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
-        atn.lexerActions = List<LexerAction>.generate(readInt(), (index) {
-          final actionType = LexerActionType.values[readInt()];
-          var data1 = readInt();
-          if (data1 == 0xFFFF) {
-            data1 = -1;
-          }
+      atn.lexerActions = List<LexerAction>.generate(readInt(), (index) {
+        final actionType = LexerActionType.values[readInt()];
+        var data1 = readInt();
+        var data2 = readInt();
+        final lexerAction = lexerActionFactory(actionType, data1, data2);
 
-          var data2 = readInt();
-          if (data2 == 0xFFFF) {
-            data2 = -1;
-          }
-          final lexerAction = lexerActionFactory(actionType, data1, data2);
-
-          return lexerAction;
-        });
-      } else {
-        // for compatibility with older serialized ATNs, convert the old
-        // serialized action index for action transitions to the new
-        // form, which is the index of a LexerCustomAction
-        final legacyLexerActions = <LexerAction>[];
-        for (var state in atn.states) {
-          if (state == null) {
-            continue;
-          }
-          for (var i = 0; i < state.numberOfTransitions; i++) {
-            final transition = state.transition(i);
-            if (transition is ActionTransition) {
-              final ruleIndex = transition.ruleIndex;
-              final actionIndex = transition.actionIndex;
-              final lexerAction = LexerCustomAction(ruleIndex, actionIndex);
-              state.setTransition(
-                  i,
-                  ActionTransition(transition.target, ruleIndex,
-                      legacyLexerActions.length, false));
-              legacyLexerActions.add(lexerAction);
-            }
-          }
-        }
-
-        atn.lexerActions = legacyLexerActions;
-      }
+        return lexerAction;
+      });
     }
   }
 
@@ -664,51 +519,6 @@ class ATNDeserializer {
 
   int readInt() {
     return data[pos++];
-  }
-
-  int readInt32() {
-    final low = readInt();
-    final high = readInt();
-    return low | (high << 16);
-  }
-
-  int readLong() {
-    final low = readInt32();
-    final high = readInt32();
-    return (low & 0x00000000FFFFFFFF) | (high << 32);
-  }
-
-  static final byteToHex = List.generate(
-      256, (i) => i.toRadixString(16).padLeft(2, '0').toUpperCase());
-
-  String readUUID() {
-    final bb = List<int>.filled(16, 0);
-
-    for (var i = 7; i >= 0; i--) {
-      final int = readInt();
-      bb[(2 * i) + 1] = int & 0xFF;
-      bb[2 * i] = (int >> 8) & 0xFF;
-    }
-    return byteToHex[bb[0]] +
-        byteToHex[bb[1]] +
-        byteToHex[bb[2]] +
-        byteToHex[bb[3]] +
-        '-' +
-        byteToHex[bb[4]] +
-        byteToHex[bb[5]] +
-        '-' +
-        byteToHex[bb[6]] +
-        byteToHex[bb[7]] +
-        '-' +
-        byteToHex[bb[8]] +
-        byteToHex[bb[9]] +
-        '-' +
-        byteToHex[bb[10]] +
-        byteToHex[bb[11]] +
-        byteToHex[bb[12]] +
-        byteToHex[bb[13]] +
-        byteToHex[bb[14]] +
-        byteToHex[bb[15]];
   }
 
   Transition edgeFactory(

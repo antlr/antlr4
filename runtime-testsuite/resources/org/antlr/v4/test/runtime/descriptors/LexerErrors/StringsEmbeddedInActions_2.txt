@@ -1,0 +1,20 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ACTION2 : '[' (STRING | ~'"')*? ']';
+STRING : '"' ('\\\\' '"' | .)*? '"';
+WS : [ \t\r\n]+ -> skip;
+
+[input]
+["foo]
+
+[output]
+"""[@0,6:5='<EOF>',<-1>,1:6]
+"""
+
+[errors]
+"""line 1:0 token recognition error at: '["foo]'
+"""
+

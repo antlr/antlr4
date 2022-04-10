@@ -1,61 +1,13 @@
-/// 
+///
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// 
-
-
-
-/// 
-/// 
-/// -  Sam Harwell
-/// 
+///
 
 import Foundation
 
 public class ATNDeserializer {
-    public static let SERIALIZED_VERSION = 3
-
-    ///
-    /// This is the earliest supported serialized UUID.
-    /// 
-    private static let BASE_SERIALIZED_UUID = UUID(uuidString: "33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3")!
-
-    /// 
-    /// This UUID indicates an extension of _BASE_SERIALIZED_UUID_ for the
-    /// addition of precedence predicates.
-    /// 
-    private static let ADDED_PRECEDENCE_TRANSITIONS = UUID(uuidString: "1DA0C57D-6C06-438A-9B27-10BCB3CE0F61")!
-    /// 
-    /// This UUID indicates an extension of _#ADDED_PRECEDENCE_TRANSITIONS_
-    /// for the addition of lexer actions encoded as a sequence of
-    /// _org.antlr.v4.runtime.atn.LexerAction_ instances.
-    /// 
-    private static let ADDED_LEXER_ACTIONS = UUID(uuidString: "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E")!
-
-    /// 
-    /// This UUID indicates the serialized ATN contains two sets of
-    /// IntervalSets, where the second set's values are encoded as
-    /// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-    /// 
-    private static let ADDED_UNICODE_SMP = UUID(uuidString: "59627784-3BE5-417A-B9EB-8131A7286089")!
-
-    /// 
-    /// This list contains all of the currently supported UUIDs, ordered by when
-    /// the feature first appeared in this branch.
-    /// 
-    private static let SUPPORTED_UUIDS = [
-        ATNDeserializer.BASE_SERIALIZED_UUID,
-        ATNDeserializer.ADDED_PRECEDENCE_TRANSITIONS,
-        ATNDeserializer.ADDED_LEXER_ACTIONS,
-        ATNDeserializer.ADDED_UNICODE_SMP,
-        ]
-
-    /// 
-    /// This is the current serialized UUID.
-    /// 
-    public static let SERIALIZED_UUID = ADDED_UNICODE_SMP
-
+    public static let SERIALIZED_VERSION = 4
 
     private let deserializationOptions: ATNDeserializationOptions
 
@@ -63,61 +15,15 @@ public class ATNDeserializer {
         self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions()
     }
 
-    /// 
-    /// Determines if a particular serialized representation of an ATN supports
-    /// a particular feature, identified by the _java.util.UUID_ used for serializing
-    /// the ATN at the time the feature was first introduced.
-    /// 
-    /// - parameter feature: The _java.util.UUID_ marking the first time the feature was
-    /// supported in the serialized ATN.
-    /// - parameter actualUuid: The _java.util.UUID_ of the actual serialized ATN which is
-    /// currently being deserialized.
-    /// - returns: `true` if the `actualUuid` value represents a
-    /// serialized ATN at or after the feature identified by `feature` was
-    /// introduced; otherwise, `false`.
-    /// 
-    internal func isFeatureSupported(_ feature: UUID, _ actualUuid: UUID) -> Bool {
-        let supported = ATNDeserializer.SUPPORTED_UUIDS
-        guard let featureIndex = supported.firstIndex(of: feature),
-            let actualIndex = supported.firstIndex(of: actualUuid) else {
-                return false
-        }
-        return actualIndex >= featureIndex
-    }
-
-
-    public func deserialize(_ inData: [Character]) throws -> ATN {
-        // don't adjust the first value since that's the version number
-        let data = [inData[0].unicodeValue] + inData[1...].map { Int(integerLiteral: $0.unicodeValue - 2) }
-
+    public func deserialize(_ data: [Int]) throws -> ATN {
         var p = 0
+
         let version = data[p]
         p += 1
         if version != ATNDeserializer.SERIALIZED_VERSION {
             let reason = "Could not deserialize ATN with version \(version) (expected \(ATNDeserializer.SERIALIZED_VERSION))."
             throw ANTLRError.unsupportedOperation(msg: reason)
         }
-
-        let uuidChars: [Character] = data[p..<(p+8)].map{Character(UnicodeScalar($0)!)}
-        let uuidBytes: [UInt8] = [ // crude approach to get correct order!
-            UInt8(uuidChars[7].unicodeValue>>8), UInt8(uuidChars[7].unicodeValue&255),
-            UInt8(uuidChars[6].unicodeValue>>8), UInt8(uuidChars[6].unicodeValue&255),
-            UInt8(uuidChars[5].unicodeValue>>8), UInt8(uuidChars[5].unicodeValue&255),
-            UInt8(uuidChars[4].unicodeValue>>8), UInt8(uuidChars[4].unicodeValue&255),
-            UInt8(uuidChars[3].unicodeValue>>8), UInt8(uuidChars[3].unicodeValue&255),
-            UInt8(uuidChars[2].unicodeValue>>8), UInt8(uuidChars[2].unicodeValue&255),
-            UInt8(uuidChars[1].unicodeValue>>8), UInt8(uuidChars[1].unicodeValue&255),
-            UInt8(uuidChars[0].unicodeValue>>8), UInt8(uuidChars[0].unicodeValue&255)
-        ]
-        let uuid = UUID(uuidString: NSUUID(uuidBytes:uuidBytes).uuidString)!
-        p += 8
-        if !ATNDeserializer.SUPPORTED_UUIDS.contains(uuid) {
-            let reason = "Could not deserialize ATN with UUID \(uuid) (expected \(ATNDeserializer.SERIALIZED_UUID) or a legacy UUID)."
-            throw ANTLRError.unsupportedOperation(msg: reason)
-        }
-
-        let supportsPrecedencePredicates = isFeatureSupported(ATNDeserializer.ADDED_PRECEDENCE_TRANSITIONS, uuid)
-        let supportsLexerActions = isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid)
 
         let grammarType = ATNType(rawValue: data[p])!
         p += 1
@@ -143,11 +49,6 @@ public class ATNDeserializer {
 
             var ruleIndex = data[p]
             p += 1
-            if ruleIndex == Int.max {
-                // Character.MAX_VALUE
-                ruleIndex = -1
-            }
-
             let s = try stateFactory(stype, ruleIndex)!
             if stype == ATNState.LOOP_END {
                 // special case
@@ -179,14 +80,12 @@ public class ATNDeserializer {
             (atn.states[stateNumber] as! DecisionState).nonGreedy = true
         }
 
-        if supportsPrecedencePredicates {
-            let numPrecedenceStates = data[p]
+        let numPrecedenceStates = data[p]
+        p += 1
+        for _ in 0..<numPrecedenceStates {
+            let stateNumber = data[p]
             p += 1
-            for _ in 0..<numPrecedenceStates {
-                let stateNumber = data[p]
-                p += 1
-                (atn.states[stateNumber] as! RuleStartState).isPrecedenceRule = true
-            }
+            (atn.states[stateNumber] as! RuleStartState).isPrecedenceRule = true
         }
 
         //
@@ -205,21 +104,7 @@ public class ATNDeserializer {
             if atn.grammarType == ATNType.lexer {
                 var tokenType = data[p]
                 p += 1
-                if tokenType == 0xFFFF {
-                    tokenType = CommonToken.EOF
-                }
-
                 ruleToTokenType.append(tokenType)
-
-                if !isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid) {
-                    // this piece of unused metadata was serialized prior to the
-                    // addition of LexerAction
-                    var actionIndexIgnored = data[p]
-                    p += 1
-                    if actionIndexIgnored == 0xFFFF {
-                        actionIndexIgnored = -1
-                    }
-                }
             }
         }
         atn.ruleToStartState = ruleToStartState
@@ -245,14 +130,7 @@ public class ATNDeserializer {
         //
         var sets = [IntervalSet]()
 
-        // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        readSets(data, &p, &sets, readUnicodeInt)
-
-        // Next, if the ATN was serialized with the Unicode SMP feature,
-        // deserialize sets with 32-bit arguments <= U+10FFFF.
-        if isFeatureSupported(ATNDeserializer.ADDED_UNICODE_SMP, uuid) {
-            readSets(data, &p, &sets, readUnicodeInt32)
-        }
+        readSets(data, &p, &sets, readInt)
 
         //
         // EDGES
@@ -281,62 +159,43 @@ public class ATNDeserializer {
         //
         let ndecisions = data[p]
         p += 1
-        for i in 1...ndecisions {
-            let s = data[p]
-            p += 1
-            let decState = atn.states[s] as! DecisionState
-            atn.appendDecisionToState(decState)
-            decState.decision = i - 1
+        if (ndecisions >= 1) {
+            for i in 1...ndecisions {
+                let s = data[p]
+                p += 1
+                let decState = atn.states[s] as! DecisionState
+                atn.appendDecisionToState(decState)
+                decState.decision = i - 1
+            }
         }
 
         //
         // LEXER ACTIONS
         //
         if atn.grammarType == ATNType.lexer {
-            if supportsLexerActions {
-                let length = data[p]
+            let length = data[p]
+            p += 1
+            var lexerActions = [LexerAction]()
+            for _ in 0..<length {
+                let actionType = LexerActionType(rawValue: data[p])!
                 p += 1
-                var lexerActions = [LexerAction]()
-                for _ in 0..<length {
-                    let actionType = LexerActionType(rawValue: data[p])!
-                    p += 1
-                    var data1 = data[p]
-                    p += 1
-                    if data1 == 0xFFFF {
-                        data1 = -1
-                    }
-
-                    var data2 = data[p]
-                    p += 1
-                    if data2 == 0xFFFF {
-                        data2 = -1
-                    }
-
-                    let lexerAction = lexerActionFactory(actionType, data1, data2)
-                    lexerActions.append(lexerAction)
-                }
-                atn.lexerActions = lexerActions
-
+                var data1 = data[p]
+                p += 1
+                var data2 = data[p]
+                p += 1
+                let lexerAction = lexerActionFactory(actionType, data1, data2)
+                lexerActions.append(lexerAction)
             }
-            else {
-                convertOldActionTransitions(atn)
-            }
+            atn.lexerActions = lexerActions
         }
 
         try finalizeATN(atn)
         return atn
     }
 
-
-    private func readUnicodeInt(_ data: [Int], _ p: inout Int) -> Int {
+    private func readInt(_ data: [Int], _ p: inout Int) -> Int {
         let result = data[p]
         p += 1
-        return result
-    }
-
-    private func readUnicodeInt32(_ data: [Int], _ p: inout Int) -> Int {
-        let result = toInt32(data[p..<p+2].map{Character(UnicodeScalar($0)!)}, 0)
-        p += 2
         return result
     }
 
@@ -359,218 +218,6 @@ public class ATNDeserializer {
                 try! set.add(readUnicode(data, &p), readUnicode(data, &p))
             }
         }
-    }
-
-    public func deserializeFromJson(_ jsonStr: String) -> ATN {
-        guard !jsonStr.isEmpty else {
-            fatalError("ATN Serialization is empty,Please include *LexerATN.json and  *ParserATN.json in TARGETS-Build Phases-Copy Bundle Resources")
-        }
-        if let JSONData = jsonStr.data(using: .utf8) {
-            do {
-                let JSON = try JSONSerialization.jsonObject(with: JSONData, options: JSONSerialization.ReadingOptions(rawValue: 0))
-                guard let JSONDictionary = JSON as? [String: Any] else {
-                    fatalError("deserializeFromJson Not a Dictionary")
-                }
-
-                return try dictToJson(JSONDictionary)
-
-            } catch let JSONError {
-                print("\(JSONError)")
-            }
-        }
-
-        fatalError("Could not deserialize ATN ")
-    }
-
-    public func dictToJson(_ dict: [String: Any]) throws -> ATN {
-        let version = dict["version"] as! Int
-        if version != ATNDeserializer.SERIALIZED_VERSION {
-            let reason = "Could not deserialize ATN with version \(version) (expected \(ATNDeserializer.SERIALIZED_VERSION))."
-            throw ANTLRError.unsupportedOperation(msg: reason)
-        }
-
-        let uuid = UUID(uuidString: dict["uuid"] as! String)!
-
-        if !ATNDeserializer.SUPPORTED_UUIDS.contains(uuid) {
-            let reason = "Could not deserialize ATN with UUID \(uuid) (expected \(ATNDeserializer.SERIALIZED_UUID) or a legacy UUID)."
-
-            throw ANTLRError.unsupportedOperation(msg: reason)
-        }
-
-        let supportsPrecedencePredicates = isFeatureSupported(ATNDeserializer.ADDED_PRECEDENCE_TRANSITIONS, uuid)
-        let supportsLexerActions = isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid)
-
-        let grammarType = ATNType(rawValue: dict["grammarType"] as! Int)!
-        let maxTokenType = dict["maxTokenType"] as! Int
-        let atn = ATN(grammarType, maxTokenType)
-
-        //
-        // STATES
-        //
-        var loopBackStateNumbers = [(LoopEndState, Int)]()
-        var endStateNumbers = [(BlockStartState, Int)]()
-
-        let states = dict["states"] as! [[String: Any]]
-        
-        for state in states {
-            let ruleIndex = state["ruleIndex"] as! Int
-            let stype = state["stateType"] as! Int
-            let s = try stateFactory(stype, ruleIndex)!
-            if stype == ATNState.LOOP_END {
-                // special case
-                let loopBackStateNumber = state["detailStateNumber"] as! Int
-                loopBackStateNumbers.append((s as! LoopEndState, loopBackStateNumber))
-            }
-            else if let bsState = s as? BlockStartState {
-                let endStateNumber = state["detailStateNumber"] as! Int
-                endStateNumbers.append((bsState, endStateNumber))
-            }
-            atn.addState(s)
-        }
-
-        // delay the assignment of loop back and end states until we know all the state instances have been initialized
-        for pair in loopBackStateNumbers {
-            pair.0.loopBackState = atn.states[pair.1]
-        }
-
-        for pair in endStateNumbers {
-            pair.0.endState = atn.states[pair.1] as? BlockEndState
-        }
-
-        let numNonGreedyStates = dict["nonGreedyStates"] as! [Int]
-        for numNonGreedyState in numNonGreedyStates {
-            (atn.states[numNonGreedyState] as! DecisionState).nonGreedy = true
-        }
-
-        if supportsPrecedencePredicates {
-            let numPrecedenceStates = dict["precedenceStates"] as! [Int]
-            for numPrecedenceState in numPrecedenceStates {
-                (atn.states[numPrecedenceState] as! RuleStartState).isPrecedenceRule = true
-            }
-        }
-
-        //
-        // RULES
-        //
-        let ruleToStartState = dict["ruleToStartState"] as! [[String: Any]]
-        let nrules = ruleToStartState.count
-        var ruleToTokenType = [Int]()
-        var ruleToStartStateParsed = [RuleStartState]()
-        for i in 0..<nrules {
-            let currentRuleToStartState = ruleToStartState[i]
-            let s = currentRuleToStartState["stateNumber"] as! Int
-            let startState = atn.states[s] as! RuleStartState
-            ruleToStartStateParsed.append(startState)
-
-            if atn.grammarType == ATNType.lexer {
-                var tokenType = currentRuleToStartState["ruleToTokenType"] as! Int
-                if tokenType == -1 {
-                    tokenType = CommonToken.EOF
-                }
-                ruleToTokenType.append(tokenType)
-            }
-        }
-        atn.ruleToStartState = ruleToStartStateParsed
-        if atn.grammarType == ATNType.lexer {
-            atn.ruleToTokenType = ruleToTokenType
-        }
-
-        fillRuleToStopState(atn)
-
-        //
-        // MODES
-        //
-        let modeToStartState = dict["modeToStartState"] as! [Int]
-        for stateNumber in modeToStartState {
-            atn.appendModeToStartState(atn.states[stateNumber] as! TokensStartState)
-        }
-
-        //
-        // SETS
-        //
-        var sets = [IntervalSet]()
-        let nsets = dict["nsets"] as! Int
-        let intervalSet = dict["IntervalSet"] as! [[String: Any]]
-
-        for i in 0..<nsets {
-            let setBuilder = intervalSet[i]
-            let nintervals = setBuilder["size"] as! Int
-
-            let set = IntervalSet()
-            sets.append(set)
-
-            let containsEof = (setBuilder["containsEof"] as! Int) != 0
-            if containsEof {
-                try! set.add(-1)
-            }
-            let intervalsBuilder = setBuilder["Intervals"] as! [[String: Any]]
-
-            for j in 0..<nintervals {
-                let vals = intervalsBuilder[j]
-                try! set.add((vals["a"] as! Int), (vals["b"] as! Int))
-            }
-        }
-
-
-        //
-        // EDGES
-        //
-        let allTransitions = dict["allTransitionsBuilder"] as! [[[String: Any]]]
-
-        for transitionsBuilder in allTransitions {
-            for transition in transitionsBuilder {
-                let src = transition["src"] as! Int
-                let trg = transition["trg"] as! Int
-                let ttype = transition["edgeType"] as! Int
-                let arg1 = transition["arg1"] as! Int
-                let arg2 = transition["arg2"] as! Int
-                let arg3 = transition["arg3"] as! Int
-                let trans = try edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
-
-                let srcState = atn.states[src]!
-                srcState.addTransition(trans)
-            }
-        }
-
-        deriveEdgesForRuleStopStates(atn)
-        try validateStates(atn)
-
-        //
-        // DECISIONS
-        //
-        let ndecisions = dict["decisionToState"] as! [Int]
-        let length = ndecisions.count
-        for i in 0..<length {
-            let s = ndecisions[i]
-            let decState = atn.states[s] as! DecisionState
-            atn.appendDecisionToState(decState)
-            decState.decision = i
-        }
-
-        //
-        // LEXER ACTIONS
-        //
-        if atn.grammarType == ATNType.lexer {
-            let lexerActionsBuilder = dict["lexerActions"] as! [[String: Any]]
-            if supportsLexerActions {
-                var lexerActions = [LexerAction]()
-                for lexerActionDict in lexerActionsBuilder {
-                    let actionTypeValue = lexerActionDict["actionType"] as! Int
-                    let actionType = LexerActionType(rawValue: actionTypeValue)!
-                    let data1 = lexerActionDict["a"] as! Int
-                    let data2 = lexerActionDict["b"] as! Int
-                    let lexerAction = lexerActionFactory(actionType, data1, data2)
-                    lexerActions.append(lexerAction)
-                }
-                atn.lexerActions = lexerActions
-            }
-            else {
-                convertOldActionTransitions(atn)
-            }
-        }
-
-        try finalizeATN(atn)
-        return atn
     }
 
     private func fillRuleToStopState(_ atn: ATN) {
@@ -611,33 +258,6 @@ public class ATNDeserializer {
             }
         }
     }
-
-
-    /// for compatibility with older serialized ATNs, convert the old
-    /// serialized action index for action transitions to the new
-    /// form, which is the index of a LexerCustomAction
-    private func convertOldActionTransitions(_ atn: ATN) {
-        var legacyLexerActions = [LexerAction]()
-        for state in atn.states {
-            guard let state = state else {
-                continue
-            }
-            let length = state.getNumberOfTransitions()
-            for i in 0..<length {
-                guard let transition = state.transition(i) as? ActionTransition else {
-                    continue
-                }
-
-                let ruleIndex = transition.ruleIndex
-                let actionIndex = transition.actionIndex
-                let lexerAction = LexerCustomAction(ruleIndex, actionIndex)
-                state.setTransition(i, ActionTransition(transition.target, ruleIndex, legacyLexerActions.count, false))
-                legacyLexerActions.append(lexerAction)
-            }
-        }
-        atn.lexerActions = legacyLexerActions
-    }
-
 
     private func validateStates(_ atn: ATN) throws {
         for state in atn.states {
@@ -696,9 +316,9 @@ public class ATNDeserializer {
     /// Analyze the _org.antlr.v4.runtime.atn.StarLoopEntryState_ states in the specified ATN to set
     /// the _org.antlr.v4.runtime.atn.StarLoopEntryState#precedenceRuleDecision_ field to the
     /// correct value.
-    /// 
+    ///
     /// - parameter atn: The ATN.
-    /// 
+    ///
     internal func markPrecedenceDecisions(_ atn: ATN) {
         for state in atn.states {
             ///

@@ -8,6 +8,7 @@
 #include "atn/PredicateTransition.h"
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
+#include "support/Casts.h"
 #include "support/CPPUtils.h"
 
 #include "FailedPredicateException.h"
@@ -26,10 +27,10 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
                          recognizer->getInputStream(), recognizer->getContext(), recognizer->getCurrentToken()) {
 
   atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[recognizer->getState()];
-  atn::Transition *transition = s->transitions[0];
-  if (is<atn::PredicateTransition*>(transition)) {
-    _ruleIndex = static_cast<atn::PredicateTransition *>(transition)->ruleIndex;
-    _predicateIndex = static_cast<atn::PredicateTransition *>(transition)->predIndex;
+  const atn::Transition *transition = s->transitions[0].get();
+  if (transition->getTransitionType() == atn::TransitionType::PREDICATE) {
+    _ruleIndex = downCast<const atn::PredicateTransition&>(*transition).getRuleIndex();
+    _predicateIndex = downCast<const atn::PredicateTransition&>(*transition).getPredIndex();
   } else {
     _ruleIndex = 0;
     _predicateIndex = 0;

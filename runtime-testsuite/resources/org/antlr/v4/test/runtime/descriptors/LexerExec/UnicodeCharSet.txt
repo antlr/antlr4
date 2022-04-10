@@ -1,0 +1,17 @@
+[notes]
+regression test for antlr/antlr4#1925
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ID : ([A-Z_]|'Ā'..'\uFFFC') ([A-Z_0-9]|'Ā'..'\uFFFC')*; // FFFD+ are not valid char
+
+[input]
+均
+
+[output]
+[@0,0:0='均',<1>,1:0]
+[@1,1:0='<EOF>',<-1>,1:1]
+

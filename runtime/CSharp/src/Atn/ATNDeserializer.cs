@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -16,52 +14,10 @@ namespace Antlr4.Runtime.Atn
     /// <author>Sam Harwell</author>
     public class ATNDeserializer
     {
-        public static readonly int SerializedVersion = 3;
-
-        /// <summary>This is the earliest supported serialized UUID.</summary>
-        /// <remarks>This is the earliest supported serialized UUID.</remarks>
-        private static readonly Guid BaseSerializedUuid;
-
-        /// <summary>
-        /// This UUID indicates the serialized ATN contains two sets of
-        /// IntervalSets, where the second set's values are encoded as
-        /// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-        /// </summary>
-        /// <remarks>
-        /// This UUID indicates the serialized ATN contains two sets of
-        /// IntervalSets, where the second set's values are encoded as
-        /// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-        /// </remarks>
-        private static readonly Guid AddedUnicodeSmp;
-
-        /// <summary>
-        /// This list contains all of the currently supported UUIDs, ordered by when
-        /// the feature first appeared in this branch.
-        /// </summary>
-        /// <remarks>
-        /// This list contains all of the currently supported UUIDs, ordered by when
-        /// the feature first appeared in this branch.
-        /// </remarks>
-        private static readonly IList<Guid> SupportedUuids;
-
-        /// <summary>This is the current serialized UUID.</summary>
-        /// <remarks>This is the current serialized UUID.</remarks>
-        public static readonly Guid SerializedUuid;
-
-        static ATNDeserializer()
-        {
-			BaseSerializedUuid = new Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
-			AddedUnicodeSmp = new Guid("59627784-3BE5-417A-B9EB-8131A7286089");
-            SupportedUuids = new List<Guid>();
-            SupportedUuids.Add(BaseSerializedUuid);
-            SupportedUuids.Add(AddedUnicodeSmp);
-			SerializedUuid = AddedUnicodeSmp;
-        }
+        public static readonly int SerializedVersion = 4;
 
         [NotNull]
         private readonly ATNDeserializationOptions deserializationOptions;
-
-        private Guid uuid;
 
         public ATNDeserializer()
             : this(ATNDeserializationOptions.Default)
@@ -77,66 +33,20 @@ namespace Antlr4.Runtime.Atn
             this.deserializationOptions = deserializationOptions;
         }
 
-        /// <summary>
-        /// Determines if a particular serialized representation of an ATN supports
-        /// a particular feature, identified by the
-        /// <see cref="Guid"/>
-        /// used for serializing
-        /// the ATN at the time the feature was first introduced.
-        /// </summary>
-        /// <param name="feature">
-        /// The
-        /// <see cref="Guid"/>
-        /// marking the first time the feature was
-        /// supported in the serialized ATN.
-        /// </param>
-        /// <param name="actualUuid">
-        /// The
-        /// <see cref="Guid"/>
-        /// of the actual serialized ATN which is
-        /// currently being deserialized.
-        /// </param>
-        /// <returns>
-        ///
-        /// <see langword="true"/>
-        /// if the
-        /// <paramref name="actualUuid"/>
-        /// value represents a
-        /// serialized ATN at or after the feature identified by
-        /// <paramref name="feature"/>
-        /// was
-        /// introduced; otherwise,
-        /// <see langword="false"/>
-        /// .
-        /// </returns>
-        protected internal virtual bool IsFeatureSupported(Guid feature, Guid actualUuid)
-        {
-            int featureIndex = SupportedUuids.IndexOf(feature);
-            if (featureIndex < 0)
-            {
-                return false;
-            }
-            return SupportedUuids.IndexOf(actualUuid) >= featureIndex;
-        }
-
-		char[] data;
+		int[] data;
 		int p;
 
-        public virtual ATN Deserialize(char[] data)
+        public virtual ATN Deserialize(int[] data)
         {
-			Reset (data);
+	        this.data = data;
 			CheckVersion ();
-			CheckUUID ();
 			ATN atn = ReadATN ();
 			ReadStates (atn);
 			ReadRules (atn);
 			ReadModes (atn);
 			IList<IntervalSet> sets = new List<IntervalSet>();
-			ReadSets (atn, sets, this.ReadInt);
-			if (IsFeatureSupported(AddedUnicodeSmp, uuid)) {
-				ReadSets (atn, sets, this.ReadInt32);
-			}
-			ReadEdges (atn, sets);
+			ReadSets (atn, sets);
+	        ReadEdges (atn, sets);
 			ReadDecisions (atn);
 			ReadLexerActions (atn);
             MarkPrecedenceDecisions(atn);
@@ -279,15 +189,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					LexerActionType actionType = (LexerActionType)ReadInt();
 					int data1 = ReadInt();
-					if (data1 == unchecked((int)(0xFFFF)))
-					{
-						data1 = -1;
-					}
 					int data2 = ReadInt();
-					if (data2 == unchecked((int)(0xFFFF)))
-					{
-						data2 = -1;
-					}
 					ILexerAction lexerAction = LexerActionFactory(actionType, data1, data2);
 					atn.lexerActions[i_10] = lexerAction;
 				}
@@ -398,7 +300,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
+		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets)
 		{
 			//
 			// SETS
@@ -416,7 +318,7 @@ namespace Antlr4.Runtime.Atn
 				}
 				for (int j = 0; j < nintervals; j++)
 				{
-					set.Add(readUnicode(), readUnicode());
+					set.Add(ReadInt(), ReadInt());
 				}
 			}
 		}
@@ -458,9 +360,6 @@ namespace Antlr4.Runtime.Atn
 				atn.ruleToStartState[i_5] = startState;
 				if (atn.grammarType == ATNType.Lexer) {
 					int tokenType = ReadInt ();
-					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.EOF;
-					}
 					atn.ruleToTokenType [i_5] = tokenType;
 				}
 			}
@@ -546,16 +445,6 @@ namespace Antlr4.Runtime.Atn
 			return new ATN(grammarType, maxTokenType);
 		}
 
-		protected internal virtual void CheckUUID()
-		{
-			uuid = ReadUUID();
-			if (!SupportedUuids.Contains(uuid))
-			{
-				string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID {0} (expected {1} or a legacy UUID).", uuid, SerializedUuid);
-				throw new NotSupportedException(reason);
-			}
-		}
-
 		protected internal virtual void CheckVersion()
 		{
 			int version = ReadInt();
@@ -564,18 +453,6 @@ namespace Antlr4.Runtime.Atn
 				string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version {0} (expected {1}).", version, SerializedVersion);
 				throw new NotSupportedException(reason);
 			}
-		}
-
-		protected internal virtual void Reset(char[] data)
-		{
-			this.data = new char[data.Length];
-			// don't adjust the first value since that's the version number
-			this.data[0] = data[0];
-			for (int i = 1; i < data.Length; i++)
-			{
-				this.data[i] = (char)(data[i] - 2);
-			}
-			this.p = 0;
 		}
 
         /// <summary>
@@ -1076,30 +953,6 @@ nextTransition_continue: ;
         protected internal int ReadInt()
         {
 			return data[p++];
-        }
-
-        protected internal int ReadInt32()
-        {
-			return (int)data[p++] | ((int)data[p++] << 16);
-        }
-
-        protected internal long ReadLong()
-        {
-            long lowOrder = ReadInt32() & unchecked((long)(0x00000000FFFFFFFFL));
-            return lowOrder | ((long)ReadInt32() << 32);
-        }
-
-        protected internal Guid ReadUUID()
-        {
-			byte[] d = BitConverter.GetBytes (ReadLong ());
-			if(BitConverter.IsLittleEndian)
-			{
-				Array.Reverse(d);
-			}
-			short c = (short)ReadInt();
-			short b = (short)ReadInt();
-			int a = ReadInt32();
-            return new Guid(a, b, c, d);
         }
 
         [return: NotNull]

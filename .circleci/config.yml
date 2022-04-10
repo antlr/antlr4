@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test_tool_and_runtime_java:
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:11.0
     steps:
       - checkout
       - run:
@@ -13,13 +13,13 @@ jobs:
           name: test runtime
           command: |
             cd runtime-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
+            mvn -Dparallel=classes -DthreadCount=4 -Dtest=java.** test
             cd ..
       - run:
           name: test tool
           command: |
             cd tool-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 test
+            mvn -Dparallel=classes -DthreadCount=4 test
             cd ..
   test_runtime:
     parameters:
@@ -32,7 +32,11 @@ jobs:
         type: string
         default: java
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:11.0
+        environment:
+          MAVEN_OPTS: -Xmx512m
+    parallelism: 4
+    resource_class: large
     environment:
       TARGET: << parameters.target >>
       GROUP: << parameters.test-group >>
@@ -57,10 +61,4 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ dart, go, python2, python3, javascript, php ]
-      - test_runtime:
-          matrix:
-            parameters:
-#              target: [ cpp, dotnet, swift ]
-              target: [ cpp, dotnet, dart ]
-              test-group: [ LEXER, PARSER, RECURSION ]
+              target: [ dart, go, python2, python3, javascript, php, cpp, dotnet ]

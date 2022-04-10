@@ -20,7 +20,7 @@
 /// * _#consume_
 /// * _#size_
 /// 
-public protocol IntStream: class {
+public protocol IntStream: AnyObject {
 
     /// 
     /// Consumes the current symbol in the stream. This method has the following

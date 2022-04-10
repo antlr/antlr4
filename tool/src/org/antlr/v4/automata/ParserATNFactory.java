@@ -110,17 +110,7 @@ public class ParserATNFactory implements ATNFactory {
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
-
-		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
-			LL1Analyzer analyzer = new LL1Analyzer(atn);
-			ATNState blkStart = pair.b;
-			ATNState blkStop = pair.c;
-			IntervalSet lookahead = analyzer.LOOK(blkStart, blkStop, null);
-			if ( lookahead.contains(org.antlr.v4.runtime.Token.EPSILON)) {
-				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
-				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
-			}
-		}
+		checkEpsilonClosure();
 
 		optionalCheck:
 		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonOptionalBlocks) {
@@ -145,6 +135,22 @@ public class ParserATNFactory implements ATNFactory {
 		}
 
 		return atn;
+	}
+
+	protected void checkEpsilonClosure() {
+		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
+			LL1Analyzer analyzer = new LL1Analyzer(atn);
+			ATNState blkStart = pair.b;
+			ATNState blkStop = pair.c;
+			IntervalSet lookahead = analyzer.LOOK(blkStart, blkStop, null);
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EPSILON)) {
+				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
+				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EOF)) {
+				g.tool.errMgr.grammarError(ErrorType.EOF_CLOSURE, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+		}
 	}
 
 	protected void _createATN(Collection<Rule> rules) {
@@ -466,12 +472,21 @@ public class ParserATNFactory implements ATNFactory {
             if ( el.left.getNumberOfTransitions()==1 ) tr = el.left.transition(0);
             boolean isRuleTrans = tr instanceof RuleTransition;
             if ( el.left.getStateType() == ATNState.BASIC &&
+				el.right != null &&
 				el.right.getStateType()== ATNState.BASIC &&
-				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) )
-			{
+				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) ) {
 				// we can avoid epsilon edge to next el
-				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;
-                else tr.target = els.get(i+1).left;
+				Handle handle = null;
+				if (i + 1 < els.size()) {
+					handle = els.get(i + 1);
+				}
+				if (handle != null) {
+					if (isRuleTrans) {
+						((RuleTransition) tr).followState = handle.left;
+					} else {
+						tr.target = handle.left;
+					}
+				}
 				atn.removeState(el.right); // we skipped over this state
 			}
 			else { // need epsilon if previous block's right end node is complicated
@@ -479,11 +494,16 @@ public class ParserATNFactory implements ATNFactory {
 			}
 		}
 		Handle first = els.get(0);
-		Handle last = els.get(n -1);
-		if ( first==null || last==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "element list has first|last == null");
+		Handle last = els.get(n - 1);
+		ATNState left = null;
+		if (first != null) {
+			left = first.left;
 		}
-		return new Handle(first.left, last.right);
+		ATNState right = null;
+		if (last != null) {
+			right = last.right;
+		}
+		return new Handle(left, right);
 	}
 
 	/**

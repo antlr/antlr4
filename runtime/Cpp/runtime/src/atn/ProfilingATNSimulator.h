@@ -13,7 +13,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ProfilingATNSimulator : public ParserATNSimulator {
   public:
-    ProfilingATNSimulator(Parser *parser);
+    explicit ProfilingATNSimulator(Parser *parser);
 
     virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext) override;
 
@@ -46,7 +46,7 @@ namespace atn {
     virtual dfa::DFAState* getExistingTargetState(dfa::DFAState *previousD, size_t t) override;
     virtual dfa::DFAState* computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) override;
     virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx) override;
-    virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
+    virtual bool evalSemanticContext(Ref<const SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                      size_t alt, bool fullCtx) override;
     virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts, ATNConfigSet *configs,
                                              size_t startIndex, size_t stopIndex) override;

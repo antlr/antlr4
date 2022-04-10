@@ -10,6 +10,16 @@ import (
 	"strings"
 )
 
+
+/* Assume the following grammar for this test.
+
+lexer grammar LexerA;
+A : 'a';
+B : 'b';
+C : 'c';
+
+*/
+
 func TestInsertBeforeIndex0(t *testing.T){
 	input := NewInputStream("abc")
 	lexer := NewLexerA(input)
@@ -318,17 +328,17 @@ func TestLexerA(t *testing.T){
 var _ = fmt.Printf
 var _ = unicode.IsLetter
 
-var serializedLexerAtn = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 2, 5, 15, 8,
-	1, 4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 3,
-	4, 2, 2, 5, 3, 3, 5, 4, 7, 5, 3, 2, 2, 2, 14, 2, 3, 3, 2, 2, 2, 2, 5, 3,
-	2, 2, 2, 2, 7, 3, 2, 2, 2, 3, 9, 3, 2, 2, 2, 5, 11, 3, 2, 2, 2, 7, 13,
-	3, 2, 2, 2, 9, 10, 7, 99, 2, 2, 10, 4, 3, 2, 2, 2, 11, 12, 7, 100, 2, 2,
-	12, 6, 3, 2, 2, 2, 13, 14, 7, 101, 2, 2, 14, 8, 3, 2, 2, 2, 3, 2, 2,
+var serializedLexerAtn = []int32{
+	4, 0, 3, 13, 6, 65535, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 1, 0, 1, 0,
+	1, 1, 1, 1, 1, 2, 1, 2, 0, 0, 3, 1, 1, 3, 2, 5, 3, 1, 0, 0, 0, 12, 0, 1,
+	1, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 5, 1, 0, 0, 0, 1, 7, 1, 0, 0, 0, 3, 9,
+	1, 0, 0, 0, 5, 11, 1, 0, 0, 0, 7, 8, 5, 97, 0, 0, 8, 2, 1, 0, 0, 0, 9,
+	10, 5, 98, 0, 0, 10, 4, 1, 0, 0, 0, 11, 12, 5, 99, 0, 0, 12, 6, 1, 0, 0,
+	0, 1, 0, 0,
 }
 
 var lexerDeserializer = NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
+var lexerAtn = lexerDeserializer.Deserialize(serializedLexerAtn)
 
 var lexerChannelNames = []string{
 	"DEFAULT_TOKEN_CHANNEL", "HIDDEN",
