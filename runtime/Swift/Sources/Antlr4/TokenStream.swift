@@ -135,3 +135,39 @@ public protocol TokenStream: IntStream {
     /// 
     func getText(_ start: Token, _ stop: Token) throws -> String
 }
+
+extension TokenStream {
+    /// 
+    /// Return the text of all tokens in this stream between `start` and
+    /// `stop` (inclusive).
+    /// 
+    /// If the specified `start` or `stop` token was not provided by
+    /// this stream, or if the `stop` occurred before the `start`
+    /// token, the behavior is unspecified.
+    /// 
+    /// For streams which ensure that the _org.antlr.v4.runtime.Token#getTokenIndex_ method is
+    /// accurate for all of its provided tokens, this method behaves like the
+    /// following code. Other streams may implement this method in other ways
+    /// provided the behavior is consistent with this at a high level.
+    /// 
+    /// 
+    /// TokenStream stream = ...;
+    /// String text = "";
+    /// for (int i = start.getTokenIndex(); i &lt;= stop.getTokenIndex(); i++) {
+    /// text += stream.get(i).getText();
+    /// }
+    /// 
+    /// 
+    /// - Parameter start: The first token in the interval to get text for.
+    /// - Parameter stop: The last token in the interval to get text for (inclusive).
+    /// - Throws: ANTLRError.unsupportedOperation if this stream does not support
+    /// this method for the specified tokens
+    /// - Returns: The text of all tokens lying between the specified `start`
+    /// and `stop` tokens.
+    /// 
+    /// 
+    func getText(_ start: Token?, _ stop: Token?) throws -> String {
+        guard let start = start, let stop = stop else { return "" }
+        return try getText(start, stop)
+    }
+}
