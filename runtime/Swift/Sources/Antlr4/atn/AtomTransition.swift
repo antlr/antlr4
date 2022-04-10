@@ -27,7 +27,7 @@ public final class AtomTransition: Transition, CustomStringConvertible {
     }
 
     override
-    public func labelIntervalSet() -> IntervalSet {
+    public func labelIntervalSet() -> IntervalSet? {
         return IntervalSet(label)
     }
 

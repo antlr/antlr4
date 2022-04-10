@@ -126,7 +126,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// - SeeAlso: #addParseListener
     /// 
-    public var _parseListeners: Array<ParseTreeListener> = []
+    public var _parseListeners: Array<ParseTreeListener>?
 
     /// 
     /// The number of syntax errors reported during parsing. This value is
@@ -285,7 +285,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func getParseListeners() -> [ParseTreeListener] {
-        return _parseListeners
+        return _parseListeners ?? [ParseTreeListener]()
     }
 
     /// 
@@ -314,7 +314,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Parameter listener: the listener to add
     /// 
     public func addParseListener(_ listener: ParseTreeListener) {
-        _parseListeners.append(listener)
+        if _parseListeners == nil {
+            _parseListeners = [ParseTreeListener]()
+        }
+
+        _parseListeners!.append(listener)
     }
 
     /// 
@@ -329,7 +333,16 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
 
     public func removeParseListener(_ listener: ParseTreeListener?) {
-        _parseListeners.removeAll(where: { $0 === listener })
+        if _parseListeners != nil {
+            if !_parseListeners!.filter({ $0 === listener }).isEmpty {
+                _parseListeners = _parseListeners!.filter({
+                    $0 !== listener
+                })
+                if _parseListeners!.isEmpty {
+                    _parseListeners = nil
+                }
+            }
+        }
     }
 
     /// 
@@ -338,7 +351,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - SeeAlso: #addParseListener
     /// 
     public func removeParseListeners() {
-        _parseListeners = []
+        _parseListeners = nil
     }
 
     /// 
@@ -347,7 +360,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - SeeAlso: #addParseListener
     /// 
     public func triggerEnterRuleEvent() throws {
-        if let _ctx = _ctx {
+        if let _parseListeners = _parseListeners, let _ctx = _ctx {
             for listener: ParseTreeListener in _parseListeners {
                 try listener.enterEveryRule(_ctx)
                 _ctx.enterRule(listener)
@@ -362,7 +375,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     public func triggerExitRuleEvent() throws {
         // reverse order walk of listeners
-        if let _ctx = _ctx {
+        if let _parseListeners = _parseListeners, let _ctx = _ctx {
             for listener in _parseListeners.reversed() {
                 _ctx.exitRule(listener)
                 try listener.exitEveryRule(_ctx)
@@ -529,20 +542,24 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _ctx = _ctx else {
             return o
         }
-        let hasListener = !_parseListeners.isEmpty
+        let hasListener = _parseListeners != nil && !_parseListeners!.isEmpty
 
         if _buildParseTrees || hasListener {
             if _errHandler.inErrorRecoveryMode(self) {
                 let node = createErrorNode(parent: _ctx, t: o)
                 _ctx.addErrorNode(node)
-                for listener in _parseListeners {
-                    listener.visitErrorNode(node)
+                if let _parseListeners = _parseListeners {
+                    for listener in _parseListeners {
+                        listener.visitErrorNode(node)
+                    }
                 }
             } else {
                 let node = createTerminalNode(parent: _ctx, t: o)
                 _ctx.addChild(node)
-                for listener in _parseListeners {
-                    listener.visitTerminal(node)
+                if let _parseListeners = _parseListeners {
+                    for listener in _parseListeners {
+                        listener.visitTerminal(node)
+                    }
                 }
             }
         }
@@ -594,7 +611,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         }
         ctx.stop = try _input.LT(-1)
         // trigger event on _ctx, before it reverts to parent
-        if !_parseListeners.isEmpty {
+        if _parseListeners != nil {
             try triggerExitRuleEvent()
         }
         setState(ctx.invokingState)
@@ -612,7 +629,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
             }
         }
         _ctx = localctx
-        if !_parseListeners.isEmpty {
+        if _parseListeners != nil {
             try triggerEnterRuleEvent()
         }
     }
@@ -647,7 +664,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         _precedenceStack.push(precedence)
         _ctx = localctx
         _ctx!.start = try _input.LT(1)
-        if !_parseListeners.isEmpty {
+        if _parseListeners != nil {
             try triggerEnterRuleEvent() // simulates rule entry for left-recursive rules
         }
     }
@@ -667,7 +684,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
             _ctx!.addChild(previous)
         }
 
-        if !_parseListeners.isEmpty {
+        if _parseListeners != nil {
             try triggerEnterRuleEvent() // simulates rule entry for left-recursive rules
         }
     }
@@ -678,7 +695,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         let retctx = _ctx! // save current ctx (return value)
 
         // unroll so _ctx is as it was before call to recursive method
-        if !_parseListeners.isEmpty {
+        if _parseListeners != nil {
             while let ctxWrap = _ctx, ctxWrap !== _parentctx {
                 try triggerExitRuleEvent()
                 _ctx = ctxWrap.parent as? ParserRuleContext

@@ -20,12 +20,12 @@ public class ATN {
     /// 
     /// Maps from rule index to starting state number.
     /// 
-    public internal(set) final var ruleToStartState: [RuleStartState] = []
+    public internal(set) final var ruleToStartState: [RuleStartState]!
 
     /// 
     /// Maps from rule index to stop state number.
     /// 
-    public internal(set) final var ruleToStopState: [RuleStopState] = []
+    public internal(set) final var ruleToStopState: [RuleStopState]!
 
     /// 
     /// The type of the ATN.
@@ -43,13 +43,13 @@ public class ATN {
     /// type if the `ATNDeserializationOptions.generateRuleBypassTransitions`
     /// deserialization option was specified; otherwise, this is `null`.
     /// 
-    public internal(set) final var ruleToTokenType: [Int] = []
+    public internal(set) final var ruleToTokenType: [Int]!
 
     /// 
     /// For lexer ATNs, this is an array of _org.antlr.v4.runtime.atn.LexerAction_ objects which may
     /// be referenced by action transitions in the ATN.
     /// 
-    public internal(set) final var lexerActions: [LexerAction] = []
+    public internal(set) final var lexerActions: [LexerAction]!
 
     public internal(set) final var modeToStartState = [TokensStartState]()
 
