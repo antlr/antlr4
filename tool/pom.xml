@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr-runtime</artifactId>
-			<version>3.5.3-SNAPSHOT</version>
+			<version>3.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -147,7 +147,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
-				<version>3.5.3-SNAPSHOT</version>
+				<version>3.5.3</version>
 				<configuration>
 					<sourceDirectory>src</sourceDirectory>
 					<verbose>true</verbose>
