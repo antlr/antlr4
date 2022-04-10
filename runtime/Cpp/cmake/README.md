@@ -29,8 +29,8 @@ set(ANTLR4_WITH_STATIC_CRT OFF)
 # By default the latest version of antlr4 will be used.  You can specify a
 # specific, stable version by setting a repository tag value or a link
 # to a zip file containing the libary source.
-# set(ANTLR4_TAG 4.9.3)
-# set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.9.3.zip)
+# set(ANTLR4_TAG 4.10)
+# set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.zip)
 
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)

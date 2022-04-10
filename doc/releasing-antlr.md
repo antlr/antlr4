@@ -40,7 +40,7 @@ It seems that [Go needs a `v` in the release git tag](https://go.dev/ref/mod#glo
 There are a number of files that require inversion number be updated.
 
 
-Here is a simple script to display any line from the critical files with, say, `4.10` in it.  Here's an example run of the script:
+(In a `pred-4.10` branch) Here is a simple script to display any line from the critical files with, say, `4.10` in it.  Here's an example run of the script:
 
 ```bash
 ~/antlr/code/antlr4 $ python scripts/update_antlr_version.py 4.9.3 4.10
@@ -67,25 +67,10 @@ We only have to copy the PHP runtime into the ANTLR repository to run the unitte
 
 ```
 cd ~/antlr/code/antlr-php-runtime/src
+git checkout dev # Should be the default
 ... vi RuntimeMetaData.php ...
 git commit -a -m "Update PHP Runtime to latest version"
 ```
-
-<!--
-them back over in the ANTLR repo:
-
-```
-cd runtime
-rm -rf PHP
-mkdir PHP
-cp ~/antlr/code/antlr-php-runtime/LICENSE PHP
-cp ~/antlr/code/antlr-php-runtime/README.md PHP
-cp ~/antlr/code/antlr-php-runtime/composer.json PHP
-cp ~/antlr/code/antlr-php-runtime/phpcs.xml.dist PHP
-cp ~/antlr/code/antlr-php-runtime/phpstan.neon.dist PHP
-cp -r ~/antlr/code/antlr-php-runtime/src PHP
-```
--->
 
 ## Build XPath parsers
 
