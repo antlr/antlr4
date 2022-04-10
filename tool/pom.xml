@@ -29,12 +29,12 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr-runtime</artifactId>
-			<version>3.5.2</version>
+			<version>3.5.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.3.1</version>
+			<version>4.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
@@ -147,7 +147,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
-				<version>3.5.2</version>
+				<version>3.5.3-SNAPSHOT</version>
 				<configuration>
 					<sourceDirectory>src</sourceDirectory>
 					<verbose>true</verbose>

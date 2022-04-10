@@ -1,6 +1,6 @@
 {
   "name": "antlr4",
-  "version": "4.9.3",
+  "version": "4.10.0",
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "main": "src/antlr4/index.js",
