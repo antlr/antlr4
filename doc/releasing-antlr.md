@@ -438,7 +438,6 @@ pub publish
 ```
 
 It will warn that no change log found for the new version.
-If there are changes relevant to dart in this release, edit [CHANGELOG.md](https://github.com/antlr/antlr4/blob/master/runtime/Dart/CHANGELOG.md) to describe the changes.
 Otherwise enter `N` to ignore the warning.
 
 ## Update website
