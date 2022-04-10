@@ -241,29 +241,6 @@ and on the left click "Staging Repositories". You click the staging repo and clo
 
 All releases should be here: [https://repo1.maven.org/maven2/org/antlr/antlr4-runtime](https://repo1.maven.org/maven2/org/antlr/antlr4-runtime).
 
-Copy the jars to antlr.org site and update download/index.html
-
-```bash
-cp ~/.m2/repository/org/antlr/antlr4-runtime/4.10/antlr4-runtime-4.10.jar ~/antlr/sites/website-antlr4/download/antlr-runtime-4.10.jar
-cp ~/.m2/repository/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar ~/antlr/sites/website-antlr4/download/antlr-4.10-complete.jar
-cd ~/antlr/sites/website-antlr4/download
-git add antlr-4.10-complete.jar
-git add antlr-runtime-4.10.jar 
-```
-
-Update on site:
-
-*   download.html
-*   index.html
-*   api/index.html
-*   download/index.html
-*   scripts/topnav.js
-
-```
-git commit -a -m 'add 4.10 jars'
-git push origin gh-pages
-```
-
 ## Deploying Targets
 
 ### JavaScript
@@ -441,7 +418,6 @@ Move target to website (**_rename to a specific ANTLR version first if needed_**
 
 ```bash
 pushd ~/antlr/sites/website-antlr4/download
-# vi index.html
 git add antlr4-cpp-runtime-4.10-macos.zip
 git add antlr4-cpp-runtime-4.10-windows.zip
 git add antlr4-cpp-runtime-4.10-source.zip
@@ -465,21 +441,48 @@ It will warn that no change log found for the new version.
 If there are changes relevant to dart in this release, edit [CHANGELOG.md](https://github.com/antlr/antlr4/blob/master/runtime/Dart/CHANGELOG.md) to describe the changes.
 Otherwise enter `N` to ignore the warning.
 
-## Update javadoc for runtime and tool
+## Update website
 
-Above build should make latest in 
+### javadoc for runtime and tool
+
+```bash
+cd ~/antlr/code/antlr4
+mvn -DskipTests javadoc:jar -q install # get lots of errors but works
+```
+
+Jars are in:
 
 ```
 ~/.m2/repository/org/antlr/antlr4-runtime/4.10/antlr4-runtime-4.10
 ```
 
-but you can regen (watch pom version!):
+### Update version and copy jars / api
+
+Copy javadoc and java jars to website using this script:
 
 ```bash
-$ cd antlr4
-$ mvn -DskipTests javadoc:jar install
+cd ~/antlr/code/antlr4
+python scripts/deploy.py 4.9.3 4.10
 ```
 
+<!--
+```bash
+cp ~/.m2/repository/org/antlr/antlr4-runtime/4.10/antlr4-runtime-4.10.jar ~/antlr/sites/website-antlr4/download/antlr-runtime-4.10.jar
+cp ~/.m2/repository/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar ~/antlr/sites/website-antlr4/download/antlr-4.10-complete.jar
+cd ~/antlr/sites/website-antlr4/download
+git add antlr-4.10-complete.jar
+git add antlr-runtime-4.10.jar 
+```
+-->
+
+Once it's done, you must do the following manually:
+
+```
+git commit -a -m 'add 4.10 jars'
+git push origin gh-pages
+```
+
+<!--
 Then copy to website:
 
 ```bash
@@ -493,6 +496,7 @@ jar xvf ~/.m2/repository/org/antlr/antlr4/4.10/antlr4-4.10-javadoc.jar
 git commit -a -m 'freshen api doc'
 git push origin gh-pages
 ```
+-->
 
 ## Update Intellij plug-in
 
