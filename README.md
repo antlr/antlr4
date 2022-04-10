@@ -8,12 +8,10 @@
 
 **Build status**
 
-[![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX)](https://github.com/antlr/antlr4/actions) 
-[![Github CI Build Status (Windows)](https://img.shields.io/github/workflow/status/antlr/antlr4/Windows)](https://github.com/antlr/antlr4/actions) 
+OS X: [![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX)](https://github.com/antlr/antlr4/actions), Windows: [![Github CI Build Status (Windows)](https://img.shields.io/github/workflow/status/antlr/antlr4/Windows)](https://github.com/antlr/antlr4/actions), Linux: [![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
 <!--
 [![AppVeyor CI Build Status (Windows)](https://img.shields.io/appveyor/build/parrt/antlr4?label=Windows)](https://ci.appveyor.com/project/parrt/antlr4) 
 -->
-[![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
 <!--
 [![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
 -->

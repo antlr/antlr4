@@ -2,7 +2,7 @@
 
 1. [Fork](https://help.github.com/articles/fork-a-repo) the [antlr/antlr4 repo](https://github.com/antlr/antlr4), which will give you both key branches, `master` and `dev`
 2. Make sure to `git checkout dev` in your fork so that you are working from the latest development branch
-3. Create and work from a branch from `dev` such as `git checkout -b your-branch-name`
+3. Create and work from a branch derived from `dev` such as `git checkout -b your-branch-name`
 4. Install and configure [EditorConfig](http://editorconfig.org/) so your text editor or IDE uses the ANTLR 4 coding style
 5. [Build ANTLR 4](doc/building-antlr.md)
 6. [Run the ANTLR project unit tests](doc/antlr-project-testing.md)

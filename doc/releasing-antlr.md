@@ -2,7 +2,15 @@
 
 ## Github
 
-Create a pre-release or full release at github; e.g., [tag 4.9](https://github.com/antlr/antlr4/tree/4.9).
+### Get dev merged into master
+
+Do this or make a PR:
+
+```bash
+cd ~/antlr/code/antlr4
+git checkout master
+git merge master
+```
 
 ### Turn on DCO Enforcement
 
@@ -10,7 +18,7 @@ As of 4.10, we will be using the Linux DCO not the previous contributors license
 
 See [GitHub App DCO](https://github.com/apps/dco).
 
-Make sure this feature is turned on for the `dev` and `master` branch upon release.
+Make sure this feature is turned on for the `antlr4` repo upon release.
 
 ### Delete existing release tag
 
