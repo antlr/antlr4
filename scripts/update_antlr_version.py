@@ -88,3 +88,8 @@ if __name__ == '__main__':
     update_files(ROOT, before, after)
 
     find_remaining(ROOT, before)
+
+    print("Warning: manually update runtime/Cpp/runtime/src/Version.h has non-standard version mechanism")
+    print("Warning: some targets can't handle 4.x; must be 4.x.0:")
+    print("\truntime/Dart/pubspec.yaml")
+    print("\truntime/JavaScript/package.json")
