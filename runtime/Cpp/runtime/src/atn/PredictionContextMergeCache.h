@@ -78,7 +78,7 @@ namespace atn {
 
     void moveToFront(Entry *entry) const;
 
-    void pushFront(Entry *entry);
+    void pushToFront(Entry *entry);
 
     void remove(Entry *entry);
 
