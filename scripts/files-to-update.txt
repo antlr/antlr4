@@ -18,7 +18,7 @@ runtime/Cpp/cmake/Antlr4Package.md
 runtime/Cpp/cmake/README.md
 runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
 runtime/Cpp/cmake/FindANTLR.cmake
-runtime/Cpp/runtime/src/RuntimeMetaData.cpp
+runtime/Cpp/runtime/src/Version.h
 runtime/Cpp/VERSION
 runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
 runtime/CSharp/src/README.md
