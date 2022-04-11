@@ -9,7 +9,7 @@ Do this or make a PR:
 ```bash
 cd ~/antlr/code/antlr4
 git checkout master
-git merge master
+git merge dev
 ```
 
 ### Turn on DCO Enforcement
@@ -28,14 +28,6 @@ Wack any existing tag as mvn will create one and it fails if already there.
 $ git tag -d 4.10
 $ git push origin :refs/tags/4.10
 $ git push upstream :refs/tags/4.10
-```
-
-### Create release candidate tag
-
-```bash
-$ git tag -a 4.10-rc.1 -m 'heading towards 4.10'
-$ git push origin 4.10-rc.1
-$ git push upstream 4.10-rc1
 ```
 
 ### Go release tags
@@ -98,8 +90,6 @@ java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.10-SNAPSHOT/antlr4-4.1
 ```
 
 ## Maven Repository Settings
-
-ugh. apparently you have to `mvn install` and then `mvn compile` or some such or subdir pom.xml's won't see the latest runtime build.
 
 First, make sure you have maven set up to communicate with staging servers etc...  Create file `~/.m2/settings.xml` with appropriate username/password for staging server and gpg.keyname/passphrase for signing. Make sure it has strict visibility privileges to just you. On unix, it looks like:
 
