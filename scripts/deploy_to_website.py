@@ -47,6 +47,9 @@ def copy_javadoc(release_version):
     os.chdir(WEBSITE_ROOT+"/api/JavaTool")
     runme(f"jar xf {ANTLR_M2_ROOT}/antlr4/{release_version}/antlr4-{release_version}-javadoc.jar")
     print(f"\tapi/JavaTool updated from antlr4-{release_version}-javadoc.jar")
+    os.chdir(WEBSITE_ROOT+"/api/maven-plugin/latest")
+    runme(f"jar xf {ANTLR_M2_ROOT}/antlr4-maven-plugin/{release_version}/antlr4-maven-plugin-{release_version}-javadoc.jar")
+    print(f"\tapi/JavaTool updated from antlr4-maven-plugin-{release_version}-javadoc.jar")
 
 
 def copy_jars(release_version):
@@ -87,5 +90,6 @@ if __name__ == '__main__':
     print("Please look for and add new api files!!")
     print("Then MANUALLY commit/push:")
     print()
+    print(f"cd {WEBSITE_ROOT}")
     print(f"git commit -a -m 'Update website, javadoc, jars to {after}'")
     print("git push origin gh-pages")

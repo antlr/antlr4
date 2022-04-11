@@ -362,7 +362,7 @@ Then run the usual python set up stuff:
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python2
 # assume you have ~/.pypirc set up
-python2 setup.py sdist upload
+python setup.py sdist upload
 ```
 
 and do again for Python 3 target
@@ -426,6 +426,8 @@ popd
 
 ### Dart
 
+*Looks like only [Lingyu.li](https://pub.dev/publishers/lingyu.li/packages) can install*
+
 Install Dart SDK from https://dart.dev/get-dart
 
 Push to pub.dev
@@ -459,7 +461,27 @@ Copy javadoc and java jars to website using this script:
 
 ```bash
 cd ~/antlr/code/antlr4
-python scripts/deploy.py 4.9.3 4.10
+python scripts/deploy_to_website.py 4.9.3 4.10
+```
+
+Output:
+
+```bash
+Updating ANTLR version from 4.9.3 to 4.10
+Set ANTLR website root (default /Users/parrt/antlr/sites/website-antlr4): 
+Version string updated. Please commit/push:
+Javadoc copied:
+	api/Java updated from antlr4-runtime-4.10-javadoc.jar
+	api/JavaTool updated from antlr4-4.10-javadoc.jar
+Jars copied:
+	antlr-4.10-complete.jar
+	antlr-runtime-4.10.jar
+
+Please look for and add new api files!!
+Then MANUALLY commit/push:
+
+git commit -a -m 'Update website, javadoc, jars to 4.10'
+git push origin gh-pages
 ```
 
 <!--
@@ -475,7 +497,8 @@ git add antlr-runtime-4.10.jar
 Once it's done, you must do the following manually:
 
 ```
-git commit -a -m 'add 4.10 jars'
+cd ~/antlr/sites/website-antlr4
+git commit -a -m 'Update website, javadoc, jars to 4.10'
 git push origin gh-pages
 ```
 
