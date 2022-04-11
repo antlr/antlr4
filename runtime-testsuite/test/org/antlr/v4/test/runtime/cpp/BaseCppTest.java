@@ -214,7 +214,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String[] command = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
+			String[] command = { "cmake", ".", "-DCMAKE_BUILD_TYPE=Debug" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
 				return false;
 			}
@@ -224,7 +224,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		}
 
 		try {
-			String[] command = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
+			String[] command = { "make", "-j", Integer.toString(Runtime.getRuntime().availableProcessors()) };
 			if (runCommand(command, runtimePath, "building antlr runtime", true) == null)
 				return false;
 		}
