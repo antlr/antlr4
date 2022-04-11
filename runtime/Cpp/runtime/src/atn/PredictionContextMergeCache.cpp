@@ -47,7 +47,6 @@ Ref<const PredictionContext> PredictionContextMergeCache::put(
 
   auto [existing, inserted] = _entries.try_emplace(std::make_pair(key1.get(), key2.get()));
   if (inserted) {
-    _size++;
     try {
       existing->second.reset(new Entry());
     } catch (...) {
@@ -56,7 +55,7 @@ Ref<const PredictionContext> PredictionContextMergeCache::put(
     }
     existing->second->key = std::make_pair(key1, key2);
     existing->second->value = std::move(value);
-    pushFront(existing->second.get());
+    pushToFront(existing->second.get());
   } else {
     if (existing->second->value != value) {
       existing->second->value = std::move(value);
@@ -94,40 +93,49 @@ void PredictionContextMergeCache::clear() {
 
 void PredictionContextMergeCache::moveToFront(Entry *entry) const {
   if (entry->prev == nullptr) {
+    assert(entry == _head);
     return;
   }
   entry->prev->next = entry->next;
-  if (entry->next) {
+  if (entry->next != nullptr) {
     entry->next->prev = entry->prev;
   } else {
+    assert(entry == _tail);
     _tail = entry->prev;
   }
   entry->prev = nullptr;
   entry->next = _head;
   _head->prev = entry;
   _head = entry;
+  assert(entry->prev == nullptr);
 }
 
-void PredictionContextMergeCache::pushFront(Entry *entry) {
+void PredictionContextMergeCache::pushToFront(Entry *entry) {
+  ++_size;
   entry->prev = nullptr;
   entry->next = _head;
-  if (_head) {
+  if (_head != nullptr) {
     _head->prev = entry;
+    _head = entry;
   } else {
+    assert(entry->next == nullptr);
     _head = entry;
     _tail = entry;
   }
+  assert(entry->prev == nullptr);
 }
 
 void PredictionContextMergeCache::remove(Entry *entry) {
-  if (entry->prev) {
+  if (entry->prev != nullptr) {
     entry->prev->next = entry->next;
   } else {
+    assert(entry == _head);
     _head = entry->next;
   }
-  if (entry->next) {
+  if (entry->next != nullptr) {
     entry->next->prev = entry->prev;
   } else {
+    assert(entry == _tail);
     _tail = entry->prev;
   }
   --_size;
@@ -137,7 +145,7 @@ void PredictionContextMergeCache::remove(Entry *entry) {
 void PredictionContextMergeCache::compact(const Entry *preserve) {
   Entry *entry = _tail;
   while (entry != nullptr && _size > getOptions().getMaxSize()) {
-    Entry *next = entry->next;
+    Entry *next = entry->prev;
     if (entry != preserve) {
       remove(entry);
     }
