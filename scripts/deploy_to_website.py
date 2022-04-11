@@ -56,7 +56,7 @@ def copy_jars(release_version):
     # release_version = release_version+"-SNAPSHOT" # testing
     print("Jars copied:")
     runme(f"cp {ANTLR_M2_ROOT}/antlr4-runtime/{release_version}/antlr4-runtime-{release_version}.jar {WEBSITE_ROOT}/download/antlr-runtime-{release_version}.jar")
-    runme(f"cp {ANTLR_M2_ROOT}/antlr4/{release_version}/antlr4-{release_version}.jar {WEBSITE_ROOT}/download/antlr-{release_version}-complete.jar")
+    runme(f"cp {ANTLR_M2_ROOT}/antlr4/{release_version}/antlr4-{release_version}-complete.jar {WEBSITE_ROOT}/download/antlr-{release_version}-complete.jar")
     os.chdir(WEBSITE_ROOT+"/download")
     runme(f"git add antlr-{release_version}-complete.jar")
     runme(f"git add antlr-runtime-{release_version}.jar")
