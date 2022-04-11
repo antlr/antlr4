@@ -160,16 +160,6 @@ public class ErrorManager {
 	{
         ANTLRMessage msg = new GrammarSemanticsMessage(etype,fileName,token,args);
 		emit(etype, msg);
-
-	}
-
-	public void leftRecursionCycles(String fileName, Collection<? extends Collection<Rule>> cycles) {
-		for (Collection<Rule> cycle : cycles) {
-			for (Rule rule : cycle) {
-				tool.error(new LeftRecursionCyclesMessage(fileName, rule, cycle));
-				errors++;
-			}
-		}
 	}
 
     public int getNumErrors() {
