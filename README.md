@@ -8,7 +8,7 @@
 
 **Dev branch build status**
 
-* [![MacOSX](https://github.com/antlr/antlr4/actions/workflows/macosx.yml/badge.svg?branch=dev)](https://github.com/antlr/antlr4/actions/workflows/macosx.yml) (github actions)
+* [![MacOSX](https://github.com/antlr/antlr4/actions/workflows/macosx.yml/badge.svg)](https://github.com/antlr/antlr4/actions/workflows/macosx.yml) (github actions)
 
 * [![Windows](https://github.com/antlr/antlr4/actions/workflows/windows.yml/badge.svg?branch=dev)](https://github.com/antlr/antlr4/actions/workflows/windows.yml) (github actions)
 
