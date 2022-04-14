@@ -5,6 +5,7 @@
 #
 from antlr4.RuleContext import RuleContext
 from antlr4.Token import Token
+from antlr4.Version import RUNTIME_VERSION
 from antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 
 # need forward delcaration
@@ -34,11 +35,10 @@ class Recognizer(object):
         return major, minor
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.10"
-        rvmajor, rvminor = self.extractVersion(runtimeVersion)
+        rvmajor, rvminor = self.extractVersion(RUNTIME_VERSION)
         tvmajor, tvminor = self.extractVersion(toolVersion)
         if rvmajor!=tvmajor or rvminor!=tvminor:
-            print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
+            print("ANTLR runtime and generated code versions disagree: "+RUNTIME_VERSION+"!="+toolVersion)
 
     def addErrorListener(self, listener):
         self._listeners.append(listener)
