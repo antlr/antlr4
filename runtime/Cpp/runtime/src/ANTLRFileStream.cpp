@@ -13,11 +13,7 @@ void ANTLRFileStream::loadFromFile(const std::string &fileName) {
     return;
   }
 
-#ifdef _MSC_VER
-  std::ifstream stream(antlrcpp::s2ws(fileName), std::ios::binary);
-#else
   std::ifstream stream(fileName, std::ios::binary);
-#endif
 
   ANTLRInputStream::load(stream);
 }
