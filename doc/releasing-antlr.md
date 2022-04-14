@@ -426,15 +426,13 @@ popd
 
 ### Dart
 
-*Looks like only [Lingyu.li](https://pub.dev/publishers/lingyu.li/packages) can install*
-
 Install Dart SDK from https://dart.dev/get-dart
 
 Push to pub.dev
 
 ```bash
 cd runtime/Dart
-pub publish
+dart pub publish
 ```
 
 It will warn that no change log found for the new version.
