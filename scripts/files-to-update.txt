@@ -5,6 +5,7 @@
 #
 # Lines starting with '*' allow multiple changes in single file
 
+docker/Dockerfile
 runtime/Go/antlr/recognizer.go
 runtime/Python3/setup.py
 runtime/Python3/src/antlr4/Recognizer.py
@@ -31,7 +32,7 @@ runtime/JavaScript/src/antlr4/Recognizer.js
 # Allow doc files to have multiple values updated
 * doc/swift-target.md
 * doc/dart-target.md
-# doc/releasing-antlr.md  # Do this one manually
+doc/releasing-antlr.md  # Do this one manually; it'll fail because of multiple lines but we get warning
 * doc/getting-started.md
 * doc/swift-target.md
 * doc/getting-started.md
