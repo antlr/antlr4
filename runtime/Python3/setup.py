@@ -1,6 +1,6 @@
 from setuptools import setup
 
-v = '4.10'
+v = '4.10.1'
 
 setup(
     name='antlr4-python3-runtime',
