@@ -43,13 +43,13 @@ There are a number of files that require inversion number be updated.
 (In a `pred-4.10.1` branch) Here is a simple script to display any line from the critical files with, say, `4.10.1` in it.  Here's an example run of the script:
 
 ```bash
-~/antlr/code/antlr4 $ python scripts/update_antlr_version.py 4.9.3 4.10.1
-Updating ANTLR version from 4.9.3 to 4.10.1
+~/antlr/code/antlr4 $ python scripts/update_antlr_version.py 4.10 4.10.1
+Updating ANTLR version from 4.10 to 4.10.1
 Set ANTLR repo root (default ~/antlr/code/antlr4): 
 Perform antlr4 `mvn clean` and wipe build dirs Y/N? (default no): 
 Ok, not cleaning antlr4 dir
-4.9.3 appears on 2 lines so _not_ updating /tmp/antlr4/runtime/JavaScript/package-lock.json
-4.9.3 not in /tmp/antlr4/doc/releasing-antlr.md
+4.10 appears on 2 lines so _not_ updating /tmp/antlr4/runtime/JavaScript/package-lock.json
+4.10 not in /tmp/antlr4/doc/releasing-antlr.md
 ```
 
 It's also worth doing a quick check to see if you find any other references to a version:
@@ -253,7 +253,7 @@ All releases should be here: [https://repo1.maven.org/maven2/org/antlr/antlr4-ru
 **Push to npm**
 
 ```bash
-cd runtime/JavaScript
+cd ~/antlr/code/antlr4/runtime/JavaScript
 npm update
 npm install
 npm run build 
@@ -398,7 +398,7 @@ For each platform there's a deployment script which generates zip archives and c
 On a Mac (with XCode 7+ installed):
 
 ```bash
-cd runtime/Cpp
+cd ~/antlr/code/antlr4/runtime/Cpp
 ./deploy-macos.sh
 cp antlr4-cpp-runtime-macos.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.10.1-macos.zip
 ```
@@ -406,7 +406,7 @@ cp antlr4-cpp-runtime-macos.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp
 On any Mac or Linux machine:
 
 ```bash
-cd runtime/Cpp
+cd ~/antlr/code/antlr4/runtime/Cpp
 ./deploy-source.sh
 cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.10.1-source.zip
 ```
@@ -414,7 +414,7 @@ cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cp
 On a Windows machine the build scripts checks if VS 2017 and/or VS 2019 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org then do `set PATH=%PATH%;C:\Program Files\7-Zip\` from DOS not powershell).
 
 ```bash
-cd runtime/Cpp
+cd ~/antlr/code/antlr4/runtime/Cpp
 deploy-windows.cmd Community
 cp antlr4-cpp-runtime-vs2019.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.10.1-vs2019.zip
 ```
@@ -438,7 +438,7 @@ Install Dart SDK from https://dart.dev/get-dart
 Push to pub.dev
 
 ```bash
-cd runtime/Dart
+cd ~/antlr/code/antlr4/runtime/Dart
 dart pub publish
 ```
 
@@ -466,13 +466,13 @@ Copy javadoc and java jars to website using this script:
 
 ```bash
 cd ~/antlr/code/antlr4
-python scripts/deploy_to_website.py 4.9.3 4.10.1
+python scripts/deploy_to_website.py 4.10 4.10.1
 ```
 
 Output:
 
 ```bash
-Updating ANTLR version from 4.9.3 to 4.10.1
+Updating ANTLR version from 4.10 to 4.10.1
 Set ANTLR website root (default /Users/parrt/antlr/sites/website-antlr4): 
 Version string updated. Please commit/push:
 Javadoc copied:
