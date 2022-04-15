@@ -224,11 +224,11 @@ What is the release version for "ANTLR 4 Maven plugin"? (org.antlr:antlr4-maven-
 What is the release version for "ANTLR 4 Runtime Test Generator"? (org.antlr:antlr4-runtime-testsuite) 4.10.1: : 
 What is the release version for "ANTLR 4 Tool Tests"? (org.antlr:antlr4-tool-testsuite) 4.10.1: : 
 What is SCM release tag or label for "ANTLR 4"? (org.antlr:antlr4-master) antlr4-master-4.10.1: : 4.10.1
-What is the new development version for "ANTLR 4"? (org.antlr:antlr4-master) 4.10.1.1-SNAPSHOT:
+What is the new development version for "ANTLR 4"? (org.antlr:antlr4-master) 4.10.2-SNAPSHOT:
 ...
 ```
 
-Maven will go through your pom.xml files to update versions from 4.10.1-SNAPSHOT to 4.10.1 for release and then to 4.10.1.1-SNAPSHOT after release, which is done with:
+Maven will go through your pom.xml files to update versions from 4.10.1-SNAPSHOT to 4.10.1 for release and then to 4.10.2-SNAPSHOT after release, which is done with:
 
 ```bash
 mvn release:perform -Darguments="-DskipTests"
