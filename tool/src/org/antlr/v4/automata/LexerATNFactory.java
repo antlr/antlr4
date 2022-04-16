@@ -10,12 +10,13 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.AntlrCharSupport;
 import org.antlr.v4.misc.EscapeSequenceParsing;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.CharSupport;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
@@ -204,7 +205,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-				CharSupport.capitalize(ID.getText())+
+				AntlrCharSupport.capitalize(ID.getText())+
 				"Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
@@ -231,8 +232,8 @@ public class LexerATNFactory extends ParserATNFactory {
 	public Handle range(GrammarAST a, GrammarAST b) {
 		ATNState left = newState(a);
 		ATNState right = newState(b);
-		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
-		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
+		int t1 = AntlrCharSupport.getCharValueFromGrammarCharLiteral(a.getText());
+		int t2 = AntlrCharSupport.getCharValueFromGrammarCharLiteral(b.getText());
 		if (checkRange(a, b, t1, t2)) {
 			left.addTransition(createTransition(right, t1, t2, a));
 		}
@@ -248,8 +249,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		IntervalSet set = new IntervalSet();
 		for (GrammarAST t : alts) {
 			if ( t.getType()==ANTLRParser.RANGE ) {
-				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
-				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
+				int a = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
+				int b = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
 				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
 					checkRangeAndAddToSet(associatedAST, t, set, a, b, currentRule.caseInsensitive, null);
 				}
@@ -258,7 +259,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				set.addAll(getSetFromCharSetLiteral(t));
 			}
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
-				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
+				int c = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
 					checkCharAndAddToSet(associatedAST, set, c);
 				}
@@ -325,7 +326,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		String s = CharSupport.getStringFromGrammarStringLiteral(chars);
+		String s = AntlrCharSupport.getStringFromGrammarStringLiteral(chars);
 		if (s == null) {
 			// the lexer will already have given an error
 			return new Handle(left, left);
@@ -488,7 +489,7 @@ public class LexerATNFactory extends ParserATNFactory {
 						ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 						g.fileName,
 						charSetAST.getToken(),
-						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
+						CharSupport.getPrintable(state.prevCodePoint) + ".." + CharSupport.getPrintable(codePoint));
 			}
 			checkRangeAndAddToSet(charSetAST, set, state.prevCodePoint, codePoint);
 			state = CharSetParseState.NONE;
@@ -565,34 +566,34 @@ public class LexerATNFactory extends ParserATNFactory {
 		else {
 			boolean charactersCollision = previousStatus != null && previousStatus.collision;
 			if (!charactersCollision) {
-				for (int i = a; i <= b; i++) {
-					if (set.contains(i)) {
-						String setText;
-						if (rootAst.getChildren() == null) {
-							setText = rootAst.getText();
-						}
-						else {
-							StringBuilder sb = new StringBuilder();
-							for (Object child : rootAst.getChildren()) {
-								if (child instanceof RangeAST) {
-									sb.append(((RangeAST) child).getChild(0).getText());
-									sb.append("..");
-									sb.append(((RangeAST) child).getChild(1).getText());
-								}
-								else {
-									sb.append(((GrammarAST) child).getText());
-								}
-								sb.append(" | ");
-							}
-							sb.replace(sb.length() - 3, sb.length(), "");
-							setText = sb.toString();
-						}
-						String charsString = a == b ? String.valueOf((char)a) : (char) a + "-" + (char) b;
-						g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-								charsString, setText);
-						charactersCollision = true;
-						break;
+				IntervalSet intersection = set.and(IntervalSet.of(a, b));
+				if (!intersection.isNil()) {
+					String setText;
+					if (rootAst.getChildren() == null) {
+						setText = rootAst.getText();
 					}
+					else {
+						StringBuilder sb = new StringBuilder();
+						for (Object child : rootAst.getChildren()) {
+							if (child instanceof RangeAST) {
+								sb.append(((RangeAST) child).getChild(0).getText());
+								sb.append("..");
+								sb.append(((RangeAST) child).getChild(1).getText());
+							}
+							else {
+								sb.append(((GrammarAST) child).getText());
+							}
+							sb.append(" | ");
+						}
+						sb.replace(sb.length() - 3, sb.length(), "");
+						setText = sb.toString();
+					}
+					g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET,
+							g.fileName,
+							ast.getToken(),
+							intersection.toString(true),
+							setText);
+					charactersCollision = true;
 				}
 			}
 			status = new CharactersDataCheckStatus(charactersCollision, charactersData.mixOfLowerAndUpperCharCase);

@@ -6,7 +6,8 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.AntlrCharSupport;
+import org.antlr.v4.runtime.misc.CharSupport;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.jupiter.api.Test;
 
@@ -15,105 +16,68 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestCharSupport {
 	@Test
-	public void testGetANTLRCharLiteralForChar() {
-		assertEquals("'<INVALID>'",
-			CharSupport.getANTLRCharLiteralForChar(-1));
-		assertEquals("'\\n'",
-			CharSupport.getANTLRCharLiteralForChar('\n'));
-		assertEquals("'\\\\'",
-			CharSupport.getANTLRCharLiteralForChar('\\'));
-		assertEquals("'\\''",
-			CharSupport.getANTLRCharLiteralForChar('\''));
-		assertEquals("'b'",
-			CharSupport.getANTLRCharLiteralForChar('b'));
-		assertEquals("'\\uFFFF'",
-			CharSupport.getANTLRCharLiteralForChar(0xFFFF));
-		assertEquals("'\\u{10FFFF}'",
-			CharSupport.getANTLRCharLiteralForChar(0x10FFFF));
+	public void testGetPrintable() {
+		assertEquals("'<INVALID>'", CharSupport.getPrintable(-1));
+		assertEquals("'\\n'", CharSupport.getPrintable('\n'));
+		assertEquals("'\\\\'", CharSupport.getPrintable('\\'));
+		assertEquals("'\\''", CharSupport.getPrintable('\''));
+		assertEquals("'b'", CharSupport.getPrintable('b'));
+		assertEquals("'\\uFFFF'", CharSupport.getPrintable(0xFFFF));
+		assertEquals("'\\u{10FFFF}'", CharSupport.getPrintable(0x10FFFF));
 	}
 
 	@Test
 	public void testGetCharValueFromGrammarCharLiteral() {
-		assertEquals(-1,
-			CharSupport.getCharValueFromGrammarCharLiteral(null));
-		assertEquals(-1,
-			CharSupport.getCharValueFromGrammarCharLiteral(""));
-		assertEquals(-1,
-			CharSupport.getCharValueFromGrammarCharLiteral("b"));
-		assertEquals(111,
-			CharSupport.getCharValueFromGrammarCharLiteral("foo"));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromGrammarCharLiteral(null));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromGrammarCharLiteral(""));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromGrammarCharLiteral("b"));
+		assertEquals(111, AntlrCharSupport.getCharValueFromGrammarCharLiteral("foo"));
 	}
 
 	@Test
 	public void testGetStringFromGrammarStringLiteral() {
-		assertNull(CharSupport
-			.getStringFromGrammarStringLiteral("foo\\u{bbb"));
-		assertNull(CharSupport
-			.getStringFromGrammarStringLiteral("foo\\u{[]bb"));
-		assertNull(CharSupport
-			.getStringFromGrammarStringLiteral("foo\\u[]bb"));
-		assertNull(CharSupport
-			.getStringFromGrammarStringLiteral("foo\\ubb"));
+		assertNull(AntlrCharSupport.getStringFromGrammarStringLiteral("foo\\u{bbb"));
+		assertNull(AntlrCharSupport.getStringFromGrammarStringLiteral("foo\\u{[]bb"));
+		assertNull(AntlrCharSupport.getStringFromGrammarStringLiteral("foo\\u[]bb"));
+		assertNull(AntlrCharSupport.getStringFromGrammarStringLiteral("foo\\ubb"));
 
-		assertEquals("oo»b", CharSupport
-			.getStringFromGrammarStringLiteral("foo\\u{bb}bb"));
+		assertEquals("oo»b", AntlrCharSupport.getStringFromGrammarStringLiteral("foo\\u{bb}bb"));
 	}
 
 	@Test
 	public void testGetCharValueFromCharInGrammarLiteral() {
-		assertEquals(102,
-			CharSupport.getCharValueFromCharInGrammarLiteral("f"));
+		assertEquals(102, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("f"));
 
-		assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\' "));
-		assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\ "));
-		assertEquals(39,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\\'"));
-		assertEquals(10,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\n"));
+		assertEquals(-1,	AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\' "));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\ "));
+		assertEquals(39,	AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\\'"));
+		assertEquals(10,	AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\n"));
 
-		assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("foobar"));
-		assertEquals(4660,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\u1234"));
-		assertEquals(18,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\u{12}"));
+		assertEquals(-1,	AntlrCharSupport.getCharValueFromCharInGrammarLiteral("foobar"));
+		assertEquals(4660, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\u1234"));
+		assertEquals(18, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\u{12}"));
 
-		assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\u{"));
-		assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("foo"));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("\\u{"));
+		assertEquals(-1, AntlrCharSupport.getCharValueFromCharInGrammarLiteral("foo"));
 	}
 
 	@Test
 	public void testParseHexValue() {
-		assertEquals(-1, CharSupport.parseHexValue("foobar", -1, 3));
-		assertEquals(-1, CharSupport.parseHexValue("foobar", 1, -1));
-		assertEquals(-1, CharSupport.parseHexValue("foobar", 1, 3));
-		assertEquals(35, CharSupport.parseHexValue("123456", 1, 3));
+		assertEquals(-1, AntlrCharSupport.parseHexValue("foobar", -1, 3));
+		assertEquals(-1, AntlrCharSupport.parseHexValue("foobar", 1, -1));
+		assertEquals(-1, AntlrCharSupport.parseHexValue("foobar", 1, 3));
+		assertEquals(35, AntlrCharSupport.parseHexValue("123456", 1, 3));
 	}
 
 	@Test
 	public void testCapitalize() {
-		assertEquals("Foo", CharSupport.capitalize("foo"));
+		assertEquals("Foo", AntlrCharSupport.capitalize("foo"));
 	}
 
 	@Test
 	public void testGetIntervalSetEscapedString() {
-		assertEquals("",
-			CharSupport.getIntervalSetEscapedString(new IntervalSet()));
-		assertEquals("'\\u0000'",
-			CharSupport.getIntervalSetEscapedString(new IntervalSet(0)));
-		assertEquals("'\\u0001'..'\\u0003'",
-			CharSupport.getIntervalSetEscapedString(new IntervalSet(3, 1, 2)));
-	}
-
-	@Test
-	public void testGetRangeEscapedString() {
-		assertEquals("'\\u0002'..'\\u0004'",
-			CharSupport.getRangeEscapedString(2, 4));
-		assertEquals("'\\u0002'",
-			CharSupport.getRangeEscapedString(2, 2));
+		assertEquals("{}", new IntervalSet().toString(true));
+		assertEquals("'\\u0000'", new IntervalSet(0).toString(true));
+		assertEquals("{'\\u0001'..'\\u0003'}", new IntervalSet(3, 1, 2).toString(true));
 	}
 }

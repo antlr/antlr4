@@ -6,74 +6,10 @@
 
 package org.antlr.v4.misc;
 
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
-
-import java.util.Iterator;
+import org.antlr.v4.runtime.misc.CharSupport;
 
 /** */
-public class CharSupport {
-	/** When converting ANTLR char and string literals, here is the
-	 *  value set of escape chars.
-	 */
-	public final static int[] ANTLRLiteralEscapedCharValue = new int[255];
-
-	/** Given a char, we need to be able to show as an ANTLR literal.
-	 */
-	public final static String[] ANTLRLiteralCharValueEscape = new String[255];
-
-	static {
-		ANTLRLiteralEscapedCharValue['n'] = '\n';
-		ANTLRLiteralEscapedCharValue['r'] = '\r';
-		ANTLRLiteralEscapedCharValue['t'] = '\t';
-		ANTLRLiteralEscapedCharValue['b'] = '\b';
-		ANTLRLiteralEscapedCharValue['f'] = '\f';
-		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralCharValueEscape['\n'] = "\\n";
-		ANTLRLiteralCharValueEscape['\r'] = "\\r";
-		ANTLRLiteralCharValueEscape['\t'] = "\\t";
-		ANTLRLiteralCharValueEscape['\b'] = "\\b";
-		ANTLRLiteralCharValueEscape['\f'] = "\\f";
-		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-	}
-
-	/** Return a string representing the escaped char for code c.  E.g., If c
-	 *  has value 0x100, you will get "\\u0100".  ASCII gets the usual
-	 *  char (non-hex) representation.  Non-ASCII characters are spit out
-	 *  as \\uXXXX or \\u{XXXXXX} escapes.
-	 */
-	public static String getANTLRCharLiteralForChar(int c) {
-		String result;
-		if ( c < Lexer.MIN_CHAR_VALUE ) {
-			result = "<INVALID>";
-		}
-		else {
-			String charValueEscape = c < ANTLRLiteralCharValueEscape.length ? ANTLRLiteralCharValueEscape[c] : null;
-			if (charValueEscape != null) {
-				result = charValueEscape;
-			}
-			else if (Character.UnicodeBlock.of((char) c) == Character.UnicodeBlock.BASIC_LATIN &&
-					!Character.isISOControl((char) c)) {
-				if (c == '\\') {
-					result = "\\\\";
-				}
-				else if (c == '\'') {
-					result = "\\'";
-				}
-				else {
-					result = Character.toString((char) c);
-				}
-			}
-			else if (c <= 0xFFFF) {
-				result = String.format("\\u%04X", c);
-			} else {
-				result = String.format("\\u{%06X}", c);
-			}
-		}
-		return '\'' + result + '\'';
-	}
-
+public class AntlrCharSupport {
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 *  Return -1 if not single char.
@@ -141,7 +77,7 @@ public class CharSupport {
 				// '\x'  (antlr lexer will catch invalid char)
 				char escChar = cstr.charAt(1);
 				if (escChar == '\'') return escChar; // escape quote only in string literals.
-				int charVal = ANTLRLiteralEscapedCharValue[escChar];
+				int charVal = CharSupport.EscapedCharValue[escChar];
 				if (charVal == 0) return -1;
 				return charVal;
 			case 6:
@@ -182,24 +118,5 @@ public class CharSupport {
 
 	public static String capitalize(String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-	}
-
-	public static String getIntervalSetEscapedString(IntervalSet intervalSet) {
-		StringBuilder buf = new StringBuilder();
-		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
-		while (iter.hasNext()) {
-			Interval interval = iter.next();
-			buf.append(getRangeEscapedString(interval.a, interval.b));
-			if (iter.hasNext()) {
-				buf.append(" | ");
-			}
-		}
-		return buf.toString();
-	}
-
-	public static String getRangeEscapedString(int codePointStart, int codePointEnd) {
-		return codePointStart != codePointEnd
-				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
-				: getANTLRCharLiteralForChar(codePointStart);
 	}
 }

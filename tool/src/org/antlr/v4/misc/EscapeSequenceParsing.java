@@ -6,6 +6,7 @@
 
 package org.antlr.v4.misc;
 
+import org.antlr.v4.runtime.misc.CharSupport;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.unicode.UnicodeData;
 
@@ -113,7 +114,7 @@ public abstract class EscapeSequenceParsing {
 				hexEndOffset = offset + 4;
 				offset = hexEndOffset;
 			}
-			int codePointValue = CharSupport.parseHexValue(s, hexStartOffset, hexEndOffset);
+			int codePointValue = AntlrCharSupport.parseHexValue(s, hexStartOffset, hexEndOffset);
 			if (codePointValue == -1 || codePointValue > Character.MAX_CODE_POINT) {
 				return invalid(startOff, startOff+6-1);
 			}
@@ -153,8 +154,8 @@ public abstract class EscapeSequenceParsing {
 				startOff,
 				offset - startOff);
 		}
-		else if (escaped < CharSupport.ANTLRLiteralEscapedCharValue.length) {
-			int codePoint = CharSupport.ANTLRLiteralEscapedCharValue[escaped];
+		else if (escaped < CharSupport.EscapedCharValue.length) {
+			int codePoint = CharSupport.EscapedCharValue[escaped];
 			if (codePoint == 0) {
 				if (escaped != ']' && escaped != '-') { // escape ']' and '-' only in char sets.
 					return invalid(startOff, startOff+1);
