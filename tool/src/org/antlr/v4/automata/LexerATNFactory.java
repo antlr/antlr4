@@ -10,8 +10,9 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.AntlrCharSupport;
-import org.antlr.v4.misc.EscapeSequenceParsing;
+import org.antlr.v4.misc.CharParseResult;
+import org.antlr.v4.misc.GrammarLiteralParser;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
@@ -204,9 +204,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		// fall back to standard action generation for the command
-		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-				AntlrCharSupport.capitalize(ID.getText())+
-				"Command");
+		ST cmdST = codegenTemplates.getInstanceOf("Lexer" + Utils.capitalize(ID.getText()) + "Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
 			return epsilon(ID);
@@ -232,10 +230,10 @@ public class LexerATNFactory extends ParserATNFactory {
 	public Handle range(GrammarAST a, GrammarAST b) {
 		ATNState left = newState(a);
 		ATNState right = newState(b);
-		int t1 = AntlrCharSupport.getCharValueFromGrammarCharLiteral(a.getText());
-		int t2 = AntlrCharSupport.getCharValueFromGrammarCharLiteral(b.getText());
+		CharParseResult t1 = GrammarLiteralParser.parseCharFromStringLiteral(a.getText());
+		CharParseResult t2 = GrammarLiteralParser.parseCharFromStringLiteral(b.getText());
 		if (checkRange(a, b, t1, t2)) {
-			left.addTransition(createTransition(right, t1, t2, a));
+			left.addTransition(createTransition(right, t1.codePoint, t2.codePoint, a));
 		}
 		a.atnState = left;
 		b.atnState = left;
@@ -249,19 +247,21 @@ public class LexerATNFactory extends ParserATNFactory {
 		IntervalSet set = new IntervalSet();
 		for (GrammarAST t : alts) {
 			if ( t.getType()==ANTLRParser.RANGE ) {
-				int a = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
-				int b = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
-					checkRangeAndAddToSet(associatedAST, t, set, a, b, currentRule.caseInsensitive, null);
+				GrammarAST child0 = (GrammarAST) t.getChild(0);
+				GrammarAST child1 = (GrammarAST) t.getChild(1);
+				CharParseResult a = GrammarLiteralParser.parseCharFromStringLiteral(child0.getText());
+				CharParseResult b = GrammarLiteralParser.parseCharFromStringLiteral(child1.getText());
+				if (checkRange(child0, child1, a, b)) {
+					checkRangeAndAddToSet(associatedAST, t, set, a.codePoint, b.codePoint, currentRule.caseInsensitive, null);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
 				set.addAll(getSetFromCharSetLiteral(t));
 			}
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
-				int c = AntlrCharSupport.getCharValueFromGrammarCharLiteral(t.getText());
-				if ( c != -1 ) {
-					checkCharAndAddToSet(associatedAST, set, c);
+				CharParseResult parseResult = GrammarLiteralParser.parseCharFromStringLiteral(t.getText());
+				if (parseResult.isCodepoint()) {
+					checkCharAndAddToSet(associatedAST, set, parseResult.codePoint);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -292,21 +292,21 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
-	protected boolean checkRange(GrammarAST leftNode, GrammarAST rightNode, int leftValue, int rightValue) {
+	protected boolean checkRange(GrammarAST leftNode, GrammarAST rightNode, CharParseResult leftResult, CharParseResult rightResult) {
 		boolean result = true;
-		if (leftValue == -1) {
+		if (!leftResult.isCodepoint()) {
 			result = false;
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 					g.fileName, leftNode.getToken(), leftNode.getText());
 		}
-		if (rightValue == -1) {
+		if (!leftResult.isCodepoint()) {
 			result = false;
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 					g.fileName, rightNode.getToken(), rightNode.getText());
 		}
 		if (!result) return false;
 
-		if (rightValue < leftValue) {
+		if (rightResult.codePoint < leftResult.codePoint) {
 			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 					g.fileName, leftNode.parent.getToken(), leftNode.getText() + ".." + rightNode.getText());
 			return false;
@@ -325,22 +325,24 @@ public class LexerATNFactory extends ParserATNFactory {
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
-		ATNState right;
-		String s = AntlrCharSupport.getStringFromGrammarStringLiteral(chars);
-		if (s == null) {
-			// the lexer will already have given an error
-			return new Handle(left, left);
-		}
-
-		int n = s.length();
+		ATNState right = null;
 		ATNState prev = left;
-		right = null;
-		for (int i = 0; i < n; ) {
+
+		int startIndex = 1; // ignore first '
+		int endIndex = chars.length() - 1; // ignore last '
+		int index = startIndex;
+		while (index < endIndex) {
+			CharParseResult parseResult = GrammarLiteralParser.parseNextChar(chars, index, endIndex, true);
+			if (!parseResult.isCodepoint()) {
+				String invalid = chars.substring(parseResult.startIndex, parseResult.getEndIndex());
+				g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, g.fileName,
+						stringLiteralAST.getToken(), invalid);
+				return new Handle(left, left);
+			}
 			right = newState(stringLiteralAST);
-			int codePoint = s.codePointAt(i);
-			prev.addTransition(createTransition(right, codePoint, codePoint, stringLiteralAST));
+			prev.addTransition(createTransition(right, parseResult.codePoint, parseResult.codePoint, stringLiteralAST));
 			prev = right;
-			i += Character.charCount(codePoint);
+			index += parseResult.length;
 		}
 		stringLiteralAST.atnState = left;
 		return new Handle(left, right);
@@ -352,121 +354,53 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
-
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
 		return new Handle(left, right);
 	}
 
-	private static class CharSetParseState {
-		enum Mode {
-			NONE,
-			ERROR,
-			PREV_CODE_POINT,
-			PREV_PROPERTY
-		}
-
-		public static final CharSetParseState NONE = new CharSetParseState(Mode.NONE, false, -1, IntervalSet.EMPTY_SET);
-		public static final CharSetParseState ERROR = new CharSetParseState(Mode.ERROR, false, -1, IntervalSet.EMPTY_SET);
-
-		public final Mode mode;
-		public final boolean inRange;
-		public final int prevCodePoint;
-		public final IntervalSet prevProperty;
-
-		public CharSetParseState(
-				Mode mode,
-				boolean inRange,
-				int prevCodePoint,
-				IntervalSet prevProperty) {
-			this.mode = mode;
-			this.inRange = inRange;
-			this.prevCodePoint = prevCodePoint;
-			this.prevProperty = prevProperty;
-		}
-
-		@Override
-		public String toString() {
-			return String.format(
-					"%s mode=%s inRange=%s prevCodePoint=%d prevProperty=%s",
-					super.toString(),
-					mode,
-					inRange,
-					prevCodePoint,
-					prevProperty);
-		}
-
-		@Override
-		public boolean equals(Object other) {
-			if (!(other instanceof CharSetParseState)) {
-				return false;
-			}
-			CharSetParseState that = (CharSetParseState) other;
-			if (this == that) {
-				return true;
-			}
-			return Objects.equals(this.mode, that.mode) &&
-				Objects.equals(this.inRange, that.inRange) &&
-				Objects.equals(this.prevCodePoint, that.prevCodePoint) &&
-				Objects.equals(this.prevProperty, that.prevProperty);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(mode, inRange, prevCodePoint, prevProperty);
-		}
-	}
-
 	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
 		String chars = charSetAST.getText();
-		chars = chars.substring(1, chars.length() - 1);
 		IntervalSet set = new IntervalSet();
 		CharSetParseState state = CharSetParseState.NONE;
 
-		int n = chars.length();
-		for (int i = 0; i < n; ) {
-			if (state.mode == CharSetParseState.Mode.ERROR) {
-				return new IntervalSet();
-			}
-			int c = chars.codePointAt(i);
-			int offset = Character.charCount(c);
-			if (c == '\\') {
-				EscapeSequenceParsing.Result escapeParseResult =
-					EscapeSequenceParsing.parseEscape(chars, i);
-				switch (escapeParseResult.type) {
-					case INVALID:
-						String invalid = chars.substring(escapeParseResult.startOffset,
-						                                 escapeParseResult.startOffset+escapeParseResult.parseLength);
-						g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-						                           g.fileName, charSetAST.getToken(), invalid);
-						state = CharSetParseState.ERROR;
-						break;
-					case CODE_POINT:
-						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint);
-						break;
-					case PROPERTY:
-						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet);
-						break;
-				}
-				offset = escapeParseResult.parseLength;
-			}
-			else if (c == '-' && !state.inRange && i != 0 && i != n - 1 && state.mode != CharSetParseState.Mode.NONE) {
+		int startIndex = 1; // ignore first [
+		int endIndex = chars.length() - 1; // ignore last ]
+		int index = startIndex;
+		while (index < endIndex) {
+			CharParseResult parseResult = GrammarLiteralParser.parseNextChar(chars, index, endIndex, false);
+			int codePoint = parseResult.codePoint;
+			if (codePoint == '-' && parseResult.length == 1 &&
+					!state.inRange && index != startIndex && index != endIndex - 1 && state.mode != CharSetParseState.Mode.NONE
+			) {
 				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
 					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 							g.fileName, charSetAST.getToken(), charSetAST.getText());
-					state = CharSetParseState.ERROR;
+					return set;
 				}
 				else {
 					state = new CharSetParseState(state.mode, true, state.prevCodePoint, state.prevProperty);
 				}
 			}
 			else {
-				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c);
+				switch (parseResult.type) {
+					case INVALID:
+						String invalid = chars.substring(parseResult.startIndex, parseResult.getEndIndex());
+						g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+								g.fileName, charSetAST.getToken(), invalid);
+						return set;
+					case CODE_POINT:
+						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, codePoint);
+						break;
+					case PROPERTY:
+						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, parseResult.propertyIntervalSet);
+						if (state == null) {
+							return set;
+						}
+						break;
+				}
 			}
-			i += offset;
-		}
-		if (state.mode == CharSetParseState.Mode.ERROR) {
-			return new IntervalSet();
+			index += parseResult.length;
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
 		applyPrevState(charSetAST, set, state);
@@ -513,7 +447,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (state.inRange) {
 			g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 						   g.fileName, charSetAST.getToken(), charSetAST.getText());
-			return CharSetParseState.ERROR;
+			return null;
 		}
 		else {
 			applyPrevState(charSetAST, set, state);
@@ -529,7 +463,6 @@ public class LexerATNFactory extends ParserATNFactory {
 	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state) {
 		switch (state.mode) {
 			case NONE:
-			case ERROR:
 				break;
 			case PREV_CODE_POINT:
 				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint);
