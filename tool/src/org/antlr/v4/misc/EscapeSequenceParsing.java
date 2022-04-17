@@ -76,12 +76,16 @@ public abstract class EscapeSequenceParsing {
 		}
 	}
 
+	public static Result parseEscape(String s, int startOf) {
+		return parseEscape(s, startOf, false);
+	}
+
 	/**
 	 * Parses a single escape sequence starting at {@code startOff}.
 	 *
 	 * Returns a type of INVALID if no valid escape sequence was found, a Result otherwise.
 	 */
-	public static Result parseEscape(String s, int startOff) {
+	public static Result parseEscape(String s, int startOff, boolean stringLiteral) {
 		int offset = startOff;
 		if (offset + 2 > s.length() || s.codePointAt(offset) != '\\') {
 			return invalid(startOff, s.length()-1);
@@ -154,14 +158,14 @@ public abstract class EscapeSequenceParsing {
 				startOff,
 				offset - startOff);
 		}
-		else if (escaped < CharSupport.EscapedCharValue.length) {
-			int codePoint = CharSupport.EscapedCharValue[escaped];
-			if (codePoint == 0) {
+		else {
+			Character codePoint = CharSupport.EscapedCharValue.get((char) escaped);
+			if (codePoint == null) {
 				if (escaped != ']' && escaped != '-') { // escape ']' and '-' only in char sets.
 					return invalid(startOff, startOff+1);
 				}
 				else {
-					codePoint = escaped;
+					codePoint = (char) escaped;
 				}
 			}
 			return new Result(
@@ -170,9 +174,6 @@ public abstract class EscapeSequenceParsing {
 				IntervalSet.EMPTY_SET,
 				startOff,
 				offset - startOff);
-		}
-		else {
-			return invalid(startOff,s.length()-1);
 		}
 	}
 

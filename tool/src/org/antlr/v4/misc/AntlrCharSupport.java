@@ -77,9 +77,9 @@ public class AntlrCharSupport {
 				// '\x'  (antlr lexer will catch invalid char)
 				char escChar = cstr.charAt(1);
 				if (escChar == '\'') return escChar; // escape quote only in string literals.
-				int charVal = CharSupport.EscapedCharValue[escChar];
-				if (charVal == 0) return -1;
-				return charVal;
+				Character escapedCharValue = CharSupport.EscapedCharValue.get(escChar);
+				if (escapedCharValue == null) return -1;
+				return escapedCharValue;
 			case 6:
 				// '\\u1234' or '\\u{12}'
 				if ( !cstr.startsWith("\\u") ) return -1;
