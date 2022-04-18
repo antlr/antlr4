@@ -15,5 +15,5 @@ setup(
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
     entry_points={'console_scripts': ['pygrun=antlr4._pygrun:main']},
-    description=f'ANTLR {v} runtime for Python 2.7.12'
+    description=f'ANTLR {v} runtime for Python 3'
 )
