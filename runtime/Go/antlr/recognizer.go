@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	runtimeVersion = "4.10"
+	runtimeVersion = "4.10.1"
 )
 
 type Recognizer interface {
