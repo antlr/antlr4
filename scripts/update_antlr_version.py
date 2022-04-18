@@ -53,11 +53,11 @@ def update_file(qfname, multi, before, after):
     count = sum(before in line for line in lines)
     if count>1 and not multi:
         print(f"{before} appears on {count} lines so _not_ updating {qfname}")
-
-    # print(f"{before} => {after} in {qfname}")
-    text = text.replace(before, after)
-    with open(qfname, "w", encoding="UTF-8") as f:
-        f.write(text)
+    else:
+        # print(f"{before} => {after} in {qfname}")
+        text = text.replace(before, after)
+        with open(qfname, "w", encoding="UTF-8") as f:
+            f.write(text)
 
 
 def update_files(ROOT, before, after):
