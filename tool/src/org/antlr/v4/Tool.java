@@ -203,7 +203,7 @@ public class Tool {
 			String arg = args[i];
 			i++;
 			if ( arg.equals("-version") ) {
-				this.version();
+				info(VERSION);
 				continue;
 			}
 			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
