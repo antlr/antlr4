@@ -26,17 +26,6 @@ file(GLOB libantlrcpp_SRC
 add_library(antlr4_shared SHARED ${libantlrcpp_SRC})
 add_library(antlr4_static STATIC ${libantlrcpp_SRC})
 
-set(LIB_OUTPUT_DIR "${CMAKE_HOME_DIRECTORY}/dist") # put generated libraries here.
-message(STATUS "Output libraries to ${LIB_OUTPUT_DIR}")
-
-# make sure 'make' works fine even if ${LIB_OUTPUT_DIR} is deleted.
-add_custom_target(make_lib_output_dir ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_OUTPUT_DIR}
-    )
-
-add_dependencies(antlr4_shared make_lib_output_dir)
-add_dependencies(antlr4_static make_lib_output_dir)
-
 if (ANTLR_BUILD_CPP_TESTS)
   include(FetchContent)
 
@@ -45,7 +34,9 @@ if (ANTLR_BUILD_CPP_TESTS)
     URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
   )
 
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  if(WITH_STATIC_CRT)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  endif()
 
   FetchContent_MakeAvailable(googletest)
 
@@ -92,47 +83,42 @@ endif()
 
 set(extra_share_compile_flags "")
 set(extra_static_compile_flags "")
-if(WIN32)
-  set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS")
-  set(extra_static_compile_flags "-DANTLR4CPP_STATIC")
-endif(WIN32)
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  if(WITH_STATIC_CRT)
-    target_compile_options(antlr4_shared PRIVATE "/MT$<$<CONFIG:Debug>:d>")
-    target_compile_options(antlr4_static PRIVATE "/MT$<$<CONFIG:Debug>:d>")
-  else()
-    target_compile_options(antlr4_shared PRIVATE "/MD$<$<CONFIG:Debug>:d>")
-    target_compile_options(antlr4_static PRIVATE "/MD$<$<CONFIG:Debug>:d>")
-  endif()
-endif()
-
 set(static_lib_suffix "")
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(static_lib_suffix "-static")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS -MP /wd4251")
-  set(extra_static_compile_flags "-DANTLR4CPP_STATIC -MP")
+  target_compile_definitions(antlr4_shared PUBLIC ANTLR4CPP_EXPORTS)
+  target_compile_definitions(antlr4_static PUBLIC ANTLR4CPP_STATIC)
+  set(extra_share_compile_flags "-MP /wd4251")
+  set(extra_static_compile_flags "-MP")
 endif()
 
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
                                  OUTPUT_NAME antlr4-runtime
-                                 LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
-                                 # TODO: test in windows. DLL is treated as runtime.
-                                 # see https://cmake.org/cmake/help/v3.0/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html
-                                 RUNTIME_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
-                                 ARCHIVE_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_share_compile_flags}")
 
 set_target_properties(antlr4_static
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
                                  OUTPUT_NAME "antlr4-runtime${static_lib_suffix}"
-                                 ARCHIVE_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
+                                 COMPILE_PDB_NAME "antlr4-runtime${static_lib_suffix}"
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
+
+# Copy the generated binaries to dist folder (required by test suite)
+add_custom_command(
+  TARGET antlr4_shared
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_LINKER_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist)
+
+add_custom_command(
+  TARGET antlr4_static
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_static> ${CMAKE_HOME_DIRECTORY}/dist)
 
 install(TARGETS antlr4_shared
         EXPORT antlr4-targets
