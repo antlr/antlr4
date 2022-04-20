@@ -11,6 +11,10 @@ import (
 	"strconv"
 )
 
+const (
+	runtimeVersion = "4.10.1"
+)
+
 type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
@@ -48,11 +52,14 @@ func NewBaseRecognizer() *BaseRecognizer {
 var tokenTypeMapCache = make(map[string]int)
 var ruleIndexMapCache = make(map[string]int)
 
-func (b *BaseRecognizer) checkVersion(toolVersion string) {
-	runtimeVersion := "4.10.1"
+func (b *BaseRecognizer) CheckVersion(toolVersion string) {
 	if runtimeVersion != toolVersion {
 		fmt.Println("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 	}
+}
+
+func (b *BaseRecognizer) GetVersion() string {
+	return runtimeVersion
 }
 
 func (b *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {

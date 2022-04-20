@@ -133,6 +133,7 @@ public class Tool {
 		new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",                         "-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	    new Option("exact_output_dir",            "-Xexact-output-dir", "all output goes into -o dir regardless of paths/package"),
+	    new Option("",                            "-version", "print the current version of the ANTLR Parser Generator")
 	};
 
 	// helper vars for option management
@@ -201,6 +202,10 @@ public class Tool {
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];
 			i++;
+			if ( arg.equals("-version") ) {
+				info(VERSION);
+				continue;
+			}
 			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
 				handleOptionSetArg(arg);
 				continue;
@@ -913,7 +918,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + Tool.VERSION);
+		this.version();
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
