@@ -16,9 +16,14 @@ import java.lang.reflect.Method;
  */
 @Deprecated
 public class TestRig {
+	/*
+	 * Ofuscate the TestRig class name a bit as bndtools (via maven-bundle-plugin) is too smart for its
+	 * own good and erroneously adds it to the Import-Package header when packaging
+	 */
+	static final String TESTRIG = new StringBuilder("org.antlr.v4.gui.TestRig").toString();
 	public static void main(String[] args) {
 		try {
-			Class<?> testRigClass = Class.forName("org.antlr.v4.gui.TestRig");
+			Class<?> testRigClass = Class.forName(TESTRIG);
 			System.err.println("Warning: TestRig moved to org.antlr.v4.gui.TestRig; calling automatically");
 			try {
 				Method mainMethod = testRigClass.getMethod("main", String[].class);
