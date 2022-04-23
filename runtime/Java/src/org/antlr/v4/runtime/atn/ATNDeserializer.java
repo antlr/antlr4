@@ -285,7 +285,8 @@ public class ATNDeserializer {
 
 				ATNState endState;
 				Transition excludeTransition = null;
-				if (atn.ruleToStartState[i].isLeftRecursiveRule) {
+				RuleStartState ruleStartState = atn.ruleToStartState[i];
+				if (ruleStartState.isLeftRecursiveRule) {
 					// wrap from the beginning of the rule to the StarLoopEntryState
 					endState = null;
 					for (ATNState state : atn.states) {
@@ -302,7 +303,7 @@ public class ATNDeserializer {
 							continue;
 						}
 
-						if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+						if (maybeLoopEndState.onlyHasEpsilonTransitions() && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
 							endState = state;
 							break;
 						}
@@ -332,19 +333,29 @@ public class ATNDeserializer {
 				}
 
 				// all transitions leaving the rule start state need to leave blockStart instead
-				while (atn.ruleToStartState[i].getNumberOfTransitions() > 0) {
-					Transition transition = atn.ruleToStartState[i].removeTransition(atn.ruleToStartState[i].getNumberOfTransitions() - 1);
+				while (ruleStartState.getNumberOfTransitions() > 0) {
+					Transition transition = ruleStartState.removeTransition(ruleStartState.getNumberOfTransitions() - 1);
 					bypassStart.addTransition(transition);
 				}
 
 				// link the new states
-				atn.ruleToStartState[i].addTransition(new EpsilonTransition(bypassStart));
+				ruleStartState.addTransition(new EpsilonTransition(bypassStart));
 				bypassStop.addTransition(new EpsilonTransition(endState));
-
 				ATNState matchState = new BasicState();
 				atn.addState(matchState);
 				matchState.addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i]));
-				bypassStart.addTransition(new EpsilonTransition(matchState));
+
+				if (bypassStart.onlyHasEpsilonTransitions()) {
+					bypassStart.addTransition(new EpsilonTransition(matchState));
+				} else {
+					ATNState matchState2 = new BasicState();
+					atn.addState(matchState2);
+					matchState2.addTransition(bypassStart.transition(0));
+
+					bypassStart.removeTransition(0);
+					bypassStart.addTransition(new EpsilonTransition(matchState));
+					bypassStart.addTransition(new EpsilonTransition(matchState2));
+				}
 			}
 
 			if (deserializationOptions.isVerifyATN()) {
@@ -398,7 +409,7 @@ public class ATNDeserializer {
 			if (atn.ruleToStartState[state.ruleIndex].isLeftRecursiveRule) {
 				ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
 				if (maybeLoopEndState instanceof LoopEndState) {
-					if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+					if (maybeLoopEndState.onlyHasEpsilonTransitions() && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
 						((StarLoopEntryState)state).isPrecedenceDecision = true;
 					}
 				}

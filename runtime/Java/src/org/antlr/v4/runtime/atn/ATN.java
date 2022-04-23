@@ -108,8 +108,10 @@ public class ATN {
 		states.add(state);
 	}
 
-	public void removeState(ATNState state) {
+	public ATNState removeState(ATNState state) {
+		ATNState removingState = states.get(state.stateNumber);
 		states.set(state.stateNumber, null); // just free mem, don't shift states in list
+		return removingState;
 	}
 
 	public int defineDecisionState(DecisionState s) {
