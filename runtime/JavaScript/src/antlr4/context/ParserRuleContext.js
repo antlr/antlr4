@@ -35,8 +35,6 @@ import Interval from "../misc/Interval.js";
  */
 export default class ParserRuleContext extends RuleContext {
 	constructor(parent, invokingStateNumber) {
-		parent = parent || null;
-		invokingStateNumber = invokingStateNumber || null;
 		super(parent, invokingStateNumber);
 		this.ruleIndex = -1;
 		/**
