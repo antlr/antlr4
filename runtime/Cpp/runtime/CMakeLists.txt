@@ -108,19 +108,21 @@ set_target_properties(antlr4_static
                                  COMPILE_PDB_NAME "antlr4-runtime${static_lib_suffix}"
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
 
-# Copy the generated binaries to dist folder (required by test suite)
-add_custom_command(
-  TARGET antlr4_shared
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_LINKER_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist)
-
-add_custom_command(
-  TARGET antlr4_static
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_static> ${CMAKE_HOME_DIRECTORY}/dist)
+if (ANTLR_BUILD_CPP_TESTS)
+  # Copy the generated binaries to dist folder (required by test suite)
+  add_custom_command(
+    TARGET antlr4_shared
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_LINKER_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist)
+  
+  add_custom_command(
+    TARGET antlr4_static
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HOME_DIRECTORY}/dist
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_static> ${CMAKE_HOME_DIRECTORY}/dist)
+endif()
 
 install(TARGETS antlr4_shared
         EXPORT antlr4-targets

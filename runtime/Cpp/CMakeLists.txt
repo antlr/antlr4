@@ -3,13 +3,6 @@ cmake_minimum_required (VERSION 3.15)
 # 3.14 needed because of FetchContent
 # 3.15 needed to avid spew of warnings related to overriding cl command line flags
 
-cmake_policy(SET CMP0091 NEW) # Enable use of CMAKE_MSVC_RUNTIME_LIBRARY
-if(WITH_STATIC_CRT)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-else()
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-endif(WITH_STATIC_CRT)
-
 enable_testing()
 
 # Detect build type, fallback to release and throw a warning if use didn't specify any
@@ -33,6 +26,13 @@ option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: 
 option(WITH_STATIC_CRT "(Visual C++) Enable to statically link CRT, which avoids requiring users to install the redistribution package.
  To disable with: -DWITH_STATIC_CRT=Off" On)
 option(DISABLE_WARNINGS "Suppress compiler warnings for all built ANTLR targets" OFF)
+ 
+cmake_policy(SET CMP0091 NEW) # Enable use of CMAKE_MSVC_RUNTIME_LIBRARY
+if(WITH_STATIC_CRT)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+else()
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif(WITH_STATIC_CRT)
 
 project(LIBANTLR4)
 
