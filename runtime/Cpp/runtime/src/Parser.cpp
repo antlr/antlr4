@@ -20,6 +20,7 @@
 #include "Exceptions.h"
 #include "ANTLRErrorListener.h"
 #include "tree/pattern/ParseTreePattern.h"
+#include "internal/Synchronization.h"
 
 #include "atn/ProfilingATNSimulator.h"
 #include "atn/ParseInfo.h"
@@ -28,6 +29,7 @@
 
 using namespace antlr4;
 using namespace antlr4::atn;
+using namespace antlr4::internal;
 using namespace antlrcpp;
 
 namespace {
@@ -573,7 +575,7 @@ std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
 std::vector<std::string> Parser::getDFAStrings() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::mutex> lck(_mutex);
+    UniqueLock<Mutex> lck(_mutex);
 
     std::vector<std::string> s;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
@@ -588,7 +590,7 @@ std::vector<std::string> Parser::getDFAStrings() {
 void Parser::dumpDFA() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::mutex> lck(_mutex);
+    UniqueLock<Mutex> lck(_mutex);
     bool seenOne = false;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
       dfa::DFA &dfa = simulator->decisionToDFA[d];

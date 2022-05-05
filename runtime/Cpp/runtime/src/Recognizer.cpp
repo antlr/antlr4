@@ -18,6 +18,7 @@
 
 using namespace antlr4;
 using namespace antlr4::atn;
+using namespace antlr4::internal;
 
 std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
@@ -33,7 +34,7 @@ Recognizer::~Recognizer() {
 std::map<std::string_view, size_t> Recognizer::getTokenTypeMap() {
   const dfa::Vocabulary& vocabulary = getVocabulary();
 
-  std::lock_guard<std::mutex> lck(_mutex);
+  UniqueLock<Mutex> lck(_mutex);
   std::map<std::string_view, size_t> result;
   auto iterator = _tokenTypeMapCache.find(&vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
@@ -63,7 +64,7 @@ std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
     throw "The current recognizer does not provide a list of rule names.";
   }
 
-  std::lock_guard<std::mutex> lck(_mutex);
+  UniqueLock<Mutex> lck(_mutex);
   std::map<std::string, size_t> result;
   auto iterator = _ruleIndexMapCache.find(ruleNames);
   if (iterator != _ruleIndexMapCache.end()) {

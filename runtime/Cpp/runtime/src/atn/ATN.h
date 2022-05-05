@@ -6,6 +6,7 @@
 #pragma once
 
 #include "RuleContext.h"
+#include "internal/Synchronization.h"
 
 // GCC generates a warning when forward-declaring ATN if ATN has already been
 // declared due to the attributes added by ANTLR4CPP_PUBLIC.
@@ -123,9 +124,9 @@ namespace atn {
     friend class LexerATNSimulator;
     friend class ParserATNSimulator;
 
-    mutable std::mutex _mutex;
-    mutable std::shared_mutex _stateMutex;
-    mutable std::shared_mutex _edgeMutex;
+    mutable internal::Mutex _mutex;
+    mutable internal::SharedMutex _stateMutex;
+    mutable internal::SharedMutex _edgeMutex;
   };
 
 } // namespace atn

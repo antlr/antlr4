@@ -25,39 +25,33 @@
 
 #pragma once
 
-#include "atn/PredictionContext.h"
-#include "FlatHashSet.h"
+#include "antlr4-common.h"
+
+#if ANTLR4CPP_USING_ABSEIL
+#include "absl/container/flat_hash_set.h"
+#else
+#include <unordered_set>
+#endif
+
+// By default ANTLRv4 uses containers provided by the C++ standard library. In most deployments this
+// is fine, however in some using custom containers may be preferred. This header allows that by
+// optionally supporting some alternative implementations and allowing for more easier patching of
+// other alternatives.
 
 namespace antlr4 {
-namespace atn {
 
-  class ANTLR4CPP_PUBLIC PredictionContextCache final {
-  public:
-    PredictionContextCache() = default;
+#if ANTLR4CPP_USING_ABSEIL
+  template <typename Key,
+            typename Hash = typename absl::flat_hash_set<Key>::hasher,
+            typename Equal = typename absl::flat_hash_set<Key>::key_equal,
+            typename Allocator = typename absl::flat_hash_set<Key>::allocator_type>
+  using FlatHashSet = absl::flat_hash_set<Key, Hash, Equal, Allocator>;
+#else
+  template <typename Key,
+            typename Hash = typename std::unordered_set<Key>::hasher,
+            typename Equal = typename std::unordered_set<Key>::key_equal,
+            typename Allocator = typename std::unordered_set<Key>::allocator_type>
+  using FlatHashSet = std::unordered_set<Key, Hash, Equal, Allocator>;
+#endif
 
-    PredictionContextCache(const PredictionContextCache&) = delete;
-    PredictionContextCache(PredictionContextCache&&) = delete;
-
-    PredictionContextCache& operator=(const PredictionContextCache&) = delete;
-    PredictionContextCache& operator=(PredictionContextCache&&) = delete;
-
-    void put(const Ref<const PredictionContext> &value);
-
-    Ref<const PredictionContext> get(const Ref<const PredictionContext> &value) const;
-
-  private:
-    struct ANTLR4CPP_PUBLIC PredictionContextHasher final {
-      size_t operator()(const Ref<const PredictionContext> &predictionContext) const;
-    };
-
-    struct ANTLR4CPP_PUBLIC PredictionContextComparer final {
-      bool operator()(const Ref<const PredictionContext> &lhs,
-                      const Ref<const PredictionContext> &rhs) const;
-    };
-
-    FlatHashSet<Ref<const PredictionContext>,
-                PredictionContextHasher, PredictionContextComparer> _data;
-  };
-
-}  // namespace atn
-}  // namespace antlr4
+} // namespace antlr4

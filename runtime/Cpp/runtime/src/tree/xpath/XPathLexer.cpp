@@ -37,7 +37,7 @@ struct XPathLexerStaticData final {
   std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
-std::once_flag xpathLexerOnceFlag;
+::antlr4::internal::OnceFlag xpathLexerOnceFlag;
 XPathLexerStaticData *xpathLexerStaticData = nullptr;
 
 void xpathLexerInitialize() {
@@ -178,5 +178,5 @@ void XPathLexer::IDAction(antlr4::RuleContext *context, size_t actionIndex) {
 }
 
 void XPathLexer::initialize() {
-  std::call_once(xpathLexerOnceFlag, xpathLexerInitialize);
+  ::antlr4::internal::call_once(xpathLexerOnceFlag, xpathLexerInitialize);
 }
