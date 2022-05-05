@@ -33,7 +33,11 @@
 
 #if ANTLR4CPP_USING_ABSEIL
 #include "absl/base/call_once.h"
+#include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
+#define ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS ABSL_NO_THREAD_SAFETY_ANALYSIS
+#else
+#define ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS
 #endif
 
 // By default ANTLRv4 uses synchronization primitives provided by the C++ standard library. In most
@@ -56,11 +60,11 @@ namespace antlr4::internal {
     Mutex& operator=(const Mutex&) = delete;
     Mutex& operator=(Mutex&&) = delete;
 
-    void lock();
+    void lock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    bool try_lock();
+    bool try_lock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    void unlock();
+    void unlock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
   private:
 #if ANTLR4CPP_USING_ABSEIL
@@ -86,17 +90,17 @@ namespace antlr4::internal {
     SharedMutex& operator=(const SharedMutex&) = delete;
     SharedMutex& operator=(SharedMutex&&) = delete;
 
-    void lock();
+    void lock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    bool try_lock();
+    bool try_lock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    void unlock();
+    void unlock() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    void lock_shared();
+    void lock_shared() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    bool try_lock_shared();
+    bool try_lock_shared() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
-    void unlock_shared();
+    void unlock_shared() ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS;
 
   private:
 #if ANTLR4CPP_USING_ABSEIL
