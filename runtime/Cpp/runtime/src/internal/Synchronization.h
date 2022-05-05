@@ -27,14 +27,13 @@
 
 #include "antlr4-common.h"
 
+#include <mutex>
+#include <shared_mutex>
 #include <utility>
 
 #if ANTLR4CPP_USING_ABSEIL
 #include "absl/base/call_once.h"
 #include "absl/synchronization/mutex.h"
-#else
-#include <mutex>
-#include <shared_mutex>
 #endif
 
 // By default ANTLRv4 uses synchronization primitives provided by the C++ standard library. In most
