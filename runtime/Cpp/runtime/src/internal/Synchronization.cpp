@@ -61,7 +61,7 @@ void SharedMutex::lock() {
 
 bool SharedMutex::try_lock() {
 #if ANTLR4CPP_USING_ABSEIL
-  return _impl.TryWriterLock();
+  return _impl.WriterTryLock();
 #else
   return _impl.try_lock();
 #endif
