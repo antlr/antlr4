@@ -23,41 +23,78 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 // WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "internal/Synchronization.h"
 
-#include "atn/PredictionContext.h"
-#include "FlatHashSet.h"
+using namespace antlr4::internal;
 
-namespace antlr4 {
-namespace atn {
+void Mutex::lock() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.Lock();
+#else
+  _impl.lock();
+#endif
+}
 
-  class ANTLR4CPP_PUBLIC PredictionContextCache final {
-  public:
-    PredictionContextCache() = default;
+bool Mutex::try_lock() {
+#if ANTLR4CPP_USING_ABSEIL
+  return _impl.TryLock();
+#else
+  return _impl.try_lock();
+#endif
+}
 
-    PredictionContextCache(const PredictionContextCache&) = delete;
-    PredictionContextCache(PredictionContextCache&&) = delete;
+void Mutex::unlock() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.Unlock();
+#else
+  _impl.unlock();
+#endif
+}
 
-    PredictionContextCache& operator=(const PredictionContextCache&) = delete;
-    PredictionContextCache& operator=(PredictionContextCache&&) = delete;
+void SharedMutex::lock() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.WriterLock();
+#else
+  _impl.lock();
+#endif
+}
 
-    void put(const Ref<const PredictionContext> &value);
+bool SharedMutex::try_lock() {
+#if ANTLR4CPP_USING_ABSEIL
+  return _impl.TryWriterLock();
+#else
+  return _impl.try_lock();
+#endif
+}
 
-    Ref<const PredictionContext> get(const Ref<const PredictionContext> &value) const;
+void SharedMutex::unlock() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.WriterUnlock();
+#else
+  _impl.unlock();
+#endif
+}
 
-  private:
-    struct ANTLR4CPP_PUBLIC PredictionContextHasher final {
-      size_t operator()(const Ref<const PredictionContext> &predictionContext) const;
-    };
+void SharedMutex::lock_shared() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.ReaderLock();
+#else
+  _impl.lock_shared();
+#endif
+}
 
-    struct ANTLR4CPP_PUBLIC PredictionContextComparer final {
-      bool operator()(const Ref<const PredictionContext> &lhs,
-                      const Ref<const PredictionContext> &rhs) const;
-    };
+bool SharedMutex::try_lock_shared() {
+#if ANTLR4CPP_USING_ABSEIL
+  return _impl.ReaderTryLock();
+#else
+  return _impl.try_lock_shared();
+#endif
+}
 
-    FlatHashSet<Ref<const PredictionContext>,
-                PredictionContextHasher, PredictionContextComparer> _data;
-  };
-
-}  // namespace atn
-}  // namespace antlr4
+void SharedMutex::unlock_shared() {
+#if ANTLR4CPP_USING_ABSEIL
+  _impl.ReaderUnlock();
+#else
+  _impl.unlock_shared();
+#endif
+}

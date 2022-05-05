@@ -165,5 +165,4 @@
 #include "tree/xpath/XPathTokenElement.h"
 #include "tree/xpath/XPathWildcardAnywhereElement.h"
 #include "tree/xpath/XPathWildcardElement.h"
-
-
+#include "internal/Synchronization.h"

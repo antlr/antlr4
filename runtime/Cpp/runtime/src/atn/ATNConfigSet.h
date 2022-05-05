@@ -10,6 +10,7 @@
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
 #include "atn/ATNConfig.h"
+#include "FlatHashSet.h"
 
 namespace antlr4 {
 namespace atn {
@@ -130,7 +131,7 @@ namespace atn {
 
     virtual bool equals(const ATNConfig &lhs, const ATNConfig &rhs) const;
 
-    using LookupContainer = std::unordered_set<ATNConfig*, ATNConfigHasher, ATNConfigComparer>;
+    using LookupContainer = FlatHashSet<ATNConfig*, ATNConfigHasher, ATNConfigComparer>;
 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.

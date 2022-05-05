@@ -8,6 +8,7 @@
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
 #include "atn/SerializedATNView.h"
+#include "internal/Synchronization.h"
 
 namespace antlr4 {
 
@@ -142,7 +143,7 @@ namespace antlr4 {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
     // Mutex to manage synchronized access for multithreading.
-    std::mutex _mutex;
+    internal::Mutex _mutex;
 
   private:
     static std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> _tokenTypeMapCache;

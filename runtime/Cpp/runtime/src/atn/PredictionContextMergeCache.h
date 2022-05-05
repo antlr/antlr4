@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <utility>
 
 #include "atn/PredictionContext.h"
 #include "atn/PredictionContextMergeCacheOptions.h"
+#include "FlatHashMap.h"
 
 namespace antlr4 {
 namespace atn {
@@ -84,8 +84,8 @@ namespace atn {
 
     void compact(const Entry *preserve);
 
-    using Container = std::unordered_map<PredictionContextPair, std::unique_ptr<Entry>,
-                                         PredictionContextHasher, PredictionContextComparer>;
+    using Container = FlatHashMap<PredictionContextPair, std::unique_ptr<Entry>,
+                                  PredictionContextHasher, PredictionContextComparer>;
 
     const PredictionContextMergeCacheOptions _options;
 

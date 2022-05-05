@@ -143,7 +143,7 @@ struct <lexer.name; format = "cap">StaticData final {
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
-std::once_flag <lexer.grammarName; format = "lower">LexerOnceFlag;
+::antlr4::internal::OnceFlag <lexer.grammarName; format = "lower">LexerOnceFlag;
 <lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
@@ -238,7 +238,7 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 <sempredFuncs.values; separator="\n">
 
 void <lexer.name>::initialize() {
-  std::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
+  ::antlr4::internal::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
 }
 >>
 
@@ -363,7 +363,7 @@ struct <parser.name; format = "cap">StaticData final {
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
-std::once_flag <parser.grammarName; format = "lower">ParserOnceFlag;
+::antlr4::internal::OnceFlag <parser.grammarName; format = "lower">ParserOnceFlag;
 <parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
@@ -435,7 +435,7 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 <sempredFuncs.values; separator="\n"><endif>
 
 void <parser.name>::initialize() {
-  std::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
+  ::antlr4::internal::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
 }
 >>
 

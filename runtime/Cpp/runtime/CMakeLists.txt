@@ -4,6 +4,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
   ${PROJECT_SOURCE_DIR}/runtime/src/atn
   ${PROJECT_SOURCE_DIR}/runtime/src/dfa
+  ${PROJECT_SOURCE_DIR}/runtime/src/internal
   ${PROJECT_SOURCE_DIR}/runtime/src/misc
   ${PROJECT_SOURCE_DIR}/runtime/src/support
   ${PROJECT_SOURCE_DIR}/runtime/src/tree
@@ -16,6 +17,7 @@ file(GLOB libantlrcpp_SRC
   "${PROJECT_SOURCE_DIR}/runtime/src/*.cpp"
   "${PROJECT_SOURCE_DIR}/runtime/src/atn/*.cpp"
   "${PROJECT_SOURCE_DIR}/runtime/src/dfa/*.cpp"
+  "${PROJECT_SOURCE_DIR}/runtime/src/internal/*.cpp"
   "${PROJECT_SOURCE_DIR}/runtime/src/misc/*.cpp"
   "${PROJECT_SOURCE_DIR}/runtime/src/support/*.cpp"
   "${PROJECT_SOURCE_DIR}/runtime/src/tree/*.cpp"
