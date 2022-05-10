@@ -12,10 +12,7 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
@@ -90,7 +87,7 @@ public class ToolTestUtils {
 	) {
 		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
 				input, profile, showDiagnosticErrors, false, false, endStage, "Java",
-				JavaRunner.runtimeTestParserName);
+				JavaRunner.runtimeTestParserName, PredictionMode.LL);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {

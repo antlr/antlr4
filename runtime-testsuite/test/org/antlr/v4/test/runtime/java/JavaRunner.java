@@ -187,6 +187,7 @@ public class JavaRunner extends RuntimeRunner {
 					profiler = new ProfilingATNSimulator(parser);
 					parser.setInterpreter(profiler);
 				}
+				parser.getInterpreter().setPredictionMode(runOptions.predictionMode);
 
 				Method startRule;
 				Object[] args = null;

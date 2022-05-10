@@ -48,6 +48,7 @@ func main() {
 	stream := antlr.NewCommonTokenStream(lexer,0)
 <if(parserName)>
 	p := parser.New<parserName>(stream)
+	p.Interpreter.SetPredictionMode(antlr.PredictionMode<predictionMode>)
 <if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>

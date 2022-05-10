@@ -13,6 +13,7 @@ public class Test {
 		var tokens = new CommonTokenStream(lex);
 <if(parserName)>
 		var parser = new <parserName>(tokens);
+		parser.Interpreter.PredictionMode = PredictionMode.<predictionMode>;
 <if(showDiagnosticErrors)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>

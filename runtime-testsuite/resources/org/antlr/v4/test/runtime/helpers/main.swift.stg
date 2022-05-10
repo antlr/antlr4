@@ -30,6 +30,7 @@ parser.addErrorListener(DiagnosticErrorListener())
 let profiler = ProfilingATNSimulator(parser)
 parser.setInterpreter(profiler)
 <endif>
+parser.getInterpreter().setPredictionMode(PredictionMode.<predictionMode>)
 let tree = try parser.<parserStartRuleName>()
 <if(profile)>
 print(profiler.getDecisionInfo().description)

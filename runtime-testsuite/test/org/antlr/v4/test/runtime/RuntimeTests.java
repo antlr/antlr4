@@ -166,7 +166,8 @@ public abstract class RuntimeTests {
 				descriptor.showDFA,
 				Stage.Execute,
 				targetName,
-				superClass
+				superClass,
+				descriptor.predictionMode
 		);
 
 		State result = runner.run(runOptions);
