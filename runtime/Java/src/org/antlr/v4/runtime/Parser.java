@@ -30,8 +30,6 @@ import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -944,6 +942,42 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	public boolean isTrace() {
 		return _tracer != null;
+	}
+
+	protected void reportAndRecover(ParserRuleContext ruleContext, RecognitionException re) {
+		ruleContext.exception = re;
+		if (shouldReportAndRecover()) {
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+	}
+
+	protected boolean shouldReportAndRecover() {
+		return _interp.getPredictionMode() != PredictionMode.SLL_OR_LL || !_interp.getIsSllInSllOrLlMode();
+	}
+
+	protected boolean shouldReparseOrThrow(ParserRuleContext ruleContext) throws RecognitionException {
+		boolean reparse = false;
+		if (_interp.getPredictionMode() == PredictionMode.SLL_OR_LL) {
+			if (_ctx == null) {
+				// Switching is only allowed for root rule
+				if (_interp.getIsSllInSllOrLlMode()) {
+					reset(); // Reset tokens stream
+					// Try reparse using full LL if errors occurred during SLL
+					reparse = ruleContext.exception != null;
+					_interp.setIsSllInSllOrLlMode(false);
+				}
+				else {
+					// Restore fast SLL prediction mode for the next time
+					_interp.setIsSllInSllOrLlMode(true);
+				}
+			}
+			else if (ruleContext.exception != null && _interp.getIsSllInSllOrLlMode()) {
+				// Rethrow exception for SLL prediction mode with SLL_OR_LL
+				throw ruleContext.exception;
+			}
+		}
+		return reparse;
 	}
 }
 

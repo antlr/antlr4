@@ -6,6 +6,8 @@
 
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
+
 import java.io.File;
 
 /** This interface describes functionality needed to execute a runtime test.
@@ -42,13 +44,14 @@ public interface RuntimeTestSupport {
 	                 boolean showDFA);
 
 	String execParser(String grammarFileName,
-	                  String grammarStr,
-	                  String parserName,
-	                  String lexerName,
-	                  String listenerName,
-	                  String visitorName,
-	                  String startRuleName,
-	                  String input,
-	                  boolean showDiagnosticErrors);
+					  String grammarStr,
+					  String parserName,
+					  String lexerName,
+					  String listenerName,
+					  String visitorName,
+					  String startRuleName,
+					  String input,
+					  boolean showDiagnosticErrors,
+					  PredictionMode predictionMode);
 
 }

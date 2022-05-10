@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.csharp;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
@@ -85,7 +86,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 							 String visitorName,
 							 String startRuleName,
 							 String input,
-							 boolean showDiagnosticErrors) {
+							 boolean showDiagnosticErrors,
+							 PredictionMode predictionMode) {
 		boolean success = rawGenerateRecognizer(grammarFileName,
 				grammarStr,
 				parserName,

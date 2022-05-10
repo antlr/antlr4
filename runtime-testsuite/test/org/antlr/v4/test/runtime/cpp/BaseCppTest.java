@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.cpp;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -69,7 +70,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	                         String visitorName,
 	                         String startRuleName,
 	                         String input,
-	                         boolean showDiagnosticErrors)
+	                         boolean showDiagnosticErrors,
+	                         PredictionMode predictionMode)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr,

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -58,7 +59,8 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String visitorName,
 		String startRuleName,
 		String input,
-		boolean showDiagnosticErrors
+		boolean showDiagnosticErrors,
+		PredictionMode predictionMode
 	) {
 		return execParser_(
 			grammarFileName,

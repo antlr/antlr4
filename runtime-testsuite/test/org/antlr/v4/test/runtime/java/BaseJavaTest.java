@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -117,7 +118,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	 * Wow! much faster than compiling outside of VM. Finicky though.
 	 * Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */
-	protected boolean compile(String... fileNames) {
+	public boolean compile(String... fileNames) {
 		List<File> files = new ArrayList<File>();
 		for (String fileName : fileNames) {
 			File f = new File(getTempTestDir(), fileName);
@@ -242,10 +243,11 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	                         String visitorName,
 	                         String startRuleName,
 	                         String input,
-	                         boolean showDiagnosticErrors)
+	                         boolean showDiagnosticErrors,
+							 PredictionMode predictionMode)
 	{
 		return execParser(grammarFileName, grammarStr, parserName, lexerName,
-		                  listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
+		                  listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false, predictionMode);
 	}
 
 	/** ANTLR isn't thread-safe to process grammars so we use a global lock for testing */
@@ -260,7 +262,8 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	                         String startRuleName,
 	                         String input,
 	                         boolean showDiagnosticErrors,
-	                         boolean profile)
+	                         boolean profile,
+	                         PredictionMode predictionMode)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr,
@@ -273,7 +276,8 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 								 lexerName,
 								 startRuleName,
 								 showDiagnosticErrors,
-								 profile);
+								 profile,
+								 predictionMode);
 	}
 
 	/** Return true if all is well */
@@ -324,7 +328,8 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 									   String lexerName,
 									   String parserStartRuleName,
 									   boolean debug,
-									   boolean profile)
+									   boolean profile,
+									   PredictionMode predictionMode)
 	{
         setParseErrors(null);
 		if ( parserName==null ) {
@@ -335,7 +340,8 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 						  lexerName,
 						  parserStartRuleName,
 						  debug,
-						  profile);
+						  profile,
+						  predictionMode);
 		}
 
 		compile("Test.java");
@@ -503,7 +509,8 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 								 String lexerName,
 								 String parserStartRuleName,
 								 boolean debug,
-								 boolean profile)
+								 boolean profile,
+								 PredictionMode predictionMode)
 	{
 		ST outputFileST = new ST(
 			"import org.antlr.v4.runtime.*;\n" +
@@ -511,6 +518,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			"import org.antlr.v4.runtime.atn.*;\n" +
 			"import java.nio.file.Paths;\n"+
 			"import java.util.Arrays;\n"+
+			"import org.antlr.v4.runtime.atn.PredictionMode;\n" +
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -518,6 +526,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
+			"        parser.getInterpreter().setPredictionMode(PredictionMode.<predictionMode>);\n" +
 			"		 parser.setBuildParseTree(true);\n" +
 			"		 <profile>\n"+
 			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
@@ -561,6 +570,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		outputFileST.add("predictionMode", predictionMode);
 		writeFile(getTempDirPath(), "Test.java", outputFileST.render());
 	}
 

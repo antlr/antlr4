@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.atn.DecisionInfo;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -216,7 +217,7 @@ public class TestParserProfiler extends BaseJavaToolTest {
 			"MULT : '*' ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", null, null, "s",
-								  "xyz;abc;z.q", false, true);
+								  "xyz;abc;z.q", false, true, PredictionMode.LL);
 		String expecting =
 			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
 			"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +

@@ -1,5 +1,6 @@
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class UniversalRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	public List<Pair<String, String>> slaveGrammars = new ArrayList<>();
 	public boolean showDFA = false;
 	public boolean showDiagnosticErrors = false;
+	public PredictionMode predictionMode = PredictionMode.LL;
 
 	public List<String> skipTargets = new ArrayList<>();
 
@@ -65,6 +67,9 @@ public class UniversalRuntimeTestDescriptor implements RuntimeTestDescriptor {
 		if ( slaveGrammars.size()==0 ) return null;
 		return slaveGrammars;
 	}
+
+	@Override
+	public PredictionMode getPredictionMode() { return predictionMode; }
 
 	@Override
 	public String getTarget() {

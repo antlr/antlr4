@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.python;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.junit.runner.Description;
 
@@ -63,7 +64,8 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 	                         String visitorName,
 	                         String startRuleName,
 	                         String input,
-	                         boolean showDiagnosticErrors) {
+	                         boolean showDiagnosticErrors,
+	                         PredictionMode predictionMode) {
 		return execParser_(grammarFileName, grammarStr, parserName, lexerName,
 		                   listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
 	}

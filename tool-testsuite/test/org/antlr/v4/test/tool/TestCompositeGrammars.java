@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestUtils;
@@ -638,7 +639,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		RuntimeTestUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "Java.g4", slave);
 		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer",
-					  null, null, "compilationUnit", "package Foo;", debug);
+					  null, null, "compilationUnit", "package Foo;", debug, PredictionMode.LL);
 		assertEquals(null, found);
 		assertNull(getParseErrors());
 	}
@@ -666,7 +667,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		RuntimeTestUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "Java.g4", slave);
 		String found = execParser("T.g4", master, "TParser", "TLexer",
-					  null, null, "s", "a=b", debug);
+					  null, null, "s", "a=b", debug, PredictionMode.LL);
 		assertEquals(null, found);
 		assertNull(getParseErrors());
 	}

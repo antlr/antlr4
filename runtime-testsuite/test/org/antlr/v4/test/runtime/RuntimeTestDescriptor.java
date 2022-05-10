@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;
@@ -50,6 +51,8 @@ public interface RuntimeTestDescriptor {
 
 	/** Return a list of grammars imported into the grammar specified in {#getGrammar}. */
 	List<Pair<String,String>> getSlaveGrammars();
+
+	PredictionMode getPredictionMode();
 
 	/** Return a string representing the name of the target currently testing
 	 *  this descriptor. Multiple instances of the same descriptor class

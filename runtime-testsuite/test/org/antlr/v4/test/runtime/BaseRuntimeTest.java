@@ -7,6 +7,7 @@
 package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -217,7 +218,8 @@ public abstract class BaseRuntimeTest {
 		                                   grammarName+"Visitor",
 		                                   descriptor.getStartRule(),
 		                                   descriptor.getInput(),
-		                                   descriptor.showDiagnosticErrors()
+		                                   descriptor.showDiagnosticErrors(),
+		                                   descriptor.getPredictionMode()
 		                                  );
 		assertCorrectOutput(descriptor, delegate, found);
 	}
@@ -495,12 +497,16 @@ public abstract class BaseRuntimeTest {
 				case "flags":
 					String[] flags = value.split("\n");
 					for (String f : flags) {
-						switch (f) {
+						String[] parts = f.split("=", 2);
+						switch (parts[0]) {
 							case "showDFA":
 								d.showDFA = true;
 								break;
 							case "showDiagnosticErrors":
 								d.showDiagnosticErrors = true;
+								break;
+							case "predictionMode":
+								d.predictionMode = PredictionMode.valueOf(parts[1]);
 								break;
 						}
 					}
