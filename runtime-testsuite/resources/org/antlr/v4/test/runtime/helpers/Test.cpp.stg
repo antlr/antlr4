@@ -33,6 +33,7 @@ int main(int argc, const char* argv[]) {
   CommonTokenStream tokens(&lexer);
 <if(parserName)>
   <parserName> parser(&tokens);
+  parser.getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(antlr4::atn::PredictionMode::<predictionMode>);
 <if(showDiagnosticErrors)>
   DiagnosticErrorListener errorListener;
   parser.addErrorListener(&errorListener);

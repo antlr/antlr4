@@ -248,6 +248,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		outputFileST.add("showDFA", runOptions.showDFA);
 		outputFileST.add("useListener", runOptions.useListener);
 		outputFileST.add("useVisitor", runOptions.useVisitor);
+		outputFileST.add("predictionMode", runOptions.predictionMode);
 		addExtraRecognizerParameters(outputFileST);
 		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
 	}
