@@ -87,12 +87,14 @@ set(extra_share_compile_flags "")
 set(extra_static_compile_flags "")
 set(static_lib_suffix "")
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (WIN32)
   set(static_lib_suffix "-static")
   target_compile_definitions(antlr4_shared PUBLIC ANTLR4CPP_EXPORTS)
   target_compile_definitions(antlr4_static PUBLIC ANTLR4CPP_STATIC)
-  set(extra_share_compile_flags "-MP /wd4251")
-  set(extra_static_compile_flags "-MP")
+  if("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    set(extra_share_compile_flags "-MP /wd4251")
+    set(extra_static_compile_flags "-MP")
+  endif()
 endif()
 
 set_target_properties(antlr4_shared
