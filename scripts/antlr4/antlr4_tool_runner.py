@@ -46,6 +46,37 @@ def download_antlr4(jar, version):
     return jar
 
 
+def find_bin_dir(install_dir):
+    for root, dirs, files in os.walk(install_dir):
+        if root.endswith("bin"):
+            return root
+    return None
+
+
+def install_jre(java_version='11'):
+    USER_DIR = os.path.expanduser("~")
+    JRE_DIR = os.path.join(USER_DIR, ".jre")
+    if os.path.exists(JRE_DIR):
+        for f in os.listdir(JRE_DIR):
+            if f.startswith(f"jdk-{java_version}"):
+                install_dir = os.path.join(JRE_DIR, f)
+                bindir = find_bin_dir(install_dir)
+                java = os.path.join(bindir, 'java')
+                return java
+
+    r = input(f"ANTLR tool needs Java to run; install Java JRE 11 yes/no (default yes)? ")
+    if r.strip().lower() not in {'yes','y',''}:
+        exit(1)
+    install_dir = jdk.install(java_version, jre=True)
+    print(f"Installed Java in {install_dir}; remove that dir to uninstall")
+    bindir = find_bin_dir(install_dir)
+    if bindir is None:
+        print(f"Can't find bin/java in {install_dir}; installation failed")
+        return None
+    java = os.path.join(bindir, 'java')
+    return java
+
+
 def main():
     global mvn_repo, homedir
 
@@ -63,25 +94,21 @@ def main():
 
     jar = antlr4_jar(version)
 
-    java = which("java")
+    java = which("javaf")
     if java is None:
-        java_version = '11'
-        r = input(f"ANTLR tool needs Java to run; install Java JRE 11 yes/no (default yes)? ")
-        if len(r.strip())>0:
-            java_version = r.strip()
-        install_dir = jdk.install(java_version, jre=True)
-        print(f"Installed Java in {install_dir}; remove that dir to uninstall")
-        for root, dirs, files in os.walk('/Users/parrt/.jre/jdk-11.0.15+10-jre'):
-            if root.endswith("/bin"):
-                java = os.path.join(root, 'java')
-        if java is None:
-            print(f"Can't find bin/java in {install_dir}; installation failed")
-            exit(1)
+        java = install_jre()
 
-    if jar is None:
+    if jar is None or java is None:
         exit(1)
 
-    p = subprocess.Popen(['java', '-cp', jar, 'org.antlr.v4.Tool']+args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    CHECK_JRE_VERSION = False
+    if CHECK_JRE_VERSION:
+        p = subprocess.Popen([java, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        out = out.decode("UTF-8").split('\n')[0]
+        print(f"Running {out}")
+
+    p = subprocess.Popen([java, '-cp', jar, 'org.antlr.v4.Tool']+args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     out = out.decode("UTF-8")
     err = err.decode("UTF-8")
