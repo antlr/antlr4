@@ -18,7 +18,6 @@ def latest_version():
         antlr_info = searchResult['docs'][0]
         # print(json.dump(searchResult))
         latest = antlr_info['latestVersion']
-        print("latest", latest)
         return latest
 
 def antlr4_jar(version):
@@ -94,7 +93,7 @@ def main():
 
     jar = antlr4_jar(version)
 
-    java = which("javaf")
+    java = which("java")
     if java is None:
         java = install_jre()
 
