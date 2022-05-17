@@ -24,6 +24,9 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -2184,11 +2187,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public static String getSafeEnv(String envName) {
 		try {
-			return System.getenv(envName);
-		}
-		catch(SecurityException e) {
-			// use the default value
-		}
+			return AccessController.doPrivileged(new PrivilegedAction<String>() {
+				@Override
+				public String run() {
+					return System.getenv(envName);
+				}
+			});
+		} catch (SecurityException e) { }
 		return null;
 	}
 }
