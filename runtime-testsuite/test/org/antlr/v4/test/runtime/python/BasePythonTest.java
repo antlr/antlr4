@@ -205,7 +205,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 				}
 			}
 		}
-		throw new RuntimeException("Could not locate " + tools);
+		return "python";
 	}
 
 	protected String locatePython() {
@@ -215,7 +215,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 			prop = locateTool(getPythonExecutables());
 		File file = new File(prop);
 		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
+			return "python";
 		return file.getAbsolutePath();
 	}
 
