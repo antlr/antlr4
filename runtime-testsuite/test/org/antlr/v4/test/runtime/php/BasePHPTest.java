@@ -252,7 +252,7 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			}
 		}
 
-		throw new RuntimeException("Could not locate " + tool);
+		return "php";
 	}
 
 	protected String locatePhp() {
@@ -266,7 +266,7 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		File file = new File(prop);
 
 		if (!file.exists()) {
-			throw new RuntimeException("Missing system property:" + propName);
+			return "php";
 		}
 
 		return file.getAbsolutePath();
