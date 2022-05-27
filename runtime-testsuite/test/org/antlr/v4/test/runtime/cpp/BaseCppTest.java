@@ -33,6 +33,87 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return "Cpp";
 	}
 
+	private static Boolean runtimeBuiltOnce = false;
+
+	private static String runtimePath;
+	private static String runtimeSourcePath;
+	private static String runtimeBinaryPath;
+	private static String runtimeLibraryFileName;
+
+	private static String compilerPath;
+	private static String visualStudioVersion;
+	private static String visualStudioProjectContent;
+	private static String visualStudioPlatformToolset;
+
+	static {
+		initCompilerFileName();
+		initRuntimePath();
+		initBinaryPath();
+
+		if (isWindows()) {
+			visualStudioProjectContent = getTextFromResource("org/antlr/v4/test/runtime/helpers/CppVisualStudioProject.stg");
+		}
+	}
+
+	private static void initRuntimePath() {
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final URL runtimeURL = loader.getResource("Cpp");
+		if (runtimeURL == null) {
+			throw new RuntimeException("Cannot find runtime");
+		}
+		// Windows not getting runtime right. See:
+		// http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
+		// it was coming back "/C:/projects/antlr4-l7imv/runtime-testsuite/target/classes/Cpp"
+		try {
+			runtimePath = Paths.get(runtimeURL.toURI()).toFile().toString();
+			runtimeSourcePath = Paths.get(runtimePath, "runtime", "src").toString();
+		} catch (URISyntaxException use) {
+			runtimePath = "Can't find runtime at " + runtimeURL;
+		}
+	}
+
+	private static void initCompilerFileName() {
+		if (isWindows()) {
+			visualStudioPlatformToolset = "v143";
+			visualStudioVersion = "2022";
+			String[] visualStudioVersions = new String[]{"2022", "2019"};
+			String[] visualStudioEditions = new String[]{"Community", "Professional", "Enterprise"};
+			for (String version : visualStudioVersions) {
+				String programFilesSuffix;
+				if (version.equals("2022")) {
+					programFilesSuffix = "";
+				} else {
+					programFilesSuffix = " (x86)";
+				}
+				for (String edition : visualStudioEditions) {
+					String file = "C:\\Program Files" + programFilesSuffix + "\\Microsoft Visual Studio\\" + version + "\\"
+							+ edition + "\\Msbuild\\Current\\Bin\\MSBuild.exe";
+					if (new File(file).exists()) {
+						visualStudioPlatformToolset = version.equals("2022") ? "v143" : "v142";
+						visualStudioVersion = version;
+						compilerPath = file;
+						return;
+					}
+				}
+			}
+			compilerPath = "MSBuild";
+		}
+		else {
+			compilerPath = "clang++";
+		}
+	}
+
+	private static void initBinaryPath() {
+		if (isWindows()) {
+			runtimeBinaryPath = Paths.get(runtimePath, "runtime", "bin", "vs-" + visualStudioVersion, "x64", "Release DLL").toString();
+			runtimeLibraryFileName = Paths.get(runtimeBinaryPath, "antlr4-runtime.dll").toString();
+		}
+		else {
+			runtimeBinaryPath = Paths.get(runtimePath, "dist").toString();
+			runtimeLibraryFileName = Paths.get(runtimeBinaryPath, "libantlr4-runtime." + (getOS().equals("mac") ? "dylib" : "so")).toString();
+		}
+	}
+
 	protected String execLexer(String grammarFileName,
 	                           String grammarStr,
 	                           String lexerName,
@@ -55,10 +136,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.cpp");
-		return output;
+		return execModule("Test.cpp");
 	}
-
 
 	@Override
 	public String execParser(String grammarFileName,
@@ -112,7 +191,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			return false;
 		}
 
-		List<String> files = new ArrayList<String>();
+		List<String> files = new ArrayList<>();
 		if ( lexerName!=null ) {
 			files.add(lexerName+".cpp");
 			files.add(lexerName+".h");
@@ -159,7 +238,6 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return execModule("Test.cpp");
 	}
 
-
 	public List<String> allCppFiles(String path) {
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
@@ -173,8 +251,158 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return files;
 	}
 
+	public String execModule(String fileName) {
+		if (!buildRuntimeIfRequired()) {
+			return null;
+		}
+
+		if (!buildTestProject()) {
+			return null;
+		}
+
+		return runTestProject(fileName);
+	}
+
+	private boolean buildRuntimeIfRequired() {
+		synchronized (BaseCppTest.class) {
+			if ( !runtimeBuiltOnce ) {
+				try {
+					String output = runCommand(new String[] {compilerPath, "--version"},
+							getTempDirPath(), "printing compiler version", false);
+					System.out.println("Compiler version is: " + output);
+				}
+				catch (Exception e) {
+					System.err.println("Can't get compiler version");
+				}
+
+				runtimeBuiltOnce = true;
+				if ( !buildRuntime() ) {
+					System.out.println("C++ runtime build failed\n");
+					return false;
+				}
+				System.out.println("C++ runtime build succeeded\n");
+			}
+		}
+		return true;
+	}
+
+	private boolean buildRuntime() {
+		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
+
+		if (isWindows()) {
+			String[] command = {compilerPath, "antlr4cpp-vs" + visualStudioVersion + ".vcxproj", "/p:configuration=Release DLL", "/p:platform=x64" };
+			try {
+				runCommand(command, runtimePath + "\\runtime", "build ANTLR runtime using MSBuild", false);
+			} catch (Exception e) {
+				System.err.println("can't build antlr cpp runtime using MSBuild");
+			}
+		}
+		else {
+			try {
+				String[] command = {"cmake", ".", "-DCMAKE_BUILD_TYPE=Debug"};
+				runCommand(command, runtimePath, "antlr runtime cmake", false);
+			} catch (Exception e) {
+				System.err.println("can't configure antlr cpp runtime cmake file");
+			}
+
+			try {
+				String[] command = {"make", "-j", Integer.toString(Runtime.getRuntime().availableProcessors())};
+				runCommand(command, runtimePath, "building antlr runtime", true);
+			} catch (Exception e) {
+				System.err.println("can't compile antlr cpp runtime");
+				e.printStackTrace(System.err);
+				try {
+					String[] command = {"ls", "-la"};
+					String output = runCommand(command, runtimeBinaryPath, "printing library folder content", true);
+					System.out.println(output);
+				} catch (Exception e2) {
+					System.err.println("can't even list folder content");
+					e2.printStackTrace(System.err);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private boolean buildTestProject() {
+		if (!isWindows()) {
+			try {
+				String[] linkCommand = new String[]{"ln", "-s", runtimeLibraryFileName};
+				runCommand(linkCommand, getTempDirPath(), "sym linking C++ runtime", true);
+			} catch (Exception e) {
+				System.err.println("can't create link to " + runtimeLibraryFileName);
+				e.printStackTrace(System.err);
+				return false;
+			}
+		}
+
+		try {
+			List<String> buildCommand = new ArrayList<>();
+			buildCommand.add(compilerPath);
+			if (isWindows()) {
+				buildCommand.add("Test.vcxproj");
+				buildCommand.add("/p:configuration=Release");
+				buildCommand.add("/p:platform=x64");
+			}
+			else {
+				buildCommand.add("-std=c++17");
+				buildCommand.add("-I");
+				buildCommand.add(runtimeSourcePath);
+				buildCommand.add("-L.");
+				buildCommand.add("-lantlr4-runtime");
+				buildCommand.add("-pthread");
+				buildCommand.add("-o");
+				buildCommand.add("Test.out");
+				buildCommand.addAll(allCppFiles(getTempDirPath()));
+			}
+			runCommand(buildCommand.toArray(new String[0]), getTempDirPath(), "building test binary", true);
+		} catch (Exception e) {
+			System.err.println("can't compile test module: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return false;
+		}
+
+		return true;
+	}
+
+	private String runTestProject(String fileName) {
+		// Now run the newly minted binary. Reset the error output, as we could have got compiler warnings which are not relevant here.
+		setParseErrors(null);
+		try {
+			String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
+			String exePath = new File(getTempTestDir(), "Test." + (isWindows() ? "exe" : "out")).getAbsolutePath();
+			ProcessBuilder builder = new ProcessBuilder(exePath, inputPath);
+			builder.directory(getTempTestDir());
+
+			Map<String, String> env = builder.environment();
+			if (isWindows()) {
+				env.put("PATH", runtimeBinaryPath);
+			} else {
+				env.put("LD_PRELOAD", runtimeLibraryFileName);
+			}
+
+			String output = runProcess(builder, "running test binary", false);
+			if ( output.length()==0 ) {
+				output = null;
+			}
+
+			return output;
+		}
+		catch (Exception e) {
+			System.err.println("can't exec module: " + fileName);
+			e.printStackTrace(System.err);
+		}
+		return null;
+	}
+
+	private String runCommand(String[] command, String workPath, String description, boolean showStderr) throws Exception {
+		ProcessBuilder builder = new ProcessBuilder(command);
+		builder.directory(new File(workPath));
+		return runProcess(builder, description, showStderr);
+	}
+
 	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
-		// System.out.println("BUILDER: " + builder.command() + " @ " + builder.directory().toString());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -201,165 +429,11 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return output;
 	}
 
-	private String runCommand(String[] command, String workPath, String description, boolean showStderr) throws Exception {
-		ProcessBuilder builder = new ProcessBuilder(command);
-		builder.directory(new File(workPath));
-
-		return runProcess(builder, description, showStderr);
-	}
-
-	// TODO: add a buildRuntimeOnWindows variant.
-	private boolean buildRuntime() {
-		String runtimePath = locateRuntime();
-		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
-
-		try {
-			String[] command = { "cmake", ".", "-DCMAKE_BUILD_TYPE=Debug" };
-			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
-				return false;
-			}
-		}
-		catch (Exception e) {
-			System.err.println("can't configure antlr cpp runtime cmake file");
-		}
-
-		try {
-			String[] command = { "make", "-j", Integer.toString(Runtime.getRuntime().availableProcessors()) };
-			if (runCommand(command, runtimePath, "building antlr runtime", true) == null)
-				return false;
-		}
-		catch (Exception e) {
-			System.err.println("can't compile antlr cpp runtime");
-			e.printStackTrace(System.err);
-			try {
-			    String[] command = { "ls", "-la" };
-					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
-				System.out.println(output);
-			}
-			catch (Exception e2) {
-				System.err.println("can't even list folder content");
-				e2.printStackTrace(System.err);
-			}
-		}
-
-/* for debugging
-		try {
-		    String command[] = { "ls", "-la" };
-				String output = runCommand(command, runtimePath + "/dist/", "printing library folder content");
-			System.out.println(output);
-		}
-		catch (Exception e) {
-			System.err.println("can't print folder content");
-		}
-*/
-
-		return true;
-	}
-
-	static Boolean runtimeBuiltOnce = false;
-
-	public String execModule(String fileName) {
-		String runtimePath = locateRuntime();
-		String includePath = runtimePath + "/runtime/src";
-		String binPath = new File(getTempTestDir(), "a.out").getAbsolutePath();
-		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
-
-		// Build runtime using cmake once per VM.
-		synchronized (BaseCppTest.class) {
-			if ( !runtimeBuiltOnce ) {
-				try {
-					String[] command = {"clang++", "--version"};
-					String output = runCommand(command, getTempDirPath(), "printing compiler version", false);
-					System.out.println("Compiler version is: "+output);
-				}
-				catch (Exception e) {
-					System.err.println("Can't get compiler version");
-				}
-
-				runtimeBuiltOnce = true;
-				if ( !buildRuntime() ) {
-					System.out.println("C++ runtime build failed\n");
-					return null;
-				}
-				System.out.println("C++ runtime build succeeded\n");
-			}
-		}
-
-		// Create symlink to the runtime. Currently only used on OSX.
-		String libExtension = (getOS().equals("mac")) ? "dylib" : "so";
-		try {
-			String[] command = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
-			if (runCommand(command, getTempDirPath(), "sym linking C++ runtime", true) == null)
-				return null;
-		}
-		catch (Exception e) {
-			System.err.println("can't create link to " + runtimePath + "/dist/libantlr4-runtime." + libExtension);
-			e.printStackTrace(System.err);
-			return null;
-		}
-
-		try {
-			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++17", "-I", includePath, "-L.", "-lantlr4-runtime", "-pthread", "-o", "a.out"));
-			command2.addAll(allCppFiles(getTempDirPath()));
-			if (runCommand(command2.toArray(new String[0]), getTempDirPath(), "building test binary", true) == null) {
-				return null;
-			}
-		}
-		catch (Exception e) {
-			System.err.println("can't compile test module: " + e.getMessage());
-			e.printStackTrace(System.err);
-			return null;
-		}
-
-		// Now run the newly minted binary. Reset the error output, as we could have got compiler warnings which are not relevant here.
-		setParseErrors(null);
-		try {
-			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
-			builder.directory(getTempTestDir());
-			Map<String, String> env = builder.environment();
-			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime." + libExtension);
-			String output = runProcess(builder, "running test binary", false);
-			if ( output.length()==0 ) {
-				output = null;
-			}
-
-      /* for debugging
-		  System.out.println("=========================================================");
-		  System.out.println(output);
-		  System.out.println("=========================================================");
-		  */
-			return output;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
-			e.printStackTrace(System.err);
-		}
-
-		return null;
-	}
-
-	protected String locateRuntime() {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeURL = loader.getResource("Cpp");
-		if (runtimeURL == null) {
-			throw new RuntimeException("Cannot find runtime");
-		}
-		// Windows not getting runtime right. See:
-		// http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
-		// it was coming back "/C:/projects/antlr4-l7imv/runtime-testsuite/target/classes/Cpp"
-		String p;
-		try {
-			p = Paths.get(runtimeURL.toURI()).toFile().toString();
-		}
-		catch (URISyntaxException use) {
-			p = "Can't find runtime at " + runtimeURL;
-		}
-		return p;
-	}
-
-	protected void writeParserTestFile(String parserName, String lexerName,
+	private void writeParserTestFile(String parserName, String lexerName,
 	                                   String listenerName, String visitorName,
 	                                   String parserStartRuleName, boolean debug, boolean trace) {
+		writeVisualStudioProjectFile(lexerName, parserName, listenerName, visitorName);
+
 		if(!parserStartRuleName.endsWith(")"))
 			parserStartRuleName += "()";
 		ST outputFileST = new ST(
@@ -421,7 +495,9 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		writeFile(getTempDirPath(), "Test.cpp", outputFileST.render());
 	}
 
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
+	private void writeLexerTestFile(String lexerName, boolean showDFA) {
+		writeVisualStudioProjectFile(lexerName, null, null, null);
+
 		ST outputFileST = new ST(
 			"#include \\<iostream>\n"
 				+ "\n"
@@ -447,5 +523,24 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		writeFile(getTempDirPath(), "Test.cpp", outputFileST.render());
 	}
 
+	private void writeVisualStudioProjectFile(String lexerName, String parserName, String listenerName, String visitorName) {
+		if (isWindows()) {
+			ST projectFileST = new ST(visualStudioProjectContent);
+			projectFileST.add("platformToolset", visualStudioPlatformToolset);
+			projectFileST.add("runtimeSourcePath", runtimeSourcePath);
+			projectFileST.add("runtimeBinaryPath", runtimeBinaryPath);
+			projectFileST.add("lexerName", lexerName);
+			if (parserName != null) {
+				projectFileST.add("parserName", parserName);
+				String grammarName = parserName.endsWith("Parser")
+						? parserName.substring(0, parserName.length() - "Parser".length())
+						: parserName;
+				projectFileST.add("grammarName", grammarName);
+				projectFileST.add("useListener", listenerName != null);
+				projectFileST.add("useVisitor", visitorName != null);
+			}
+			writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
+		}
+	}
 }
 

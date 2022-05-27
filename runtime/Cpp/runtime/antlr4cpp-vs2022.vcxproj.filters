@@ -55,6 +55,12 @@
     <Filter Include="Source Files\tree\xpath">
       <UniqueIdentifier>{290632d2-c56e-4005-a417-eb83b9531e1a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\internal">
+      <UniqueIdentifier>{b4b32b3f-e97a-448a-98e6-cbf901862bd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\internal">
+      <UniqueIdentifier>{f8c2bdf9-7e81-4f31-ba17-06b16ba2f081}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ANTLRErrorListener.h">
@@ -177,9 +183,6 @@
     <ClInclude Include="src\atn\DecisionState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="src\atn\EmptyPredictionContext.h">
-      <Filter>Header Files\atn</Filter>
-    </ClInclude>
     <ClInclude Include="src\atn\EpsilonTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
@@ -261,9 +264,6 @@
     <ClInclude Include="src\atn\WildcardTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="src\atn\AbstractPredicateTransition.h">
-      <Filter>Header Files\atn</Filter>
-    </ClInclude>
     <ClInclude Include="src\atn\ActionTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
@@ -309,9 +309,6 @@
     <ClInclude Include="src\atn\BlockStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="src\atn\ConfigLookup.h">
-      <Filter>Header Files\atn</Filter>
-    </ClInclude>
     <ClInclude Include="src\dfa\LexerDFASerializer.h">
       <Filter>Header Files\dfa</Filter>
     </ClInclude>
@@ -333,9 +330,6 @@
     <ClInclude Include="src\misc\MurmurHash.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="src\misc\TestRig.h">
-      <Filter>Header Files\misc</Filter>
-    </ClInclude>
     <ClInclude Include="src\support\Arrays.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
@@ -346,9 +340,6 @@
       <Filter>Header Files\support</Filter>
     </ClInclude>
     <ClInclude Include="src\support\Declarations.h">
-      <Filter>Header Files\support</Filter>
-    </ClInclude>
-    <ClInclude Include="src\support\guid.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
     <ClInclude Include="src\tree\AbstractParseTreeVisitor.h">
@@ -375,19 +366,10 @@
     <ClInclude Include="src\tree\ParseTreeWalker.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="src\tree\RuleNode.h">
-      <Filter>Header Files\tree</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tree\SyntaxTree.h">
-      <Filter>Header Files\tree</Filter>
-    </ClInclude>
     <ClInclude Include="src\tree\TerminalNode.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
     <ClInclude Include="src\tree\TerminalNodeImpl.h">
-      <Filter>Header Files\tree</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tree\Tree.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
     <ClInclude Include="src\tree\Trees.h">
@@ -528,11 +510,35 @@
     <ClInclude Include="src\antlr4-common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\antlr4-runtime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\tree\IterativeParseTreeWalker.h">
       <Filter>Header Files\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="src\misc\InterpreterDataReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\Synchronization.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\support\Casts.h">
+      <Filter>Header Files\support</Filter>
+    </ClInclude>
+    <ClInclude Include="src\support\Unicode.h">
+      <Filter>Header Files\support</Filter>
+    </ClInclude>
+    <ClInclude Include="src\support\Any.h">
+      <Filter>Header Files\support</Filter>
+    </ClInclude>
+    <ClInclude Include="src\support\Utf8.h">
+      <Filter>Header Files\support</Filter>
+    </ClInclude>
+    <ClInclude Include="src\atn\PredictionContextMergeCache.h">
+      <Filter>Header Files\atn</Filter>
+    </ClInclude>
+    <ClInclude Include="src\atn\PredictionContextMergeCacheOptions.h">
+      <Filter>Header Files\atn</Filter>
+    </ClInclude>
+    <ClInclude Include="src\atn\PredictionContextCache.h">
+      <Filter>Header Files\atn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -635,9 +641,6 @@
     <ClCompile Include="src\UnbufferedTokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\AbstractPredicateTransition.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\ActionTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -659,9 +662,6 @@
     <ClCompile Include="src\atn\ATNDeserializer.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\ATNSerializer.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\ATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -671,19 +671,7 @@
     <ClCompile Include="src\atn\AtomTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\BasicBlockStartState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\BasicState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\BlockEndState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\DecisionState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\EmptyPredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\EpsilonTransition.cpp">
@@ -698,9 +686,6 @@
     <ClCompile Include="src\atn\LL1Analyzer.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\LoopEndState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\NotSetTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -708,12 +693,6 @@
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\ParserATNSimulator.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\PlusBlockStartState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\PlusLoopbackState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\PrecedencePredicateTransition.cpp">
@@ -731,12 +710,6 @@
     <ClCompile Include="src\atn\RangeTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\RuleStartState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\RuleStopState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\RuleTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -749,16 +722,7 @@
     <ClCompile Include="src\atn\SingletonPredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\StarBlockStartState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\StarLoopbackState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\StarLoopEntryState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\TokensStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\Transition.cpp">
@@ -792,9 +756,6 @@
       <Filter>Source Files\support</Filter>
     </ClCompile>
     <ClCompile Include="src\support\CPPUtils.cpp">
-      <Filter>Source Files\support</Filter>
-    </ClCompile>
-    <ClCompile Include="src\support\guid.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp">
@@ -935,11 +896,20 @@
     <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
+    <ClCompile Include="src\misc\InterpreterDataReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ANTLRErrorListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ANTLRErrorStrategy.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atn\LexerAction.cpp">
+      <Filter>Source Files\atn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc\Predicate.cpp">
+      <Filter>Source Files\misc</Filter>
     </ClCompile>
     <ClCompile Include="src\Token.cpp">
       <Filter>Source Files</Filter>
@@ -950,8 +920,8 @@
     <ClCompile Include="src\WritableToken.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tree\ErrorNode.cpp">
-      <Filter>Source Files\tree</Filter>
+    <ClCompile Include="src\support\Any.cpp">
+      <Filter>Source Files\support</Filter>
     </ClCompile>
     <ClCompile Include="src\tree\ParseTreeListener.cpp">
       <Filter>Source Files\tree</Filter>
@@ -959,23 +929,20 @@
     <ClCompile Include="src\tree\ParseTreeVisitor.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="src\tree\TerminalNode.cpp">
-      <Filter>Source Files\tree</Filter>
-    </ClCompile>
-    <ClCompile Include="src\support\Any.cpp">
-      <Filter>Source Files\support</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\BlockStartState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\LexerAction.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\tree\pattern\Chunk.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="src\misc\Predicate.cpp">
-      <Filter>Source Files\misc</Filter>
+    <ClCompile Include="src\internal\Synchronization.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\support\Utf8.cpp">
+      <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atn\PredictionContextMergeCache.cpp">
+      <Filter>Source Files\atn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atn\PredictionContextCache.cpp">
+      <Filter>Source Files\atn</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
