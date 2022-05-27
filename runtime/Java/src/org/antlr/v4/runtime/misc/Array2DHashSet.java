@@ -26,10 +26,12 @@ public class Array2DHashSet<T> implements Set<T> {
 	/** How many elements in set */
 	protected int n = 0;
 
-	protected int threshold = (int)Math.floor(INITAL_CAPACITY * LOAD_FACTOR); // when to expand
-
 	protected int currentPrime = 1; // jump by 4 primes each expand or whatever
-	protected int initialBucketCapacity = INITAL_BUCKET_CAPACITY;
+
+	/** when to expand */
+	protected int threshold;
+	protected final int initialCapacity;
+	protected final int initialBucketCapacity;
 
 	public Array2DHashSet() {
 		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
@@ -45,8 +47,10 @@ public class Array2DHashSet<T> implements Set<T> {
 		}
 
 		this.comparator = comparator;
-		this.buckets = createBuckets(initialCapacity);
+		this.initialCapacity = initialCapacity;
 		this.initialBucketCapacity = initialBucketCapacity;
+		this.buckets = createBuckets(initialCapacity);
+		this.threshold = (int)Math.floor(initialCapacity * LOAD_FACTOR);
 	}
 
 	/**
@@ -381,9 +385,9 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public void clear() {
-		buckets = createBuckets(INITAL_CAPACITY);
 		n = 0;
-		threshold = (int)Math.floor(INITAL_CAPACITY * LOAD_FACTOR);
+		buckets = createBuckets(this.initialCapacity);
+		threshold = (int)Math.floor(this.initialCapacity * LOAD_FACTOR);
 	}
 
 	@Override
