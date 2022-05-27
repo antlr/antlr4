@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.runtime.cpp.BaseCppTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.rules.TestRule;
@@ -17,6 +18,7 @@ import org.junit.runner.Description;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -202,9 +204,14 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		return detectedOS;
 	}
 
+	private static Boolean isWindows;
 
 	public static boolean isWindows() {
-		return getOS().equalsIgnoreCase("windows");
+		if (isWindows == null) {
+			isWindows = getOS().equalsIgnoreCase("windows");
+		}
+
+		return isWindows;
 	}
 
 	protected ATN createATN(Grammar g, boolean useSerializer) {
@@ -242,4 +249,12 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		}
 	}
 
+	protected static String getTextFromResource(String name) {
+		try {
+			return new String(Files.readAllBytes(Paths.get(BaseCppTest.class.getClassLoader().getResource(name).toURI())));
+		}
+		catch (Exception ex) {
+			return null;
+		}
+	}
 }
