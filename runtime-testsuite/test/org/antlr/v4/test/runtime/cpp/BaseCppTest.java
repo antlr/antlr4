@@ -77,22 +77,20 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			visualStudioPlatformToolset = "v143";
 			visualStudioVersion = "2022";
 			String[] visualStudioVersions = new String[]{"2022", "2019"};
-			String[] visualStudioEditions = new String[]{"Community", "Professional", "Enterprise"};
+			String[] visualStudioEditions = new String[]{"BuildTools", "Community", "Professional", "Enterprise"};
+			String[] programFilesPaths = new String[]{"Program Files", "Program Files (x86)"};
+
 			for (String version : visualStudioVersions) {
-				String programFilesSuffix;
-				if (version.equals("2022")) {
-					programFilesSuffix = "";
-				} else {
-					programFilesSuffix = " (x86)";
-				}
 				for (String edition : visualStudioEditions) {
-					String file = "C:\\Program Files" + programFilesSuffix + "\\Microsoft Visual Studio\\" + version + "\\"
-							+ edition + "\\Msbuild\\Current\\Bin\\MSBuild.exe";
-					if (new File(file).exists()) {
-						visualStudioPlatformToolset = version.equals("2022") ? "v143" : "v142";
-						visualStudioVersion = version;
-						compilerPath = file;
-						return;
+					for (String programFilesPath : programFilesPaths) {
+						String file = "C:\\" + programFilesPath + "\\Microsoft Visual Studio\\" + version + "\\"
+								+ edition + "\\Msbuild\\Current\\Bin\\MSBuild.exe";
+						if (new File(file).exists()) {
+							visualStudioPlatformToolset = version.equals("2022") ? "v143" : "v142";
+							visualStudioVersion = version;
+							compilerPath = file;
+							return;
+						}
 					}
 				}
 			}
