@@ -1,9 +1,9 @@
 <!--
 All ANTLR contributors provide implementation, maintenance and support for free.
-We therefore kindly require that before submitting any issue to ANTLR, you please check off these boxes:
- 
+We therefore kindly ask that before submitting any issue to ANTLR, you please check off these boxes:
+
 - [ ] I have reproduced my issue using the latest version of ANTLR
-- [ ] I have submitted my issue to [antlr4-discussion google group](https://groups.google.com/forum/#!forum/antlr-discussion) or asked at [stackoverflow](http://stackoverflow.com/questions/tagged/antlr4)
+- [ ] I have asked at [stackoverflow](http://stackoverflow.com/questions/tagged/antlr4)
 - [ ] Responses from the above seem to indicate that my issue could be an ANTLR bug
 - [ ] I have done a search of the existing issues to make sure I'm not sending in a duplicate
 
