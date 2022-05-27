@@ -449,7 +449,7 @@ public class BufferedTokenStream implements TokenStream {
 		int start = interval.a;
 		int stop = interval.b;
 		if ( start<0 || stop<0 ) return "";
-		fill();
+		sync(stop);
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
 		StringBuilder buf = new StringBuilder();

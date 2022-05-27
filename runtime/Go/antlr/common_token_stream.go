@@ -331,10 +331,12 @@ func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string 
 
 func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 	c.lazyInit()
-	c.Fill()
 
 	if interval == nil {
+		c.Fill()
 		interval = NewInterval(0, len(c.tokens)-1)
+	} else {
+		c.Sync(interval.Stop)
 	}
 
 	start := interval.Start
