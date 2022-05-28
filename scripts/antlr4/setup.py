@@ -13,6 +13,6 @@ setup(
     license='BSD',
     author='Terence Parr',
     author_email='parrt@antlr.org',
-    entry_points={'console_scripts': ['antlr4=antlr4_tool_runner:main']},
+    entry_points={'console_scripts': ['antlr4=antlr4_tool_runner:tool']},
     description='Scripts to run ANTLR4 tool and grammar profiler'
 )

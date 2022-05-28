@@ -76,36 +76,41 @@ def install_jre(java_version='11'):
     return java
 
 
-def main():
+def install_jre_and_antlr(version):
     global mvn_repo, homedir
-
-    args = sys.argv[1:]
     homedir = Path.home()
     mvn_repo = os.path.join(homedir, '.m2', 'repository', 'org', 'antlr', 'antlr4')
 
-    version = None
-    if len(args)>0 and args[0]=='-v':
-        version = args[1]
-        args = args[2:]
-
-    if version is None:
-        version = latest_version()
-
     jar = antlr4_jar(version)
-
     java = which("java")
     if java is None:
         java = install_jre()
-
     if jar is None or java is None:
         exit(1)
-
     CHECK_JRE_VERSION = False
     if CHECK_JRE_VERSION:
         p = subprocess.Popen([java, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         out = out.decode("UTF-8").split('\n')[0]
         print(f"Running {out}")
+    return jar, java
+
+
+def get_version_arg(args):
+    version = None
+    if len(args) > 0 and args[0] == '-v':
+        version = args[1]
+        args = args[2:]
+    if version is None:
+        version = latest_version()
+    return args, version
+
+
+def tool():
+    """Entry point to run antlr4 tool itself"""
+    args = sys.argv[1:]
+    args, version = get_version_arg(args)
+    jar, java = install_jre_and_antlr(version)
 
     p = subprocess.Popen([java, '-cp', jar, 'org.antlr.v4.Tool']+args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
@@ -116,5 +121,12 @@ def main():
     if out: print(out)
 
 
+def prof():
+    """Entry point to run antlr4 profiling using grammar and input file"""
+    args = sys.argv[1:]
+    args, version = get_version_arg(args)
+    jar, java = install_jre_and_antlr(version)
+
+
 if __name__ == '__main__':
-    main()
+    tool()
