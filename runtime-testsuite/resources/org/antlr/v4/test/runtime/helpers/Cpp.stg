@@ -1,0 +1,52 @@
+#include \<iostream>
+
+#include "antlr4-runtime.h"
+#include "<lexerName>.h"
+<if(parserName)>
+#include "<parserName>.h"
+<endif>
+
+using namespace antlr4;
+
+<if(parserName)>
+class TreeShapeListener : public tree::ParseTreeListener {
+public:
+  void visitTerminal(tree::TerminalNode *) override {}
+  void visitErrorNode(tree::ErrorNode *) override {}
+  void exitEveryRule(ParserRuleContext *) override {}
+  void enterEveryRule(ParserRuleContext *ctx) override {
+    for (auto child : ctx->children) {
+      tree::ParseTree *parent = child->parent;
+      ParserRuleContext *rule = dynamic_cast\<ParserRuleContext *>(parent);
+      if (rule != ctx) {
+        throw "Invalid parse tree shape detected.";
+      }
+    }
+  }
+};
+<endif>
+
+int main(int argc, const char* argv[]) {
+  ANTLRFileStream input;
+  input.loadFromFile(argv[1]);
+  <lexerName> lexer(&input);
+  CommonTokenStream tokens(&lexer);
+<if(parserName)>
+  <parserName> parser(&tokens);
+<if(debug)>
+  DiagnosticErrorListener errorListener;
+  parser.addErrorListener(&errorListener);
+<endif>
+  tree::ParseTree *tree = parser.<parserStartRuleName>();
+  TreeShapeListener listener;
+  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+<else>
+  tokens.fill();
+  for (auto token : tokens.getTokens())
+    std::cout \<\< token->toString() \<\< std::endl;
+<if(showDFA)>
+  std::cout \<\< lexer.getInterpreter\<atn::LexerATNSimulator>()->getDFA(Lexer::DEFAULT_MODE).toLexerString();
+<endif>
+<endif>
+  return 0;
+}

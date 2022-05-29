@@ -61,6 +61,10 @@ import static junit.framework.TestCase.assertTrue;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "Java";
+	}
 
 	/**
 	 * When the {@code antlr.testinprocess} runtime property is set to
@@ -168,7 +172,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		                                                lexerName);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		compile("Test.java");
 		return execClass("Test");
 	}
@@ -324,20 +328,9 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 									   String lexerName,
 									   String parserStartRuleName,
 									   boolean debug,
-									   boolean profile)
-	{
-        setParseErrors(null);
-		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, false);
-		}
-		else {
-			writeTestFile(parserName,
-						  lexerName,
-						  parserStartRuleName,
-						  debug,
-						  profile);
-		}
-
+									   boolean profile) {
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, profile);
 		compile("Test.java");
 		return execClass("Test");
 	}
@@ -499,96 +492,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		}
 	}
 
-	protected void writeTestFile(String parserName,
-								 String lexerName,
-								 String parserStartRuleName,
-								 boolean debug,
-								 boolean profile)
-	{
-		ST outputFileST = new ST(
-			"import org.antlr.v4.runtime.*;\n" +
-			"import org.antlr.v4.runtime.tree.*;\n" +
-			"import org.antlr.v4.runtime.atn.*;\n" +
-			"import java.nio.file.Paths;\n"+
-			"import java.util.Arrays;\n"+
-			"\n" +
-			"public class Test {\n" +
-			"    public static void main(String[] args) throws Exception {\n" +
-			"        CharStream input = CharStreams.fromPath(Paths.get(args[0]));\n" +
-			"        <lexerName> lex = new <lexerName>(input);\n" +
-			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-			"        <createParser>\n"+
-			"		 parser.setBuildParseTree(true);\n" +
-			"		 <profile>\n"+
-			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-			"		 <if(profile)>System.out.println(Arrays.toString(profiler.getDecisionInfo()));<endif>\n" +
-			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
-			"    }\n" +
-			"\n" +
-			"	static class TreeShapeListener implements ParseTreeListener {\n" +
-			"		@Override public void visitTerminal(TerminalNode node) { }\n" +
-			"		@Override public void visitErrorNode(ErrorNode node) { }\n" +
-			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
-			"\n" +
-			"		@Override\n" +
-			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
-			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
-			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
-			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
-			"					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
-			"				}\n" +
-			"			}\n" +
-			"		}\n" +
-			"	}\n" +
-			"}"
-			);
-        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
-		if ( debug ) {
-			createParserST =
-				new ST(
-				"        <parserName> parser = new <parserName>(tokens);\n" +
-                "        parser.addErrorListener(new DiagnosticErrorListener());\n");
-		}
-		if ( profile ) {
-			outputFileST.add("profile",
-							 "ProfilingATNSimulator profiler = new ProfilingATNSimulator(parser);\n" +
-							 "parser.setInterpreter(profiler);");
-		}
-		else {
-			outputFileST.add("profile", new ArrayList<Object>());
-		}
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(getTempDirPath(), "Test.java", outputFileST.render());
-	}
-
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-		ST outputFileST = new ST(
-			"import java.nio.file.Paths;\n" +
-			"import org.antlr.v4.runtime.*;\n" +
-			"\n" +
-			"public class Test {\n" +
-			"    public static void main(String[] args) throws Exception {\n" +
-			"        CharStream input = CharStreams.fromPath(Paths.get(args[0]));\n" +
-			"        <lexerName> lex = new <lexerName>(input);\n" +
-			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-			"        tokens.fill();\n" +
-			"        for (Object t : tokens.getTokens()) System.out.println(t);\n" +
-			(showDFA?"System.out.print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());\n":"")+
-			"    }\n" +
-			"}"
-			);
-
-		outputFileST.add("lexerName", lexerName);
-		writeFile(getTempDirPath(), "Test.java", outputFileST.render());
-	}
-
-
 	public List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
-
-
 }

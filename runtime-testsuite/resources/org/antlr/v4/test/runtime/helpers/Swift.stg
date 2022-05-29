@@ -1,0 +1,48 @@
+import Antlr4
+import Foundation
+setbuf(stdout, nil)
+
+<if(parserName)>
+class TreeShapeListener: ParseTreeListener{
+    func visitTerminal(_ node: TerminalNode){ }
+    func visitErrorNode(_ node: ErrorNode){ }
+    func enterEveryRule(_ ctx: ParserRuleContext) throws { }
+    func exitEveryRule(_ ctx: ParserRuleContext) throws {
+        for i in 0..\<ctx.getChildCount() {
+            let parent = ctx.getChild(i)?.getParent()
+            if (!(parent is RuleNode) || (parent as! RuleNode ).getRuleContext() !== ctx) {
+                throw ANTLRError.illegalState(msg: "Invalid parse tree shape detected.")
+            }
+        }
+    }
+}
+<endif>
+
+let args = CommandLine.arguments
+let input = try ANTLRFileStream(args[1])
+let lex = <lexerName>(input)
+let tokens = CommonTokenStream(lex)
+<if(parserName)>
+let parser = try <parserName>(tokens)
+<if(debug)>
+parser.addErrorListener(DiagnosticErrorListener())
+<endif>
+parser.setBuildParseTree(true)
+<if(profile)>
+let profiler = ProfilingATNSimulator(parser)
+parser.setInterpreter(profiler)
+<endif>
+let tree = try parser.<parserStartRuleName>()
+<if(profile)>
+print(profiler.getDecisionInfo().description)
+<endif>
+try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
+<else>
+try tokens.fill()
+for t in tokens.getTokens() {
+    print(t)
+}
+<if(showDFA)>
+print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString(), terminator: "")
+<endif>
+<endif>

@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.*;
-import org.stringtemplate.v4.ST;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +22,15 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "Swift";
+	}
+
+	@Override
+	public String getTestFileName() {
+		return "main";
+	}
 
 	private static final boolean USE_ARCH_ARM64 = false;
 	private static final boolean VERBOSE = false;
@@ -108,7 +116,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 				null,
 				lexerName);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		addSourceFiles("main.swift");
 
 		String projectName = "testcase-" + System.currentTimeMillis();
@@ -131,10 +139,19 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 				lexerName,
 				"-visitor");
 		writeFile(getTempDirPath(), "input", input);
-		return execParser(parserName,
-				lexerName,
-				startRuleName,
-				showDiagnosticErrors,false);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+
+		addSourceFiles("main.swift");
+		String projectName = "testcase-" + System.currentTimeMillis();
+		String projectDir = new File(getTempTestDir(), projectName).getAbsolutePath();
+		try {
+			buildProject(projectDir, projectName);
+			return execTest(projectDir, projectName);
+		}
+		catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	private String execTest(String projectDir, String projectName) {
@@ -269,116 +286,6 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);
 		}
-	}
-
-	@SuppressWarnings("SameParameterValue")
-	private String execParser(String parserName,
-							  String lexerName,
-							  String parserStartRuleName,
-							  boolean debug,
-							  boolean profile)
-	{
-		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, false);
-		}
-		else {
-			writeParserTestFile(parserName,
-					lexerName,
-					parserStartRuleName,
-					debug,
-					profile);
-		}
-
-		addSourceFiles("main.swift");
-		String projectName = "testcase-" + System.currentTimeMillis();
-		String projectDir = new File(getTempTestDir(), projectName).getAbsolutePath();
-		try {
-			buildProject(projectDir, projectName);
-			return execTest(projectDir, projectName);
-		}
-		catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private void writeParserTestFile(String parserName,
-									 String lexerName,
-									 String parserStartRuleName,
-									 boolean debug,
-									 boolean profile) {
-
-		ST outputFileST = new ST(
-				"import Antlr4\n" +
-						"import Foundation\n" +
-						"setbuf(stdout, nil)\n" +
-						"class TreeShapeListener: ParseTreeListener{\n" +
-						"    func visitTerminal(_ node: TerminalNode){ }\n" +
-						"    func visitErrorNode(_ node: ErrorNode){ }\n" +
-						"    func enterEveryRule(_ ctx: ParserRuleContext) throws { }\n" +
-						"    func exitEveryRule(_ ctx: ParserRuleContext) throws {\n" +
-						"        for i in 0..\\<ctx.getChildCount() {\n" +
-						"            let parent = ctx.getChild(i)?.getParent()\n" +
-						"            if (!(parent is RuleNode) || (parent as! RuleNode ).getRuleContext() !== ctx) {\n" +
-						"                throw ANTLRError.illegalState(msg: \"Invalid parse tree shape detected.\")\n" +
-						"            }\n" +
-						"        }\n" +
-						"    }\n" +
-						"}\n" +
-						"\n" +
-						"let args = CommandLine.arguments\n" +
-						"let input = try ANTLRFileStream(args[1])\n" +
-						"let lex = <lexerName>(input)\n" +
-						"let tokens = CommonTokenStream(lex)\n" +
-						"<createParser>\n" +
-						"parser.setBuildParseTree(true)\n" +
-						"<profile>\n" +
-						"let tree = try parser.<parserStartRuleName>()\n" +
-						"<if(profile)>print(profiler.getDecisionInfo().description)<endif>\n" +
-						"try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
-		);
-		ST createParserST = new ST("       let parser = try <parserName>(tokens)\n");
-		if (debug) {
-			createParserST =
-					new ST(
-							"        let parser = try <parserName>(tokens)\n" +
-									"        parser.addErrorListener(DiagnosticErrorListener())\n");
-		}
-		if (profile) {
-			outputFileST.add("profile",
-					"let profiler = ProfilingATNSimulator(parser)\n" +
-							"parser.setInterpreter(profiler)");
-		}
-		else {
-			outputFileST.add("profile", new ArrayList<>());
-		}
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(getTempDirPath(), "main.swift", outputFileST.render());
-	}
-
-	private void writeLexerTestFile(String lexerName, boolean showDFA) {
-		ST outputFileST = new ST(
-				"import Antlr4\n" +
-						"import Foundation\n" +
-
-						"setbuf(stdout, nil)\n" +
-						"let args = CommandLine.arguments\n" +
-						"let input = try ANTLRFileStream(args[1])\n" +
-						"let lex = <lexerName>(input)\n" +
-						"let tokens = CommonTokenStream(lex)\n" +
-
-						"try tokens.fill()\n" +
-
-						"for t in tokens.getTokens() {\n" +
-						"	print(t)\n" +
-						"}\n" +
-						(showDFA ? "print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString(), terminator: \"\" )\n" : ""));
-
-		outputFileST.add("lexerName", lexerName);
-		writeFile(getTempDirPath(), "main.swift", outputFileST.render());
 	}
 
 	/**

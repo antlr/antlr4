@@ -9,8 +9,8 @@ import org.antlr.v4.test.runtime.*;
 import org.junit.runner.Description;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,6 +22,8 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.*;
 
 public abstract class BasePythonTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getExtension() { return "py"; }
 
 	@Override
 	protected void testSucceeded(Description description) {
@@ -33,9 +35,6 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 	protected String getPropertyPrefix() {
 		return "antlr-" + getLanguage().toLowerCase();
 	}
-
-
-	protected abstract String getLanguage();
 
 	@Override
 	public  String execLexer(String grammarFileName,
@@ -50,7 +49,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 		                                                lexerName,"-no-listener");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		return execModule("Test.py");
 	}
 
@@ -64,35 +63,15 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 	                         String startRuleName,
 	                         String input,
 	                         boolean showDiagnosticErrors) {
-		return execParser_(grammarFileName, grammarStr, parserName, lexerName,
-		                   listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
-	}
-
-	public String execParser_(String grammarFileName,
-	                          String grammarStr,
-	                          String parserName,
-	                          String lexerName,
-	                          String listenerName,
-	                          String visitorName,
-	                          String startRuleName,
-	                          String input,
-	                          boolean debug,
-	                          boolean trace)
-	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr,
-		                                                parserName,
-		                                                lexerName,
-		                                                "-visitor");
+				grammarStr,
+				parserName,
+				lexerName,
+				"-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		rawBuildRecognizerTestFile(parserName,
-		                           lexerName,
-		                           listenerName,
-		                           visitorName,
-		                           startRuleName,
-		                           debug,
-		                           trace);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
 		return execRecognizer();
 	}
 
@@ -136,35 +115,13 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 		return true; // allIsWell: no compile
 	}
 
-	protected void rawBuildRecognizerTestFile(String parserName,
-	                                          String lexerName,
-	                                          String listenerName,
-	                                          String visitorName,
-	                                          String parserStartRuleName,
-	                                          boolean debug,
-	                                          boolean trace)
-	{
-		setParseErrors(null);
-		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, false);
-		}
-		else {
-			writeParserTestFile(parserName,
-			                    lexerName,
-			                    listenerName,
-			                    visitorName,
-			                    parserStartRuleName,
-			                    debug, trace);
-		}
-	}
-
 	public String execRecognizer() {
 		return execModule("Test.py");
 	}
 
 	public String execModule(String fileName) {
 		String pythonPath = locatePython();
-		String runtimePath = locateRuntime();
+		String runtimePath = Paths.get(getRuntimePath(), "src").toString();
 		File tmpdirFile = new File(getTempDirPath());
 		String modulePath = new File(tmpdirFile, fileName).getAbsolutePath();
 		String inputPath = new File(tmpdirFile, "input").getAbsolutePath();
@@ -221,33 +178,6 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 
 	protected abstract List<String> getPythonExecutables();
 
-	protected String locateRuntime() { return locateRuntime(getLanguage()); }
-
-	protected String locateRuntime(String targetName) {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource(targetName+"/src");
-		if ( runtimeSrc==null ) {
-			throw new RuntimeException("Cannot find "+targetName+" runtime");
-		}
-		if(isWindows()){
-			return runtimeSrc.getPath().replaceFirst("/", "");
-		}
-		return runtimeSrc.getPath();
-	}
-
-	protected abstract void writeParserTestFile(String parserName,
-	                                            String lexerName,
-	                                            String listenerName,
-	                                            String visitorName,
-	                                            String parserStartRuleName,
-	                                            boolean debug,
-	                                            boolean setTrace);
-
-
-
-	protected abstract void writeLexerTestFile(String lexerName, boolean showDFA);
-
-
 	protected void eraseTempPyCache() {
 		File tmpdirF = new File(getTempTestDir() + "/__pycache__");
 		if ( tmpdirF.exists() ) {
@@ -255,5 +185,4 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 			tmpdirF.delete();
 		}
 	}
-
 }

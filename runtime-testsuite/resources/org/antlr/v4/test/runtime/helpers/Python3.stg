@@ -1,0 +1,51 @@
+import sys
+import codecs
+from antlr4 import *
+from <lexerName> import <lexerName>
+<if(parserName)>
+from <parserName> import <parserName>
+from <grammarName>Listener import <grammarName>Listener
+from <grammarName>Visitor import <grammarName>Visitor
+
+class TreeShapeListener(ParseTreeListener):
+
+    def visitTerminal(self, node:TerminalNode):
+        pass
+
+    def visitErrorNode(self, node:ErrorNode):
+        pass
+
+    def exitEveryRule(self, ctx:ParserRuleContext):
+        pass
+
+    def enterEveryRule(self, ctx:ParserRuleContext):
+        for child in ctx.getChildren():
+            parent = child.parentCtx
+            if not isinstance(parent, RuleNode) or parent.getRuleContext() != ctx:
+                raise IllegalStateException("Invalid parse tree shape detected.")
+<endif>
+
+def main(argv):
+    input = FileStream(argv[1], encoding='utf-8', errors='replace')
+    with codecs.open(argv[2], 'w', 'utf-8', 'replace') as output:
+        lexer = <lexerName>(input, output)
+        stream = CommonTokenStream(lexer)
+<if(parserName)>
+        parser = <parserName>(stream, output)
+<if(debug)>
+        parser.addErrorListener(DiagnosticErrorListener())
+<endif>
+        parser.buildParseTrees = True
+        tree = parser.<parserStartRuleName>()
+        ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
+<else>
+        stream.fill()
+        [ print(t, file=output) for t in stream.tokens ]
+<if(showDFA)>
+        print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='', file=output)
+<endif>
+<endif>
+
+if __name__ == '__main__':
+    main(sys.argv)
+

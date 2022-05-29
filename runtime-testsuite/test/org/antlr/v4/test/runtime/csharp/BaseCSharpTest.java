@@ -27,6 +27,14 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "CSharp";
+	}
+
+	@Override
+	public String getExtension() { return "cs"; }
+
 	private static Boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
@@ -57,7 +65,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				lexerName);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		addSourceFiles("Test.cs");
 		if (!compile()) {
 			System.err.println("Failed to compile!");
@@ -150,15 +158,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 									   String parserStartRuleName,
 									   boolean debug) {
 		setParseErrors(null);
-		if (parserName == null) {
-			writeLexerTestFile(lexerName, false);
-		} else {
-			writeParserTestFile(parserName,
-					lexerName,
-					parserStartRuleName,
-					debug);
-		}
-
+		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, false);
 		addSourceFiles("Test.cs");
 		return execRecognizer();
 	}
@@ -332,98 +332,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			e.printStackTrace(System.err);
 		}
 		return null;
-	}
-
-	protected void writeParserTestFile(String parserName,
-									   String lexerName,
-									   String parserStartRuleName,
-									   boolean debug) {
-		ST outputFileST = new ST(
-				"using System;\n" +
-						"using Antlr4.Runtime;\n" +
-						"using Antlr4.Runtime.Tree;\n" +
-						"using System.Text;\n" +
-						"\n" +
-						"public class Test {\n" +
-						"    public static void Main(string[] args) {\n" +
-						"        Console.OutputEncoding = Encoding.UTF8;\n" +
-						"        Console.InputEncoding = Encoding.UTF8;\n" +
-						"        var input = CharStreams.fromPath(args[0]);\n" +
-						"        <lexerName> lex = new <lexerName>(input);\n" +
-						"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-						"        <createParser>\n" +
-						"        parser.BuildParseTree = true;\n" +
-						"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-						"        ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
-						"    }\n" +
-						"}\n" +
-						"\n" +
-						"class TreeShapeListener : IParseTreeListener {\n" +
-						"    public void VisitTerminal(ITerminalNode node) { }\n" +
-						"    public void VisitErrorNode(IErrorNode node) { }\n" +
-						"    public void ExitEveryRule(ParserRuleContext ctx) { }\n" +
-						"\n" +
-						"    public void EnterEveryRule(ParserRuleContext ctx) {\n" +
-						"        for (int i = 0; i \\< ctx.ChildCount; i++) {\n" +
-						"            IParseTree parent = ctx.GetChild(i).Parent;\n" +
-						"            if (!(parent is IRuleNode) || ((IRuleNode)parent).RuleContext != ctx) {\n" +
-						"                throw new Exception(\"Invalid parse tree shape detected.\");\n" +
-						"            }\n" +
-						"        }\n" +
-						"    }\n" +
-						"}"
-		);
-		ST createParserST = new ST("<parserName> parser = new <parserName>(tokens);\n");
-		if (debug) {
-			createParserST =
-					new ST(
-							"<parserName> parser = new <parserName>(tokens);\n" +
-									"        parser.AddErrorListener(new DiagnosticErrorListener());\n");
-		}
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(getTempDirPath(), "Test.cs", outputFileST.render());
-	}
-
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-		ST outputFileST = new ST(
-				"using System;\n" +
-						"using Antlr4.Runtime;\n" +
-						"using System.IO;\n" +
-						"using System.Text;\n" +
-						"\n" +
-						"public class Test {\n" +
-						"    public static void Main(string[] args) {\n" +
-						"        Console.OutputEncoding = Encoding.UTF8;\n" +
-						"        Console.InputEncoding = Encoding.UTF8;\n" +
-						"        var input = CharStreams.fromPath(args[0]);\n" +
-						"        <lexerName> lex = new <lexerName>(input);\n" +
-						"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-						"        tokens.Fill();\n" +
-						"        foreach (object t in tokens.GetTokens())\n" +
-						"        Console.Out.WriteLine(t);\n" +
-						(showDFA ? "        Console.Out.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n" : "") +
-						"    }\n" +
-						"}"
-		);
-
-		outputFileST.add("lexerName", lexerName);
-		writeFile(getTempDirPath(), "Test.cs", outputFileST.render());
-	}
-
-	/**
-	 * Return map sorted by key
-	 */
-	public <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sort(Map<K, V> data) {
-		LinkedHashMap<K, V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>(data.keySet());
-		Collections.sort(keys);
-		for (K k : keys) {
-			dup.put(k, data.get(k));
-		}
-		return dup;
 	}
 
 	protected static void assertEquals(String msg, int a, int b) {

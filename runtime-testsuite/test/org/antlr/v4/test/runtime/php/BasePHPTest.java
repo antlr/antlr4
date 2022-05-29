@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.php;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,13 +15,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.antlr.v4.test.runtime.*;
-import org.stringtemplate.v4.ST;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "PHP";
+	}
 
 	public String getPropertyPrefix() {
 		return "antlr-php";
@@ -45,7 +47,7 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		return execModule("Test.php");
 	}
 
@@ -60,53 +62,19 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String input,
 		boolean showDiagnosticErrors
 	) {
-		return execParser_(
-			grammarFileName,
-			grammarStr,
-			parserName,
-			lexerName,
-			listenerName,
-			visitorName,
-			startRuleName,
-			input,
-			showDiagnosticErrors,
-			false
-		);
-	}
-
-	public String execParser_(
-		String grammarFileName,
-		String grammarStr,
-		String parserName,
-		String lexerName,
-		String listenerName,
-		String visitorName,
-		String startRuleName,
-		String input,
-		boolean debug,
-		boolean trace
-	) {
 		boolean success = rawGenerateAndBuildRecognizer(
-			grammarFileName,
-			grammarStr,
-			parserName,
-			lexerName,
+				grammarFileName,
+				grammarStr,
+				parserName,
+				lexerName,
 			"-visitor"
 		);
 
 		assertTrue(success);
-
 		writeFile(getTempDirPath(), "input", input);
 
-		rawBuildRecognizerTestFile(
-			parserName,
-			lexerName,
-			listenerName,
-			visitorName,
-			startRuleName,
-			debug,
-			trace
-		);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
 
 		return execRecognizer();
 	}
@@ -170,38 +138,13 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return true;
 	}
 
-	protected void rawBuildRecognizerTestFile(
-		String parserName,
-		String lexerName,
-		String listenerName,
-		String visitorName,
-		String parserStartRuleName,
-		boolean debug,
-		boolean trace
-	) {
-		setParseErrors(null);
-		if (parserName == null) {
-			writeLexerTestFile(lexerName, false);
-		} else {
-			writeParserTestFile(
-				parserName,
-				lexerName,
-				listenerName,
-				visitorName,
-				parserStartRuleName,
-				debug,
-				trace
-			);
-		}
-	}
-
 	public String execRecognizer() {
 		return execModule("Test.php");
 	}
 
 	public String execModule(String fileName) {
 		String phpPath = locatePhp();
-		String runtimePath = locateRuntime();
+		String runtimePath = getRuntimePath();
 
 		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
 		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
@@ -271,153 +214,4 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 
 		return file.getAbsolutePath();
 	}
-
-	protected String locateRuntime() {
-		String propName = "antlr-php-runtime";
-		String prop = System.getProperty(propName);
-
-		if (prop == null || prop.length() == 0) {
-			prop = "../runtime/PHP";
-		}
-
-		File file = new File(prop);
-
-		if (!file.exists()) {
-			throw new RuntimeException("Missing system property:" + propName);
-		}
-
-		try {
-			return file.getCanonicalPath();
-		} catch (IOException e) {
-			return file.getAbsolutePath();
-		}
-	}
-
-	protected void mkdir(String dir) {
-		File f = new File(dir);
-		f.mkdirs();
-	}
-
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-		ST outputFileST = new ST(
-			"\\<?php\n"
-				+ "\n"
-				+ "declare(strict_types=1);\n"
-				+ "\n"
-				+ "use Antlr\\Antlr4\\Runtime\\CommonTokenStream;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Error\\Listeners\\ConsoleErrorListener;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\InputStream;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Lexer;\n"
-				+ "\n"
-				+ "$runtime = \\getenv('RUNTIME');\n"
-				+ "\n"
-				+ "\\spl_autoload_register(function (string $class) use ($runtime) : void {\n"
-				+ "    $file = \\str_replace('\\\\\\', \\DIRECTORY_SEPARATOR, \\str_replace('Antlr\\Antlr4\\Runtime\\\\\\', $runtime . '\\\\\\src\\\\\\', $class)) . '.php';\n"
-				+ "\n"
-				+ "    if (\\file_exists($file)) {\n"
-				+ "        require_once $file;   \n"
-				+ "    }\n"
-				+ "});"
-				+ "\n"
-				+ "$input = InputStream::fromPath($argv[1]);\n"
-				+ "$lexer = new <lexerName>($input);\n"
-				+ "$lexer->addErrorListener(new ConsoleErrorListener());"
-				+ "$tokens = new CommonTokenStream($lexer);\n"
-				+ "$tokens->fill();\n"
-				+ "\n"
-				+ "foreach ($tokens->getAllTokens() as $token) {\n"
-				+ "    echo $token . \\PHP_EOL;\n"
-				+ "}"
-				+ (showDFA
-				? "echo $lexer->getInterpreter()->getDFA(Lexer::DEFAULT_MODE)->toLexerString();\n"
-				: "")
-		);
-
-		outputFileST.add("lexerName", lexerName);
-
-		writeFile(getTempDirPath(), "Test.php", outputFileST.render());
-	}
-
-	protected void writeParserTestFile(
-		String parserName, String lexerName,
-		String listenerName, String visitorName,
-		String parserStartRuleName, boolean debug, boolean trace
-	) {
-		if (!parserStartRuleName.endsWith(")")) {
-			parserStartRuleName += "()";
-		}
-		ST outputFileST = new ST(
-			"\\<?php\n"
-				+ "\n"
-				+ "declare(strict_types=1);\n"
-				+ "\n"
-				+ "use Antlr\\Antlr4\\Runtime\\CommonTokenStream;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Error\\Listeners\\DiagnosticErrorListener;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Error\\Listeners\\ConsoleErrorListener;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\InputStream;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\ParserRuleContext;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Tree\\ErrorNode;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeListener;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeWalker;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Tree\\RuleNode;\n"
-				+ "use Antlr\\Antlr4\\Runtime\\Tree\\TerminalNode;\n"
-				+ "\n"
-				+ "$runtime = \\getenv('RUNTIME');\n"
-				+ "\n"
-				+ "\\spl_autoload_register(function (string $class) use ($runtime) : void {\n"
-				+ "    $file = \\str_replace('\\\\\\', \\DIRECTORY_SEPARATOR, \\str_replace('Antlr\\Antlr4\\Runtime\\\\\\', $runtime . '\\\\\\src\\\\\\', $class)) . '.php';\n"
-				+ "\n"
-				+ "    if (\\file_exists($file)) {\n"
-				+ "        require_once $file;   \n"
-				+ "    }\n"
-				+ "});\n"
-				+ "\n"
-				+ "final class TreeShapeListener implements ParseTreeListener {\n"
-				+ "    public function visitTerminal(TerminalNode $node) : void {}\n"
-				+ "    public function visitErrorNode(ErrorNode $node) : void {}\n"
-				+ "    public function exitEveryRule(ParserRuleContext $ctx) : void {}\n"
-				+ "\n"
-				+ "    public function enterEveryRule(ParserRuleContext $ctx) : void {\n"
-				+ "        for ($i = 0, $count = $ctx->getChildCount(); $i \\< $count; $i++) {\n"
-				+ "            $parent = $ctx->getChild($i)->getParent();\n"
-				+ "\n"
-				+ "            if (!($parent instanceof RuleNode) || $parent->getRuleContext() !== $ctx) {\n"
-				+ "                throw new RuntimeException('Invalid parse tree shape detected.');\n"
-				+ "            }\n"
-				+ "        }\n"
-				+ "    }\n"
-				+ "}"
-				+ "\n"
-				+ "$input = InputStream::fromPath($argv[1]);\n"
-				+ "$lexer = new <lexerName>($input);\n"
-				+ "$lexer->addErrorListener(new ConsoleErrorListener());"
-				+ "$tokens = new CommonTokenStream($lexer);\n"
-				+ "<createParser>"
-				+ "$parser->addErrorListener(new ConsoleErrorListener());"
-				+ "$parser->setBuildParseTree(true);\n"
-				+ "$tree = $parser-><parserStartRuleName>;\n\n"
-				+ "ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);\n"
-		);
-
-		String stSource = "$parser = new <parserName>($tokens);\n";
-
-		if (debug) {
-			stSource += "$parser->addErrorListener(new DiagnosticErrorListener());\n";
-		}
-
-		if (trace) {
-			stSource += "$parser->setTrace(true);\n";
-		}
-
-		ST createParserST = new ST(stSource);
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("listenerName", listenerName);
-		outputFileST.add("visitorName", visitorName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-
-		writeFile(getTempDirPath(), "Test.php", outputFileST.render());
-	}
-
 }
