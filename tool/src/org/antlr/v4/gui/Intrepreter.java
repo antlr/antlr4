@@ -17,16 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Run a lexer/parser combo, optionally printing tree string or generating
- *  postscript file. Optionally taking input file.
+/** Interpret a lexer/parser, optionally printing tree string and dumping profile info
  *
- *  $ java org.antlr.v4.runtime.misc.TestRig X.g4 startRuleName inputFileName
+ *  $ java org.antlr.v4.runtime.misc.Intrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName inputFileName
  *        [-tree]
- *        [-tokens]
- *        [-profile]
- *
- *  $ java org.antlr.v4.runtime.misc.TestRig XParser.g4 XLexer.g4 startRuleName inputFileName
- *        [-tree]
+ *        [-gui]
+ *        [-encoding encoding]
  *        [-tokens]
  *        [-profile]
  */
@@ -48,7 +44,7 @@ public class Intrepreter {
 
 	public Intrepreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.gui.Intrepreter GrammarFileName startRuleName\n" +
+			System.err.println("java org.antlr.v4.guIntrepreter GrammarFileName startRuleName\n" +
 					"  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
 					"  [-trace] [-diagnostics] [-SLL]\n"+
 					"  [input-filename(s)]");
@@ -96,14 +92,43 @@ public class Intrepreter {
 		}
 	}
 
-	protected ParseInfo interp(Grammar g, LexerGrammar lg) throws RecognitionException, IOException {
+	protected ParseInfo interp() throws RecognitionException, IOException {
+		Grammar g;
+		LexerGrammar lg = null;
+		DefaultToolListener listener = new DefaultToolListener(new Tool());
+		if (grammarFileName != null) {
+			String grammarContent = Files.readString(Path.of(grammarFileName));
+			g = new Grammar(grammarFileName, grammarContent, null, listener);
+		}
+		else {
+			String lexerGrammarContent = Files.readString(Path.of(lexerGrammarFileName));
+			lg = new LexerGrammar(lexerGrammarContent, listener);
+			String parserGrammarContent = Files.readString(Path.of(parserGrammarFileName));
+			g = new Grammar(parserGrammarFileName, parserGrammarContent, lg, listener);
+		}
+
 		Charset charset = ( encoding == null ? Charset.defaultCharset () : Charset.forName(encoding) );
 		CharStream charStream = CharStreams.fromPath(Paths.get(inputFileName), charset);
+
 		LexerInterpreter lexEngine = (lg!=null) ?
 				lg.createLexerInterpreter(charStream) :
 				g.createLexerInterpreter(charStream);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+
+		tokens.fill();
+
+		if ( showTokens ) {
+			for (Token tok : tokens.getTokens()) {
+				if ( tok instanceof CommonToken ) {
+					System.out.println(((CommonToken)tok).toString(lexEngine));
+				}
+				else {
+					System.out.println(tok.toString());
+				}
+			}
+		}
+
 		GrammarParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
 		parser.setProfile(true);
 
@@ -184,21 +209,6 @@ public class Intrepreter {
 
 	public static void main(String[] args) throws Exception {
 		Intrepreter I = new Intrepreter(args);
-		DefaultToolListener listener = new DefaultToolListener(new Tool());
-
-		if (I.grammarFileName != null) {
-
-			String grammarContent = Files.readString(Path.of(I.grammarFileName));
-			Grammar g = new Grammar(I.grammarFileName, grammarContent, null, listener);
-			ParseInfo parseInfo = I.interp(g, null);
-		}
-		else {
-			String lexerGrammarContent = Files.readString(Path.of(I.lexerGrammarFileName));
-			LexerGrammar lg = new LexerGrammar(lexerGrammarContent, listener);
-			String parserGrammarContent = Files.readString(Path.of(I.parserGrammarFileName));
-			Grammar g = new Grammar(I.parserGrammarFileName, parserGrammarContent, lg, listener);
-			ParseInfo parseInfo = I.interp(g, lg);
-		}
-//		System.out.println(Arrays.toString(info));
+		I.interp();
 	}
 }
