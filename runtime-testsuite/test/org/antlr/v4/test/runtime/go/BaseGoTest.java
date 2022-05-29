@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
+import java.util.HashMap;
 
 import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -88,7 +89,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
 		writeGoModFile();
-		return execModule("Test.go");
+		return execModule();
 	}
 
 	@Override
@@ -106,22 +107,15 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		String ruleNameFunction = startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
 		writeRecognizerFile(lexerName, parserName, ruleNameFunction, showDiagnosticErrors, false, false,
 				listenerName != null, visitorName != null);
-		return execModule("Test.go");
+		return execModule();
 	}
 
 	private void writeGoModFile() {
 		if (goModContent == null) {
 			try {
-				ProcessBuilder pb = new ProcessBuilder("go", "mod", "init", "test");
-				pb.directory(getTempTestDir());
-				pb.redirectErrorStream(true);
-				Process process = pb.start();
-				StreamVacuum sucker = new StreamVacuum(process.getInputStream());
-				sucker.start();
-				int exit = process.waitFor();
-				sucker.join();
-				if (exit != 0) {
-					throw new Exception("Non-zero exit while setting up go module: " + sucker);
+				ProcessorResult result = Processor.run(new String[]{"go", "mod", "init", "test"}, getTempDirPath());
+				if (result.exitCode != 0) {
+					throw new Exception("Non-zero exit while setting up go module: " + result.output);
 				}
 				goModContent = new String(Files.readAllBytes(Paths.get(getTempDirPath(), goModFileName)), StandardCharsets.UTF_8);
 			} catch (Exception e) {
@@ -161,31 +155,17 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return errorQueue.errors.isEmpty();
 	}
 
-	private String execModule(String fileName) {
+	private String execModule() {
 		initializeRuntime();
 
-		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
+		String modulePath = new File(getTempTestDir(), "Test.go").getAbsolutePath();
 		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder("go", "run", modulePath, inputPath);
-			builder.directory(getTempTestDir());
-			builder.environment().put("GOROOT", newGoRootString);
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if (output.length() == 0) {
-				output = null;
-			}
-			if (stderrVacuum.toString().length() > 0) {
-				setParseErrors(stderrVacuum.toString());
-			}
-			return output;
+			HashMap<String, String> environment = new HashMap<>();
+			environment.put("GOROOT", newGoRootString);
+			ProcessorResult result = Processor.run(new String[]{"go", "run", modulePath, inputPath}, getTempDirPath(), environment);
+			setParseErrors(result.errors);
+			return result.output;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
@@ -261,13 +241,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 
 	private static String getGoRootValue() {
 		try {
-			ProcessBuilder pb = new ProcessBuilder("go", "env", "GOROOT");
-			Process process = pb.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			stdoutVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			return stdoutVacuum.toString().trim();
+			return Processor.run(new String[] {"go", "env", "GOROOT"}, null).output.trim();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("Unable to execute go env");

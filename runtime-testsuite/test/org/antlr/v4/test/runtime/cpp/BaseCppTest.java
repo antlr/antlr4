@@ -11,6 +11,7 @@ import org.stringtemplate.v4.ST;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -272,22 +273,16 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		try {
 			String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 			String exePath = new File(getTempTestDir(), "Test." + (isWindows() ? "exe" : "out")).getAbsolutePath();
-			ProcessBuilder builder = new ProcessBuilder(exePath, inputPath);
-			builder.directory(getTempTestDir());
+			String[] args = new String[] { exePath, inputPath };
 
-			Map<String, String> env = builder.environment();
+			Map<String, String> environmentVariables = new HashMap<>();
 			if (isWindows()) {
-				env.put("PATH", runtimeBinaryPath);
+				environmentVariables.put("PATH", runtimeBinaryPath);
 			} else {
-				env.put("LD_PRELOAD", runtimeLibraryFileName);
+				environmentVariables.put("LD_PRELOAD", runtimeLibraryFileName);
 			}
 
-			String output = runProcess(builder, "running test binary", false);
-			if ( output.length()==0 ) {
-				output = null;
-			}
-
-			return output;
+			return runCommand(args, getTempDirPath(),  "running test binary", false, environmentVariables);
 		}
 		catch (Exception e) {
 			System.err.println("can't exec module: " + fileName);
@@ -297,36 +292,26 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	}
 
 	private String runCommand(String[] command, String workPath, String description, boolean showStderr) throws Exception {
-		ProcessBuilder builder = new ProcessBuilder(command);
-		builder.directory(new File(workPath));
-		return runProcess(builder, description, showStderr);
+		return runCommand(command, workPath, description, showStderr, new HashMap<>());
 	}
 
-	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
-		Process process = builder.start();
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
-		int errcode = process.waitFor();
-		stdoutVacuum.join();
-		stderrVacuum.join();
-		String output = stdoutVacuum.toString();
-		if ( stderrVacuum.toString().length()>0 ) {
-			setParseErrors(stderrVacuum.toString());
-			if ( showStderr ) System.err.println(getParseErrors());
+	private String runCommand(String[] command, String workPath, String description, boolean showStderr,
+							  Map<String, String> environmentVariables) throws Exception {
+		ProcessorResult result = Processor.run(command, workPath, environmentVariables);
+		if (result.errors.length() > 0) {
+			setParseErrors(result.errors);
+			if (showStderr) System.err.println(getParseErrors());
 		}
-		if (errcode != 0) {
-			String err = "execution of '"+description+"' failed with error code: "+errcode;
-			if ( getParseErrors()!=null ) {
+		if (result.exitCode != 0) {
+			String err = "execution of '" + description + "' failed with error code: " + result.exitCode;
+			if (getParseErrors() != null) {
 				setParseErrors(getParseErrors() + err);
 			}
 			else {
 				setParseErrors(err);
 			}
 		}
-
-		return output;
+		return result.output;
 	}
 
 	@Override

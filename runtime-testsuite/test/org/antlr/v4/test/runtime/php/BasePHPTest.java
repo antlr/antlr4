@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime.php;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.HashMap;
 
 import org.antlr.v4.test.runtime.*;
 
@@ -84,28 +85,14 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		Path outputPath = getTempTestDir().toPath().resolve("output").toAbsolutePath();
 
 		try {
-			ProcessBuilder builder = new ProcessBuilder(phpPath, modulePath, inputPath, outputPath.toString());
-			builder.environment().put("RUNTIME", runtimePath);
-			builder.directory(getTempTestDir());
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
+			HashMap<String, String> environment = new HashMap<>();
+			environment.put("RUNTIME", runtimePath);
+			ProcessorResult result = Processor.run(new String[]{phpPath, modulePath, inputPath, outputPath.toString()},
+					getTempDirPath(),
+					environment);
 
-			if (output.length() == 0) {
-				output = null;
-			}
-
-			if (stderrVacuum.toString().length() > 0) {
-				setParseErrors(stderrVacuum.toString());
-			}
-
-			return output;
+			setParseErrors(result.errors);
+			return result.output;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
