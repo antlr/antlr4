@@ -362,25 +362,10 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"-Dfile.encoding=UTF-8",
 				className, new File(getTempTestDir(), "input").getAbsolutePath()
 			};
-//			String cmdLine = Utils.join(args, " ");
-//			System.err.println("execParser: "+cmdLine);
-			Process process =
-				Runtime.getRuntime().exec(args, null, getTempTestDir());
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
-				output = null;
-			}
-			if ( stderrVacuum.toString().length()>0 ) {
-				setParseErrors(stderrVacuum.toString());
-			}
-			return output;
+
+			ProcessorResult result = Processor.run(args, getTempDirPath());
+			setParseErrors(result.errors);
+			return result.output;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");

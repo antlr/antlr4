@@ -6,11 +6,9 @@
 
 package org.antlr.v4.test.runtime.dart;
 
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 
 import java.io.*;
-import java.util.*;
 
 import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.readFile;
@@ -40,7 +38,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
-		return execClass("Test", false);
+		return execClass("Test");
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		setParseErrors(null);
 		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
 				false, listenerName != null, visitorName != null);
-		return execClass("Test", false);
+		return execClass("Test");
 	}
 
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
@@ -83,30 +81,11 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		final File dartToolDir = new File(getTempDirPath(), ".dart_tool");
 		if (cacheDartPackages == null) {
 			try {
-				final Process process =
-					Runtime.getRuntime().exec(
-						new String[]{locateDart(), "pub", "get"}, null, getTempTestDir());
-				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-				stderrVacuum.start();
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						try {
-							process.destroy();
-						} catch(Exception e) {
-							e.printStackTrace(System.err);
-						}
-					}
-				}, 30_000);
-				process.waitFor();
-				timer.cancel();
-				stderrVacuum.join();
-				String stderrDuringPubGet = stderrVacuum.toString();
-				if (!stderrDuringPubGet.isEmpty()) {
-					System.out.println("Pub Get error: " + stderrVacuum);
+				ProcessorResult result = Processor.run(new String[]{locateDart(), "pub", "get"}, getTempDirPath());
+				if (!result.errors.isEmpty()) {
+					System.out.println("Pub Get error: " + result.errors);
 				}
-			} catch (IOException | InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
 			}
@@ -121,80 +100,16 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		return true; // allIsWell: no compile
 	}
 
-	public String execClass(String className, boolean compile) {
+	public String execClass(String className) {
 		try {
-			if (compile) {
-				String[] args = new String[]{
-					locateDart(),
-					"compile", "exe", className + ".dart", "-o", className
-				};
-				String cmdLine = Utils.join(args, " ");
-				System.err.println("Compile: " + cmdLine);
-				final Process process =
-					Runtime.getRuntime().exec(args, null, getTempTestDir());
-				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-				stderrVacuum.start();
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						try {
-							process.destroy();
-						} catch(Exception e) {
-							e.printStackTrace(System.err);
-						}
-					}
-				}, 30_000);
-				int result = process.waitFor();
-				timer.cancel();
-				if (result != 0) {
-					stderrVacuum.join();
-					System.err.print("Error compiling dart file: " + stderrVacuum);
-				}
-			}
+			String[] args = new String[]{
+				locateDart(),
+				className + ".dart", new File(getTempTestDir(), "input").getAbsolutePath()
+			};
 
-			String[] args;
-			if (compile) {
-				args = new String[]{
-					new File(getTempTestDir(), className).getAbsolutePath(), new File(getTempTestDir(), "input").getAbsolutePath()
-				};
-			} else {
-				args = new String[]{
-					locateDart(),
-					className + ".dart", new File(getTempTestDir(), "input").getAbsolutePath()
-				};
-			}
-			//String cmdLine = Utils.join(args, " ");
-			//System.err.println("execParser: " + cmdLine);
-			final Process process =
-				Runtime.getRuntime().exec(args, null, getTempTestDir());
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			Timer timer = new Timer();
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						process.destroy();
-					} catch(Exception e) {
-						e.printStackTrace(System.err);
-					}
-				}
-			}, 30_000);
-			process.waitFor();
-			timer.cancel();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if (output.length() == 0) {
-				output = null;
-			}
-			if (stderrVacuum.toString().length() > 0) {
-				setParseErrors(stderrVacuum.toString());
-			}
-			return output;
+			ProcessorResult result = Processor.run(args, getTempDirPath());
+			setParseErrors(result.errors);
+			return result.output;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);

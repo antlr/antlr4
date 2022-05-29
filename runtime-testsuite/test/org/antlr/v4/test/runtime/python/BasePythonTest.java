@@ -9,8 +9,8 @@ import org.antlr.v4.test.runtime.*;
 import org.junit.runner.Description;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -43,7 +43,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
-		return execModule("Test.py");
+		return execModule();
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 		setParseErrors(null);
 		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
 				false, listenerName != null, visitorName != null);
-		return execModule("Test.py");
+		return execModule();
 	}
 
 	/** Return true if all is well */
@@ -72,28 +72,21 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 		return errorQueue.errors.isEmpty();
 	}
 
-	public String execModule(String fileName) {
+	public String execModule() {
 		String pythonPath = locatePython();
 		String runtimePath = Paths.get(getRuntimePath(), "src").toString();
 		File tmpdirFile = new File(getTempDirPath());
-		String modulePath = new File(tmpdirFile, fileName).getAbsolutePath();
+		String modulePath = new File(tmpdirFile, "Test.py").getAbsolutePath();
 		String inputPath = new File(tmpdirFile, "input").getAbsolutePath();
-		Path outputPath = tmpdirFile.toPath().resolve("output").toAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath, outputPath.toString() );
-			builder.environment().put("PYTHONPATH",runtimePath);
-			builder.environment().put("PYTHONIOENCODING", "utf-8");
-			builder.directory(tmpdirFile);
-			Process process = builder.start();
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stderrVacuum.start();
-			process.waitFor();
-			stderrVacuum.join();
-			String output = TestOutputReading.read(outputPath);
-			if ( stderrVacuum.toString().length()>0 ) {
-				setParseErrors(stderrVacuum.toString());
-			}
-			return output;
+			HashMap<String, String> environment = new HashMap<>();
+			environment.put("PYTHONPATH", runtimePath);
+			environment.put("PYTHONIOENCODING", "utf-8");
+			ProcessorResult result = Processor.run(new String[]{pythonPath, modulePath, inputPath},
+					getTempDirPath(),
+					environment);
+			setParseErrors(result.errors);
+			return result.output;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");

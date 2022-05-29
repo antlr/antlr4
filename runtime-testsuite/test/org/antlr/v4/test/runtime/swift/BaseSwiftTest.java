@@ -6,7 +6,6 @@
 
 package org.antlr.v4.test.runtime.swift;
 
-import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.*;
 
 import java.io.BufferedReader;
@@ -31,9 +30,6 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 	public String getTestFileName() {
 		return "main";
 	}
-
-	private static final boolean USE_ARCH_ARM64 = false;
-	private static final boolean VERBOSE = false;
 
 	/**
 	 * Path of the ANTLR runtime.
@@ -125,7 +121,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
 		}
-		catch (IOException | InterruptedException e) {
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -149,7 +145,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
 		}
-		catch (IOException | InterruptedException e) {
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -157,12 +153,11 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			Pair<String, String> output = runProcess(projectDir, "./.build/release/" + projectName, "input");
-			if (output.b.length() > 0) {
-				setParseErrors(output.b);
-			}
-			String stdout = output.a;
-			return stdout.length() > 0 ? stdout : null;
+			ProcessorResult result = Processor.run(
+					new String[]{ projectDir, "./.build/release/" + projectName, "input"},
+					getTempDirPath());
+			setParseErrors(result.errors);
+			return result.output;
 		}
 		catch (Exception e) {
 			System.err.println("Execution of testcase failed.");
@@ -175,7 +170,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		Collections.addAll(this.sourceFiles, files);
 	}
 
-	private void buildProject(String projectDir, String projectName) throws IOException, InterruptedException {
+	private void buildProject(String projectDir, String projectName) throws Exception {
 		mkdir(projectDir);
 		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
@@ -184,27 +179,14 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		}
 		fastFailRunProcess(getTempDirPath(), "mv", "-f", "input", projectDir);
 		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/release/";
-//		System.err.println(dylibPath);
-		Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
+		Processor.run(new String[]{projectDir, SWIFT_CMD, "build",
 				"-c", "release",
-				"-Xswiftc", "-I"+dylibPath,
-				"-Xlinker", "-L"+dylibPath,
+				"-Xswiftc", "-I" + dylibPath,
+				"-Xlinker", "-L" + dylibPath,
 				"-Xlinker", "-lAntlr4",
 				"-Xlinker", "-rpath",
-				"-Xlinker", dylibPath);
-		if (buildResult.b.length() > 0) {
-			throw new IOException("unit test build failed: " + buildResult.a + "\n" + buildResult.b);
-		}
-	}
-
-	static Boolean IS_MAC_ARM_64 = null;
-
-	private static boolean isMacOSArm64() {
-		if (IS_MAC_ARM_64 == null) {
-			IS_MAC_ARM_64 = computeIsMacOSArm64();
-			System.err.println("IS_MAC_ARM_64 = " + IS_MAC_ARM_64);
-		}
-		return IS_MAC_ARM_64;
+				"-Xlinker", dylibPath
+		}, getTempDirPath());
 	}
 
 	private static boolean computeIsMacOSArm64() {
@@ -222,49 +204,9 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		}
 	}
 
-	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
-		List<String> argsWithArch = new ArrayList<>();
-		if(USE_ARCH_ARM64 && isMacOSArm64())
-			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
-		argsWithArch.addAll(Arrays.asList(args));
-		if(VERBOSE)
-			System.err.println("Executing " + argsWithArch + " " + execPath);
-		final Process process = Runtime.getRuntime().exec(argsWithArch.toArray(new String[0]), null, new File(execPath));
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					process.destroy();
-				} catch(Exception e) {
-					e.printStackTrace(System.err);
-				}
-			}
-		}, 120_000);
-		int status = process.waitFor();
-		timer.cancel();
-		stdoutVacuum.join();
-		stderrVacuum.join();
-		if(VERBOSE)
-			System.err.println("Done executing " + argsWithArch + " " + execPath);
-		if (status != 0) {
-			System.err.println("Process exited with status " + status);
-			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum + "\n" + stderrVacuum);
-		}
-		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
-	}
-
 	private static void fastFailRunProcess(String workingDir, String... command) throws IOException, InterruptedException {
 		List<String> argsWithArch = new ArrayList<>();
-		if(USE_ARCH_ARM64 && isMacOSArm64())
-			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(command));
-		if(VERBOSE)
-			System.err.println("Executing " + argsWithArch + " " + workingDir);
 		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
 		final Process process = builder.start();
@@ -281,8 +223,6 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		}, 120_000);
 		int status = process.waitFor();
 		timer.cancel();
-		if(VERBOSE)
-			System.err.println("Done executing " + argsWithArch + " " + workingDir);
 		if (status != 0) {
 			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);

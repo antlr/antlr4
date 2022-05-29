@@ -28,22 +28,21 @@ class TreeShapeListener(ParseTreeListener):
 
 def main(argv):
     input = FileStream(argv[1], encoding='utf-8', errors='replace')
-    with codecs.open(argv[2], 'w', 'utf-8', 'replace') as output:
-        lexer = <lexerName>(input, output)
-        stream = CommonTokenStream(lexer)
+    lexer = <lexerName>(input)
+    stream = CommonTokenStream(lexer)
 <if(parserName)>
-        parser = <parserName>(stream, output)
+    parser = <parserName>(stream)
 <if(debug)>
-        parser.addErrorListener(DiagnosticErrorListener())
+    parser.addErrorListener(DiagnosticErrorListener())
 <endif>
-        parser.buildParseTrees = True
-        tree = parser.<parserStartRuleName>()
-        ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
+    parser.buildParseTrees = True
+    tree = parser.<parserStartRuleName>()
+    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
 <else>
-        stream.fill()
-        [ print(unicode(t), file=output) for t in stream.tokens ]
+    stream.fill()
+    [ print(unicode(t)) for t in stream.tokens ]
 <if(showDFA)>
-        print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='', file=output)
+    print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='')
 <endif>
 <endif>
 

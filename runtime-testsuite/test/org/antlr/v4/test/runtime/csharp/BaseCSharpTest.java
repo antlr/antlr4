@@ -5,7 +5,6 @@
  */
 package org.antlr.v4.test.runtime.csharp;
 
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 
 import java.io.*;
@@ -40,6 +39,12 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return "antlr4-csharp";
 	}
 
+	Set<String> sourceFiles = new HashSet<>();
+
+	private void addSourceFiles(String... files) {
+		Collections.addAll(sourceFiles, files);
+	}
+
 	@Override
 	public String execLexer(String grammarFileName,
 							String grammarStr,
@@ -54,21 +59,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
 		addSourceFiles("Test.cs");
-		if (!compile()) {
-			System.err.println("Failed to compile!");
-			return getParseErrors();
-		}
-		String output = execTest();
-		if (output != null && output.length() == 0) {
-			output = null;
-		}
-		return output;
-	}
-
-	Set<String> sourceFiles = new HashSet<>();
-
-	private void addSourceFiles(String... files) {
-		Collections.addAll(sourceFiles, files);
+		return execRecognizer();
 	}
 
 	@Override
@@ -113,28 +104,25 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	public String execRecognizer() {
-		boolean success = compile();
-		assertTrue(success);
-
-		String output = execTest();
-		if (output != null && output.length() == 0) {
-			output = null;
+		if (!buildProject()) {
+			System.err.println("Failed to compile!");
+			return getParseErrors();
 		}
-		return output;
-	}
-
-	public boolean compile() {
+		String exec = new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
+		String output;
 		try {
-			return buildProject();
+			ProcessorResult result =
+					Processor.run(new String[]{"dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath()},
+							getTempDirPath());
+			setParseErrors(result.errors);
+			output = result.output;
 		}
 		catch (Exception e) {
+			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
-			return false;
+			return null;
 		}
-	}
-
-	private String locateExec() {
-		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return output;
 	}
 
 	public boolean buildProject() {
@@ -147,8 +135,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 
 			// build test
 			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
-			boolean success = runProcess(args, getTempDirPath());
-			assertTrue(success);
+			Processor.run(args, getTempDirPath());
 		}
 		catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -201,7 +188,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				}
 				cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
 
-				success = runProcess(args, cSharpCachingDirectory);
+				success = Processor.run(args, cSharpCachingDirectory).isSuccess();
 			} catch (Exception e) {
 				e.printStackTrace(System.err);
 				success = false;
@@ -213,81 +200,5 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			isRuntimeInitialized = true; // try only once
 			return success;
 		}
-	}
-
-	private boolean runProcess(String[] args, String path) throws Exception {
-		return runProcess(args, path, 0);
-	}
-
-	private boolean runProcess(String[] args, String path, int retries) throws Exception {
-		ProcessBuilder pb = new ProcessBuilder(args);
-		pb.directory(new File(path));
-		Process process = pb.start();
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
-		process.waitFor();
-		stdoutVacuum.join();
-		stderrVacuum.join();
-		int exitValue = process.exitValue();
-		boolean success = (exitValue == 0);
-		if (!success) {
-			setParseErrors(stderrVacuum.toString());
-			System.err.println("runProcess command: " + Utils.join(args, " "));
-			System.err.println("runProcess exitValue: " + exitValue);
-			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum);
-			System.err.println("runProcess stderrVacuum: " + getParseErrors());
-		}
-		if (exitValue == 132) {
-			// Retry after SIGILL.  We are seeing this intermittently on
-			// macOS (issue #2078).
-			if (retries < 3) {
-				System.err.println("runProcess retrying; " + retries +
-						" retries so far");
-				return runProcess(args, path, retries + 1);
-			} else {
-				System.err.println("runProcess giving up after " + retries +
-						" retries");
-				return false;
-			}
-		}
-		return success;
-	}
-
-	public String execTest() {
-		String exec = locateExec();
-		try {
-			File tmpdirFile = new File(getTempDirPath());
-			String[] args = new String[] { "dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath() };
-			ProcessBuilder pb = new ProcessBuilder(args);
-			pb.directory(tmpdirFile);
-			Process process = pb.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			process.exitValue();
-			String stdoutString = stdoutVacuum.toString();
-			String stderrString = stderrVacuum.toString();
-			setParseErrors(stderrString);
-			return stdoutString;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec recognizer");
-			e.printStackTrace(System.err);
-		}
-		return null;
-	}
-
-	protected static void assertEquals(String msg, int a, int b) {
-		org.junit.Assert.assertEquals(msg, a, b);
-	}
-
-	protected static void assertEquals(String a, String b) {
-		org.junit.Assert.assertEquals(a, b);
 	}
 }

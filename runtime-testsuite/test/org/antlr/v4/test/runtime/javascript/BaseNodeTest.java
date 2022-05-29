@@ -48,11 +48,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
 		writeFile(getTempDirPath(), "package.json", "{\"type\": \"module\"}");
-		String output = execModule("Test.js");
-		if ( output!=null && output.length()==0 ) {
-			output = null;
-		}
-		return output;
+		return execModule("Test.js");
 	}
 
 	@Override
@@ -106,54 +102,17 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
 			String nodejsPath = locateNodeJS();
 			String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
-			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
-					inputPath);
-			builder.environment().put("NODE_PATH", getTempDirPath());
-			builder.directory(getTempTestDir());
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(
-					process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(
-					process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			// TODO switch to jdk 8
-			process.waitFor();
-			// if(!process.waitFor(1L, TimeUnit.MINUTES))
-			//	process.destroyForcibly();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
-				output = null;
-			}
-			if (stderrVacuum.toString().length() > 0) {
-				setParseErrors(stderrVacuum.toString());
-			}
-			return output;
+
+			HashMap<String, String> environment = new HashMap<>();
+			environment.put("NODE_PATH", getTempDirPath());
+			ProcessorResult result = Processor.run(new String[]{nodejsPath, modulePath, inputPath}, getTempDirPath(), environment);
+			setParseErrors(result.errors);
+			return result.output;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 			System.err.println();
 			return null;
-		}
-	}
-
-	private boolean canExecute(String tool) {
-		try {
-			ProcessBuilder builder = new ProcessBuilder(tool, "--version");
-			builder.redirectErrorStream(true);
-			Process process = builder.start();
-			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
-			vacuum.start();
-			// TODO switch to jdk 8
-			process.waitFor();
-			// if(!process.waitFor(30L, TimeUnit.SECONDS))
-			//	process.destroyForcibly();
-			vacuum.join();
-			return process.exitValue() == 0;
-		} catch (Exception e) {
-			return false;
 		}
 	}
 
@@ -164,9 +123,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			if(prop.contains(" "))
 				prop = "\"" + prop + "\"";
 			return prop;
-		}
-		if (canExecute("nodejs")) {
-			return "nodejs"; // nodejs on Debian without node-legacy package
 		}
 		return "node"; // everywhere else
 	}
