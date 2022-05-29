@@ -11,11 +11,8 @@ import org.stringtemplate.v4.ST;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
@@ -98,14 +95,6 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		}
 	}
 
-	protected String execLexer(String grammarFileName,
-	                           String grammarStr,
-	                           String lexerName,
-	                           String input)
-	{
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
-	}
-
 	@Override
 	public  String execLexer(String grammarFileName,
 	                         String grammarStr,
@@ -113,10 +102,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	                         String input,
 	                         boolean showDFA)
 	{
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr,
-		                                                null,
-		                                                lexerName,"-no-listener");
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
@@ -134,65 +120,21 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	                         String input,
 	                         boolean showDiagnosticErrors)
 	{
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr,
-		                                                parserName,
-		                                                lexerName,
-		                                                "-visitor");
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, "-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
-		return execRecognizer();
-	}
-
-	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-	                                                String grammarStr,
-	                                                String parserName,
-	                                                String lexerName,
-	                                                String... extraOptions)
-	{
-		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
-	}
-
-	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-	                                                String grammarStr,
-	                                                String parserName,
-	                                                String lexerName,
-	                                                boolean defaultListener,
-	                                                String... extraOptions)
-	{
-		ErrorQueue equeue =
-			antlrOnString(getTempDirPath(), "Cpp", grammarFileName, grammarStr, defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
-			return false;
-		}
-
-		List<String> files = new ArrayList<>();
-		if ( lexerName!=null ) {
-			files.add(lexerName+".cpp");
-			files.add(lexerName+".h");
-		}
-		if ( parserName!=null ) {
-			files.add(parserName+".cpp");
-			files.add(parserName+".h");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.cpp");
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.h");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.cpp");
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.h");
-			}
-		}
-		return true; // allIsWell: no compile
-	}
-
-	public String execRecognizer() {
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
+				false, listenerName != null, visitorName != null);
 		return execModule("Test.cpp");
+	}
+
+	/** Return true if all is well */
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName, String grammarStr, String... extraOptions)
+	{
+		ErrorQueue errorQueue =
+			antlrOnString(getTempDirPath(), "Cpp", grammarFileName, grammarStr, false, extraOptions);
+		return errorQueue.errors.isEmpty();
 	}
 
 	public List<String> allCppFiles(String path) {

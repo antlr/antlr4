@@ -8,11 +8,6 @@ package org.antlr.v4.test.runtime.php;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.antlr.v4.test.runtime.*;
 
@@ -38,13 +33,7 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String input,
 		boolean showDFA
 	) {
-		boolean success = rawGenerateAndBuildRecognizer(
-			grammarFileName,
-			grammarStr,
-			null,
-			lexerName,
-			"-no-listener"
-		);
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
@@ -62,84 +51,28 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String input,
 		boolean showDiagnosticErrors
 	) {
-		boolean success = rawGenerateAndBuildRecognizer(
-				grammarFileName,
-				grammarStr,
-				parserName,
-				lexerName,
-			"-visitor"
-		);
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, "-visitor");
 
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 
 		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
+				false, listenerName != null, visitorName != null);
 
-		return execRecognizer();
-	}
-
-	/**
-	 * Return true if all is well
-	 */
-	protected boolean rawGenerateAndBuildRecognizer(
-		String grammarFileName,
-		String grammarStr,
-		String parserName,
-		String lexerName,
-		String... extraOptions
-	) {
-		return rawGenerateAndBuildRecognizer(
-			grammarFileName,
-			grammarStr,
-			parserName,
-			lexerName,
-			false,
-			extraOptions
-		);
-	}
-
-	/**
-	 * Return true if all is well
-	 */
-	protected boolean rawGenerateAndBuildRecognizer(
-		String grammarFileName,
-		String grammarStr,
-		String parserName,
-		String lexerName,
-		boolean defaultListener,
-		String... extraOptions
-	) {
-		ErrorQueue equeue = antlrOnString(getTempDirPath(), "PHP", grammarFileName, grammarStr, defaultListener, extraOptions);
-
-		if (!equeue.errors.isEmpty()) {
-			return false;
-		}
-
-		List<String> files = new ArrayList<String>();
-
-		if (lexerName != null) {
-			files.add(lexerName + ".php");
-		}
-
-		if (parserName != null) {
-			files.add(parserName + ".php");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "Listener.php");
-			}
-
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "Visitor.php");
-			}
-		}
-
-		return true;
-	}
-
-	public String execRecognizer() {
 		return execModule("Test.php");
+	}
+
+	/**
+	 * Return true if all is well
+	 */
+	protected boolean rawGenerateAndBuildRecognizer(
+		String grammarFileName,
+		String grammarStr,
+		String... extraOptions
+	) {
+		ErrorQueue enqueue = antlrOnString(getTempDirPath(), "PHP", grammarFileName, grammarStr, false, extraOptions);
+		return enqueue.errors.isEmpty();
 	}
 
 	public String execModule(String fileName) {

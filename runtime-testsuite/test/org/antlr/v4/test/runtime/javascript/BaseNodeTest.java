@@ -29,20 +29,21 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	public String getExtension() { return "js"; }
 
 	@Override
+	public String getBaseListenerSuffix() { return null; }
+
+	@Override
+	public String getBaseVisitorSuffix() { return null; }
+
+	@Override
 	protected String getPropertyPrefix() {
 		return "antlr4-javascript";
-	}
-
-	protected String execLexer(String grammarFileName, String grammarStr,
-	                           String lexerName, String input) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
 	}
 
 	@Override
 	public  String execLexer(String grammarFileName, String grammarStr,
 	                         String lexerName, String input, boolean showDFA) {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr, null, lexerName, "-no-listener");
+		                                                grammarStr, null, lexerName);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
@@ -65,48 +66,23 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
+				false, listenerName != null, visitorName != null);
 		writeFile(getTempDirPath(), "package.json", "{\"type\": \"module\"}");
-		return execRecognizer();
+		return execModule("Test.js");
 	}
 
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 	                                                String grammarStr, String parserName, String lexerName,
 	                                                String... extraOptions) {
-		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr,
-		                                     parserName, lexerName, false, extraOptions);
-	}
-
-	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-	                                                String grammarStr, String parserName, String lexerName,
-	                                                boolean defaultListener, String... extraOptions) {
 		ErrorQueue equeue = antlrOnString(getTempDirPath(), "JavaScript", grammarFileName, grammarStr,
-		                                  defaultListener, extraOptions);
+				false, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
 
-		List<String> files = new ArrayList<String>();
-		if (lexerName != null) {
-			files.add(lexerName + ".js");
-		}
-		if (parserName != null) {
-			files.add(parserName + ".js");
-			Set<String> optionsSet = new HashSet<String>(
-					Arrays.asList(extraOptions));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0,
-						grammarFileName.lastIndexOf('.'))
-						+ "Listener.js");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0,
-						grammarFileName.lastIndexOf('.'))
-						+ "Visitor.js");
-			}
-		}
+		List<String> files = getGeneratedFiles(grammarFileName, lexerName, parserName, extraOptions);
 
 		String newImportAntlrString = "import antlr4 from 'file://" + getRuntimePath() + "/src/antlr4/index.js'";
 		for (String file : files) {
@@ -123,10 +99,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		}
 
 		return true; // allIsWell: no compile
-	}
-
-	public String execRecognizer() {
-		return execModule("Test.js");
 	}
 
 	public String execModule(String fileName) {
