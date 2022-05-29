@@ -6,7 +6,7 @@ Here is how you can use this external project to create the antlr4cpp demo to st
    1. Make a subfolder cmake
    2. Copy the files in this folder to srcfolder/cmake
    3. Cut below and use it to create srcfolder/CMakeLists.txt
-   4. Copy main.cpp, TLexer.g4 and TParser.g4 to ./srcfolder/ from [here](https://github.com/antlr/antlr4/tree/master/runtime/Cpp/demo)
+   4. Copy main.cpp, TLexer.g4 and TParser.g4 to srcfolder/ from [here](https://github.com/antlr/antlr4/tree/master/runtime/Cpp/demo)
 2. Make a build folder e.g. ~/buildfolder/
 3. From the buildfolder, run `cmake ~/srcfolder; make`
 
@@ -16,14 +16,22 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.7 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# compiler must be 11 or 14
-set(CMAKE_CXX_STANDARD 11)
+# compiler must be 17
+set(CMAKE_CXX_STANDARD 17)
 
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 set(ANTLR4_WITH_STATIC_CRT OFF)
+
+# Specify the version of the antlr4 library needed for this project.
+# By default the latest version of antlr4 will be used.  You can specify a
+# specific, stable version by setting a repository tag value or a link
+# to a zip file containing the libary source.
+# set(ANTLR4_TAG 4.10.1)
+# set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.10.1.zip)
+
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -31,7 +39,7 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
-set(ANTLR_EXECUTABLE /home/user/antlr-4.9.2-complete.jar)
+set(ANTLR_EXECUTABLE /home/user/antlr-4.10.1-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
@@ -123,9 +131,9 @@ ANTLR4_RUNTIME_LIBRARIES - path to antlr4 shared runtime library (such as DLL, D
 ANTLR4_TAG - branch/tag used for building antlr4 library
 ```
 
-`ANTLR4_TAG` is set to master branch by default to keep antlr4 updated. However, it will be required to rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically update to latest commit.
+`ANTLR4_TAG` is set to master branch by default to keep the antlr4 library up to date. However, this will require a rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically updating to latest commit.
 
-The ANTLR C++ runtime source is downloaded from GitHub by default. However, users may specify `ANTLR4_ZIP_REPOSITORY` to list the zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*). This variable can list a zip file included in the project directory; this is useful for maintaining a canonical source for each new build.
+By defualt the ANTLR C++ runtime source is cloned from GitHub. However, users may specify `ANTLR4_ZIP_REPOSITORY` in order to download source as a zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*) or other locations. For example, this variable could list a zip file included in your the project directory.  This is useful for maintaining a canonical source tree for each new build.
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 

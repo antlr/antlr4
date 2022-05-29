@@ -6,6 +6,7 @@
 #pragma once
 
 #include "misc/IntervalSet.h"
+#include "atn/TransitionType.h"
 
 namespace antlr4 {
 namespace atn {
@@ -25,33 +26,13 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC Transition {
   public:
-    // constants for serialization
-    enum SerializationType {
-      EPSILON = 1,
-      RANGE = 2,
-      RULE = 3,
-      PREDICATE = 4, // e.g., {isType(input.LT(1))}?
-      ATOM = 5,
-      ACTION = 6,
-      SET = 7, // ~(A|B) or ~atom, wildcard, which convert to next 2
-      NOT_SET = 8,
-      WILDCARD = 9,
-      PRECEDENCE = 10,
-    };
-
-    static const std::vector<std::string> serializationNames;
-
     /// The target of this transition.
     // ml: this is a reference into the ATN.
     ATNState *target;
 
-    virtual ~Transition();
+    virtual ~Transition() = default;
 
-  protected:
-    Transition(ATNState *target);
-
-  public:
-    virtual SerializationType getSerializationType() const = 0;
+    TransitionType getTransitionType() const { return _transitionType; }
 
     /**
      * Determines if the transition is an "epsilon" transition.
@@ -70,7 +51,15 @@ namespace atn {
 
     Transition(Transition const&) = delete;
     Transition& operator=(Transition const&) = delete;
+
+  protected:
+    Transition(TransitionType transitionType, ATNState *target);
+
+  private:
+    const TransitionType _transitionType;
   };
+
+  using ConstTransitionPtr = std::unique_ptr<const Transition>;
 
 } // namespace atn
 } // namespace antlr4

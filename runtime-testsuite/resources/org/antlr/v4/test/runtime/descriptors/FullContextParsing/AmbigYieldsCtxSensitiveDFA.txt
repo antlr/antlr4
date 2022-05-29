@@ -1,0 +1,27 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<DumpDFA()>}
+   : ID | ID {} ;
+ID : 'a'..'z'+;
+WS : (' '|'\t'|'\n')+ -> skip ;
+
+[start]
+s
+
+[input]
+abc
+
+[output]
+Decision 0:
+s0-ID->:s1^=>1
+
+[errors]
+"""line 1:0 reportAttemptingFullContext d=0 (s), input='abc'
+"""
+
+[flags]
+showDiagnosticErrors
+

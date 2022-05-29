@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.9.3-SNAPSHOT</version>
+	<version>4.10.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
@@ -25,7 +25,11 @@
 		<url>http://www.antlr.org</url>
 	</organization>
 
-	<licenses>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
+
+    <licenses>
 		<license>
 			<name>The BSD License</name>
 			<url>http://www.antlr.org/license.html</url>
@@ -87,8 +91,6 @@
 		<module>tool</module>
 		<module>antlr4-maven-plugin</module>
 		<module>tool-testsuite</module>
-		<module>runtime-testsuite/annotations</module>
-		<module>runtime-testsuite/processors</module>
 		<module>runtime-testsuite</module>
 	</modules>
 
@@ -96,8 +98,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<antlr.testinprocess>true</antlr.testinprocess>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<mailingLists>
@@ -113,7 +115,7 @@
 	</issueManagement>
 
 	<scm>
-		<url>https://github.com/antlr/antlr4/tree/master</url>
+        <url>https://github.com/antlr/antlr4/tree/master</url>
 		<connection>scm:git:git://github.com/antlr/antlr4.git</connection>
 		<developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
 		<tag>HEAD</tag>
@@ -133,7 +135,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<configuration>
 					<filesets>
 						<fileset>

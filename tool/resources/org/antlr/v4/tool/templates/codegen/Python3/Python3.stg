@@ -263,9 +263,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self<currentRule.args:{a | , <a.name><if(a.type)>:<a.type><endif>}>):
+def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>:<a.type><endif>}>):
 
-    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.name>}>)
+    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.escapedName>}>)
     self.enterRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>)
     <namedActions.init>
     <locals; separator="\n">
@@ -295,10 +295,10 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
+def <currentRule.escapedName>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
     _parentctx = self._ctx
     _parentState = self.state
-    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.name>}>)
+    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.escapedName>}>)
     _prevctx = localctx
     _startState = <currentRule.startState>
     self.enterRecursionRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>, _p)
@@ -493,7 +493,7 @@ if token in [<ttypes:{t | <parser.name>.<t>}; separator=", ">]:
 
 InvokeRule(r, argExprsChunks) ::= <<
 self.state = <r.stateNumber>
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>self.<r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>self.<r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 >>
 
 MatchToken(m) ::= <<
@@ -552,15 +552,15 @@ LexerPushModeCommand(arg, grammar)  ::= "pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "localctx.<a.name>"
-LocalRef(a) ::= "localctx.<a.name>"
-RetValueRef(a) ::= "localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "localctx.<a.escapedName>"
+LocalRef(a) ::= "localctx.<a.escapedName>"
+RetValueRef(a) ::= "localctx.<a.escapedName>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.escapedName>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
+TokenRef(t) ::= "<ctx(t)>.<t.escapedName>"
+LabelRef(t) ::= "<ctx(t)>.<t.escapedName>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.escapedName)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.escapedName> = <rhsChunks>"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
@@ -585,19 +585,19 @@ ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._inpu
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.escapedName>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.escapedName> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
-TokenDecl(t) ::= "self.<t.name> = None # <TokenLabelType()>"
-TokenTypeDecl(t) ::= "self.<t.name> = 0 # <TokenLabelType()> type"
-TokenListDecl(t) ::= "self.<t.name> = list() # of <TokenLabelType()>s"
-RuleContextDecl(r) ::= "self.<r.name> = None # <r.ctxName>"
-RuleContextListDecl(rdecl) ::= "self.<rdecl.name> = list() # of <rdecl.ctxName>s"
+TokenDecl(t) ::= "self.<t.escapedName> = None # <TokenLabelType()>"
+TokenTypeDecl(t) ::= "self.<t.escapedName> = 0 # <TokenLabelType()> type"
+TokenListDecl(t) ::= "self.<t.escapedName> = list() # of <TokenLabelType()>s"
+RuleContextDecl(r) ::= "self.<r.escapedName> = None # <r.ctxName>"
+RuleContextListDecl(rdecl) ::= "self.<rdecl.escapedName> = list() # of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
-def <t.name>(self):
+def <t.escapedName>(self):
     return self.getToken(<parser.name>.<t.name>, 0)
 >>
 
@@ -608,7 +608,7 @@ def <t.name>_list(self):
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-def <t.name>(self, i:int=None):
+def <t.escapedName>(self, i:int=None):
     if i is None:
         return self.getTokens(<parser.name>.<t.name>)
     else:
@@ -616,7 +616,7 @@ def <t.name>(self, i:int=None):
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-def <r.name>(self):
+def <r.escapedName>(self):
     return self.getTypedRuleContext(<parser.name>.<r.ctxName>,0)
 
 >>
@@ -629,7 +629,7 @@ def <r.name>_list(self):
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-def <r.name>(self, i:int=None):
+def <r.escapedName>(self, i:int=None):
     if i is None:
         return self.getTypedRuleContexts(<parser.name>.<r.ctxName>)
     else:
@@ -653,14 +653,14 @@ CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
-class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
+class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
     __slots__ = 'parser'
 
-    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name><if(a.type)>:<a.type><endif>=None}>):
+    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.escapedName><if(a.type)>:<a.type><endif>=None}>):
         super().__init__(parent, invokingState)
         self.parser = parser
         <attrs:{a | <a>}; separator="\n">
-        <struct.ctorAttrs:{a | self.<a.name> = <a.name>}; separator="\n">
+        <struct.ctorAttrs:{a | self.<a.escapedName> = <a.escapedName>}; separator="\n">
 
     <getters:{g | <g>}; separator="\n\n">
 
@@ -670,7 +670,7 @@ class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleCo
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
     def copyFrom(self, ctx:ParserRuleContext):
         super().copyFrom(ctx)
-        <struct.attrs:{a | self.<a.name> = ctx.<a.name>}; separator="\n">
+        <struct.attrs:{a | self.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 
 <endif>
     <dispatchMethods; separator="\n">
@@ -679,7 +679,7 @@ class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleCo
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-class <struct.name>(<currentRule.name; format="cap">Context):
+class <struct.escapedName>(<currentRule.name; format="cap">Context):
 
     def __init__(self, parser, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context
         super().__init__(parser)
@@ -708,10 +708,10 @@ def accept(self, visitor:ParseTreeVisitor):
 
 >>
 
-AttributeDecl(d) ::= "self.<d.name> = <if(d.initValue)><d.initValue><else>None<endif>"
+AttributeDecl(d) ::= "self.<d.escapedName> = <if(d.initValue)><d.initValue><else>None<endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "localctx"
@@ -783,19 +783,19 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
-<if(lexer.channels)>
-    <lexer.channels:{c| <c> = <lexer.channels.(c)>}; separator="\n">
+<if(lexer.escapedChannels)>
+    <lexer.escapedChannels:{c| <c> = <lexer.escapedChannels.(c)>}; separator="\n">
 
 <endif>
-<if(rest(lexer.modes))>
-    <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
+<if(rest(lexer.escapedModeNames))>
+    <rest(lexer.escapedModeNames):{m| <m> = <i>}; separator="\n">
 
 <endif>
     <if(lexer.tokens)>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 
     modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ]
 
@@ -823,13 +823,10 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 >>
 
 SerializedATN(model) ::= <<
-<! only one segment, can be inlined !>
-
 def serializedATN():
-    with StringIO() as buf:
-        buf.write("<model.serialized; wrap={")<\n>        buf.write("}>")
-        return buf.getvalue()
-
+    return [
+        <model.serialized: {s | <s>}; separator=",", wrap>
+    ]
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

@@ -1,9 +1,15 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
-
 #include "LexerAction.h"
 
-antlr4::atn::LexerAction::~LexerAction() {
+using namespace antlr4::atn;
+
+size_t LexerAction::hashCode() const {
+  auto hash = cachedHashCode();
+  if (hash == 0) {
+    hash = hashCodeImpl();
+    if (hash == 0) {
+      hash = std::numeric_limits<size_t>::max();
+    }
+    _hashCode.store(hash, std::memory_order_relaxed);
+  }
+  return hash;
 }

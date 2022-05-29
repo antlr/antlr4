@@ -35,26 +35,15 @@ public func +(lhs: Token, rhs: String) -> String {
 infix operator >>> : BitwiseShiftPrecedence
 
 func >>>(lhs: Int32, rhs: Int32) -> Int32 {
-    let left = UInt32(bitPattern: lhs)
-    let right = UInt32(bitPattern: rhs) % 32
-
-    return Int32(bitPattern: left >> right)
+    return lhs &>> rhs
 }
 
 func >>>(lhs: Int64, rhs: Int64) -> Int64 {
-    let left = UInt64(bitPattern: lhs)
-    let right = UInt64(bitPattern: rhs) % 64
-
-    return Int64(bitPattern: left >> right)
+    return lhs &>> rhs
 }
 
 func >>>(lhs: Int, rhs: Int) -> Int {
-    let numberOfBits: UInt = MemoryLayout<UInt>.size == MemoryLayout<UInt64>.size ? 64 : 32
-
-    let left = UInt(bitPattern: lhs)
-    let right = UInt(bitPattern: rhs) % numberOfBits
-
-    return Int(bitPattern: left >> right)
+    return lhs &>> rhs
 }
 
 func intChar2String(_ i: Int) -> String {
@@ -88,19 +77,4 @@ func toUUID(_ data: [Character], _ offset: Int) -> UUID {
     let leastSigBits: Int64 = toLong(data, offset)
     let mostSigBits: Int64 = toLong(data, offset + 4)
     return UUID(mostSigBits: mostSigBits, leastSigBits: leastSigBits)
-}
-
-func ==<T:Equatable>(_ lhs: [T?], _ rhs: [T?]) -> Bool {
-
-    if lhs.count != rhs.count {
-        return false
-    }
-
-    for i in 0..<lhs.count {
-        if lhs[i] != rhs[i] {
-            return false
-        }
-    }
-
-    return true
 }

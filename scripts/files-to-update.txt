@@ -1,0 +1,48 @@
+# The list of files with an antlr version number to update
+# generated initially from:
+# $ mvn clean
+# $ find tool runtime -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
+#
+# Lines starting with '*' allow multiple changes in single file
+
+docker/Dockerfile
+runtime/Go/antlr/recognizer.go
+runtime/Python3/setup.py
+runtime/Python3/src/antlr4/Recognizer.py
+runtime/Python2/setup.py
+runtime/Python2/src/antlr4/Recognizer.py
+runtime/Dart/pubspec.yaml
+runtime/Dart/lib/src/runtime_meta_data.dart
+runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
+runtime/Cpp/demo/generate.cmd
+runtime/Cpp/cmake/Antlr4Package.md
+runtime/Cpp/cmake/README.md
+runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
+runtime/Cpp/cmake/FindANTLR.cmake
+runtime/Cpp/runtime/src/Version.h
+runtime/Cpp/VERSION
+runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
+runtime/CSharp/src/README.md
+runtime/CSharp/src/Properties/AssemblyInfo.cs
+runtime/CSharp/src/Antlr4.csproj
+runtime/JavaScript/package-lock.json
+runtime/JavaScript/package.json
+runtime/JavaScript/src/antlr4/Recognizer.js
+
+# Allow doc files to have multiple values updated
+* doc/swift-target.md
+* doc/dart-target.md
+doc/releasing-antlr.md  # Do this one manually; it'll fail because of multiple lines but we get warning
+* doc/getting-started.md
+* doc/swift-target.md
+* doc/getting-started.md
+
+#runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
+
+# Just documenting that these are generated...
+
+# runtime/Python3/src/antlr4/xpath/XPathLexer.py
+# runtime/Python2/src/antlr4/xpath/XPathLexer.py
+# runtime/Cpp/runtime/src/tree/xpath/XPathLexer.cpp
+# runtime/Cpp/runtime/src/tree/xpath/XPathLexer.h
+# runtime/CSharp/src/Tree/Xpath/XPathLexer.cs

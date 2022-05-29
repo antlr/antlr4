@@ -8,7 +8,7 @@
 /// It is the most abstract interface for all the trees used by ANTLR.
 /// 
 
-public protocol Tree: class {
+public protocol Tree: AnyObject {
     /// The parent of this node. If the return value is null, then this
     /// node is the root of the tree.
     /// 

@@ -29,7 +29,7 @@ public class LexerInterpreter: Lexer {
 
         self._decisionToDFA = [DFA]()
         for i in 0 ..< atn.getNumberOfDecisions() {
-            _decisionToDFA[i] = DFA(atn.getDecisionState(i)!, i)
+            _decisionToDFA.append(DFA(atn.getDecisionState(i)!, i))
         }
         super.init(input)
         self._interp = LexerATNSimulator(self, atn, _decisionToDFA, _sharedContextCache)
@@ -71,10 +71,6 @@ public class LexerInterpreter: Lexer {
 
     override
     public func getVocabulary() -> Vocabulary {
-        if vocabulary != nil {
-            return vocabulary!
-        }
-
-        return super.getVocabulary()
+        return vocabulary ?? super.getVocabulary()
     }
 }

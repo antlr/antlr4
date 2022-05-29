@@ -1,15 +1,10 @@
 # ANTLR4 Language Target, Runtime for Swift
 
-## Requirements
-
-ANTLR 4.7.2 requires Swift 4.2.  It works on Swift 4.2.1 also.
-
-ANTLR 4.7.1 requires Swift 4.0, and does not work on Swift 4.2.  (The status of
-Swift 4.1 support is unknown.)
-
 ## Performance Note
 
-To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/master/Documentation/Usage.md#build-configurations) if you use SwiftPM to build your project. If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.
+To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/main/Documentation/Usage.md#setting-the-build-configuration) if you use SwiftPM to build your project. 
+
+If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.
 
 Conclusion is, you need to turn on `release` mode (which will have all the optimization pre configured for you) so the ANTLR4 Swift target can have reasonable parsing speed.
 
@@ -60,10 +55,7 @@ Note that even if you are otherwise using ANTLR from a binary distribution,
 you should compile the ANTLR Swift runtime from source, because the Swift
 language does not yet have a stable ABI.
 
-ANTLR uses Swift Package Manager to generate Xcode project files. Note that
-Swift Package Manager does not currently support iOS, watchOS, or tvOS, so
-if you wish to use those platforms, you will need to alter the project build
-settings manually as appropriate.
+ANTLR uses Swift Package Manager to generate Xcode project files. 
 
 #### Download source code for ANTLR
 
@@ -135,30 +127,12 @@ The runtime and generated grammar should now build correctly.
 
 ### Swift Package Manager Projects
 
-Since we cannot have a separate repository for Swift target (see issue [#1774](https://github.com/antlr/antlr4/issues/1774)), 
-and Swift is currently not ABI stable. We currently support support SPM-based
-projects by creating temporary local repository.
+Add Antlr4 as a dependency to your `Package.swift` file. For more information, please see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
 
-For people using [Swift Package Manager](https://swift.org/package-manager/),
-the __boot.py__ script supports generating local repository that can be used
-as a dependency to your project. Simply run:
 
+```swift
+.package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.10.1"
 ```
-python boot.py --gen-spm-module
-```
-
-The prompt will show something like below:
-
-<img src=images/gen_spm_module.png width="800">
-
-Put the SPM directive that contains the url to temporary repository to your 
-project's Package.swift. And run `swift build` in your project.
-
-The project is generated in your system's `/tmp/` directory, if you find it
-inconvenient, consider copy that generated ANTLR repository to some place 
-that won't be cleaned automatically and update `url` parameter in your 
-`Package.swift` file.
-
 ## Swift access levels
 
 You may use the `accessLevel` option to control the access levels on generated

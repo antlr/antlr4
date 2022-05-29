@@ -1,0 +1,25 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : x INT;
+
+[slaveGrammar]
+parser grammar S;
+tokens { A, B, C }
+x : 'x' INT {<writeln("\"S.x\"")>};
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+x 34 9
+
+[output]
+"""S.x
+"""
+

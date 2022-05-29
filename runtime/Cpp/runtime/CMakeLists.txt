@@ -1,3 +1,5 @@
+option(ANTLR_BUILD_CPP_TESTS "Build C++ tests." ON)
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
   ${PROJECT_SOURCE_DIR}/runtime/src/atn
@@ -35,45 +37,36 @@ add_custom_target(make_lib_output_dir ALL
 add_dependencies(antlr4_shared make_lib_output_dir)
 add_dependencies(antlr4_static make_lib_output_dir)
 
-find_package(utf8cpp QUIET)
+if (ANTLR_BUILD_CPP_TESTS)
+  include(FetchContent)
 
-set(INSTALL_utf8cpp FALSE)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+  )
 
-if (utf8cpp_FOUND)
-  target_link_libraries(antlr4_shared utf8cpp)
-  target_link_libraries(antlr4_static utf8cpp)
-else()
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-  # older utf8cpp doesn't define the package above
-  find_path(utf8cpp_HEADER utf8.h
-    PATH_SUFFIXES utf8cpp
-    )
+  FetchContent_MakeAvailable(googletest)
 
-  if (utf8cpp_HEADER)
-    include_directories(${utf8cpp_HEADER})
-  else()
-    include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
-    set(THIRDPARTY_DIR ${CMAKE_BINARY_DIR}/runtime/thirdparty)
-    set(UTFCPP_DIR ${THIRDPARTY_DIR}/utfcpp)
-    ExternalProject_Add(
-      utf8cpp
-      GIT_REPOSITORY        "git://github.com/nemtrif/utfcpp"
-      GIT_TAG               "v3.1.1"
-      SOURCE_DIR            ${UTFCPP_DIR}
-      UPDATE_DISCONNECTED   1
-      CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${UTFCPP_DIR}/install -Dgtest_force_shared_crt=ON
-      TEST_AFTER_INSTALL    1
-      STEP_TARGETS          build)
+  file(GLOB libantlrcpp_TESTS
+    "${PROJECT_SOURCE_DIR}/runtime/tests/*.cpp"
+  )
 
-    include_directories(
-      ${UTFCPP_DIR}/install/include/utf8cpp
-      ${UTFCPP_DIR}/install/include/utf8cpp/utf8
-      )
+  add_executable(
+    antlr4_tests
+    ${libantlrcpp_TESTS}
+  )
 
-    add_dependencies(antlr4_shared utf8cpp)
-    add_dependencies(antlr4_static utf8cpp)
-    set(INSTALL_utf8cpp TRUE)
-  endif()
+  target_link_libraries(
+    antlr4_tests
+    antlr4_static
+    gtest_main
+  )
+
+  include(GoogleTest)
+
+  gtest_discover_tests(antlr4_tests)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -142,27 +135,19 @@ set_target_properties(antlr4_static
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
 
 install(TARGETS antlr4_shared
-        DESTINATION lib
-        EXPORT antlr4-targets)
+        EXPORT antlr4-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 install(TARGETS antlr4_static
-        DESTINATION lib
-        EXPORT antlr4-targets)
+        EXPORT antlr4-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
         DESTINATION "include/antlr4-runtime"
         COMPONENT dev
         FILES_MATCHING PATTERN "*.h"
         )
-
-if (INSTALL_utf8cpp)
-  install(FILES "${UTFCPP_DIR}/source/utf8.h"
-	  DESTINATION "include/antlr4-runtime")
-  install(DIRECTORY "${UTFCPP_DIR}/source/utf8"
-	  DESTINATION "include/antlr4-runtime"
-	  COMPONENT dev
-	  FILES_MATCHING PATTERN "*.h"
-	  )
-endif()
-
-
-

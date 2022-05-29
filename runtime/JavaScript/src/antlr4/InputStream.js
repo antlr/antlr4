@@ -1,11 +1,11 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Token} = require('./Token');
-require('./polyfills/codepointat');
-require('./polyfills/fromcodepoint');
+import Token from './Token.js';
+import './polyfills/codepointat.js';
+import './polyfills/fromcodepoint.js';
 
 /**
  * If decodeToUnicodeCodePoints is true, the input is treated
@@ -14,7 +14,7 @@ require('./polyfills/fromcodepoint');
  * Otherwise, the input is treated as a series of 16-bit UTF-16 code
  * units.
  */
-class InputStream {
+export default class InputStream {
 	constructor(data, decodeToUnicodeCodePoints) {
 		this.name = "<empty>";
 		this.strdata = data;
@@ -29,9 +29,10 @@ class InputStream {
 				i += codePoint <= 0xFFFF ? 1 : 2;
 			}
 		} else {
+			this.data = new Array(this.strdata.length);
 			for (let i = 0; i < this.strdata.length; i++) {
 				const codeUnit = this.strdata.charCodeAt(i);
-				this.data.push(codeUnit);
+				this.data[i] = codeUnit;
 			}
 		}
 		this._size = this.data.length;
@@ -125,6 +126,3 @@ class InputStream {
 		return this._size;
 	}
 }
-
-
-module.exports = InputStream;

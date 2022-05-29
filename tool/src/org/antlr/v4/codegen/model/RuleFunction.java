@@ -50,15 +50,16 @@ import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 
 /** */
 public class RuleFunction extends OutputModelObject {
-	public String name;
-	public List<String> modifiers;
+	public final String name;
+	public final String escapedName;
+	public final List<String> modifiers;
 	public String ctxType;
-	public Collection<String> ruleLabels;
-	public Collection<String> tokenLabels;
-	public ATNState startState;
-	public int index;
-	public Rule rule;
-	public AltLabelStructDecl[] altToContext;
+	public final Collection<String> ruleLabels;
+	public final Collection<String> tokenLabels;
+	public final ATNState startState;
+	public final int index;
+	public final Rule rule;
+	public final AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
@@ -74,11 +75,8 @@ public class RuleFunction extends OutputModelObject {
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
+		this.escapedName = factory.getGenerator().getTarget().escapeIfNeeded(r.name);
 		this.rule = r;
-		if ( r.modifiers!=null && !r.modifiers.isEmpty() ) {
-			this.modifiers = new ArrayList<String>();
-			for (GrammarAST t : r.modifiers) modifiers.add(t.getText());
-		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
 		index = r.index;
@@ -198,7 +196,7 @@ public class RuleFunction extends OutputModelObject {
 				}
 			}
 
-			for (String ref : nonOptional.toArray(new String[nonOptional.size()])) {
+			for (String ref : nonOptional.toArray(new String[0])) {
 				if (minFreq.count(ref) == 0) {
 					nonOptional.remove(ref);
 				}

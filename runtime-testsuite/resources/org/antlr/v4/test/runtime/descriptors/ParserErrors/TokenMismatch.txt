@@ -1,0 +1,17 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : 'a' 'b' ;
+
+[start]
+a
+
+[input]
+aa
+
+[errors]
+"""line 1:1 mismatched input 'a' expecting 'b'
+"""
+

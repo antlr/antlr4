@@ -100,12 +100,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// is returned.
     /// 
     public func getAll(_ label: String) -> Array<ParseTree> {
-        let nodes: Array<ParseTree>? = labels.get(label)
-        if nodes == nil {
-            return Array<ParseTree>()
-        }
-
-        return nodes!
+        return labels.get(label) ?? []
     }
 
     /// 

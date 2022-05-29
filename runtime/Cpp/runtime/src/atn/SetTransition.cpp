@@ -11,12 +11,8 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-SetTransition::SetTransition(ATNState *target, const misc::IntervalSet &aSet)
-  : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : aSet) {
-}
-
-Transition::SerializationType SetTransition::getSerializationType() const {
-  return SET;
+SetTransition::SetTransition(TransitionType transitionType, ATNState *target, misc::IntervalSet aSet)
+  : Transition(transitionType, target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : std::move(aSet)) {
 }
 
 misc::IntervalSet SetTransition::label() const {

@@ -1,16 +1,16 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Set} = require("../Utils");
-const {DFAState} = require('./DFAState');
-const {StarLoopEntryState} = require('../atn/ATNState');
-const {ATNConfigSet} = require('./../atn/ATNConfigSet');
-const {DFASerializer} = require('./DFASerializer');
-const {LexerDFASerializer} = require('./DFASerializer');
+import DFAState from './DFAState.js';
+import StarLoopEntryState from '../state/StarLoopEntryState.js';
+import ATNConfigSet from './../atn/ATNConfigSet.js';
+import DFASerializer from './DFASerializer.js';
+import LexerDFASerializer from './LexerDFASerializer.js';
+import HashSet from "../misc/HashSet.js";
 
-class DFA {
+export default class DFA {
 	constructor(atnStartState, decision) {
 		if (decision === undefined) {
 			decision = 0;
@@ -24,7 +24,7 @@ class DFA {
 		 * A set of all DFA states. Use {@link Map} so we can get old state back
 		 * ({@link Set} only allows you to see if it's there).
 		 */
-		this._states = new Set();
+		this._states = new HashSet();
 		this.s0 = null;
 		/**
 		 * {@code true} if this DFA is for a precedence decision; otherwise,
@@ -111,7 +111,7 @@ class DFA {
 	 */
 	setPrecedenceDfa(precedenceDfa) {
 		if (this.precedenceDfa!==precedenceDfa) {
-			this._states = new Set();
+			this._states = new HashSet();
 			if (precedenceDfa) {
 				const precedenceState = new DFAState(null, new ATNConfigSet());
 				precedenceState.edges = [];
@@ -157,6 +157,3 @@ class DFA {
 		return this._states;
 	}
 }
-
-
-module.exports = DFA;

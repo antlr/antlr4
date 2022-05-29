@@ -11,15 +11,11 @@ EpsilonTransition::EpsilonTransition(ATNState *target) : EpsilonTransition(targe
 }
 
 EpsilonTransition::EpsilonTransition(ATNState *target, size_t outermostPrecedenceReturn)
-  : Transition(target), _outermostPrecedenceReturn(outermostPrecedenceReturn) {
+  : Transition(TransitionType::EPSILON, target), _outermostPrecedenceReturn(outermostPrecedenceReturn) {
 }
 
-size_t EpsilonTransition::outermostPrecedenceReturn() {
+size_t EpsilonTransition::outermostPrecedenceReturn() const {
   return _outermostPrecedenceReturn;
-}
-
-Transition::SerializationType EpsilonTransition::getSerializationType() const {
-  return EPSILON;
 }
 
 bool EpsilonTransition::isEpsilon() const {

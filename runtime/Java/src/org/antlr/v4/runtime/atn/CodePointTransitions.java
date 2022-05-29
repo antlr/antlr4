@@ -6,47 +6,25 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.IntervalSet;
-
 /**
  * Utility class to create {@link AtomTransition}, {@link RangeTransition},
  * and {@link SetTransition} appropriately based on the range of the input.
  *
- * To keep the serialized ATN size small, we only inline atom and
- * range transitions for Unicode code points <= U+FFFF.
- *
- * Whenever we encounter a Unicode code point > U+FFFF, we represent that
- * as a set transition (even if it is logically an atom or a range).
+ * Previously, we distinguished between atom and range transitions for
+ * Unicode code points <= U+FFFF and those above. We used a set
+ * transition for a Unicode code point > U+FFFF. Now that we can serialize
+ * 32-bit int/chars in the ATN serialization, this is no longer necessary.
  */
 public abstract class CodePointTransitions {
-	/**
-	 * If {@code codePoint} is <= U+FFFF, returns a new {@link AtomTransition}.
-	 * Otherwise, returns a new {@link SetTransition}.
-	 */
+	/** Return new {@link AtomTransition} */
 	public static Transition createWithCodePoint(ATNState target, int codePoint) {
-		if (Character.isSupplementaryCodePoint(codePoint)) {
-			return new SetTransition(target, IntervalSet.of(codePoint));
-		}
-		else {
-			return new AtomTransition(target, codePoint);
-		}
+		return createWithCodePointRange(target, codePoint, codePoint);
 	}
 
-	/**
-	 * If {@code codePointFrom} and {@code codePointTo} are both
-	 * <= U+FFFF, returns a new {@link RangeTransition}.
-	 * Otherwise, returns a new {@link SetTransition}.
-	 */
-	public static Transition createWithCodePointRange(
-			ATNState target,
-			int codePointFrom,
-			int codePointTo) {
-		if (Character.isSupplementaryCodePoint(codePointFrom) ||
-		    Character.isSupplementaryCodePoint(codePointTo)) {
-			return new SetTransition(target, IntervalSet.of(codePointFrom, codePointTo));
-		}
-		else {
-			return new RangeTransition(target, codePointFrom, codePointTo);
-		}
+	/** Return new {@link AtomTransition} if range represents one atom else {@link SetTransition}. */
+	public static Transition createWithCodePointRange(ATNState target, int codePointFrom, int codePointTo) {
+		return codePointFrom == codePointTo
+				? new AtomTransition(target, codePointFrom)
+				: new RangeTransition(target, codePointFrom, codePointTo);
 	}
 }

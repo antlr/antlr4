@@ -131,7 +131,7 @@ namespace Antlr4.Runtime
         /// <p>For interpreters, we don't know their serialized ATN despite having
         /// created the interpreter from it.</p>
         /// </remarks>
-        public virtual string SerializedAtn
+        public virtual int[] SerializedAtn
         {
             [return: NotNull]
             get

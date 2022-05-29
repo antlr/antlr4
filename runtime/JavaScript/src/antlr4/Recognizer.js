@@ -1,13 +1,13 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {Token} = require('./Token');
-const {ConsoleErrorListener} = require('./error/ErrorListener');
-const {ProxyErrorListener} = require('./error/ErrorListener');
+import Token from './Token.js';
+import ConsoleErrorListener from './error/ConsoleErrorListener.js';
+import ProxyErrorListener from './error/ProxyErrorListener.js';
 
-class Recognizer {
+export default class Recognizer {
     constructor() {
         this._listeners = [ ConsoleErrorListener.INSTANCE ];
         this._interp = null;
@@ -15,7 +15,7 @@ class Recognizer {
     }
 
     checkVersion(toolVersion) {
-        const runtimeVersion = "4.9.2";
+        const runtimeVersion = "4.10.1";
         if (runtimeVersion!==toolVersion) {
             console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
         }
@@ -27,6 +27,27 @@ class Recognizer {
 
     removeErrorListeners() {
         this._listeners = [];
+    }
+
+    getLiteralNames() {
+        return Object.getPrototypeOf(this).constructor.literalNames || [];
+    }
+
+    getSymbolicNames() {
+        return Object.getPrototypeOf(this).constructor.symbolicNames || [];
+    }
+
+    getTokenNames() {
+        if(!this.tokenNames) {
+            const literalNames = this.getLiteralNames();
+            const symbolicNames = this.getSymbolicNames();
+            const length = literalNames.length > symbolicNames.length ? literalNames.length : symbolicNames.length;
+            this.tokenNames = [];
+            for(let i=0; i<length; i++) {
+                this.tokenNames[i] = literalNames[i] || symbolicNames[i] || "<INVALID";
+            }
+        }
+        return this.tokenNames;
     }
 
     getTokenTypeMap() {
@@ -132,5 +153,3 @@ class Recognizer {
 
 Recognizer.tokenTypeMapCache = {};
 Recognizer.ruleIndexMapCache = {};
-
-module.exports = Recognizer;

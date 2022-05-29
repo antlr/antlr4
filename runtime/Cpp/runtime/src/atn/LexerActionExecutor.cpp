@@ -7,6 +7,7 @@
 #include "atn/LexerIndexedCustomAction.h"
 #include "support/CPPUtils.h"
 #include "support/Arrays.h"
+#include "support/Casts.h"
 
 #include "atn/LexerActionExecutor.h"
 
@@ -15,48 +16,54 @@ using namespace antlr4::atn;
 using namespace antlr4::misc;
 using namespace antlrcpp;
 
-LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions)
-  : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
-}
+namespace {
 
-LexerActionExecutor::~LexerActionExecutor() {
-}
-
-Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                                     Ref<LexerAction> const& lexerAction) {
-  if (lexerActionExecutor == nullptr) {
-    return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>> { lexerAction });
+  bool cachedHashCodeEqual(size_t lhs, size_t rhs) {
+    return lhs == rhs || lhs == 0 || rhs == 0;
   }
 
-  std::vector<Ref<LexerAction>> lexerActions = lexerActionExecutor->_lexerActions; // Make a copy.
-  lexerActions.push_back(lexerAction);
-  return std::make_shared<LexerActionExecutor>(lexerActions);
+  bool lexerActionEqual(const Ref<const LexerAction> &lhs, const Ref<const LexerAction> &rhs) {
+    return *lhs == *rhs;
+  }
+
 }
 
-Ref<LexerActionExecutor> LexerActionExecutor::fixOffsetBeforeMatch(int offset) {
-  std::vector<Ref<LexerAction>> updatedLexerActions;
+LexerActionExecutor::LexerActionExecutor(std::vector<Ref<const LexerAction>> lexerActions)
+    : _lexerActions(std::move(lexerActions)), _hashCode(0) {}
+
+Ref<const LexerActionExecutor> LexerActionExecutor::append(const Ref<const LexerActionExecutor> &lexerActionExecutor,
+                                                           Ref<const LexerAction> lexerAction) {
+  if (lexerActionExecutor == nullptr) {
+    return std::make_shared<LexerActionExecutor>(std::vector<Ref<const LexerAction>>{ std::move(lexerAction) });
+  }
+  std::vector<Ref<const LexerAction>> lexerActions;
+  lexerActions.reserve(lexerActionExecutor->_lexerActions.size() + 1);
+  lexerActions.insert(lexerActions.begin(), lexerActionExecutor->_lexerActions.begin(), lexerActionExecutor->_lexerActions.end());
+  lexerActions.push_back(std::move(lexerAction));
+  return std::make_shared<LexerActionExecutor>(std::move(lexerActions));
+}
+
+Ref<const LexerActionExecutor> LexerActionExecutor::fixOffsetBeforeMatch(int offset) const {
+  std::vector<Ref<const LexerAction>> updatedLexerActions;
   for (size_t i = 0; i < _lexerActions.size(); i++) {
-    if (_lexerActions[i]->isPositionDependent() && !is<LexerIndexedCustomAction>(_lexerActions[i])) {
+    if (_lexerActions[i]->isPositionDependent() && !LexerIndexedCustomAction::is(*_lexerActions[i])) {
       if (updatedLexerActions.empty()) {
         updatedLexerActions = _lexerActions; // Make a copy.
       }
-
       updatedLexerActions[i] = std::make_shared<LexerIndexedCustomAction>(offset, _lexerActions[i]);
     }
   }
-
   if (updatedLexerActions.empty()) {
     return shared_from_this();
   }
-
-  return std::make_shared<LexerActionExecutor>(updatedLexerActions);
+  return std::make_shared<LexerActionExecutor>(std::move(updatedLexerActions));
 }
 
-std::vector<Ref<LexerAction>> LexerActionExecutor::getLexerActions() const {
+const std::vector<Ref<const LexerAction>>& LexerActionExecutor::getLexerActions() const {
   return _lexerActions;
 }
 
-void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startIndex) {
+void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startIndex) const {
   bool requiresSeek = false;
   size_t stopIndex = input->index();
 
@@ -65,43 +72,40 @@ void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startI
       input->seek(stopIndex);
     }
   });
-  for (auto lexerAction : _lexerActions) {
-    if (is<LexerIndexedCustomAction>(lexerAction)) {
-      int offset = (std::static_pointer_cast<LexerIndexedCustomAction>(lexerAction))->getOffset();
+  for (const auto &lexerAction : _lexerActions) {
+    if (LexerIndexedCustomAction::is(*lexerAction)) {
+      int offset = downCast<const LexerIndexedCustomAction&>(*lexerAction).getOffset();
       input->seek(startIndex + offset);
-      lexerAction = std::static_pointer_cast<LexerIndexedCustomAction>(lexerAction)->getAction();
       requiresSeek = (startIndex + offset) != stopIndex;
     } else if (lexerAction->isPositionDependent()) {
       input->seek(stopIndex);
       requiresSeek = false;
     }
-
     lexerAction->execute(lexer);
   }
 }
 
 size_t LexerActionExecutor::hashCode() const {
-  return _hashCode;
+  auto hash = _hashCode.load(std::memory_order_relaxed);
+  if (hash == 0) {
+    hash = MurmurHash::initialize();
+    for (const auto &lexerAction : _lexerActions) {
+      hash = MurmurHash::update(hash, lexerAction);
+    }
+    hash = MurmurHash::finish(hash, _lexerActions.size());
+    if (hash == 0) {
+      hash = std::numeric_limits<size_t>::max();
+    }
+    _hashCode.store(hash, std::memory_order_relaxed);
+  }
+  return hash;
 }
 
-bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
-  if (&obj == this) {
+bool LexerActionExecutor::equals(const LexerActionExecutor &other) const {
+  if (this == std::addressof(other)) {
     return true;
   }
-
-  return _hashCode == obj._hashCode && Arrays::equals(_lexerActions, obj._lexerActions);
-}
-
-bool LexerActionExecutor::operator != (const LexerActionExecutor &obj) const {
-  return !operator==(obj);
-}
-
-size_t LexerActionExecutor::generateHashCode() const {
-  size_t hash = MurmurHash::initialize();
-  for (auto lexerAction : _lexerActions) {
-    hash = MurmurHash::update(hash, lexerAction);
-  }
-  hash = MurmurHash::finish(hash, _lexerActions.size());
-
-  return hash;
+  return cachedHashCodeEqual(_hashCode.load(std::memory_order_relaxed), other._hashCode.load(std::memory_order_relaxed)) &&
+         _lexerActions.size() == other._lexerActions.size() &&
+         std::equal(_lexerActions.begin(), _lexerActions.end(), other._lexerActions.begin(), lexerActionEqual);
 }

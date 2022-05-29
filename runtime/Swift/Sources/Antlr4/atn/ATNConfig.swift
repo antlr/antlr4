@@ -20,7 +20,7 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _#isPrecedenceFilterSuppressed_ property as a bit within the
     /// existing _#reachesIntoOuterContext_ field.
     /// 
-    private final let SUPPRESS_PRECEDENCE_FILTER: Int = 0x40000000
+    private static let SUPPRESS_PRECEDENCE_FILTER: Int = 0x40000000
 
     /// 
     /// The ATN state associated with this configuration
@@ -111,18 +111,18 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _#isPrecedenceFilterSuppressed_ method.
     /// 
     public final func getOuterContextDepth() -> Int {
-        return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER
+        return reachesIntoOuterContext & ~Self.SUPPRESS_PRECEDENCE_FILTER
     }
 
     public final func isPrecedenceFilterSuppressed() -> Bool {
-        return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0
+        return (reachesIntoOuterContext & Self.SUPPRESS_PRECEDENCE_FILTER) != 0
     }
 
     public final func setPrecedenceFilterSuppressed(_ value: Bool) {
         if value {
-            self.reachesIntoOuterContext |= 0x40000000
+            self.reachesIntoOuterContext |= Self.SUPPRESS_PRECEDENCE_FILTER
         } else {
-            self.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER
+            self.reachesIntoOuterContext &= ~Self.SUPPRESS_PRECEDENCE_FILTER
         }
     }
 
@@ -168,8 +168,8 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
         return true
     }
     
-    if (lhs is LexerATNConfig) && (rhs is LexerATNConfig) {
-        return (lhs as! LexerATNConfig) == (rhs as! LexerATNConfig)
+    if let l = lhs as? LexerATNConfig, let r = rhs as? LexerATNConfig {
+        return l == r
 
 
     }
@@ -185,19 +185,7 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
         return false
     }
 
-    var contextCompare = false
-
-    if lhs.context == nil && rhs.context == nil {
-        contextCompare = true
-    } else if lhs.context == nil && rhs.context != nil {
-        contextCompare = false
-    } else if lhs.context != nil && rhs.context == nil {
-        contextCompare = false
-    } else {
-        contextCompare = (lhs.context! == rhs.context!)
-    }
-
-    if !contextCompare {
+    if lhs.context != rhs.context {
         return false
     }
 

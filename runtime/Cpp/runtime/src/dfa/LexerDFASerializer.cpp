@@ -9,10 +9,7 @@
 
 using namespace antlr4::dfa;
 
-LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, Vocabulary::EMPTY_VOCABULARY) {
-}
-
-LexerDFASerializer::~LexerDFASerializer() {
+LexerDFASerializer::LexerDFASerializer(const DFA *dfa) : DFASerializer(dfa, Vocabulary()) {
 }
 
 std::string LexerDFASerializer::getEdgeLabel(size_t i) const {

@@ -58,91 +58,8 @@ from antlr4.error.Errors import LexerNoViableAltException
 from antlr4.tree.Tree import ParseTree
 from antlr4.tree.Trees import Trees
 from io import StringIO
+from antlr4.xpath.XPathLexer import XPathLexer
 
-
-def serializedATN():
-    with StringIO() as buf:
-        buf.write("\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\2\n")
-        buf.write("\64\b\1\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t")
-        buf.write("\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\5\3\5")
-        buf.write("\3\6\3\6\7\6\37\n\6\f\6\16\6\"\13\6\3\6\3\6\3\7\3\7\5")
-        buf.write("\7(\n\7\3\b\3\b\3\t\3\t\7\t.\n\t\f\t\16\t\61\13\t\3\t")
-        buf.write("\3\t\3/\2\n\3\5\5\6\7\7\t\b\13\t\r\2\17\2\21\n\3\2\4\7")
-        buf.write("\2\62;aa\u00b9\u00b9\u0302\u0371\u2041\u2042\17\2C\\c")
-        buf.write("|\u00c2\u00d8\u00da\u00f8\u00fa\u0301\u0372\u037f\u0381")
-        buf.write("\u2001\u200e\u200f\u2072\u2191\u2c02\u2ff1\u3003\ud801")
-        buf.write("\uf902\ufdd1\ufdf2\uffff\64\2\3\3\2\2\2\2\5\3\2\2\2\2")
-        buf.write("\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2\21\3\2\2\2\3\23")
-        buf.write("\3\2\2\2\5\26\3\2\2\2\7\30\3\2\2\2\t\32\3\2\2\2\13\34")
-        buf.write("\3\2\2\2\r\'\3\2\2\2\17)\3\2\2\2\21+\3\2\2\2\23\24\7\61")
-        buf.write("\2\2\24\25\7\61\2\2\25\4\3\2\2\2\26\27\7\61\2\2\27\6\3")
-        buf.write("\2\2\2\30\31\7,\2\2\31\b\3\2\2\2\32\33\7#\2\2\33\n\3\2")
-        buf.write("\2\2\34 \5\17\b\2\35\37\5\r\7\2\36\35\3\2\2\2\37\"\3\2")
-        buf.write("\2\2 \36\3\2\2\2 !\3\2\2\2!#\3\2\2\2\" \3\2\2\2#$\b\6")
-        buf.write("\2\2$\f\3\2\2\2%(\5\17\b\2&(\t\2\2\2\'%\3\2\2\2\'&\3\2")
-        buf.write("\2\2(\16\3\2\2\2)*\t\3\2\2*\20\3\2\2\2+/\7)\2\2,.\13\2")
-        buf.write("\2\2-,\3\2\2\2.\61\3\2\2\2/\60\3\2\2\2/-\3\2\2\2\60\62")
-        buf.write("\3\2\2\2\61/\3\2\2\2\62\63\7)\2\2\63\22\3\2\2\2\6\2 \'")
-        buf.write("/\3\3\6\2")
-        return buf.getvalue()
-
-
-class XPathLexer(Lexer):
-
-    atn = ATNDeserializer().deserialize(serializedATN())
-
-    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
-
-
-    TOKEN_REF = 1
-    RULE_REF = 2
-    ANYWHERE = 3
-    ROOT = 4
-    WILDCARD = 5
-    BANG = 6
-    ID = 7
-    STRING = 8
-
-    modeNames = [ "DEFAULT_MODE" ]
-
-    literalNames = [ "<INVALID>",
-            "'//'", "'/'", "'*'", "'!'" ]
-
-    symbolicNames = [ "<INVALID>",
-            "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG",
-            "ID", "STRING" ]
-
-    ruleNames = [ "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar",
-                  "NameStartChar", "STRING" ]
-
-    grammarFileName = "XPathLexer.g4"
-
-    def __init__(self, input=None):
-        super().__init__(input)
-        self.checkVersion("4.9.1")
-        self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
-        self._actions = None
-        self._predicates = None
-
-
-    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
-        if self._actions is None:
-            actions = dict()
-            actions[4] = self.ID_action
-            self._actions = actions
-        _action = self._actions.get(ruleIndex, None)
-        if _action is not None:
-            _action(localctx, actionIndex)
-        else:
-            raise Exception("No registered action for: %d" % ruleIndex)
-
-    def ID_action(self, localctx:RuleContext , actionIndex:int):
-        if actionIndex == 0:
-            char = self.text[0]
-            if char.isupper():
-                self.type = XPathLexer.TOKEN_REF
-            else:
-                self.type = XPathLexer.RULE_REF
 
 class XPath(object):
 
@@ -262,10 +179,10 @@ class XPath(object):
                     # we can't go looking for stat nodes.
                     matching = element.evaluate(node)
 
-                    # See issue antlr#370 - Prevents XPath from returning the 
+                    # See issue antlr#370 - Prevents XPath from returning the
                     # same node multiple times
                     matching = filter(lambda m: m not in work_next, matching)
-                    
+
                     work_next.extend(matching)
             work = work_next
 

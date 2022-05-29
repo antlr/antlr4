@@ -12,34 +12,23 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerPopModeAction> LexerPopModeAction::getInstance() {
-  static Ref<LexerPopModeAction> instance(new LexerPopModeAction());
+const Ref<const LexerPopModeAction>& LexerPopModeAction::getInstance() {
+  static const Ref<const LexerPopModeAction> instance(new LexerPopModeAction());
   return instance;
 }
 
-LexerPopModeAction::LexerPopModeAction() {
-}
-
-LexerActionType LexerPopModeAction::getActionType() const {
-  return LexerActionType::POP_MODE;
-}
-
-bool LexerPopModeAction::isPositionDependent() const {
-  return false;
-}
-
-void LexerPopModeAction::execute(Lexer *lexer) {
+void LexerPopModeAction::execute(Lexer *lexer) const {
   lexer->popMode();
 }
 
-size_t LexerPopModeAction::hashCode() const {
+size_t LexerPopModeAction::hashCodeImpl() const {
   size_t hash = MurmurHash::initialize();
   hash = MurmurHash::update(hash, static_cast<size_t>(getActionType()));
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerPopModeAction::operator == (const LexerAction &obj) const {
-  return &obj == this;
+bool LexerPopModeAction::equals(const LexerAction &other) const {
+  return this == std::addressof(other);
 }
 
 std::string LexerPopModeAction::toString() const {

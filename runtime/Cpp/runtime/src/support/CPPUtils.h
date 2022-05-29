@@ -9,14 +9,14 @@
 
 namespace antlrcpp {
 
-  std::string join(std::vector<std::string> strings, const std::string &separator);
-  std::map<std::string, size_t> toMap(const std::vector<std::string> &keys);
-  std::string escapeWhitespace(std::string str, bool escapeSpaces);
-  std::string toHexString(const int t);
-  std::string arrayToString(const std::vector<std::string> &data);
-  std::string replaceString(const std::string &s, const std::string &from, const std::string &to);
-  std::vector<std::string> split(const std::string &s, const std::string &sep, int count);
-  std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
+  ANTLR4CPP_PUBLIC std::string join(const std::vector<std::string> &strings, const std::string &separator);
+  ANTLR4CPP_PUBLIC std::map<std::string, size_t> toMap(const std::vector<std::string> &keys);
+  ANTLR4CPP_PUBLIC std::string escapeWhitespace(std::string str, bool escapeSpaces);
+  ANTLR4CPP_PUBLIC std::string toHexString(const int t);
+  ANTLR4CPP_PUBLIC std::string arrayToString(const std::vector<std::string> &data);
+  ANTLR4CPP_PUBLIC std::string replaceString(const std::string &s, const std::string &from, const std::string &to);
+  ANTLR4CPP_PUBLIC std::vector<std::string> split(const std::string &s, const std::string &sep, int count);
+  ANTLR4CPP_PUBLIC std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
 
   // Using RAII + a lambda to implement a "finally" replacement.
   template <typename OnEnd>
@@ -60,23 +60,6 @@ namespace antlrcpp {
   }
 
   // Get the error text from an exception pointer or the current exception.
-  std::string what(std::exception_ptr eptr = std::current_exception());
-
-  class SingleWriteMultipleReadLock {
-  public:
-    void readLock();
-    void readUnlock();
-    void writeLock();
-    void writeUnlock();
-
-  private:
-    std::condition_variable _readerGate;
-    std::condition_variable _writerGate;
-
-    std::mutex _mutex;
-    size_t _activeReaders = 0;
-    size_t _waitingWriters = 0;
-    size_t _activeWriters = 0;
-  };
+  ANTLR4CPP_PUBLIC std::string what(std::exception_ptr eptr = std::current_exception());
 
 } // namespace antlrcpp

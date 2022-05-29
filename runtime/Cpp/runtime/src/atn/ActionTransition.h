@@ -12,6 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ActionTransition final : public Transition {
   public:
+    static bool is(const Transition &transition) { return transition.getTransitionType() == TransitionType::ACTION; }
+
+    static bool is(const Transition *transition) { return transition != nullptr && is(*transition); }
+
     const size_t ruleIndex;
     const size_t actionIndex;
     const bool isCtxDependent; // e.g., $i ref in action
@@ -19,8 +23,6 @@ namespace atn {
     ActionTransition(ATNState *target, size_t ruleIndex);
 
     ActionTransition(ATNState *target, size_t ruleIndex, size_t actionIndex, bool isCtxDependent);
-
-    virtual SerializationType getSerializationType() const override;
 
     virtual bool isEpsilon() const override;
 

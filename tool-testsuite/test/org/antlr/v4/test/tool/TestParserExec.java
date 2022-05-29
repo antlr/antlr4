@@ -160,4 +160,25 @@ public class TestParserExec extends BaseJavaToolTest {
 		assertEquals("6\n", found);
 		assertNull(getParseErrors());
 	}
+
+	@Test public void testCaseInsensitiveInCombinedGrammar() throws Exception {
+		String grammar =
+				"grammar CaseInsensitiveGrammar;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"e\n" +
+				"    : ID\n" +
+				"    | 'not' e\n" +
+				"    | e 'and' e\n" +
+				"    | 'new' ID '(' e ')'\n" +
+				"    ;\n" +
+				"ID: [a-z_][a-z_0-9]*;\n" +
+				"WS: [ \\t\\n\\r]+ -> skip;";
+
+		String input = "NEW Abc (Not a AND not B)";
+		execParser(
+				"CaseInsensitiveGrammar.g4", grammar,
+				"CaseInsensitiveGrammarParser", "CaseInsensitiveGrammarLexer",
+				null, null, "e", input, false);
+		assertNull(getParseErrors());
+	}
 }

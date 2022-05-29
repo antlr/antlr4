@@ -1,0 +1,330 @@
+ANTLR Project Contributors Certification of Origin and Rights
+
+All contributors to ANTLR v4 must formally agree to abide by this
+certificate of origin by signing on the bottom with their github
+userid, full name, email address (you can obscure your e-mail, but it
+must be computable by human), and date.
+
+By signing this agreement, you are warranting and representing that
+you have the right to release code contributions or other content free
+of any obligations to third parties and are granting Terence Parr and
+ANTLR project contributors, henceforth referred to as The ANTLR
+Project, a license to incorporate it into The ANTLR Project tools
+(such as ANTLRWorks and StringTemplate) or related works under the BSD
+license. You understand that The ANTLR Project may or may not
+incorporate your contribution and you warrant and represent the
+following:
+
+1. I am the creator of all my contributions. I am the author of all
+   contributed work submitted and further warrant and represent that
+   such work is my original creation and I have the right to license
+   it to The ANTLR Project for release under the 3-clause BSD
+   license. I hereby grant The ANTLR Project a nonexclusive,
+   irrevocable, royalty-free, worldwide license to reproduce,
+   distribute, prepare derivative works, and otherwise use this
+   contribution as part of the ANTLR project, associated
+   documentation, books, and tools at no cost to The ANTLR Project.
+
+2. I have the right to submit. This submission does not violate the
+   rights of any person or entity and that I have legal authority over
+   this submission and to make this certification.
+
+3. If I violate another's rights, liability lies with me. I agree to
+   defend, indemnify, and hold The ANTLR Project and ANTLR users
+   harmless from any claim or demand, including reasonable attorney
+   fees, made by any third party due to or arising out of my violation
+   of these terms and conditions or my violation of the rights of
+   another person or entity.
+
+4. I understand and agree that this project and the contribution are
+   public and that a record of the contribution (including all
+   personal information I submit with it, including my sign-off) is
+   maintained indefinitely and may be redistributed consistent with
+   this project or the open source license indicated in the file.
+
+I have read this agreement and do so certify by adding my signoff to
+the end of the following contributors list.
+
+CONTRIBUTORS:
+
+YYYY/MM/DD, github id, Full name, email
+2012/07/12, parrt, Terence Parr, parrt@antlr.org
+2012/09/18, sharwell, Sam Harwell, sam@tunnelvisionlabs.com
+2012/10/10, stephengaito, Stephen Gaito, stephen@percepitsys.co.uk
+2012/11/23, maguro, Alan Cabrera, adc@toolazydogs.com
+2013/01/29, metadave, Dave Parfitt, diparfitt@gmail.com
+2013/03/06, bkiers, Bart Kiers, bkiers@gmail.com
+2013/08/20, cayhorstmann, Cay Horstmann, cay@horstmann.com
+2014/03/18, aphyr, Kyle Kingsbury, aphyr@aphyr.com
+2014/06/07, ericvergnaud, Eric Vergnaud, eric.vergnaud@wanadoo.fr
+2014/07/04, jimidle, Jim Idle, jimi@Idle.ws
+2014/01/01, danmclaughlin, Dan McLaughlin, dan.mclaughlin@gmail.com
+2014/09/04. jeduden, Jan-Eric Duden, jeduden@gmail.com
+2014/09/27, petrbel, Petr Bělohlávek, antlr@petrbel.cz
+2014/10/18, sergiusignacius, Sérgio Silva, serge.a.silva@gmail.com
+2014/10/26, bdkearns, Brian Kearns, bdkearns@gmail.com
+2014/10/27, michaelpj, Michael Peyton Jones, michaelpj@gmail.com
+2015/01/29, TomLottermann, Thomas Lottermann, tomlottermann@gmail.com
+2015/02/15, pavlo, Pavlo Lysov, pavlikus@gmail.com
+2015/03/07, RedTailedHawk, Lawrence Parker, larry@answerrocket.com
+2015/04/03, rljacobson, Robert Jacobson, rljacobson@gmail.com
+2015/04/06, ojakubcik, Ondrej Jakubcik, ojakubcik@gmail.com
+2015/04/29, jszheng, Jinshan Zheng, zheng_js@hotmail.com
+2015/05/08, ViceIce, Michael Kriese, michael.kriese@gmx.de
+2015/05/09, lkraz, Luke Krasnoff, luke.krasnoff@gmail.com
+2015/05/12, Pursuit92, Josh Chase, jcjoshuachase@gmail.com
+2015/05/20, peturingi, Pétur Ingi Egilsson, petur@petur.eu
+2015/05/27, jcbrinfo, Jean-Christophe Beaupré, jcbrinfo@users.noreply.github.com
+2015/06/29, jvanzyl, Jason van Zyl, jason@takari.io
+2015/08/18, krzkaczor, Krzysztof Kaczor, krzysztof@kaczor.io
+2015/09/18, worsht, Rajiv Subrahmanyam, rajiv.public@gmail.com
+2015/09/24, HSorensen, Henrik Sorensen, henrik.b.sorensen@gmail.com
+2015/10/06, brwml, Bryan Wilhelm, bryan.wilhelm@microsoft.com
+2015/10/08, fedotovalex, Alex Fedotov, me@alexfedotov.com
+2015/10/12, KvanTTT, Ivan Kochurkin, ivan.kochurkin@gmail.com
+2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
+2015/10/21, hkff, Walid Benghabrit, walid.benghabrit@mines-nantes.fr
+2015/11/12, cooperra, Robbie Cooper, cooperra@users.noreply.github.com
+2015/11/25, abego, Udo Borkowski, ub@abego.org
+2015/12/17, sebadur, Sebastian Badur, sebadur@users.noreply.github.com
+2015/12/23, pboyer, Peter Boyer, peter.b.boyer@gmail.com
+2015/12/24, dtymon, David Tymon, david.tymon@gmail.com
+2016/02/18, reitzig, Raphael Reitzig, reitzig[at]cs.uni-kl.de
+2016/03/10, mike-lischke, Mike Lischke, mike@lischke-online.de
+2016/03/27, beardlybread, Bradley Steinbacher, bradley.j.steinbacher@gmail.com
+2016/03/29, msteiger, Martin Steiger, antlr@martin-steiger.de
+2016/03/28, gagern, Martin von Gagern, gagern@ma.tum.de
+2016/07/10, twz123, Tom Wieczorek, tom.wieczorek@zalando.de
+2016/07/20, chrisheller, Chris Heller, chris.heller.greyheller@gmail.com
+2016/07/20, nburles, Nathan Burles, nburles@gmail.com
+2016/07/20, kosl90, Li Liqiang, kos1990l@gmail.com
+2016/07/27, timoc, Tim O'Callaghan, timo@linux.com
+2016/07/26, nic30, Michal Orsák, michal.o.socials@gmail.com
+2016/07/18, willfaught, Will Faught, will.faught@gmail.com
+2016/08/08, wjkohnen, Wolfgang Johannes Kohnen, wjkohnen-go-antlr@ko-sys.com
+2016/08/11, BurtHarris, Ralph "Burt" Harris, Burt_Harris_antlr4@azxs.33mail.com
+2016/08/19, andjo403, Andreas Jonson, andjo403@hotmail.com
+2016/09/27, harriman, Kurt Harriman, harriman@acm.org
+2016/10/13, cgudrian, Christian Gudrian, christian.gudrian@gmx.de
+2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl
+2016/10/21, FloorGoddijn, Floor Goddijn, floor.goddijn[at]aimms.com
+2016/11/01, RYDB3RG, Kai Stammerjohann, RYDB3RG@users.noreply.github.com
+2016/11/05, runner-mei, meifakun, runner.mei@gmail.com
+2016/11/15, hanjoes, Hanzhou Shi, hanzhou87@gmail.com
+2016/11/16, sridharxp, Sridharan S, aurosridhar@gmail.com
+2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com
+2016/11/01, sebkur, Sebastian Kürten, sebastian@topobyte.de
+2016/04/13, renatahodovan, Renata Hodovan, reni@inf.u-szeged.hu
+2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
+2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
+2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
+2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
+2016/09/23, ghosthope, Dmitry Shakhtanov, sudstrike@gmail.com
+2016/11/25, MrSampson, Oliver Sampson, olsam@quickaudio.com
+2016/11/29, millergarym, Gary Miller, miller.garym@gmail.com
+2016/11/29, wxio, Gary Miller, gm@wx.io
+2016/11/29, Naios, Denis Blank, naios@users.noreply.github.com
+2016/12/01, samtatasurya, Samuel Tatasurya, xemradiant@gmail.com
+2016/12/03, redxdev, Samuel Bloomberg, sam@redxdev.com
+2016/12/11, Gaulouis, Gaulouis, gaulouis.com@gmail.com
+2016/12/22, akosthekiss, Akos Kiss, akiss@inf.u-szeged.hu
+2016/12/24, adrpo, Adrian Pop, adrian.pop@liu.se
+2017/01/11, robertbrignull, Robert Brignull, robertbrignull@gmail.com
+2017/01/13, marcelo-rocha, Marcelo Rocha, mcrocha@gmail.com
+2017/01/23, bhamiltoncx, Ben Hamilton, bhamiltoncx+antlr@gmail.com
+2017/01/18, mshockwave, Bekket McClane, yihshyng223@gmail.com
+2017/02/10, lionelplessis, Lionel Plessis, lionelplessis@users.noreply.github.com
+2017/02/14, lecode-official, David Neumann, david.neumann@lecode.de
+2017/02/14, xied75, Dong Xie, xied75@gmail.com
+2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
+2017/02/26, jvasileff, John Vasileff, john@vasileff.com
+2017/03/08, harry-tallbelt, Igor Vysokopoyasny, harry.tallbelt@gmail.com
+2017/03/09, teverett, Tom Everett, tom@khubla.com
+2017/03/03, chund, Christian Hund, christian.hund@gmail.com
+2017/03/15, robertvanderhulst, Robert van der Hulst, robert@xsharp.eu
+2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com
+2017/04/12, lys0716, Yishuang Lu, luyscmu@gmail.com
+2017/04/30, shravanrn, Shravan Narayan, shravanrn@gmail.com
+2017/05/11, jimallman, Jim Allman, jim@ibang.com
+2017/05/26, waf, Will Fuqua, wafuqua@gmail.com
+2017/05/29, kosak, Corey Kosak, kosak@kosak.com
+2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
+2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
+2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/06/28, jBugman, Sergey Parshukov, codedby@bugman.me
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/11, dhalperi, Daniel Halperin, daniel@halper.in
+2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
+2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/27, matthauck, Matt Hauck, matthauck@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
+2017/08/20, milanaleksic, Milan Aleksic, milanaleksic@gmail.com
+2017/08/29, Eddy Reyes, eddy@mindsight.io
+2017/09/09, brauliobz, Bráulio Bezerra, brauliobezerra@gmail.com
+2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
+2017/09/25, kaedvann, Rostislav Listerenko, r.listerenko@gmail.com
+2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
+2017/10/15, simkimsia, Sim Kim Sia, kimcity@gmail.com
+2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com
+2017/05/29, rlfnb, Ralf Neeb, rlfnb@rlfnb.de
+2017/10/29, gendalph, Максим Прохоренко, Maxim\dotProhorenko@gm@il.com
+2017/11/02, jasonmoo, Jason Mooberry, jason.mooberry@gmail.com
+2017/11/05, ajaypanyala, Ajay Panyala, ajay.panyala@gmail.com
+2017/11/24, zqlu.cn, Zhiqiang Lu, zqlu.cn@gmail.com
+2017/11/28, niccroad, Nicolas Croad, nic.croad@gmail.com
+2017/12/01, DavidMoraisFerreira, David Morais Ferreira, david.moraisferreira@gmail.com
+2017/12/01, SebastianLng, Sebastian Lang, sebastian.lang@outlook.com
+2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
+2017/12/12, janlinde, Jan Lindemann, jan@janware.com
+2017/12/13, enessoylu, Enes Soylu, enessoylutr@gmail.com
+2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
+2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/03/08, dannoc, Daniel Clifford, danno@google.com
+2018/03/10, uvguy, kangjoni76@gmail.com
+2018/01/06, kasbah, Kaspar Emanuel, kaspar@monostable.co.uk
+2018/01/15, xgcssch, Sönke Schau, xgcssch@users.noreply.github.com
+2018/02/08, razfriman, Raz Friman, raz@razfriman.com
+2018/02/11, io7m, Mark Raynsford, code@io7m.com
+2018/04/24, solussd, Joe Smith, joe@uwcreations.com
+2018/15/05, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/06/14, scadgek, Sergey Chupov, scadgek@live.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/06/27, wu-sheng, Wu Sheng, wu.sheng@foxmail.com
+2018/02/25, chaseoxide, Marcus Ong, taccs97[at]gmail[dot]com
+2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/05/17, sinopsysHK, Eric Bardes, sinofwd@gmail.com
+2018/05/23, srvance, Stephen Vance, steve@vance.com
+2018/06/14, alecont, Alessandro Contenti, alecontenti@hotmail.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
+2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
+2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/08, xsIceman, Andreas Skaar, andreas.skaar@gmail.com
+2018/10/18, edirgarcia, Edir García Lazo, edirgl@hotmail.com
+2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
+2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/29, chrisaycock, Christopher Aycock, chris[at]chrisaycock[dot]com
+2018/11/12, vinoski, Steve Vinoski, vinoski@ieee.org
+2018/11/14, nxtstep, Adriaan (Arjan) Duz, codewithadriaan[et]gmail[dot]com
+2018/11/15, amykyta3, Alex Mykyta, amykyta3@users.noreply.github.com
+2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
+2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
+2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
+2019/01/01, khoroshilov, Alexey Khoroshilov, khoroshilov@ispras.ru
+2019/01/02, wkhemir, Wail Khemir, khemirwail@gmail.com
+2019/01/16, kuegi, Markus Zancolo, markus.zancolo@roomle.com
+2019/01/29, hc-codersatlas, Harry Chan, harry.chan@codersatlas.com
+2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
+2019/02/23, gedimitr, Gerasimos Dimitriadis, gedimitr@gmail.com
+2019/03/13, base698, Justin Thomas, justin.thomas1@gmail.com
+2019/03/18, carlodri, Carlo Dri, carlo.dri@gmail.com
+2019/05/02, askingalot, Andy Collins, askingalot@gmail.com
+2019/05/13, mapio, Massimo Santini, massimo.santini@gmail.com
+2019/07/11, olowo726, Olof Wolgast, olof@baah.se
+2019/07/16, abhijithneilabraham, Abhijith Neil Abraham, abhijithneilabrahampk@gmail.com
+2019/07/26, Braavos96, Eric Hettiaratchi, erichettiaratchi@gmail.com
+2019/08/02, thron7, Thomas Herchenroeder, thron7[at]users[dot]sourceforge[dot]net
+2019/08/12, easonlin404, Eason Lin, easonlin404@gmail.com
+2019/08/23, akaJes, Oleksandr Mamchyts, akaJes@gmail.com
+2019/08/27, wurzelpeter, Markus Franke, markus[hyphen]franke[at]web[dot]de
+2019/09/10, ImanHosseini, Iman Hosseini, hosseini.iman@yahoo.com
+2019/09/03, João Henrique, johnnyonflame@hotmail.com
+2019/09/10, neko1235, Ihar Mokharau, igor.mohorev@gmail.com
+2019/09/10, yar3333, Yaroslav Sivakov, yar3333@gmail.com
+2019/09/10, marcospassos, Marcos Passos, marcospassos.com@gmail.com
+2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
+2019/09/15, sullis, Sean Sullivan, github@seansullivan.com
+2019/09/17, kaz, Kazuki Sawada, kazuki@6715.jp
+2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
+2019/10/29, tehbone, Tabari Alexander, tehbone@gmail.com
+2019/10/31, a-square, Alexei Averchenko, lex.aver@gmail.com
+2019/11/05, listba, Ben List, ben.list89@gmail.com
+2019/11/11, foxeverl, Liu Xinfeng, liuxf1986[at]gmail[dot]com
+2019/11/17, felixn, Felix Nieuwenhuizhen, felix@tdlrali.com
+2019/11/18, mlilback, Mark Lilback, mark@lilback.com
+2020/01/19, lingyv-li, Lingyu Li, lingyv.li@gmail.com
+2020/02/02, carocad, Camilo Roca, carocad@unal.edu.co
+2020/02/10, julibert, Julián Bermúdez Ortega, julibert.dev@gmail.com
+2020/02/17, quantumsheep, Nathanael Demacon, nathanael.dmc@outlook.fr
+2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
+2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
+2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
+2020/04/08, lwehmeier, Leon Wehmeier, wehmeier@st.ovgu.de
+2020/04/10, agrabski, Adam Grabski, adam.gr@outlook.com
+2020/04/23, martinvw, Martin van Wingerden, martin@martinvw.nl
+2020/04/23, kaczmarj, Jakub Kaczmarzyk, jakub.kaczmarzyk@stonybrookmedicine.edu
+2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
+2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
+2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
+2020/05/22, keywan-ghadami-oxid, Keywan Ghadami, keywan.ghadami@oxid-esales.com
+2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
+2020/05/31, d-markey, David Markey, dmarkey@free.fr
+2020/06/02, cohomology, Kilian Kilger, kkilger AT gmail.com
+2020/06/04, IohannRabeson, Iohann Rabeson, iotaka6@gmail.com
+2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
+2020/06/15, mattpaletta, Matthew Paletta, mattpaletta@gmail.com
+2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
+2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
+2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
+2020/09/10, Khailian, Arunav Sanyal, arunav.sanyal91@gmail.com
+2020/09/12, Clcanny, Charles Ruan, a837940593@gmail.com
+2020/09/15, rmcgregor1990, Robert McGregor, rmcgregor1990@gmail.com
+2020/09/16, trenki2, Markus Trenkwalder, trenki2[at]gmx[dot]net
+2020/10/08, Marti2203, Martin Mirchev, mirchevmartin2203@gmail.com
+2020/10/16, adarshbhat, Adarsh Bhat, adarshbhat@users.noreply.github.com
+2020/10/20, adamwojs, Adam Wójs, adam[at]wojs.pl
+2020/10/24, cliid, Jiwu Jang, jiwujang@naver.com
+2020/11/05, MichelHartmann, Michel Hartmann, MichelHartmann@users.noreply.github.com
+2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
+2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
+2020/12/03, electrum, David Phillips, david@acz.org
+2021/01/03, niw, Yoshimasa Niwa, niw@niw.at
+2021/01/25, l215884529, Qiheng Liu, 13607681+l215884529@users.noreply.github.com
+2021/02/02, tsotnikov, Taras Sotnikov, taras.sotnikov@gmail.com
+2021/02/10, jirislaby, Jiri Slaby, jirislaby@gmail.com
+2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/26, ahooper, Andrew Hooper, ahooper at kos dot net
+2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
+2021/02/28, Dante-Broggi, Dante Broggi, 34220985+Dante-Broggi@users.noreply.github.com
+2021/03/02, hackeris
+2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
+2021/03/22, 100mango, Fangqiu Fang, 100mango@gmail.com
+2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com
+2021/04/17, jaggerjo, Josua Jäger, mail@jaggerjo.com
+2021/04/24, bigerl, Alexander Bigerl, alexander [äät] bigerl [pkt] eu
+2021/05/02, michalharakal, Michal Harakal, michal.harakal@users.noreply.github.com
+2021/05/03, redexp, Sergii Kliuchnyk, redexp@users.noreply.github.com
+2021/05/03, mitar, Mi Tar, mitar.git@tnode.com
+2021/05/04, joakker, Joaquín León, joaquinandresleon108@gmail.com
+2021/05/06, renancaraujo, Renan C. Araújo, renancaraujo@users.noreply.github.com
+2021/05/06, canastro, Ricardo Canastro, ricardocanastro@users.noreply.github.com
+2021/06/19, abe149, Abe Skolnik, abe 149 at gmail . com
+2021/07/01, appel1, Johan Appelgren, johan.appelgren@gmail.com
+2021/07/01, marcauberer, Marc Auberer, marc.auberer@chillibits.com
+2021/07/14, renzhentaxibaerde, Renzhentaxi Baerde, renzhentaxibaerde@gmail.com
+2021/07/21, skittlepox, Benjamin Spiegel, bspiegel@cs.brown.edu
+2021/07/29, ksyx, Qixing Xue, qixingxue@outlook.com
+2021/07/29, rachidlamouri, Rachid Lamouri, rachidlamouri@gmail.com
+2021/08/02, minjoosur, Minjoo Sur, msur@salesforce.com
+2021/08/05, jjeffcaii, Jeff Tsai, caiweiwei.cww@alibaba-inc.com
+2021/08/08, ansiemens, Yi-Hong Lin, ansiemens@gmail.com
+2021/08/25, XenoAmess, Jin Xu, xenoamess@gmail.com
+2021/09/08, jmcken8, Joel McKenzie, joel.b.mckenzie@gmail.com
+2021/09/23, skalt, Steven Kalt, kalt.steven@gmail.com
+2021/09/26, idraper, Isaac Draper, idraper@byu.edu
+2021/10/10, tools4origins, Erwan Guyomarc'h, contact@erwan-guyomarch.fr
+2021/10/19, jcking, Justin King, jcking@google.com
+2021/10/31, skef, Skef Iterum, github@skef.org
+2021/10/31, hlstwizard, h.l.s.t@163.com
+2021/11/30, bollwyvl, Nick Bollweg, bollwyvl@users.noreply.github.com
+2021/12/03, eneko, Eneko Alonso, eneko.alonso@gmail.com
+2021/12/16, Ketler13, Oleksandr Martyshchenko, oleksandr.martyshchenko@gmail.com
+2021/12/25, Tinker1024, Tinker1024, tinker@huawei.com
+2021/12/31, Biswa96, Biswapriyo Nath, nathbappai@gmail.com
+2022/03/07, chenquan, chenquan, chenquan.dev@gmail.com
+2022/03/15, hzeller, Henner Zeller, h.zeller@acm.org

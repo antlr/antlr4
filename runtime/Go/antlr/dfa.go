@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"sort"
-	"sync"
 )
 
 type DFA struct {
@@ -18,10 +17,8 @@ type DFA struct {
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there.
 	states map[int]*DFAState
-	statesMu sync.RWMutex
 
 	s0 *DFAState
-	s0Mu sync.RWMutex
 
 	// precedenceDfa is the backing field for isPrecedenceDfa and setPrecedenceDfa.
 	// True if the DFA is for a precedence decision and false otherwise.
@@ -29,11 +26,18 @@ type DFA struct {
 }
 
 func NewDFA(atnStartState DecisionState, decision int) *DFA {
-	return &DFA{
+	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
 		states:        make(map[int]*DFAState),
 	}
+	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
+		dfa.precedenceDfa = true
+		dfa.s0 = NewDFAState(-1, NewBaseATNConfigSet(false))
+		dfa.s0.isAcceptState = false
+		dfa.s0.requiresFullContext = false
+	}
+	return dfa
 }
 
 // getPrecedenceStartState gets the start state for the current precedence and
@@ -41,25 +45,22 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 // state exists for the specified precedence and nil otherwise. d must be a
 // precedence DFA. See also isPrecedenceDfa.
 func (d *DFA) getPrecedenceStartState(precedence int) *DFAState {
-	if !d.precedenceDfa {
+	if !d.getPrecedenceDfa() {
 		panic("only precedence DFAs may contain a precedence start state")
 	}
 
-	d.s0Mu.RLock()
-	defer d.s0Mu.RUnlock()
-
 	// s0.edges is never nil for a precedence DFA
-	if precedence < 0 || precedence >= len(d.s0.edges) {
+	if precedence < 0 || precedence >= len(d.getS0().getEdges()) {
 		return nil
 	}
 
-	return d.s0.edges[precedence]
+	return d.getS0().getIthEdge(precedence)
 }
 
 // setPrecedenceStartState sets the start state for the current precedence. d
 // must be a precedence DFA. See also isPrecedenceDfa.
 func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
-	if !d.precedenceDfa {
+	if !d.getPrecedenceDfa() {
 		panic("only precedence DFAs may contain a precedence start state")
 	}
 
@@ -67,17 +68,21 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 		return
 	}
 
-	d.s0Mu.Lock()
-	defer d.s0Mu.Unlock()
-
 	// Synchronization on s0 here is ok. When the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again. s0.edges
 	// is never nil for a precedence DFA.
-	if precedence >= len(d.s0.edges) {
-		d.s0.edges = append(d.s0.edges, make([]*DFAState, precedence+1-len(d.s0.edges))...)
+	s0 := d.getS0()
+	if precedence >= s0.numEdges() {
+		edges := append(s0.getEdges(), make([]*DFAState, precedence+1-s0.numEdges())...)
+		s0.setEdges(edges)
+		d.setS0(s0)
 	}
 
-	d.s0.edges[precedence] = startState
+	s0.setIthEdge(precedence, startState)
+}
+
+func (d *DFA) getPrecedenceDfa() bool {
+	return d.precedenceDfa
 }
 
 // setPrecedenceDfa sets whether d is a precedence DFA. If precedenceDfa differs
@@ -86,18 +91,18 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 // store the start states for individual precedence values if precedenceDfa is
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
-	if d.precedenceDfa != precedenceDfa {
-		d.states = make(map[int]*DFAState)
+	if d.getPrecedenceDfa() != precedenceDfa {
+		d.setStates(make(map[int]*DFAState))
 
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
 
-			precedenceState.edges = make([]*DFAState, 0)
+			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
-			d.s0 = precedenceState
+			d.setS0(precedenceState)
 		} else {
-			d.s0 = nil
+			d.setS0(nil)
 		}
 
 		d.precedenceDfa = precedenceDfa
@@ -105,33 +110,27 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 }
 
 func (d *DFA) getS0() *DFAState {
-	d.s0Mu.RLock()
-	defer d.s0Mu.RUnlock()
 	return d.s0
 }
 
 func (d *DFA) setS0(s *DFAState) {
-	d.s0Mu.Lock()
-	defer d.s0Mu.Unlock()
 	d.s0 = s
 }
 
 func (d *DFA) getState(hash int) (*DFAState, bool) {
-	d.statesMu.RLock()
-	defer d.statesMu.RUnlock()
 	s, ok := d.states[hash]
 	return s, ok
 }
 
+func (d *DFA) setStates(states map[int]*DFAState) {
+	d.states = states
+}
+
 func (d *DFA) setState(hash int, state *DFAState) {
-	d.statesMu.Lock()
-	defer d.statesMu.Unlock()
 	d.states[hash] = state
 }
 
 func (d *DFA) numStates() int {
-	d.statesMu.RLock()
-	defer d.statesMu.RUnlock()
 	return len(d.states)
 }
 
@@ -155,7 +154,7 @@ func (d *DFA) sortedStates() []*DFAState {
 }
 
 func (d *DFA) String(literalNames []string, symbolicNames []string) string {
-	if d.s0 == nil {
+	if d.getS0() == nil {
 		return ""
 	}
 
@@ -163,7 +162,7 @@ func (d *DFA) String(literalNames []string, symbolicNames []string) string {
 }
 
 func (d *DFA) ToLexerString() string {
-	if d.s0 == nil {
+	if d.getS0() == nil {
 		return ""
 	}
 

@@ -1,0 +1,23 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : a a;
+a : {<False()>}? ID INT {<writeln("\"alt 1\"")>}
+  | {<False()>}? ID INT {<writeln("\"alt 2\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+y 3 x 4
+
+[errors]
+"""line 1:0 no viable alternative at input 'y'
+"""
+

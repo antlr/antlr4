@@ -17,13 +17,12 @@ namespace atn {
   /// <para>The executor tracks position information for position-dependent lexer actions
   /// efficiently, ensuring that actions appearing only at the end of the rule do
   /// not cause bloating of the <seealso cref="DFA"/> created for the lexer.</para>
-  class ANTLR4CPP_PUBLIC LexerActionExecutor : public std::enable_shared_from_this<LexerActionExecutor> {
+  class ANTLR4CPP_PUBLIC LexerActionExecutor final : public std::enable_shared_from_this<LexerActionExecutor> {
   public:
     /// <summary>
     /// Constructs an executor for a sequence of <seealso cref="LexerAction"/> actions. </summary>
     /// <param name="lexerActions"> The lexer actions to execute. </param>
-    LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions);
-    virtual ~LexerActionExecutor();
+    explicit LexerActionExecutor(std::vector<Ref<const LexerAction>> lexerActions);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which executes the actions for
@@ -39,8 +38,8 @@ namespace atn {
     /// </param>
     /// <returns> A <seealso cref="LexerActionExecutor"/> for executing the combine actions
     /// of {@code lexerActionExecutor} and {@code lexerAction}. </returns>
-    static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                           Ref<LexerAction> const& lexerAction);
+    static Ref<const LexerActionExecutor> append(const Ref<const LexerActionExecutor> &lexerActionExecutor,
+                                                 Ref<const LexerAction> lexerAction);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which encodes the current offset
@@ -70,12 +69,12 @@ namespace atn {
     /// </param>
     /// <returns> A <seealso cref="LexerActionExecutor"/> which stores input stream offsets
     /// for all position-dependent lexer actions. </returns>
-    virtual Ref<LexerActionExecutor> fixOffsetBeforeMatch(int offset);
+    Ref<const LexerActionExecutor> fixOffsetBeforeMatch(int offset) const;
 
     /// <summary>
     /// Gets the lexer actions to be executed by this executor. </summary>
     /// <returns> The lexer actions to be executed by this executor. </returns>
-    virtual std::vector<Ref<LexerAction>> getLexerActions() const;
+    const std::vector<Ref<const LexerAction>>& getLexerActions() const;
 
     /// <summary>
     /// Execute the actions encapsulated by this executor within the context of a
@@ -95,21 +94,35 @@ namespace atn {
     /// <param name="startIndex"> The token start index. This value may be passed to
     /// <seealso cref="IntStream#seek"/> to set the {@code input} position to the beginning
     /// of the token. </param>
-    virtual void execute(Lexer *lexer, CharStream *input, size_t startIndex);
+    void execute(Lexer *lexer, CharStream *input, size_t startIndex) const;
 
-    virtual size_t hashCode() const;
-    virtual bool operator == (const LexerActionExecutor &obj) const;
-    virtual bool operator != (const LexerActionExecutor &obj) const;
+    size_t hashCode() const;
+
+    bool equals(const LexerActionExecutor &other) const;
 
   private:
-    const std::vector<Ref<LexerAction>> _lexerActions;
-
-    /// Caches the result of <seealso cref="#hashCode"/> since the hash code is an element
-    /// of the performance-critical <seealso cref="LexerATNConfig#hashCode"/> operation.
-    const size_t _hashCode;
-
-    size_t generateHashCode() const;
+    const std::vector<Ref<const LexerAction>> _lexerActions;
+    mutable std::atomic<size_t> _hashCode;
   };
 
-} // namespace atn
-} // namespace antlr4
+  inline bool operator==(const LexerActionExecutor &lhs, const LexerActionExecutor &rhs) {
+    return lhs.equals(rhs);
+  }
+
+  inline bool operator!=(const LexerActionExecutor &lhs, const LexerActionExecutor &rhs) {
+    return !operator==(lhs, rhs);
+  }
+
+}  // namespace atn
+}  // namespace antlr4
+
+namespace std {
+
+  template <>
+  struct hash<::antlr4::atn::LexerActionExecutor> {
+    size_t operator()(const ::antlr4::atn::LexerActionExecutor &lexerActionExecutor) const {
+      return lexerActionExecutor.hashCode();
+    }
+  };
+
+}  // namespace std

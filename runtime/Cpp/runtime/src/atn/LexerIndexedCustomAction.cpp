@@ -6,58 +6,52 @@
 #include "misc/MurmurHash.h"
 #include "Lexer.h"
 #include "support/CPPUtils.h"
+#include "support/Casts.h"
 
 #include "atn/LexerIndexedCustomAction.h"
 
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
+using namespace antlrcpp;
 
-LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action)
-  : _offset(offset), _action(action) {
+namespace {
+
+  bool cachedHashCodeEqual(size_t lhs, size_t rhs) {
+    return lhs == rhs || lhs == 0 || rhs == 0;
+  }
+
 }
 
-int LexerIndexedCustomAction::getOffset() const {
-  return _offset;
-}
+LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<const LexerAction> action)
+    : LexerAction(LexerActionType::INDEXED_CUSTOM, true), _action(std::move(action)), _offset(offset) {}
 
-Ref<LexerAction> LexerIndexedCustomAction::getAction() const {
-  return _action;
-}
-
-LexerActionType LexerIndexedCustomAction::getActionType() const {
-  return _action->getActionType();
-}
-
-bool LexerIndexedCustomAction::isPositionDependent() const {
-  return true;
-}
-
-void LexerIndexedCustomAction::execute(Lexer *lexer) {
+void LexerIndexedCustomAction::execute(Lexer *lexer) const {
   // assume the input stream position was properly set by the calling code
-  _action->execute(lexer);
+  getAction()->execute(lexer);
 }
 
-size_t LexerIndexedCustomAction::hashCode() const {
+size_t LexerIndexedCustomAction::hashCodeImpl() const {
   size_t hash = MurmurHash::initialize();
-  hash = MurmurHash::update(hash, _offset);
-  hash = MurmurHash::update(hash, _action);
-  return MurmurHash::finish(hash, 2);
+  hash = MurmurHash::update(hash, static_cast<size_t>(getActionType()));
+  hash = MurmurHash::update(hash, getOffset());
+  hash = MurmurHash::update(hash, getAction());
+  return MurmurHash::finish(hash, 3);
 }
 
-bool LexerIndexedCustomAction::operator == (const LexerAction &obj) const {
-  if (&obj == this) {
+bool LexerIndexedCustomAction::equals(const LexerAction &other) const {
+  if (this == std::addressof(other)) {
     return true;
   }
-
-  const LexerIndexedCustomAction *action = dynamic_cast<const LexerIndexedCustomAction *>(&obj);
-  if (action == nullptr) {
+  if (getActionType() != other.getActionType()) {
     return false;
   }
-
-  return _offset == action->_offset && *_action == *action->_action;
+  const auto &lexerAction = downCast<const LexerIndexedCustomAction&>(other);
+  return getOffset() == lexerAction.getOffset() &&
+         cachedHashCodeEqual(cachedHashCode(), lexerAction.cachedHashCode()) &&
+         *getAction() == *lexerAction.getAction();
 }
 
 std::string LexerIndexedCustomAction::toString() const {
-  return antlrcpp::toString(this);
+  return "indexedCustom(" + std::to_string(getOffset()) + ", " + getAction()->toString() + ")";
 }

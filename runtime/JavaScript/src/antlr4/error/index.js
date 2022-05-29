@@ -1,14 +1,19 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-module.exports.RecognitionException = require('./Errors').RecognitionException;
-module.exports.NoViableAltException = require('./Errors').NoViableAltException;
-module.exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltException;
-module.exports.InputMismatchException = require('./Errors').InputMismatchException;
-module.exports.FailedPredicateException = require('./Errors').FailedPredicateException;
-module.exports.DiagnosticErrorListener = require('./DiagnosticErrorListener');
-module.exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
-module.exports.DefaultErrorStrategy = require('./ErrorStrategy').DefaultErrorStrategy;
-module.exports.ErrorListener = require('./ErrorListener').ErrorListener;
+import RecognitionException from './RecognitionException.js';
+import NoViableAltException from './NoViableAltException.js';
+import LexerNoViableAltException from './LexerNoViableAltException.js';
+import InputMismatchException from './InputMismatchException.js';
+import FailedPredicateException from './FailedPredicateException.js';
+import DiagnosticErrorListener from './DiagnosticErrorListener.js';
+import BailErrorStrategy from './BailErrorStrategy.js';
+import DefaultErrorStrategy from './DefaultErrorStrategy.js';
+import ErrorListener from './ErrorListener.js';
+
+export default {
+    RecognitionException, NoViableAltException, LexerNoViableAltException, InputMismatchException, FailedPredicateException,
+    DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy, ErrorListener
+}

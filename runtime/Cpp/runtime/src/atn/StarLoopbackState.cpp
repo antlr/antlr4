@@ -5,15 +5,15 @@
 
 #include "atn/StarLoopEntryState.h"
 #include "atn/Transition.h"
+#include "support/Casts.h"
 
 #include "atn/StarLoopbackState.h"
 
 using namespace antlr4::atn;
 
-StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
-  return dynamic_cast<StarLoopEntryState *>(transitions[0]->target);
-}
-
-size_t StarLoopbackState::getStateType() {
-  return STAR_LOOP_BACK;
+StarLoopEntryState *StarLoopbackState::getLoopEntryState() const {
+  if (transitions[0]->target != nullptr && transitions[0]->target->getStateType() == ATNStateType::STAR_LOOP_ENTRY) {
+    return antlrcpp::downCast<StarLoopEntryState*>(transitions[0]->target);
+  }
+  return nullptr;
 }

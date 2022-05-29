@@ -1,0 +1,29 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S,T;
+s : a ;
+B : 'b' ; // defines B from inherited token space
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar T;
+a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
+
+[slaveGrammar]
+parser grammar S;
+a : b {<writeln("\"S.a\"")>};
+b : B;
+
+[start]
+s
+
+[input]
+b
+
+[output]
+"""S.a
+"""
+

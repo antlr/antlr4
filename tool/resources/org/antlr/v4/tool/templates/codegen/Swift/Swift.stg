@@ -274,7 +274,7 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 	func getRuleNames() -> [String] { return <parser.name>.ruleNames }
 
 	override <accessLevelOpenOK(parser)>
-	func getSerializedATN() -> String { return <parser.name>._serializedATN }
+	func getSerializedATN() -> [Int] { return <parser.name>._serializedATN }
 
 	override <accessLevelOpenOK(parser)>
 	func getATN() -> ATN { return <parser.name>._ATN }
@@ -300,10 +300,7 @@ case  <f.ruleIndex>:
 	<atn>
 
 	<accessLevelNotOpen(parser)>
-	static let _serializedATN = <parser.name>ATN().jsonString
-
-	<accessLevelNotOpen(parser)>
-	static let _ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+	static let _ATN = try! ATNDeserializer().deserialize(_serializedATN)
 }
 >>
 
@@ -356,7 +353,7 @@ func getVocabulary() -> Vocabulary {
 
 override <accessLevelNotOpen(parser)>
 init(_ input:TokenStream) throws {
-    RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -396,8 +393,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 @discardableResult
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.name>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
-	var _localctx: <currentRule.ctxType> = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>)
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.escapedName>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
+	var _localctx: <currentRule.ctxType>
+	_localctx = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>)
 	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>)
 	<namedActions.init>
 	<locals; separator="\n">
@@ -434,14 +432,15 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelNotOpen(parser)> final <endif> func <currentRule.name>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
-	return try <currentRule.name>(0<currentRule.args:{a | , <a.name>}>)
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelNotOpen(parser)> final <endif> func <currentRule.escapedName>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
+	return try <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>)
 }
 @discardableResult
-private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
+private func <currentRule.escapedName>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
 	let _parentctx: ParserRuleContext? = _ctx
 	let _parentState: Int = getState()
-	var _localctx: <currentRule.ctxType> = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>)
+	var _localctx: <currentRule.ctxType>
+	_localctx = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>)
 	var _prevctx: <currentRule.ctxType> = _localctx
 	let _startState: Int = <currentRule.startState>
 	try enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p)
@@ -665,20 +664,20 @@ InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>)
 <if(r.labels)>
 try {
-		let assignmentValue = try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+		let assignmentValue = try <r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 		<r.labels:{l | <labelref(l)> = assignmentValue} ; separator="\n">
      }()
-<else>try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)<endif>
+<else>try <r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)<endif>
 >>
 
 MatchToken(m) ::= <<
 setState(<m.stateNumber>)
 <if(m.labels)>
 try {
-		let assignmentValue = try match(<parser.name>.Tokens.<m.name>.rawValue)
+		let assignmentValue = try match(<parser.name>.Tokens.<m.escapedName>.rawValue)
 		<m.labels:{l | <labelref(l)> = assignmentValue}  ; separator="\n">
      }()
-<else>try match(<parser.name>.Tokens.<m.name>.rawValue)<endif>
+<else>try match(<parser.name>.Tokens.<m.escapedName>.rawValue)<endif>
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -735,15 +734,15 @@ LexerPushModeCommand(arg)  ::= "pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "_localctx.<a.name>"
-LocalRef(a) ::= "_localctx.<a.name>"
-RetValueRef(a) ::= "_localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "_localctx.<a.escapedName>"
+LocalRef(a) ::= "_localctx.<a.escapedName>"
+RetValueRef(a) ::= "_localctx.<a.escapedName>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.escapedName>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
+TokenRef(t) ::= "<ctx(t)>.<t.escapedName>"
+LabelRef(t) ::= "<ctx(t)>.<t.escapedName>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.escapedName)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.escapedName> = <rhsChunks>"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
@@ -768,51 +767,51 @@ ThisRulePropertyRef_text(r)	 ::= "(try _input.getText(_localctx.start, try _inpu
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
+NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.escapedName>"
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	"((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>"
+	"((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.escapedName> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
-TokenDecl(t) ::= "<t.name>: <SwiftTypeMap.(TokenLabelType())>!"
-TokenTypeDecl(t) ::= "var <t.name>: Int = 0"
-TokenListDecl(t) ::= "<t.name>: [Token] = [Token]()"
-RuleContextDecl(r) ::= "<r.name>: <r.ctxName>!"
-RuleContextListDecl(rdecl) ::= "<rdecl.name>: [<rdecl.ctxName>] = [<rdecl.ctxName>]()"
+TokenDecl(t) ::= "<t.escapedName>: <SwiftTypeMap.(TokenLabelType())>!"
+TokenTypeDecl(t) ::= "var <t.escapedName>: Int = 0"
+TokenListDecl(t) ::= "<t.escapedName>: [Token] = [Token]()"
+RuleContextDecl(r) ::= "<r.escapedName>: <r.ctxName>!"
+RuleContextListDecl(rdecl) ::= "<rdecl.escapedName>: [<rdecl.ctxName>] = [<rdecl.ctxName>]()"
 
 ContextTokenGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
-	func <t.name>() -> TerminalNode? {
-		return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0)
+	func <t.escapedName>() -> TerminalNode? {
+		return getToken(<parser.name>.Tokens.<t.escapedName>.rawValue, 0)
 	}
 >>
 ContextTokenListGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
-	func <t.name>() -> [TerminalNode] {
-		return getTokens(<parser.name>.Tokens.<t.name>.rawValue)
+	func <t.escapedName>() -> [TerminalNode] {
+		return getTokens(<parser.name>.Tokens.<t.escapedName>.rawValue)
 	}
 >>
 ContextTokenListIndexedGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
-	func <t.name>(_ i:Int) -> TerminalNode? {
-		return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
+	func <t.escapedName>(_ i:Int) -> TerminalNode? {
+		return getToken(<parser.name>.Tokens.<t.escapedName>.rawValue, i)
 	}
 >>
 ContextRuleGetterDecl(r) ::= <<
 	<accessLevelOpenOK(parser)>
-	func <r.name>() -> <r.ctxName>? {
+	func <r.escapedName>() -> <r.ctxName>? {
 		return getRuleContext(<r.ctxName>.self, 0)
 	}
 >>
 ContextRuleListGetterDecl(r) ::= <<
 	<accessLevelOpenOK(parser)>
-	func <r.name>() -> [<r.ctxName>] {
+	func <r.escapedName>() -> [<r.ctxName>] {
 		return getRuleContexts(<r.ctxName>.self)
 	}
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 	<accessLevelOpenOK(parser)>
-	func <r.name>(_ i: Int) -> <r.ctxName>? {
+	func <r.escapedName>(_ i: Int) -> <r.ctxName>? {
 		return getRuleContext(<r.ctxName>.self, i)
 	}
 >>
@@ -835,14 +834,14 @@ CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
 
-<accessLevelNotOpen(parser)> class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+<accessLevelNotOpen(parser)> class <struct.escapedName>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | <accessLevelOpenOK(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<! <if(ctorAttrs)> <accessLevelNotOpen(parser)> init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
 	<if(ctorAttrs)>
 	<accessLevelNotOpen(parser)> convenience init(_ parent: ParserRuleContext?, _ invokingState: Int<ctorAttrs:{a | , _ <a>}>) {
 		self.init(parent, invokingState)
-		<struct.ctorAttrs:{a | self.<a.name> = <a.name>;}; separator="\n">
+		<struct.ctorAttrs:{a | self.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
 	<endif>
 
@@ -854,8 +853,8 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 	<accessLevelOpenOK(parser)>
 	override func copyFrom(_ ctx_: ParserRuleContext) {
 		super.copyFrom(ctx_)
-		let ctx = ctx_ as! <struct.name>
-		<struct.attrs:{a | self.<a.name> = ctx.<a.name>;}; separator="\n">
+		let ctx = ctx_ as! <struct.escapedName>
+		<struct.attrs:{a | self.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
 <endif>
 	<dispatchMethods; separator="\n">
@@ -864,7 +863,7 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-<accessLevelNotOpen(parser)> class <struct.name>: <currentRule.name; format="cap">Context {
+<accessLevelNotOpen(parser)> class <struct.escapedName>: <currentRule.name; format="cap">Context {
 	<attrs:{a | <accessLevelNotOpen(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 
@@ -901,10 +900,10 @@ func accept\<T>(_ visitor: ParseTreeVisitor\<T>) -> T? {
 }
 >>
 
-AttributeDecl(d) ::= "<d.name>: <SwiftTypeMap.(d.type)><if(d.initValue)> = <d.initValue><else>!<endif>"
+AttributeDecl(d) ::= "<d.escapedName>: <SwiftTypeMap.(d.type)><if(d.initValue)> = <d.initValue><else>!<endif>"
 
 /** If we don't know location of label def x, use this template (_localctx as! <x.ctx.name> */
-labelref(x) ::= "<if(!x.isLocal)>_localctx.castdown(<x.ctx.name>.self).<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)>_localctx.castdown(<x.ctx.name>.self).<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr?    */
 ctx(actionChunk) ::= "_localctx.castdown(<actionChunk.ctx.name>.self)"
@@ -983,17 +982,17 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
 	<endif>
 
-	<if(lexer.channels)>
+	<if(lexer.escapedChannels)>
 	<accessLevelNotOpen(lexer)>
-	static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
+	static let <lexer.escapedChannels:{k | <k>=<lexer.escapedChannels.(k)>}; separator=", ", wrap, anchor>
 	<endif>
-	<if(rest(lexer.modes))>
+	<if(rest(lexer.escapedModeNames))>
 	<accessLevelNotOpen(lexer)>
-	static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
+	static let <rest(lexer.escapedModeNames):{m| <m>=<i>}; separator=", ", wrap, anchor>
 	<endif>
 	<accessLevelNotOpen(lexer)>
 	static let channelNames: [String] = [
-		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	]
 
 	<accessLevelNotOpen(lexer)>
@@ -1030,7 +1029,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	func getRuleNames() -> [String] { return <lexer.name>.ruleNames }
 
 	override <accessLevelOpenOK(lexer)>
-	func getSerializedATN() -> String { return <lexer.name>._serializedATN }
+	func getSerializedATN() -> [Int] { return <lexer.name>._serializedATN }
 
 	override <accessLevelOpenOK(lexer)>
 	func getChannelNames() -> [String] { return <lexer.name>.channelNames }
@@ -1045,19 +1044,14 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	<atn>
 
 	<accessLevelNotOpen(lexer)>
-	static let _serializedATN: String = <lexer.name>ATN().jsonString
-
-	<accessLevelNotOpen(lexer)>
-	static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+	static let _ATN: ATN = try! ATNDeserializer().deserialize(_serializedATN)
 }
 >>
 
-/** Don't need to define anything. The tool generates a XParserATN.swift file (and same for lexer)
- *  which is referenced from static field _serializedATN.  This json string is passed to
- *  deserializeFromJson(). Note this is not the "serialization as array of ints" that other targets
- *  do. It is more or less the output of ATNPrinter which gets read back in.
- */
 SerializedATN(model) ::= <<
+static let _serializedATN:[Int] = [
+	<model.serialized: {s | <s>}; separator=",", wrap>
+]
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

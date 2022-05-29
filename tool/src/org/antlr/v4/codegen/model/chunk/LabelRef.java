@@ -8,11 +8,8 @@ package org.antlr.v4.codegen.model.chunk;
 
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
-public class LabelRef extends ActionChunk {
-	public String name;
-
-	public LabelRef(StructDecl ctx, String name) {
-		super(ctx);
-		this.name = name;
+public class LabelRef extends SymbolRefChunk {
+	public LabelRef(StructDecl ctx, String name, String escapedName) {
+		super(ctx, name, escapedName);
 	}
 }

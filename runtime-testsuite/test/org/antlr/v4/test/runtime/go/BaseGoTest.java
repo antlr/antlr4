@@ -7,21 +7,28 @@ package org.antlr.v4.test.runtime.go;
 
 
 import org.antlr.v4.test.runtime.*;
+import org.junit.Assert;
 import org.stringtemplate.v4.ST;
 
-import java.io.File;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
 
 import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
+import static org.junit.Assert.fail;
 
 public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
-
-	private static File tmpGopath = null;
+	private final static String antlrTestPackageName = "antlr";
+	private static final String goModFileName = "go.mod";
 	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/antlr/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
+	private static boolean isRuntimeInitialized = false;
+	private static String newGoRootString;
+	private static String goModContent = null;
 
 	private File parserTempDir; // "parser" with tempDir
 
@@ -30,55 +37,8 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return "antlr4-go";
 	}
 
-	/**
-	 * Copies all files from go runtime to a temporary folder that is inside a valid GOPATH project structure.
-	 */
-	public static void groupSetUp() throws Exception {
-		tmpGopath = new File(System.getProperty("java.io.tmpdir"), "antlr-goruntime-tmpgopath-" + Long.toHexString(System.currentTimeMillis()));
-
-		ArrayList<String> pathsegments = new ArrayList<String>();
-		pathsegments.add("src");
-		pathsegments.addAll(Arrays.asList(GO_RUNTIME_IMPORT_PATH.split("/")));
-
-		File tmpPackageDir = tmpGopath;
-		for (String pathsegment : pathsegments) {
-			tmpPackageDir = new File(tmpPackageDir, pathsegment);
-		}
-		if (!tmpPackageDir.mkdirs()) {
-			throw new Exception("Could not create temp go runtime package dirs!");
-		}
-
-		File[] runtimeFiles = locateRuntime().listFiles();
-		if (runtimeFiles == null) {
-			throw new Exception("Go runtime file list is empty.");
-		}
-		for (File runtimeFile : runtimeFiles) {
-			File dest = new File(tmpPackageDir, runtimeFile.getName());
-			RuntimeTestUtils.copyFile(runtimeFile, dest);
-		}
-
-		cacheGoRuntime(tmpPackageDir);
-	}
-
-	public static void groupTearDown() throws Exception {
-		eraseDirectory(tmpGopath);
-	}
-
-	private static void cacheGoRuntime(File tmpPackageDir) throws Exception {
-		String goExecutable = locateGo();
-		ProcessBuilder pb = new ProcessBuilder(goExecutable, "install", "-x");
-		pb.directory(tmpPackageDir);
-		pb.environment().put("GOPATH", tmpGopath.getPath());
-		pb.redirectErrorStream(true);
-		Process process = pb.start();
-		StreamVacuum sucker = new StreamVacuum(process.getInputStream());
-		sucker.start();
-		int exit = process.waitFor();
-		sucker.join();
-		if (exit != 0) {
-			throw new Exception("Non-zero exit while caching go runtime, output: " + sucker.toString());
-		}
-	}
+	public static void groupSetUp() throws Exception { }
+	public static void groupTearDown() throws Exception { }
 
 	public void testSetUp() throws Exception {
 		eraseParserTempDir();
@@ -109,8 +69,10 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, null, lexerName, "-no-listener");
 		assertTrue(success);
+		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
+		writeGoModFile();
 		return execModule("Test.go");
 	}
 
@@ -123,10 +85,57 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, parserName, lexerName, "-visitor");
 		assertTrue(success);
+		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
+		writeGoModFile();
 		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 		                           visitorName, startRuleName, showDiagnosticErrors);
-		return execRecognizer();
+		return execModule("Test.go");
+	}
+
+	private void writeGoModFile() {
+		if (goModContent == null) {
+			try {
+				ProcessBuilder pb = new ProcessBuilder("go", "mod", "init", "test");
+				pb.directory(getTempTestDir());
+				pb.redirectErrorStream(true);
+				Process process = pb.start();
+				StreamVacuum sucker = new StreamVacuum(process.getInputStream());
+				sucker.start();
+				int exit = process.waitFor();
+				sucker.join();
+				if (exit != 0) {
+					throw new Exception("Non-zero exit while setting up go module: " + sucker);
+				}
+				goModContent = new String(Files.readAllBytes(Paths.get(getTempDirPath(), goModFileName)), StandardCharsets.UTF_8);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Assert.fail("Unable to execute go mod");
+			}
+		} else {
+			try (PrintWriter out = new PrintWriter(Paths.get(getTempDirPath(), goModFileName).toString())) {
+				out.println(goModContent);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				Assert.fail("Unable to write " + goModFileName);
+			}
+		}
+	}
+
+	private void replaceImportPath() {
+		File[] files = getTempParserDir().listFiles(new GoFileFilter());
+		for (File file : files) {
+			String fileName = file.toString();
+			try {
+				String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+				String newContent = content.replaceAll(GO_RUNTIME_IMPORT_PATH, antlrTestPackageName);
+				try (PrintWriter out = new PrintWriter(fileName)) {
+					out.println(newContent);
+				}
+			} catch (IOException e) {
+				fail("Error during processing " + fileName);
+			}
+		}
 	}
 
 	/** Return true if all is well */
@@ -143,10 +152,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	                                                boolean defaultListener, String... extraOptions) {
 		ErrorQueue equeue = antlrOnString(getTempParserDirPath(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
-			return false;
-		}
-		return true;
+		return equeue.errors.isEmpty();
 	}
 
 	protected void rawBuildRecognizerTestFile(String parserName,
@@ -162,18 +168,15 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 	}
 
-	public String execRecognizer() {
-		return execModule("Test.go");
-	}
+	private String execModule(String fileName) {
+		initializeRuntime();
 
-	public String execModule(String fileName) {
-		String goExecutable = locateGo();
 		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
 		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder(goExecutable, "run", modulePath, inputPath);
-			builder.environment().put("GOPATH", tmpGopath.getPath());
+			ProcessBuilder builder = new ProcessBuilder("go", "run", modulePath, inputPath);
 			builder.directory(getTempTestDir());
+			builder.environment().put("GOROOT", newGoRootString);
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -183,62 +186,100 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
+			if (output.length() == 0) {
 				output = null;
 			}
 			if (stderrVacuum.toString().length() > 0) {
 				setParseErrors(stderrVacuum.toString());
 			}
 			return output;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
 		return null;
 	}
 
-	private static String locateTool(String tool) {
-		ArrayList<String> paths = new ArrayList<String>(); // default cap is about right
+	private static synchronized boolean initializeRuntime() {
+		if (isRuntimeInitialized)
+			return true;
 
-		// GOROOT should have priority if set
-		String goroot = System.getenv("GOROOT");
-		if (goroot != null) {
-			paths.add(goroot + File.separatorChar + "bin");
+		String goRoot = getGoRootValue();
+		Path newGoRoot = Paths.get(cachingDirectory, "Go");
+		newGoRootString = newGoRoot.toString();
+		try {
+			File newGoRootDirectory = newGoRoot.toFile();
+			if (newGoRootDirectory.exists())
+				deleteDirectory(newGoRootDirectory);
+			copyDirectory(Paths.get(goRoot), newGoRoot);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail("Unable to copy go system files");
 		}
 
-		String pathEnv = System.getenv("PATH");
-		if (pathEnv != null) {
-			paths.addAll(Arrays.asList(pathEnv.split(File.pathSeparator)));
+		String packageDir = Paths.get(newGoRootString, "src", antlrTestPackageName).toString();
+		RuntimeTestUtils.mkdir(packageDir);
+		File[] runtimeFiles = locateRuntime().listFiles(new GoFileFilter());
+		if (runtimeFiles == null) {
+			Assert.fail("Go runtime file list is empty.");
 		}
 
-		// OS specific default locations of binary dist as last resort
-		paths.add("/usr/local/go/bin");
-		paths.add("c:\\Go\\bin");
-
-		for (String path : paths) {
-			File candidate = new File(new File(path), tool);
-			if (candidate.exists()) {
-				return candidate.getPath();
+		for (File runtimeFile : runtimeFiles) {
+			File dest = new File(packageDir, runtimeFile.getName());
+			try {
+				RuntimeTestUtils.copyFile(runtimeFile, dest);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Assert.fail("Unable to copy runtime file " + runtimeFile);
 			}
-			candidate = new File(new File(path), tool+".exe");
-			if (candidate.exists()) {
-				return candidate.getPath();
-			}
 		}
-		return null;
+
+		isRuntimeInitialized = true;
+		return isRuntimeInitialized;
 	}
 
-	private static String locateGo() {
-		String propName = "antlr-go";
-		String prop = System.getProperty(propName);
-		if (prop == null || prop.length() == 0) {
-			prop = locateTool("go");
+	private static void copyDirectory(final Path source, final Path target, final CopyOption... options)
+			throws IOException {
+		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 2147483647, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+					throws IOException {
+				Files.createDirectories(target.resolve(source.relativize(dir)));
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+					throws IOException {
+				Files.copy(file, target.resolve(source.relativize(file)), options);
+				return FileVisitResult.CONTINUE;
+			}
+		});
+	}
+
+	private static void deleteDirectory(File f) throws IOException {
+		if (f.isDirectory()) {
+			for (File c : f.listFiles())
+				deleteDirectory(c);
 		}
-		if (prop == null) {
-			throw new RuntimeException("Missing system property:" + propName);
+		if (!f.delete())
+			throw new FileNotFoundException("Failed to delete file: " + f);
+	}
+
+	private static String getGoRootValue() {
+		try {
+			ProcessBuilder pb = new ProcessBuilder("go", "env", "GOROOT");
+			Process process = pb.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			stdoutVacuum.start();
+			process.waitFor();
+			stdoutVacuum.join();
+			return stdoutVacuum.toString().trim();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("Unable to execute go env");
 		}
-		return prop;
+		return null;
 	}
 
 	private static File locateRuntime() {
@@ -251,7 +292,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		if (!runtimeDir.exists()) {
 			throw new RuntimeException("Cannot find Go ANTLR runtime");
 		}
-		return runtimeDir;
+		return new File(runtimeDir.getPath());
 	}
 
 	protected void writeParserTestFile(String parserName, String lexerName,
@@ -260,11 +301,11 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		ST outputFileST = new ST(
 			"package main\n" +
 				"import (\n"
-				+"	\"github.com/antlr/antlr4/runtime/Go/antlr\"\n"
-				+"	\"./parser\"\n"
-				+"	\"fmt\"\n"
-				+"	\"os\"\n"
-				+")\n"
+				+ "	\"test/parser\"\n"
+				+ "	\"" + antlrTestPackageName + "\"\n"
+				+ "	\"fmt\"\n"
+				+ "	\"os\"\n"
+				+ ")\n"
 				+ "\n"
 				+ "type TreeShapeListener struct {\n"
 				+ "	*parser.Base<listenerName>\n"
@@ -314,14 +355,12 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		writeFile(getTempDirPath(), "Test.go", outputFileST.render());
 	}
 
-
-
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
 			"package main\n" +
 				"import (\n"
-				+ "	\"github.com/antlr/antlr4/runtime/Go/antlr\"\n"
-				+ "	\"./parser\"\n"
+				+ "	\"test/parser\"\n"
+				+ "	\"" + antlrTestPackageName + "\"\n"
 				+ "	\"os\"\n"
 				+ "	\"fmt\"\n"
 				+ ")\n"
@@ -345,5 +384,4 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		outputFileST.add("lexerName", lexerName);
 		writeFile(getTempDirPath(), "Test.go", outputFileST.render());
 	}
-
 }

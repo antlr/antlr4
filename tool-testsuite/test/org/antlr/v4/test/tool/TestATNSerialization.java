@@ -8,6 +8,7 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -16,6 +17,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.antlr.v4.runtime.atn.ATNDeserializer.encodeIntsWith16BitWords;
+import static org.antlr.v4.runtime.atn.ATNDeserializer.decodeIntsEncodedAs16BitWords;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class TestATNSerialization extends BaseJavaToolTest {
@@ -42,31 +46,27 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"2->3 ATOM 1,0,0\n" +
 				"3->4 ATOM 2,0,0\n" +
 				"4->1 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testEOF() throws Exception {
 		Grammar g = new Grammar(
-			"parser grammar T;\n"+
-			"a : A EOF ;");
+				"parser grammar T;\n"+
+						"a : A EOF ;");
 		String expecting =
-			"max type 1\n" +
-				"0:RULE_START 0\n" +
-				"1:RULE_STOP 0\n" +
-				"2:BASIC 0\n" +
-				"3:BASIC 0\n" +
-				"4:BASIC 0\n" +
-				"5:BASIC 0\n" +
-				"rule 0:0\n" +
-				"0->2 EPSILON 0,0,0\n" +
-				"2->3 ATOM 1,0,0\n" +
-				"3->4 ATOM 0,0,1\n" +
-				"4->1 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+				"max type 1\n" +
+						"0:RULE_START 0\n" +
+						"1:RULE_STOP 0\n" +
+						"2:BASIC 0\n" +
+						"3:BASIC 0\n" +
+						"4:BASIC 0\n" +
+						"5:BASIC 0\n" +
+						"rule 0:0\n" +
+						"0->2 EPSILON 0,0,0\n" +
+						"2->3 ATOM 1,0,0\n" +
+						"3->4 ATOM 0,0,1\n" +
+						"4->1 EPSILON 0,0,0\n";
+		checkResults(g, expecting);
 	}
 
 	@Test public void testEOFInSet() throws Exception {
@@ -85,9 +85,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"0->2 EPSILON 0,0,0\n" +
 				"2->3 SET 0,0,0\n" +
 				"3->1 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testNot() throws Exception {
@@ -108,8 +106,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"2->3 NOT_SET 0,0,0\n" +
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		DOTGenerator gen = new DOTGenerator(g);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(g.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -129,9 +127,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"0->2 EPSILON 0,0,0\n" +
 			"2->3 WILDCARD 0,0,0\n" +
 			"3->1 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testPEGAchillesHeel() throws Exception {
@@ -157,9 +153,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->3 EPSILON 0,0,0\n" +
 				"6->1 EPSILON 0,0,0\n" +
 				"0:5\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void test3Alts() throws Exception {
@@ -192,9 +186,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"8->5 EPSILON 0,0,0\n" +
 				"9->1 EPSILON 0,0,0\n" +
 				"0:8\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testSimpleLoop() throws Exception {
@@ -224,9 +216,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"7->8 ATOM 2,0,0\n" +
 				"8->1 EPSILON 0,0,0\n" +
 				"0:5\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testRuleRef() throws Exception {
@@ -253,9 +243,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->1 EPSILON 0,0,0\n" +
 				"6->7 ATOM 1,0,0\n" +
 				"7->3 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(g, expecting);
 	}
 
 	@Test public void testLexerTwoRules() throws Exception {
@@ -287,7 +275,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"8->4 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -304,14 +293,14 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4:BASIC 0\n" +
 			"rule 0:1 1\n" +
 			"mode 0:0\n" +
-			"0:128169..128169\n" +
 			"0->1 EPSILON 0,0,0\n" +
 			"1->3 EPSILON 0,0,0\n" +
-			"3->4 SET 0,0,0\n" +
+			"3->4 ATOM 128169,0,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -328,49 +317,94 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4:BASIC 0\n" +
 			"rule 0:1 1\n" +
 			"mode 0:0\n" +
-			"0:'a'..128169\n" +
 			"0->1 EPSILON 0,0,0\n" +
 			"1->3 EPSILON 0,0,0\n" +
-			"3->4 SET 0,0,0\n" +
+			"3->4 RANGE 97,128169,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
-	@Test public void testLexerUnicodeSMPSetSerializedAfterBMPSet() throws Exception {
+	@Test public void testLexerUnicodeSMPAndBMPSetSerialized() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
-			"lexer grammar L;\n"+
-			"SMP : ('\\u{1F4A9}' | '\\u{1F4AF}') ;\n"+
-			"BMP : ('a' | 'x') ;");
+				"lexer grammar L;\n"+
+						"SMP : ('\\u{1F4A9}' | '\\u{1F4AF}') ;\n"+
+						"BMP : ('a' | 'x') ;");
 		String expecting =
-			"max type 2\n" +
-			"0:TOKEN_START -1\n" +
-			"1:RULE_START 0\n" +
-			"2:RULE_STOP 0\n" +
-			"3:RULE_START 1\n" +
-			"4:RULE_STOP 1\n" +
-			"5:BASIC 0\n" +
-			"6:BASIC 0\n" +
-			"7:BASIC 1\n" +
-			"8:BASIC 1\n" +
-			"rule 0:1 1\n" +
-			"rule 1:3 2\n" +
-			"mode 0:0\n" +
-			"0:'a'..'a', 'x'..'x'\n" +
-			"1:128169..128169, 128175..128175\n" +
-			"0->1 EPSILON 0,0,0\n" +
-			"0->3 EPSILON 0,0,0\n" +
-			"1->5 EPSILON 0,0,0\n" +
-			"3->7 EPSILON 0,0,0\n" +
-			"5->6 SET 1,0,0\n" +
-			"6->2 EPSILON 0,0,0\n" +
-			"7->8 SET 0,0,0\n" +
-			"8->4 EPSILON 0,0,0\n" +
-			"0:0\n";
+				"max type 2\n" +
+						"0:TOKEN_START -1\n" +
+						"1:RULE_START 0\n" +
+						"2:RULE_STOP 0\n" +
+						"3:RULE_START 1\n" +
+						"4:RULE_STOP 1\n" +
+						"5:BASIC 0\n" +
+						"6:BASIC 0\n" +
+						"7:BASIC 1\n" +
+						"8:BASIC 1\n" +
+						"rule 0:1 1\n" +
+						"rule 1:3 2\n" +
+						"mode 0:0\n" +
+						"0:128169..128169, 128175..128175\n" +
+						"1:'a'..'a', 'x'..'x'\n" +
+						"0->1 EPSILON 0,0,0\n" +
+						"0->3 EPSILON 0,0,0\n" +
+						"1->5 EPSILON 0,0,0\n" +
+						"3->7 EPSILON 0,0,0\n" +
+						"5->6 SET 0,0,0\n" +
+						"6->2 EPSILON 0,0,0\n" +
+						"7->8 SET 1,0,0\n" +
+						"8->4 EPSILON 0,0,0\n" +
+						"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerWith0xFFFCInSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+						"ID : ([A-Z_]|'Ā'..'\\uFFFC') ([A-Z_0-9]|'Ā'..'\\uFFFC')*; // FFFD+ are not valid char\n");
+		String expecting =
+				"max type 1\n" +
+				"0:TOKEN_START -1\n" +
+				"1:RULE_START 0\n" +
+				"2:RULE_STOP 0\n" +
+				"3:BASIC 0\n" +
+				"4:BLOCK_START 0 5\n" +
+				"5:BLOCK_END 0\n" +
+				"6:BASIC 0\n" +
+				"7:STAR_BLOCK_START 0 8\n" +
+				"8:BLOCK_END 0\n" +
+				"9:STAR_LOOP_ENTRY 0\n" +
+				"10:LOOP_END 0 11\n" +
+				"11:STAR_LOOP_BACK 0\n" +
+				"rule 0:1 1\n" +
+				"mode 0:0\n" +
+				"0:'A'..'Z', '_'..'_', '\\u0100'..'\\uFFFC'\n" +
+				"1:'0'..'9', 'A'..'Z', '_'..'_', '\\u0100'..'\\uFFFC'\n" +
+				"0->1 EPSILON 0,0,0\n" +
+				"1->4 EPSILON 0,0,0\n" +
+				"3->5 SET 0,0,0\n" +
+				"4->3 EPSILON 0,0,0\n" +
+				"5->9 EPSILON 0,0,0\n" +
+				"6->8 SET 1,0,0\n" +
+				"7->6 EPSILON 0,0,0\n" +
+				"8->11 EPSILON 0,0,0\n" +
+				"9->7 EPSILON 0,0,0\n" +
+				"9->10 EPSILON 0,0,0\n" +
+				"10->2 EPSILON 0,0,0\n" +
+				"11->9 EPSILON 0,0,0\n" +
+				"0:0\n" +
+				"1:4\n" +
+				"2:7\n" +
+				"3:9\n";
+		ATN atn = createATN(lg, true);
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -394,7 +428,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -417,7 +452,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -442,7 +478,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -471,7 +508,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"0:0\n" +
 				"1:5\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -502,7 +540,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"0:0\n" +
 				"1:6\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -549,7 +588,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"14->6 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -572,9 +612,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"3->4 NOT_SET 0,0,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
-		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(lg, expecting);
 	}
 
 	@Test public void testLexerSetWithRange() throws Exception {
@@ -597,7 +635,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -621,7 +660,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -645,7 +685,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -669,7 +710,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -693,7 +735,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -717,7 +760,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -741,7 +785,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -765,7 +810,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -789,7 +835,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -813,7 +860,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -837,7 +885,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -900,7 +949,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"1:1\n" +
 				"2:11\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -927,7 +977,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -984,7 +1035,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"0:0\n" +
 			"1:1\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(lg.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
 	}
 
@@ -1034,9 +1086,23 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"0:0\n" +
 			"1:1\n" +
 			"2:2\n";
-		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
-		assertEquals(expecting, result);
+		checkResults(lg, expecting);
 	}
 
+	private void checkResults(Grammar g, String expecting) {
+		ATN atn = createATN(g, true);
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String result = new ATNDescriber(atn, Arrays.asList(g.getTokenNames())).decode(serialized.toArray());
+		assertEquals(expecting, result);
+
+		IntegerList serialized16 = encodeIntsWith16BitWords(serialized);
+		int[] ints16 = serialized16.toArray();
+		char[] chars = new char[ints16.length];
+		for (int i = 0; i < ints16.length; i++) {
+			chars[i] = (char)ints16[i];
+		}
+		int[] serialized32 = decodeIntsEncodedAs16BitWords(chars, true);
+
+		assertArrayEquals(serialized.toArray(), serialized32);
+	}
 }

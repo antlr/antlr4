@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : (A {<writeln("$A.text")>})+ ;
+A : [AaBb] ;
+WS : (' '|'\n')+ -> skip ;
+
+[start]
+a
+
+[input]
+A a B b
+
+[output]
+A
+a
+B
+b
+

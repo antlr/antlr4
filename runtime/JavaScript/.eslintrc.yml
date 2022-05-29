@@ -1,0 +1,18 @@
+env:
+  browser: true
+  node: true
+  es2016: true
+  amd: true
+  jasmine: true
+extends: 'eslint:recommended'
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+  Set: readonly
+# parser: babel-eslint
+parserOptions:
+  sourceType: module
+rules:
+  no-unused-vars: ["error", {vars: "all", args: "none"}]
+  no-prototype-builtins: [ "off" ]
+  no-fallthrough: ["error", { "commentPattern": "no-break" }]

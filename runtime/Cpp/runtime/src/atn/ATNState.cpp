@@ -13,30 +13,15 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-ATNState::ATNState() {
-}
-
-ATNState::~ATNState() {
-  for (auto *transition : transitions) {
-    delete transition;
-  }
-}
-
-const std::vector<std::string> ATNState::serializationNames = {
-  "INVALID", "BASIC", "RULE_START", "BLOCK_START",
-  "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP",
-  "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"
-};
-
-size_t ATNState::hashCode() {
+size_t ATNState::hashCode() const {
   return stateNumber;
 }
 
-bool ATNState::operator == (const ATNState &other) {
+bool ATNState::equals(const ATNState &other) const {
   return stateNumber == other.stateNumber;
 }
 
-bool ATNState::isNonGreedyExitState() {
+bool ATNState::isNonGreedyExitState() const {
   return false;
 }
 
@@ -44,14 +29,13 @@ std::string ATNState::toString() const {
   return std::to_string(stateNumber);
 }
 
-void ATNState::addTransition(Transition *e) {
-  addTransition(transitions.size(), e);
+void ATNState::addTransition(ConstTransitionPtr e) {
+  addTransition(transitions.size(), std::move(e));
 }
 
-void ATNState::addTransition(size_t index, Transition *e) {
-  for (Transition *transition : transitions)
+void ATNState::addTransition(size_t index, ConstTransitionPtr e) {
+  for (const auto &transition : transitions)
     if (transition->target->stateNumber == e->target->stateNumber) {
-      delete e;
       return;
     }
 
@@ -62,11 +46,11 @@ void ATNState::addTransition(size_t index, Transition *e) {
     epsilonOnlyTransitions = false;
   }
 
-  transitions.insert(transitions.begin() + index, e);
+  transitions.insert(transitions.begin() + index, std::move(e));
 }
 
-Transition *ATNState::removeTransition(size_t index) {
-  Transition *result = transitions[index];
+ConstTransitionPtr ATNState::removeTransition(size_t index) {
+  ConstTransitionPtr result = std::move(transitions[index]);
   transitions.erase(transitions.begin() + index);
   return result;
 }

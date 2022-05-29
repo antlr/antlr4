@@ -13,11 +13,13 @@ namespace atn {
   /// Terminal node of a simple {@code (a|b|c)} block.
   class ANTLR4CPP_PUBLIC BlockEndState final : public ATNState {
   public:
+    static bool is(const ATNState &atnState) { return atnState.getStateType() == ATNStateType::BLOCK_END; }
+
+    static bool is(const ATNState *atnState) { return atnState != nullptr && is(*atnState); }
+
     BlockStartState *startState = nullptr;
 
-    BlockEndState();
-
-    virtual size_t getStateType() override;
+    BlockEndState() : ATNState(ATNStateType::BLOCK_END) {}
   };
 
 } // namespace atn
