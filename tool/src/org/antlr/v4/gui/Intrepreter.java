@@ -6,10 +6,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.DecisionInfo;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarParserInterpreter;
-import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -47,7 +44,7 @@ public class Intrepreter {
 	protected String encoding = null;
 	protected boolean showTokens = false;
 	protected boolean profile = false;
-	protected final List<String> inputFiles = new ArrayList<String>();
+	protected String inputFileName;
 
 	public Intrepreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
@@ -66,6 +63,7 @@ public class Intrepreter {
 			parserGrammarFileName = grammarFileName;
 			lexerGrammarFileName = args[i];
 			i++;
+			grammarFileName = null;
 		}
 		startRuleName = args[i];
 		i++;
@@ -73,7 +71,7 @@ public class Intrepreter {
 			String arg = args[i];
 			i++;
 			if ( arg.charAt(0)!='-' ) { // input file name
-				inputFiles.add(arg);
+				inputFileName = arg;
 			}
 			else if ( arg.equals("-tree") ) {
 				printTree = true;
@@ -98,38 +96,39 @@ public class Intrepreter {
 		}
 	}
 
-	protected ParseInfo interp(Grammar g, String startRule, String inputFileName)
-			throws RecognitionException, IOException {
+	protected ParseInfo interp(Grammar g, LexerGrammar lg) throws RecognitionException, IOException {
 		Charset charset = ( encoding == null ? Charset.defaultCharset () : Charset.forName(encoding) );
 		CharStream charStream = CharStreams.fromPath(Paths.get(inputFileName), charset);
-		LexerInterpreter lexEngine = g.createLexerInterpreter(charStream);
-
-		class SyntaxErrorListener extends BaseErrorListener {
-			@Override
-			public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, org.antlr.v4.runtime.RecognitionException e) {
-				super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-			}
-		};
-
-		SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
-//		lexEngine.removeErrorListeners();
-		lexEngine.addErrorListener(syntaxErrorListener);
+		LexerInterpreter lexEngine = (lg!=null) ?
+				lg.createLexerInterpreter(charStream) :
+				g.createLexerInterpreter(charStream);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		GrammarParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
 		parser.setProfile(true);
-//		parser.setTrace(true);
-//		tokens.fill();
-//		System.out.println(tokens.getTokens());
 
-		Rule r = g.rules.get(startRule);
-		ParseInfo parseInfo = parser.getParseInfo();
+		Rule r = g.rules.get(startRuleName);
 		if (r == null) {
-			return parseInfo;
+			System.err.println("No such start rule: "+startRuleName);
+			return null;
 		}
 		ParseTree t = parser.parse(r.index);
-		System.out.println(t.toStringTree(parser));
+		ParseInfo parseInfo = parser.getParseInfo();
 
+		if ( printTree ) {
+			System.out.println(t.toStringTree(parser));
+		}
+		if ( gui ) {
+			Trees.inspect(t, parser);
+		}
+		if ( profile ) {
+			dumpProfilerCSV(parser, parseInfo);
+		}
+
+		return parseInfo;
+	}
+
+	private void dumpProfilerCSV(GrammarParserInterpreter parser, ParseInfo parseInfo) {
 		String[] ruleNamesByDecision = new String[parser.getATN().decisionToState.size()];
 		for(int i = 0; i < ruleNamesByDecision .length; i++) {
 			ruleNamesByDecision [i] = parser.getRuleNames()[parser.getATN().getDecisionState(i).ruleIndex];
@@ -156,8 +155,6 @@ public class Intrepreter {
 			}
 			System.out.println();
 		}
-
-		return parseInfo;
 	}
 
 	protected static Object getValue(DecisionInfo decisionInfo,
@@ -185,14 +182,23 @@ public class Intrepreter {
 		return "n/a";
 	}
 
-
 	public static void main(String[] args) throws Exception {
 		Intrepreter I = new Intrepreter(args);
+		DefaultToolListener listener = new DefaultToolListener(new Tool());
 
-		String grammarContent = Files.readString(Path.of(I.grammarFileName));
-		Grammar g = new Grammar(grammarContent);
+		if (I.grammarFileName != null) {
 
-		ParseInfo parseInfo = I.interp(g, I.startRuleName, I.inputFiles.get(0));
+			String grammarContent = Files.readString(Path.of(I.grammarFileName));
+			Grammar g = new Grammar(I.grammarFileName, grammarContent, null, listener);
+			ParseInfo parseInfo = I.interp(g, null);
+		}
+		else {
+			String lexerGrammarContent = Files.readString(Path.of(I.lexerGrammarFileName));
+			LexerGrammar lg = new LexerGrammar(lexerGrammarContent, listener);
+			String parserGrammarContent = Files.readString(Path.of(I.parserGrammarFileName));
+			Grammar g = new Grammar(I.parserGrammarFileName, parserGrammarContent, lg, listener);
+			ParseInfo parseInfo = I.interp(g, lg);
+		}
 //		System.out.println(Arrays.toString(info));
 	}
 }
