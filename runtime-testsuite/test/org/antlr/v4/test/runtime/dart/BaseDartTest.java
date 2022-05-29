@@ -36,10 +36,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 							String lexerName,
 							String input,
 							boolean showDFA) {
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-			grammarStr,
-			null,
-			lexerName);
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, false);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerFile(lexerName, showDFA);
@@ -56,60 +53,23 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 							 String startRuleName,
 							 String input,
 							 boolean showDiagnosticErrors) {
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-				grammarStr,
-				parserName,
-				lexerName,
-			"-visitor");
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, false, "-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
 		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
+				false, listenerName != null, visitorName != null);
 		return execClass("Test", false);
 	}
 
-	/**
-	 * Return true if all is well
-	 */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													String parserName,
-													String lexerName,
-													String... extraOptions) {
-		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
-	}
-
-	/**
-	 * Return true if all is well
-	 */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-													String grammarStr,
-													String parserName,
-													String lexerName,
 													boolean defaultListener,
 													String... extraOptions) {
-		ErrorQueue equeue =
+		ErrorQueue errorQueue =
 			BaseRuntimeTest.antlrOnString(getTempDirPath(), "Dart", grammarFileName, grammarStr, defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
+		if (!errorQueue.errors.isEmpty()) {
 			return false;
-		}
-
-		List<String> files = new ArrayList<String>();
-		if (lexerName != null) {
-			files.add(lexerName + ".dart");
-		}
-		if (parserName != null) {
-			files.add(parserName + ".dart");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarName + "Listener.dart");
-				files.add(grammarName + "BaseListener.dart");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarName + "Visitor.dart");
-				files.add(grammarName + "BaseVisitor.dart");
-			}
 		}
 
 		String runtime = getRuntimePath();

@@ -26,6 +26,24 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return "Go";
 	}
 
+	@Override
+	public String getLexerSuffix() { return "_lexer"; }
+
+	@Override
+	public String getParserSuffix() { return "_parser"; }
+
+	@Override
+	public String getBaseListenerSuffix() { return "_base_listener"; }
+
+	@Override
+	public String getListenerSuffix() { return "_listener"; }
+
+	@Override
+	public String getBaseVisitorSuffix() { return "_base_visitor"; }
+
+	@Override
+	public String getVisitorSuffix() { return "_visitor"; }
+
 	private final static String antlrTestPackageName = "antlr";
 	private static final String goModFileName = "go.mod";
 	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/antlr/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
@@ -61,16 +79,10 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 	}
 
-	protected String execLexer(String grammarFileName, String grammarStr,
-	                           String lexerName, String input) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
-	}
-
 	@Override
 	public  String execLexer(String grammarFileName, String grammarStr,
 	                         String lexerName, String input, boolean showDFA) {
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr, null, lexerName, "-no-listener");
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr);
 		assertTrue(success);
 		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
@@ -85,15 +97,15 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	                         String visitorName, String startRuleName, String input,
 	                         boolean showDiagnosticErrors)
 	{
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-		                                                grammarStr, parserName, lexerName, "-visitor");
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, "-visitor");
 		assertTrue(success);
 		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
 		writeGoModFile();
 		setParseErrors(null);
 		String ruleNameFunction = startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
-		writeRecognizerFile(lexerName, parserName, ruleNameFunction, showDiagnosticErrors, false);
+		writeRecognizerFile(lexerName, parserName, ruleNameFunction, showDiagnosticErrors, false, false,
+				listenerName != null, visitorName != null);
 		return execModule("Test.go");
 	}
 
@@ -143,20 +155,10 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	}
 
 	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-	                                                String grammarStr, String parserName, String lexerName,
-	                                                String... extraOptions) {
-		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr,
-		                                     parserName, lexerName, false, extraOptions);
-	}
-
-	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-	                                                String grammarStr, String parserName, String lexerName,
-	                                                boolean defaultListener, String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTempParserDirPath(), "Go", grammarFileName, grammarStr,
-		                                  defaultListener, extraOptions);
-		return equeue.errors.isEmpty();
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName, String grammarStr, String... extraOptions) {
+		ErrorQueue errorQueue = antlrOnString(getTempParserDirPath(), "Go", grammarFileName, grammarStr,
+				false, extraOptions);
+		return errorQueue.errors.isEmpty();
 	}
 
 	private String execModule(String fileName) {

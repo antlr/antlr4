@@ -139,7 +139,8 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 				lexerName,
 				"-visitor");
 		writeFile(getTempDirPath(), "input", input);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
+				false, listenerName != null, visitorName != null);
 
 		addSourceFiles("main.swift");
 		String projectName = "testcase-" + System.currentTimeMillis();
@@ -296,29 +297,9 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 								String parserName,
 								String lexerName,
 								String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTempDirPath(), "Swift", grammarFileName, grammarStr, false, extraOptions);
-		assertTrue(equeue.errors.isEmpty());
-//		System.out.println(getTmpDir());
-
-		List<String> files = new ArrayList<>();
-		if (lexerName != null) {
-			files.add(lexerName + ".swift");
-		}
-
-		if (parserName != null) {
-			files.add(parserName + ".swift");
-			Set<String> optionsSet = new HashSet<>(Arrays.asList(extraOptions));
-			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarName + "Listener.swift");
-				files.add(grammarName + "BaseListener.swift");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarName + "Visitor.swift");
-				files.add(grammarName + "BaseVisitor.swift");
-			}
-		}
+		ErrorQueue errorQueue = antlrOnString(getTempDirPath(), "Swift", grammarFileName, grammarStr, false, extraOptions);
+		assertTrue(errorQueue.errors.isEmpty());
+		List<String> files = getGeneratedFiles(grammarFileName, lexerName, parserName, extraOptions);
 		addSourceFiles(files.toArray(new String[0]));
 	}
-
 }

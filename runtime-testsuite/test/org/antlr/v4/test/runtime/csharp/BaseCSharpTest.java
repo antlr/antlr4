@@ -7,19 +7,13 @@ package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
-import org.stringtemplate.v4.ST;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -44,13 +38,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	@Override
 	protected String getPropertyPrefix() {
 		return "antlr4-csharp";
-	}
-
-	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
 	}
 
 	@Override
@@ -101,10 +88,11 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		return rawExecRecognizer(parserName,
-				lexerName,
-				startRuleName,
-				showDiagnosticErrors);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false, false,
+				listenerName != null, visitorName != null);
+		addSourceFiles("Test.cs");
+		return execRecognizer();
 	}
 
 	/**
@@ -115,52 +103,13 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 											String parserName,
 											String lexerName,
 											String... extraOptions) {
-		return rawGenerateRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
-	}
-
-	/**
-	 * Return true if all is well
-	 */
-	protected boolean rawGenerateRecognizer(String grammarFileName,
-											String grammarStr,
-											String parserName,
-											String lexerName,
-											boolean defaultListener,
-											String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTempDirPath(), "CSharp", grammarFileName, grammarStr, defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
+		ErrorQueue errorQueue = antlrOnString(getTempDirPath(), "CSharp", grammarFileName, grammarStr, false, extraOptions);
+		if (!errorQueue.errors.isEmpty()) {
 			return false;
 		}
 
-		List<String> files = new ArrayList<String>();
-		if (lexerName != null) {
-			files.add(lexerName + ".cs");
-		}
-		if (parserName != null) {
-			files.add(parserName + ".cs");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarName + "Listener.cs");
-				files.add(grammarName + "BaseListener.cs");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarName + "Visitor.cs");
-				files.add(grammarName + "BaseVisitor.cs");
-			}
-		}
-		addSourceFiles(files.toArray(new String[0]));
+		addSourceFiles(getGeneratedFiles(grammarFileName, lexerName, parserName, extraOptions).toArray(new String[0]));
 		return true;
-	}
-
-	protected String rawExecRecognizer(String parserName,
-									   String lexerName,
-									   String parserStartRuleName,
-									   boolean debug) {
-		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, false);
-		addSourceFiles("Test.cs");
-		return execRecognizer();
 	}
 
 	public String execRecognizer() {

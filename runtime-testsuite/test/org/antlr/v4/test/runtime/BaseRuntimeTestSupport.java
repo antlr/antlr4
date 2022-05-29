@@ -40,6 +40,46 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	public String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
 
+	public String getLexerSuffix() { return "Lexer"; }
+
+	public String getParserSuffix() { return "Parser"; }
+
+	public String getBaseListenerSuffix() { return "BaseListener"; }
+
+	public String getListenerSuffix() { return "Listener"; }
+
+	public String getBaseVisitorSuffix() { return "BaseVisitor"; }
+
+	public String getVisitorSuffix() { return "Visitor"; }
+
+	public List<String> getGeneratedFiles(String grammarFileName, String lexerName, String parserName, String... extraOptions) {
+		List<String> files = new ArrayList<>();
+		String extensionWithDot = "." + getExtension();
+		if (lexerName != null) {
+			files.add(lexerName + extensionWithDot);
+		}
+		if (parserName != null) {
+			files.add(parserName + extensionWithDot);
+			Set<String> optionsSet = new HashSet<>(Arrays.asList(extraOptions));
+			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
+			if (!optionsSet.contains("-no-listener")) {
+				files.add(grammarName + getListenerSuffix() + extensionWithDot);
+				String baseListenerSuffix = getBaseListenerSuffix();
+				if (baseListenerSuffix != null) {
+					files.add(grammarName + baseListenerSuffix + extensionWithDot);
+				}
+			}
+			if (optionsSet.contains("-visitor")) {
+				files.add(grammarName + getVisitorSuffix() + extensionWithDot);
+				String baseVisitorSuffix = getBaseVisitorSuffix();
+				if (baseVisitorSuffix != null) {
+					files.add(grammarName + baseVisitorSuffix + extensionWithDot);
+				}
+			}
+		}
+		return files;
+	}
+
 	private static final Map<String, String> runtimePaths = new ConcurrentHashMap<>();
 
 	public String getRuntimePath() {
@@ -285,11 +325,6 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	protected void writeLexerFile(String lexerName, boolean showDFA) {
 		writeRecognizerFile(lexerName, null, null, false, false, showDFA, false, false);
-	}
-
-	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,
-									   boolean debug, boolean profile) {
-		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, profile, false, true, true);
 	}
 
 	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,

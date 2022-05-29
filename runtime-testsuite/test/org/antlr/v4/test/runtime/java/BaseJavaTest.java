@@ -273,11 +273,11 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		                                                "-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		return rawExecRecognizer(parserName,
-								 lexerName,
-								 startRuleName,
-								 showDiagnosticErrors,
-								 profile);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, profile, false,
+				listenerName != null, visitorName != null);
+		compile("Test.java");
+		return execClass("Test");
 	}
 
 	/** Return true if all is well */
@@ -304,39 +304,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			return false;
 		}
 
-		List<String> files = new ArrayList<String>();
-		if ( lexerName!=null ) {
-			files.add(lexerName+".java");
-		}
-		if ( parserName!=null ) {
-			files.add(parserName+".java");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarName+"Listener.java");
-				files.add(grammarName+"BaseListener.java");
-			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarName+"Visitor.java");
-				files.add(grammarName+"BaseVisitor.java");
-			}
-		}
-		return compile(files.toArray(new String[0]));
-	}
-
-	protected String rawExecRecognizer(String parserName,
-									   String lexerName,
-									   String parserStartRuleName,
-									   boolean debug,
-									   boolean profile) {
-		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, profile);
-		compile("Test.java");
-		return execClass("Test");
-	}
-
-	public String execRecognizer() {
-		return execClass("Test");
+		return compile(getGeneratedFiles(grammarFileName, lexerName, parserName, extraOptions).toArray(new String[0]));
 	}
 
 	public String execClass(String className) {
