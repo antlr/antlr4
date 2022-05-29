@@ -1,0 +1,54 @@
+package main
+import (
+	"test/parser"
+	"antlr"
+	"fmt"
+	"os"
+)
+
+<if(parserName)>
+type TreeShapeListener struct {
+	*parser.Base<grammarName>Listener
+}
+
+func NewTreeShapeListener() *TreeShapeListener {
+	return new(TreeShapeListener)
+}
+
+func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
+	for i := 0; i\<ctx.GetChildCount(); i++ {
+		child := ctx.GetChild(i)
+		parentR,ok := child.GetParent().(antlr.RuleNode)
+		if !ok || parentR.GetBaseRuleContext() != ctx.GetBaseRuleContext() {
+			panic("Invalid parse tree shape detected.")
+		}
+	}
+}
+<endif>
+
+func main() {
+	input, err := antlr.NewFileStream(os.Args[1])
+		if err != nil {
+		fmt.Printf("Failed to find file: %v", err)
+		return
+	}
+	lexer := parser.New<lexerName>(input)
+	stream := antlr.NewCommonTokenStream(lexer,0)
+<if(parserName)>
+	p := parser.New<parserName>(stream)
+<if(debug)>
+	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+<endif>
+	p.BuildParseTrees = true
+	tree := p.<parserStartRuleName>()
+	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
+<else>
+	stream.Fill()
+	for _, t := range stream.GetAllTokens() {
+		fmt.Println(t)
+	}
+<if(showDFA)>
+	fmt.Print(lexer.GetInterpreter().DecisionToDFA()[antlr.LexerDefaultMode].ToLexerString())
+<endif>
+<endif>
+}

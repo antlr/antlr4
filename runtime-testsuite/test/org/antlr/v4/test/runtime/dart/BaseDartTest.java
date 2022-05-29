@@ -8,10 +8,8 @@ package org.antlr.v4.test.runtime.dart;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.test.runtime.*;
-import org.stringtemplate.v4.ST;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 
 import static junit.framework.TestCase.*;
@@ -20,6 +18,10 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 
 public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "Dart";
+	}
 
 	private static String cacheDartPackages;
 	private static String cacheDartPackageConfig;
@@ -40,9 +42,8 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			lexerName);
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
-		String output = execClass("Test", false);
-		return output;
+		writeLexerFile(lexerName, showDFA);
+		return execClass("Test", false);
 	}
 
 	@Override
@@ -55,33 +56,16 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 							 String startRuleName,
 							 String input,
 							 boolean showDiagnosticErrors) {
-		return execParser(grammarFileName, grammarStr, parserName, lexerName,
-			listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
-	}
-
-	public String execParser(String grammarFileName,
-							 String grammarStr,
-							 String parserName,
-							 String lexerName,
-							 String listenerName,
-							 String visitorName,
-							 String startRuleName,
-							 String input,
-							 boolean showDiagnosticErrors,
-							 boolean profile) {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-			grammarStr,
-			parserName,
-			lexerName,
+				grammarStr,
+				parserName,
+				lexerName,
 			"-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		return rawExecRecognizer(parserName,
-			lexerName,
-			startRuleName,
-			showDiagnosticErrors,
-			profile,
-			false);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
+		return execClass("Test", false);
 	}
 
 	/**
@@ -128,7 +112,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			}
 		}
 
-		String runtime = locateRuntime();
+		String runtime = getRuntimePath();
 		writeFile(getTempDirPath(), "pubspec.yaml",
 			"name: \"test\"\n" +
 				"dependencies:\n" +
@@ -175,27 +159,6 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			writeFile(dartToolDir.getAbsolutePath(), "package_config.json", cacheDartPackageConfig);
 		}
 		return true; // allIsWell: no compile
-	}
-
-	protected String rawExecRecognizer(String parserName,
-									   String lexerName,
-									   String parserStartRuleName,
-									   boolean debug,
-									   boolean profile,
-									   boolean aotCompile) {
-		setParseErrors(null);
-		if (parserName == null) {
-			writeLexerTestFile(lexerName, false);
-		}
-		else {
-			writeTestFile(parserName,
-				lexerName,
-				parserStartRuleName,
-				debug,
-				profile);
-		}
-
-		return execClass("Test", aotCompile);
 	}
 
 	public String execClass(String className, boolean compile) {
@@ -325,103 +288,4 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 		return file.getAbsolutePath();
 	}
-
-	private String locateRuntime() {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("Dart");
-		if (runtimeSrc == null) {
-			throw new RuntimeException("Cannot find Dart runtime");
-		}
-		if (isWindows()) {
-			return runtimeSrc.getPath().replaceFirst("/", "");
-		}
-		return runtimeSrc.getPath();
-	}
-
-	protected void writeTestFile(String parserName,
-								 String lexerName,
-								 String parserStartRuleName,
-								 boolean debug,
-								 boolean profile) {
-		ST outputFileST = new ST(
-			"import 'package:antlr4/antlr4.dart';\n" +
-				"\n" +
-				"import '<lexerName>.dart';\n" +
-				"import '<parserName>.dart';\n" +
-				"\n" +
-				"void main(List\\<String> args) async {\n" +
-				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
-				"  final lex = <lexerName>(input);\n" +
-				"  final tokens = CommonTokenStream(lex);\n" +
-				"  <createParser>\n" +
-				"  parser.buildParseTree = true;\n" +
-				"  <profile>\n" +
-				"  ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-				"  <if(profile)>print('[${profiler.getDecisionInfo().join(', ')}]');<endif>\n" +
-				"  ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree);\n" +
-				"}\n" +
-				"\n" +
-				"class TreeShapeListener implements ParseTreeListener {\n" +
-				"  @override void visitTerminal(TerminalNode node) {}\n" +
-				"\n" +
-				"  @override void visitErrorNode(ErrorNode node) {}\n" +
-				"\n" +
-				"  @override void exitEveryRule(ParserRuleContext ctx) {}\n" +
-				"\n" +
-				"  @override\n" +
-				"  void enterEveryRule(ParserRuleContext ctx) {\n" +
-				"    for (var i = 0; i \\< ctx.childCount; i++) {\n" +
-				"      final parent = ctx.getChild(i)?.parent;\n" +
-				"      if (!(parent is RuleNode) || (parent as RuleNode).ruleContext != ctx) {\n" +
-				"        throw StateError('Invalid parse tree shape detected.');\n" +
-				"      }\n" +
-				"    }\n" +
-				"  }\n" +
-				"}\n"
-		);
-		ST createParserST = new ST("final parser = <parserName>(tokens);\n");
-		if (debug) {
-			createParserST =
-				new ST(
-					"final parser = <parserName>(tokens);\n" +
-						"  parser.addErrorListener(new DiagnosticErrorListener());\n");
-		}
-		if (profile) {
-			outputFileST.add("profile",
-				"ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);\n" +
-					"parser.setInterpreter(profiler);");
-		} else {
-			outputFileST.add("profile", new ArrayList<Object>());
-		}
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(getTempDirPath(), "Test.dart", outputFileST.render());
-	}
-
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-		ST outputFileST = new ST(
-			"import 'dart:io';\n" +
-				"\n" +
-				"import 'package:antlr4/antlr4.dart';\n" +
-				"\n" +
-				"import '<lexerName>.dart';\n" +
-				"\n" +
-				"void main(List\\<String> args) async {\n" +
-				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
-				"  <lexerName> lex = <lexerName>(input);\n" +
-				"  CommonTokenStream tokens = CommonTokenStream(lex);\n" +
-				"  tokens.fill();\n" +
-				"  for (Object t in tokens.getTokens()!)\n" +
-				"    print(t);\n" +
-				"\n" +
-				(showDFA ? "stdout.write(lex.interpreter!.getDFA(Lexer.DEFAULT_MODE).toLexerString());\n" : "") +
-				"}\n"
-		);
-
-		outputFileST.add("lexerName", lexerName);
-		writeFile(getTempDirPath(), "Test.dart", outputFileST.render());
-	}
-
 }

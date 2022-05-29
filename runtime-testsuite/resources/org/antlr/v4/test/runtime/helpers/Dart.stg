@@ -1,0 +1,60 @@
+import 'dart:io';
+import 'package:antlr4/antlr4.dart';
+
+import '<lexerName>.dart';
+<if(parserName)>
+import '<parserName>.dart';
+<endif>
+
+void main(List\<String> args) async {
+  CharStream input = await InputStream.fromPath(args[0]);
+  final lex = <lexerName>(input);
+  final tokens = CommonTokenStream(lex);
+<if(parserName)>
+  final parser = <parserName>(tokens);
+<if(debug)>
+  parser.addErrorListener(new DiagnosticErrorListener());
+<endif>
+<if(profile)>
+  ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
+  parser.setInterpreter(profiler);
+<endif>
+  parser.buildParseTree = true;
+<if(profile)>
+  ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
+  parser.setInterpreter(profiler);
+<endif>
+  ParserRuleContext tree = parser.<parserStartRuleName>();
+<if(profile)>
+  print('[${profiler.getDecisionInfo().join(', ')}]');
+<endif>
+  ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree);
+<else>
+  tokens.fill();
+  for (Object t in tokens.getTokens()!)
+    print(t);
+<if(showDFA)>
+  stdout.write(lex.interpreter!.getDFA(Lexer.DEFAULT_MODE).toLexerString());
+<endif>
+<endif>
+}
+
+<if(parserName)>
+class TreeShapeListener implements ParseTreeListener {
+  @override void visitTerminal(TerminalNode node) {}
+
+  @override void visitErrorNode(ErrorNode node) {}
+
+  @override void exitEveryRule(ParserRuleContext ctx) {}
+
+  @override
+  void enterEveryRule(ParserRuleContext ctx) {
+    for (var i = 0; i \< ctx.childCount; i++) {
+      final parent = ctx.getChild(i)?.parent;
+      if (!(parent is RuleNode) || (parent as RuleNode).ruleContext != ctx) {
+        throw StateError('Invalid parse tree shape detected.');
+      }
+    }
+  }
+}
+<endif>

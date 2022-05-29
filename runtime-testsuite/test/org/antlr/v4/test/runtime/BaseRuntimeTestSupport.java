@@ -14,18 +14,51 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
+	public abstract String getLanguage();
+
+	public String getExtension() {
+		return getLanguage().toLowerCase();
+	}
+
+	public String getTestFileName() { return "Test"; }
+
+	public String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
+
+	private static final Map<String, String> runtimePaths = new ConcurrentHashMap<>();
+
+	public String getRuntimePath() {
+		return getRuntimePath(getLanguage());
+	}
+
+	public static String getRuntimePath(String language) {
+		String runtimePath = runtimePaths.get(language);
+		if (runtimePath == null) {
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			URL resource = loader.getResource(language);
+			runtimePath = resource.getPath();
+			if(isWindows()){
+				runtimePath = runtimePath.replaceFirst("/", "");
+			}
+			runtimePaths.put(language, runtimePath);
+		}
+		return runtimePath;
+	}
 
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	protected static final Logger logger = Logger.getLogger(BaseRuntimeTestSupport.class.getName());
@@ -44,6 +77,7 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 	private StringBuilder antlrToolErrors;
 
 	public static String cachingDirectory;
+
 
 	static {
 		cachingDirectory = new File(System.getProperty("java.io.tmpdir"), "ANTLR-runtime-testsuite-cache").getAbsolutePath();
@@ -249,9 +283,54 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		}
 	}
 
+	protected void writeLexerFile(String lexerName, boolean showDFA) {
+		writeRecognizerFile(lexerName, null, null, false, false, showDFA, false, false);
+	}
+
+	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,
+									   boolean debug, boolean profile) {
+		writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, profile, false, true, true);
+	}
+
+	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,
+									   boolean debug, boolean profile, boolean showDFA,
+									   boolean useListener, boolean useVisitor) {
+		String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + getLanguage() + ".stg");
+		ST outputFileST = new ST(text);
+		outputFileST.add("runtimePath", getRuntimePath());
+		outputFileST.add("lexerName", lexerName);
+		outputFileST.add("parserName", parserName);
+		String grammarName = null;
+		if (parserName != null) {
+			grammarName = parserName.endsWith("Parser")
+					? parserName.substring(0, parserName.length() - "Parser".length())
+					: parserName;
+		}
+		if (grammarName == null) {
+			grammarName = lexerName.endsWith("Lexer")
+					? lexerName.substring(0, lexerName.length() - "Lexer".length())
+					: lexerName;
+		}
+		outputFileST.add("grammarName", grammarName);
+		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		outputFileST.add("debug", debug);
+		outputFileST.add("profile", profile);
+		outputFileST.add("showDFA", showDFA);
+		outputFileST.add("useListener", useListener);
+		outputFileST.add("useVisitor", useVisitor);
+		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
+	}
+
+	final static ConcurrentHashMap<String, String> resourceCache = new ConcurrentHashMap<>();
+
 	protected static String getTextFromResource(String name) {
 		try {
-			return new String(Files.readAllBytes(Paths.get(BaseCppTest.class.getClassLoader().getResource(name).toURI())));
+			String text = resourceCache.get(name);
+			if (text == null) {
+				text = new String(Files.readAllBytes(Paths.get(BaseCppTest.class.getClassLoader().getResource(name).toURI())));
+				resourceCache.put(name, text);
+			}
+			return text;
 		}
 		catch (Exception ex) {
 			return null;

@@ -9,8 +9,6 @@ import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,13 +22,13 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	@Override
+	public String getLanguage() {
+		return "Cpp";
+	}
 
 	protected String getPropertyPrefix() {
 		return "antlr-" + getLanguage().toLowerCase();
-	}
-
-	protected String getLanguage() {
-		return "Cpp";
 	}
 
 	private static Boolean runtimeBuiltOnce = false;
@@ -56,20 +54,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	}
 
 	private static void initRuntimePath() {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeURL = loader.getResource("Cpp");
-		if (runtimeURL == null) {
-			throw new RuntimeException("Cannot find runtime");
-		}
-		// Windows not getting runtime right. See:
-		// http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
-		// it was coming back "/C:/projects/antlr4-l7imv/runtime-testsuite/target/classes/Cpp"
-		try {
-			runtimePath = Paths.get(runtimeURL.toURI()).toFile().toString();
-			runtimeSourcePath = Paths.get(runtimePath, "runtime", "src").toString();
-		} catch (URISyntaxException use) {
-			runtimePath = "Can't find runtime at " + runtimeURL;
-		}
+		runtimePath = getRuntimePath("Cpp");
+		runtimeSourcePath = Paths.get(runtimePath, "runtime", "src").toString();
 	}
 
 	private static void initCompilerFileName() {
@@ -133,7 +119,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		                                                lexerName,"-no-listener");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		writeLexerTestFile(lexerName, showDFA);
+		writeLexerFile(lexerName, showDFA);
 		return execModule("Test.cpp");
 	}
 
@@ -155,13 +141,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		                                                "-visitor");
 		assertTrue(success);
 		writeFile(getTempDirPath(), "input", input);
-		rawBuildRecognizerTestFile(parserName,
-		                           lexerName,
-		                           listenerName,
-		                           visitorName,
-		                           startRuleName,
-		                           showDiagnosticErrors,
-		                           false);
+		setParseErrors(null);
+		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false);
 		return execRecognizer();
 	}
 
@@ -208,28 +189,6 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			}
 		}
 		return true; // allIsWell: no compile
-	}
-
-	protected void rawBuildRecognizerTestFile(String parserName,
-	                                          String lexerName,
-	                                          String listenerName,
-	                                          String visitorName,
-	                                          String parserStartRuleName,
-	                                          boolean debug,
-	                                          boolean trace)
-	{
-		setParseErrors(null);
-		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, false);
-		}
-		else {
-			writeParserTestFile(parserName,
-			                    lexerName,
-			                    listenerName,
-			                    visitorName,
-			                    parserStartRuleName,
-			                    debug, trace);
-		}
 	}
 
 	public String execRecognizer() {
@@ -285,7 +244,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	}
 
 	private boolean buildRuntime() {
-		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
+		String runtimePath = getRuntimePath();
+		System.out.println("Building ANTLR4 C++ runtime (if necessary) at " + runtimePath);
 
 		if (isWindows()) {
 			String[] command = {compilerPath, "antlr4cpp-vs" + visualStudioVersion + ".vcxproj", "/p:configuration=Release DLL", "/p:platform=x64" };
@@ -427,118 +387,32 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return output;
 	}
 
-	private void writeParserTestFile(String parserName, String lexerName,
-	                                   String listenerName, String visitorName,
-	                                   String parserStartRuleName, boolean debug, boolean trace) {
-		writeVisualStudioProjectFile(lexerName, parserName, listenerName, visitorName);
-
-		if(!parserStartRuleName.endsWith(")"))
-			parserStartRuleName += "()";
-		ST outputFileST = new ST(
-			"#include \\<iostream>\n"
-				+ "\n"
-				+ "#include \"antlr4-runtime.h\"\n"
-				+ "#include \"<lexerName>.h\"\n"
-				+ "#include \"<parserName>.h\"\n"
-				+ "\n"
-				+ "using namespace antlr4;\n"
-				+ "\n"
-				+ "class TreeShapeListener : public tree::ParseTreeListener {\n"
-				+ "public:\n"
-				+ "  void visitTerminal(tree::TerminalNode *) override {}\n"
-				+ "  void visitErrorNode(tree::ErrorNode *) override {}\n"
-				+ "  void exitEveryRule(ParserRuleContext *) override {}\n"
-				+ "  void enterEveryRule(ParserRuleContext *ctx) override {\n"
-				+ "    for (auto child : ctx->children) {\n"
-				+ "      tree::ParseTree *parent = child->parent;\n"
-				+ "      ParserRuleContext *rule = dynamic_cast\\<ParserRuleContext *>(parent);\n"
-				+ "      if (rule != ctx) {\n"
-				+ "        throw \"Invalid parse tree shape detected.\";\n"
-				+ "      }\n"
-
-				+ "    }\n"
-				+ "  }\n"
-				+ "};\n"
-				+ "\n"
-				+ "\n"
-				+ "int main(int argc, const char* argv[]) {\n"
-				+ "  ANTLRFileStream input;\n"
-				+ "  input.loadFromFile(argv[1]);\n"
-				+ "  <lexerName> lexer(&input);\n"
-				+ "  CommonTokenStream tokens(&lexer);\n"
-				+ "<createParser>"
-				+ "\n"
-				+ "  tree::ParseTree *tree = parser.<parserStartRuleName>;\n"
-				+ "  TreeShapeListener listener;\n"
-				+ "  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);\n"
-				+ "\n"
-				+ "  return 0;\n"
-				+ "}\n"
-		);
-
-		String stSource = "  <parserName> parser(&tokens);\n";
-		if(debug) {
-			stSource += "  DiagnosticErrorListener errorListener;\n";
-			stSource += "  parser.addErrorListener(&errorListener);\n";
-		}
-		if(trace)
-			stSource += "  parser.setTrace(true);\n";
-		ST createParserST = new ST(stSource);
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("listenerName", listenerName);
-		outputFileST.add("visitorName", visitorName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(getTempDirPath(), "Test.cpp", outputFileST.render());
-	}
-
-	private void writeLexerTestFile(String lexerName, boolean showDFA) {
-		writeVisualStudioProjectFile(lexerName, null, null, null);
-
-		ST outputFileST = new ST(
-			"#include \\<iostream>\n"
-				+ "\n"
-				+ "#include \"antlr4-runtime.h\"\n"
-				+ "#include \"<lexerName>.h\"\n"
-				+ "\n"
-				+ "#include \"support/StringUtils.h\"\n"
-				+ "\n"
-				+ "using namespace antlr4;\n"
-				+ "\n"
-				+ "int main(int argc, const char* argv[]) {\n"
-				+ "  ANTLRFileStream input;\n"
-				+ "  input.loadFromFile(argv[1]);\n"
-				+ "  <lexerName> lexer(&input);\n"
-				+ "  CommonTokenStream tokens(&lexer);\n"
-				+ "  tokens.fill();\n"
-				+ "  for (auto token : tokens.getTokens())\n"
-				+ "    std::cout \\<\\< token->toString() \\<\\< std::endl;\n"
-				+ (showDFA ? "  std::cout \\<\\< lexer.getInterpreter\\<atn::LexerATNSimulator>()->getDFA(Lexer::DEFAULT_MODE).toLexerString();\n" : "\n")
-				+ "  return 0;\n"
-				+ "}\n");
-		outputFileST.add("lexerName", lexerName);
-		writeFile(getTempDirPath(), "Test.cpp", outputFileST.render());
-	}
-
-	private void writeVisualStudioProjectFile(String lexerName, String parserName, String listenerName, String visitorName) {
+	@Override
+	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,
+									   boolean debug, boolean profile, boolean showDFA,
+									   boolean useListener, boolean useVisitor) {
 		if (isWindows()) {
-			ST projectFileST = new ST(visualStudioProjectContent);
-			projectFileST.add("platformToolset", visualStudioPlatformToolset);
-			projectFileST.add("runtimeSourcePath", runtimeSourcePath);
-			projectFileST.add("runtimeBinaryPath", runtimeBinaryPath);
-			projectFileST.add("lexerName", lexerName);
-			if (parserName != null) {
-				projectFileST.add("parserName", parserName);
-				String grammarName = parserName.endsWith("Parser")
-						? parserName.substring(0, parserName.length() - "Parser".length())
-						: parserName;
-				projectFileST.add("grammarName", grammarName);
-				projectFileST.add("useListener", listenerName != null);
-				projectFileST.add("useVisitor", visitorName != null);
-			}
-			writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
+			writeVisualStudioProjectFile(lexerName, parserName, useListener, useVisitor);
 		}
+		super.writeRecognizerFile(lexerName, parserName, parserStartRuleName, debug, profile, showDFA, useListener, useVisitor);
+	}
+
+	private void writeVisualStudioProjectFile(String lexerName, String parserName, boolean useListener, boolean useVisitor) {
+		ST projectFileST = new ST(visualStudioProjectContent);
+		projectFileST.add("platformToolset", visualStudioPlatformToolset);
+		projectFileST.add("runtimeSourcePath", runtimeSourcePath);
+		projectFileST.add("runtimeBinaryPath", runtimeBinaryPath);
+		projectFileST.add("lexerName", lexerName);
+		if (parserName != null) {
+			projectFileST.add("parserName", parserName);
+			String grammarName = parserName.endsWith("Parser")
+					? parserName.substring(0, parserName.length() - "Parser".length())
+					: parserName;
+			projectFileST.add("grammarName", grammarName);
+			projectFileST.add("useListener", useListener);
+			projectFileST.add("useVisitor", useVisitor);
+		}
+		writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
 	}
 }
 
