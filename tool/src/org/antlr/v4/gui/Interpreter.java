@@ -130,6 +130,9 @@ public class Interpreter {
 	}
 
 	protected ParseInfo interp() throws RecognitionException, IOException {
+		if ( grammarFileName==null && (parserGrammarFileName==null && lexerGrammarFileName==null) ) {
+			return null;
+		}
 		Grammar g;
 		LexerGrammar lg = null;
 		DefaultToolListener listener = new DefaultToolListener(new Tool());
