@@ -16,6 +16,8 @@ import java.util.Map;
 /** */
 public class ParserFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String generatedAnnotation; // from -generated cmd-line
+	public String generatedImport; // from -generated cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
@@ -29,6 +31,14 @@ public class ParserFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = g.tool.genPackage;
+
+		String generated = factory.getGrammar().tool.genGenerated;
+		if (generated != null) {
+			generatedImport = generated;
+			int index = generated.lastIndexOf('.');
+			generatedAnnotation = (index != -1) ? generated.substring(index + 1) : generated;
+		}
+
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;

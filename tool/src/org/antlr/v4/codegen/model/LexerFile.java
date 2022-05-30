@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class LexerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String generatedAnnotation; // from -generated cmd-line
+	public String generatedImport; // from -generated cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
@@ -25,5 +27,12 @@ public class LexerFile extends OutputFile {
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		genListener = factory.getGrammar().tool.gen_listener;
 		genVisitor = factory.getGrammar().tool.gen_visitor;
+
+		String generated = factory.getGrammar().tool.genGenerated;
+		if (generated != null) {
+			generatedImport = generated;
+			int index = generated.lastIndexOf('.');
+			generatedAnnotation = (index != -1) ? generated.substring(index + 1) : generated;
+		}
 	}
 }

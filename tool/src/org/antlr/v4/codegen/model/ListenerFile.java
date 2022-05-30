@@ -23,6 +23,8 @@ import java.util.Set;
  */
 public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String generatedAnnotation; // from -generated cmd-line
+	public String generatedImport; // from -generated cmd-line
 	public String accessLevel; // from -DaccessLevel cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
@@ -65,5 +67,12 @@ public class ListenerFile extends OutputFile {
 		genPackage = g.tool.genPackage;
 		accessLevel = g.getOptionString("accessLevel");
 		exportMacro = g.getOptionString("exportMacro");
+
+		String generated = factory.getGrammar().tool.genGenerated;
+		if (generated != null) {
+			generatedImport = generated;
+			int index = generated.lastIndexOf('.');
+			generatedAnnotation = (index != -1) ? generated.substring(index + 1) : generated;
+		}
 	}
 }

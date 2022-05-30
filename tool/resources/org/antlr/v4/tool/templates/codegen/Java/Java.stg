@@ -48,6 +48,9 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 package <file.genPackage>;
 <endif>
 <namedActions.header>
+<if(file.generatedImport)>
+import <file.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -57,6 +60,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
+<if(file.generatedAnnotation)>
+@<file.generatedAnnotation>("ANTLR")
+<endif>
 <parser>
 >>
 
@@ -66,12 +72,18 @@ ListenerFile(file, header, namedActions) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+<if(file.generatedImport)>
+import <file.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
+<if(file.generatedAnnotation)>
+@<file.generatedAnnotation>("ANTLR")
+<endif>
 public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
@@ -104,6 +116,9 @@ package <file.genPackage>;
 <endif>
 <header>
 
+<if(file.generatedImport)>
+import <file.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -113,6 +128,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
+<if(file.generatedAnnotation)>
+@<file.generatedAnnotation>("ANTLR")
+<endif>
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /**
@@ -161,6 +179,9 @@ VisitorFile(file, header, namedActions) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+<if(file.generatedImport)>
+import <file.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -170,6 +191,9 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+<if(file.generatedAnnotation)>
+@<file.generatedAnnotation>("ANTLR")
+<endif>
 public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 /**
@@ -192,6 +216,9 @@ BaseVisitorFile(file, header, namedActions) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+<if(file.generatedImport)>
+import <file.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -202,6 +229,9 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+<if(file.generatedAnnotation)>
+@<file.generatedAnnotation>("ANTLR")
+<endif>
 public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 /**
@@ -885,6 +915,9 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 package <lexerFile.genPackage>;
 <endif>
 <namedActions.header>
+<if(lexerFile.generatedImport)>
+import <lexerFile.generatedImport>;
+<endif>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -898,6 +931,9 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(lexerFile.generatedAnnotation)>
+@<lexerFile.generatedAnnotation>("ANTLR")
+<endif>
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends <superClass; null="Lexer"> {
 	static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION); }
