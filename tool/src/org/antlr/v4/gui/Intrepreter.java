@@ -8,9 +8,12 @@ import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,14 +22,31 @@ import java.nio.file.Paths;
  *  $ java org.antlr.v4.runtime.misc.Intrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName inputFileName
  *        [-tree]
  *        [-gui]
+ *        [-trace]
  *        [-encoding encoding]
  *        [-tokens]
- *        [-profile]
+ *        [-profile filename.csv]
  */
 public class Intrepreter {
 	public static final String[] profilerColumnNames = {
-			"Rule","Invocations", "Time", "Total k", "Max k", "Ambiguities", "DFA cache miss"
+			"Rule","Invocations", "Time (ms)", "Total k", "Max k", "Ambiguities", "DFA cache miss"
 	};
+
+	protected static class IgnoreTokenVocabGrammar extends Grammar {
+		public IgnoreTokenVocabGrammar(String fileName,
+									   String grammarText,
+									   Grammar tokenVocabSource,
+									   ANTLRToolListener listener)
+				throws RecognitionException
+		{
+			super(fileName, grammarText, tokenVocabSource, listener);
+		}
+
+		@Override
+		public void importTokensFromTokensFile() {
+			// don't try to import tokens files; must give me both grammars if split
+		}
+	}
 
 	protected String grammarFileName;
 	protected String parserGrammarFileName;
@@ -34,18 +54,17 @@ public class Intrepreter {
 	protected String startRuleName;
 	protected boolean printTree = false;
 	protected boolean gui = false;
+	protected boolean trace = false;
 	protected String encoding = null;
 	protected boolean showTokens = false;
-	protected boolean profile = false;
+	protected String profileFileName = null;
 	protected String inputFileName;
 
 	public Intrepreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.guIntrepreter GrammarFileName startRuleName\n" +
-					"  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
-					"  [-trace] [-diagnostics] [-SLL]\n"+
-					"  [input-filename(s)]");
-			System.err.println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
+			System.err.println("java org.antlr.v4.guIntrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
+					"  [-tokens] [-tree] [-gui] [-encoding encodingname]\n" +
+					"  [-trace] [-profile filename.csv] [input-filename(s)]");
 			System.err.println("Omitting input-filename makes rig read from stdin.");
 			return;
 		}
@@ -57,6 +76,12 @@ public class Intrepreter {
 			lexerGrammarFileName = args[i];
 			i++;
 			grammarFileName = null;
+
+			if ( parserGrammarFileName.toLowerCase().endsWith("lexer.g4") ) { // swap
+				String save = parserGrammarFileName;
+				parserGrammarFileName = lexerGrammarFileName;
+				lexerGrammarFileName = save;
+			}
 		}
 		startRuleName = args[i];
 		i++;
@@ -75,8 +100,23 @@ public class Intrepreter {
 			else if ( arg.equals("-tokens") ) {
 				showTokens = true;
 			}
+			else if ( arg.equals("-trace") ) {
+				trace = true;
+			}
 			else if ( arg.equals("-profile") ) {
-				profile = true;
+				if ( i>=args.length ) {
+					System.err.println("missing CSV filename on -profile (ignoring -profile)");
+					return;
+				}
+				if ( args[i].startsWith("-") ) { // filename can't start with '-' since likely an arg
+					System.err.println("missing CSV filename on -profile (ignoring -profile)");
+					return;
+				}
+				profileFileName = args[i];
+				if ( !profileFileName.endsWith(".csv") ) {
+					System.err.println("warning: missing '.csv' suffix on -profile filename: "+profileFileName);
+				}
+				i++;
 			}
 			else if ( arg.equals("-encoding") ) {
 				if ( i>=args.length ) {
@@ -95,17 +135,29 @@ public class Intrepreter {
 		DefaultToolListener listener = new DefaultToolListener(new Tool());
 		if (grammarFileName != null) {
 			String grammarContent = Files.readString(Path.of(grammarFileName));
-			g = new Grammar(grammarFileName, grammarContent, null, listener);
+			g = new IgnoreTokenVocabGrammar(grammarFileName, grammarContent, null, listener);
 		}
 		else {
 			String lexerGrammarContent = Files.readString(Path.of(lexerGrammarFileName));
 			lg = new LexerGrammar(lexerGrammarContent, listener);
 			String parserGrammarContent = Files.readString(Path.of(parserGrammarFileName));
-			g = new Grammar(parserGrammarFileName, parserGrammarContent, lg, listener);
+			g = new IgnoreTokenVocabGrammar(parserGrammarFileName, parserGrammarContent, lg, listener);
 		}
 
 		Charset charset = ( encoding == null ? Charset.defaultCharset () : Charset.forName(encoding) );
-		CharStream charStream = CharStreams.fromPath(Paths.get(inputFileName), charset);
+		CharStream charStream = null;
+		if ( inputFileName==null ) {
+			charStream = CharStreams.fromStream(System.in, charset);
+		}
+		else {
+			try {
+				charStream = CharStreams.fromPath(Paths.get(inputFileName), charset);
+			}
+			catch (NoSuchFileException nsfe) {
+				System.err.println("Can't find input file "+inputFileName);
+				System.exit(1);
+			}
+		}
 
 		LexerInterpreter lexEngine = (lg!=null) ?
 				lg.createLexerInterpreter(charStream) :
@@ -127,7 +179,10 @@ public class Intrepreter {
 		}
 
 		GrammarParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
-		parser.setProfile(true);
+		if ( profileFileName!=null ) {
+			parser.setProfile(true);
+		}
+		parser.setTrace(trace);
 
 		Rule r = g.rules.get(startRuleName);
 		if (r == null) {
@@ -143,7 +198,7 @@ public class Intrepreter {
 		if ( gui ) {
 			Trees.inspect(t, parser);
 		}
-		if ( profile ) {
+		if ( profileFileName!=null ) {
 			dumpProfilerCSV(parser, parseInfo);
 		}
 
@@ -165,17 +220,27 @@ public class Intrepreter {
 				table[decision][col] = colVal.toString();
 			}
 		}
-		for (int i = 0; i < profilerColumnNames.length; i++) {
-			if ( i>0 ) System.out.print(",");
-			System.out.print(profilerColumnNames[i]);
-		}
-		System.out.println();
-		for (String[] row : table) {
+
+		try {
+			FileWriter fileWriter = new FileWriter(profileFileName);
+			PrintWriter pw = new PrintWriter(fileWriter);
+
 			for (int i = 0; i < profilerColumnNames.length; i++) {
-				if ( i>0 ) System.out.print(",");
-				System.out.print(row[i]);
+				if (i > 0) pw.print(",");
+				pw.print(profilerColumnNames[i]);
 			}
-			System.out.println();
+			pw.println();
+			for (String[] row : table) {
+				for (int i = 0; i < profilerColumnNames.length; i++) {
+					if (i > 0) pw.print(",");
+					pw.print(row[i]);
+				}
+				pw.println();
+			}
+			pw.close();
+		}
+		catch (IOException ioe) {
+			System.err.println("Error writing profile info to "+profileFileName+": "+ioe.getMessage());
 		}
 	}
 
