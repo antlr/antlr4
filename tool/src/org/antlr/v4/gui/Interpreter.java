@@ -27,7 +27,7 @@ import java.nio.file.Paths;
  *        [-tokens]
  *        [-profile filename.csv]
  */
-public class Intrepreter {
+public class Interpreter {
 	public static final String[] profilerColumnNames = {
 			"Rule","Invocations", "Time (ms)", "Total k", "Max k", "Ambiguities", "DFA cache miss"
 	};
@@ -60,7 +60,7 @@ public class Intrepreter {
 	protected String profileFileName = null;
 	protected String inputFileName;
 
-	public Intrepreter(String[] args) throws Exception {
+	public Interpreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.guIntrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
 					"  [-tokens] [-tree] [-gui] [-encoding encodingname]\n" +
@@ -270,7 +270,7 @@ public class Intrepreter {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Intrepreter I = new Intrepreter(args);
+		Interpreter I = new Interpreter(args);
 		I.interp();
 	}
 }
