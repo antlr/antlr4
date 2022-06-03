@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,14 +27,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34 34");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,3:4='34',<1>,1:3]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testActionEvalsAtCorrectIndex() throws Exception {
@@ -41,14 +42,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : [0-9] {System.out.println(\"2nd char: \"+(char)_input.LA(1));} [0-9]+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "123 45");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 45");
 		String expecting =
 			"2nd char: 2\n" +
 			"2nd char: 5\n" +
 			"[@0,0:2='123',<1>,1:0]\n" +
 			"[@1,4:5='45',<1>,1:4]\n" +
 			"[@2,6:5='<EOF>',<-1>,1:6]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	/**
@@ -86,7 +87,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"NAME: ('a'..'z' | 'A'..'Z')+ ('\\n')?;\n" +
 			"\n" +
 			"fragment WS: [ \\r\\t\\n]+ ;\n";
-		String found = execLexer("L.g4", grammar, "L", "hello Steve\n");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "hello Steve\n");
 		String expecting =
 			"Start:6\n" +
 			"Stop:11\n" +
@@ -94,7 +95,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"\n" +
 			"[@0,0:11='hello Steve\\n',<1>,1:0]\n" +
 			"[@1,12:11='<EOF>',<-1>,2:0]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void test2ActionsIn1Rule() throws Exception {
@@ -102,7 +103,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : [0-9] {System.out.println(\"x\");} [0-9]+ {System.out.println(\"y\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "123 45");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 45");
 		String expecting =
 			"x\n" +
 			"y\n" +
@@ -111,7 +112,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"[@0,0:2='123',<1>,1:0]\n" +
 			"[@1,4:5='45',<1>,1:4]\n" +
 			"[@2,6:5='<EOF>',<-1>,1:6]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testAltActionsIn1Rule() throws Exception {
@@ -123,14 +124,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"    {System.out.println(\" last\");}\n" +
 			"    ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "123 ab");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 ab");
 		String expecting =
 			"int last\n" +
 			"id last\n" +
 			"[@0,0:2='123',<1>,1:0]\n" +
 			"[@1,4:5='ab',<1>,1:4]\n" +
 			"[@2,6:5='<EOF>',<-1>,1:6]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testActionPlusCommand() throws Exception {
@@ -138,12 +139,12 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} -> skip ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34 34");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
 			"[@0,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	// ----- COMMANDS --------------------------------------------------------
@@ -153,14 +154,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34 34");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,3:4='34',<1>,1:3]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testMoreCommand() throws Exception {
@@ -168,14 +169,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : '#' -> more ;";
-		String found = execLexer("L.g4", grammar, "L", "34#10");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#10");
 		String expecting =
 			"I\n" +
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,2:4='#10',<1>,1:2]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testTypeCommand() throws Exception {
@@ -183,13 +184,13 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(HASH) ;";
-		String found = execLexer("L.g4", grammar, "L", "34#");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#");
 		String expecting =
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,2:2='#',<2>,1:2]\n" +
 			"[@2,3:2='<EOF>',<-1>,1:3]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testCombinedCommand() throws Exception {
@@ -197,14 +198,14 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(100), skip, more  ;";
-		String found = execLexer("L.g4", grammar, "L", "34#11");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#11");
 		String expecting =
 			"I\n" +
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,2:4='#11',<1>,1:2]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testLexerMode() throws Exception {
@@ -215,12 +216,12 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> popMode;\n"+
 			"ANY : . -> more;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testLexerPushPopModeAction() throws Exception {
@@ -231,12 +232,12 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> popMode ;\n"+  // token type 2
 			"ANY : . -> more ;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	@Test public void testLexerModeAction() throws Exception {
@@ -247,12 +248,12 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+ // ttype 2 since '"' ambiguity
 			"ANY : . -> more ;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 	// ----- PREDICATES --------------------------------------------------------
@@ -282,7 +283,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"Item: name of item\n" +
 			"Another line.\n" +
 			"More line.\n";
-		String found = execLexer("TestLexer.g4", grammar, "TestLexer", input);
+		ExecutedState executedState = execLexer("TestLexer.g4", grammar, "TestLexer", input);
 		String expecting =
 			"[@0,0:12='A line here.\\n',<1>,1:0]\n" +
 			"[@1,13:17='Item:',<2>,2:0]\n" +
@@ -291,7 +292,7 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"[@4,32:45='Another line.\\n',<1>,3:0]\n" +
 			"[@5,46:56='More line.\\n',<1>,4:0]\n" +
 			"[@6,57:56='<EOF>',<-1>,5:0]\n";
-		assertEquals(expecting, found);
+		assertEquals(expecting, executedState.output);
 	}
 
 }

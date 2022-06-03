@@ -1,5 +1,7 @@
 package org.antlr.v4.test.runtime;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,11 +11,12 @@ public class Processor {
 	public final Map<String, String> environmentVariables;
 	public final boolean throwOnNonZeroErrorCode;
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables) throws Exception {
+	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables
+	) throws InterruptedException, IOException {
 		return new Processor(arguments, workingDirectory, environmentVariables, true).Start();
 	}
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory) throws Exception {
+	public static ProcessorResult run(String[] arguments, String workingDirectory) throws InterruptedException, IOException {
 		return new Processor(arguments, workingDirectory, new HashMap<>(), true).Start();
 	}
 
@@ -25,13 +28,16 @@ public class Processor {
 		this.throwOnNonZeroErrorCode = throwOnNonZeroErrorCode;
 	}
 
-	public ProcessorResult Start() throws Exception {
+	public ProcessorResult Start() throws InterruptedException, IOException {
 		ProcessBuilder builder = new ProcessBuilder(arguments);
 		if (workingDirectory != null) {
 			builder.directory(new File(workingDirectory));
 		}
-		for (String key : environmentVariables.keySet()) {
-			builder.environment().put(key, environmentVariables.get(key));
+		if (environmentVariables != null && environmentVariables.size() > 0) {
+			Map<String, String> environment = builder.environment();
+			for (String key : environmentVariables.keySet()) {
+				environment.put(key, environmentVariables.get(key));
+			}
 		}
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -42,7 +48,7 @@ public class Processor {
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		if (throwOnNonZeroErrorCode && process.exitValue() != 0) {
-			throw new Exception(stderrVacuum.toString());
+			throw new InterruptedException(stderrVacuum.toString());
 		}
 		return new ProcessorResult(process.exitValue(), stdoutVacuum.toString(), stderrVacuum.toString());
 	}

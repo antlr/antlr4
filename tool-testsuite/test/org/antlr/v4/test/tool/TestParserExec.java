@@ -6,13 +6,13 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /** Test parser execution.
  *
@@ -66,16 +66,15 @@ public class TestParserExec extends BaseJavaToolTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
-		String result = execParser("T.g4", grammar, "TParser", "TLexer",
-		                           null, null, "s",
-								   "abc 34", true);
+		ExecutedState executedState = execParser("T.g4", grammar, "TParser", "TLexer",
+				"s", "abc 34", true);
 		String expecting =
 			"Decision 0:\n" +
 			"s0-ID->s1\n" +
 			"s1-INT->s2\n" +
 			"s2-EOF->:s3=>1\n"; // Must point at accept state
-		assertEquals(expecting, result);
-		assertNull(getParseErrors());
+		assertEquals(expecting, executedState.output);
+		assertEquals("", executedState.errors);
 	}
 
 	/**
@@ -85,10 +84,11 @@ public class TestParserExec extends BaseJavaToolTest {
 	 */
 	// TODO: port to test framework (can we simplify the Psl grammar?)
 	@Test public void testFailedPredicateExceptionState() throws Exception {
-		String grammar = load("Psl.g4", "UTF-8");
-		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false);
-		assertEquals(null, found);
-		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", getParseErrors());
+		String grammar = load("Psl.g4");
+		ExecutedState executedState = execParser("Psl.g4", grammar,
+				"PslParser", "PslLexer", "floating_constant", " . 234", false);
+		assertEquals("", executedState.output);
+		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", executedState.errors);
 	}
 
 	/**
@@ -120,16 +120,12 @@ public class TestParserExec extends BaseJavaToolTest {
 			"    | '«' '/' ID '»'\n" +
 			"    ;";
 
-		boolean success = rawGenerateAndBuildRecognizer("ModeTagsLexer.g4",
-														lexerGrammar,
-														null,
-														"ModeTagsLexer");
-		assertTrue(success);
-
-		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer",
-		                          null, null, "file", "", false);
-		assertEquals(null, found);
-		assertNull(getParseErrors());
+		execLexer("ModeTagsLexer.g4", lexerGrammar, "ModeTagsLexer", "");
+		ExecutedState executedState = execParser("ModeTagsParser.g4", parserGrammar,
+				"ModeTagsParser", "ModeTagsLexer",
+				"file", "", false);
+		assertEquals("", executedState.output);
+		assertEquals("", executedState.errors);
 	}
 
 	/**
@@ -155,10 +151,10 @@ public class TestParserExec extends BaseJavaToolTest {
 			"WS : [ \\t\\n\\r]+ -> skip ; // toss out all whitespace\n";
 
 		String input = "2 9 10 3 1 2 3";
-		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer",
-		                          null, null, "file", input, false);
-		assertEquals("6\n", found);
-		assertNull(getParseErrors());
+		ExecutedState executedState = execParser("Data.g4", grammar,
+				"DataParser", "DataLexer", "file", input, false);
+		assertEquals("6\n", executedState.output);
+		assertEquals("", executedState.errors);
 	}
 
 	@Test public void testCaseInsensitiveInCombinedGrammar() throws Exception {
@@ -175,10 +171,11 @@ public class TestParserExec extends BaseJavaToolTest {
 				"WS: [ \\t\\n\\r]+ -> skip;";
 
 		String input = "NEW Abc (Not a AND not B)";
-		execParser(
+		ExecutedState executedState = execParser(
 				"CaseInsensitiveGrammar.g4", grammar,
 				"CaseInsensitiveGrammarParser", "CaseInsensitiveGrammarLexer",
-				null, null, "e", input, false);
-		assertNull(getParseErrors());
+				"e", input, false);
+		assertEquals("", executedState.output);
+		assertEquals("", executedState.errors);
 	}
 }

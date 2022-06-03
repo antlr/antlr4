@@ -9,14 +9,14 @@ public class Test {
 		Console.InputEncoding = Encoding.UTF8;
 		var input = CharStreams.fromPath(args[0]);
 		var lex = new <lexerName>(input);
-		CommonTokenStream tokens = new CommonTokenStream(lex);
+		var tokens = new CommonTokenStream(lex);
 <if(parserName)>
 		var parser = new <parserName>(tokens);
 <if(debug)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>
 		parser.BuildParseTree = true;
-		ParserRuleContext tree = parser.<parserStartRuleName>();
+		var tree = parser.<parserStartRuleName>();
 		ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);
 <else>
 		tokens.Fill();

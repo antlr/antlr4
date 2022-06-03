@@ -24,7 +24,6 @@ import org.antlr.v4.tool.Rule;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTokenTypesViaATN;
 import static org.junit.Assert.assertEquals;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH

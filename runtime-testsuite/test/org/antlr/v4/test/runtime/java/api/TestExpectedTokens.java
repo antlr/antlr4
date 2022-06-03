@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class TestExpectedTokens extends BaseJavaTest {
 			"s7-C->s8\n"+
 			"s8->RuleStop_a_1\n"+
 			"RuleStop_a_1-EOF->s9\n";
-		checkRuleATN(g, "a", atnText);
+		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 
 		ATN atn = g.getATN();
 		int blkStartStateNumber = 5;
@@ -55,7 +56,7 @@ public class TestExpectedTokens extends BaseJavaTest {
 			"s6-C->s7\n"+
 			"s7->RuleStop_a_1\n"+
 			"RuleStop_a_1-EOF->s8\n";
-		checkRuleATN(g, "a", atnText);
+		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 
 		ATN atn = g.getATN();
 		int blkStartStateNumber = 4;
@@ -75,7 +76,7 @@ public class TestExpectedTokens extends BaseJavaTest {
 			"s5-A->s6\n"+
 			"s6->RuleStop_a_1\n"+
 			"RuleStop_a_1-EOF->s11\n";
-		checkRuleATN(g, "a", atnText);
+		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 		atnText =
 			"RuleStart_b_2->BlockStart_9\n"+
 			"BlockStart_9->s7\n"+
@@ -84,7 +85,7 @@ public class TestExpectedTokens extends BaseJavaTest {
 			"s8->BlockEnd_10\n"+
 			"BlockEnd_10->RuleStop_b_3\n"+
 			"RuleStop_b_3->s5\n";
-		checkRuleATN(g, "b", atnText);
+		RuntimeTestUtils.checkRuleATN(g, "b", atnText);
 
 		ATN atn = g.getATN();
 
@@ -132,7 +133,7 @@ public class TestExpectedTokens extends BaseJavaTest {
 			"s17-expr->RuleStart_expr_2\n"+
 			"BlockEnd_19->StarLoopBack_22\n"+
 			"StarLoopBack_22->StarLoopEntry_20\n";
-		checkRuleATN(g, "expr", atnText);
+		RuntimeTestUtils.checkRuleATN(g, "expr", atnText);
 
 		ATN atn = g.getATN();
 

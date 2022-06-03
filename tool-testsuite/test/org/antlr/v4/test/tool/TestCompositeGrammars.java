@@ -6,9 +6,10 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestUtils;
+import junit.framework.TestCase;
+import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.states.ExecutedState;
+import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -17,11 +18,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.*;
 
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.sort;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.PathSeparator;
+import static org.junit.Assert.*;
 
 public class TestCompositeGrammars extends BaseJavaToolTest {
 	protected boolean debug = false;
@@ -36,9 +39,9 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.println(\"S.a\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
-		String subdir = getTempDirPath() + PATH_SEP + "sub";
-		RuntimeTestUtils.mkdir(subdir);
+		FileUtils.mkdir(getTempDirPath());
+		String subdir = getTempDirPath() + PathSeparator + "sub";
+		FileUtils.mkdir(subdir);
 		writeFile(subdir, "S.g4", slave);
 		String master =
 			"grammar M;\n" +
@@ -47,24 +50,24 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(getTempDirPath(), "M.g4", master);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", subdir);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", subdir);
 		assertEquals(0, equeue.size());
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/1317
 	@Test public void testImportSelfLoop() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		String master =
 			"grammar M;\n" +
 			"import M;\n" +
 			"s : 'a' ;\n";
 		writeFile(getTempDirPath(), "M.g4", master);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.size());
 	}
 
 	@Test public void testImportIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -78,12 +81,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c';\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testImportModesIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -99,12 +102,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> popMode;\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testImportChannelsIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -119,12 +122,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c';\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testImportMixedChannelsIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -140,12 +143,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> channel(CH_C);\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testImportClashingChannelsIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -162,12 +165,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> channel(CH_C);\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testMergeModesIntoLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -184,12 +187,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> popMode;\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testEmptyModesInLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"lexer grammar M;\n" +
@@ -206,12 +209,12 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> popMode;\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(0, equeue.errors.size());
 	}
 
 	@Test public void testCombinedGrammarImportsModalLexerGrammar() throws Exception {
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		String master =
 			"grammar M;\n" +
@@ -228,7 +231,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"C : 'c' -> popMode;\n";
 		writeFile(getTempDirPath(), "S.g4", slave);
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		assertEquals(1, equeue.errors.size());
 		ANTLRMessage msg = equeue.errors.get(0);
 		assertEquals(ErrorType.MODE_NOT_IN_LEXER, msg.getErrorType());
@@ -248,7 +251,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"tokens { C, B, A } // reverse order\n"+
 			"y : A ;\n";
 
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slaveS);
 		writeFile(getTempDirPath(), "T.g4", slaveT);
 
@@ -286,13 +289,13 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"a : 'a' | c;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave);
 		String master =
 			"grammar M;\n" +
 			"import S;\n";
 		writeFile(getTempDirPath(), "M.g4", master);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-lib", getTempDirPath());
 		ANTLRMessage msg = equeue.errors.get(0);
 		assertEquals(ErrorType.UNDEFINED_RULE_REF, msg.getErrorType());
 		assertEquals("c", msg.getArgs()[0]);
@@ -305,9 +308,9 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.println(\"S.a\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		String outdir = getTempDirPath() + "/out";
-		RuntimeTestUtils.mkdir(outdir);
+		FileUtils.mkdir(outdir);
 		writeFile(outdir, "S.g4", slave);
 		String master =
 			"grammar M;\n" +
@@ -316,7 +319,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(getTempDirPath(), "M.g4", master);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-o", outdir);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-o", outdir);
 		assertEquals(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, equeue.errors.get(0).getErrorType());
 	}
 
@@ -324,9 +327,9 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.println(\"S.a\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		String subdir = getTempDirPath() + "/sub";
-		RuntimeTestUtils.mkdir(subdir);
+		FileUtils.mkdir(subdir);
 		writeFile(subdir, "S.g4", slave);
 		String master =
 			"grammar M;\n" +
@@ -336,8 +339,8 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(getTempDirPath(), "M.g4", master);
 		String outdir = getTempDirPath() + "/out";
-		RuntimeTestUtils.mkdir(outdir);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-o", outdir, "-lib", subdir);
+		FileUtils.mkdir(outdir);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", false, "-o", outdir, "-lib", subdir);
 		assertEquals(0, equeue.size());
 	}
 
@@ -345,9 +348,9 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.println(\"S.a\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		String subdir = getTempDirPath() + "/sub";
-		RuntimeTestUtils.mkdir(subdir);
+		FileUtils.mkdir(subdir);
 		writeFile(subdir, "S.g4", slave);
 		String parser =
 			"parser grammar MParser;\n" +
@@ -361,10 +364,10 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(getTempDirPath(), "MLexer.g4", lexer);
 		String outdir = getTempDirPath() + "/out";
-		RuntimeTestUtils.mkdir(outdir);
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "MLexer.g4", false, "-o", outdir);
+		FileUtils.mkdir(outdir);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "MLexer.g4", false, "-o", outdir);
 		assertEquals(0, equeue.size());
-		equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "MParser.g4", false, "-o", outdir, "-lib", subdir);
+		equeue = Generator.antlrOnString(getTempDirPath(), "Java", "MParser.g4", false, "-o", outdir, "-lib", subdir);
 		assertEquals(0, equeue.size());
 	}
 
@@ -375,7 +378,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"options {tokenVocab=whatever;}\n" +
 			"tokens { A }\n" +
 			"x : A {System.out.println(\"S.x\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave);
 
 		String master =
@@ -401,7 +404,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar S;\n" +
 			"options {toke\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave);
 
 		String master =
@@ -421,13 +424,13 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar T;\n" +
 			"a : T ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "T.g4", slave);
 		String slave2 =
 			"parser grammar S;\n" +
 			"import T;\n" +
 			"a : S ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave2);
 
 		String master =
@@ -448,11 +451,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 					 realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-
-		boolean ok =
-			rawGenerateAndBuildRecognizer("M.g4", master, "MParser", null);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		assertTrue(compile("M.g4", master, "MParser", "a"));
 	}
 
 	@Test public void testBigTreeOfImports() throws Exception {
@@ -461,34 +460,34 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"parser grammar T;\n" +
 			"tokens{T}\n" +
 			"x : T ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "T.g4", slave);
 		slave =
 			"parser grammar S;\n" +
 			"import T;\n" +
 			"tokens{S}\n" +
 			"y : S ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave);
 
 		slave =
 			"parser grammar C;\n" +
 			"tokens{C}\n" +
 			"i : C ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "C.g4", slave);
 		slave =
 			"parser grammar B;\n" +
 			"tokens{B}\n" +
 			"j : B ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "B.g4", slave);
 		slave =
 			"parser grammar A;\n" +
 			"import B,C;\n" +
 			"tokens{A}\n" +
 			"k : A ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "A.g4", slave);
 
 		String master =
@@ -510,11 +509,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList,
 					 realElements(g.typeToTokenList).toString());
-
-		boolean ok =
-			rawGenerateAndBuildRecognizer("M.g4", master, "MParser", null);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		assertTrue(compile("M.g4", master, "MParser", "a"));
 	}
 
 	@Test public void testRulesVisibleThroughMultilevelImport() throws Exception {
@@ -522,13 +517,13 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		String slave =
 			"parser grammar T;\n" +
 			"x : T ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "T.g4", slave);
 		String slave2 =
 			"parser grammar S;\n" + // A, B, C token type order
 			"import T;\n" +
 			"a : S ;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave2);
 
 		String master =
@@ -560,27 +555,27 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"T2: '2';\n" +
 			"T3: '3';\n" +
 			"T4: '4';\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "L.g4", gstr);
 		gstr =
 			"parser grammar G1;\n" +
 			"s: a | b;\n" +
 			"a: T1;\n" +
 			"b: T2;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "G1.g4", gstr);
 
 		gstr =
 			"parser grammar G2;\n" +
 			"import G1;\n" +
 			"a: T3;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "G2.g4", gstr);
 		String G3str =
 			"grammar G3;\n" +
 			"import G2;\n" +
 			"b: T4;\n" ;
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "G3.g4", G3str);
 
 		Grammar g = new Grammar(getTempDirPath()+"/G3.g4", G3str, equeue);
@@ -597,17 +592,14 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
-		boolean ok =
-			rawGenerateAndBuildRecognizer("G3.g4", G3str, "G3Parser", null);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		assertTrue(compile("G3.g4", G3str, "G3Parser", "b"));
 	}
 
 	@Test public void testHeadersPropogatedCorrectlyToImportedGrammars() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.print(\"S.a\");} ;\n";
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "S.g4", slave);
 		String master =
 			"grammar M;\n" +
@@ -616,7 +608,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "M.g4", master, false);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "M.g4", master, false);
 		int expecting = 0; // should be ok
 		assertEquals(expecting, equeue.errors.size());
 	}
@@ -630,17 +622,17 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 	// TODO: migrate to test framework
 	@Test
 	public void testImportLargeGrammar() throws Exception {
-		String slave = load("Java.g4", "UTF-8");
+		String slave = load("Java.g4");
 		String master =
 			"grammar NewJava;\n" +
 			"import Java;\n";
 
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "Java.g4", slave);
-		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer",
-					  null, null, "compilationUnit", "package Foo;", debug);
-		assertEquals(null, found);
-		assertNull(getParseErrors());
+		ExecutedState executedState = execParser("NewJava.g4", master,
+				"NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
+		assertEquals("", executedState.output);
+		assertEquals("", executedState.errors);
 	}
 
 	/**
@@ -663,11 +655,45 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 			"import Java;\n" +
 			"s : e ;\n";
 
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 		writeFile(getTempDirPath(), "Java.g4", slave);
-		String found = execParser("T.g4", master, "TParser", "TLexer",
-					  null, null, "s", "a=b", debug);
-		assertEquals(null, found);
-		assertNull(getParseErrors());
+		ExecutedState executedState = execParser("T.g4", master, "TParser", "TLexer", "s", "a=b", debug);
+		assertEquals("", executedState.output);
+		assertEquals("", executedState.errors);
+	}
+
+	private void checkGrammarSemanticsWarning(ErrorQueue equeue, GrammarSemanticsMessage expectedMessage) {
+		ANTLRMessage foundMsg = null;
+		for (int i = 0; i < equeue.warnings.size(); i++) {
+			ANTLRMessage m = equeue.warnings.get(i);
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				foundMsg instanceof GrammarSemanticsMessage);
+		TestCase.assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
+		if ( equeue.size()!=1 ) {
+			System.err.println(equeue);
+		}
+	}
+
+	private boolean compile(String grammarFileName, String grammarStr, String parserName, String startRuleName) {
+		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, null,
+				false, false, startRuleName, null,
+				false, false, Stage.Compile, false);
+		JavaCompiledState compiledState = (JavaCompiledState)run(runOptions);
+		return !compiledState.containsErrors();
+	}
+
+	public static <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
+		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
+		List<K> keys = new ArrayList<K>(data.keySet());
+		Collections.sort(keys);
+		for (K k : keys) {
+			dup.put(k, data.get(k));
+		}
+		return dup;
 	}
 }

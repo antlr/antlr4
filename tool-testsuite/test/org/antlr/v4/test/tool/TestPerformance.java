@@ -21,7 +21,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
@@ -40,9 +39,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestUtils;
+import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,8 +54,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -79,7 +75,8 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.NewLine;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -398,12 +395,12 @@ public class TestPerformance extends BaseJavaToolTest {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
-        compileJavaParser(USE_LR_GRAMMAR);
+        JavaCompiledState javaCompiledState = compileJavaParser(USE_LR_GRAMMAR);
         final String lexerName    = USE_LR_GRAMMAR ? "JavaLRLexer"        : "JavaLexer";
         final String parserName   = USE_LR_GRAMMAR ? "JavaLRParser"       : "JavaParser";
         final String listenerName = USE_LR_GRAMMAR ? "JavaLRBaseListener" : "JavaBaseListener";
         final String entryPoint = "compilationUnit";
-        final ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
+        final ParserFactory factory = getParserFactory(javaCompiledState, listenerName, entryPoint);
 
 		if (!TOP_PACKAGE.isEmpty()) {
             jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
@@ -682,13 +679,6 @@ public class TestPerformance extends BaseJavaToolTest {
 		return sourceRoot;
 	}
 
-    @Override
-    public void eraseTempDir() {
-        if (DELETE_TEMP_FILES) {
-            super.eraseTempDir();
-        }
-    }
-
     public static String getOptionsDescription(String topPackage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Input=");
@@ -702,20 +692,20 @@ public class TestPerformance extends BaseJavaToolTest {
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
 
-        builder.append(NEW_LINE);
+        builder.append(NewLine);
 
         builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
         builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
         builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
         builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
-        builder.append(NEW_LINE);
+        builder.append(NewLine);
 
         builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
-        builder.append(NEW_LINE);
+        builder.append(NewLine);
 
         return builder.toString();
     }
@@ -1091,11 +1081,11 @@ public class TestPerformance extends BaseJavaToolTest {
 		return result;
 	}
 
-    protected void compileJavaParser(boolean leftRecursive) throws IOException {
+    protected JavaCompiledState compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = leftRecursive ? "JavaLR.g4"    : "Java.g4";
         String parserName      = leftRecursive ? "JavaLRParser" : "JavaParser";
         String lexerName       = leftRecursive ? "JavaLRLexer"  : "JavaLexer";
-        String body = load(grammarFileName, null);
+        String body = load(grammarFileName);
         List<String> extraOptions = new ArrayList<String>();
 		extraOptions.add("-Werror");
         if (FORCE_ATN) {
@@ -1110,10 +1100,12 @@ public class TestPerformance extends BaseJavaToolTest {
 				extraOptions.add("-XdbgSTWait");
 			}
 		}
-		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[0]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, parserName, lexerName, true, extraOptionsArray);
-        assertTrue(success);
+
+		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, body, parserName, lexerName,
+				false, true, null, null,
+				false, false, Stage.Compile, false);
+		return (JavaCompiledState) run(runOptions);
     }
 
 	private static void updateChecksum(MurmurHashChecksum checksum, int value) {
@@ -1134,19 +1126,16 @@ public class TestPerformance extends BaseJavaToolTest {
 		updateChecksum(checksum, token.getChannel());
 	}
 
-    protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
+    protected ParserFactory getParserFactory(JavaCompiledState javaCompiledState, String listenerName, final String entryPoint) {
         try {
-            ClassLoader loader = new URLClassLoader(new URL[] { getTempTestDir().toURI().toURL() }, ClassLoader.getSystemClassLoader());
-            final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
-            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+            ClassLoader loader = javaCompiledState.loader;
+			final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
-            final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-            final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+            final Constructor<? extends Lexer> lexerCtor = javaCompiledState.lexer.getConstructor(CharStream.class);
+            final Constructor<? extends Parser> parserCtor = javaCompiledState.parser.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
-            parserCtor.newInstance(new CommonTokenStream(tokenSource));
+			javaCompiledState.initializeLexerAndParser("");
 
             return new ParserFactory() {
 
@@ -1260,7 +1249,7 @@ public class TestPerformance extends BaseJavaToolTest {
 							parser.setErrorHandler(new BailErrorStrategy());
 						}
 
-                        Method parseMethod = parserClass.getMethod(entryPoint);
+                        Method parseMethod = javaCompiledState.parser.getMethod(entryPoint);
                         Object parseResult;
 
 						try {
@@ -1953,7 +1942,7 @@ public class TestPerformance extends BaseJavaToolTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		RuntimeTestUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(getTempDirPath());
 
 		long startTime = System.nanoTime();
 
@@ -1968,7 +1957,7 @@ public class TestPerformance extends BaseJavaToolTest {
 			}
 		}
 
-		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), "Java", "Level_0_1.g4", false);
+		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "Level_0_1.g4", false);
 		Assert.assertTrue(equeue.errors.isEmpty());
 
 		long endTime = System.nanoTime();

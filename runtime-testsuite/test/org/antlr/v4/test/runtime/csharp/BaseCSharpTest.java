@@ -6,199 +6,71 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.states.CompiledState;
+import org.antlr.v4.test.runtime.states.GeneratedState;
+import org.stringtemplate.v4.ST;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertTrue;
+import static org.antlr.v4.test.runtime.FileUtils.mkdir;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 
-public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+public class BaseCSharpTest extends BaseRuntimeTestSupport {
 	@Override
-	public String getLanguage() {
-		return "CSharp";
-	}
+	public String getLanguage() { return "CSharp"; }
+
+	@Override
+	public String getTitleName() { return "C#"; }
 
 	@Override
 	public String getExtension() { return "cs"; }
 
-	private static Boolean isRuntimeInitialized = false;
-	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
+	@Override
+	public String getRuntimeToolName() { return "dotnet"; }
+
+	@Override
+	public String getExecFileName() { return getTestFileName() + ".dll"; }
+
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
-	private static String cSharpTestProjectContent;
-	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
+	private final static String cSharpAntlrRuntimeDllName =
+			Paths.get(getCachePath("CSharp"), "Antlr4.Runtime.Standard.dll").toString();
 
-	@Override
-	protected String getPropertyPrefix() {
-		return "antlr4-csharp";
-	}
+	private final static String cSharpTestProjectContent;
 
-	Set<String> sourceFiles = new HashSet<>();
-
-	private void addSourceFiles(String... files) {
-		Collections.addAll(sourceFiles, files);
+	static {
+		ST projectTemplate = new ST(RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/Antlr4.Test.csproj.stg"));
+		projectTemplate.add("runtimeLibraryPath", cSharpAntlrRuntimeDllName);
+		cSharpTestProjectContent = projectTemplate.render();
 	}
 
 	@Override
-	public String execLexer(String grammarFileName,
-							String grammarStr,
-							String lexerName,
-							String input,
-							boolean showDFA) {
-		boolean success = rawGenerateRecognizer(grammarFileName,
-				grammarStr,
-				null,
-				lexerName);
-		assertTrue(success);
-		writeFile(getTempDirPath(), "input", input);
-		writeLexerFile(lexerName, showDFA);
-		addSourceFiles("Test.cs");
-		return execRecognizer();
+	protected void initRuntime() throws Exception {
+		String cachePath = getCachePath();
+		mkdir(cachePath);
+
+		String[] args = new String[]{
+				"dotnet",
+				"build",
+				Paths.get(getRuntimePath(), "src", "Antlr4.csproj").toString(),
+				"-c",
+				"Release",
+				"-o",
+				cachePath
+		};
+
+		runCommand(args, cachePath, "build " + getTitleName() + " ANTLR runtime");
 	}
 
 	@Override
-	public String execParser(String grammarFileName,
-							 String grammarStr,
-							 String parserName,
-							 String lexerName,
-							 String listenerName,
-							 String visitorName,
-							 String startRuleName,
-							 String input,
-							 boolean showDiagnosticErrors) {
-		boolean success = rawGenerateRecognizer(grammarFileName,
-				grammarStr,
-				parserName,
-				lexerName,
-				"-visitor");
-		assertTrue(success);
-		writeFile(getTempDirPath(), "input", input);
-		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false, false,
-				listenerName != null, visitorName != null);
-		addSourceFiles("Test.cs");
-		return execRecognizer();
-	}
-
-	/**
-	 * Return true if all is well
-	 */
-	protected boolean rawGenerateRecognizer(String grammarFileName,
-											String grammarStr,
-											String parserName,
-											String lexerName,
-											String... extraOptions) {
-		ErrorQueue errorQueue = antlrOnString(getTempDirPath(), "CSharp", grammarFileName, grammarStr, false, extraOptions);
-		if (!errorQueue.errors.isEmpty()) {
-			return false;
-		}
-
-		addSourceFiles(getGeneratedFiles(grammarFileName, lexerName, parserName, extraOptions).toArray(new String[0]));
-		return true;
-	}
-
-	public String execRecognizer() {
-		if (!buildProject()) {
-			System.err.println("Failed to compile!");
-			return getParseErrors();
-		}
-		String exec = new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
-		String output;
+	public CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+		Exception exception = null;
 		try {
-			ProcessorResult result =
-					Processor.run(new String[]{"dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath()},
-							getTempDirPath());
-			setParseErrors(result.errors);
-			output = result.output;
+			writeFile(getTempDirPath(), testProjectFileName, cSharpTestProjectContent);
+			runCommand(new String[]{"dotnet", "build", testProjectFileName, "-c", "Release"}, getTempDirPath(),
+					"build C# test binary");
+		} catch (Exception e) {
+			exception = e;
 		}
-		catch (Exception e) {
-			System.err.println("can't exec recognizer");
-			e.printStackTrace(System.err);
-			return null;
-		}
-		return output;
-	}
-
-	public boolean buildProject() {
-		try {
-			assertTrue(initializeRuntime());
-			// save auxiliary files
-			try (PrintWriter out = new PrintWriter(new File(getTempTestDir(), testProjectFileName))) {
-				out.print(cSharpTestProjectContent);
-			}
-
-			// build test
-			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
-			Processor.run(args, getTempDirPath());
-		}
-		catch (Exception e) {
-			e.printStackTrace(System.err);
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean initializeRuntime() {
-		// Compile runtime project once per overall maven test session (assuming forkCount=0)
-		synchronized (BaseCSharpTest.class) {
-			if ( isRuntimeInitialized) {
-//				System.out.println("C# runtime build REUSED\n");
-				return true;
-			}
-
-			System.out.println("Building C# runtime\n");
-
-			// find runtime package
-			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
-			if (runtimeProj == null) {
-				throw new RuntimeException("C# runtime project file not found!");
-			}
-			File runtimeProjFile = new File(runtimeProj.getFile());
-			String runtimeProjPath = runtimeProjFile.getPath();
-
-			RuntimeTestUtils.mkdir(cSharpCachingDirectory);
-			String[] args = new String[]{
-					"dotnet",
-					"build",
-					runtimeProjPath,
-					"-c",
-					"Release",
-					"-o",
-					cSharpCachingDirectory
-			};
-
-			boolean success;
-			try {
-				String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-				InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
-				int bufferSize = 1024;
-				char[] buffer = new char[bufferSize];
-				StringBuilder out = new StringBuilder();
-				Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-				for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-					out.append(buffer, 0, numRead);
-				}
-				cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
-
-				success = Processor.run(args, cSharpCachingDirectory).isSuccess();
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
-				success = false;
-			}
-
-			if (success) System.out.println("C# runtime build succeeded\n");
-			else System.out.println("C# runtime build failed\n");
-
-			isRuntimeInitialized = true; // try only once
-			return success;
-		}
+		return new CompiledState(generatedState, exception);
 	}
 }

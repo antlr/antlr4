@@ -6,37 +6,32 @@
 
 package org.antlr.v4.test.runtime;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
+import org.antlr.v4.test.runtime.states.ExecutedState;
+import org.antlr.v4.test.runtime.states.State;
 import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STGroupString;
 import org.stringtemplate.v4.StringRenderer;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static junit.framework.TestCase.fail;
-import static junit.framework.TestCase.failNotEquals;
+import static org.antlr.v4.test.runtime.FileUtils.eraseDirectory;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.junit.Assume.assumeFalse;
 
 /** This class represents a single runtime test. It pulls data from
  *  a {@link RuntimeTestDescriptor} and uses junit to trigger a test.
  *  The only functionality needed to execute a test is defined in
- *  {@link RuntimeTestSupport}. All of the various test rig classes
+ *  {@link BaseRuntimeTestSupport}. All of the various test rig classes
  *  derived from this one. E.g., see {@link org.antlr.v4.test.runtime.java.TestParserExec}.
  *
  *  @since 4.6.
@@ -126,13 +121,10 @@ public abstract class BaseRuntimeTest {
 		t.start();
 	}
 
-	/** ANTLR isn't thread-safe to process grammars so we use a global lock for testing */
-	public static final Object antlrLock = new Object();
-
-	protected RuntimeTestSupport delegate;
+	protected BaseRuntimeTestSupport delegate;
 	protected RuntimeTestDescriptor descriptor;
 
-	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate) {
+	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, BaseRuntimeTestSupport delegate) {
 		this.descriptor = descriptor;
 		this.delegate = delegate;
 	}
@@ -158,175 +150,78 @@ public abstract class BaseRuntimeTest {
 		@Override
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
-			delegate.eraseTempDir();
+			eraseDirectory(delegate.getTempTestDir());
 		}
 	};
 
+	private final static StringRenderer rendered = new StringRenderer();
+
 	@Test
-	public void testOne() throws Exception {
-		// System.out.println(descriptor.getTestName());
-		// System.out.println(delegate.getTmpDir());
+	public void testOne() {
+		// System.out.println(delegate.getTempDirPath());
 		if (descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.println("Ignore " + descriptor);
 			return;
 		}
-		delegate.beforeTest(descriptor);
+
+		FileUtils.mkdir(delegate.getTempDirPath());
+
+		Pair<String, String> pair = descriptor.getGrammar();
+		String sourceName = "org/antlr/v4/test/runtime/templates/" + descriptor.getTarget() + ".test.stg";
+		String template = RuntimeTestUtils.getTextFromResource(sourceName);
+		STGroup targetTemplates = new STGroupString(sourceName, template, '<', '>');
+		targetTemplates.registerRenderer(String.class, rendered);
+
+		// write out any slave grammars
+		List<Pair<String, String>> slaveGrammars = descriptor.getSlaveGrammars();
+		if ( slaveGrammars!=null ) {
+			for (Pair<String, String> spair : slaveGrammars) {
+				STGroup g = new STGroup('<', '>');
+				g.registerRenderer(String.class, rendered);
+				g.importTemplates(targetTemplates);
+				ST grammarST = new ST(g, spair.b);
+				writeFile(delegate.getTempDirPath(), spair.a+".g4", grammarST.render());
+			}
+		}
+
+		String grammarName = pair.a;
+		String grammar = pair.b;
+		STGroup g = new STGroup('<', '>');
+		g.importTemplates(targetTemplates);
+		g.registerRenderer(String.class, rendered);
+		ST grammarST = new ST(g, grammar);
+		grammar = grammarST.render();
+
+		String lexerName, parserName;
 		if (descriptor.getTestType().contains("Parser") ) {
-			testParser(descriptor);
+			lexerName = grammarName + "Lexer";
+			parserName = grammarName + "Parser";
 		}
 		else {
-			testLexer(descriptor);
+			lexerName = grammarName;
+			parserName = null;
 		}
-		delegate.afterTest(descriptor);
+
+		RunOptions runOptions = new RunOptions(grammarName + ".g4",
+				grammar,
+				parserName,
+				lexerName,
+				true,
+				true,
+				descriptor.getStartRule(),
+				descriptor.getInput(),
+				false,
+				descriptor.showDiagnosticErrors(),
+				descriptor.showDFA(),
+				Stage.Execute,
+				false,
+				delegate.getLanguage()
+		);
+
+		State result = delegate.run(runOptions);
+
+		assertCorrectOutput(descriptor, result);
 	}
-
-	public void testParser(RuntimeTestDescriptor descriptor) {
-		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
-
-		Pair<String, String> pair = descriptor.getGrammar();
-
-		ClassLoader cloader = getClass().getClassLoader();
-		URL templates = cloader.getResource("org/antlr/v4/test/runtime/templates/"+descriptor.getTarget()+".test.stg");
-		STGroupFile targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
-		targetTemplates.registerRenderer(String.class, new StringRenderer());
-
-		// write out any slave grammars
-		List<Pair<String, String>> slaveGrammars = descriptor.getSlaveGrammars();
-		if ( slaveGrammars!=null ) {
-			for (Pair<String, String> spair : slaveGrammars) {
-				STGroup g = new STGroup('<', '>');
-				g.registerRenderer(String.class, new StringRenderer());
-				g.importTemplates(targetTemplates);
-				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
-			}
-		}
-
-		String grammarName = pair.a;
-		String grammar = pair.b;
-		STGroup g = new STGroup('<', '>');
-		g.importTemplates(targetTemplates);
-		g.registerRenderer(String.class, new StringRenderer());
-		ST grammarST = new ST(g, grammar);
-		grammar = grammarST.render();
-
-		String found = delegate.execParser(grammarName+".g4", grammar,
-		                                   grammarName+"Parser",
-		                                   grammarName+"Lexer",
-		                                   grammarName+"Listener",
-		                                   grammarName+"Visitor",
-		                                   descriptor.getStartRule(),
-		                                   descriptor.getInput(),
-		                                   descriptor.showDiagnosticErrors()
-		                                  );
-		assertCorrectOutput(descriptor, delegate, found);
-	}
-
-	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
-		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
-
-		Pair<String, String> pair = descriptor.getGrammar();
-
-		ClassLoader cloader = getClass().getClassLoader();
-		URL templates = cloader.getResource("org/antlr/v4/test/runtime/templates/"+descriptor.getTarget()+".test.stg");
-		STGroupFile targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
-		targetTemplates.registerRenderer(String.class, new StringRenderer());
-
-		// write out any slave grammars
-		List<Pair<String, String>> slaveGrammars = descriptor.getSlaveGrammars();
-		if ( slaveGrammars!=null ) {
-			for (Pair<String, String> spair : slaveGrammars) {
-				STGroup g = new STGroup('<', '>');
-				g.registerRenderer(String.class, new StringRenderer());
-				g.importTemplates(targetTemplates);
-				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
-			}
-		}
-
-		String grammarName = pair.a;
-		String grammar = pair.b;
-		STGroup g = new STGroup('<', '>');
-		g.registerRenderer(String.class, new StringRenderer());
-		g.importTemplates(targetTemplates);
-		ST grammarST = new ST(g, grammar);
-		grammar = grammarST.render();
-
-		String found = delegate.execLexer(grammarName+".g4", grammar, grammarName, descriptor.getInput(), descriptor.showDFA());
-		assertCorrectOutput(descriptor, delegate, found);
-	}
-
-	/** Write a grammar to tmpdir and run antlr */
-	public static ErrorQueue antlrOnString(String workdir,
-	                                       String targetName,
-	                                       String grammarFileName,
-	                                       String grammarStr,
-	                                       boolean defaultListener,
-	                                       String... extraOptions)
-	{
-		RuntimeTestUtils.mkdir(workdir);
-		writeFile(workdir, grammarFileName, grammarStr);
-		return antlrOnString(workdir, targetName, grammarFileName, defaultListener, extraOptions);
-	}
-
-	/** Run ANTLR on stuff in workdir and error queue back */
-	public static ErrorQueue antlrOnString(String workdir,
-	                                       String targetName,
-	                                       String grammarFileName,
-	                                       boolean defaultListener,
-	                                       String... extraOptions)
-	{
-		final List<String> options = new ArrayList<>();
-		Collections.addAll(options, extraOptions);
-		if ( targetName!=null ) {
-			options.add("-Dlanguage="+targetName);
-		}
-		if ( !options.contains("-o") ) {
-			options.add("-o");
-			options.add(workdir);
-		}
-		if ( !options.contains("-lib") ) {
-			options.add("-lib");
-			options.add(workdir);
-		}
-		if ( !options.contains("-encoding") ) {
-			options.add("-encoding");
-			options.add("UTF-8");
-		}
-		options.add(new File(workdir,grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = new Tool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if (defaultListener) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		List<String> errors = new ArrayList<>();
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i < equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				ST msgST = antlr.errMgr.getMessageTemplate(msg);
-				errors.add(msgST.render());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i < equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
-	// ---- support ----
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(String group, String targetName) {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -339,29 +234,14 @@ public abstract class BaseRuntimeTest {
 			System.err.println("Bad URL:"+descrURL);
 		}
 
-//		String[] descriptorFilenames = new File("/tmp/descriptors/"+group).list();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
 		for (String fname : descriptorFilenames) {
-			try {
-//				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
-				final URL dURL = loader.getResource("org/antlr/v4/test/runtime/descriptors/" +group+"/"+fname);
-				String dtext = null;
-				try {
-					URI uri = dURL.toURI();
-					dtext = new String(Files.readAllBytes(Paths.get(uri)));
-				}
-				catch (URISyntaxException e) {
-					System.err.println("Bad URL:"+dURL);
-				}
-				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
-				if ( !d.ignore(targetName) ) {
-					d.name = fname.replace(".txt", "");
-					d.targetName = targetName;
-					descriptors.add(d);
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("Can't read descriptor file "+fname);
+			String dtext = RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/descriptors/" + group + "/" + fname);
+			UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
+			if (!d.ignore(targetName)) {
+				d.name = fname.replace(".txt", "");
+				d.targetName = targetName;
+				descriptors.add(d);
 			}
 		}
 
@@ -422,9 +302,7 @@ public abstract class BaseRuntimeTest {
 	 a : b {<writeln("\"S.a\"")>};
 	 b : B;
 	 */
-	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
-			throws RuntimeException
-	{
+	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext) throws RuntimeException {
 		String currentField = null;
 		StringBuilder currentValue = new StringBuilder();
 
@@ -528,255 +406,42 @@ public abstract class BaseRuntimeTest {
 		return grammarDeclLine.substring(gi, gsemi);
 	}
 
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
+	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, State state) {
+		ExecutedState executedState;
+		if (state instanceof ExecutedState) {
+			executedState = (ExecutedState)state;
+			if (executedState.exception != null) {
+				fail(state.getErrorMessage());
+			}
 		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
-	public static String readFile(String dir, String fileName) {
-		try {
-			return String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8"));
-		}
-		catch (IOException ioe) {
-			System.err.println("can't read file");
-			ioe.printStackTrace(System.err);
-		}
-		return null;
-	}
-
-	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
-		String actualParseErrors = delegate.getParseErrors();
-		String actualToolErrors = delegate.getANTLRToolErrors();
-		String expectedOutput = descriptor.getOutput();
-		String expectedParseErrors = descriptor.getErrors();
-		String expectedToolErrors = descriptor.getANTLRToolErrors();
-
-		if (actualOutput == null) {
-			actualOutput = "";
-		}
-		if (actualParseErrors == null) {
-			actualParseErrors = "";
-		}
-		if (actualToolErrors == null) {
-			actualToolErrors = "";
-		}
-		if (expectedOutput == null) {
-			expectedOutput = "";
-		}
-		if (expectedParseErrors == null) {
-			expectedParseErrors = "";
-		}
-		if (expectedToolErrors == null) {
-			expectedToolErrors = "";
-		}
-
-		if (actualOutput.equals(expectedOutput) &&
-				actualParseErrors.equals(expectedParseErrors) &&
-				actualToolErrors.equals(expectedToolErrors)) {
+		else {
+			fail(state.getErrorMessage());
 			return;
 		}
 
-		if (actualOutput.equals(expectedOutput)) {
-			if (actualParseErrors.equals(expectedParseErrors)) {
-				failNotEquals("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
-								"Parse output and parse errors are as expected, but tool errors are incorrect",
-						expectedToolErrors, actualToolErrors);
-			}
-			else {
-				fail("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
-						"Parse output is as expected, but errors are not: " +
-						"expectedParseErrors:<" + expectedParseErrors +
-						">; actualParseErrors:<" + actualParseErrors +
-						">; expectedToolErrors:<" + expectedToolErrors +
-						">; actualToolErrors:<" + actualToolErrors +
-						">.");
-			}
+		String expectedOutput = descriptor.getOutput();
+		String expectedParseErrors = descriptor.getErrors();
+
+		if (executedState.output.equals(expectedOutput) &&
+				executedState.errors.equals(expectedParseErrors)) {
+			return;
+		}
+
+		if (executedState.output.equals(expectedOutput)) {
+			fail("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
+					"Parse output is as expected, but errors are not: " +
+					"expectedParseErrors:<" + expectedParseErrors +
+					">; actualParseErrors:<" + executedState.errors +
+					">.");
 		}
 		else {
 			fail("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
 					"Parse output is incorrect: " +
 					"expectedOutput:<" + expectedOutput +
-					">; actualOutput:<" + actualOutput +
+					">; actualOutput:<" + executedState.output +
 					">; expectedParseErrors:<" + expectedParseErrors +
-					">; actualParseErrors:<" + actualParseErrors +
-					">; expectedToolErrors:<" + expectedToolErrors +
-					">; actualToolErrors:<" + actualToolErrors +
+					">; actualParseErrors:<" + executedState.errors +
 					">.");
 		}
 	}
-
-	// ----------------------------------------------------------------------------
-	// stuff used during conversion that I don't want to throw away yet and we might lose if
-	// I squash this branch unless I keep it around in a comment or something
-	// ----------------------------------------------------------------------------
-
-//	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
-//		if(!TestContext.isSupportedTarget(targetName))
-//			return new RuntimeTestDescriptor[0];
-//		Class<?>[] nestedClasses = clazz.getClasses();
-//		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
-//		for (Class<?> nestedClass : nestedClasses) {
-//			int modifiers = nestedClass.getModifiers();
-//			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
-//				try {
-//					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-//					if(!d.ignore(targetName)) {
-//						d.setTarget(targetName);
-//						descriptors.add(d);
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace(System.err);
-//				}
-//			}
-//		}
-//		writeDescriptors(clazz, descriptors);
-//		return descriptors.toArray(new RuntimeTestDescriptor[0]);
-//	}
-
-
-	/** Write descriptor files. */
-//	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
-//		String descrRootDir = "/Users/parrt/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/new_descriptors";
-//		new File(descrRootDir).mkdir();
-//		String groupName = clazz.getSimpleName();
-//		groupName = groupName.replace("Descriptors", "");
-//		String groupDir = descrRootDir + "/" + groupName;
-//		new File(groupDir).mkdir();
-//
-//		for (RuntimeTestDescriptor d : descriptors) {
-//			try {
-//				Pair<String,String> g = d.getGrammar();
-//				String gname = g.a;
-//				String grammar = g.b;
-//				String filename = d.getTestName()+".txt";
-//				String content = "";
-//				String input = quoteForDescriptorFile(d.getInput());
-//				String output = quoteForDescriptorFile(d.getOutput());
-//				String errors = quoteForDescriptorFile(d.getErrors());
-//				content += "[type]\n";
-//				content += d.getTestType();
-//				content += "\n\n";
-//				content += "[grammar]\n";
-//				content += grammar;
-//				if ( !content.endsWith("\n\n") ) content += "\n";
-//				if ( d.getSlaveGrammars()!=null ) {
-//					for (Pair<String, String> slaveG : d.getSlaveGrammars()) {
-//						String sg = quoteForDescriptorFile(slaveG.b);
-//						content += "[slaveGrammar]\n";
-//						content += sg;
-//						content += "\n";
-//					}
-//				}
-//				if ( d.getStartRule()!=null && d.getStartRule().length()>0 ) {
-//					content += "[start]\n";
-//					content += d.getStartRule();
-//					content += "\n\n";
-//				}
-//				if ( input!=null ) {
-//					content += "[input]\n";
-//					content += input;
-//					content += "\n";
-//				}
-//				if ( output!=null ) {
-//					content += "[output]\n";
-//					content += output;
-//					content += "\n";
-//				}
-//				if ( errors!=null ) {
-//					content += "[errors]\n";
-//					content += errors;
-//					content += "\n";
-//				}
-//				if ( d.showDFA() || d.showDiagnosticErrors() ) {
-//					content += "[flags]\n";
-//					if (d.showDFA()) {
-//						content += "showDFA\n";
-//					}
-//					if (d.showDiagnosticErrors()) {
-//						content += "showDiagnosticErrors\n";
-//					}
-//					content += '\n';
-//				}
-//				List<String> skip = new ArrayList<>();
-//				for (String target : Targets) {
-//					if ( d.ignore(target) ) {
-//						skip.add(target);
-//					}
-//				}
-//				if ( skip.size()>0 ) {
-//					content += "[skip]\n";
-//					for (String sk : skip) {
-//						content += sk+"\n";
-//					}
-//					content += '\n';
-//				}
-//				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
-//			}
-//			catch (IOException e) {
-//				//exception handling left as an exercise for the reader
-//				System.err.println(e.getMessage());
-//			}
-//		}
-//	}
-//
-//	/** Rules for strings look like this:
-//	 *
-//	 * [input]  if one line, remove all WS before/after
-//	 * a b
-//	 *
-//	 * [input] need whitespace
-//	 * """34
-//	 *  34"""
-//	 *
-//	 * [input] single quote char, remove all WS before/after
-//	 * "
-//	 *
-//	 * [input]  same as "b = 6\n" in java
-//	 * """b = 6
-//	 * """
-//	 *
-//	 * [input]
-//	 * """a """ space and no newline inside
-//	 *
-//	 * [input]  same as java string "\"aaa"
-//	 * "aaa
-//	 *
-//	 * [input] ignore front/back \n except leave last \n
-//	 * a
-//	 * b
-//	 * c
-//	 * d
-//	 */
-//	private static String quoteForDescriptorFile(String s) {
-//		if ( s==null ) {
-//			return null;
-//		}
-//		long nnl = s.chars().filter(ch -> ch == '\n').count();
-//
-//		if ( s.endsWith(" ") ||            // whitespace matters
-//				(nnl==1&&s.endsWith("\n")) || // "b = 6\n"
-//				s.startsWith("\n") ) {        // whitespace matters
-//			return "\"\"\"" + s + "\"\"\"\n";
-//		}
-//		if ( s.endsWith(" \n") || s.endsWith("\n\n") ) {
-//			return "\"\"\"" + s + "\"\"\"\n";
-//		}
-//		if ( nnl==0 ) { // one line input
-//			return s + "\n";
-//		}
-//		if ( nnl>1 && s.endsWith("\n") ) {
-//			return s;
-//		}
-//		if ( !s.endsWith("\n") ) { // "a\n b"
-//			return "\"\"\"" + s + "\"\"\"\n";
-//		}
-//
-//		return s;
-//	}
-
 }
