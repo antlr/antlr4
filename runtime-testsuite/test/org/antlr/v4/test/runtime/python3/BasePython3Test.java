@@ -6,17 +6,27 @@
 package org.antlr.v4.test.runtime.python3;
 
 import org.antlr.v4.test.runtime.python.BasePythonTest;
-import java.util.Arrays;
-import java.util.List;
+
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BasePython3Test extends BasePythonTest {
+	public final static Map<String, String> environment;
+
+	static {
+		environment = new HashMap<>();
+		environment.put("PYTHONPATH", Paths.get(getRuntimePath("Python3"), "src").toString());
+		environment.put("PYTHONIOENCODING", "utf-8");
+	}
+
 	@Override
 	public String getLanguage() {
 		return "Python3";
 	}
 
 	@Override
-	protected List<String> getPythonExecutables() {
-		return Arrays.asList("python3.7", "python3.8");
-	} // force 3.7 or 3.8
+	public Map<String, String> getExecEnvironment() {
+		return environment;
+	}
 }

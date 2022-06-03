@@ -6,11 +6,11 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestDollarParser extends BaseJavaToolTest {
 	@Before
@@ -20,15 +20,13 @@ public class TestDollarParser extends BaseJavaToolTest {
 	}
 
 	@Test
-	public void testSimpleCall() throws Exception {
+	public void testSimpleCall() {
 		String grammar = "grammar T;\n" +
-	                  "a : ID  { System.out.println( $parser.getSourceName() ); }\n" +
+	                  "a : ID  { System.out.println( new java.io.File($parser.getSourceName()).getAbsolutePath() ); }\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          null, null, "a", "x", true);
-		assertTrue(found.indexOf(this.getClass().getSimpleName())>=0);
-		assertNull(getParseErrors());
+		ExecutedState executedState = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", true);
+		assertTrue(executedState.output.contains(this.getClass().getSimpleName()));
+		assertEquals("", executedState.errors);
 	}
-
 }

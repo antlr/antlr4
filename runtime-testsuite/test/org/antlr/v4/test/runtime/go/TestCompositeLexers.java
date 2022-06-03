@@ -18,12 +18,6 @@ public class TestCompositeLexers extends BaseRuntimeTest {
 		super(descriptor,new BaseGoTest());
 	}
 
-	@BeforeClass
-	public static void groupSetUp() throws Exception { BaseGoTest.groupSetUp(); }
-
-	@AfterClass
-	public static void groupTearDown() throws Exception { BaseGoTest.groupTearDown(); }
-
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
 		return BaseRuntimeTest.getRuntimeTestDescriptors("CompositeLexers", "Go");

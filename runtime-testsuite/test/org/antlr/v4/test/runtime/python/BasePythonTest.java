@@ -6,129 +6,24 @@
 package org.antlr.v4.test.runtime.python;
 
 import org.antlr.v4.test.runtime.*;
-import org.junit.runner.Description;
+import org.stringtemplate.v4.ST;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.*;
-
-public abstract class BasePythonTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+public abstract class BasePythonTest extends BaseRuntimeTestSupport {
 	@Override
 	public String getExtension() { return "py"; }
 
 	@Override
-	protected void testSucceeded(Description description) {
-		eraseTempPyCache();
-		eraseTempDir();
+	public String getRuntimeToolName() {
+		String toolFileName = System.getProperty(getPropertyPrefix() + "-exec");
+		if (toolFileName != null && toolFileName.length() > 0) {
+			return toolFileName;
+		}
+
+		return getLanguage().toLowerCase();
 	}
 
 	@Override
-	protected String getPropertyPrefix() {
-		return "antlr-" + getLanguage().toLowerCase();
-	}
-
-	@Override
-	public  String execLexer(String grammarFileName,
-	                         String grammarStr,
-	                         String lexerName,
-	                         String input,
-	                         boolean showDFA)
-	{
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr);
-		assertTrue(success);
-		writeFile(getTempDirPath(), "input", input);
-		writeLexerFile(lexerName, showDFA);
-		return execModule();
-	}
-
-	@Override
-	public String execParser(String grammarFileName,
-	                         String grammarStr,
-	                         String parserName,
-	                         String lexerName,
-	                         String listenerName,
-	                         String visitorName,
-	                         String startRuleName,
-	                         String input,
-	                         boolean showDiagnosticErrors) {
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, "-visitor");
-		assertTrue(success);
-		writeFile(getTempDirPath(), "input", input);
-		setParseErrors(null);
-		writeRecognizerFile(lexerName, parserName, startRuleName, showDiagnosticErrors, false,
-				false, listenerName != null, visitorName != null);
-		return execModule();
-	}
-
-	/** Return true if all is well */
-	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName, String grammarStr, String... extraOptions)
-	{
-		ErrorQueue errorQueue = antlrOnString(getTempDirPath(), getLanguage(), grammarFileName, grammarStr, false, extraOptions);
-		return errorQueue.errors.isEmpty();
-	}
-
-	public String execModule() {
-		String pythonPath = locatePython();
-		String runtimePath = Paths.get(getRuntimePath(), "src").toString();
-		File tmpdirFile = new File(getTempDirPath());
-		String modulePath = new File(tmpdirFile, "Test.py").getAbsolutePath();
-		String inputPath = new File(tmpdirFile, "input").getAbsolutePath();
-		try {
-			HashMap<String, String> environment = new HashMap<>();
-			environment.put("PYTHONPATH", runtimePath);
-			environment.put("PYTHONIOENCODING", "utf-8");
-			ProcessorResult result = Processor.run(new String[]{pythonPath, modulePath, inputPath},
-					getTempDirPath(),
-					environment);
-			setParseErrors(result.errors);
-			return result.output;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec recognizer");
-			e.printStackTrace(System.err);
-		}
-		return null;
-	}
-
-	private String locateTool(List<String> tools) {
-		String[] roots = {
-			"/opt/local/bin", "/usr/bin/", "/usr/local/bin/",
-			"/Users/"+System.getProperty("user.name")+"/anaconda3/bin/",
-			"/Users/"+System.getProperty("user.name")+"/opt/anaconda3/bin/"
-		};
-		for(String root : roots) {
-			for (String tool : tools) {
-				if ( new File(root+tool).exists() ) {
-					return root+tool;
-				}
-			}
-		}
-		return "python";
-	}
-
-	protected String locatePython() {
-		String propName = getPropertyPrefix() + "-python";
-		String prop = System.getProperty(propName);
-		if(prop==null || prop.length()==0)
-			prop = locateTool(getPythonExecutables());
-		File file = new File(prop);
-		if(!file.exists())
-			return "python";
-		return file.getAbsolutePath();
-	}
-
-	protected abstract List<String> getPythonExecutables();
-
-	protected void eraseTempPyCache() {
-		File tmpdirF = new File(getTempTestDir() + "/__pycache__");
-		if ( tmpdirF.exists() ) {
-			eraseFilesInDir(tmpdirF);
-			tmpdirF.delete();
-		}
+	protected void addExtraRecognizerParameters(ST template) {
+		template.add("python3", getLanguage().equals("Python3"));
 	}
 }

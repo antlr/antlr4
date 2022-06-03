@@ -1,0 +1,28 @@
+package org.antlr.v4.test.runtime.states;
+
+import org.antlr.v4.test.runtime.Stage;
+
+public abstract class State {
+	public final State previousState;
+
+	public final Exception exception;
+
+	public abstract Stage getStage();
+
+	public boolean containsErrors() {
+		return exception != null;
+	}
+
+	public String getErrorMessage() {
+		String result = "State: " + getStage() + "; ";
+		if (exception != null) {
+			result += exception.toString();
+		}
+		return result;
+	}
+
+	public State(State previousState, Exception exception) {
+		this.previousState = previousState;
+		this.exception = exception;
+	}
+}

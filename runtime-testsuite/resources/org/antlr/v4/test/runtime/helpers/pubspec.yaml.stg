@@ -1,0 +1,6 @@
+name: "test"
+dependencies:
+  antlr4:
+    path: <runtimePath>
+environment:
+  sdk: ">=2.12.0 \<3.0.0"

@@ -1,16 +1,9 @@
 package org.antlr.v4.test.runtime;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.cpp.BaseCppTest;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.test.runtime.states.CompiledState;
+import org.antlr.v4.test.runtime.states.ExecutedState;
+import org.antlr.v4.test.runtime.states.GeneratedState;
+import org.antlr.v4.test.runtime.states.State;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -18,357 +11,272 @@ import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertEquals;
+import static org.antlr.v4.test.runtime.FileUtils.eraseDirectory;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
-public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
+public abstract class BaseRuntimeTestSupport {
 	public abstract String getLanguage();
 
-	public String getExtension() {
-		return getLanguage().toLowerCase();
+	protected String getExtension() { return getLanguage().toLowerCase(); }
+
+	protected String getTitleName() { return getLanguage(); }
+
+	protected String getTestFileName() { return "Test"; }
+
+	protected String getLexerSuffix() { return "Lexer"; }
+
+	protected String getParserSuffix() { return "Parser"; }
+
+	protected String getBaseListenerSuffix() { return "BaseListener"; }
+
+	protected String getListenerSuffix() { return "Listener"; }
+
+	protected String getBaseVisitorSuffix() { return "BaseVisitor"; }
+
+	protected String getVisitorSuffix() { return "Visitor"; }
+
+	protected String grammarNameToFileName(String grammarName) { return grammarName; }
+
+	protected String getRuntimeToolName() { return getLanguage().toLowerCase(); }
+
+	protected String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
+
+	protected String getExecFileName() { return getTestFileWithExt(); }
+
+	protected String[] getExtraRunArgs() { return null; }
+
+	protected Map<String, String> getExecEnvironment() { return null; }
+
+	protected String getPropertyPrefix() {
+		return "antlr-" + getLanguage().toLowerCase();
 	}
 
-	public String getTestFileName() { return "Test"; }
+	protected final File getTempTestDir() {
+		return tempTestDir;
+	}
 
-	public String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
+	protected final String getTempDirPath() {
+		return tempTestDir.getAbsolutePath();
+	}
 
-	public String getLexerSuffix() { return "Lexer"; }
+	private File tempTestDir = null;
 
-	public String getParserSuffix() { return "Parser"; }
+	private final static Object runtimeInitLockObject = new Object();
 
-	public String getBaseListenerSuffix() { return "BaseListener"; }
+	public final static String cacheDirectory;
+	public final static Path targetClassesPath;
 
-	public String getListenerSuffix() { return "Listener"; }
+	private static class InitializationStatus {
+		public final Object lockObject = new Object();
+		public Boolean isInitialized;
+		public Exception exception;
+	}
 
-	public String getBaseVisitorSuffix() { return "BaseVisitor"; }
+	private final static HashMap<String, InitializationStatus> runtimeInitializationStatuses = new HashMap<>();
 
-	public String getVisitorSuffix() { return "Visitor"; }
+	static {
+		targetClassesPath = Paths.get(RuntimeTestUtils.runtimeTestsuitePath.toString(), "target", "classes");
+		cacheDirectory = new File(System.getProperty("java.io.tmpdir"), "ANTLR-runtime-testsuite-cache").getAbsolutePath();
+	}
 
-	public List<String> getGeneratedFiles(String grammarFileName, String lexerName, String parserName, String... extraOptions) {
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+		@Override
+		protected void succeeded(Description description) {
+			eraseDirectory(tempTestDir);
+		}
+	};
+
+	protected final String getCachePath() {
+		return getCachePath(getLanguage());
+	}
+
+	public static String getCachePath(String language) {
+		return cacheDirectory + FileSeparator + language;
+	}
+
+	protected final String getRuntimePath() {
+		return getRuntimePath(getLanguage());
+	}
+
+	public static String getRuntimePath(String language) {
+		return targetClassesPath.toString() + FileSeparator + language;
+	}
+
+	protected State run(RunOptions runOptions) {
+		String[] options = runOptions.useVisitor ? new String[]{"-visitor"} : new String[0];
+		ErrorQueue errorQueue = Generator.antlrOnString(getTempDirPath(), getLanguage(),
+				runOptions.grammarFileName, runOptions.grammarStr, false, options);
+
+		List<String> generatedFiles = getGeneratedFiles(runOptions);
+		GeneratedState generatedState = new GeneratedState(errorQueue, generatedFiles, null);
+
+		if (generatedState.containsErrors() || runOptions.endStage == Stage.Generate) {
+			return generatedState;
+		}
+
+		writeRecognizerFile(runOptions);
+
+		if (!initAntlrRuntimeIfRequired()) {
+			// Do not repeat ANTLR runtime initialization error
+			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized"));
+		}
+
+		CompiledState compiledState = compile(runOptions, generatedState);
+
+		if (compiledState.containsErrors() || runOptions.endStage == Stage.Compile) {
+			return compiledState;
+		}
+
+		writeFile(getTempDirPath(), "input", runOptions.input);
+
+		return execute(runOptions, compiledState);
+	}
+
+	protected List<String> getGeneratedFiles(RunOptions runOptions) {
 		List<String> files = new ArrayList<>();
 		String extensionWithDot = "." + getExtension();
-		if (lexerName != null) {
-			files.add(lexerName + extensionWithDot);
+		String fileGrammarName = grammarNameToFileName(runOptions.grammarName);
+		boolean isCombinedGrammarOrGo = runOptions.lexerName != null && runOptions.parserName != null || getLanguage().equals("Go");
+		if (runOptions.lexerName != null) {
+			files.add(fileGrammarName + (isCombinedGrammarOrGo ? getLexerSuffix() : "") + extensionWithDot);
 		}
-		if (parserName != null) {
-			files.add(parserName + extensionWithDot);
-			Set<String> optionsSet = new HashSet<>(Arrays.asList(extraOptions));
-			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarName + getListenerSuffix() + extensionWithDot);
+		if (runOptions.parserName != null) {
+			files.add(fileGrammarName + (isCombinedGrammarOrGo ? getParserSuffix() : "") + extensionWithDot);
+			if (runOptions.useListener) {
+				files.add(fileGrammarName + getListenerSuffix() + extensionWithDot);
 				String baseListenerSuffix = getBaseListenerSuffix();
 				if (baseListenerSuffix != null) {
-					files.add(grammarName + baseListenerSuffix + extensionWithDot);
+					files.add(fileGrammarName + baseListenerSuffix + extensionWithDot);
 				}
 			}
-			if (optionsSet.contains("-visitor")) {
-				files.add(grammarName + getVisitorSuffix() + extensionWithDot);
+			if (runOptions.useVisitor) {
+				files.add(fileGrammarName + getVisitorSuffix() + extensionWithDot);
 				String baseVisitorSuffix = getBaseVisitorSuffix();
 				if (baseVisitorSuffix != null) {
-					files.add(grammarName + baseVisitorSuffix + extensionWithDot);
+					files.add(fileGrammarName + baseVisitorSuffix + extensionWithDot);
 				}
 			}
 		}
 		return files;
 	}
 
-	private static final Map<String, String> runtimePaths = new ConcurrentHashMap<>();
-
-	public String getRuntimePath() {
-		return getRuntimePath(getLanguage());
+	protected void writeRecognizerFile(RunOptions runOptions) {
+		String text = RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/" + getTestFileWithExt() + ".stg");
+		ST outputFileST = new ST(text);
+		outputFileST.add("grammarName", runOptions.grammarName);
+		outputFileST.add("lexerName", runOptions.lexerName);
+		outputFileST.add("parserName", runOptions.parserName);
+		outputFileST.add("parserStartRuleName", grammarParseRuleToRecognizerName(runOptions.startRuleName));
+		outputFileST.add("debug", runOptions.showDiagnosticErrors);
+		outputFileST.add("profile", runOptions.profile);
+		outputFileST.add("showDFA", runOptions.showDFA);
+		outputFileST.add("useListener", runOptions.useListener);
+		outputFileST.add("useVisitor", runOptions.useVisitor);
+		addExtraRecognizerParameters(outputFileST);
+		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
 	}
 
-	public static String getRuntimePath(String language) {
-		String runtimePath = runtimePaths.get(language);
-		if (runtimePath == null) {
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			URL resource = loader.getResource(language);
-			runtimePath = resource.getPath();
-			if(isWindows()){
-				runtimePath = runtimePath.replaceFirst("/", "");
+	protected String grammarParseRuleToRecognizerName(String startRuleName) {
+		return startRuleName;
+	}
+
+	protected void addExtraRecognizerParameters(ST template) {}
+
+	private boolean initAntlrRuntimeIfRequired() {
+		String language = getLanguage();
+		InitializationStatus status = runtimeInitializationStatuses.get(language);
+
+		// Create initialization status for every runtime with lock object
+		if (status == null) {
+			synchronized (runtimeInitLockObject) {
+				status = runtimeInitializationStatuses.get(language);
+				if (status == null) {
+					status = new InitializationStatus();
+					runtimeInitializationStatuses.put(language, status);
+				}
 			}
-			runtimePaths.put(language, runtimePath);
-		}
-		return runtimePath;
-	}
-
-	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
-	protected static final Logger logger = Logger.getLogger(BaseRuntimeTestSupport.class.getName());
-
-	public static final String NEW_LINE = System.getProperty("line.separator");
-	public static final String PATH_SEP = System.getProperty("path.separator");
-
-	private File tempTestDir = null;
-
-	/** If error during parser execution, store stderr here; can't return
-	 *  stdout and stderr.  This doesn't trap errors from running antlr.
-	 */
-	private String parseErrors;
-
-	/** Errors found while running antlr */
-	private StringBuilder antlrToolErrors;
-
-	public static String cachingDirectory;
-
-
-	static {
-		cachingDirectory = new File(System.getProperty("java.io.tmpdir"), "ANTLR-runtime-testsuite-cache").getAbsolutePath();
-	}
-
-	@org.junit.Rule
-	public final TestRule testWatcher = new TestWatcher() {
-
-		@Override
-		protected void succeeded(Description description) {
-			testSucceeded(description);
 		}
 
-	};
-
-	protected void testSucceeded(Description description) {
-		// remove tmpdir if no error.
-		eraseTempDir();
-	}
-
-	@Override
-	public File getTempParserDir() {
-		return getTempTestDir();
-	}
-
-	@Override
-	public String getTempParserDirPath() {
-		return getTempParserDir() == null ? null : getTempParserDir().getAbsolutePath();
-	}
-
-	@Override
-	public final File getTempTestDir() {
-		return tempTestDir;
-	}
-
-	@Override
-	public final String getTempDirPath() {
-		return tempTestDir ==null ? null : tempTestDir.getAbsolutePath();
-	}
-
-
-	public void setParseErrors(String errors) {
-		this.parseErrors = errors;
-	}
-
-	public String getParseErrors() {
-		return parseErrors;
-	}
-
-	public String getANTLRToolErrors() {
-		if ( antlrToolErrors.length()==0 ) {
-			return null;
+		if (status.isInitialized != null) {
+			return status.isInitialized;
 		}
-		return antlrToolErrors.toString();
+
+		// Locking per runtime, several runtimes can be being initialized simultaneously
+		synchronized (status.lockObject) {
+			if (status.isInitialized == null) {
+				Exception exception = null;
+				try {
+					initRuntime();
+				} catch (Exception e) {
+					exception = e;
+					e.printStackTrace();
+				}
+				status.isInitialized = exception == null;
+				status.exception = exception;
+			}
+		}
+		return status.isInitialized;
 	}
 
-	protected abstract String getPropertyPrefix();
+	protected void initRuntime() throws Exception {
+	}
 
-	@Override
+	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+		return new CompiledState(generatedState, null);
+	}
+
+	protected ExecutedState execute(RunOptions runOptions, CompiledState compiledState) {
+		String output = null;
+		String errors = null;
+		Exception exception = null;
+		try {
+			List<String> args = new ArrayList<>();
+			String runtimeToolName = getRuntimeToolName();
+			if (runtimeToolName != null) {
+				args.add(runtimeToolName);
+			}
+			String[] extraRunArgs = getExtraRunArgs();
+			if (extraRunArgs != null) {
+				args.addAll(Arrays.asList(extraRunArgs));
+			}
+			args.add(getExecFileName());
+			args.add("input");
+			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
+			output = result.output;
+			errors = result.errors;
+		} catch (InterruptedException | IOException e) {
+			exception = e;
+		}
+		return new ExecutedState(compiledState, output, errors, exception);
+	}
+
+	protected ProcessorResult runCommand(String[] command, String workPath) throws Exception {
+		return runCommand(command, workPath, null);
+	}
+
+	protected ProcessorResult runCommand(String[] command, String workPath, String description) throws Exception {
+		try {
+			return Processor.run(command, workPath);
+		} catch (InterruptedException | IOException e) {
+			throw description != null ? new Exception("can't " + description, e) : e;
+		}
+	}
+
 	public void testSetUp() throws Exception {
-		createTempDir();
-		antlrToolErrors = new StringBuilder();
-	}
-
-	private void createTempDir() {
 		// new output dir for each test
 		String propName = getPropertyPrefix() + "-test-dir";
 		String prop = System.getProperty(propName);
 		if(prop!=null && prop.length()>0) {
 			tempTestDir = new File(prop);
 		} else {
-			String dirName = getClass().getSimpleName() +  "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
+			String dirName = getClass().getSimpleName() +  "-" + Thread.currentThread().getName() + "-" + System.nanoTime();
 			tempTestDir = new File(System.getProperty("java.io.tmpdir"), dirName);
-		}
-	}
-
-	@Override
-	public void testTearDown() throws Exception {
-	}
-
-	@Override
-	public void beforeTest(RuntimeTestDescriptor descriptor) {
-	}
-
-	@Override
-	public void afterTest(RuntimeTestDescriptor descriptor) {
-	}
-
-	public void eraseTempDir() {
-		if(shouldEraseTempDir()) {
-			eraseDirectory(getTempTestDir());
-		}
-	}
-
-	protected boolean shouldEraseTempDir() {
-		if(tempTestDir == null)
-			return false;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
-			return Boolean.getBoolean(prop);
-		else
-			return true;
-	}
-
-	public static void eraseDirectory(File dir) {
-		if ( dir.exists() ) {
-			eraseFilesInDir(dir);
-			dir.delete();
-		}
-	}
-
-
-	public static void eraseFilesInDir(File dir) {
-		String[] files = dir.list();
-		for(int i = 0; files!=null && i < files.length; i++) {
-			try {
-				eraseFile(dir, files[i]);
-			} catch(IOException e) {
-				logger.info(e.getMessage());
-			}
-		}
-	}
-
-	private static void eraseFile(File dir, String name) throws IOException {
-		File file = new File(dir,name);
-		if(Files.isSymbolicLink((file.toPath())))
-			Files.delete(file.toPath());
-		else if(file.isDirectory()) {
-			// work around issue where Files.isSymbolicLink returns false on Windows for node/antlr4 linked package
-			if("antlr4".equals(name))
-				; // logger.warning("antlr4 not seen as a symlink");
-			else
-				eraseDirectory(file);
-		} else
-			file.delete();
-	}
-
-
-	private static String detectedOS;
-
-	public static String getOS() {
-		if (detectedOS == null) {
-			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-			if (os.contains("mac") || os.contains("darwin")) {
-				detectedOS = "mac";
-			}
-			else if (os.contains("win")) {
-				detectedOS = "windows";
-			}
-			else if (os.contains("nux")) {
-				detectedOS = "linux";
-			}
-			else {
-				detectedOS = "unknown";
-			}
-		}
-		return detectedOS;
-	}
-
-	private static Boolean isWindows;
-
-	public static boolean isWindows() {
-		if (isWindows == null) {
-			isWindows = getOS().equalsIgnoreCase("windows");
-		}
-
-		return isWindows;
-	}
-
-	protected ATN createATN(Grammar g, boolean useSerializer) {
-		if ( g.atn==null ) {
-			semanticProcess(g);
-			assertEquals(0, g.tool.getNumErrors());
-
-			ParserATNFactory f = g.isLexer() ? new LexerATNFactory((LexerGrammar) g) : new ParserATNFactory(g);
-
-			g.atn = f.createATN();
-			assertEquals(0, g.tool.getNumErrors());
-		}
-
-		ATN atn = g.atn;
-		if ( useSerializer ) {
-			// sets some flags in ATN
-			IntegerList serialized = ATNSerializer.getSerialized(atn);
-			return new ATNDeserializer().deserialize(serialized.toArray());
-		}
-
-		return atn;
-	}
-
-	protected void semanticProcess(Grammar g) {
-		if ( g.ast!=null && !g.ast.hasErrors ) {
-//			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp, false);
-				}
-			}
-		}
-	}
-
-	protected void writeLexerFile(String lexerName, boolean showDFA) {
-		writeRecognizerFile(lexerName, null, null, false, false, showDFA, false, false);
-	}
-
-	protected void writeRecognizerFile(String lexerName, String parserName, String parserStartRuleName,
-									   boolean debug, boolean profile, boolean showDFA,
-									   boolean useListener, boolean useVisitor) {
-		String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + getLanguage() + ".stg");
-		ST outputFileST = new ST(text);
-		outputFileST.add("runtimePath", getRuntimePath());
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("parserName", parserName);
-		String grammarName = null;
-		if (parserName != null) {
-			grammarName = parserName.endsWith("Parser")
-					? parserName.substring(0, parserName.length() - "Parser".length())
-					: parserName;
-		}
-		if (grammarName == null) {
-			grammarName = lexerName.endsWith("Lexer")
-					? lexerName.substring(0, lexerName.length() - "Lexer".length())
-					: lexerName;
-		}
-		outputFileST.add("grammarName", grammarName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		outputFileST.add("debug", debug);
-		outputFileST.add("profile", profile);
-		outputFileST.add("showDFA", showDFA);
-		outputFileST.add("useListener", useListener);
-		outputFileST.add("useVisitor", useVisitor);
-		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
-	}
-
-	final static ConcurrentHashMap<String, String> resourceCache = new ConcurrentHashMap<>();
-
-	protected static String getTextFromResource(String name) {
-		try {
-			String text = resourceCache.get(name);
-			if (text == null) {
-				text = new String(Files.readAllBytes(Paths.get(BaseCppTest.class.getClassLoader().getResource(name).toURI())));
-				resourceCache.put(name, text);
-			}
-			return text;
-		}
-		catch (Exception ex) {
-			return null;
 		}
 	}
 }

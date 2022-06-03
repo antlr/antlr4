@@ -14,8 +14,8 @@ public class UniversalRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	public String name;
 	public String notes;
 	public String input = "";
-	public String output;
-	public String errors;
+	public String output = "";
+	public String errors = "";
 	public String startRule;
 	public String grammarName;
 	public String grammar;

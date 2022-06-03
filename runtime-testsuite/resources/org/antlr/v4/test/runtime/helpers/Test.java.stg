@@ -6,9 +6,13 @@ import java.util.Arrays;
 
 public class Test {
 	public static void main(String[] args) throws Exception {
+<if(lexerName)>
 		CharStream input = CharStreams.fromPath(Paths.get(args[0]));
-		<lexerName> lex = new <lexerName>(input);
-		CommonTokenStream tokens = new CommonTokenStream(lex);
+		<lexerName> lexer = new <lexerName>(input);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+<else>
+		CommonTokenStream tokens = null; // It's required for compilation
+<endif>
 <if(parserName)>
 		<parserName> parser = new <parserName>(tokens);
 <if(debug)>
@@ -28,7 +32,7 @@ public class Test {
 		tokens.fill();
 		for (Object t : tokens.getTokens()) System.out.println(t);
 <if(showDFA)>
-		System.out.print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());
+		System.out.print(lexer.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());
 <endif>
 <endif>
 	}

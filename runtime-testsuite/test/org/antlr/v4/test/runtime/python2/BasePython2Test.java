@@ -8,10 +8,18 @@ package org.antlr.v4.test.runtime.python2;
 
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BasePython2Test extends BasePythonTest {
+	public final static Map<String, String> environment;
+
+	static {
+		environment = new HashMap<>();
+		environment.put("PYTHONPATH", Paths.get(getRuntimePath("Python2"), "src").toString());
+		environment.put("PYTHONIOENCODING", "utf-8");
+	}
 
 	@Override
 	public String getLanguage() {
@@ -19,7 +27,7 @@ public class BasePython2Test extends BasePythonTest {
 	}
 
 	@Override
-	protected List<String> getPythonExecutables() {
-		return Collections.singletonList("python2.7");
+	public Map<String, String> getExecEnvironment() {
+		return environment;
 	}
 }
