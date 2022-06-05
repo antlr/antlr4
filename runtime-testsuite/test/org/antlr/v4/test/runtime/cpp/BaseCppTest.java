@@ -299,7 +299,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		}
 		else {
 			try {
-				String[] command = {"cmake", ".", "-DCMAKE_BUILD_TYPE=Debug"};
+				String[] command = {"cmake", ".", "-DCMAKE_BUILD_TYPE=Release"};
 				runCommand(command, runtimePath, "antlr runtime cmake", false);
 			} catch (Exception e) {
 				System.err.println("can't configure antlr cpp runtime cmake file");
