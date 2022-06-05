@@ -25,17 +25,15 @@ using namespace antlr4;
 
 int main(int argc, const char * argv[]) {
 
-  ANTLRInputStream input("🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
+  ANTLRInputStream input("a = b + \"c\";(((x * d))) * e + f; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
   tree::ParseTree *tree = parser.main();
 
-  std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
-
-  OutputDebugString(s.data()); // Only works properly since VS 2015.
-  //std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
+  auto s = tree->toStringTree(&parser);
+  std::cout << "Parse Tree: " << s << std::endl;
 
   return 0;
 }
