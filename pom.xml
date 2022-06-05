@@ -18,11 +18,11 @@
 
 	<name>ANTLR 4</name>
 	<description>ANTLR 4 Master Build POM</description>
-	<url>http://www.antlr.org</url>
+	<url>https://www.antlr.org/</url>
 	<inceptionYear>1992</inceptionYear>
 	<organization>
 		<name>ANTLR</name>
-		<url>http://www.antlr.org</url>
+		<url>https://www.antlr.org/</url>
 	</organization>
 
     <prerequisites>
@@ -31,8 +31,8 @@
 
     <licenses>
 		<license>
-			<name>The BSD License</name>
-			<url>http://www.antlr.org/license.html</url>
+			<name>BSD-3-Clause</name>
+			<url>https://www.antlr.org/license.html</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -40,7 +40,7 @@
 	<developers>
 		<developer>
 			<name>Terence Parr</name>
-			<url>http://parrt.cs.usfca.edu</url>
+			<url>https://parrt.cs.usfca.edu/</url>
 			<roles>
 				<role>Project lead - ANTLR</role>
 			</roles>
@@ -67,7 +67,7 @@
 		<developer>
 			<name>Jim Idle</name>
 			<email>jimi@idle.ws</email>
-			<url>http://www.linkedin.com/in/jimidle</url>
+			<url>https://www.linkedin.com/in/jimidle/</url>
 			<roles>
 				<role>Developer - Maven Plugin</role>
 			</roles>
