@@ -59,5 +59,8 @@
     <ClInclude Include="..\..\generated\TParserVisitor.h">
       <Filter>generated</Filter>
     </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
