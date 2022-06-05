@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x86\dbg</ANTLR4>
+    </PropertyGroup>
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x86\dbg</ANTLR4>
+    </PropertyGroup>
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x64\dbg</ANTLR4>
+    </PropertyGroup>
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x86\rel</ANTLR4>
+    </PropertyGroup>
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x86\rel</ANTLR4>
+    </PropertyGroup>
+    <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <ANTLR4>$(MSBuildThisFileDirectory)x64\rel</ANTLR4>
+    </PropertyGroup>
+</Project>
