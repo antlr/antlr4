@@ -4,40 +4,40 @@
     <Lib>
         <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x86'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release DLL|x86'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Lib  Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x86'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release DLL|x86'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
