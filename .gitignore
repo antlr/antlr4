@@ -1,3 +1,6 @@
+# Nuget packages
+*.nupkg
+
 # Maven build folders
 target/
 # ... but not code generation targets
