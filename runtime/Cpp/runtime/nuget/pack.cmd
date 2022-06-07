@@ -16,8 +16,8 @@ rem  should be set "VSWHERE='%ProgramFiles(x86)%\Microsoft Visual Studio\Install
 if %VS_VERSION%==vs2019 (
   set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[16.0^,17.0^)'"
 ) else (
-if %VS_VERSION%==vs2017 (
-  set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[15.0^,16.0^)'"
+if %VS_VERSION%==vs2022 (
+  set "VSWHERE='C:\PROGRA~2\"Microsoft Visual Studio"\Installer\vswhere.exe  -latest -property installationPath -version ^[17.0^,18.0^)'"
 )
 )
 for /f " delims=" %%a in (%VSWHERE%) do @set "VSCOMNTOOLS=%%a"
@@ -28,35 +28,27 @@ if %VS_VERSION%==vs2019 (
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
   set "VS160COMNTOOLS=%VSCOMNTOOLS%\Common7\Tools\"
 ) else (
-  if %VS_VERSION%==vs2017 (
+  if %VS_VERSION%==vs2022 (
     set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
-    set "VS150COMNTOOLS=%VSCOMNTOOLS%\Common7\Tools\"
+    set "VS170COMNTOOLS=%VSCOMNTOOLS%\Common7\Tools\"
   ) else (
     set VS_VARSALL=..\..\VC\vcvarsall.bat
   )
 )
 
 if not defined VCINSTALLDIR (
-  if %VS_VERSION%==vs2015 (
+  if %VS_VERSION%==vs2019 (
     if %PLATFORM%==x64 (
-      call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
+      call "%VS160COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
     ) else (
-      call "%VS140COMNTOOLS%%VS_VARSALL%" x86 8.1
+      call "%VS160COMNTOOLS%%VS_VARSALL%" x86 8.1
     )
   ) else (
-    if %VS_VERSION%==vs2017 (
+    if %VS_VERSION%==vs2022 (
       if %PLATFORM%==x64 (
-        call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
+        call "%VS170COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
       ) else (
-        call "%VS150COMNTOOLS%%VS_VARSALL%" x86 8.1
-      )
-    ) else (
-      if %VS_VERSION%==vs2019 (
-        if %PLATFORM%==x64 (
-          call "%VS160COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
-        ) else (
-          call "%VS160COMNTOOLS%%VS_VARSALL%" x86 8.1
-        )
+        call "%VS170COMNTOOLS%%VS_VARSALL%" x86 8.1
       )
     )
   )
