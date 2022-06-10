@@ -40,7 +40,7 @@
 	<developers>
 		<developer>
 			<name>Terence Parr</name>
-			<url>https://parrt.cs.usfca.edu/</url>
+			<url>https://github.com/parrt</url>
 			<roles>
 				<role>Project lead - ANTLR</role>
 			</roles>
