@@ -41,88 +41,10 @@ public abstract class BaseRuntimeTest {
 		"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip"
 	));
 
-	@BeforeClass
-	public static void startHeartbeatToAvoidTimeout() {
-		if(requiresHeartbeat()) {
-			startHeartbeat();
-		}
-	}
+	private final static StringRenderer rendered = new StringRenderer();
 
-	private static boolean requiresHeartbeat() {
-		return isTravisCI()
-				|| isAppVeyorCI()
-				|| (isCPP() && isRecursion())
-				|| (isCircleCI() && isGo())
-				|| (isCircleCI() && isDotNet() && isRecursion());
-	}
-
-	@AfterClass
-	public static void stopHeartbeat() {
-		heartbeat = false;
-	}
-
-	private static boolean isRecursion() {
-		String s = System.getenv("GROUP");
-		return "recursion".equalsIgnoreCase(s);
-	}
-
-	private static boolean isGo() {
-		String s = System.getenv("TARGET");
-		return "go".equalsIgnoreCase(s);
-	}
-
-	private static boolean isCPP() {
-		String s = System.getenv("TARGET");
-		return "cpp".equalsIgnoreCase(s);
-	}
-
-	private static boolean isDotNet() {
-		String s = System.getenv("TARGET");
-		return "dotnet".equalsIgnoreCase(s);
-	}
-
-	private static boolean isCircleCI() {
-		// see https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-		String s = System.getenv("CIRCLECI");
-		return "true".equalsIgnoreCase(s);
-	}
-
-	private static boolean isAppVeyorCI() {
-		// see https://www.appveyor.com/docs/environment-variables/
-		String s = System.getenv("APPVEYOR");
-		return "true".equalsIgnoreCase(s);
-	}
-
-	private static boolean isTravisCI() {
-		// see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-		String s = System.getenv("TRAVIS");
-		return "true".equalsIgnoreCase(s);
-	}
-
-	static boolean heartbeat = false;
-
-	private static void startHeartbeat() {
-		// Add heartbeat thread to gen minimal output for travis, appveyor to avoid timeout.
-		Thread t = new Thread("heartbeat") {
-			@Override
-			public void run() {
-				heartbeat = true;
-				while (heartbeat) {
-					try {
-						//noinspection BusyWait
-						Thread.sleep(10000);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					System.out.print('.');
-				}
-			}
-		};
-		t.start();
-	}
-
-	protected BaseRuntimeTestSupport delegate;
-	protected RuntimeTestDescriptor descriptor;
+	protected final BaseRuntimeTestSupport delegate;
+	protected final RuntimeTestDescriptor descriptor;
 
 	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, BaseRuntimeTestSupport delegate) {
 		this.descriptor = descriptor;
@@ -138,7 +60,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public boolean checkIgnored() {
-		boolean ignored = !TestContext.isSupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
+		boolean ignored = descriptor.ignore(descriptor.getTarget());
 		if (ignored) {
 			System.out.println("Ignore " + descriptor);
 		}
@@ -153,8 +75,6 @@ public abstract class BaseRuntimeTest {
 			eraseDirectory(delegate.getTempTestDir());
 		}
 	};
-
-	private final static StringRenderer rendered = new StringRenderer();
 
 	@Test
 	public void testOne() {
