@@ -55,7 +55,7 @@ public class CppRunner extends RuntimeRunner {
 		else {
 			runtimeBinaryPath = Paths.get(runtimePath, "dist").toString();
 			runtimeLibraryFileName = Paths.get(runtimeBinaryPath,
-					"libantlr4-runtime." + (getOS().equals("mac") ? "dylib" : "so")).toString();
+					"libantlr4-runtime." + (getOS() == OSType.Mac ? "dylib" : "so")).toString();
 			environment.put("LD_PRELOAD", runtimeLibraryFileName);
 		}
 
