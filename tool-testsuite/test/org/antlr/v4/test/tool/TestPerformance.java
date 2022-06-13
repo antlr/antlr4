@@ -40,10 +40,12 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.JavaCompiledState;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -54,6 +56,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -77,9 +80,8 @@ import java.util.logging.Logger;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.NewLine;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @SuppressWarnings("unused")
 public class TestPerformance extends BaseJavaToolTest {
@@ -383,17 +385,12 @@ public class TestPerformance extends BaseJavaToolTest {
 
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
 
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
     @Test
-    @org.junit.Ignore
+    @Disabled
     public void compileJdk() throws IOException, InterruptedException, ExecutionException {
         String jdkSourceRoot = getSourceRoot("JDK");
-		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
+		assertTrue(jdkSourceRoot != null && !jdkSourceRoot.isEmpty(),
+				"The JDK_SOURCE_ROOT environment variable must be set for performance testing.");
 
         JavaCompiledState javaCompiledState = compileJavaParser(USE_LR_GRAMMAR);
         final String lexerName    = USE_LR_GRAMMAR ? "JavaLRLexer"        : "JavaLexer";
@@ -1102,10 +1099,12 @@ public class TestPerformance extends BaseJavaToolTest {
 		}
         String[] extraOptionsArray = extraOptions.toArray(new String[0]);
 
-		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, body, parserName, lexerName,
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, body, parserName, lexerName,
 				false, true, null, null,
 				false, false, Stage.Compile, false);
-		return (JavaCompiledState) run(runOptions);
+		try (RuntimeRunner runner = new JavaRunner()) {
+			return (JavaCompiledState) runner.run(runOptions);
+		}
     }
 
 	private static void updateChecksum(MurmurHashChecksum checksum, int value) {
@@ -1322,7 +1321,7 @@ public class TestPerformance extends BaseJavaToolTest {
 							parseResult = parseMethod.invoke(parser);
 						}
 
-						assertThat(parseResult, instanceOf(ParseTree.class));
+						assertTrue(parseResult instanceof ParseTree);
 						if (COMPUTE_CHECKSUM && BUILD_PARSE_TREES) {
 							ParseTreeWalker.DEFAULT.walk(new ChecksumParseTreeListener(checksum), (ParseTree)parseResult);
 						}
@@ -1343,7 +1342,7 @@ public class TestPerformance extends BaseJavaToolTest {
             };
         } catch (Exception e) {
             e.printStackTrace(System.out);
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
             throw new IllegalStateException(e);
         }
     }
@@ -1933,8 +1932,10 @@ public class TestPerformance extends BaseJavaToolTest {
 		}
 	}
 
-	@Test(timeout = 20000)
-	public void testExponentialInclude() {
+	@Test
+	@Timeout(20)
+	public void testExponentialInclude(@TempDir Path tempDir) {
+		String tempDirPath = tempDir.toString();
 		String grammarFormat =
 			"parser grammar Level_%d_%d;\n" +
 			"\n" +
@@ -1942,7 +1943,7 @@ public class TestPerformance extends BaseJavaToolTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		FileUtils.mkdir(getTempDirPath());
+		FileUtils.mkdir(tempDirPath);
 
 		long startTime = System.nanoTime();
 
@@ -1950,15 +1951,15 @@ public class TestPerformance extends BaseJavaToolTest {
 		for (int level = 0; level < levels; level++) {
 			String leafPrefix = level == levels - 1 ? "//" : "";
 			String grammar1 = String.format(grammarFormat, level, 1, leafPrefix, level + 1, level + 1, level, 1);
-			writeFile(getTempDirPath(), "Level_" + level + "_1.g4", grammar1);
+			writeFile(tempDirPath, "Level_" + level + "_1.g4", grammar1);
 			if (level > 0) {
 				String grammar2 = String.format(grammarFormat, level, 2, leafPrefix, level + 1, level + 1, level, 1);
-				writeFile(getTempDirPath(), "Level_" + level + "_2.g4", grammar2);
+				writeFile(tempDirPath, "Level_" + level + "_2.g4", grammar2);
 			}
 		}
 
-		ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), "Java", "Level_0_1.g4", false);
-		Assert.assertTrue(equeue.errors.isEmpty());
+		ErrorQueue equeue = Generator.antlrOnString(tempDirPath, "Java", "Level_0_1.g4", false);
+		assertTrue(equeue.errors.isEmpty());
 
 		long endTime = System.nanoTime();
 		System.out.format("%s milliseconds.%n", (endTime - startTime) / 1000000.0);

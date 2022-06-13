@@ -36,30 +36,4 @@ public abstract class TestOutputReading {
 			line = in.readLine();
 		}
 	}
-
-	/**
-	 * Read in the UTF-8 bytes at {@code path}, convert all
-	 * platform-specific line terminators to NL, and append NL
-	 * if the file was non-empty and didn't already end with one.
-	 *
-	 * {@see StreamVacuum#run()} for why this method exists.
-	 *
-	 * Returns {@code null} if the file does not exist or the output
-	 * was empty.
-	 */
-	public static String read(Path path) throws IOException {
-		// Mimic StreamVacuum.run()'s behavior of replacing all platform-specific
-		// EOL sequences with NL.
-		StringBuilder buf = new StringBuilder();
-		try (BufferedReader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			append(in, buf);
-		} catch (FileNotFoundException | NoSuchFileException e) {
-			return null;
-		}
-		if (buf.length() > 0) {
-			return buf.toString();
-		} else {
-			return null;
-		}
-	}
 }

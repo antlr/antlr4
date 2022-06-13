@@ -16,16 +16,6 @@ public class RunOptions {
 	public final Stage endStage;
 	public final boolean returnObject;
 
-	public static RunOptions createOptionsForJavaToolTests(
-			String grammarFileName, String grammarStr, String parserName, String lexerName,
-			boolean useListener, boolean useVisitor, String startRuleName,
-			String input, boolean profile, boolean showDiagnosticErrors,
-			Stage endStage, boolean returnObject
-	) {
-		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
-				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java");
-	}
-
 	public RunOptions(String grammarFileName, String grammarStr, String parserName, String lexerName,
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,

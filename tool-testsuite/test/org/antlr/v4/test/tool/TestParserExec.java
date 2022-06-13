@@ -7,12 +7,13 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.test.runtime.states.ExecutedState;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test parser execution.
  *
@@ -46,17 +47,11 @@ import static org.junit.Assert.assertNull;
  *  the remaining input to match.
  */
 public class TestParserExec extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	/**
 	 * This is a regression test for antlr/antlr4#118.
 	 * https://github.com/antlr/antlr4/issues/118
 	 */
-	@Ignore("Performance impact of passing this test may not be worthwhile")
+	@Disabled("Performance impact of passing this test may not be worthwhile")
 	// TODO: port to test framework (not ported because test currently fails)
 	@Test public void testStartRuleWithoutEOF() {
 		String grammar =
@@ -97,7 +92,7 @@ public class TestParserExec extends BaseJavaToolTest {
 	 * https://github.com/antlr/antlr4/issues/563
 	 */
 	// TODO: port to test framework (missing templates)
-	@Test public void testAlternateQuotes() throws Exception {
+	@Test public void testAlternateQuotes(@TempDir Path tempDir) {
 		String lexerGrammar =
 			"lexer grammar ModeTagsLexer;\n" +
 			"\n" +
@@ -120,10 +115,12 @@ public class TestParserExec extends BaseJavaToolTest {
 			"    | '«' '/' ID '»'\n" +
 			"    ;";
 
-		execLexer("ModeTagsLexer.g4", lexerGrammar, "ModeTagsLexer", "");
+		execLexer("ModeTagsLexer.g4", lexerGrammar, "ModeTagsLexer", "",
+				tempDir, true);
 		ExecutedState executedState = execParser("ModeTagsParser.g4", parserGrammar,
 				"ModeTagsParser", "ModeTagsLexer",
-				"file", "", false);
+				"file", "", false,
+				tempDir);
 		assertEquals("", executedState.output);
 		assertEquals("", executedState.errors);
 	}
@@ -134,7 +131,7 @@ public class TestParserExec extends BaseJavaToolTest {
 	 * https://github.com/antlr/antlr4/issues/672
 	 */
 	// TODO: port to test framework (missing templates)
-	@Test public void testAttributeValueInitialization() throws Exception {
+	@Test public void testAttributeValueInitialization() {
 		String grammar =
 			"grammar Data; \n" +
 			"\n" +

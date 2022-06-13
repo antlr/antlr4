@@ -7,16 +7,12 @@
 package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestIntegerList {
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void emptyListToEmptyCharArray() {
 		IntegerList l = new IntegerList();
@@ -27,8 +23,10 @@ public class TestIntegerList {
 	public void negativeIntegerToCharArrayThrows() {
 		IntegerList l = new IntegerList();
 		l.add(-42);
-		thrown.expect(IllegalArgumentException.class);
-		l.toCharArray();
+		assertThrows(
+				IllegalArgumentException.class,
+				l::toCharArray
+		);
 	}
 
 	@Test
@@ -45,8 +43,10 @@ public class TestIntegerList {
 	public void tooLargeIntegerToCharArrayThrows() {
 		IntegerList l = new IntegerList();
 		l.add(0x110000);
-		thrown.expect(IllegalArgumentException.class);
-		l.toCharArray();
+		assertThrows(
+				IllegalArgumentException.class,
+				l::toCharArray
+		);
 	}
 
 	@Test

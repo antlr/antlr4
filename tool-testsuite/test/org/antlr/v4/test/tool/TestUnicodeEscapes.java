@@ -7,9 +7,9 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.codegen.UnicodeEscapes;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestUnicodeEscapes {
 	@Test

@@ -6,11 +6,11 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.misc.FastQueue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestFastQueue {
     @Test public void testQueueNoRemove() throws Exception {
@@ -38,7 +38,7 @@ public class TestFastQueue {
             buf.append(o);
             if ( q.size()>0 ) buf.append(" ");
         }
-        assertEquals("queue should be empty", 0, q.size());
+        assertEquals(0, q.size(), "queue should be empty");
         String expecting = "a b c d e";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -57,7 +57,7 @@ public class TestFastQueue {
         buf.append(q.remove());
         q.add("e");
         buf.append(q.remove());
-        assertEquals("queue should be empty", 0, q.size());
+        assertEquals(0, q.size(), "queue should be empty");
         String expecting = "abcde";
         String found = buf.toString();
         assertEquals(expecting, found);

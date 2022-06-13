@@ -8,28 +8,18 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ArrayPredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContext;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SingletonPredictionContext;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestGraphNodes {
-	PredictionContextCache contextCache;
-
-	@Before
-	public void setUp() {
-		PredictionContext.globalNodeCount = 1;
-		contextCache = new PredictionContextCache();
-	}
-
 	public boolean rootIsWildcard() { return true; }
 	public boolean fullCtx() { return false; }
 
@@ -403,7 +393,7 @@ public class TestGraphNodes {
 		assertEquals(expecting, toDOTString(r, fullCtx()));
 	}
 
-	@Ignore("Known inefficiency but deferring resolving the issue for now")
+	@Disabled("Known inefficiency but deferring resolving the issue for now")
 	@Test public void test_aex_bfx() {
 		// TJP: this is inefficient as it leaves the top x nodes unmerged.
 		PredictionContext x1 = x();

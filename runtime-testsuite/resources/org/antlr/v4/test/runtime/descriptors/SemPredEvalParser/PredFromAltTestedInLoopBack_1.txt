@@ -38,7 +38,7 @@ Cpp
 CSharp
 Dart
 Go
-Node
+JavaScript
 PHP
 Python2
 Python3

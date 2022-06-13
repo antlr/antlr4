@@ -17,27 +17,17 @@ import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import org.antlr.v4.test.runtime.RunOptions;
 import org.antlr.v4.test.runtime.Stage;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.antlr.v4.test.runtime.states.JavaExecutedState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParseTreeMatcher extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test public void testChunking() throws Exception {
+	@Test public void testChunking() {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
 		assertEquals("[' ', ID, ' = ', expr]", m.split(" <ID> = <expr>").toString());
@@ -47,7 +37,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		assertEquals("['foo <x> bar ', tag]", m.split("foo \\<x\\> bar <tag>").toString());
 	}
 
-	@Test public void testDelimiters() throws Exception {
+	@Test public void testDelimiters() {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		m.setDelimiters("<<", ">>", "$");
 		String result = m.split("<<ID>> = <<expr>> ;$<< ick $>>").toString();
@@ -399,33 +389,37 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		String grammarFileName = grammarName+".g4";
 		String parserName = grammarName+"Parser";
 		String lexerName = grammarName+"Lexer";
-		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, input,
 				false, false, Stage.Execute, true);
-		JavaExecutedState executedState = (JavaExecutedState)run(runOptions);
-		JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
-		Parser parser = compiledState.initializeLexerAndParser("").b;
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
+			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
+			Parser parser = compiledState.initializeLexerAndParser("").b;
 
-		ParseTreePattern p = parser.compileParseTreePattern(pattern, parser.getRuleIndex(startRule));
+			ParseTreePattern p = parser.compileParseTreePattern(pattern, parser.getRuleIndex(startRule));
 
-		ParseTreeMatch match = p.match(executedState.parseTree);
-		boolean matched = match.succeeded();
-		if ( invertMatch ) assertFalse(matched);
-		else assertTrue(matched);
-		return match;
+			ParseTreeMatch match = p.match(executedState.parseTree);
+			boolean matched = match.succeeded();
+			if ( invertMatch ) assertFalse(matched);
+			else assertTrue(matched);
+			return match;
+		}
 	}
 
 	public ParseTreePatternMatcher getPatternMatcher(String grammarFileName, String grammar, String parserName, String lexerName,
 													 String startRule)
 			throws Exception
 	{
-		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, null,
 				false, false, Stage.Compile, false);
-		JavaCompiledState compiledState = (JavaCompiledState)run(runOptions);
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaCompiledState compiledState = (JavaCompiledState) runner.run(runOptions);
 
-		Pair<Lexer, Parser> lexerParserPair = compiledState.initializeLexerAndParser("");
+			Pair<Lexer, Parser> lexerParserPair = compiledState.initializeLexerAndParser("");
 
-		return new ParseTreePatternMatcher(lexerParserPair.a, lexerParserPair.b);
+			return new ParseTreePatternMatcher(lexerParserPair.a, lexerParserPair.b);
+		}
 	}
 }

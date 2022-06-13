@@ -14,17 +14,17 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
 import org.antlr.v4.test.runtime.RunOptions;
 import org.antlr.v4.test.runtime.Stage;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.antlr.v4.test.runtime.states.JavaExecutedState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestXPath extends BaseJavaToolTest {
 	public static final String grammar =
@@ -60,12 +60,6 @@ public class TestXPath extends BaseJavaToolTest {
 	public static final String SAMPLE_PROGRAM =
 			"def f(x,y) { x = 3+4; y; ; }\n" +
 			"def g(x) { return 1+2*x; }\n";
-
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
 
 	@Test public void testValidPaths() throws Exception {
 		String xpath[] = {
@@ -118,7 +112,7 @@ public class TestXPath extends BaseJavaToolTest {
 		for (int i=0; i<xpath.length; i++) {
 			List<String> nodes = getNodeStrings("Expr.g4", grammar, SAMPLE_PROGRAM, xpath[i], "prog", "ExprParser", "ExprLexer");
 			String result = nodes.toString();
-			assertEquals("path "+xpath[i]+" failed", expected[i], result);
+			assertEquals(expected[i], result, "path "+xpath[i]+" failed");
 		}
 	}
 
@@ -204,14 +198,16 @@ public class TestXPath extends BaseJavaToolTest {
 																	String input, String xpath, String startRuleName,
 																	String parserName, String lexerName
 	) throws Exception {
-		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRuleName, input,
 				false, false, Stage.Execute, true);
-		JavaExecutedState executedState = (JavaExecutedState)run(runOptions);
-		JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
-		Parser parser = compiledState.initializeLexerAndParser(input).b;
-		Collection<ParseTree> found = XPath.findAll(executedState.parseTree, xpath, parser);
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
+			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
+			Parser parser = compiledState.initializeLexerAndParser(input).b;
+			Collection<ParseTree> found = XPath.findAll(executedState.parseTree, xpath, parser);
 
-		return new Pair<>(parser.getRuleNames(), found);
+			return new Pair<>(parser.getRuleNames(), found);
+		}
 	}
 }

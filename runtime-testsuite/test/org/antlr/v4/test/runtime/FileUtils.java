@@ -43,11 +43,15 @@ public class FileUtils {
 		os.close();
 	}
 
-	public static void moveFile(File sourceFir, String destDir, String fileName) throws IOException {
+	public static boolean moveFile(File sourceFir, String destDir, String fileName) {
 		File file = new File(sourceFir, fileName);
-		if (!file.renameTo(new File(destDir, fileName))) {
-			throw new IOException("can't move source file " + file);
+		File newFile = new File(destDir, fileName);
+		if (newFile.exists()) {
+			if (!newFile.delete()) {
+				return false;
+			}
 		}
+		return file.renameTo(newFile);
 	}
 
 	public static void mkdir(String dir) {
@@ -76,42 +80,13 @@ public class FileUtils {
 
 	public static void deleteDirectory(File f) throws IOException {
 		if (f.isDirectory()) {
-			for (File c : f.listFiles())
-				deleteDirectory(c);
-		}
-		if (!f.delete())
-			throw new FileNotFoundException("Failed to delete file: " + f);
-	}
-
-	public static void eraseDirectory(File dir) {
-		if ( dir != null && dir.exists() ) {
-			eraseFilesInDir(dir);
-			dir.delete();
-		}
-	}
-
-	public static void eraseFilesInDir(File dir) {
-		String[] files = dir.list();
-		for(int i = 0; files!=null && i < files.length; i++) {
-			try {
-				eraseFile(dir, files[i]);
-			} catch(IOException e) {
-				//logger.info(e.getMessage());
+			File[] files = f.listFiles();
+			if (files != null) {
+				for (File c : files)
+					deleteDirectory(c);
 			}
 		}
-	}
-
-	private static void eraseFile(File dir, String name) throws IOException {
-		File file = new File(dir,name);
-		if(Files.isSymbolicLink((file.toPath())))
-			Files.delete(file.toPath());
-		else if(file.isDirectory()) {
-			// work around issue where Files.isSymbolicLink returns false on Windows for node/antlr4 linked package
-			if("antlr4".equals(name))
-				; // logger.warning("antlr4 not seen as a symlink");
-			else
-				eraseDirectory(file);
-		} else
-			file.delete();
+		if (!f.delete())
+			throw new IOException("Failed to delete file: " + f);
 	}
 }

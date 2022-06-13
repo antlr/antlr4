@@ -8,11 +8,10 @@ package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.channels.SeekableByteChannel;
@@ -23,15 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestCharStreams {
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void fromBMPStringHasExpectedSize() {
 		CharStream s = CharStreams.fromString("hello");
@@ -50,19 +44,19 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromBMPUTF8PathHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
-		Files.write(p, "hello".getBytes(StandardCharsets.UTF_8));
-		CharStream s = CharStreams.fromPath(p);
+	public void fromBMPUTF8PathHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path test = new File(tempDir.toString(), "test").toPath();
+		Files.write(test, "hello".getBytes(StandardCharsets.UTF_8));
+		CharStream s = CharStreams.fromPath(test);
 		assertEquals(5, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello", s.toString());
-		assertEquals(p.toString(), s.getSourceName());
+		assertEquals(test.toString(), s.getSourceName());
 	}
 
 	@Test
-	public void fromSMPUTF8PathHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF8PathHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		CharStream s = CharStreams.fromPath(p);
 		assertEquals(7, s.size());
@@ -72,8 +66,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromBMPUTF8InputStreamHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromBMPUTF8InputStreamHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello".getBytes(StandardCharsets.UTF_8));
 		try (InputStream is = Files.newInputStream(p)) {
 			CharStream s = CharStreams.fromStream(is);
@@ -84,8 +78,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromSMPUTF8InputStreamHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF8InputStreamHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		try (InputStream is = Files.newInputStream(p)) {
 			CharStream s = CharStreams.fromStream(is);
@@ -96,8 +90,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromBMPUTF8ChannelHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromBMPUTF8ChannelHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello".getBytes(StandardCharsets.UTF_8));
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CharStream s = CharStreams.fromChannel(
@@ -110,8 +104,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromSMPUTF8ChannelHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF8ChannelHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CharStream s = CharStreams.fromChannel(
@@ -124,9 +118,9 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromInvalidUTF8BytesChannelReplacesWithSubstCharInReplaceMode()
+	public void fromInvalidUTF8BytesChannelReplacesWithSubstCharInReplaceMode(@TempDir Path tempDir)
 		throws Exception {
-		Path p = folder.newFile().toPath();
+		Path p = getTestFile(tempDir);
 		byte[] toWrite = new byte[] { (byte)0xCA, (byte)0xFE, (byte)0xFE, (byte)0xED };
 		Files.write(p, toWrite);
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
@@ -139,19 +133,21 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromInvalidUTF8BytesThrowsInReportMode() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromInvalidUTF8BytesThrowsInReportMode(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		byte[] toWrite = new byte[] { (byte)0xCA, (byte)0xFE };
 		Files.write(p, toWrite);
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
-			thrown.expect(CharacterCodingException.class);
-			CharStreams.fromChannel(c, 4096, CodingErrorAction.REPORT, "foo");
+			assertThrows(
+					CharacterCodingException.class,
+					() -> CharStreams.fromChannel(c, 4096, CodingErrorAction.REPORT, "foo")
+			);
 		}
 	}
 
 	@Test
-	public void fromSMPUTF8SequenceStraddlingBufferBoundary() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF8SequenceStraddlingBufferBoundary(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CharStream s = CharStreams.fromChannel(
@@ -168,8 +164,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromFileName() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromFileName(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		CharStream s = CharStreams.fromFileName(p.toString());
 		assertEquals(7, s.size());
@@ -180,20 +176,19 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromFileNameWithLatin1() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromFileNameWithLatin1(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \u00CA\u00FE".getBytes(StandardCharsets.ISO_8859_1));
 		CharStream s = CharStreams.fromFileName(p.toString(), StandardCharsets.ISO_8859_1);
 		assertEquals(8, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello \u00CA\u00FE", s.toString());
 		assertEquals(p.toString(), s.getSourceName());
-
 	}
 
 	@Test
-	public void fromReader() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromReader(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		try (Reader r = Files.newBufferedReader(p, StandardCharsets.UTF_8)) {
 			CharStream s = CharStreams.fromReader(r);
@@ -204,8 +199,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromSMPUTF16LEPathSMPHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF16LEPathSMPHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_16LE));
 		CharStream s = CharStreams.fromPath(p, StandardCharsets.UTF_16LE);
 		assertEquals(7, s.size());
@@ -215,8 +210,8 @@ public class TestCharStreams {
 	}
 
 	@Test
-	public void fromSMPUTF32LEPathSMPHasExpectedSize() throws Exception {
-		Path p = folder.newFile().toPath();
+	public void fromSMPUTF32LEPathSMPHasExpectedSize(@TempDir Path tempDir) throws Exception {
+		Path p = getTestFile(tempDir);
 		// UTF-32 isn't popular enough to have an entry in StandardCharsets.
 		Charset c = Charset.forName("UTF-32LE");
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(c));
@@ -225,5 +220,9 @@ public class TestCharStreams {
 		assertEquals(0, s.index());
 		assertEquals("hello \uD83C\uDF0E", s.toString());
 		assertEquals(p.toString(), s.getSourceName());
+	}
+
+	private Path getTestFile(Path dir) {
+		return new File(dir.toString(), "test").toPath();
 	}
 }

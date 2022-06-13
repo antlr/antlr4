@@ -6,22 +6,11 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.tool.ErrorType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Test errors with the set stuff in lexer and parser */
 public class TestErrorSets extends BaseJavaToolTest {
 	protected boolean debug = false;
-
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	/** Public default constructor used by TestRig */
-	public TestErrorSets() {
-	}
 
 	@Test public void testNotCharSetWithRuleRef() throws Exception {
 		// might be a useful feature to add someday
@@ -46,6 +35,4 @@ public class TestErrorSets extends BaseJavaToolTest {
 		};
 		super.testErrors(pair, true);
 	}
-
-
 }
