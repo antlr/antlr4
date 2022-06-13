@@ -25,7 +25,7 @@ public abstract class RuntimeTestUtils {
 
 	private final static Object resourceLockObject = new Object();
 	private final static Map<String, String> resourceCache = new HashMap<>();
-	private static String detectedOS;
+	private static OSType detectedOS;
 	private static Boolean isWindows;
 
 	static {
@@ -48,26 +48,26 @@ public abstract class RuntimeTestUtils {
 
 	public static boolean isWindows() {
 		if (isWindows == null) {
-			isWindows = getOS().equalsIgnoreCase("windows");
+			isWindows = getOS() == OSType.Windows;
 		}
 
 		return isWindows;
 	}
 
-	public static String getOS() {
+	public static OSType getOS() {
 		if (detectedOS == null) {
 			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 			if (os.contains("mac") || os.contains("darwin")) {
-				detectedOS = "mac";
+				detectedOS = OSType.Mac;
 			}
 			else if (os.contains("win")) {
-				detectedOS = "windows";
+				detectedOS = OSType.Windows;
 			}
 			else if (os.contains("nux")) {
-				detectedOS = "linux";
+				detectedOS = OSType.Linux;
 			}
 			else {
-				detectedOS = "unknown";
+				detectedOS = OSType.Unknown;
 			}
 		}
 		return detectedOS;
@@ -78,9 +78,12 @@ public abstract class RuntimeTestUtils {
 			String text = resourceCache.get(name);
 			if (text == null) {
 				synchronized (resourceLockObject) {
-					Path path = Paths.get(resourcePath.toString(), name);
-					text = new String(Files.readAllBytes(path));
-					resourceCache.put(name, text);
+					text = resourceCache.get(name);
+					if (text == null) {
+						Path path = Paths.get(resourcePath.toString(), name);
+						text = new String(Files.readAllBytes(path));
+						resourceCache.put(name, text);
+					}
 				}
 			}
 			return text;
