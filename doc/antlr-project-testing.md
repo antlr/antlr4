@@ -149,7 +149,7 @@ Use this to run tests in parallel:
 
 ```bash
 $ export MAVEN_OPTS="-Xmx1G"
-$ mvn -Dparallel=classes -DthreadCount=4 test
+$ mvn test
 ...
 -------------------------------------------------------
  T E S T S

@@ -7,17 +7,11 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCodePointCharStream {
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void emptyBytesHasSize0() {
 		CodePointCharStream s = CharStreams.fromString("");
@@ -36,9 +30,11 @@ public class TestCodePointCharStream {
 	@Test
 	public void consumingEmptyStreamShouldThrow() {
 		CodePointCharStream s = CharStreams.fromString("");
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("cannot consume EOF");
-		s.consume();
+		IllegalStateException illegalStateException = assertThrows(
+				IllegalStateException.class,
+				s::consume
+		);
+		assertEquals("cannot consume EOF", illegalStateException.getMessage());
 	}
 
 	@Test
@@ -59,9 +55,8 @@ public class TestCodePointCharStream {
 	public void consumingPastSingleLatinCodePointShouldThrow() {
 		CodePointCharStream s = CharStreams.fromString("X");
 		s.consume();
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("cannot consume EOF");
-		s.consume();
+		IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, s::consume);
+		assertEquals("cannot consume EOF", illegalStateException.getMessage());
 	}
 
 	@Test
@@ -107,9 +102,8 @@ public class TestCodePointCharStream {
 	public void consumingPastSingleCJKCodePointShouldThrow() {
 		CodePointCharStream s = CharStreams.fromString("\u611B");
 		s.consume();
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("cannot consume EOF");
-		s.consume();
+		IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, s::consume);
+		assertEquals("cannot consume EOF", illegalStateException.getMessage());
 	}
 
 	@Test
@@ -150,9 +144,8 @@ public class TestCodePointCharStream {
 		assertEquals(0, s.index());
 		s.consume();
 		assertEquals(1, s.index());
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("cannot consume EOF");
-		s.consume();
+		IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, s::consume);
+		assertEquals("cannot consume EOF", illegalStateException.getMessage());
 	}
 
 	@Test

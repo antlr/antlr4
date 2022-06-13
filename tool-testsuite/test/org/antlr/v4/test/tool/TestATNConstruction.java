@@ -20,26 +20,18 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestATNConstruction extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test
-	public void testA() throws Exception {
+	@Test public void testA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A;");

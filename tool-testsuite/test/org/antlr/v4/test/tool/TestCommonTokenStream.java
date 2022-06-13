@@ -16,18 +16,12 @@ import org.antlr.v4.runtime.TokenFactory;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestCommonTokenStream extends TestBufferedTokenStream {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	@Override
 	protected TokenStream createTokenStream(TokenSource src) {
 		return new CommonTokenStream(src);
@@ -242,8 +236,8 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 		assertEquals(1, tokens.size());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testCannotConsumeEOF() throws Exception {
+	@Test
+	public void testCannotConsumeEOF() {
 		TokenSource lexer = new TokenSource() {
 
 			@Override
@@ -288,6 +282,6 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 		assertEquals(Token.EOF, tokens.LA(1));
 		assertEquals(0, tokens.index());
 		assertEquals(1, tokens.size());
-		tokens.consume();
+		assertThrows(IllegalStateException.class, tokens::consume);
 	}
 }

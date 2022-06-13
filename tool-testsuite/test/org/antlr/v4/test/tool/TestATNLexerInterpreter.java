@@ -15,13 +15,12 @@ import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Lexer rules are little quirky when it comes to wildcards. Problem
@@ -37,12 +36,6 @@ import static org.junit.Assert.assertEquals;
  * the tests below.
  */
 public class TestATNLexerInterpreter extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	@Test public void testLexerTwoRules() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+

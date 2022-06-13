@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.State;
 import org.antlr.v4.tool.Grammar;
@@ -29,58 +29,103 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
+import static org.antlr.v4.test.runtime.Generator.antlrOnString;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class BaseJavaToolTest extends BaseJavaTest {
+
+public class BaseJavaToolTest {
 	protected ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input) {
-		return execRecognizer(grammarFileName, grammarStr, null, lexerName, null, input, false);
+		return execLexer(grammarFileName, grammarStr, lexerName, input, null, false);
+	}
+
+	protected ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input,
+									  Path tempDir, boolean saveTestDir) {
+		return execRecognizer(grammarFileName, grammarStr, null, lexerName,
+				null, input, false, tempDir, saveTestDir);
+	}
+
+	protected ExecutedState execParser(String grammarFileName, String grammarStr,
+									   String parserName, String lexerName, String startRuleName,
+									   String input, boolean showDiagnosticErrors
+	) {
+		return execParser(grammarFileName, grammarStr, parserName, lexerName, startRuleName,
+				input, showDiagnosticErrors, null);
 	}
 
 	protected ExecutedState execParser(String grammarFileName, String grammarStr,
 									String parserName, String lexerName, String startRuleName,
-									String input, boolean showDiagnosticErrors
+									String input, boolean showDiagnosticErrors, Path workingDir
 	) {
 		return execRecognizer(grammarFileName, grammarStr, parserName, lexerName,
-				startRuleName, input, showDiagnosticErrors);
+				startRuleName, input, showDiagnosticErrors, workingDir, false);
 	}
 
 	private ExecutedState execRecognizer(String grammarFileName, String grammarStr,
 										 String parserName, String lexerName, String startRuleName,
-										 String input, boolean showDiagnosticErrors) {
-		RunOptions runOptions = RunOptions.createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, lexerName,
+										 String input, boolean showDiagnosticErrors,
+										 Path workingDir, boolean saveTestDir) {
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, lexerName,
 				false, true, startRuleName, input,
 				false, showDiagnosticErrors, Stage.Execute, false);
-		State result = run(runOptions);
-		if (!(result instanceof ExecutedState)) {
-			fail(result.getErrorMessage());
+		try (JavaRunner runner = new JavaRunner(workingDir, saveTestDir)) {
+			State result = runner.run(runOptions);
+			if (!(result instanceof ExecutedState)) {
+				fail(result.getErrorMessage());
+			}
+			return  (ExecutedState) result;
 		}
-		return  (ExecutedState) result;
 	}
 
-	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String grammarStr = pairs[i];
-            String expect = pairs[i+1];
+	protected static RunOptions createOptionsForJavaToolTests(
+			String grammarFileName, String grammarStr, String parserName, String lexerName,
+			boolean useListener, boolean useVisitor, String startRuleName,
+			String input, boolean profile, boolean showDiagnosticErrors,
+			Stage endStage, boolean returnObject
+	) {
+		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
+				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java");
+	}
+
+	protected void testErrors(String[] pairs, boolean printTree) {
+		for (int i = 0; i < pairs.length; i += 2) {
+			String grammarStr = pairs[i];
+			String expect = pairs[i + 1];
 
 			String[] lines = grammarStr.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = Generator.antlrOnString(getTempDirPath(), null, fileName, grammarStr, false); // use default language target in case test overrides
 
-			String actual = equeue.toString(true);
-			actual = actual.replace(getTempDirPath() + File.separator, "");
-//			System.err.println(actual);
-			String msg = grammarStr;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
+			String tempDirName = getClass().getSimpleName() + "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
+			String tempTestDir = Paths.get(TempDirectory, tempDirName).toString();
 
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
+			try {
+				ErrorQueue equeue = antlrOnString(tempTestDir, null, fileName, grammarStr, false);
 
-	public String getFilenameFromFirstLineOfGrammar(String line) {
+				String actual = equeue.toString(true);
+				actual = actual.replace(tempTestDir + File.separator, "");
+				String msg = grammarStr;
+				msg = msg.replace("\n", "\\n");
+				msg = msg.replace("\r", "\\r");
+				msg = msg.replace("\t", "\\t");
+
+				assertEquals(expect, actual, "error in: " + msg);
+			}
+			finally {
+				try {
+					deleteDirectory(new File(tempTestDir));
+				} catch (IOException ignored) {
+				}
+			}
+		}
+	}
+
+	protected String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		int grIndex = line.lastIndexOf("grammar");
 		int semi = line.lastIndexOf(';');
@@ -92,7 +137,7 @@ public class BaseJavaToolTest extends BaseJavaTest {
 		return fileName;
 	}
 
-	public List<String> realElements(List<String> elements) {
+	protected List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
 

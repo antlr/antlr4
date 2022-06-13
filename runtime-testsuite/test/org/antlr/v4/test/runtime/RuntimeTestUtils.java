@@ -1,6 +1,5 @@
 package org.antlr.v4.test.runtime;
 
-import junit.framework.TestCase;
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.Grammar;
@@ -13,21 +12,24 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public abstract class RuntimeTestUtils {
 	public static final String NewLine = System.getProperty("line.separator");
 	public static final String PathSeparator = System.getProperty("path.separator");
 	public static final String FileSeparator = System.getProperty("file.separator");
+	public static final String TempDirectory = System.getProperty("java.io.tmpdir");
 
 	public final static Path runtimeTestsuitePath;
+	public final static Path resourcePath;
 
-	private final static Path resourcePath;
 	private final static Object resourceLockObject = new Object();
 	private final static Map<String, String> resourceCache = new HashMap<>();
 	private static String detectedOS;
 	private static Boolean isWindows;
 
 	static {
-		String locationPath = BaseRuntimeTestSupport.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		String locationPath = RuntimeTestUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 		if (isWindows()) {
 			locationPath = locationPath.replaceFirst("/", "");
 		}
@@ -94,6 +96,6 @@ public abstract class RuntimeTestUtils {
 		ATNPrinter serializer = new ATNPrinter(g, startState);
 		String result = serializer.asString();
 
-		TestCase.assertEquals(expecting, result);
+		assertEquals(expecting, result);
 	}
 }

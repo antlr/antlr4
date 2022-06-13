@@ -7,18 +7,12 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.test.runtime.states.ExecutedState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestDollarParser extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	@Test
 	public void testSimpleCall() {
 		String grammar = "grammar T;\n" +
@@ -26,7 +20,7 @@ public class TestDollarParser extends BaseJavaToolTest {
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n";
 		ExecutedState executedState = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", true);
-		assertTrue(executedState.output.contains(this.getClass().getSimpleName()));
+		assertTrue(executedState.output.contains("input"));
 		assertEquals("", executedState.errors);
 	}
 }

@@ -9,26 +9,18 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
 import static org.antlr.v4.runtime.atn.ATNDeserializer.encodeIntsWith16BitWords;
 import static org.antlr.v4.runtime.atn.ATNDeserializer.decodeIntsEncodedAs16BitWords;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestATNSerialization extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+

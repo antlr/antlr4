@@ -25,7 +25,7 @@ baa
 Cpp
 CSharp
 Go
-Node
+JavaScript
 PHP
 Python2
 Python3

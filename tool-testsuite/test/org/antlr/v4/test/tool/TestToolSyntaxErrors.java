@@ -8,9 +8,9 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestToolSyntaxErrors extends BaseJavaToolTest {
     static String[] A = {
@@ -55,18 +55,12 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:15: syntax error: mismatched input ';' expecting COLON while matching a lexer rule\n",
     };
 
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	@Test
 	public void AllErrorCodesDistinct() {
 		ErrorType[] errorTypes = ErrorType.class.getEnumConstants();
 		for (int i = 0; i < errorTypes.length; i++) {
 			for (int j = i + 1; j < errorTypes.length; j++) {
-				Assert.assertNotEquals(errorTypes[i].code, errorTypes[j].code);
+				assertNotEquals(errorTypes[i].code, errorTypes[j].code);
 			}
 		}
 	}
@@ -718,7 +712,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	 * https://github.com/antlr/antlr4/issues/649
 	 * Stops before processing the lexer
 	 */
-	@Test public void testInvalidLanguageInGrammarWithLexerCommand() throws Exception {
+	@Test public void testInvalidLanguageInGrammarWithLexerCommand() {
 		String grammar =
 			"grammar T;\n" +
 			"options { language=Foo; }\n" +
@@ -739,7 +733,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	 * null ptr exception.".
 	 * https://github.com/antlr/antlr4/issues/649
 	 */
-	@Test public void testInvalidLanguageInGrammar() throws Exception {
+	@Test public void testInvalidLanguageInGrammar() {
 		String grammar =
 			"grammar T;\n" +
 			"options { language=Foo; }\n" +

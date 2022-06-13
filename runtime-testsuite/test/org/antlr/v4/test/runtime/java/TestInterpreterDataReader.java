@@ -9,8 +9,7 @@ import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
 import org.antlr.v4.tool.Grammar;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -20,10 +19,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /** This file represents a simple sanity checks on the parsing of the .interp file
  *  available to the Java runtime for interpreting rather than compiling and executing parsers.
  */
-public class TestInterpreterDataReader extends BaseJavaTest {
+public class TestInterpreterDataReader {
     @Test
     public void testParseFile() throws IOException, NoSuchFieldException, IllegalAccessException, org.antlr.runtime.RecognitionException {
 		Grammar g = new Grammar(
@@ -67,15 +68,15 @@ public class TestInterpreterDataReader extends BaseJavaTest {
         List<String> channels = castList(channelsField.get(interpreterData), String.class);
         List<String> modes = castList(modesField.get(interpreterData), String.class);
 
-		Assert.assertEquals(6, vocabulary.getMaxTokenType());
-		Assert.assertArrayEquals(new String[]{"s","expr"}, ruleNames.toArray());
-		Assert.assertArrayEquals(new String[]{"", "", "'*'", "'/'", "'+'", "'-'", ""}, literalNames);
-		Assert.assertArrayEquals(new String[]{"", "INT", "MUL", "DIV", "ADD", "SUB", "WS"}, symbolicNames);
-		Assert.assertNull(channels);
-		Assert.assertNull(modes);
+		assertEquals(6, vocabulary.getMaxTokenType());
+		assertArrayEquals(new String[]{"s","expr"}, ruleNames.toArray());
+		assertArrayEquals(new String[]{"", "", "'*'", "'/'", "'+'", "'-'", ""}, literalNames);
+		assertArrayEquals(new String[]{"", "INT", "MUL", "DIV", "ADD", "SUB", "WS"}, symbolicNames);
+		assertNull(channels);
+		assertNull(modes);
 
 		IntegerList serialized = ATNSerializer.getSerialized(atn);
-		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, serialized.get(0));
+		assertEquals(ATNDeserializer.SERIALIZED_VERSION, serialized.get(0));
     }
 
     private <T> List<T> castList(Object obj, Class<T> clazz) {

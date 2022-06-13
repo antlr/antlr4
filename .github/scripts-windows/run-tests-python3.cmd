@@ -1,3 +1,3 @@
 cd runtime-testsuite
-mvn -Dparallel=classes -DthreadCount=2 -Dantlr-python3-exec="C:\Python310\python.exe" -Dtest=python3.** test
+mvn -Dantlr-python3-exec="C:\Python310\python.exe" -Dtest=python3.** test
 cd ..

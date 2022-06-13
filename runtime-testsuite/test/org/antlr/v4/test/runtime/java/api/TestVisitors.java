@@ -14,11 +14,12 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestVisitors {
 
@@ -33,7 +34,7 @@ public class TestVisitors {
 		VisitorBasicParser parser = new VisitorBasicParser(new CommonTokenStream(lexer));
 
 		VisitorBasicParser.SContext context = parser.s();
-		Assert.assertEquals("(s A <EOF>)", context.toStringTree(parser));
+		assertEquals("(s A <EOF>)", context.toStringTree(parser));
 
 		VisitorBasicVisitor<String> listener = new VisitorBasicBaseVisitor<String>() {
 			@Override
@@ -56,7 +57,7 @@ public class TestVisitors {
 		String expected =
 			"[@0,0:0='A',<1>,1:0]\n" +
 			"[@1,1:0='<EOF>',<-1>,1:1]\n";
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	/**
@@ -79,9 +80,9 @@ public class TestVisitors {
 		});
 
 		VisitorBasicParser.SContext context = parser.s();
-		Assert.assertEquals("(s <missing 'A'> <EOF>)", context.toStringTree(parser));
-		Assert.assertEquals(1, errors.size());
-		Assert.assertEquals("line 1:0 missing 'A' at '<EOF>'", errors.get(0));
+		assertEquals("(s <missing 'A'> <EOF>)", context.toStringTree(parser));
+		assertEquals(1, errors.size());
+		assertEquals("line 1:0 missing 'A' at '<EOF>'", errors.get(0));
 
 		VisitorBasicVisitor<String> listener = new VisitorBasicBaseVisitor<String>() {
 			@Override
@@ -102,7 +103,7 @@ public class TestVisitors {
 
 		String result = listener.visit(context);
 		String expected = "Error encountered: [@-1,-1:-1='<missing 'A'>',<1>,1:0]";
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	/**
@@ -118,7 +119,7 @@ public class TestVisitors {
 		VisitorBasicParser parser = new VisitorBasicParser(new CommonTokenStream(lexer));
 
 		VisitorBasicParser.SContext context = parser.s();
-		Assert.assertEquals("(s A <EOF>)", context.toStringTree(parser));
+		assertEquals("(s A <EOF>)", context.toStringTree(parser));
 
 		VisitorBasicVisitor<String> listener = new VisitorBasicBaseVisitor<String>() {
 			@Override
@@ -134,7 +135,7 @@ public class TestVisitors {
 
 		String result = listener.visit(context);
 		String expected = "[@0,0:0='A',<1>,1:0]\n";
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	/**
@@ -149,7 +150,7 @@ public class TestVisitors {
 		VisitorBasicParser parser = new VisitorBasicParser(new CommonTokenStream(lexer));
 
 		VisitorBasicParser.SContext context = parser.s();
-		Assert.assertEquals("(s A <EOF>)", context.toStringTree(parser));
+		assertEquals("(s A <EOF>)", context.toStringTree(parser));
 
 		VisitorBasicVisitor<String> listener = new VisitorBasicBaseVisitor<String>() {
 			@Override
@@ -170,7 +171,7 @@ public class TestVisitors {
 
 		String result = listener.visit(context);
 		String expected = "default result";
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 	/**
@@ -183,7 +184,7 @@ public class TestVisitors {
 		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
 
 		VisitorCalcParser.SContext context = parser.s();
-		Assert.assertEquals("(s (expr (expr 2) + (expr (expr 8) / (expr 2))) <EOF>)", context.toStringTree(parser));
+		assertEquals("(s (expr (expr 2) + (expr (expr 8) / (expr 2))) <EOF>)", context.toStringTree(parser));
 
 		VisitorCalcVisitor<Integer> listener = new VisitorCalcBaseVisitor<Integer>() {
 			@Override
@@ -233,7 +234,7 @@ public class TestVisitors {
 
 		int result = listener.visit(context);
 		int expected = 6;
-		Assert.assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 
 }

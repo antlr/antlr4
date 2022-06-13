@@ -1,3 +1,3 @@
 cd runtime-testsuite
-mvn -Dparallel=classes -DthreadCount=2 -Dtest=csharp.** test
+mvn -Dtest=csharp.** test
 cd ..

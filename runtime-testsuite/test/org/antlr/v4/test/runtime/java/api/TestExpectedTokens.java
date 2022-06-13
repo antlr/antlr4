@@ -10,14 +10,15 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.test.runtime.RuntimeTestUtils;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.tool.Grammar;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestExpectedTokens extends BaseJavaTest {
-	@Test public void testEpsilonAltSubrule() throws Exception {
+public class TestExpectedTokens extends JavaRunner {
+	@Test
+	public void testEpsilonAltSubrule() throws Exception {
 		String gtext =
 			"parser grammar T;\n" +
 			"a : A (B | ) C ;\n";

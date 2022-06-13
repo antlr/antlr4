@@ -7,19 +7,11 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.test.runtime.states.ExecutedState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLexerActions extends BaseJavaToolTest {
-
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
 	// ----- ACTIONS --------------------------------------------------------
 
 	@Test public void testActionExecutedInDFA() throws Exception {

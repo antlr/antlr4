@@ -10,27 +10,20 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestTokenStreamRewriter extends BaseJavaTest {
+public class TestTokenStreamRewriter {
 
 	/** Public default constructor used by TestRig */
 	public TestTokenStreamRewriter() {
 	}
 
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test public void testInsertBeforeIndex0() throws Exception {
+	@Test
+	public void testInsertBeforeIndex0() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +

@@ -8,20 +8,13 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.tool.ErrorType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.misc.ErrorBuffer;
 
 /** */
 public class TestAttributeChecks extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +
