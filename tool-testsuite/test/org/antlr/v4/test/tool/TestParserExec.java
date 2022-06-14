@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -68,7 +69,7 @@ public class TestParserExec extends BaseJavaToolTest {
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer",
 		                           null, null, "s",
-								   "abc 34", true);
+								   "abc 34", true, PredictionMode.LL);
 		String expecting =
 			"Decision 0:\n" +
 			"s0-ID->s1\n" +
@@ -86,7 +87,7 @@ public class TestParserExec extends BaseJavaToolTest {
 	// TODO: port to test framework (can we simplify the Psl grammar?)
 	@Test public void testFailedPredicateExceptionState() throws Exception {
 		String grammar = load("Psl.g4", "UTF-8");
-		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false);
+		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false, PredictionMode.LL);
 		assertEquals(null, found);
 		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", getParseErrors());
 	}
@@ -127,7 +128,7 @@ public class TestParserExec extends BaseJavaToolTest {
 		assertTrue(success);
 
 		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer",
-		                          null, null, "file", "", false);
+		                          null, null, "file", "", false, PredictionMode.LL);
 		assertEquals(null, found);
 		assertNull(getParseErrors());
 	}
@@ -156,7 +157,7 @@ public class TestParserExec extends BaseJavaToolTest {
 
 		String input = "2 9 10 3 1 2 3";
 		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer",
-		                          null, null, "file", input, false);
+		                          null, null, "file", input, false, PredictionMode.LL);
 		assertEquals("6\n", found);
 		assertNull(getParseErrors());
 	}
@@ -178,7 +179,7 @@ public class TestParserExec extends BaseJavaToolTest {
 		execParser(
 				"CaseInsensitiveGrammar.g4", grammar,
 				"CaseInsensitiveGrammarParser", "CaseInsensitiveGrammarLexer",
-				null, null, "e", input, false);
+				null, null, "e", input, false, PredictionMode.LL);
 		assertNull(getParseErrors());
 	}
 }

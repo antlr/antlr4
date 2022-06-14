@@ -7,6 +7,7 @@
 package org.antlr.v4.test.runtime.dart;
 
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -54,7 +55,8 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 							 String visitorName,
 							 String startRuleName,
 							 String input,
-							 boolean showDiagnosticErrors) {
+							 boolean showDiagnosticErrors,
+							 PredictionMode predictionMode) {
 		return execParser(grammarFileName, grammarStr, parserName, lexerName,
 			listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
 	}

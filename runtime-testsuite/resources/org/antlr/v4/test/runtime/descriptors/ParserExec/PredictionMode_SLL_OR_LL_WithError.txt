@@ -1,0 +1,34 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+r
+   : (a b | a) EOF {<writeln("$text")>}
+   ;
+a
+   : X
+   ;
+b
+   : Y
+   ;
+X: 'X';
+Y: 'Y';
+WS  : [ \r\n\t]+ -> skip ;
+
+[start]
+r
+
+[input]
+z
+
+[output]
+
+[errors]
+"""line 1:0 token recognition error at: 'z'
+line 1:1 mismatched input '<EOF>' expecting 'X'
+"""
+
+[flags]
+predictionMode=SLL_OR_LL

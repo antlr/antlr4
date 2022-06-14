@@ -80,7 +80,12 @@ public enum PredictionMode {
 	 * This prediction mode does not provide any guarantees for prediction
 	 * behavior for syntactically-incorrect inputs.</p>
 	 */
-	LL_EXACT_AMBIG_DETECTION;
+	LL_EXACT_AMBIG_DETECTION,
+
+	/**
+	 * Use fast SLL or switch to LL if SLL has been failed (syntax or ambiguity error)
+	 */
+	SLL_OR_LL;
 
 	/** A Map that uses just the state and the stack context as the key. */
 	static class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
@@ -209,7 +214,7 @@ public enum PredictionMode {
 	 * the configurations to strip out all of the predicates so that a standard
 	 * {@link ATNConfigSet} will merge everything ignoring predicates.</p>
 	 */
-	public static boolean hasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configs) {
+	public static boolean hasSLLConflictTerminatingPrediction(boolean isSllMode, ATNConfigSet configs) {
 		/* Configs in rule stop states indicate reaching the end of the decision
 		 * rule (local context) or end of start rule (full context). If all
 		 * configs meet this condition, then none of the configurations is able
@@ -220,7 +225,7 @@ public enum PredictionMode {
 		}
 
 		// pure SLL mode parsing
-		if ( mode == PredictionMode.SLL ) {
+		if (  isSllMode ) {
 			// Don't bother with combining configs from different semantic
 			// contexts if we can fail over to full LL; costs more time
 			// since we'll often fail over anyway.

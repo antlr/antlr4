@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.javascript;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -64,9 +65,9 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 	@Override
 	public String execParser(String grammarFileName, String grammarStr,
-	                         String parserName, String lexerName, String listenerName,
-	                         String visitorName, String startRuleName, String input,
-	                         boolean showDiagnosticErrors)
+							 String parserName, String lexerName, String listenerName,
+							 String visitorName, String startRuleName, String input,
+							 boolean showDiagnosticErrors, PredictionMode predictionMode)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 				grammarStr, parserName, lexerName, "-visitor");

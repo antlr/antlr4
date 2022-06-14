@@ -6,6 +6,7 @@
 package org.antlr.v4.test.runtime.go;
 
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.test.runtime.*;
 import org.junit.Assert;
 import org.stringtemplate.v4.ST;
@@ -80,7 +81,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	public String execParser(String grammarFileName, String grammarStr,
 	                         String parserName, String lexerName, String listenerName,
 	                         String visitorName, String startRuleName, String input,
-	                         boolean showDiagnosticErrors)
+	                         boolean showDiagnosticErrors, PredictionMode predictionMode)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, parserName, lexerName, "-visitor");

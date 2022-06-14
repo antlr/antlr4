@@ -363,13 +363,17 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * @param recognizer the parser instance
 	 */
 	protected void reportUnwantedToken(Parser recognizer) {
+		Token t = recognizer.getCurrentToken();
+		if (!recognizer.shouldReportAndRecover()) {
+			throw new UnwantedTokenException(t, recognizer, recognizer._input, recognizer._ctx);
+		}
+
 		if (inErrorRecoveryMode(recognizer)) {
 			return;
 		}
 
 		beginErrorCondition(recognizer);
 
-		Token t = recognizer.getCurrentToken();
 		String tokenName = getTokenErrorDisplay(t);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
@@ -395,14 +399,18 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 * @param recognizer the parser instance
 	 */
 	protected void reportMissingToken(Parser recognizer) {
+		Token t = recognizer.getCurrentToken();
+		IntervalSet expecting = getExpectedTokens(recognizer);
+		if (!recognizer.shouldReportAndRecover()) {
+			throw new MissingTokenException(expecting, recognizer, recognizer._input, recognizer._ctx);
+		}
+
 		if (inErrorRecoveryMode(recognizer)) {
 			return;
 		}
 
 		beginErrorCondition(recognizer);
 
-		Token t = recognizer.getCurrentToken();
-		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "missing "+expecting.toString(recognizer.getVocabulary())+
 			" at "+getTokenErrorDisplay(t);
 

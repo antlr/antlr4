@@ -410,14 +410,15 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	<exceptions; separator="\n">
 	<else>
 	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
+		reportAndRecover(_localctx, re);
 	}
 	<endif>
 	finally {
 		<finallyAction>
 		exitRule();
+	}
+	if (shouldReparseOrThrow(_localctx)) {
+		return <currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>}; separator=", ">);
 	}
 	return _localctx;
 }
@@ -431,7 +432,11 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) throws RecognitionException {
-	return <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
+	<currentRule.ctxType> result = <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
+	if (shouldReparseOrThrow(result)) {
+		return <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
+	}
+	return result;
 }
 
 private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>) throws RecognitionException {
@@ -452,9 +457,7 @@ private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>
 		<namedActions.after>
 	}
 	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
+		reportAndRecover(_localctx, re);
 	}
 	finally {
 		<finallyAction>

@@ -280,6 +280,9 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	private PredictionMode mode = PredictionMode.LL;
 
+	private boolean isSllInSllOrLlMode = true;
+
+
 	/** Each prediction operation uses a cache for merge of prediction contexts.
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
 	 *  isn't synchronized but we're ok since two threads shouldn't reuse same
@@ -473,7 +476,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				throw e;
 			}
 
-			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
+			if ( D.requiresFullContext && !isSllMode() ) {
 				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
 				BitSet conflictingAlts = D.configs.conflictingAlts;
 				if ( D.predicates!=null ) {
@@ -599,7 +602,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			D.configs.uniqueAlt = predictedAlt;
 			D.prediction = predictedAlt;
 		}
-		else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
+		else if ( PredictionMode.hasSLLConflictTerminatingPrediction(isSllMode(), reach) ) {
 			// MORE THAN ONE VIABLE ALTERNATIVE
 			D.configs.conflictingAlts = getConflictingAlts(reach);
 			D.requiresFullContext = true;
@@ -2170,9 +2173,19 @@ public class ParserATNSimulator extends ATNSimulator {
 		this.mode = mode;
 	}
 
+	public final void setIsSllInSllOrLlMode(boolean isSllInSllOrLlMode) { this.isSllInSllOrLlMode = isSllInSllOrLlMode; }
+
 
 	public final PredictionMode getPredictionMode() {
 		return mode;
+	}
+
+	public final boolean getIsSllInSllOrLlMode() {
+		return isSllInSllOrLlMode;
+	}
+
+	public boolean isSllMode() {
+		return mode == PredictionMode.SLL || mode == PredictionMode.SLL_OR_LL && isSllInSllOrLlMode;
 	}
 
 	/**

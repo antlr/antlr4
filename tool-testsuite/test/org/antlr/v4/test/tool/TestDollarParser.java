@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class TestDollarParser extends BaseJavaToolTest {
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          null, null, "a", "x", true);
+		                          null, null, "a", "x", true, PredictionMode.LL);
 		assertTrue(found.indexOf(this.getClass().getSimpleName())>=0);
 		assertNull(getParseErrors());
 	}

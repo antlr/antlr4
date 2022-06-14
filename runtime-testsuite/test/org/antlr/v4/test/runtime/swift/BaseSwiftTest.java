@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime.swift;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
@@ -124,7 +125,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 	}
 
 	@Override
-	public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String listenerName, String visitorName, String startRuleName, String input, boolean showDiagnosticErrors) {
+	public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String listenerName, String visitorName, String startRuleName, String input, boolean showDiagnosticErrors, PredictionMode predictionMode) {
 		generateParser(grammarFileName,
 				grammarStr,
 				parserName,
