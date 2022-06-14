@@ -12,7 +12,7 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 
 ### UNIX
 
-0. Install Java (version 1.7 or higher)
+0. Install Java (version 11 or higher)
 1. Download
 ```
 $ cd /usr/local/lib
