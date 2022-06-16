@@ -39,17 +39,21 @@ public class Processor {
 				environment.put(key, environmentVariables.get(key));
 			}
 		}
+
 		Process process = builder.start();
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
+		StreamReader stdoutReader = new StreamReader(process.getInputStream());
+		StreamReader stderrReader = new StreamReader(process.getErrorStream());
+		stdoutReader.start();
+		stderrReader.start();
 		process.waitFor();
-		stdoutVacuum.join();
-		stderrVacuum.join();
+		stdoutReader.join();
+		stderrReader.join();
+
+		String output = stdoutReader.toString();
+		String errors = stderrReader.toString();
 		if (throwOnNonZeroErrorCode && process.exitValue() != 0) {
-			throw new InterruptedException(stderrVacuum.toString());
+			throw new InterruptedException(output + errors);
 		}
-		return new ProcessorResult(process.exitValue(), stdoutVacuum.toString(), stderrVacuum.toString());
+		return new ProcessorResult(process.exitValue(), output, errors);
 	}
 }

@@ -258,7 +258,7 @@ void foo() {
 >>
 
 Declare_foo() ::= <<void foo() {
-	std::cout \<\< "foo";
+	std::cout \<\< "foo" \<\< std::endl;
 }
 >>
 
