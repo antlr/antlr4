@@ -12,32 +12,46 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-public final class StreamVacuum implements Runnable {
-	private StringBuilder buf = new StringBuilder();
-	private BufferedReader in;
-	private Thread sucker;
-	public StreamVacuum(InputStream in) {
-		this.in = new BufferedReader( new InputStreamReader(in, StandardCharsets.UTF_8) );
+public final class StreamReader implements Runnable {
+	private final StringBuilder buffer = new StringBuilder();
+	private final BufferedReader in;
+	private final Thread worker;
+
+	public StreamReader(InputStream in) {
+		this.in = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8) );
+		worker = new Thread(this);
 	}
+
 	public void start() {
-		sucker = new Thread(this);
-		sucker.start();
+		worker.start();
 	}
+
 	@Override
 	public void run() {
 		try {
-			TestOutputReading.append(in, buf);
+			while (true) {
+				int c = in.read();
+				if (c == -1) {
+					break;
+				}
+				if (c == '\r') {
+					continue;
+				}
+				buffer.append((char) c);
+			}
 		}
 		catch (IOException ioe) {
 			System.err.println("can't read output from process");
 		}
 	}
+
 	/** wait for the thread to finish */
 	public void join() throws InterruptedException {
-		sucker.join();
+		worker.join();
 	}
+
 	@Override
 	public String toString() {
-		return buf.toString();
+		return buffer.toString();
 	}
 }

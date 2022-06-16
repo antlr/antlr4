@@ -217,7 +217,7 @@ TokenGetterListener(X) ::= <<
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2)
-			System.out.printf("%s %s %s",ctx.INT(0).getSymbol().getText(),
+			System.out.printf("%s %s %s\n",ctx.INT(0).getSymbol().getText(),
 				ctx.INT(1).getSymbol().getText(),ctx.INT());
 		else
 			System.out.println(ctx.ID().getSymbol());
@@ -231,7 +231,7 @@ RuleGetterListener(X) ::= <<
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2) {
-			System.out.printf("%s %s %s",ctx.b(0).start.getText(),
+			System.out.printf("%s %s %s\n",ctx.b(0).start.getText(),
 				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());
 		} else
 			System.out.println(ctx.b(0).start.getText());
@@ -259,7 +259,7 @@ LRWithLabelsListener(X) ::= <<
 @parser::members {
 public static class LeafListener extends TBaseListener {
 	public void exitCall(TParser.CallContext ctx) {
-		System.out.printf("%s %s",ctx.e().start.getText(),ctx.eList());
+		System.out.printf("%s %s\n",ctx.e().start.getText(),ctx.eList());
 	}
 	public void exitInt(TParser.IntContext ctx) {
 		System.out.println(ctx.INT().getSymbol().getText());
