@@ -1205,9 +1205,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		int nPredAlts = 0;
 		for (int i = 1; i <= nalts; i++) {
 			if (altToPred[i] == null) {
-				altToPred[i] = SemanticContext.NONE;
+				altToPred[i] = SemanticContext.Empty.Instance;
 			}
-			else if (altToPred[i] != SemanticContext.NONE) {
+			else if (altToPred[i] != SemanticContext.Empty.Instance) {
 				nPredAlts++;
 			}
 		}
@@ -1237,7 +1237,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if (ambigAlts!=null && ambigAlts.get(i)) {
 				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
-			if ( pred!=SemanticContext.NONE ) containsPredicate = true;
+			if ( pred!=SemanticContext.Empty.Instance ) containsPredicate = true;
 		}
 
 		if ( !containsPredicate ) {
@@ -1342,7 +1342,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfigSet succeeded = new ATNConfigSet(configs.fullCtx);
 		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig c : configs) {
-			if ( c.semanticContext!=SemanticContext.NONE ) {
+			if ( c.semanticContext!=SemanticContext.Empty.Instance ) {
 				boolean predicateEvaluationResult = evalSemanticContext(c.semanticContext, outerContext, c.alt, configs.fullCtx);
 				if ( predicateEvaluationResult ) {
 					succeeded.add(c);
@@ -1370,7 +1370,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
-			if ( pair.pred==SemanticContext.NONE ) {
+			if ( pair.pred==SemanticContext.Empty.Instance ) {
 				predictions.set(pair.alt);
 				if (!complete) {
 					break;
@@ -1468,7 +1468,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				for (int i = 0; i < config.context.size(); i++) {
 					if ( config.context.getReturnState(i)==PredictionContext.EMPTY_RETURN_STATE ) {
 						if (fullCtx) {
-							configs.add(new ATNConfig(config, config.state, PredictionContext.EMPTY), mergeCache);
+							configs.add(new ATNConfig(config, config.state, EmptyPredictionContext.Instance), mergeCache);
 							continue;
 						}
 						else {

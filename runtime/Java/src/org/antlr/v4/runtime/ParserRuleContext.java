@@ -40,6 +40,8 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext extends RuleContext {
+	public static final ParserRuleContext EMPTY = new ParserRuleContext();
+
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
 	 *  with this rule's context. This is empty for parsing w/o tree constr.

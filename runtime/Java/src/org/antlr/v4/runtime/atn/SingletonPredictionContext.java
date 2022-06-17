@@ -20,7 +20,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public static SingletonPredictionContext create(PredictionContext parent, int returnState) {
 		if ( returnState == EMPTY_RETURN_STATE && parent == null ) {
 			// someone can pass in the bits of an array ctx that mean $
-			return EMPTY;
+			return EmptyPredictionContext.Instance;
 		}
 		return new SingletonPredictionContext(parent, returnState);
 	}

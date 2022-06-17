@@ -7,7 +7,10 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
+
+import java.util.Objects;
 
 /** A tuple: (ATN state, predicted alt, syntactic, semantic context).
  *  The syntactic context is a graph-structured stack node whose
@@ -76,7 +79,7 @@ public class ATNConfig {
 					 int alt,
 					 PredictionContext context)
 	{
-		this(state, alt, context, SemanticContext.NONE);
+		this(state, alt, context, SemanticContext.Empty.Instance);
 	}
 
 	public ATNConfig(ATNState state,
@@ -168,7 +171,7 @@ public class ATNConfig {
 
 		return this.state.stateNumber==other.state.stateNumber
 			&& this.alt==other.alt
-			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
+			&& Objects.equals(this.context, other.context)
 			&& this.semanticContext.equals(other.semanticContext)
 			&& this.isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 	}
@@ -206,7 +209,7 @@ public class ATNConfig {
             buf.append(context.toString());
 			buf.append("]");
         }
-        if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
+        if ( semanticContext!=null && semanticContext != SemanticContext.Empty.Instance ) {
             buf.append(",");
             buf.append(semanticContext);
         }

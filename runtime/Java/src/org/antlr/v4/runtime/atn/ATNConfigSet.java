@@ -137,7 +137,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		if ( config.semanticContext!=SemanticContext.NONE ) {
+		if ( config.semanticContext != SemanticContext.Empty.Instance ) {
 			hasSemanticContext = true;
 		}
 		if (config.getOuterContextDepth() > 0) {
@@ -199,7 +199,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public List<SemanticContext> getPredicates() {
 		List<SemanticContext> preds = new ArrayList<SemanticContext>();
 		for (ATNConfig c : configs) {
-			if ( c.semanticContext!=SemanticContext.NONE ) {
+			if ( c.semanticContext!=SemanticContext.Empty.Instance ) {
 				preds.add(c.semanticContext);
 			}
 		}

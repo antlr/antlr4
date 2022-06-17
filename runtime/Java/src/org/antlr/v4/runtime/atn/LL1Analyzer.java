@@ -45,7 +45,7 @@ public class LL1Analyzer {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
-			_LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
+			_LOOK(s.transition(alt).target, null, EmptyPredictionContext.Instance,
 				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
@@ -167,7 +167,7 @@ public class LL1Analyzer {
 				return;
 			}
 
-			if ( ctx != PredictionContext.EMPTY ) {
+			if ( ctx != EmptyPredictionContext.Instance ) {
 				// run thru all possible stack tops in ctx
 				boolean removed = calledRuleStack.get(s.ruleIndex);
 				try {
