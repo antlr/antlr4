@@ -11,7 +11,7 @@ public class Interval {
 
 	public static final Interval INVALID = new Interval(-1,-2);
 
-	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
+	static final Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
 	public int a;
 	public int b;

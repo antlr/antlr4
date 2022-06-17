@@ -20,7 +20,7 @@ public class XPathLexer extends Lexer {
 	public static final int
 		TOKEN_REF=1, RULE_REF=2, ANYWHERE=3, ROOT=4, WILDCARD=5, BANG=6, ID=7,
 		STRING=8;
-	public static String[] modeNames = {
+	public final static String[] modeNames = {
 		"DEFAULT_MODE"
 	};
 

@@ -1543,7 +1543,7 @@ public class TestPerformance {
 	}
 
 	private static class DescriptiveErrorListener extends BaseErrorListener {
-		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
+		public final static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,

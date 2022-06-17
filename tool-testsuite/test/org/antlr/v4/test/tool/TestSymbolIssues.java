@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** */
 public class TestSymbolIssues {
-    static String[] A = {
+    final static String[] A = {
         // INPUT
         "grammar A;\n" +
         "options { opt='sss'; k=3; }\n" +
@@ -44,7 +44,7 @@ public class TestSymbolIssues {
 			"error(" + ErrorType.MISSING_RULE_ARGS.code + "): A.g4:10:31: missing argument(s) on rule reference: a\n"
     };
 
-    static String[] B = {
+	final static String[] B = {
         // INPUT
         "parser grammar B;\n" +
         "tokens { ID, FOO, X, Y }\n" +
@@ -62,7 +62,7 @@ public class TestSymbolIssues {
 		"error(" + ErrorType.IMPLICIT_STRING_DEFINITION.code + "): B.g4:4:20: cannot create implicit token for string literal in non-combined grammar: '.'\n"
     };
 
-    static String[] D = {
+	final static String[] D = {
         // INPUT
         "parser grammar D;\n" +
 		"tokens{ID}\n" +
@@ -79,7 +79,7 @@ public class TestSymbolIssues {
 		"error(" + ErrorType.RETVAL_CONFLICTS_WITH_ARG.code + "): D.g4:6:22: return value i conflicts with parameter with same name\n"
     };
 
-	static String[] E = {
+	final static String[] E = {
 		// INPUT
 		"grammar E;\n" +
 		"tokens {\n" +
@@ -93,7 +93,7 @@ public class TestSymbolIssues {
 		"warning(" + ErrorType.TOKEN_NAME_REASSIGNMENT.code + "): E.g4:3:4: token name A is already defined\n"
 	};
 
-	static String[] F = {
+	final static String[] F = {
 		// INPUT
 		"lexer grammar F;\n" +
 		"A: 'a';\n" +

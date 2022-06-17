@@ -113,7 +113,7 @@ public class Tool {
 	public boolean longMessages = false;
 	public boolean exact_output_dir = false;
 
-    public static Option[] optionDefs = {
+    public final static Option[] optionDefs = {
 		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
 		new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
 		new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),

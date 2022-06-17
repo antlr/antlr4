@@ -9,7 +9,7 @@ package org.antlr.v4.test.runtime;
 import java.util.*;
 
 public class CustomDescriptors {
-	public static HashMap<String, RuntimeTestDescriptor[]> descriptors;
+	public final static HashMap<String, RuntimeTestDescriptor[]> descriptors;
 
 	static {
 		descriptors = new HashMap<>();
