@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestUnicodeGrammar extends BaseJavaToolTest {
+public class TestUnicodeGrammar {
 	@Test
 	public void unicodeBMPLiteralInGrammar() throws Exception {
 		String grammarText =

@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class TestParserInterpreter extends BaseJavaToolTest {
+public class TestParserInterpreter {
 	@Test public void testEmptyStartRule() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +

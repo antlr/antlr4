@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestTokenTypeAssignment extends BaseJavaToolTest {
+public class TestTokenTypeAssignment {
 	@Test public void testParserSimpleTokens() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+

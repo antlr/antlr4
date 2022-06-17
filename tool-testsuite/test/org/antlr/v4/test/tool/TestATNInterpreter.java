@@ -22,6 +22,8 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.createATN;
+import static org.antlr.v4.test.tool.ToolTestUtils.getTokenTypesViaATN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -29,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNInterpreter extends BaseJavaToolTest {
+public class TestATNInterpreter {
 	@Test public void testSimpleNoBlock() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +

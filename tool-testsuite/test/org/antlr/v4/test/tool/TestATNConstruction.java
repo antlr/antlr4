@@ -30,7 +30,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestATNConstruction extends BaseJavaToolTest {
+public class TestATNConstruction {
 	@Test public void testA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+

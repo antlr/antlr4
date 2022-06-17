@@ -32,7 +32,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestCodeGeneration extends BaseJavaToolTest {
+public class TestCodeGeneration {
 	@Test public void testArgDecl() throws Exception { // should use template not string
 		/*ErrorQueue equeue = */new ErrorQueue();
 		String g =

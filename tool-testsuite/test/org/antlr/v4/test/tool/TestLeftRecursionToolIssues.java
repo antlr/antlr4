@@ -9,8 +9,10 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
+
 /** */
-public class TestLeftRecursionToolIssues extends BaseJavaToolTest {
+public class TestLeftRecursionToolIssues {
 	protected boolean debug = false;
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {

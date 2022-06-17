@@ -10,9 +10,10 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestToolSyntaxErrors extends BaseJavaToolTest {
+public class TestToolSyntaxErrors {
     static String[] A = {
 	    // INPUT
 		"grammar A;\n" +
@@ -65,7 +66,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		}
 	}
 
-	@Test public void testA() { super.testErrors(A, true); }
+	@Test public void testA() { testErrors(A, true); }
 
 	@Test public void testExtraColon() {
 		String[] pair = new String[] {
@@ -74,7 +75,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"b : B ;",
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:4: syntax error: ':' came as a complete surprise to me while matching alternative\n",
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testMissingRuleSemi() {
@@ -84,7 +85,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"b : B ;",
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:3:0: syntax error: unterminated rule (missing ';') detected at 'b :' while looking for rule element\n",
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testMissingRuleSemi2() {
@@ -94,7 +95,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"B : 'b' ;",
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:3:2: syntax error: unterminated rule (missing ';') detected at ': 'b'' while looking for lexer rule element\n",
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testMissingRuleSemi3() {
@@ -104,7 +105,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"b[int i] returns [int y] : B ;",
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:3:9: syntax error: unterminated rule (missing ';') detected at 'returns int y' while looking for rule element\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testMissingRuleSemi4() {
@@ -116,7 +117,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:4: syntax error: unterminated rule (missing ';') detected at 'b catch' while looking for rule element\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testMissingRuleSemi5() {
@@ -127,7 +128,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:4: syntax error: unterminated rule (missing ';') detected at 'A catch' while looking for rule element\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testBadRulePrequelStart() {
@@ -138,7 +139,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:4: syntax error: 'options {' came as a complete surprise to me while looking for an identifier\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testBadRulePrequelStart2() {
@@ -149,7 +150,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:2: syntax error: '}' came as a complete surprise to me while matching rule preamble\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testModeInParser() {
@@ -162,7 +163,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:4:0: syntax error: 'b' came as a complete surprise to me\n" +
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:4:6: syntax error: mismatched input ';' expecting COLON while matching a lexer rule\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -178,7 +179,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.UNTERMINATED_STRING_LITERAL.code + "): A.g4:2:4: unterminated string literal\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -193,7 +194,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:0: syntax error: '_' came as a complete surprise to me\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -209,7 +210,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			""
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -224,7 +225,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			""
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -239,7 +240,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			""
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testEmptyTokensBlock() {
@@ -250,7 +251,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			""
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -269,7 +270,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:14: lexer command popmode does not exist or is not supported by the current target\n" +
 			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:14: lexer command token does not exist or is not supported by the current target\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testLexerCommandArgumentValidation() {
@@ -283,7 +284,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:14: lexer command popMode does not take any arguments\n" +
 			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:14: missing argument for lexer command type\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testRuleRedefinition() {
@@ -298,7 +299,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule ret_ty redefinition; previous at line 3\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testEpsilonClosureAnalysis() {
@@ -319,7 +320,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/1203
@@ -336,7 +337,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/2860, https://github.com/antlr/antlr4/issues/1105
@@ -354,7 +355,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/3359
@@ -372,7 +373,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/1203
@@ -389,7 +390,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testEpsilonOptionalAnalysis() {
@@ -408,7 +409,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -438,7 +439,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"";
 
 		String[] pair = new String[] { grammar, expected };
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -470,7 +471,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -490,7 +491,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -510,7 +511,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -532,7 +533,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -559,7 +560,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testInvalidCharSetsAndStringLiterals() {
@@ -591,7 +592,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testInvalidUnicodeEscapesInCharSet() {
@@ -631,7 +632,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -653,7 +654,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -682,7 +683,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -703,7 +704,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -725,7 +726,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -746,7 +747,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testChannelDefinitionInLexer() throws Exception {
@@ -764,7 +765,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		String expected = "";
 
 		String[] pair = { grammar, expected };
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testChannelDefinitionInParser() throws Exception {
@@ -782,7 +783,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.CHANNELS_BLOCK_IN_PARSER_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in parser grammars\n";
 
 		String[] pair = { grammar, expected };
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testChannelDefinitionInCombined() throws Exception {
@@ -805,7 +806,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in combined grammars\n";
 
 		String[] pair = { grammar, expected };
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	/**
@@ -832,7 +833,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): T.g4:10:34: NEWLINE_CHANNEL is not a recognized channel name\n";
 
 		String[] pair = { grammar, expected };
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	// Test for https://github.com/antlr/antlr4/issues/1556
@@ -848,14 +849,14 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			expected
 		};
 
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testRuleNamesAsTree() {
 		String grammar =
 				"grammar T;\n" +
 				"tree : 'X';";
-		super.testErrors(new String[] { grammar, "" }, true);
+		testErrors(new String[] { grammar, "" }, true);
 	}
 
 	@Test public void testLexerRuleLabel() {
@@ -863,7 +864,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"grammar T;\n" +
 				"a : A;\n" +
 				"A : h=~('b'|'c') ;";
-		super.testErrors(new String[] {
+		testErrors(new String[] {
 				grammar,
 				"error(" + ErrorType.SYNTAX_ERROR.code + "): T.g4:3:5: syntax error: '=' came as a complete surprise to me while looking for lexer rule element\n" }, false);
 	}

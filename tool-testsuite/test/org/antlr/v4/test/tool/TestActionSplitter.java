@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestActionSplitter extends BaseJavaToolTest {
+public class TestActionSplitter {
     static String[] exprs = {
         "foo",		"['foo'<" + ActionSplitter.TEXT + ">]",
         "$x",		"['$x'<" + ActionSplitter.ATTR + ">]",
@@ -45,7 +45,7 @@ public class TestActionSplitter extends BaseJavaToolTest {
 		}
 	}
 
-    public static List<String> getActionChunks(String a) {
+	private static List<String> getActionChunks(String a) {
         List<String> chunks = new ArrayList<String>();
         ActionSplitter splitter = new ActionSplitter(new ANTLRStringStream(a),
 													 new BlankActionSplitterListener());

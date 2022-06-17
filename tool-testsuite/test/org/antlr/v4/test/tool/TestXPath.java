@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestXPath extends BaseJavaToolTest {
+public class TestXPath {
 	public static final String grammar =
 		"grammar Expr;\n" +
 		"prog:   func+ ;\n" +

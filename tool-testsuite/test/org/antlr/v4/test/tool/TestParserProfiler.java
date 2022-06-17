@@ -25,10 +25,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestParserProfiler extends BaseJavaToolTest {
+public class TestParserProfiler {
 	final static LexerGrammar lg;
 
 	static {

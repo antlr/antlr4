@@ -18,11 +18,12 @@ import java.util.Arrays;
 
 import static org.antlr.v4.runtime.atn.ATNDeserializer.encodeIntsWith16BitWords;
 import static org.antlr.v4.runtime.atn.ATNDeserializer.decodeIntsEncodedAs16BitWords;
+import static org.antlr.v4.test.tool.ToolTestUtils.createATN;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class TestATNDeserialization extends BaseJavaToolTest {
+public class TestATNDeserialization {
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+

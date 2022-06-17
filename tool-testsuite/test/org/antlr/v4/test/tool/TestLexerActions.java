@@ -9,9 +9,10 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.execLexer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestLexerActions extends BaseJavaToolTest {
+public class TestLexerActions {
 	// ----- ACTIONS --------------------------------------------------------
 
 	@Test public void testActionExecutedInDFA() throws Exception {

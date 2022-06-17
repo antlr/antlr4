@@ -39,19 +39,18 @@ import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
-public class BaseJavaToolTest {
-	protected ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input) {
+public class ToolTestUtils {
+	public static ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input) {
 		return execLexer(grammarFileName, grammarStr, lexerName, input, null, false);
 	}
 
-	protected ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input,
+	public static ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input,
 									  Path tempDir, boolean saveTestDir) {
 		return execRecognizer(grammarFileName, grammarStr, null, lexerName,
 				null, input, false, tempDir, saveTestDir);
 	}
 
-	protected ExecutedState execParser(String grammarFileName, String grammarStr,
+	public static ExecutedState execParser(String grammarFileName, String grammarStr,
 									   String parserName, String lexerName, String startRuleName,
 									   String input, boolean showDiagnosticErrors
 	) {
@@ -59,7 +58,7 @@ public class BaseJavaToolTest {
 				input, showDiagnosticErrors, null);
 	}
 
-	protected ExecutedState execParser(String grammarFileName, String grammarStr,
+	public static ExecutedState execParser(String grammarFileName, String grammarStr,
 									String parserName, String lexerName, String startRuleName,
 									String input, boolean showDiagnosticErrors, Path workingDir
 	) {
@@ -67,7 +66,7 @@ public class BaseJavaToolTest {
 				startRuleName, input, showDiagnosticErrors, workingDir, false);
 	}
 
-	private ExecutedState execRecognizer(String grammarFileName, String grammarStr,
+	private static ExecutedState execRecognizer(String grammarFileName, String grammarStr,
 										 String parserName, String lexerName, String startRuleName,
 										 String input, boolean showDiagnosticErrors,
 										 Path workingDir, boolean saveTestDir) {
@@ -83,7 +82,7 @@ public class BaseJavaToolTest {
 		}
 	}
 
-	protected static RunOptions createOptionsForJavaToolTests(
+	public static RunOptions createOptionsForJavaToolTests(
 			String grammarFileName, String grammarStr, String parserName, String lexerName,
 			boolean useListener, boolean useVisitor, String startRuleName,
 			String input, boolean profile, boolean showDiagnosticErrors,
@@ -93,7 +92,7 @@ public class BaseJavaToolTest {
 				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java");
 	}
 
-	protected void testErrors(String[] pairs, boolean printTree) {
+	public static void testErrors(String[] pairs, boolean printTree) {
 		for (int i = 0; i < pairs.length; i += 2) {
 			String grammarStr = pairs[i];
 			String expect = pairs[i + 1];
@@ -101,7 +100,7 @@ public class BaseJavaToolTest {
 			String[] lines = grammarStr.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
 
-			String tempDirName = getClass().getSimpleName() + "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
+			String tempDirName = "AntlrTestErrors-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
 			String tempTestDir = Paths.get(TempDirectory, tempDirName).toString();
 
 			try {
@@ -125,7 +124,7 @@ public class BaseJavaToolTest {
 		}
 	}
 
-	protected String getFilenameFromFirstLineOfGrammar(String line) {
+	public static String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		int grIndex = line.lastIndexOf("grammar");
 		int semi = line.lastIndexOf(';');
@@ -137,19 +136,19 @@ public class BaseJavaToolTest {
 		return fileName;
 	}
 
-	protected List<String> realElements(List<String> elements) {
+	public static List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
 
-	protected String load(String fileName)
+	public static String load(String fileName)
 			throws IOException {
 		if ( fileName==null ) {
 			return null;
 		}
 
-		String fullFileName = getClass().getPackage().getName().replace('.', '/')+'/'+fileName;
+		String fullFileName = ToolTestUtils.class.getPackage().getName().replace('.', '/')+'/'+fileName;
 		int size = 65000;
-		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+		InputStream fis = ToolTestUtils.class.getClassLoader().getResourceAsStream(fullFileName);
 		try (InputStreamReader isr = new InputStreamReader(fis)) {
 			char[] data = new char[size];
 			int n = isr.read(data);
@@ -157,7 +156,7 @@ public class BaseJavaToolTest {
 		}
 	}
 
-	protected ATN createATN(Grammar g, boolean useSerializer) {
+	public static ATN createATN(Grammar g, boolean useSerializer) {
 		if ( g.atn==null ) {
 			semanticProcess(g);
 			assertEquals(0, g.tool.getNumErrors());
@@ -178,7 +177,7 @@ public class BaseJavaToolTest {
 		return atn;
 	}
 
-	protected void semanticProcess(Grammar g) {
+	public static void semanticProcess(Grammar g) {
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 //			System.out.println(g.ast.toStringTree());
 			Tool antlr = new Tool();
@@ -192,7 +191,7 @@ public class BaseJavaToolTest {
 		}
 	}
 
-	protected static IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
+	public static IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
 		ANTLRInputStream in = new ANTLRInputStream(input);
 		IntegerList tokenTypes = new IntegerList();
 		int ttype;

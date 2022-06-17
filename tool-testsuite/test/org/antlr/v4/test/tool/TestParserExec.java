@@ -13,6 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test parser execution.
@@ -46,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *  Nongreedy loops match as much input as possible while still allowing
  *  the remaining input to match.
  */
-public class TestParserExec extends BaseJavaToolTest {
+public class TestParserExec {
 	/**
 	 * This is a regression test for antlr/antlr4#118.
 	 * https://github.com/antlr/antlr4/issues/118

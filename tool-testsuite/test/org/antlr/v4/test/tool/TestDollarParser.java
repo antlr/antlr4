@@ -9,10 +9,11 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.execParser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestDollarParser extends BaseJavaToolTest {
+public class TestDollarParser {
 	@Test
 	public void testSimpleCall() {
 		String grammar = "grammar T;\n" +

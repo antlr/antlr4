@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test topo sort in GraphNode. */
-public class TestTopologicalSort extends BaseJavaToolTest {
+public class TestTopologicalSort {
     @Test
     public void testFairlyLargeGraph() throws Exception {
         Graph<String> g = new Graph<String>();

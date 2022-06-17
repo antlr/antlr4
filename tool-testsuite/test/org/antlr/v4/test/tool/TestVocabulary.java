@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Sam Harwell
  */
-public class TestVocabulary extends BaseJavaToolTest {
+public class TestVocabulary {
 	@Test
 	public void testEmptyVocabulary() {
 		assertNotNull(VocabularyImpl.EMPTY_VOCABULARY);

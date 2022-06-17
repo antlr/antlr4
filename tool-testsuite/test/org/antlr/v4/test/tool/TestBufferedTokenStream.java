@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestBufferedTokenStream extends BaseJavaToolTest {
+public class TestBufferedTokenStream {
 	protected TokenStream createTokenStream(TokenSource src) {
 		return new BufferedTokenStream(src);
 	}
