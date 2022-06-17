@@ -22,7 +22,7 @@ public class PredictionContextCache {
 	 *  Protect shared cache from unsafe thread access.
 	 */
 	public PredictionContext add(PredictionContext ctx) {
-		if ( ctx==PredictionContext.EMPTY ) return PredictionContext.EMPTY;
+		if ( ctx==EmptyPredictionContext.Instance ) return EmptyPredictionContext.Instance;
 		PredictionContext existing = cache.get(ctx);
 		if ( existing!=null ) {
 //			System.out.println(name+" reuses "+existing);

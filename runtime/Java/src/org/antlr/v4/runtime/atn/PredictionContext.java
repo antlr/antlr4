@@ -6,6 +6,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -21,12 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class PredictionContext {
-	/**
-	 * Represents {@code $} in local context prediction, which means wildcard.
-	 * {@code *+x = *}.
-	 */
-	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
-
 	/**
 	 * Represents {@code $} in an array in full context mode, when {@code $}
 	 * doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
@@ -67,19 +62,19 @@ public abstract class PredictionContext {
 	}
 
 	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
-	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
+	 *  Return {@link EmptyPredictionContext#Instance} if {@code outerContext} is empty or null.
 	 */
 	public static PredictionContext fromRuleContext(ATN atn, RuleContext outerContext) {
-		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
+		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 
 		// if we are in RuleContext of start rule, s, then PredictionContext
 		// is EMPTY. Nobody called us. (if we are empty, return empty)
-		if ( outerContext.parent==null || outerContext==RuleContext.EMPTY ) {
-			return PredictionContext.EMPTY;
+		if ( outerContext.parent==null || outerContext==ParserRuleContext.EMPTY ) {
+			return EmptyPredictionContext.Instance;
 		}
 
 		// If we have a parent, convert it to a PredictionContext graph
-		PredictionContext parent = EMPTY;
+		PredictionContext parent = EmptyPredictionContext.Instance;
 		parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
 
 		ATNState state = atn.states.get(outerContext.invokingState);
@@ -93,9 +88,9 @@ public abstract class PredictionContext {
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
+	/** This means only the {@link EmptyPredictionContext#Instance} (wildcard? not sure) context is in set. */
 	public boolean isEmpty() {
-		return this == EMPTY;
+		return this == EmptyPredictionContext.Instance;
 	}
 
 	public boolean hasEmptyPath() {
@@ -270,18 +265,18 @@ public abstract class PredictionContext {
 
 	/**
 	 * Handle case where at least one of {@code a} or {@code b} is
-	 * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
-	 * to represent {@link #EMPTY}.
+	 * {@link EmptyPredictionContext#Instance}. In the following diagrams, the symbol {@code $} is used
+	 * to represent {@link EmptyPredictionContext#Instance}.
 	 *
 	 * <h2>Local-Context Merges</h2>
 	 *
 	 * <p>These local-context merge operations are used when {@code rootIsWildcard}
 	 * is true.</p>
 	 *
-	 * <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
+	 * <p>{@link EmptyPredictionContext#Instance} is superset of any graph; return {@link EmptyPredictionContext#Instance}.<br>
 	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+	 * <p>{@link EmptyPredictionContext#Instance} and anything is {@code #EMPTY}, so merged parent is
 	 * {@code #EMPTY}; return left graph.<br>
 	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
 	 *
@@ -295,7 +290,7 @@ public abstract class PredictionContext {
 	 *
 	 * <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
+	 * <p>Must keep all contexts; {@link EmptyPredictionContext#Instance} in array is a special value (and
 	 * null parent).<br>
 	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
 	 *
@@ -311,19 +306,19 @@ public abstract class PredictionContext {
 											  boolean rootIsWildcard)
 	{
 		if ( rootIsWildcard ) {
-			if ( a == EMPTY ) return EMPTY;  // * + b = *
-			if ( b == EMPTY ) return EMPTY;  // a + * = *
+			if ( a == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance;  // * + b = *
+			if ( b == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance;  // a + * = *
 		}
 		else {
-			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
-			if ( a == EMPTY ) { // $ + x = [x,$]
+			if ( a == EmptyPredictionContext.Instance && b == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance; // $ + $ = $
+			if ( a == EmptyPredictionContext.Instance) { // $ + x = [x,$]
 				int[] payloads = {b.returnState, EMPTY_RETURN_STATE};
 				PredictionContext[] parents = {b.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
-			if ( b == EMPTY ) { // x + $ = [x,$] ($ is always last if present)
+			if ( b == EmptyPredictionContext.Instance) { // x + $ = [x,$] ($ is always last if present)
 				int[] payloads = {a.returnState, EMPTY_RETURN_STATE};
 				PredictionContext[] parents = {a.parent, null};
 				PredictionContext joined =
@@ -521,7 +516,7 @@ public abstract class PredictionContext {
 		}
 
 		for (PredictionContext current : nodes) {
-			if ( current==EMPTY ) continue;
+			if ( current== EmptyPredictionContext.Instance) continue;
 			for (int i = 0; i < current.size(); i++) {
 				if ( current.getParent(i)==null ) continue;
 				String s = String.valueOf(current.id);
@@ -585,7 +580,7 @@ public abstract class PredictionContext {
 
 		PredictionContext updated;
 		if (parents.length == 0) {
-			updated = EMPTY;
+			updated = EmptyPredictionContext.Instance;
 		}
 		else if (parents.length == 1) {
 			updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0));
@@ -651,7 +646,7 @@ public abstract class PredictionContext {
 	}
 
 	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
-		return toStrings(recognizer, EMPTY, currentState);
+		return toStrings(recognizer, EmptyPredictionContext.Instance, currentState);
 	}
 
 	// FROM SAM
