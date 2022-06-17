@@ -19,9 +19,6 @@ import java.util.List;
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 
 public class Generator {
-	/** ANTLR isn't thread-safe to process grammars so we use a global lock for testing */
-	public static final Object antlrLock = new Object();
-
 	/** Write a grammar to tmpdir and run antlr */
 	public static ErrorQueue antlrOnString(String workdir,
 										   String targetName,
@@ -69,9 +66,7 @@ public class Generator {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
+		antlr.processGrammarsOnCommandLine();
 
 		List<String> errors = new ArrayList<>();
 
