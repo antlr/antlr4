@@ -16,11 +16,6 @@ public class Interval {
 	public int a;
 	public int b;
 
-	public static int creates = 0;
-	public static int misses = 0;
-	public static int hits = 0;
-	public static int outOfRange = 0;
-
 	public Interval(int a, int b) { this.a=a; this.b=b; }
 
 	/** Interval objects are used readonly so share all with the

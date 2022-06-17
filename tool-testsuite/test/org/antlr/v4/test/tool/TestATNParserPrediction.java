@@ -491,7 +491,6 @@ public class TestATNParserPrediction {
 	public void checkPredictedAlt(LexerGrammar lg, Grammar g, int decision,
 	                              String inputString, int expectedAlt)
 	{
-		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
 		new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },new PredictionContextCache());
