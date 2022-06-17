@@ -31,8 +31,6 @@ public class Utils {
 		TResult exec(T1 arg1);
 	}
 
-	static Integer[] ints = new Integer[INTEGER_POOL_MAX_VALUE+1];
-
     public static String stripFileExtension(String name) {
         if ( name==null ) return null;
         int lastDot = name.lastIndexOf('.');
