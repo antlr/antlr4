@@ -47,7 +47,7 @@ public class ATNDeserializer {
                 continue
             }
 
-            var ruleIndex = data[p]
+            let ruleIndex = data[p]
             p += 1
             let s = try stateFactory(stype, ruleIndex)!
             if stype == ATNState.LOOP_END {
@@ -102,7 +102,7 @@ public class ATNDeserializer {
             ruleToStartState.append(startState)
 
             if atn.grammarType == ATNType.lexer {
-                var tokenType = data[p]
+                let tokenType = data[p]
                 p += 1
                 ruleToTokenType.append(tokenType)
             }
@@ -179,9 +179,9 @@ public class ATNDeserializer {
             for _ in 0..<length {
                 let actionType = LexerActionType(rawValue: data[p])!
                 p += 1
-                var data1 = data[p]
+                let data1 = data[p]
                 p += 1
-                var data2 = data[p]
+                let data2 = data[p]
                 p += 1
                 let lexerAction = lexerActionFactory(actionType, data1, data2)
                 lexerActions.append(lexerAction)
