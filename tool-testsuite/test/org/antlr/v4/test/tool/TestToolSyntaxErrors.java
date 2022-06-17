@@ -14,7 +14,7 @@ import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestToolSyntaxErrors {
-    static String[] A = {
+	final static String[] A = {
 	    // INPUT
 		"grammar A;\n" +
 		"",

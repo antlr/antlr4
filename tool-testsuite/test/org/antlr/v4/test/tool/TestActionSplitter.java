@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestActionSplitter {
-    static String[] exprs = {
+    final static String[] exprs = {
         "foo",		"['foo'<" + ActionSplitter.TEXT + ">]",
         "$x",		"['$x'<" + ActionSplitter.ATTR + ">]",
         "\\$x",		"['\\$x'<" + ActionSplitter.TEXT + ">]",

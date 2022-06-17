@@ -13,7 +13,7 @@ import org.stringtemplate.v4.ST;
 import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
 
 public class TestBasicSemanticErrors {
-    static String[] U = {
+    final static String[] U = {
         // INPUT
         "parser grammar U;\n" +
         "options { foo=bar; k=3;}\n" +
