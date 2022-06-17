@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestScopeParsing extends BaseJavaToolTest {
+public class TestScopeParsing {
     static String[] argPairs = {
 			"", "",
 			" ", "",

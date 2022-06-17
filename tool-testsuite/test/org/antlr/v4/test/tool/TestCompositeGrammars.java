@@ -26,9 +26,10 @@ import java.util.*;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.PathSeparator;
+import static org.antlr.v4.test.tool.ToolTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCompositeGrammars extends BaseJavaToolTest {
+public class TestCompositeGrammars {
 	protected boolean debug = false;
 
 	@Test public void testImportFileLocationInSubdir(@TempDir Path tempDir) {
@@ -685,7 +686,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		assertEquals("", executedState.errors);
 	}
 
-	private void checkGrammarSemanticsWarning(ErrorQueue equeue, GrammarSemanticsMessage expectedMessage) {
+	private static void checkGrammarSemanticsWarning(ErrorQueue equeue, GrammarSemanticsMessage expectedMessage) {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.warnings.size(); i++) {
 			ANTLRMessage m = equeue.warnings.get(i);
@@ -701,7 +702,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		}
 	}
 
-	private boolean compile(String grammarFileName, String grammarStr, String parserName, String startRuleName,
+	private static boolean compile(String grammarFileName, String grammarStr, String parserName, String startRuleName,
 							Path tempDirPath
 	) {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, null,

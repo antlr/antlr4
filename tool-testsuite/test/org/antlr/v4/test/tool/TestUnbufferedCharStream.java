@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unused")
-public class TestUnbufferedCharStream extends BaseJavaToolTest {
+public class TestUnbufferedCharStream {
 	@Test public void testNoChar() {
 		CharStream input = createStream("");
 		assertEquals(IntStream.EOF, input.LA(1));

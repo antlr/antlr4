@@ -24,9 +24,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestParseTreeMatcher extends BaseJavaToolTest {
+public class TestParseTreeMatcher {
 	@Test public void testChunking() {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
@@ -373,7 +374,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		checkPatternMatch(grammar, "expr", input, pattern, "X6");
 	}
 
-	public ParseTreeMatch checkPatternMatch(String grammar, String startRule,
+	private static ParseTreeMatch checkPatternMatch(String grammar, String startRule,
 											String input, String pattern,
 											String grammarName)
 		throws Exception
@@ -381,7 +382,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		return checkPatternMatch(grammar, startRule, input, pattern, grammarName, false);
 	}
 
-	public ParseTreeMatch checkPatternMatch(String grammar, String startRule,
+	private static ParseTreeMatch checkPatternMatch(String grammar, String startRule,
 											String input, String pattern,
 											String grammarName, boolean invertMatch)
 		throws Exception
@@ -407,10 +408,9 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		}
 	}
 
-	public ParseTreePatternMatcher getPatternMatcher(String grammarFileName, String grammar, String parserName, String lexerName,
-													 String startRule)
-			throws Exception
-	{
+	private static ParseTreePatternMatcher getPatternMatcher(
+			String grammarFileName, String grammar, String parserName, String lexerName, String startRule
+	) throws Exception {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, null,
 				false, false, Stage.Compile, false);

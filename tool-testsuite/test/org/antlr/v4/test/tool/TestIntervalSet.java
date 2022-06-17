@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestIntervalSet extends BaseJavaToolTest {
+public class TestIntervalSet {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseJavaToolTest {
+public class TestActionTranslation {
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
 		"parser grammar A;\n"+
@@ -223,7 +223,7 @@ public class TestActionTranslation extends BaseJavaToolTest {
 	    Grammar g = new Grammar(gS);
     }
 
-	public void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
+	private static void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
 		int lp = templates.indexOf('(');
 		String name = templates.substring(0, lp);
 		STGroup group = new STGroupString(templates);

@@ -10,10 +10,12 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.jupiter.api.Test;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.realElements;
+import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** */
-public class TestSymbolIssues extends BaseJavaToolTest {
+public class TestSymbolIssues {
     static String[] A = {
         // INPUT
         "grammar A;\n" +
@@ -105,11 +107,11 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
 	};
 
-    @Test public void testA() { super.testErrors(A, false); }
-    @Test public void testB() { super.testErrors(B, false); }
-	@Test public void testD() { super.testErrors(D, false); }
-	@Test public void testE() { super.testErrors(E, false); }
-	@Test public void testF() { super.testErrors(F, false); }
+    @Test public void testA() { testErrors(A, false); }
+    @Test public void testB() { testErrors(B, false); }
+	@Test public void testD() { testErrors(D, false); }
+	@Test public void testE() { testErrors(E, false); }
+	@Test public void testF() { testErrors(F, false); }
 
 	@Test public void testStringLiteralRedefs() throws Exception {
 		String grammar =

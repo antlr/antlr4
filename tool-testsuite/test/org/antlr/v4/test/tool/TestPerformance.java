@@ -80,11 +80,13 @@ import java.util.logging.Logger;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.NewLine;
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
+import static org.antlr.v4.test.tool.ToolTestUtils.load;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SuppressWarnings("unused")
-public class TestPerformance extends BaseJavaToolTest {
+public class TestPerformance {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
      * (environment variable or property defined on the Java command line).

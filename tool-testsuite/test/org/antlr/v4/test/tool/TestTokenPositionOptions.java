@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestTokenPositionOptions extends BaseJavaToolTest {
+public class TestTokenPositionOptions {
 	@Test public void testLeftRecursionRewrite() throws Exception {
 		Grammar g = new Grammar(
 				"grammar T;\n" +

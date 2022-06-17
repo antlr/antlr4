@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.antlr.v4.test.tool.ToolTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * want, but occasionally there are some quirks as you'll see from
  * the tests below.
  */
-public class TestATNLexerInterpreter extends BaseJavaToolTest {
+public class TestATNLexerInterpreter {
 	@Test public void testLexerTwoRules() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -520,7 +521,7 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		assertEquals("line 1:0 token recognition error at: 'n'\n", executedState.errors);
 	}
 
-	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
+	private void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = CharStreams.fromString(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");

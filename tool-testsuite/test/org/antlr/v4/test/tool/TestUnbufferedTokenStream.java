@@ -24,7 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestUnbufferedTokenStream extends BaseJavaToolTest {
+public class TestUnbufferedTokenStream {
 	@Test
 	public void testLookahead() throws Exception {
         LexerGrammar g = new LexerGrammar(
