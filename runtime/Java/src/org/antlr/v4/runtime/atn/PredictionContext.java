@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class PredictionContext {
 	/**
@@ -31,8 +32,8 @@ public abstract class PredictionContext {
 
 	private static final int INITIAL_HASH = 1;
 
-	public static int globalNodeCount = 0;
-	public final int id = globalNodeCount++;
+	private static final AtomicInteger globalNodeCount = new AtomicInteger();
+	public final int id = globalNodeCount.getAndIncrement();
 
 	/**
 	 * Stores the computed hash code of this {@link PredictionContext}. The hash
