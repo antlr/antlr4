@@ -15,13 +15,11 @@ import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
-import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -44,9 +42,9 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 public abstract class RuntimeTests {
 	protected abstract RuntimeRunner createRuntimeRunner();
 
-	private final static StringRenderer rendered = new StringRenderer();
-
 	private final static HashMap<String, RuntimeTestDescriptor[]> testDescriptors = new HashMap<>();
+	private final static HashMap<String, STGroup> cachedTargetTemplates = new HashMap<>();
+	private final static StringRenderer rendered = new StringRenderer();
 
 	static {
 		File descriptorsDir = new File(Paths.get(RuntimeTestUtils.resourcePath.toString(), "org/antlr/v4/test/runtime/descriptors").toString());
@@ -120,10 +118,20 @@ public abstract class RuntimeTests {
 
 		FileUtils.mkdir(runner.getTempDirPath());
 
-		String sourceName = "org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg";
-		String template = RuntimeTestUtils.getTextFromResource(sourceName);
-		STGroup targetTemplates = new STGroupString(sourceName, template, '<', '>');
-		targetTemplates.registerRenderer(String.class, rendered);
+		STGroup targetTemplates = cachedTargetTemplates.get(targetName);
+		if (targetTemplates == null) {
+			synchronized (cachedTargetTemplates) {
+				targetTemplates = cachedTargetTemplates.get(targetName);
+				if (targetTemplates == null) {
+					ClassLoader classLoader = RuntimeTests.class.getClassLoader();
+					URL templates = classLoader.getResource("org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg");
+					assert templates != null;
+					targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
+					targetTemplates.registerRenderer(String.class, rendered);
+					cachedTargetTemplates.put(targetName, targetTemplates);
+				}
+			}
+		}
 
 		// write out any slave grammars
 		List<Pair<String, String>> slaveGrammars = descriptor.slaveGrammars;
