@@ -12,9 +12,12 @@ import org.antlr.v4.test.runtime.states.GeneratedState;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.antlr.v4.test.runtime.FileUtils.mkdir;
 import static org.antlr.v4.test.runtime.FileUtils.moveFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
 public class SwiftRunner extends RuntimeRunner {
 	@Override
@@ -28,16 +31,44 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	private static final String antlrRuntimePath;
+	private static final String buildSuffix;
 	private static final String[] initPackageArgs;
 	private static final String[] buildProjectArgs;
+	private static final Map<String, String> environment;
 
 	static {
 		String swiftRuntimePath = getRuntimePath("Swift");
 		antlrRuntimePath = Paths.get(swiftRuntimePath, "..", "..").normalize().toString();
-		String dylibPath = antlrRuntimePath + "/.build/release/";
+		String libraryPath;
+		String includePath;
+		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
+		includePath = Paths.get(antlrRuntimePath, ".build", buildSuffix, "release").toString();
+		environment = new HashMap<>();
+		if (isWindows()) {
+			libraryPath = Paths.get(includePath, "Antlr4.lib").toString();
+			String path = System.getenv("PATH");
+			environment.put("PATH", path == null ? includePath : path + ";" + includePath);
+		}
+		else {
+			libraryPath = includePath;
+		}
 		initPackageArgs = new String[]{"swift", "package", "init", "--type", "executable"};
-		buildProjectArgs = new String[]{"swift", "build", "-c", "release", "-Xswiftc", "-I" + dylibPath, "-Xlinker", "-L" + dylibPath,
-				"-Xlinker", "-lAntlr4", "-Xlinker", "-rpath", "-Xlinker", dylibPath};
+		buildProjectArgs = new String[]{
+				"swift",
+				"build",
+				"-c",
+				"release",
+				"-Xswiftc",
+				"-I" + includePath,
+				"-Xlinker",
+				"-L" + includePath,
+				"-Xlinker",
+				"-lAntlr4",
+				"-Xlinker",
+				"-rpath",
+				"-Xlinker",
+				libraryPath
+		};
 	}
 
 	@Override
@@ -49,11 +80,11 @@ public class SwiftRunner extends RuntimeRunner {
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		Exception exception = null;
 		try {
-			String projectName = "Test";
+			final String projectName = "Test";
 			File testDir = tempTestDir.toFile();
 			String projectDir = new File(testDir, projectName).getAbsolutePath();
 			mkdir(projectDir);
-			String destDir = projectDir + "/Sources/" + projectName;
+			String destDir = Paths.get(projectDir, "Sources", projectName).toString();
 
 			runCommand(initPackageArgs, projectDir);
 
@@ -77,6 +108,16 @@ public class SwiftRunner extends RuntimeRunner {
 
 	@Override
 	public String getExecFileName() {
-		return Paths.get(getTempDirPath(), "Test/.build/release/Test").toString();
+		return Paths.get(getTempDirPath(),
+				"Test",
+				".build",
+				isWindows() ? "x86_64-unknown-windows-msvc" : "",
+				"release",
+				"Test" + (isWindows() ? ".exe" : "")).toString();
+	}
+
+	@Override
+	public Map<String, String> getExecEnvironment() {
+		return environment;
 	}
 }

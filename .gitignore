@@ -29,9 +29,8 @@ __pycache__/
 *.userosscache
 *.sln.docstates
 
-# User-specific files (MonoDevelop/Xamarin Studio)
+# User-specific files (MonoDevelop/Xamarin Studio/Visual Studio)
 *.userprefs
-*.user
 .vs/
 project.lock.json
 
@@ -46,9 +45,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-
-# Visual Studio 2015 cache/options directory
-.vs/
 
 # NetBeans user configuration files
 nbactions*.xml
@@ -102,3 +98,6 @@ javac-services.0.log.lck
 !runtime/Python3/test/
 Antlr4.sln
 runtime/PHP
+
+# Swift binaries
+.build/
