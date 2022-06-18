@@ -16,9 +16,12 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Set;
 
 public class ErrorManager {
+	private final static HashMap<String, STGroupFile> loadedFormats = new HashMap<>();
+
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
 
 	public Tool tool;
@@ -216,25 +219,37 @@ public class ErrorManager {
      *  Otherwise we just use the default "antlr".
      */
     public void setFormat(String formatName) {
-        this.formatName = formatName;
-        String fileName = FORMATS_DIR +formatName+STGroup.GROUP_FILE_EXTENSION;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL url = cl.getResource(fileName);
-        if ( url==null ) {
-            cl = ErrorManager.class.getClassLoader();
-            url = cl.getResource(fileName);
-        }
-        if ( url==null && formatName.equals("antlr") ) {
-            rawError("ANTLR installation corrupted; cannot find ANTLR messages format file "+fileName);
-            panic();
-        }
-        else if ( url==null ) {
-            rawError("no such message format file "+fileName+" retrying with default ANTLR format");
-            setFormat("antlr"); // recurse on this rule, trying the default message format
-            return;
-        }
-        format = new STGroupFile(url, "UTF-8", '<', '>');
-        format.load();
+		STGroupFile loadedFormat = loadedFormats.get(formatName);
+		if (loadedFormat == null) {
+			synchronized (loadedFormats) {
+				loadedFormat = loadedFormats.get(formatName);
+				if (loadedFormat == null) {
+					String fileName = FORMATS_DIR +formatName+STGroup.GROUP_FILE_EXTENSION;
+					ClassLoader cl = Thread.currentThread().getContextClassLoader();
+					URL url = cl.getResource(fileName);
+					if ( url==null ) {
+						cl = ErrorManager.class.getClassLoader();
+						url = cl.getResource(fileName);
+					}
+					if ( url==null && formatName.equals("antlr") ) {
+						rawError("ANTLR installation corrupted; cannot find ANTLR messages format file "+fileName);
+						panic();
+					}
+					else if ( url==null ) {
+						rawError("no such message format file "+fileName+" retrying with default ANTLR format");
+						setFormat("antlr"); // recurse on this rule, trying the default message format
+						return;
+					}
+					loadedFormat = new STGroupFile(url, "UTF-8", '<', '>');
+					loadedFormat.load();
+
+					loadedFormats.put(formatName, loadedFormat);
+				}
+			}
+		}
+
+		this.formatName = formatName;
+		this.format = loadedFormat;
 
         if ( !initSTListener.errors.isEmpty() ) {
             rawError("ANTLR installation corrupted; can't load messages format file:\n"+
