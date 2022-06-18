@@ -27,6 +27,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -55,11 +56,23 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public GrammarAST retvals;
 
-	public STGroup recRuleTemplates;
-	public STGroup codegenTemplates;
-	public String language;
+	public final static STGroup recRuleTemplates;
+	public final STGroup codegenTemplates;
+	public final String language;
 
 	public Map<Integer, ASSOC> altAssociativity = new HashMap<Integer, ASSOC>();
+
+	static {
+		String templateGroupFile = "org/antlr/v4/tool/templates/LeftRecursiveRules.stg";
+		recRuleTemplates = new STGroupFile(templateGroupFile);
+		if (!recRuleTemplates.isDefined("recRule")) {
+			try {
+				throw new FileNotFoundException("can't find code generation templates: LeftRecursiveRules");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public LeftRecursiveRuleAnalyzer(GrammarAST ruleAST,
 									 Tool tool, String ruleName, String language)
@@ -71,16 +84,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		this.tokenStream = ruleAST.g.tokenStream;
 		if (this.tokenStream == null) {
 			throw new NullPointerException("grammar must have a token stream");
-		}
-
-		loadPrecRuleTemplates();
-	}
-
-	public void loadPrecRuleTemplates() {
-		String templateGroupFile = "org/antlr/v4/tool/templates/LeftRecursiveRules.stg";
-		recRuleTemplates = new STGroupFile(templateGroupFile);
-		if ( !recRuleTemplates.isDefined("recRule") ) {
-			tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES, "LeftRecursiveRules");
 		}
 
 		// use codegen to get correct language templates; that's it though
