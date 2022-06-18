@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -34,16 +34,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-/** This class represents a single runtime test.
- *  It pulls data from
- *  a {@link RuntimeTestDescriptor} and uses junit to trigger a test.
- *  The only functionality needed to execute a test is defined in
- *  {@link RuntimeRunner}.
- *  All the various test rig classes
- *  derived from this one.
+/** This class represents runtime tests for specified runtime.
+ *  It pulls data from {@link RuntimeTestDescriptor} and uses junit to trigger tests.
+ *  The only functionality needed to execute a test is defined in {@link RuntimeRunner}.
+ *  All the various test rig classes derived from this one.
  *  E.g., see {@link JavaRuntimeTests}.
- *
- *  @since 4.6.
  */
 public abstract class RuntimeTests {
 	protected abstract RuntimeRunner createRuntimeRunner();
@@ -116,7 +111,6 @@ public abstract class RuntimeTests {
 
 		FileUtils.mkdir(runner.getTempDirPath());
 
-		Pair<String, String> pair = descriptor.getGrammar();
 		String sourceName = "org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg";
 		String template = RuntimeTestUtils.getTextFromResource(sourceName);
 		STGroup targetTemplates = new STGroupString(sourceName, template, '<', '>');
@@ -134,8 +128,8 @@ public abstract class RuntimeTests {
 			}
 		}
 
-		String grammarName = pair.a;
-		String grammar = pair.b;
+		String grammarName = descriptor.grammarName;
+		String grammar =  descriptor.grammar;
 		STGroup g = new STGroup('<', '>');
 		g.importTemplates(targetTemplates);
 		g.registerRenderer(String.class, rendered);

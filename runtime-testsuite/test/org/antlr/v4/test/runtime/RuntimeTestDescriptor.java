@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.misc.Pair;
@@ -64,12 +70,6 @@ public class RuntimeTestDescriptor {
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
-	}
-
-
-	/** Associates name of grammar like M in M.g4 to string (template) of grammar */
-	public Pair<String, String> getGrammar() {
-		return new Pair<>(grammarName,grammar);
 	}
 
 	/** Return true if this test should be ignored for the indicated target */
