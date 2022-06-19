@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.joinLines;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -99,7 +100,11 @@ public abstract class RuntimeTests {
 			for (RuntimeTestDescriptor descriptor : descriptors) {
 				descriptorTests.add(dynamicTest(descriptor.name, () -> {
 					try (RuntimeRunner runner = createRuntimeRunner()) {
-						test(descriptor, runner);
+						String errorMessage = test(descriptor, runner);
+						if (errorMessage != null) {
+							runner.setSaveTestDir(true);
+							fail(joinLines("Test: " + descriptor.name + "; " + errorMessage, "Test directory: " + runner.getTempDirPath()));
+						}
 					}
 				}));
 			}
@@ -109,11 +114,11 @@ public abstract class RuntimeTests {
 		return result;
 	}
 
-	private static void test(RuntimeTestDescriptor descriptor, RuntimeRunner runner) {
+	private static String test(RuntimeTestDescriptor descriptor, RuntimeRunner runner) {
 		String targetName = runner.getLanguage();
 		if (descriptor.ignore(targetName)) {
 			System.out.println("Ignore " + descriptor);
-			return;
+			return null;
 		}
 
 		FileUtils.mkdir(runner.getTempDirPath());
@@ -198,21 +203,19 @@ public abstract class RuntimeTests {
 
 		State result = runner.run(runOptions);
 
-		assertCorrectOutput(descriptor, targetName, result);
+		return assertCorrectOutput(descriptor, targetName, result);
 	}
 
-	private static void assertCorrectOutput(RuntimeTestDescriptor descriptor, String targetName, State state) {
+	private static String assertCorrectOutput(RuntimeTestDescriptor descriptor, String targetName, State state) {
 		ExecutedState executedState;
 		if (state instanceof ExecutedState) {
 			executedState = (ExecutedState)state;
 			if (executedState.exception != null) {
-				fail(state.getErrorMessage());
-				return;
+				return state.getErrorMessage();
 			}
 		}
 		else {
-			fail(state.getErrorMessage());
-			return;
+			return state.getErrorMessage();
 		}
 
 		String expectedOutput = descriptor.output;
@@ -229,10 +232,12 @@ public abstract class RuntimeTests {
 						"expectedOutput:<" + expectedOutput + ">; actualOutput:<" + executedState.output + ">; ";
 			}
 
-			fail("[" + targetName + ":" + descriptor.name + "] " +
+			return "[" + targetName + ":" + descriptor.name + "] " +
 					message +
 					"expectedParseErrors:<" + expectedParseErrors + ">;" +
-					"actualParseErrors:<" + executedState.errors + ">.");
+					"actualParseErrors:<" + executedState.errors + ">.";
 		}
+
+		return null;
 	}
 }

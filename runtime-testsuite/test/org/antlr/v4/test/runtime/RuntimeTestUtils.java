@@ -107,4 +107,15 @@ public abstract class RuntimeTestUtils {
 
 		assertEquals(expecting, result);
 	}
+
+	public static String joinLines(Object... args) {
+		StringBuilder result = new StringBuilder();
+		for (Object arg : args) {
+			String str = arg.toString();
+			result.append(str);
+			if (!str.endsWith("\n"))
+				result.append("\n");
+		}
+		return result.toString();
+	}
 }
