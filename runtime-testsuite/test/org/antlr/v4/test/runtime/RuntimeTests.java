@@ -53,12 +53,20 @@ public abstract class RuntimeTests {
 		assert directoryListing != null;
 		for (File directory : directoryListing) {
 			String groupName = directory.getName();
+			if (groupName.startsWith(".")) {
+				continue; // Ignore service directories (like .DS_Store in Mac)
+			}
+
 			List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
 
 			File[] descriptorFiles = directory.listFiles();
 			assert descriptorFiles != null;
 			for (File descriptorFile : descriptorFiles) {
 				String name = descriptorFile.getName().replace(".txt", "");
+				if (name.startsWith(".")) {
+					continue;
+				}
+
 				String text;
 				try {
 					text = new String(Files.readAllBytes(descriptorFile.toPath()));
