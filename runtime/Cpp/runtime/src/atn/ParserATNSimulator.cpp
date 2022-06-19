@@ -692,8 +692,8 @@ std::vector<Ref<const SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts
   size_t nPredAlts = 0;
   for (size_t i = 1; i <= nalts; i++) {
     if (altToPred[i] == nullptr) {
-      altToPred[i] = SemanticContext::NONE;
-    } else if (altToPred[i] != SemanticContext::NONE) {
+      altToPred[i] = SemanticContext::Empty::Instance;
+    } else if (altToPred[i] != SemanticContext::Empty::Instance) {
       nPredAlts++;
     }
   }
@@ -712,7 +712,7 @@ std::vector<Ref<const SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts
 std::vector<dfa::DFAState::PredPrediction> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
                                                                                        const std::vector<Ref<const SemanticContext>> &altToPred) {
   bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](const Ref<const SemanticContext> &context) {
-    return context != SemanticContext::NONE;
+    return context != SemanticContext::Empty::Instance;
   }) != altToPred.end();
   std::vector<dfa::DFAState::PredPrediction> pairs;
   if (containsPredicate) {
@@ -767,7 +767,7 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
   ATNConfigSet *succeeded(new ATNConfigSet(configs->fullCtx));
   ATNConfigSet *failed(new ATNConfigSet(configs->fullCtx));
   for (const auto &c : configs->configs) {
-    if (c->semanticContext != SemanticContext::NONE) {
+    if (c->semanticContext != SemanticContext::Empty::Instance) {
       bool predicateEvaluationResult = evalSemanticContext(c->semanticContext, outerContext, c->alt, configs->fullCtx);
       if (predicateEvaluationResult) {
         succeeded->add(c);
@@ -785,7 +785,7 @@ BitSet ParserATNSimulator::evalSemanticContext(const std::vector<dfa::DFAState::
                                                ParserRuleContext *outerContext, bool complete) {
   BitSet predictions;
   for (const auto &prediction : predPredictions) {
-    if (prediction.pred == SemanticContext::NONE) {
+    if (prediction.pred == SemanticContext::Empty::Instance) {
       predictions.set(prediction.alt);
       if (!complete) {
         break;

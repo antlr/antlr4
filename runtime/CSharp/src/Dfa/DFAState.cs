@@ -168,7 +168,7 @@ namespace Antlr4.Runtime.Dfa
 	public class PredPrediction
 	{
 
-		public SemanticContext pred; // never null; at least SemanticContext.NONE
+		public SemanticContext pred; // never null; at least SemanticContext.Empty.Instance
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt)
 		{

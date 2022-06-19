@@ -401,7 +401,7 @@ class LexerATNSimulator extends ATNSimulator {
   }
 
   ATNConfigSet computeStartState(CharStream input, ATNState p) {
-    PredictionContext initialContext = PredictionContext.EMPTY;
+    PredictionContext initialContext = EmptyPredictionContext.Instance;
     ATNConfigSet configs = OrderedATNConfigSet();
     for (var i = 0; i < p.numberOfTransitions; i++) {
       final target = p.transition(i).target;
@@ -445,7 +445,7 @@ class LexerATNSimulator extends ATNSimulator {
           configs.add(LexerATNConfig.dup(
             config,
             config.state,
-            context: PredictionContext.EMPTY,
+            context: EmptyPredictionContext.Instance,
           ));
           currentAltReachedAcceptState = true;
         }

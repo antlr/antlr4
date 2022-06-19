@@ -258,7 +258,7 @@ namespace Antlr4.Runtime.Atn
                     ATNConfigSet dup = new ATNConfigSet();
 					foreach (ATNConfig c in configSet.configs)
                     {
-						dup.Add(new ATNConfig(c, SemanticContext.NONE));
+						dup.Add(new ATNConfig(c, SemanticContext.Empty.Instance));
                     }
                     configSet = dup;
                 }

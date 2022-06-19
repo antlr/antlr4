@@ -92,6 +92,9 @@ def orContext(a, b):
 def filterPrecedencePredicates(collection):
     return [context for context in collection if isinstance(context, PrecedencePredicate)]
 
+class EmptySemanticContext(SemanticContext):
+    pass
+
 class Predicate(SemanticContext):
 
     def __init__(self, ruleIndex=-1, predIndex=-1, isCtxDependent=False):
@@ -315,4 +318,4 @@ class OR (SemanticContext):
             return buf.getvalue()
 
 
-SemanticContext.NONE = Predicate()
+SemanticContext.NONE = EmptySemanticContext()

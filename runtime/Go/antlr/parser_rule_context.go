@@ -340,7 +340,7 @@ func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) s
 	return s
 }
 
-var RuleContextEmpty = NewBaseParserRuleContext(nil, -1)
+var ParserRuleContextEmpty = NewBaseParserRuleContext(nil, -1)
 
 type InterpreterRuleContext interface {
 	ParserRuleContext

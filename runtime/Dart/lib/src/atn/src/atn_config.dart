@@ -89,7 +89,7 @@ class ATNConfig {
     this.state,
     this.alt,
     this.context, [
-    this.semanticContext = SemanticContext.NONE,
+    this.semanticContext = EmptySemanticContext.Instance,
   ]) : reachesIntoOuterContext = 0;
 
   ATNConfig.dup(
@@ -169,7 +169,7 @@ class ATNConfig {
       buf.write(context.toString());
       buf.write(']');
     }
-    if (semanticContext != SemanticContext.NONE) {
+    if (semanticContext != EmptySemanticContext.Instance) {
       buf.write(',');
       buf.write(semanticContext);
     }
@@ -194,7 +194,7 @@ class LexerATNConfig extends ATNConfig {
     int alt,
     PredictionContext context, [
     this.lexerActionExecutor,
-  ]) : super(state, alt, context, SemanticContext.NONE) {
+  ]) : super(state, alt, context, EmptySemanticContext.Instance) {
     passedThroughNonGreedyDecision = false;
   }
 

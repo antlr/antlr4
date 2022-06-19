@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -137,7 +137,7 @@ bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, RuleContext 
 Ref<const SemanticContext> SemanticContext::PrecedencePredicate::evalPrecedence(Recognizer *parser,
   RuleContext *parserCallStack) const {
   if (parser->precpred(parserCallStack, precedence)) {
-    return SemanticContext::NONE;
+    return SemanticContext::Empty::Instance;
   }
   return nullptr;
 }
@@ -237,7 +237,7 @@ Ref<const SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *pars
       // The AND context is false if any element is false.
       return nullptr;
     }
-    if (evaluated != NONE) {
+    if (evaluated != Empty::Instance) {
       // Reduce the result by skipping true elements.
       operands.push_back(std::move(evaluated));
     }
@@ -249,7 +249,7 @@ Ref<const SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *pars
 
   if (operands.empty()) {
     // All elements were true, so the AND context is true.
-    return NONE;
+    return Empty::Instance;
   }
 
   Ref<const SemanticContext> result = std::move(operands[0]);
@@ -337,9 +337,9 @@ Ref<const SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parse
   for (const auto &context : getOperands()) {
     auto evaluated = context->evalPrecedence(parser, parserCallStack);
     differs |= (evaluated != context);
-    if (evaluated == NONE) {
+    if (evaluated == Empty::Instance) {
       // The OR context is true if any element is true.
-      return NONE;
+      return Empty::Instance;
     }
     if (evaluated != nullptr) {
       // Reduce the result by skipping false elements.
@@ -374,18 +374,18 @@ std::string SemanticContext::OR::toString() const {
 
 //------------------ SemanticContext -----------------------------------------------------------------------------------
 
-const Ref<const SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
+const Ref<const SemanticContext> SemanticContext::Empty::Instance = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
 
 Ref<const SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, RuleContext * /*parserCallStack*/) const {
   return shared_from_this();
 }
 
 Ref<const SemanticContext> SemanticContext::And(Ref<const SemanticContext> a, Ref<const SemanticContext> b) {
-  if (!a || a == NONE) {
+  if (!a || a == Empty::Instance) {
     return b;
   }
 
-  if (!b || b == NONE) {
+  if (!b || b == Empty::Instance) {
     return a;
   }
 
@@ -405,8 +405,8 @@ Ref<const SemanticContext> SemanticContext::Or(Ref<const SemanticContext> a, Ref
     return a;
   }
 
-  if (a == NONE || b == NONE) {
-    return NONE;
+  if (a == Empty::Instance || b == Empty::Instance) {
+    return Empty::Instance;
   }
 
   Ref<OR> result = std::make_shared<OR>(std::move(a), std::move(b));

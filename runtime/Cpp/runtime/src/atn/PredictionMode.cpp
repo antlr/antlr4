@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -62,7 +62,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
     for (auto &config : configs->configs) {
-      Ref<ATNConfig> c = std::make_shared<ATNConfig>(*config, SemanticContext::NONE);
+      Ref<ATNConfig> c = std::make_shared<ATNConfig>(*config, SemanticContext::Empty::Instance);
       dup.add(c);
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);

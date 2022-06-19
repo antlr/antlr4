@@ -343,11 +343,11 @@ func (a *ArrayPredictionContext) String() string {
 // /
 func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
-		outerContext = RuleContextEmpty
+		outerContext = ParserRuleContextEmpty
 	}
 	// if we are in RuleContext of start rule, s, then BasePredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
-	if outerContext.GetParent() == nil || outerContext == RuleContextEmpty {
+	if outerContext.GetParent() == nil || outerContext == ParserRuleContextEmpty {
 		return BasePredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a BasePredictionContext graph
