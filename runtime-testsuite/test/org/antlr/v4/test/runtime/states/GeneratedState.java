@@ -9,11 +9,10 @@ package org.antlr.v4.test.runtime.states;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.GeneratedFile;
 import org.antlr.v4.test.runtime.Stage;
-import org.antlr.v4.tool.ANTLRMessage;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.joinLines;
 
 public class GeneratedState extends State {
 	@Override
@@ -30,16 +29,13 @@ public class GeneratedState extends State {
 	}
 
 	public String getErrorMessage() {
-		if (exception != null) {
-			return exception.toString();
-		}
+		String result = super.getErrorMessage();
 
 		if (errorQueue.errors.size() > 0) {
-			List<String> errors = errorQueue.errors.stream().map(ANTLRMessage::toString).collect(Collectors.toList());
-			return String.join("\n", errors);
+			result = joinLines(result, errorQueue.toString(true));
 		}
 
-		return null;
+		return result;
 	}
 
 	public GeneratedState(ErrorQueue errorQueue, List<GeneratedFile>  generatedFiles, Exception exception) {

@@ -63,7 +63,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return tempTestDir.toString();
 	}
 
-	private final boolean saveTestDir;
+	private boolean saveTestDir;
 
 	protected final Path tempTestDir;
 
@@ -79,6 +79,10 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		else {
 			tempTestDir = tempDir;
 		}
+		this.saveTestDir = saveTestDir;
+	}
+
+	public void setSaveTestDir(boolean saveTestDir) {
 		this.saveTestDir = saveTestDir;
 	}
 
@@ -153,9 +157,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 		writeFile(getTempDirPath(), "input", runOptions.input);
 
-		ExecutedState executedState = execute(runOptions, compiledState);
-
-		return executedState;
+		return execute(runOptions, compiledState);
 	}
 
 	protected List<GeneratedFile> getGeneratedFiles(RunOptions runOptions) {
