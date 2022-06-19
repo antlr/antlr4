@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Atn
 		public LexerATNConfig(ATNState state,
 							  int alt,
 							  PredictionContext context)
-				: base(state, alt, context/*, SemanticContext.NONE*/) // TODO
+				: base(state, alt, context/*, SemanticContext.Empty.Instance*/) // TODO
 		{
 			this.passedThroughNonGreedyDecision = false;
 			this.lexerActionExecutor = null;
@@ -30,7 +30,7 @@ namespace Antlr4.Runtime.Atn
 							  int alt,
 							  PredictionContext context,
 							  LexerActionExecutor lexerActionExecutor)
-			: base(state, alt, context, SemanticContext.NONE)
+			: base(state, alt, context, SemanticContext.Empty.Instance)
 		{
 			this.lexerActionExecutor = lexerActionExecutor;
 			this.passedThroughNonGreedyDecision = false;

@@ -19,8 +19,8 @@ namespace Antlr4.Runtime.Atn
 		 */
 		public PredictionContext Add(PredictionContext ctx)
 		{
-			if (ctx == PredictionContext.EMPTY)
-				return PredictionContext.EMPTY;
+			if (ctx == EmptyPredictionContext.Instance)
+				return EmptyPredictionContext.Instance;
 			PredictionContext existing = cache.Get(ctx);
 			if (existing != null)
 			{

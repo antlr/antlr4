@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -23,7 +23,7 @@ inline constexpr size_t SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 }
 
 ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<const PredictionContext> context)
-    : ATNConfig(state, alt, std::move(context), 0, SemanticContext::NONE) {}
+    : ATNConfig(state, alt, std::move(context), 0, SemanticContext::Empty::Instance) {}
 
 ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<const PredictionContext> context, Ref<const SemanticContext> semanticContext)
     : ATNConfig(state, alt, std::move(context), 0, std::move(semanticContext)) {}
@@ -94,7 +94,7 @@ std::string ATNConfig::toString(bool showAlt) const {
   if (context) {
     ss << ",[" << context->toString() << "]";
   }
-  if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
+  if (semanticContext != nullptr && semanticContext != SemanticContext::Empty::Instance) {
     ss << ",[" << semanticContext->toString() << "]";
   }
   if (getOuterContextDepth() > 0) {

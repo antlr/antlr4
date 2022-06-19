@@ -78,7 +78,7 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
 
-var SemanticContextNone SemanticContext = NewPredicate(-1, -1, false)
+var SemanticContextNone = NewPredicate(-1, -1, false)
 
 func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	return p

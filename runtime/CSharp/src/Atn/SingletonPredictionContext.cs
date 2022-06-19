@@ -15,7 +15,7 @@ namespace Antlr4.Runtime.Atn
 			if (returnState == EMPTY_RETURN_STATE && parent == null)
 			{
 				// someone can pass in the bits of an array ctx that mean $
-				return PredictionContext.EMPTY;
+				return EmptyPredictionContext.Instance;
 			}
 			return new SingletonPredictionContext(parent, returnState);
 		}

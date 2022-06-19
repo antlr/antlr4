@@ -1234,8 +1234,8 @@ class ParserATNSimulator extends ATNSimulator {
     var nPredAlts = 0;
     for (var i = 1; i <= nalts; i++) {
       if (altToPred[i] == null) {
-        altToPred[i] = SemanticContext.NONE;
-      } else if (altToPred[i] != SemanticContext.NONE) {
+        altToPred[i] = EmptySemanticContext.Instance;
+      } else if (altToPred[i] != EmptySemanticContext.Instance) {
         nPredAlts++;
       }
     }
@@ -1266,7 +1266,7 @@ class ParserATNSimulator extends ATNSimulator {
       if (ambigAlts != null && ambigAlts[i]) {
         pairs.add(PredPrediction(pred!, i));
       }
-      if (pred != SemanticContext.NONE) containsPredicate = true;
+      if (pred != EmptySemanticContext.Instance) containsPredicate = true;
     }
 
     if (!containsPredicate) {
@@ -1370,7 +1370,7 @@ class ParserATNSimulator extends ATNSimulator {
     final succeeded = ATNConfigSet(configs.fullCtx);
     final failed = ATNConfigSet(configs.fullCtx);
     for (var c in configs) {
-      if (c.semanticContext != SemanticContext.NONE) {
+      if (c.semanticContext != EmptySemanticContext.Instance) {
         final predicateEvaluationResult = evalSemanticContextOne(
           c.semanticContext,
           outerContext,
@@ -1390,7 +1390,7 @@ class ParserATNSimulator extends ATNSimulator {
   }
 
   /// Look through a list of predicate/alt pairs, returning alts for the
-  ///  pairs that win. A [NONE] predicate indicates an alt containing an
+  ///  pairs that win. A [Instance] predicate indicates an alt containing an
   ///  unpredicated config which behaves as "always true." If !complete
   ///  then we stop at the first predicate that evaluates to true. This
   ///  includes pairs with null predicates.
@@ -1401,7 +1401,7 @@ class ParserATNSimulator extends ATNSimulator {
   ) {
     final predictions = BitSet();
     for (var pair in predPredictions) {
-      if (pair.pred == SemanticContext.NONE) {
+      if (pair.pred == EmptySemanticContext.Instance) {
         predictions.set(pair.alt);
         if (!complete) {
           break;
@@ -1511,7 +1511,7 @@ class ParserATNSimulator extends ATNSimulator {
                   ATNConfig.dup(
                     config,
                     state: config.state,
-                    context: PredictionContext.EMPTY,
+                    context: EmptyPredictionContext.Instance,
                   ),
                   mergeCache);
               continue;
@@ -2431,7 +2431,7 @@ extension PredictionModeExtension on PredictionMode {
 // dup configs, tossing out semantic predicates
         final dup = ATNConfigSet();
         for (var c in configs) {
-          c = ATNConfig.dup(c, semanticContext: SemanticContext.NONE);
+          c = ATNConfig.dup(c, semanticContext: EmptySemanticContext.Instance);
           dup.add(c);
         }
         configs = dup;
