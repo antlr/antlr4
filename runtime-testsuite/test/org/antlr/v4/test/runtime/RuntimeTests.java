@@ -126,40 +126,8 @@ public abstract class RuntimeTests {
 
 		FileUtils.mkdir(runner.getTempDirPath());
 
-		STGroup targetTemplates = cachedTargetTemplates.get(targetName);
-		if (targetTemplates == null) {
-			synchronized (cachedTargetTemplates) {
-				targetTemplates = cachedTargetTemplates.get(targetName);
-				if (targetTemplates == null) {
-					ClassLoader classLoader = RuntimeTests.class.getClassLoader();
-					URL templates = classLoader.getResource("org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg");
-					assert templates != null;
-					targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
-					targetTemplates.registerRenderer(String.class, rendered);
-					cachedTargetTemplates.put(targetName, targetTemplates);
-				}
-			}
-		}
-
-		// write out any slave grammars
-		List<Pair<String, String>> slaveGrammars = descriptor.slaveGrammars;
-		if ( slaveGrammars!=null ) {
-			for (Pair<String, String> spair : slaveGrammars) {
-				STGroup g = new STGroup('<', '>');
-				g.registerRenderer(String.class, rendered);
-				g.importTemplates(targetTemplates);
-				ST grammarST = new ST(g, spair.b);
-				writeFile(runner.getTempDirPath(), spair.a + ".g4", grammarST.render());
-			}
-		}
-
 		String grammarName = descriptor.grammarName;
-		String grammar =  descriptor.grammar;
-		STGroup g = new STGroup('<', '>');
-		g.importTemplates(targetTemplates);
-		g.registerRenderer(String.class, rendered);
-		ST grammarST = new ST(g, grammar);
-		grammar = grammarST.render();
+		String grammar = prepareGrammars(descriptor, runner);
 
 		String lexerName, parserName;
 		boolean useListenerOrVisitor;
@@ -207,6 +175,42 @@ public abstract class RuntimeTests {
 		State result = runner.run(runOptions);
 
 		return assertCorrectOutput(descriptor, targetName, result);
+	}
+
+	private static String prepareGrammars(RuntimeTestDescriptor descriptor, RuntimeRunner runner) {
+		String targetName = runner.getLanguage();
+		STGroup targetTemplates = cachedTargetTemplates.get(targetName);
+		if (targetTemplates == null) {
+			synchronized (cachedTargetTemplates) {
+				targetTemplates = cachedTargetTemplates.get(targetName);
+				if (targetTemplates == null) {
+					ClassLoader classLoader = RuntimeTests.class.getClassLoader();
+					URL templates = classLoader.getResource("org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg");
+					assert templates != null;
+					targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
+					targetTemplates.registerRenderer(String.class, rendered);
+					cachedTargetTemplates.put(targetName, targetTemplates);
+				}
+			}
+		}
+
+		// write out any slave grammars
+		List<Pair<String, String>> slaveGrammars = descriptor.slaveGrammars;
+		if ( slaveGrammars!=null ) {
+			for (Pair<String, String> spair : slaveGrammars) {
+				STGroup g = new STGroup('<', '>');
+				g.registerRenderer(String.class, rendered);
+				g.importTemplates(targetTemplates);
+				ST grammarST = new ST(g, spair.b);
+				writeFile(runner.getTempDirPath(), spair.a + ".g4", grammarST.render());
+			}
+		}
+
+		STGroup g = new STGroup('<', '>');
+		g.importTemplates(targetTemplates);
+		g.registerRenderer(String.class, rendered);
+		ST grammarST = new ST(g, descriptor.grammar);
+		return grammarST.render();
 	}
 
 	private static String assertCorrectOutput(RuntimeTestDescriptor descriptor, String targetName, State state) {
