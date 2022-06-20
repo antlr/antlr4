@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,11 +53,14 @@ public class RuntimeTestDescriptor {
 
 	public final String[] skipTargets;
 
+	public final URI uri;
+
 	public RuntimeTestDescriptor(GrammarType testType, String name, String notes,
 								 String input, String output, String errors,
 								 String startRule,
 								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
-								 boolean showDFA, boolean showDiagnosticErrors, String[] skipTargets) {
+								 boolean showDFA, boolean showDiagnosticErrors, String[] skipTargets,
+								 URI uri) {
 		this.testType = testType;
 		this.name = name;
 		this.notes = notes;
@@ -70,6 +74,7 @@ public class RuntimeTestDescriptor {
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
+		this.uri = uri;
 	}
 
 	/** Return true if this test should be ignored for the indicated target */
