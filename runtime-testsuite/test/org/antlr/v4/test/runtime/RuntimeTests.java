@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public abstract class RuntimeTests {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-				descriptors.add(RuntimeTestDescriptorParser.parse(name, text));
+				descriptors.add(RuntimeTestDescriptorParser.parse(name, text, descriptorFile.toURI()));
 			}
 
 			testDescriptors.put(groupName, descriptors.toArray(new RuntimeTestDescriptor[0]));
@@ -98,7 +99,7 @@ public abstract class RuntimeTests {
 			ArrayList<DynamicNode> descriptorTests = new ArrayList<>();
 			RuntimeTestDescriptor[] descriptors = testDescriptors.get(group);
 			for (RuntimeTestDescriptor descriptor : descriptors) {
-				descriptorTests.add(dynamicTest(descriptor.name, () -> {
+				descriptorTests.add(dynamicTest(descriptor.name, descriptor.uri, () -> {
 					try (RuntimeRunner runner = createRuntimeRunner()) {
 						String errorMessage = test(descriptor, runner);
 						if (errorMessage != null) {
@@ -108,7 +109,9 @@ public abstract class RuntimeTests {
 					}
 				}));
 			}
-			result.add(dynamicContainer(group, descriptorTests));
+
+			Path descriptorGroupPath = Paths.get(RuntimeTestUtils.resourcePath.toString(), "descriptors", group);
+			result.add(dynamicContainer(group, descriptorGroupPath.toUri(), Arrays.stream(descriptorTests.toArray(new DynamicNode[0]))));
 		}
 
 		return result;

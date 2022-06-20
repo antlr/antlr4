@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.net.URI;
 import java.util.*;
 
 public class RuntimeTestDescriptorParser {
@@ -62,7 +63,7 @@ public class RuntimeTestDescriptorParser {
 	 a : b {<writeln("\"S.a\"")>};
 	 b : B;
 	 */
-	public static RuntimeTestDescriptor parse(String name, String text) throws RuntimeException {
+	public static RuntimeTestDescriptor parse(String name, String text, URI uri) throws RuntimeException {
 		String currentField = null;
 		StringBuilder currentValue = new StringBuilder();
 
@@ -162,7 +163,7 @@ public class RuntimeTestDescriptorParser {
 			}
 		}
 		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets);
+				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets, uri);
 	}
 
 	/** Get A, B, or C from:

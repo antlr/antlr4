@@ -6,12 +6,18 @@
 
 package org.antlr.v4.test.runtime;
 
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class CustomDescriptors {
 	public final static HashMap<String, RuntimeTestDescriptor[]> descriptors;
+	private final static URI uri;
 
 	static {
+		uri = Paths.get(RuntimeTestUtils.runtimeTestsuitePath.toString(),
+						"test", "org", "antlr", "v4", "test", "runtime", "CustomDescriptors.java").toUri();
+
 		descriptors = new HashMap<>();
 		descriptors.put("LexerExec",
 				new RuntimeTestDescriptor[]{
@@ -40,7 +46,7 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\n'+;\n" +
 						"SEPARATOR: '\\n';",
-				null, false, false, null);
+				null, false, false, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLineSeparatorCrLfDescriptor() {
@@ -61,7 +67,7 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\r'+;\n" +
 						"SEPARATOR: '\\r\\n';",
-				null, false, false, null);
+				null, false, false, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLargeLexerDescriptor() {
@@ -88,7 +94,7 @@ public class CustomDescriptors {
 				"",
 				grammarName,
 				grammar.toString(),
-				null, false, false, null);
+				null, false, false, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getAtnStatesSizeMoreThan65535Descriptor() {
@@ -138,6 +144,6 @@ public class CustomDescriptors {
 				grammarName,
 				grammar.toString(),
 				null, false, false,
-				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"});
+				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"}, uri);
 	}
 }
