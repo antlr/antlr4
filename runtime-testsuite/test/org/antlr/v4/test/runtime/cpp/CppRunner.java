@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.getOS;
@@ -167,7 +168,7 @@ public class CppRunner extends RuntimeRunner {
 				buildCommand.add("-o");
 				buildCommand.add(getTestFileName() + ".out");
 				buildCommand.add(getTestFileWithExt());
-				buildCommand.addAll(generatedState.generatedFiles);
+				buildCommand.addAll(generatedState.generatedFiles.stream().map(file -> file.name).collect(Collectors.toList()));
 			}
 
 			runCommand(buildCommand.toArray(new String[0]), getTempDirPath(), "build test c++ binary");

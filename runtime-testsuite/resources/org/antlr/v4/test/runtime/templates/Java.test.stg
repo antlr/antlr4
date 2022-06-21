@@ -1,6 +1,6 @@
-writeln(s) ::= <<System.out.println(<s>);>>
-write(s) ::= <<System.out.print(<s>);>>
-writeList(s) ::= <<System.out.println(<s; separator="+">);>>
+writeln(s) ::= <<outStream.println(<s>);>>
+write(s) ::= <<outStream.print(<s>);>>
+writeList(s) ::= <<outStream.println(<s; separator="+">);>>
 
 False() ::= "false"
 
@@ -44,7 +44,7 @@ ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
 
-DumpDFA() ::= "this.dumpDFA();"
+DumpDFA() ::= "this.dumpDFA(outStream);"
 
 Pass() ::= ""
 
@@ -186,9 +186,9 @@ protected static class PositionAdjustingLexerATNSimulator extends LexerATNSimula
 
 BasicListener(X) ::= <<
 @parser::members {
-public static class LeafListener extends TBaseListener {
+public class LeafListener extends TBaseListener {
 	public void visitTerminal(TerminalNode node) {
-		System.out.println(node.getSymbol().getText());
+		outStream.println(node.getSymbol().getText());
 	}
 }
 }
@@ -214,13 +214,13 @@ public static class MyRuleNode extends ParserRuleContext {
 
 TokenGetterListener(X) ::= <<
 @parser::members {
-public static class LeafListener extends TBaseListener {
+public class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2)
-			System.out.printf("%s %s %s\n",ctx.INT(0).getSymbol().getText(),
+			outStream.printf("%s %s %s\n",ctx.INT(0).getSymbol().getText(),
 				ctx.INT(1).getSymbol().getText(),ctx.INT());
 		else
-			System.out.println(ctx.ID().getSymbol());
+			outStream.println(ctx.ID().getSymbol());
 	}
 }
 }
@@ -228,13 +228,13 @@ public static class LeafListener extends TBaseListener {
 
 RuleGetterListener(X) ::= <<
 @parser::members {
-public static class LeafListener extends TBaseListener {
+public class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2) {
-			System.out.printf("%s %s %s\n",ctx.b(0).start.getText(),
+			outStream.printf("%s %s %s\n",ctx.b(0).start.getText(),
 				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());
 		} else
-			System.out.println(ctx.b(0).start.getText());
+			outStream.println(ctx.b(0).start.getText());
 	}
 }
 }
@@ -243,13 +243,13 @@ public static class LeafListener extends TBaseListener {
 
 LRListener(X) ::= <<
 @parser::members {
-public static class LeafListener extends TBaseListener {
+public class LeafListener extends TBaseListener {
 	public void exitE(TParser.EContext ctx) {
 		if (ctx.getChildCount()==3) {
-			System.out.printf("%s %s %s\n",ctx.e(0).start.getText(),
+			outStream.printf("%s %s %s\n",ctx.e(0).start.getText(),
 				ctx.e(1).start.getText(), ctx.e().get(0).start.getText());
 		} else
-			System.out.println(ctx.INT().getSymbol().getText());
+			outStream.println(ctx.INT().getSymbol().getText());
 	}
 }
 }
@@ -257,12 +257,12 @@ public static class LeafListener extends TBaseListener {
 
 LRWithLabelsListener(X) ::= <<
 @parser::members {
-public static class LeafListener extends TBaseListener {
+public class LeafListener extends TBaseListener {
 	public void exitCall(TParser.CallContext ctx) {
-		System.out.printf("%s %s\n",ctx.e().start.getText(),ctx.eList());
+		outStream.printf("%s %s\n",ctx.e().start.getText(),ctx.eList());
 	}
 	public void exitInt(TParser.IntContext ctx) {
-		System.out.println(ctx.INT().getSymbol().getText());
+		outStream.println(ctx.INT().getSymbol().getText());
 	}
 }
 }
@@ -277,13 +277,13 @@ void foo() {
 >>
 
 Declare_foo() ::= <<
-	public void foo() {System.out.println("foo");}
+	public void foo() {outStream.println("foo");}
 >>
 
 Invoke_foo() ::= "foo();"
 
 Declare_pred() ::= <<boolean pred(boolean v) {
-	System.out.println("eval="+v);
+	outStream.println("eval="+v);
 	return v;
 }
 >>

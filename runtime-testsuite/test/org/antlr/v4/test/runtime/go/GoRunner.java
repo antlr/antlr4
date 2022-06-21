@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static org.antlr.v4.test.runtime.FileUtils.replaceInFile;
+
 public class GoRunner extends RuntimeRunner {
 	@Override
 	public String getLanguage() {
@@ -116,20 +118,18 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		List<String> files = generatedState.generatedFiles;
+		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
 		String tempDirPath = getTempDirPath();
 		File generatedFir = new File(tempDirPath, "parser");
 		if (!generatedFir.mkdir()) {
 			return new CompiledState(generatedState, new Exception("can't make dir " + generatedFir));
 		}
-		for (String file : files) {
+		for (GeneratedFile generatedFile : generatedFiles) {
 			try {
-				Path originalFile = Paths.get(tempDirPath, file);
-				String content = new String(Files.readAllBytes(originalFile), StandardCharsets.UTF_8);
-				String newContent = content.replaceAll(GoRuntimeImportPath, antlrTestPackageName);
-				try (PrintWriter out = new PrintWriter(Paths.get(tempDirPath, "parser", file).toString())) {
-					out.println(newContent);
-				}
+				Path originalFile = Paths.get(tempDirPath, generatedFile.name);
+				replaceInFile(originalFile,
+						Paths.get(tempDirPath, "parser", generatedFile.name),
+						GoRuntimeImportPath, antlrTestPackageName);
 				originalFile.toFile().delete();
 			} catch (IOException e) {
 				return new CompiledState(generatedState, e);

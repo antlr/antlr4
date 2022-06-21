@@ -9,6 +9,7 @@ package org.antlr.v4.test.runtime;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
@@ -58,6 +59,18 @@ public class FileUtils {
 			}
 		}
 		return file.renameTo(newFile);
+	}
+
+	public static void replaceInFile(Path sourcePath, String target, String replacement) throws IOException {
+		replaceInFile(sourcePath, sourcePath, target, replacement);
+	}
+
+	public static void replaceInFile(Path sourcePath, Path destPath, String target, String replacement) throws IOException {
+		String content = new String(Files.readAllBytes(sourcePath), StandardCharsets.UTF_8);
+		String newContent = content.replace(target, replacement);
+		try (PrintWriter out = new PrintWriter(destPath.toString())) {
+			out.println(newContent);
+		}
 	}
 
 	public static void mkdir(String dir) {
