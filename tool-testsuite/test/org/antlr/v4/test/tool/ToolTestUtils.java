@@ -89,7 +89,8 @@ public class ToolTestUtils {
 			Stage endStage, boolean returnObject
 	) {
 		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
-				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java");
+				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java",
+				JavaRunner.runtimeTestParserName);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {

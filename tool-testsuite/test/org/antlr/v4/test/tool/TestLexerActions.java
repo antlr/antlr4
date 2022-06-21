@@ -18,7 +18,7 @@ public class TestLexerActions {
 	@Test public void testActionExecutedInDFA() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"I : '0'..'9'+ {outStream.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
@@ -33,7 +33,7 @@ public class TestLexerActions {
 	@Test public void testActionEvalsAtCorrectIndex() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : [0-9] {System.out.println(\"2nd char: \"+(char)_input.LA(1));} [0-9]+ ;\n"+
+			"I : [0-9] {outStream.println(\"2nd char: \"+(char)_input.LA(1));} [0-9]+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 45");
 		String expecting =
@@ -65,8 +65,8 @@ public class TestLexerActions {
 			"      return lexer._input.getText (new Interval (start_index, stop_index));\n" +
 			"   }\n" +
 			"\n" +
-			"   public void start ()  { start_index = lexer._input.index (); System.out.println (\"Start:\" + start_index);}\n" +
-			"   public void stop () { stop_index = lexer._input.index (); System.out.println (\"Stop:\" + stop_index);}\n" +
+			"   public void start ()  { start_index = lexer._input.index (); outStream.println (\"Start:\" + start_index);}\n" +
+			"   public void stop () { stop_index = lexer._input.index (); outStream.println (\"Stop:\" + stop_index);}\n" +
 			"\n" +
 			"   private int start_index = 0;\n" +
 			"   private int stop_index = 0;\n" +
@@ -76,7 +76,7 @@ public class TestLexerActions {
 			"Marker m_name = new Marker (this);\n" +
 			"}\n" +
 			"\n" +
-			"HELLO: 'hello' WS { m_name.start (); } NAME { m_name.stop (); } '\\n' { System.out.println (\"Hello: \" + m_name.getText ()); };\n" +
+			"HELLO: 'hello' WS { m_name.start (); } NAME { m_name.stop (); } '\\n' { outStream.println (\"Hello: \" + m_name.getText ()); };\n" +
 			"NAME: ('a'..'z' | 'A'..'Z')+ ('\\n')?;\n" +
 			"\n" +
 			"fragment WS: [ \\r\\t\\n]+ ;\n";
@@ -94,7 +94,7 @@ public class TestLexerActions {
 	@Test public void test2ActionsIn1Rule() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : [0-9] {System.out.println(\"x\");} [0-9]+ {System.out.println(\"y\");} ;\n"+
+			"I : [0-9] {outStream.println(\"x\");} [0-9]+ {outStream.println(\"y\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 45");
 		String expecting =
@@ -111,10 +111,10 @@ public class TestLexerActions {
 	@Test public void testAltActionsIn1Rule() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : ( [0-9]+ {System.out.print(\"int\");}\n" +
-			"    | [a-z]+ {System.out.print(\"id\");}\n" +
+			"I : ( [0-9]+ {outStream.print(\"int\");}\n" +
+			"    | [a-z]+ {outStream.print(\"id\");}\n" +
 			"    )\n" +
-			"    {System.out.println(\" last\");}\n" +
+			"    {outStream.println(\" last\");}\n" +
 			"    ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "123 ab");
@@ -130,7 +130,7 @@ public class TestLexerActions {
 	@Test public void testActionPlusCommand() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} -> skip ;\n"+
+			"I : '0'..'9'+ {outStream.println(\"I\");} -> skip ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
@@ -145,7 +145,7 @@ public class TestLexerActions {
 	@Test public void testSkipCommand() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"I : '0'..'9'+ {outStream.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
@@ -160,7 +160,7 @@ public class TestLexerActions {
 	@Test public void testMoreCommand() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"I : '0'..'9'+ {outStream.println(\"I\");} ;\n"+
 			"WS : '#' -> more ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#10");
 		String expecting =
@@ -175,7 +175,7 @@ public class TestLexerActions {
 	@Test public void testTypeCommand() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"I : '0'..'9'+ {outStream.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(HASH) ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#");
 		String expecting =
@@ -188,8 +188,8 @@ public class TestLexerActions {
 
 	@Test public void testCombinedCommand() throws Exception {
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {outStream.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(100), skip, more  ;";
 		ExecutedState executedState = execLexer("L.g4", grammar, "L", "34#11");
 		String expecting =

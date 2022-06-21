@@ -5,18 +5,12 @@
  */
 package org.antlr.v4.test.runtime.javascript;
 
-import org.antlr.v4.test.runtime.RuntimeRunner;
-import org.antlr.v4.test.runtime.RunOptions;
-import org.antlr.v4.test.runtime.RuntimeTestUtils;
+import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -46,15 +40,12 @@ public class NodeRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		List<String> generatedFiles = generatedState.generatedFiles;
-		for (String file : generatedFiles) {
+		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
+		for (GeneratedFile generatedFile : generatedFiles) {
 			try {
-				Path path = Paths.get(getTempDirPath(), file);
-				String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-				String newContent = content.replaceAll("import antlr4 from 'antlr4';", newImportAntlrString);
-				try (PrintWriter out = new PrintWriter(path.toString())) {
-					out.println(newContent);
-				}
+				FileUtils.replaceInFile(Paths.get(getTempDirPath(), generatedFile.name),
+						"import antlr4 from 'antlr4';",
+						newImportAntlrString);
 			} catch (IOException e) {
 				return new CompiledState(generatedState, e);
 			}

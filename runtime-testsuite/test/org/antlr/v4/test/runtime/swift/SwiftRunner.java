@@ -57,8 +57,8 @@ public class SwiftRunner extends RuntimeRunner {
 
 			runCommand(initPackageArgs, projectDir);
 
-			for (String generatedFile : generatedState.generatedFiles) {
-				moveFile(testDir, destDir, generatedFile);
+			for (GeneratedFile generatedFile : generatedState.generatedFiles) {
+				moveFile(testDir, destDir, generatedFile.name);
 			}
 			moveFile(testDir, destDir, getTestFileWithExt());
 

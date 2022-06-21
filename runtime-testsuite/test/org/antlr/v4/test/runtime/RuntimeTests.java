@@ -7,6 +7,7 @@
 package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.java.JavaRuntimeTests;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.State;
@@ -146,15 +147,28 @@ public abstract class RuntimeTests {
 
 		String lexerName, parserName;
 		boolean useListenerOrVisitor;
+		String superClass;
 		if (descriptor.testType == GrammarType.Parser || descriptor.testType == GrammarType.CompositeParser) {
 			lexerName = grammarName + "Lexer";
 			parserName = grammarName + "Parser";
 			useListenerOrVisitor = true;
+			if (targetName.equals("Java")) {
+				superClass = JavaRunner.runtimeTestParserName;
+			}
+			else {
+				superClass = null;
+			}
 		}
 		else {
 			lexerName = grammarName;
 			parserName = null;
 			useListenerOrVisitor = false;
+			if (targetName.equals("Java")) {
+				superClass = JavaRunner.runtimeTestLexerName;
+			}
+			else {
+				superClass = null;
+			}
 		}
 
 		RunOptions runOptions = new RunOptions(grammarName + ".g4",
@@ -170,7 +184,8 @@ public abstract class RuntimeTests {
 				descriptor.showDFA,
 				Stage.Execute,
 				false,
-				targetName
+				targetName,
+				superClass
 		);
 
 		State result = runner.run(runOptions);

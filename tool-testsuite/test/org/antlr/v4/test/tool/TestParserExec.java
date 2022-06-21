@@ -138,7 +138,7 @@ public class TestParserExec {
 			"\n" +
 			"file : group+ EOF; \n" +
 			"\n" +
-			"group: INT sequence {System.out.println($sequence.values.size());} ; \n" +
+			"group: INT sequence {outStream.println($sequence.values.size());} ; \n" +
 			"\n" +
 			"sequence returns [List<Integer> values = new ArrayList<Integer>()] \n" +
 			"  locals[List<Integer> localValues = new ArrayList<Integer>()]\n" +

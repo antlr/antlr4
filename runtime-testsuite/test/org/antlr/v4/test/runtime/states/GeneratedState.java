@@ -7,6 +7,7 @@
 package org.antlr.v4.test.runtime.states;
 
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.GeneratedFile;
 import org.antlr.v4.test.runtime.Stage;
 import org.antlr.v4.tool.ANTLRMessage;
 
@@ -21,7 +22,7 @@ public class GeneratedState extends State {
 	}
 
 	public final ErrorQueue errorQueue;
-	public final List<String> generatedFiles;
+	public final List<GeneratedFile> generatedFiles;
 
 	@Override
 	public boolean containsErrors() {
@@ -41,7 +42,7 @@ public class GeneratedState extends State {
 		return null;
 	}
 
-	public GeneratedState(ErrorQueue errorQueue, List<String> generatedFiles, Exception exception) {
+	public GeneratedState(ErrorQueue errorQueue, List<GeneratedFile>  generatedFiles, Exception exception) {
 		super(null, exception);
 		this.errorQueue = errorQueue;
 		this.generatedFiles = generatedFiles;

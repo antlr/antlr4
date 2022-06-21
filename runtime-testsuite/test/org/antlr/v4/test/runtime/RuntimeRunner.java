@@ -121,11 +121,17 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	}
 
 	public State run(RunOptions runOptions) {
-		String[] options = runOptions.useVisitor ? new String[]{"-visitor"} : new String[0];
+		List<String> options = new ArrayList<>();
+		if (runOptions.useVisitor) {
+			options.add("-visitor");
+		}
+		if (runOptions.superClass != null && runOptions.superClass.length() > 0) {
+			options.add("-DsuperClass=" + runOptions.superClass);
+		}
 		ErrorQueue errorQueue = Generator.antlrOnString(getTempDirPath(), getLanguage(),
-				runOptions.grammarFileName, runOptions.grammarStr, false, options);
+				runOptions.grammarFileName, runOptions.grammarStr, false, options.toArray(new String[0]));
 
-		List<String> generatedFiles = getGeneratedFiles(runOptions);
+		List<GeneratedFile> generatedFiles = getGeneratedFiles(runOptions);
 		GeneratedState generatedState = new GeneratedState(errorQueue, generatedFiles, null);
 
 		if (generatedState.containsErrors() || runOptions.endStage == Stage.Generate) {
@@ -152,28 +158,28 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return executedState;
 	}
 
-	protected List<String> getGeneratedFiles(RunOptions runOptions) {
-		List<String> files = new ArrayList<>();
+	protected List<GeneratedFile> getGeneratedFiles(RunOptions runOptions) {
+		List<GeneratedFile> files = new ArrayList<>();
 		String extensionWithDot = "." + getExtension();
 		String fileGrammarName = grammarNameToFileName(runOptions.grammarName);
 		boolean isCombinedGrammarOrGo = runOptions.lexerName != null && runOptions.parserName != null || getLanguage().equals("Go");
 		if (runOptions.lexerName != null) {
-			files.add(fileGrammarName + (isCombinedGrammarOrGo ? getLexerSuffix() : "") + extensionWithDot);
+			files.add(new GeneratedFile(fileGrammarName + (isCombinedGrammarOrGo ? getLexerSuffix() : "") + extensionWithDot, false));
 		}
 		if (runOptions.parserName != null) {
-			files.add(fileGrammarName + (isCombinedGrammarOrGo ? getParserSuffix() : "") + extensionWithDot);
+			files.add(new GeneratedFile(fileGrammarName + (isCombinedGrammarOrGo ? getParserSuffix() : "") + extensionWithDot, true));
 			if (runOptions.useListener) {
-				files.add(fileGrammarName + getListenerSuffix() + extensionWithDot);
+				files.add(new GeneratedFile(fileGrammarName + getListenerSuffix() + extensionWithDot, true));
 				String baseListenerSuffix = getBaseListenerSuffix();
 				if (baseListenerSuffix != null) {
-					files.add(fileGrammarName + baseListenerSuffix + extensionWithDot);
+					files.add(new GeneratedFile(fileGrammarName + baseListenerSuffix + extensionWithDot, true));
 				}
 			}
 			if (runOptions.useVisitor) {
-				files.add(fileGrammarName + getVisitorSuffix() + extensionWithDot);
+				files.add(new GeneratedFile(fileGrammarName + getVisitorSuffix() + extensionWithDot, true));
 				String baseVisitorSuffix = getBaseVisitorSuffix();
 				if (baseVisitorSuffix != null) {
-					files.add(fileGrammarName + baseVisitorSuffix + extensionWithDot);
+					files.add(new GeneratedFile(fileGrammarName + baseVisitorSuffix + extensionWithDot, true));
 				}
 			}
 		}

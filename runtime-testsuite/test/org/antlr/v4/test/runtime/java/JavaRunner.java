@@ -9,8 +9,7 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.test.runtime.RuntimeRunner;
-import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.*;
 
 import javax.tools.JavaCompiler;
@@ -22,11 +21,14 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.antlr.v4.test.runtime.FileUtils.replaceInFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.PathSeparator;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTextFromResource;
 
 public class JavaRunner extends RuntimeRunner {
 	@Override
@@ -36,7 +38,17 @@ public class JavaRunner extends RuntimeRunner {
 
 	public static final String classPath = System.getProperty("java.class.path");
 
+	public static final String runtimeTestLexerName = "RuntimeTestLexer";
+	public static final String runtimeTestParserName = "RuntimeTestParser";
+
+	private final static String testLexerContent;
+	private final static String testParserContent;
 	private static JavaCompiler compiler;
+
+	static {
+		testLexerContent = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + runtimeTestLexerName + ".java");
+		testParserContent = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + runtimeTestParserName + ".java");
+	}
 
 	public JavaRunner(Path tempDir, boolean saveTestDir) {
 		super(tempDir, saveTestDir);
@@ -53,6 +65,27 @@ public class JavaRunner extends RuntimeRunner {
 
 	@Override
 	protected JavaCompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+		String tempTestDir = getTempDirPath();
+
+		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
+		GeneratedFile firstFile = generatedFiles.get(0);
+
+		if (!firstFile.isParser) {
+			FileUtils.writeFile(tempTestDir, runtimeTestLexerName + ".java", testLexerContent);
+			try {
+				// superClass for combined grammar generates the same extends base class for Lexer and Parser
+				// So, for lexer it should be replaced on correct base lexer class
+				replaceInFile(Paths.get(getTempDirPath(), firstFile.name),
+						"extends " + runtimeTestParserName + " {",
+						"extends " + runtimeTestLexerName + " {");
+			} catch (IOException e) {
+				return new JavaCompiledState(generatedState, null, null, null, e);
+			}
+		}
+		if (generatedFiles.stream().anyMatch(file -> file.isParser)) {
+			FileUtils.writeFile(tempTestDir,  runtimeTestParserName + ".java", testParserContent);
+		}
+
 		ClassLoader loader = null;
 		Class<? extends Lexer> lexer = null;
 		Class<? extends Parser> parser = null;
@@ -63,7 +96,6 @@ public class JavaRunner extends RuntimeRunner {
 
 			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
-			String tempTestDir = getTempDirPath();
 			List<File> files = new ArrayList<>();
 			File f = new File(tempTestDir, getTestFileWithExt());
 			files.add(f);
@@ -72,7 +104,7 @@ public class JavaRunner extends RuntimeRunner {
 
 			Iterable<String> compileOptions =
 					Arrays.asList("-g", "-source", "1.8", "-target", "1.8", "-implicit:class", "-Xlint:-options", "-d",
-							getTempDirPath(), "-cp", getTempDirPath() + PathSeparator + classPath);
+							tempTestDir, "-cp", tempTestDir + PathSeparator + classPath);
 
 			JavaCompiler.CompilationTask task =
 					compiler.getTask(null, fileManager, null, compileOptions, null,
@@ -101,7 +133,7 @@ public class JavaRunner extends RuntimeRunner {
 		if (runOptions.returnObject) {
 			result = execWithObject(runOptions, javaCompiledState);
 		} else {
-			result = super.execute(runOptions, javaCompiledState);
+			result = execCommon(javaCompiledState);
 		}
 		return result;
 	}
@@ -130,15 +162,36 @@ public class JavaRunner extends RuntimeRunner {
 		return new JavaExecutedState(javaCompiledState, null, null, parseTree, exception);
 	}
 
-	@Override
-	protected String[] getExtraRunArgs() {
-		return new String[] {
-			"-classpath",
-			getTempDirPath() + PathSeparator + classPath,
-			"-Dfile.encoding=UTF-8",
-		};
-	}
+	private ExecutedState execCommon(JavaCompiledState compiledState) {
+		Exception exception = null;
+		String output = null;
+		String errors = null;
+		try {
+			final Class<?> mainClass = compiledState.loader.loadClass(getTestFileName());
+			final Method recognizeMethod = mainClass.getDeclaredMethod("recognize", String.class,
+					PrintStream.class, PrintStream.class);
 
-	@Override
-	protected String getExecFileName() { return getTestFileName(); }
+			PipedInputStream stdoutIn = new PipedInputStream();
+			PipedInputStream stderrIn = new PipedInputStream();
+			PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
+			PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
+			StreamReader stdoutReader = new StreamReader(stdoutIn);
+			StreamReader stderrReader = new StreamReader(stderrIn);
+			stdoutReader.start();
+			stderrReader.start();
+
+			recognizeMethod.invoke(null, new File(getTempDirPath(), "input").getAbsolutePath(),
+					new PrintStream(stdoutOut), new PrintStream(stderrOut));
+
+			stdoutOut.close();
+			stderrOut.close();
+			stdoutReader.join();
+			stderrReader.join();
+			output = stdoutReader.toString();
+			errors = stderrReader.toString();
+		} catch (Exception ex) {
+			exception = ex;
+		}
+		return new JavaExecutedState(compiledState, output, errors, null, exception);
+	}
 }
