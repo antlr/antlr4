@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.3.1</version>
+			<version>4.3.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -72,19 +72,6 @@
 
 	<build>
 		<testSourceDirectory>test</testSourceDirectory>
-		<resources>
-			<resource>
-				<directory>resources</directory>
-			</resource>
-			<resource>
-				<directory>../runtime</directory>
-				<excludes>
-					<exclude>**/.build/**</exclude>
-					<exclude>**/target/**</exclude>
-					<exclude>Swift/*.xcodeproj/**</exclude>
-				</excludes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -93,18 +80,6 @@
 				<configuration>
 					<!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
 					<argLine>-Dfile.encoding=UTF-8</argLine>
-					<includes>
-                        <include>**/csharp/Test*.java</include>
-                        <include>**/java/Test*.java</include>
-                        <include>**/java/api/Test*.java</include>
-                        <include>**/go/Test*.java</include>
-                        <include>**/javascript/Test*.java</include>
-                        <include>**/python2/Test*.java</include>
-                        <include>**/python3/Test*.java</include>
-                        <include>**/php/Test*.java</include>
-                        <include>**/dart/Test*.java</include>
-                        <include>${antlr.tests.swift}</include>
-                    </includes>
                 </configuration>
 			</plugin>
 			<plugin>
