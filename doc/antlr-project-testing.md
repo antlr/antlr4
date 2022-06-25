@@ -87,6 +87,8 @@ And the result of testing the entire subdirectory:
 
 All test are run in parallel both via maven and via IDE.
 
+In IntelliJ, it's very easy to go to source by right-click on any test and pressing `Jump to source` (F4).
+
 ## Running test subsets
 
 From the `runtime-testsuite` dir
