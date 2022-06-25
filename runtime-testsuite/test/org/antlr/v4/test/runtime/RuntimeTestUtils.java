@@ -26,6 +26,7 @@ public abstract class RuntimeTestUtils {
 	public static final String FileSeparator = System.getProperty("file.separator");
 	public static final String TempDirectory = System.getProperty("java.io.tmpdir");
 
+	public final static Path runtimePath;
 	public final static Path runtimeTestsuitePath;
 	public final static Path resourcePath;
 
@@ -49,6 +50,7 @@ public abstract class RuntimeTestUtils {
 			runtimeTestsuitePath = Paths.get("..", "runtime-testsuite").normalize();
 		}
 
+		runtimePath = Paths.get(runtimeTestsuitePath.toString(), "..", "runtime").normalize();
 		resourcePath = Paths.get(runtimeTestsuitePath.toString(), "resources");
 	}
 
