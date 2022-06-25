@@ -19,8 +19,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.antlr.v4.test.runtime.FileUtils.*;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.*;
 
 public abstract class RuntimeRunner implements AutoCloseable {
 	public abstract String getLanguage();
@@ -93,7 +92,6 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	private final static Object runtimeInitLockObject = new Object();
 
 	public final static String cacheDirectory;
-	public final static Path targetClassesPath;
 
 	private static class InitializationStatus {
 		public final Object lockObject = new Object();
@@ -104,7 +102,6 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	private final static HashMap<String, InitializationStatus> runtimeInitializationStatuses = new HashMap<>();
 
 	static {
-		targetClassesPath = Paths.get(RuntimeTestUtils.runtimeTestsuitePath.toString(), "target", "classes");
 		cacheDirectory = new File(System.getProperty("java.io.tmpdir"), "ANTLR-runtime-testsuite-cache").getAbsolutePath();
 	}
 
@@ -121,7 +118,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	}
 
 	public static String getRuntimePath(String language) {
-		return targetClassesPath.toString() + FileSeparator + language;
+		return runtimePath.toString() + FileSeparator + language;
 	}
 
 	public State run(RunOptions runOptions) {

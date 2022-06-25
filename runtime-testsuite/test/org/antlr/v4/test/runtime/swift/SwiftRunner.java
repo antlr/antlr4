@@ -33,7 +33,7 @@ public class SwiftRunner extends RuntimeRunner {
 
 	static {
 		String swiftRuntimePath = getRuntimePath("Swift");
-		antlrRuntimePath = Paths.get(swiftRuntimePath, "..", "..", "..", "..").normalize().toString();
+		antlrRuntimePath = Paths.get(swiftRuntimePath, "..", "..").normalize().toString();
 		String dylibPath = antlrRuntimePath + "/.build/release/";
 		initPackageArgs = new String[]{"swift", "package", "init", "--type", "executable"};
 		buildProjectArgs = new String[]{"swift", "build", "-c", "release", "-Xswiftc", "-I" + dylibPath, "-Xlinker", "-L" + dylibPath,
