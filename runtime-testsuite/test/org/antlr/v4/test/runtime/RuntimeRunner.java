@@ -294,7 +294,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 				try {
 					deleteDirectory(dirFile);
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
 				}
 			}
 		}
