@@ -87,23 +87,18 @@ public abstract class Target {
 		return Tool.VERSION;
 	}
 
-	public STGroup getTemplates() {
+	public synchronized STGroup getTemplates() {
 		String language = getLanguage();
 		STGroup templates = languageTemplates.get(language);
 
 		if (templates == null) {
-			synchronized (languageTemplates) {
-				templates = languageTemplates.get(language);
-				if (templates == null) {
-					String version = getVersion();
-					if (version == null ||
-							!RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION))) {
-						gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
-					}
-					templates = loadTemplates();
-					languageTemplates.put(language, templates);
-				}
+			String version = getVersion();
+			if (version == null ||
+					!RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION))) {
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
 			}
+			templates = loadTemplates();
+			languageTemplates.put(language, templates);
 		}
 
 		return templates;

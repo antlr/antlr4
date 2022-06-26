@@ -23,10 +23,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
@@ -45,7 +42,7 @@ public abstract class RuntimeTests {
 	protected abstract RuntimeRunner createRuntimeRunner();
 
 	private final static HashMap<String, RuntimeTestDescriptor[]> testDescriptors = new HashMap<>();
-	private final static HashMap<String, STGroup> cachedTargetTemplates = new HashMap<>();
+	private final static Map<String, STGroup> cachedTargetTemplates = new HashMap<>();
 	private final static StringRenderer rendered = new StringRenderer();
 
 	static {
@@ -179,24 +176,23 @@ public abstract class RuntimeTests {
 
 	private static String prepareGrammars(RuntimeTestDescriptor descriptor, RuntimeRunner runner) {
 		String targetName = runner.getLanguage();
-		STGroup targetTemplates = cachedTargetTemplates.get(targetName);
-		if (targetTemplates == null) {
-			synchronized (cachedTargetTemplates) {
-				targetTemplates = cachedTargetTemplates.get(targetName);
-				if (targetTemplates == null) {
-					ClassLoader classLoader = RuntimeTests.class.getClassLoader();
-					URL templates = classLoader.getResource("org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg");
-					assert templates != null;
-					targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
-					targetTemplates.registerRenderer(String.class, rendered);
-					cachedTargetTemplates.put(targetName, targetTemplates);
-				}
+
+		STGroup targetTemplates;
+		synchronized (cachedTargetTemplates) {
+			targetTemplates = cachedTargetTemplates.get(targetName);
+			if (targetTemplates == null) {
+				ClassLoader classLoader = RuntimeTests.class.getClassLoader();
+				URL templates = classLoader.getResource("org/antlr/v4/test/runtime/templates/" + targetName + ".test.stg");
+				assert templates != null;
+				targetTemplates = new STGroupFile(templates, "UTF-8", '<', '>');
+				targetTemplates.registerRenderer(String.class, rendered);
+				cachedTargetTemplates.put(targetName, targetTemplates);
 			}
 		}
 
 		// write out any slave grammars
 		List<Pair<String, String>> slaveGrammars = descriptor.slaveGrammars;
-		if ( slaveGrammars!=null ) {
+		if (slaveGrammars != null) {
 			for (Pair<String, String> spair : slaveGrammars) {
 				STGroup g = new STGroup('<', '>');
 				g.registerRenderer(String.class, rendered);
