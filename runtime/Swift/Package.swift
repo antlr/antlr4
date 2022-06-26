@@ -1,5 +1,4 @@
-// swift-tools-version:5.3
-
+// swift-tools-version:5.6
 
 import PackageDescription
 
@@ -15,10 +14,14 @@ let package = Package(
         .target(
             name: "Antlr4",
             dependencies: [],
-            path: "./runtime/Swift/Sources/Antlr4"),
+            path: "Sources/Antlr4"),
         .testTarget(
             name: "Antlr4Tests",
             dependencies: ["Antlr4"],
-            path:"./runtime/Swift/Tests/Antlr4Tests"),
+            path:"Tests/Antlr4Tests",
+            exclude: [
+                "VisitorBasic.g4", "VisitorCalc.g4", "LexerA.g4", "LexerB.g4", "Threading.g4"
+            ]
+        )
     ]
 )
