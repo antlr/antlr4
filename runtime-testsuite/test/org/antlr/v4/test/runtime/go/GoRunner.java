@@ -87,7 +87,7 @@ public class GoRunner extends RuntimeRunner {
 
 			String packageDir = Paths.get(newGoRootString, "src", antlrTestPackageName).toString();
 			FileUtils.mkdir(packageDir);
-			File[] runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr").toFile().listFiles(new GoFileFilter());
+			File[] runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr").toFile().listFiles(GoFileFilter.Instance);
 			if (runtimeFiles == null) {
 				throw new Exception("Go runtime file list is empty.");
 			}
@@ -111,6 +111,8 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	static class GoFileFilter implements FilenameFilter {
+		public final static GoFileFilter Instance = new GoFileFilter();
+
 		public boolean accept(File dir, String name) {
 			return name.endsWith(".go");
 		}
