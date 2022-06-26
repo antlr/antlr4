@@ -85,6 +85,7 @@
 							<instructions>
 								<Automatic-Module-Name>org.antlr.antlr4.runtime</Automatic-Module-Name>
 								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
+								<Import-Package>org.antlr.v4.gui;resolution:=optional, *</Import-Package>
 							</instructions>
 						</configuration>
 						<goals>

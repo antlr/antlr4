@@ -32,6 +32,7 @@ endif(NOT WITH_DEMO)
 option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" Off)
 option(WITH_STATIC_CRT "(Visual C++) Enable to statically link CRT, which avoids requiring users to install the redistribution package.
  To disable with: -DWITH_STATIC_CRT=Off" On)
+option(DISABLE_WARNINGS "Suppress compiler warnings for all built ANTLR targets" OFF)
 
 project(LIBANTLR4)
 
@@ -77,8 +78,16 @@ endif(WITH_DEMO)
 
 if(MSVC_VERSION)
   set(MY_CXX_WARNING_FLAGS "  /W4")
+
+  if(DISABLE_WARNINGS)
+    set(MY_CXX_WARNING_FLAGS "  /w")
+  endif()
 else()
   set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
+
+  if(DISABLE_WARNINGS)
+    set(MY_CXX_WARNING_FLAGS "  -w")
+  endif()
 endif()
 
 # Define USE_UTF8_INSTEAD_OF_CODECVT macro.
