@@ -35,18 +35,17 @@ public class SwiftRunner extends RuntimeRunner {
 		return "main";
 	}
 
-	private static final String antlrRuntimePath;
+	private static final String swiftRuntimePath;
 	private static final String buildSuffix;
 	private static final String[] buildProjectArgs;
 	private static final Map<String, String> environment;
 
 	static {
-		String swiftRuntimePath = getRuntimePath("Swift");
-		antlrRuntimePath = Paths.get(swiftRuntimePath, "..", "..").normalize().toString();
+		swiftRuntimePath = getRuntimePath("Swift");
 		String libraryPath;
 		String includePath;
 		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
-		includePath = Paths.get(antlrRuntimePath, ".build", buildSuffix, "release").toString();
+		includePath = Paths.get(swiftRuntimePath, ".build", buildSuffix, "release").toString();
 		environment = new HashMap<>();
 		if (isWindows()) {
 			libraryPath = Paths.get(includePath, "Antlr4.lib").toString();
@@ -76,7 +75,7 @@ public class SwiftRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-		runCommand(new String[] {"swift", "build", "-c", "release"}, antlrRuntimePath, "build Swift runtime");
+		runCommand(new String[] {"swift", "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
 	}
 
 	@Override
