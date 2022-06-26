@@ -87,7 +87,7 @@ And the result of testing the entire subdirectory:
 
 All test are run in parallel both via maven and via IDE.
 
-In IntelliJ, it's very easy to go to source by right-click on any test and pressing `Jump to source` (F4).
+In IntelliJ, it's very easy to go to source by right-clicking on any test and pressing `Jump to source` (F4).
 
 ## Running test subsets
 
@@ -98,12 +98,14 @@ From the `runtime-testsuite` dir
 ```bash
 $ cd runtime-testsuite
 $ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
-$ mvn -Dtest=JavaRuntimeTests test
+$ mvn -Dtest=java.** test
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
+[INFO] Running org.antlr.v4.test.runtime.java.TestIntegerList
 [INFO] Running org.antlr.v4.test.runtime.java.JavaRuntimeTests
 ...
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s - in org.antlr.v4.test.runtime.java.TestIntegerList
 [INFO] Tests run: 348, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 19.269 s - in org.antlr.v4.test.runtime.java.JavaRuntimeTests
 ...
 ```
