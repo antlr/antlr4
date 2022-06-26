@@ -30,7 +30,6 @@ public abstract class RuntimeTestUtils {
 	public final static Path runtimeTestsuitePath;
 	public final static Path resourcePath;
 
-	private final static Object resourceLockObject = new Object();
 	private final static Map<String, String> resourceCache = new HashMap<>();
 	private static OSType detectedOS;
 	private static Boolean isWindows;
@@ -81,18 +80,13 @@ public abstract class RuntimeTestUtils {
 		return detectedOS;
 	}
 
-	public static String getTextFromResource(String name) {
+	public static synchronized String getTextFromResource(String name) {
 		try {
 			String text = resourceCache.get(name);
 			if (text == null) {
-				synchronized (resourceLockObject) {
-					text = resourceCache.get(name);
-					if (text == null) {
-						Path path = Paths.get(resourcePath.toString(), name);
-						text = new String(Files.readAllBytes(path));
-						resourceCache.put(name, text);
-					}
-				}
+				Path path = Paths.get(resourcePath.toString(), name);
+				text = new String(Files.readAllBytes(path));
+				resourceCache.put(name, text);
 			}
 			return text;
 		}
