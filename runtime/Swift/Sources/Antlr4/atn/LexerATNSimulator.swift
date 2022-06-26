@@ -389,7 +389,7 @@ open class LexerATNSimulator: ATNSimulator {
 
     final func computeStartState(_ input: CharStream,
         _ p: ATNState) throws -> ATNConfigSet {
-            let initialContext = PredictionContext.EMPTY
+            let initialContext = EmptyPredictionContext.Instance
             let configs = ATNConfigSet(true, isOrdered: true)
             let length = p.getNumberOfTransitions()
             for i in 0..<length {
@@ -431,7 +431,7 @@ open class LexerATNSimulator: ATNSimulator {
                     try configs.add(config)
                     return true
                 } else {
-                    try configs.add(LexerATNConfig(config, config.state, PredictionContext.EMPTY))
+                    try configs.add(LexerATNConfig(config, config.state, EmptyPredictionContext.Instance))
                     currentAltReachedAcceptState = true
                 }
             }
