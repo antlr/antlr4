@@ -89,13 +89,11 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		removeTempTestDirIfRequired();
 	}
 
-	private final static Object runtimeInitLockObject = new Object();
-
 	public final static String cacheDirectory;
 
 	private static class InitializationStatus {
 		public final Object lockObject = new Object();
-		public Boolean isInitialized;
+		public volatile Boolean isInitialized;
 		public Exception exception;
 	}
 
@@ -209,16 +207,14 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	private boolean initAntlrRuntimeIfRequired() {
 		String language = getLanguage();
-		InitializationStatus status = runtimeInitializationStatuses.get(language);
+		InitializationStatus status;
 
 		// Create initialization status for every runtime with lock object
-		if (status == null) {
-			synchronized (runtimeInitLockObject) {
-				status = runtimeInitializationStatuses.get(language);
-				if (status == null) {
-					status = new InitializationStatus();
-					runtimeInitializationStatuses.put(language, status);
-				}
+		synchronized (runtimeInitializationStatuses) {
+			status = runtimeInitializationStatuses.get(language);
+			if (status == null) {
+				status = new InitializationStatus();
+				runtimeInitializationStatuses.put(language, status);
 			}
 		}
 
