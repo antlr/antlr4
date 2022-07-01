@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  test_tool_and_runtime_java:
+  test_tool:
     docker:
       - image: cimg/openjdk:11.0
     steps:
@@ -9,12 +9,6 @@ jobs:
       - run:
           name: build tool
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run:
-          name: test runtime
-          command: |
-            cd runtime-testsuite
-            mvn -Dtest=java.** test
-            cd ..
       - run:
           name: test tool
           command: |
@@ -38,27 +32,36 @@ jobs:
     parallelism: 4
     resource_class: large
     environment:
-      TARGET: << parameters.target >>
-      GROUP: << parameters.test-group >>
+      TARGET: <<parameters.target>>
+      GROUP: <<parameters.test-group>>
     steps:
       - checkout
       - run:
-          name: Install << parameters.target >> pre-requisites
+          name: Install <<parameters.target>> pre-requisites
           command: |
-            f=".circleci/scripts/install-linux-<< parameters.target >>.sh"; ! [ -x "$f" ] || "$f"
+            set -euo pipefail
+            f=".circleci/scripts/install-linux-<<parameters.target>>.sh"; ! [ -x "$f" ] || "$f"
       - run:
-          name: Build ANTLR4 tool
+          name: Build ANTLR4
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
       - run:
-          name: Test << parameters.target >> runtime
+          name: Test <<parameters.target>> runtime
           command: |
-            .circleci/scripts/run-tests-<< parameters.target >>.sh
+            set -euo pipefail
+            if [ "<<parameters.target>>" == "swift" ]
+            then
+              export PATH=$PATH:/usr/share/swift/usr/bin
+            fi
+            pushd runtime-testsuite
+            mvn -Dtest=<<parameters.target>>.** test
+            popd
+            f=".circleci/scripts/run-tests-<<parameters.target>>.sh"; ! [ -x "$f" ] || "$f"
 
 workflows:
   build:
     jobs:
-      - test_tool_and_runtime_java
+      - test_tool
       - test_runtime:
           matrix:
             parameters:
-              target: [ dart, go, python2, python3, javascript, php, cpp, dotnet, swift ]
+              target: [ java, csharp, python2, python3, javascript, cpp, go, swift, php, dart ]

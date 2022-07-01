@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 # use v14 and check
 echo "installing nodejs..."
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
@@ -10,8 +8,8 @@ echo node version: $(node --version)
 echo "done installing nodejs"
 
 echo "packaging javascript runtime..."
-pushd runtime/JavaScript
+pushd runtime/JavaScript || exit
   sudo npm install
   sudo npm link
-popd
+popd || exit
 echo "done packaging javascript runtime"

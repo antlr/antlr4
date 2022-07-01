@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 echo "installing swift SDK..."
 
 sudo apt update && sudo apt upgrade
@@ -13,10 +11,9 @@ tar xzf swift-5.6.2-RELEASE-ubuntu20.04.tar.gz
 
 sudo mv swift-5.6.2-RELEASE-ubuntu20.04 /usr/share/swift
 
-echo "export PATH=/usr/share/swift/usr/bin:$PATH" >> ~/.zshrc
-source ~/.zshrc
+export PATH=$PATH:/usr/share/swift/usr/bin
 
 echo "done installing swift SDK..."
 
 # check swift
-/usr/share/swift/usr/bin/swift --version
+swift --version

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Appears to be unused
-
-set -euo pipefail
-
 # TODO: https://github.com/antlr/antlr4/issues/3521
 #
 # pushd runtime/Swift
@@ -14,9 +10,3 @@ set -euo pipefail
 #     echo "failed running native tests"
 #   fi
 # popd
-
-pushd runtime-testsuite
-  echo "running maven tests..."
-  export MAVEN_OPTS="-Xmx8g"
-  mvn -Dantlr-swift-compiler="/usr/share/swift/usr/bin/swift" -Dtest=swift.** test
-popd
