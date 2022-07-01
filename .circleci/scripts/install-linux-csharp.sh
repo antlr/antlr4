@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 echo "installing .Net SDK..."
 wget https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
@@ -11,4 +9,3 @@ sudo apt-get update; \
   sudo apt-get install -y dotnet-sdk-3.1
 export PATH=$PATH:~/.dotnet
 echo "done installing .Net SDK"
-

@@ -1,24 +1,11 @@
 #!/bin/bash
 
-set -euo pipefail
-
 declare -i RESULT=0
 
-pushd runtime/JavaScript
-
+pushd runtime/JavaScript || exit
   echo "running jasmine tests..."
   npm test
   RESULT+=$?
-
-popd
-
-pushd runtime-testsuite
-
-  echo "running maven tests..."
-  export MAVEN_OPTS="-Xmx8g"
-  mvn -Dtest=javascript.** test
-  RESULT+=$?
-
-popd
+popd || exit
 
 exit $RESULT

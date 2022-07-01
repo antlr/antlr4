@@ -1,9 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
-python3 --version
-
 # TODO: https://github.com/antlr/antlr4/issues/3521
 #
 # pushd runtime/Python3/tests
@@ -14,9 +10,3 @@ python3 --version
 #     echo "failed running native tests"
 #   fi
 # popd
-
-pushd runtime-testsuite
-  echo "running maven tests..."
-  export MAVEN_OPTS="-Xmx8g"
-  mvn -Dtest=python3.** test
-popd

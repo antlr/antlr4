@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 echo "installing cpp SDK..."
 
 sudo apt-get update -y
