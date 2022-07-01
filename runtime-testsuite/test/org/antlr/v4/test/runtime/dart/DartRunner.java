@@ -34,7 +34,7 @@ public class DartRunner extends RuntimeRunner {
 
 		writeFile(cachePath, "pubspec.yaml", projectTemplate.render());
 
-		runCommand(new String[]{"dart", "pub", "get"}, cachePath);
+		runCommand(new String[]{getRuntimeToolPath(), "pub", "get"}, cachePath);
 
 		cacheDartPackageConfig = readFile(cachePath + FileSeparator + ".dart_tool", "package_config.json");
 	}

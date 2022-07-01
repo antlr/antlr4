@@ -18,7 +18,7 @@
   \<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     \<ConfigurationType>Application\</ConfigurationType>
     \<UseDebugLibraries>false\</UseDebugLibraries>
-    \<PlatformToolset><platformToolset>\</PlatformToolset>
+    \<PlatformToolset>v143\</PlatformToolset>
     \<WholeProgramOptimization>false\</WholeProgramOptimization> \<!-- compile time is more important than run time for tests -->
     \<CharacterSet>Unicode\</CharacterSet>
   \</PropertyGroup>

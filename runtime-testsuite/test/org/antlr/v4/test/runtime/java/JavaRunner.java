@@ -64,6 +64,11 @@ public class JavaRunner extends RuntimeRunner {
 	}
 
 	@Override
+	protected String getCompilerName() {
+		return "javac";
+	}
+
+	@Override
 	protected JavaCompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		String tempTestDir = getTempDirPath();
 

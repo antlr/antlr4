@@ -77,7 +77,7 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-		String goRoot = runCommand(new String[]{"go", "env", "GOROOT"}, null, "get GO root").output.trim();
+		String goRoot = runCommand(new String[]{getRuntimeToolPath(), "env", "GOROOT"}, null, "get GO root").output.trim();
 
 		try {
 			File newGoRootDirectory = newGoRoot.toFile();
@@ -103,7 +103,7 @@ public class GoRunner extends RuntimeRunner {
 
 		try {
 			new File(newGoRootString, goModFileName).deleteOnExit();
-			Processor.run(new String[]{"go", "mod", "init", "test"}, newGoRootString);
+			Processor.run(new String[]{getRuntimeToolPath(), "mod", "init", "test"}, newGoRootString);
 			goModContent = new String(Files.readAllBytes(Paths.get(newGoRootString, goModFileName)), StandardCharsets.UTF_8);
 		} catch (InterruptedException | IOException e) {
 			throw new RuntimeException(e);
