@@ -18,5 +18,5 @@ set -euo pipefail
 pushd runtime-testsuite
   echo "running maven tests..."
   export MAVEN_OPTS="-Xmx8g"
-  mvn -Dtest=swift.** test
+  mvn -Dantlr-swift-compiler="/usr/share/swift/usr/bin/swift" -Dtest=swift.** test
 popd
