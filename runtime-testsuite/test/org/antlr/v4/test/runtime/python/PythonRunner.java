@@ -13,16 +13,6 @@ public abstract class PythonRunner extends RuntimeRunner {
 	public String getExtension() { return "py"; }
 
 	@Override
-	public String getRuntimeToolName() {
-		String toolFileName = System.getProperty(getPropertyPrefix() + "-exec");
-		if (toolFileName != null && toolFileName.length() > 0) {
-			return toolFileName;
-		}
-
-		return getLanguage().toLowerCase();
-	}
-
-	@Override
 	protected void addExtraRecognizerParameters(ST template) {
 		template.add("python3", getLanguage().equals("Python3"));
 	}

@@ -10,7 +10,6 @@ import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,21 +33,17 @@ public class CppRunner extends RuntimeRunner {
 	private static final String runtimeSourcePath;
 	private static final String runtimeBinaryPath;
 	private static final String runtimeLibraryFileName;
-	private static final String compilerPath;
+	private static String compilerName;
 	private static final String visualStudioProjectContent;
-	private static String visualStudioVersion;
-	private static String visualStudioPlatformToolset;
 	private static final Map<String, String> environment;
 
 	static {
-		compilerPath = initCompilerFileName();
-
 		String runtimePath = getRuntimePath("Cpp");
 		runtimeSourcePath = Paths.get(runtimePath, "runtime", "src").toString();
 
 		environment = new HashMap<>();
 		if (isWindows()) {
-			runtimeBinaryPath = Paths.get(runtimePath, "runtime", "bin", "vs-" + visualStudioVersion, "x64", "Release DLL").toString();
+			runtimeBinaryPath = Paths.get(runtimePath, "runtime", "bin", "vs-2022", "x64", "Release DLL").toString();
 			runtimeLibraryFileName = Paths.get(runtimeBinaryPath, "antlr4-runtime.dll").toString();
 			String path = System.getenv("PATH");
 			environment.put("PATH", path == null ? runtimeBinaryPath : path + ";" + runtimeBinaryPath);
@@ -67,56 +62,18 @@ public class CppRunner extends RuntimeRunner {
 		}
 	}
 
-	private static String initCompilerFileName() {
-		if (isWindows()) {
-			visualStudioPlatformToolset = "v143";
-			visualStudioVersion = "2022";
-			String[] visualStudioVersions = new String[]{"2022", "2019"};
-			String[] visualStudioEditions = new String[]{"BuildTools", "Community", "Professional", "Enterprise"};
-			String[] programFilesPaths = new String[]{"Program Files", "Program Files (x86)"};
-
-			for (String version : visualStudioVersions) {
-				for (String edition : visualStudioEditions) {
-					for (String programFilesPath : programFilesPaths) {
-						String file = "C:\\" + programFilesPath + "\\Microsoft Visual Studio\\" + version + "\\"
-								+ edition + "\\Msbuild\\Current\\Bin\\MSBuild.exe";
-						if (new File(file).exists()) {
-							visualStudioPlatformToolset = version.equals("2022") ? "v143" : "v142";
-							visualStudioVersion = version;
-							return file;
-						}
-					}
-				}
-			}
-			return "MSBuild";
-		}
-		else {
-			return "clang++";
-		}
-	}
-
 	@Override
-	protected void writeRecognizerFile(RunOptions runOptions) {
-		super.writeRecognizerFile(runOptions);
-		if (isWindows()) {
-			writeVisualStudioProjectFile(runOptions.grammarName, runOptions.lexerName, runOptions.parserName,
-					runOptions.useListener, runOptions.useVisitor);
+	protected String getCompilerName() {
+		if (compilerName == null) {
+			if (isWindows()) {
+				compilerName = "MSBuild";
+			}
+			else {
+				compilerName = "clang++";
+			}
 		}
-	}
 
-	private void writeVisualStudioProjectFile(String grammarName, String lexerName, String parserName,
-											  boolean useListener, boolean useVisitor
-	) {
-		ST projectFileST = new ST(visualStudioProjectContent);
-		projectFileST.add("platformToolset", visualStudioPlatformToolset);
-		projectFileST.add("runtimeSourcePath", runtimeSourcePath);
-		projectFileST.add("runtimeBinaryPath", runtimeBinaryPath);
-		projectFileST.add("grammarName", grammarName);
-		projectFileST.add("lexerName", lexerName);
-		projectFileST.add("parserName", parserName);
-		projectFileST.add("useListener", useListener);
-		projectFileST.add("useVisitor", useVisitor);
-		writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
+		return compilerName;
 	}
 
 	@Override
@@ -125,10 +82,7 @@ public class CppRunner extends RuntimeRunner {
 
 		if (isWindows()) {
 			String[] command = {
-					compilerPath,
-					"antlr4cpp-vs" + visualStudioVersion + ".vcxproj",
-					"/p:configuration=Release DLL",
-					"/p:platform=x64"
+				getCompilerPath(), "antlr4cpp-vs2022.vcxproj", "/p:configuration=Release DLL", "/p:platform=x64"
 			};
 
 			runCommand(command, runtimePath + "\\runtime","build c++ ANTLR runtime using MSBuild");
@@ -144,6 +98,11 @@ public class CppRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+		if (isWindows()) {
+			writeVisualStudioProjectFile(runOptions.grammarName, runOptions.lexerName, runOptions.parserName,
+					runOptions.useListener, runOptions.useVisitor);
+		}
+
 		Exception exception = null;
 		try {
 			if (!isWindows()) {
@@ -152,7 +111,7 @@ public class CppRunner extends RuntimeRunner {
 			}
 
 			List<String> buildCommand = new ArrayList<>();
-			buildCommand.add(compilerPath);
+			buildCommand.add(getCompilerPath());
 			if (isWindows()) {
 				buildCommand.add(getTestFileName() + ".vcxproj");
 				buildCommand.add("/p:configuration=Release");
@@ -177,6 +136,19 @@ public class CppRunner extends RuntimeRunner {
 			exception = ex;
 		}
 		return new CompiledState(generatedState, exception);
+	}
+
+	private void writeVisualStudioProjectFile(String grammarName, String lexerName, String parserName,
+											  boolean useListener, boolean useVisitor) {
+		ST projectFileST = new ST(visualStudioProjectContent);
+		projectFileST.add("runtimeSourcePath", runtimeSourcePath);
+		projectFileST.add("runtimeBinaryPath", runtimeBinaryPath);
+		projectFileST.add("grammarName", grammarName);
+		projectFileST.add("lexerName", lexerName);
+		projectFileST.add("parserName", parserName);
+		projectFileST.add("useListener", useListener);
+		projectFileST.add("useVisitor", useVisitor);
+		writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
 	}
 
 	@Override

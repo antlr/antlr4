@@ -37,13 +37,13 @@ public class SwiftRunner extends RuntimeRunner {
 
 	private static final String swiftRuntimePath;
 	private static final String buildSuffix;
-	private static final String[] buildProjectArgs;
 	private static final Map<String, String> environment;
+
+	private static final String includePath;
+	private static final String libraryPath;
 
 	static {
 		swiftRuntimePath = getRuntimePath("Swift");
-		String libraryPath;
-		String includePath;
 		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
 		includePath = Paths.get(swiftRuntimePath, ".build", buildSuffix, "release").toString();
 		environment = new HashMap<>();
@@ -55,27 +55,16 @@ public class SwiftRunner extends RuntimeRunner {
 		else {
 			libraryPath = includePath;
 		}
-		buildProjectArgs = new String[]{
-				"swift",
-				"build",
-				"-c",
-				"release",
-				"-Xswiftc",
-				"-I" + includePath,
-				"-Xlinker",
-				"-L" + includePath,
-				"-Xlinker",
-				"-lAntlr4",
-				"-Xlinker",
-				"-rpath",
-				"-Xlinker",
-				libraryPath
-		};
+	}
+
+	@Override
+	protected String getCompilerName() {
+		return "swift";
 	}
 
 	@Override
 	protected void initRuntime() throws Exception {
-		runCommand(new String[] {"swift", "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
+		runCommand(new String[] {getCompilerPath(), "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
 	}
 
 	@Override
@@ -94,6 +83,22 @@ public class SwiftRunner extends RuntimeRunner {
 			outputFileST.add("excludedFiles", excludedFiles);
 			writeFile(tempDirPath, "Package.swift", outputFileST.render());
 
+			String[] buildProjectArgs = new String[]{
+					getCompilerPath(),
+					"build",
+					"-c",
+					"release",
+					"-Xswiftc",
+					"-I" + includePath,
+					"-Xlinker",
+					"-L" + includePath,
+					"-Xlinker",
+					"-lAntlr4",
+					"-Xlinker",
+					"-rpath",
+					"-Xlinker",
+					libraryPath
+			};
 			runCommand(buildProjectArgs, tempDirPath);
 		} catch (Exception e) {
 			exception = e;
@@ -117,8 +122,7 @@ public class SwiftRunner extends RuntimeRunner {
 
 	@Override
 	public String getExecFileName() {
-		String tempDirPath = getTempDirPath();
-		return Paths.get(tempDirPath,
+		return Paths.get(getTempDirPath(),
 				".build",
 				buildSuffix,
 				"release",

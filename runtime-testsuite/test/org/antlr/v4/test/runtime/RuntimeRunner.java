@@ -44,6 +44,39 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	protected String grammarNameToFileName(String grammarName) { return grammarName; }
 
+	private static String runtimeToolPath;
+	private static String compilerPath;
+
+	protected final String getCompilerPath() {
+		if (compilerPath == null) {
+			compilerPath = getCompilerName();
+			if (compilerPath != null) {
+				String compilerPathFromProperty = System.getProperty(getPropertyPrefix() + "-compiler");
+				if (compilerPathFromProperty != null && compilerPathFromProperty.length() > 0) {
+					compilerPath = compilerPathFromProperty;
+				}
+			}
+		}
+
+		return compilerPath;
+	}
+
+	protected final String getRuntimeToolPath() {
+		if (runtimeToolPath == null) {
+			runtimeToolPath = getRuntimeToolName();
+			if (runtimeToolPath != null) {
+				String runtimeToolPathFromProperty = System.getProperty(getPropertyPrefix() + "-exec");
+				if (runtimeToolPathFromProperty != null && runtimeToolPathFromProperty.length() > 0) {
+					runtimeToolPath = runtimeToolPathFromProperty;
+				}
+			}
+		}
+
+		return runtimeToolPath;
+	}
+
+	protected String getCompilerName() { return null; }
+
 	protected String getRuntimeToolName() { return getLanguage().toLowerCase(); }
 
 	protected String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
@@ -252,9 +285,9 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		Exception exception = null;
 		try {
 			List<String> args = new ArrayList<>();
-			String runtimeToolName = getRuntimeToolName();
-			if (runtimeToolName != null) {
-				args.add(runtimeToolName);
+			String runtimeToolPath = getRuntimeToolPath();
+			if (runtimeToolPath != null) {
+				args.add(runtimeToolPath);
 			}
 			String[] extraRunArgs = getExtraRunArgs();
 			if (extraRunArgs != null) {
