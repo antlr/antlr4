@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build tool
+          name: Build ANTLR4
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
       - run:
           name: test tool
@@ -55,6 +55,9 @@ jobs:
             pushd runtime-testsuite
             mvn -Dtest=<<parameters.target>>.** test
             popd
+      - run:
+          name: Extra tests of <<parameters.target>> runtime
+          command: |
             f=".circleci/scripts/run-tests-<<parameters.target>>.sh"; ! [ -x "$f" ] || "$f"
 
 workflows:
