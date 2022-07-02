@@ -30,40 +30,40 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
-      <version>4.3.1</version>
+      <version>4.3.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
-			<scope>test</scope>
-			<type>test-jar</type>
+      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-api</artifactId>
-          <version>${jUnitVersion}</version>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-engine</artifactId>
-          <version>${jUnitVersion}</version>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-params</artifactId>
-          <version>${jUnitVersion}</version>
-          <scope>test</scope>
-      </dependency>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -76,15 +76,6 @@
         <configuration>
           <!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
           <argLine>-Dfile.encoding=UTF-8</argLine>
-          <includes>
-            <include>**/Test*.java</include>
-          </includes>
-          <systemPropertyVariables>
-            <antlr-python2-runtime>../../antlr4-python2/src</antlr-python2-runtime>
-            <antlr-python3-runtime>../../antlr4-python3/src</antlr-python3-runtime>
-            <antlr-cpp-runtime>../../antlr4-cpp/src</antlr-cpp-runtime>
-            <antlr-javascript-runtime>../../antlr4-javascript/src</antlr-javascript-runtime>
-          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>
