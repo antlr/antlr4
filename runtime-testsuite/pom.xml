@@ -123,18 +123,4 @@
             </plugin>
         </plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>includeSwiftTests</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<properties>
-				<antlr.tests.swift>**/swift/Test*.java</antlr.tests.swift>
-			</properties>
-		</profile>
-	</profiles>
 </project>
