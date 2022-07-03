@@ -686,6 +686,26 @@ public class TestCompositeGrammars {
 		assertEquals("", executedState.errors);
 	}
 
+	// ISSUE: https://github.com/antlr/antlr4/issues/2296
+	@Test
+	public void testCircularGrammarInclusion(@TempDir Path tempDir) {
+		String tempDirPath = tempDir.toString();
+		String g1 =
+				"grammar G1;\n" +
+				"import  G2;\n" +
+				"r : 'R1';";
+
+		String g2 =
+				"grammar G2;\n" +
+				"import  G1;\n" +
+				"r : 'R2';";
+
+		FileUtils.mkdir(tempDirPath);
+		writeFile(tempDirPath, "G1.g4", g1);
+		ExecutedState executedState = execParser("G2.g4", g2, "G2Parser", "G2Lexer", "r", "R2", debug, tempDir);
+		assertEquals("", executedState.errors);
+	}
+
 	private static void checkGrammarSemanticsWarning(ErrorQueue equeue, GrammarSemanticsMessage expectedMessage) {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.warnings.size(); i++) {
