@@ -61,6 +61,41 @@ public class Trees {
 		return buf.toString();
 	}
 
+	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
+	 *  node payloads to get the text for the nodes.  Detect
+	 *  parse trees and extract data appropriately.
+	 * @since 4.10.2
+	 */
+	public static String toJSONTree(Tree t, Parser recog) {
+		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+		return toJSONTree(t, ruleNamesList);
+	}
+
+	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
+	 *  node payloads to get the text for the nodes.  Detect
+	 *  parse trees and extract data appropriately.
+	 * @since 4.10.2
+	 */
+	public static String toJSONTree(final Tree t, final List<String> ruleNames) {
+		StringBuilder buf = new StringBuilder();
+		String s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+		if ( t.getChildCount()==0 ) {
+			return getJSONNodeText(t, ruleNames);
+		}
+		buf.append("{");
+		s = Utils.escapeWhitespace(getJSONNodeText(t, ruleNames), false);
+		buf.append(s);
+		buf.append(":[");
+		for (int i = 0; i<t.getChildCount(); i++) {
+			if ( i>0 ) buf.append(',');
+			buf.append(toJSONTree(t.getChild(i), ruleNames));
+		}
+		buf.append("]");
+		buf.append("}");
+		return buf.toString();
+	}
+
 	public static String getNodeText(Tree t, Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
@@ -86,6 +121,36 @@ public class Trees {
 				if (symbol != null) {
 					String s = symbol.getText();
 					return s;
+				}
+			}
+		}
+		// no recog for rule names
+		Object payload = t.getPayload();
+		if ( payload instanceof Token ) {
+			return ((Token)payload).getText();
+		}
+		return t.getPayload().toString();
+	}
+
+	/** @since 4.10.2 */
+	public static String getJSONNodeText(Tree t, List<String> ruleNames) {
+		if ( ruleNames!=null ) {
+			if ( t instanceof RuleContext ) {
+				int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
+				String ruleName = ruleNames.get(ruleIndex);
+				int altNumber = ((RuleContext) t).getAltNumber();
+				if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
+					return ruleName+":"+altNumber;
+				}
+				return '"'+ruleName+'"';
+			}
+			else if ( t instanceof ErrorNode) {
+				return t.toString();
+			}
+			else if ( t instanceof TerminalNode) {
+				Token symbol = ((TerminalNode)t).getSymbol();
+				if (symbol != null) {
+					return String.format("{\"idx\":\"%d\",\"text\":\"%s\"}", symbol.getTokenIndex(), symbol.getText());
 				}
 			}
 		}
