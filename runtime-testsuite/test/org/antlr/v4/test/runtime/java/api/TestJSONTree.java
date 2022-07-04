@@ -24,7 +24,9 @@ public class TestJSONTree {
 
 		ParseTree t = parser.expr();
 		String result = Trees.toJSONTree(t, parser);
-		assertEquals("{\"expr\":[{\"idx\":\"0\",\"text\":\"8\"}]}", result);
+		String expected = "{'expr':[{'idx':'0','text':'8'}]}";
+		expected = expected.replace('\'', '"');
+		assertEquals(expected, result);
 	}
 
 	@Test
@@ -35,7 +37,9 @@ public class TestJSONTree {
 
 		ParseTree t = parser.s();
 		String result = Trees.toJSONTree(t, parser);
-		assertEquals("{\"s\":[{\"expr\":[{\"idx\":\"0\",\"text\":\"99\"}]},{\"idx\":\"1\",\"text\":\"<EOF>\"}]}", result);
+		String expected = "{'s':[{'expr':[{'idx':'0','text':'99'}]},{'idx':'1','text':'<EOF>'}]}";
+		expected = expected.replace('\'', '"');
+		assertEquals(expected, result);
 	}
 
 	@Test
@@ -47,6 +51,11 @@ public class TestJSONTree {
 		ParseTree t = parser.s();
 		String result = Trees.toJSONTree(t, parser);
 		System.out.println(result);
-		assertEquals("{\"s\":[{\"expr\":[{\"expr\":[{\"idx\":\"0\",\"text\":\"1\"}]},{\"idx\":\"2\",\"text\":\"+\"},{\"expr\":[{\"idx\":\"4\",\"text\":\"2\"}]}]},{\"idx\":\"5\",\"text\":\"<EOF>\"}]}", result);
+		String expected =
+				"{'s':[{'expr':[{'expr':[{'idx':'0','text':'1'}]},{'idx':'2','text':'+'},"+
+				"{'expr':[{'idx':'4','text':'2'}]}]},"+
+				"{'idx':'5','text':'<EOF>'}]}";
+		expected = expected.replace('\'', '"');
+		assertEquals(expected, result);
 	}
 }
