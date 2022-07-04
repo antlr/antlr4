@@ -19,8 +19,8 @@ public class TestJSONTree {
 		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
 
 		ParseTree t = parser.s(); // rule s can match nothing
-		String result = Trees.toJSONTree(t, parser);
-		String expected = "'s'";
+		String result = Trees.toJSON(t, parser);
+		String expected = "{'tree':'0'}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -32,8 +32,8 @@ public class TestJSONTree {
 		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
 
 		ParseTree t = parser.expr();
-		String result = Trees.toJSONTree(t, parser);
-		String expected = "{\"expr\":[0]}";
+		String result = Trees.toJSON(t, parser);
+		String expected = "{'tree':{'1':[0]}}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -45,8 +45,8 @@ public class TestJSONTree {
 		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
 
 		ParseTree t = parser.s();
-		String result = Trees.toJSONTree(t, parser);
-		String expected = "{\"s\":[{\"expr\":[0]},1]}";
+		String result = Trees.toJSON(t, parser);
+		String expected = "{'tree':{'0':[{'1':[0]},1]}}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -58,10 +58,10 @@ public class TestJSONTree {
 		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
 
 		ParseTree t = parser.s();
-		String result = Trees.toJSONTree(t, parser);
+		String result = Trees.toJSON(t, parser);
 		System.out.println(result);
 		String expected =
-				"{\"s\":[{\"expr\":[{\"expr\":[0]},2,{\"expr\":[4]}]},5]}";
+				"{'s':[{'expr':[{'expr':[0]},2,{'expr':[4]}]},5]}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -74,11 +74,11 @@ public class TestJSONTree {
 		parser.removeErrorListeners(); // Turn off error msgs.
 
 		ParseTree t = parser.expr();
-		String result = Trees.toJSONTree(t, parser);
+		String result = Trees.toJSON(t, parser);
 		String expected =
-				"{\"expr\":[0,1,{\"error\":\"<missing ')'>\"}]}";
+				"{'expr':[0,1,{'error':'<missing ')'>'}]}";
 		expected = expected.replace('\'', '"');
-		expected = expected.replace("\")\"", "')'"); // undo error msg tweak
+		expected = expected.replace("')'", "')'"); // undo error msg tweak
 		assertEquals(expected, result);
 	}
 }

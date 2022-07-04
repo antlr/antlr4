@@ -6,11 +6,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Predicate;
@@ -63,13 +59,53 @@ public class Trees {
 
 	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
 	 *  node payloads to get the text for the nodes.  Detect
-	 *  parse trees and extract data appropriately.
+	 *  parse trees and extract data appropriately. Include rulenames, input, tokens.
 	 * @since 4.10.2
 	 */
-	public static String toJSONTree(Tree t, Parser recog) {
+	public static String toJSON(Tree t, Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
-		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
-		return toJSONTree(t, ruleNamesList);
+		if ( ruleNames==null ) {
+			return null;
+		}
+		List<String> ruleNamesList = Arrays.asList(ruleNames);
+
+		TokenStream tokenStream = recog.getInputStream();
+		CharStream inputStream = tokenStream.getTokenSource().getInputStream();
+		Interval allchar = Interval.of(0, inputStream.size() - 1);
+		String input = inputStream.getText(allchar);
+		input = Utils.escapeJSONString(input);
+//		List<Token> tokens;
+//		if ( tokenStream instanceof CommonTokenStream ) {
+//			tokens = ((CommonTokenStream) tokenStream).getTokens(0, tokenStream.size()-1);
+//		}
+//		else {
+//		}
+		List<String> tokenStrings = new ArrayList<>();
+		for (int i = 0; i < tokenStream.size(); i++) {
+			Token tok = tokenStream.get(i);
+			String s = String.format("{\"type\":%d,\"line\":%d,\"pos\":%d,\"channel\":%d,\"text\":\"%s\"}\n",
+					tok.getType(), tok.getLine(), tok.getCharPositionInLine(), tok.getChannel(),
+					Utils.escapeJSONString(tok.getText()));
+			tokenStrings.add(s);
+		}
+		String tree = toJSONTree(t, ruleNamesList);
+
+		StringBuilder buf = new StringBuilder();
+		buf.append("{");
+		buf.append("\"rules\":[\"");
+		buf.append(String.join("\",\"", ruleNames));
+		buf.append("\"],\n");
+		buf.append("\"input\":\"");
+		buf.append(input);
+		buf.append("\",\n");
+		buf.append("\"tokens\":[");
+		buf.append(String.join(",", tokenStrings));
+		buf.append("],\n");
+		buf.append("\"tree\":");
+		buf.append(tree);
+		buf.append("}");
+
+		return buf.toString();
 	}
 
 	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
@@ -79,13 +115,11 @@ public class Trees {
 	 */
 	public static String toJSONTree(final Tree t, final List<String> ruleNames) {
 		StringBuilder buf = new StringBuilder();
-		String s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
 		if ( t.getChildCount()==0 ) {
 			return getJSONNodeText(t, ruleNames);
 		}
 		buf.append("{");
-		s = Utils.escapeWhitespace(getJSONNodeText(t, ruleNames), false);
-		buf.append(s);
+		buf.append(getJSONNodeText(t, ruleNames));
 		buf.append(":[");
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(',');
@@ -139,18 +173,15 @@ public class Trees {
 		}
 		if ( t instanceof RuleContext ) {
 			int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
-			String ruleName = ruleNames.get(ruleIndex);
 			int altNumber = ((RuleContext) t).getAltNumber();
 			if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
-				return '"'+ruleName+":"+altNumber+'"';
+				return String.format("\"%d:%d\"",ruleIndex,altNumber);
 			}
-			return '"'+ruleName+'"';
+			return String.format("\"%d\"",ruleIndex);
 		}
 		else if ( t instanceof ErrorNode) {
 			Token symbol = ((TerminalNode)t).getSymbol();
 			if (symbol != null) {
-				String txt = String.format("{\"idx\":\"%d\",\"text\":\"%s\"}",
-						symbol.getTokenIndex(), symbol.getText());
 				return "{\"error\":\"" + symbol.getText() + "\"}";
 			}
 			return "{\"error\":\""+t.getPayload().toString()+"\"}";
