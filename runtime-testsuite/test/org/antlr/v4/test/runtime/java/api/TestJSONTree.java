@@ -33,7 +33,7 @@ public class TestJSONTree {
 
 		ParseTree t = parser.expr();
 		String result = Trees.toJSONTree(t, parser);
-		String expected = "{'expr':[{'idx':'0','text':'8'}]}";
+		String expected = "{\"expr\":[0]}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -46,7 +46,7 @@ public class TestJSONTree {
 
 		ParseTree t = parser.s();
 		String result = Trees.toJSONTree(t, parser);
-		String expected = "{'s':[{'expr':[{'idx':'0','text':'99'}]},{'idx':'1','text':'<EOF>'}]}";
+		String expected = "{\"s\":[{\"expr\":[0]},1]}";
 		expected = expected.replace('\'', '"');
 		assertEquals(expected, result);
 	}
@@ -61,10 +61,24 @@ public class TestJSONTree {
 		String result = Trees.toJSONTree(t, parser);
 		System.out.println(result);
 		String expected =
-				"{'s':[{'expr':[{'expr':[{'idx':'0','text':'1'}]},{'idx':'2','text':'+'},"+
-				"{'expr':[{'idx':'4','text':'2'}]}]},"+
-				"{'idx':'5','text':'<EOF>'}]}";
+				"{\"s\":[{\"expr\":[{\"expr\":[0]},2,{\"expr\":[4]}]},5]}";
 		expected = expected.replace('\'', '"');
+		assertEquals(expected, result);
+	}
+
+	@Test
+	public void testMismatchedToken() {
+		String input = "f(";
+		VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
+		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
+		parser.removeErrorListeners(); // Turn off error msgs.
+
+		ParseTree t = parser.expr();
+		String result = Trees.toJSONTree(t, parser);
+		String expected =
+				"{\"expr\":[0,1,{\"error\":\"<missing ')'>\"}]}";
+		expected = expected.replace('\'', '"');
+		expected = expected.replace("\")\"", "')'"); // undo error msg tweak
 		assertEquals(expected, result);
 	}
 }

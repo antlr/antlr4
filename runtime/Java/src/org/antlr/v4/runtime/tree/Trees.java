@@ -134,32 +134,35 @@ public class Trees {
 
 	/** @since 4.10.2 */
 	public static String getJSONNodeText(Tree t, List<String> ruleNames) {
-		if ( ruleNames!=null ) {
-			if ( t instanceof RuleContext ) {
-				int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
-				String ruleName = ruleNames.get(ruleIndex);
-				int altNumber = ((RuleContext) t).getAltNumber();
-				if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
-					return ruleName+":"+altNumber;
-				}
-				return '"'+ruleName+'"';
-			}
-			else if ( t instanceof ErrorNode) {
-				return t.toString();
-			}
-			else if ( t instanceof TerminalNode) {
-				Token symbol = ((TerminalNode)t).getSymbol();
-				if (symbol != null) {
-					return String.format("{\"idx\":\"%d\",\"text\":\"%s\"}", symbol.getTokenIndex(), symbol.getText());
-				}
-			}
+		if ( ruleNames==null ) {
+			return null;
 		}
-		// no recog for rule names
-		Object payload = t.getPayload();
-		if ( payload instanceof Token ) {
-			return ((Token)payload).getText();
+		if ( t instanceof RuleContext ) {
+			int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
+			String ruleName = ruleNames.get(ruleIndex);
+			int altNumber = ((RuleContext) t).getAltNumber();
+			if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
+				return '"'+ruleName+":"+altNumber+'"';
+			}
+			return '"'+ruleName+'"';
 		}
-		return t.getPayload().toString();
+		else if ( t instanceof ErrorNode) {
+			Token symbol = ((TerminalNode)t).getSymbol();
+			if (symbol != null) {
+				String txt = String.format("{\"idx\":\"%d\",\"text\":\"%s\"}",
+						symbol.getTokenIndex(), symbol.getText());
+				return "{\"error\":\"" + symbol.getText() + "\"}";
+			}
+			return "{\"error\":\""+t.getPayload().toString()+"\"}";
+		}
+		else if ( t instanceof TerminalNode) {
+			Token symbol = ((TerminalNode)t).getSymbol();
+			if (symbol != null) {
+				return String.valueOf(symbol.getTokenIndex());
+			}
+			return "-1";
+		}
+		return "<unknown node type>";
 	}
 
 	/** Return ordered list of all children of this node */
