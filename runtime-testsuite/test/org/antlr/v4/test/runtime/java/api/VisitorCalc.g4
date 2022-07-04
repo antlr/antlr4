@@ -2,6 +2,7 @@ grammar VisitorCalc;
 
 s
 	:	expr EOF
+	|
 	;
 
 expr

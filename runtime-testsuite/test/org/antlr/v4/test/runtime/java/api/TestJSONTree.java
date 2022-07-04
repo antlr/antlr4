@@ -14,6 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestJSONTree {
 	@Test
 	public void testEmpty() {
+		String input = "";
+		VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
+		VisitorCalcParser parser = new VisitorCalcParser(new CommonTokenStream(lexer));
+
+		ParseTree t = parser.s(); // rule s can match nothing
+		String result = Trees.toJSONTree(t, parser);
+		String expected = "'s'";
+		expected = expected.replace('\'', '"');
+		assertEquals(expected, result);
 	}
 
 	@Test
