@@ -55,6 +55,7 @@ BuildParseTrees() ::= "self._buildParseTrees = True"
 BailErrorStrategy() ::= <%self._errHandler = BailErrorStrategy()%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(recog=self)%>
+ToJSON(s) ::= ""
 
 Column() ::= "self.column"
 

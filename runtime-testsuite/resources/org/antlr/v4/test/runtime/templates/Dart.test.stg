@@ -55,6 +55,7 @@ BuildParseTrees() ::= "buildParseTree = true;"
 BailErrorStrategy() ::= <%errorHandler = new BailErrorStrategy();%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(parser: this)%>
+ToJSON(s) ::= ""
 
 Column() ::= "this.charPositionInLine"
 

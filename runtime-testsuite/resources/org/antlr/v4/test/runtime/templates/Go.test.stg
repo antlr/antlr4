@@ -55,6 +55,7 @@ BuildParseTrees() ::= "p.BuildParseTrees = true"
 BailErrorStrategy() ::= <%p.SetErrorHandler(antlr.NewBailErrorStrategy())%>
 
 ToStringTree(s) ::= <%<s>.ToStringTree(nil, p)%>
+ToJSON(s) ::= ""
 
 Column() ::= "p.GetCharPositionInLine()"
 

@@ -55,6 +55,7 @@ BuildParseTrees() ::= "setBuildParseTree(true)"
 BailErrorStrategy() ::= <%setErrorHandler(BailErrorStrategy())%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(self)%>
+ToJSON(s) ::= ""
 
 Column() ::= "self.getCharPositionInLine()"
 
