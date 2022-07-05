@@ -57,74 +57,6 @@ public class Trees {
 		return buf.toString();
 	}
 
-	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
-	 *  node payloads to get the text for the nodes.  Detect
-	 *  parse trees and extract data appropriately. Include rulenames, input, tokens.
-	 *
-	 * @since 4.10.2
-	 */
-	public static String toJSON(Tree t, Parser recog) {
-		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
-		if ( ruleNames==null ) {
-			return null;
-		}
-		List<String> ruleNamesList = Arrays.asList(ruleNames);
-
-		TokenStream tokenStream = recog.getInputStream();
-		CharStream inputStream = tokenStream.getTokenSource().getInputStream();
-		Interval allchar = Interval.of(0, inputStream.size() - 1);
-		String input = inputStream.getText(allchar);
-		input = Utils.escapeJSONString(input);
-		List<String> tokenStrings = new ArrayList<>();
-		for (int i = 0; i < tokenStream.size(); i++) {
-			Token tok = tokenStream.get(i);
-			String s = String.format("{\"type\":%d,\"line\":%d,\"pos\":%d,\"channel\":%d,\"start\":%d,\"stop\":%d}",
-					tok.getType(), tok.getLine(), tok.getCharPositionInLine(), tok.getChannel(),
-					tok.getStartIndex(), tok.getStopIndex());
-			tokenStrings.add(s);
-		}
-		String tree = toJSONTree(t, ruleNamesList);
-
-		StringBuilder buf = new StringBuilder();
-		buf.append("{");
-		buf.append("\"rules\":[\"");
-		buf.append(String.join("\",\"", ruleNames));
-		buf.append("\"],");
-		buf.append("\"input\":\"");
-		buf.append(input);
-		buf.append("\",");
-		buf.append("\"tokens\":[");
-		buf.append(String.join(",", tokenStrings));
-		buf.append("],");
-		buf.append("\"tree\":");
-		buf.append(tree);
-		buf.append("}");
-
-		return buf.toString();
-	}
-
-	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
-	 *  node payloads to get the text for the nodes.  Detect
-	 *  parse trees and extract data appropriately.
-	 * @since 4.10.2
-	 */
-	public static String toJSONTree(final Tree t, final List<String> ruleNames) {
-		StringBuilder buf = new StringBuilder();
-		if ( t.getChildCount()==0 ) {
-			return getJSONNodeText(t, ruleNames);
-		}
-		buf.append("{");
-		buf.append(getJSONNodeText(t, ruleNames));
-		buf.append(":[");
-		for (int i = 0; i<t.getChildCount(); i++) {
-			if ( i>0 ) buf.append(',');
-			buf.append(toJSONTree(t.getChild(i), ruleNames));
-		}
-		buf.append("]");
-		buf.append("}");
-		return buf.toString();
-	}
-
 	public static String getNodeText(Tree t, Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
@@ -159,36 +91,6 @@ public class Trees {
 			return ((Token)payload).getText();
 		}
 		return t.getPayload().toString();
-	}
-
-	/** @since 4.10.2 */
-	public static String getJSONNodeText(Tree t, List<String> ruleNames) {
-		if ( ruleNames==null ) {
-			return null;
-		}
-		if ( t instanceof RuleContext ) {
-			int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
-			int altNumber = ((RuleContext) t).getAltNumber();
-			if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
-				return String.format("\"%d:%d\"",ruleIndex,altNumber);
-			}
-			return String.format("\"%d\"",ruleIndex);
-		}
-		else if ( t instanceof ErrorNode) {
-			Token symbol = ((TerminalNode)t).getSymbol();
-			if (symbol != null) {
-				return "{\"error\":\"" + symbol.getText() + "\"}";
-			}
-			return "{\"error\":\""+t.getPayload().toString()+"\"}";
-		}
-		else if ( t instanceof TerminalNode) {
-			Token symbol = ((TerminalNode)t).getSymbol();
-			if (symbol != null) {
-				return String.valueOf(symbol.getTokenIndex());
-			}
-			return "-1";
-		}
-		return "<unknown node type>";
 	}
 
 	/** Return ordered list of all children of this node */
