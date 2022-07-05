@@ -74,3 +74,6 @@ surrogateRangeIntegerToCharArray();
 tooLargeIntegerToCharArrayThrows();
 unicodeBMPIntegerListToCharArray();
 unicodeSMPIntegerListToCharArray();
+
+[skip]
+CSharp Java Cpp Dart Go JavaScript Php Python2 Python3 Swift
