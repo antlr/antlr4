@@ -16,32 +16,35 @@ import java.lang.reflect.InvocationTargetException;
 
 public class JavaCompiledState extends CompiledState {
 	public final ClassLoader loader;
-	public final Class<? extends Lexer> lexer;
-	public final Class<? extends Parser> parser;
+	public final Class<? extends Lexer> lexerClass;
+	public final Class<? extends Parser> parserClass;
 
 	public JavaCompiledState(GeneratedState previousState,
 							 ClassLoader loader,
-							 Class<? extends Lexer> lexer,
-							 Class<? extends Parser> parser,
+							 Class<? extends Lexer> lexerClass,
+							 Class<? extends Parser> parserClass,
 							 Exception exception
 	) {
 		super(previousState, exception);
 		this.loader = loader;
-		this.lexer = lexer;
-		this.parser = parser;
+		this.lexerClass = lexerClass;
+		this.parserClass = parserClass;
 	}
 
 	public Pair<Lexer, Parser> initializeLexerAndParser(String input)
 			throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
 
-		Constructor<? extends Lexer> lexerConstructor = lexer.getConstructor(CharStream.class);
+		Constructor<? extends Lexer> lexerConstructor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = lexerConstructor.newInstance(in);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Parser parser = null;
+		if (parserClass != null) {
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		Constructor<? extends Parser> parserConstructor = parser.getConstructor(TokenStream.class);
-		Parser parser = parserConstructor.newInstance(tokens);
+			Constructor<? extends Parser> parserConstructor = parserClass.getConstructor(TokenStream.class);
+			parser = parserConstructor.newInstance(tokens);
+		}
 		return new Pair<>(lexer, parser);
 	}
 }
