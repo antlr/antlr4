@@ -166,7 +166,7 @@ public class RuntimeTestDescriptorParser {
 					}
 					continue;
 				case "skip":
-					skipTargets = value.split("\n");
+					skipTargets = value.split("\\s");
 					continue;
 				case "codeDeclaration":
 					isCodeDeclaration = true;

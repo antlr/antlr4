@@ -32,3 +32,6 @@ assert Token.EOF == tokenStream.get(2).getType();
 [output]
 [@0,0:0='A',<1>,1:0]
 [@1,1:0='<EOF>',<-1>,1:1]
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

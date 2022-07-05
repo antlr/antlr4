@@ -44,3 +44,6 @@ outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
 
 [output]
 Error encountered: [@-1,-1:-1='<missing 'A'>',<1>,1:0]
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

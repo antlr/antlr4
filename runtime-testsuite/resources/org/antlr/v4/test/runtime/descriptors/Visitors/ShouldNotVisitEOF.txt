@@ -40,3 +40,6 @@ outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
 [output]
 """[@0,0:0='A',<1>,1:0]
 """
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

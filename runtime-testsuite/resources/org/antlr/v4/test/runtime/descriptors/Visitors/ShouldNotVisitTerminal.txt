@@ -45,3 +45,6 @@ outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
 
 [output]
 default result
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift
