@@ -38,11 +38,8 @@ s
 
 
 [output]
-{"rules":["s","expr"],
-"input":"",
-"tokens":[{"type":-1,"line":1,"pos":0,"channel":0,"text":"<EOF>"}
-],
-"tree":"0"}
+"""{"rules":["s","expr"],"input":"","tokens":[{"type":-1,"line":1,"pos":0,"channel":0,"start":0,"stop":-1}],"tree":"0"}
+"""
 
 [skip]
 Cpp

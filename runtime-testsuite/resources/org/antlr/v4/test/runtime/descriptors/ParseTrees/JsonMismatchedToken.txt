@@ -38,13 +38,8 @@ expr
 f(
 
 [output]
-{"rules":["s","expr"],
-"input":"f(",
-"tokens":[{"type":4,"line":1,"pos":0,"channel":0,"text":"f"}
-,{"type":1,"line":1,"pos":1,"channel":0,"text":"("}
-,{"type":-1,"line":1,"pos":2,"channel":0,"text":"<EOF>"}
-],
-"tree":{"1":[0,1,{"error":"<missing ')'>"}]}}
+"""{"rules":["s","expr"],"input":"f(","tokens":[{"type":4,"line":1,"pos":0,"channel":0,"start":0,"stop":0},{"type":1,"line":1,"pos":1,"channel":0,"start":1,"stop":1},{"type":-1,"line":1,"pos":2,"channel":0,"start":2,"stop":1}],"tree":{"1":[0,1,{"error":"<missing ')'>"}]}}
+"""
 
 [errors]
 """line 1:2 missing ')' at '<EOF>'

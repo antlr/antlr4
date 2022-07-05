@@ -38,12 +38,8 @@ expr
 8
 
 [output]
-{"rules":["s","expr"],
-"input":"8",
-"tokens":[{"type":3,"line":1,"pos":0,"channel":0,"text":"8"}
-,{"type":-1,"line":1,"pos":1,"channel":0,"text":"<EOF>"}
-],
-"tree":{"1":[0]}}
+"""{"rules":["s","expr"],"input":"8","tokens":[{"type":3,"line":1,"pos":0,"channel":0,"start":0,"stop":0},{"type":-1,"line":1,"pos":1,"channel":0,"start":1,"stop":0}],"tree":{"1":[0]}}
+"""
 
 [skip]
 Cpp

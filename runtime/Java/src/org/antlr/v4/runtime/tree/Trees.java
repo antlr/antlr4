@@ -60,6 +60,7 @@ public class Trees {
 	/** Print out a whole tree in JSON form. {@link #getNodeText} is used on the
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately. Include rulenames, input, tokens.
+	 *
 	 * @since 4.10.2
 	 */
 	public static String toJSON(Tree t, Parser recog) {
@@ -74,18 +75,12 @@ public class Trees {
 		Interval allchar = Interval.of(0, inputStream.size() - 1);
 		String input = inputStream.getText(allchar);
 		input = Utils.escapeJSONString(input);
-//		List<Token> tokens;
-//		if ( tokenStream instanceof CommonTokenStream ) {
-//			tokens = ((CommonTokenStream) tokenStream).getTokens(0, tokenStream.size()-1);
-//		}
-//		else {
-//		}
 		List<String> tokenStrings = new ArrayList<>();
 		for (int i = 0; i < tokenStream.size(); i++) {
 			Token tok = tokenStream.get(i);
-			String s = String.format("{\"type\":%d,\"line\":%d,\"pos\":%d,\"channel\":%d,\"text\":\"%s\"}\n",
+			String s = String.format("{\"type\":%d,\"line\":%d,\"pos\":%d,\"channel\":%d,\"start\":%d,\"stop\":%d}",
 					tok.getType(), tok.getLine(), tok.getCharPositionInLine(), tok.getChannel(),
-					Utils.escapeJSONString(tok.getText()));
+					tok.getStartIndex(), tok.getStopIndex());
 			tokenStrings.add(s);
 		}
 		String tree = toJSONTree(t, ruleNamesList);
@@ -94,13 +89,13 @@ public class Trees {
 		buf.append("{");
 		buf.append("\"rules\":[\"");
 		buf.append(String.join("\",\"", ruleNames));
-		buf.append("\"],\n");
+		buf.append("\"],");
 		buf.append("\"input\":\"");
 		buf.append(input);
-		buf.append("\",\n");
+		buf.append("\",");
 		buf.append("\"tokens\":[");
 		buf.append(String.join(",", tokenStrings));
-		buf.append("],\n");
+		buf.append("],");
 		buf.append("\"tree\":");
 		buf.append(tree);
 		buf.append("}");
