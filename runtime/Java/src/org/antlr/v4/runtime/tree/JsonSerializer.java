@@ -63,6 +63,20 @@ import java.util.List;
  *  returns JSON for the parse tree and the tokens.  This can be deserialized by JavaScript in a web browser
  *  to display the parse result.
  *
+ *  To load and dump elements from Python 3:
+ *
+ *    import json
+ *
+ *    with open("/tmp/t.json") as f:
+ *         data = f.read()
+ *
+ *    data = json.loads(data)
+ *    print(data['rules'])
+ *    print(data['input'])
+ *    for t in data['tokens']:
+ *         print(t)
+ *    print(data['tree'])
+ *
  *  @since 4.10.2
  */
 public class JsonSerializer {
