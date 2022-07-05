@@ -10,14 +10,16 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** This object represents all the information we need about a single test and is the
  * in-memory representation of a descriptor file
  */
 public class RuntimeTestDescriptor {
 	/** A type in {"Lexer", "Parser", "CompositeLexer", "CompositeParser"} */
-	public final GrammarType testType;
+	public final TestType testType;
 
 	/** Return a string representing the name of the target currently testing
 	 *  this descriptor.
@@ -55,12 +57,14 @@ public class RuntimeTestDescriptor {
 
 	public final URI uri;
 
-	public RuntimeTestDescriptor(GrammarType testType, String name, String notes,
+	public final Map<String, ExtraRuntimeCode> extraRuntimeCode;
+
+	public RuntimeTestDescriptor(TestType testType, String name, String notes,
 								 String input, String output, String errors,
 								 String startRule,
 								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
 								 boolean showDFA, boolean showDiagnosticErrors, String[] skipTargets,
-								 URI uri) {
+								 Map<String, ExtraRuntimeCode> extraRuntimeCode, URI uri) {
 		this.testType = testType;
 		this.name = name;
 		this.notes = notes;
@@ -74,6 +78,7 @@ public class RuntimeTestDescriptor {
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
+		this.extraRuntimeCode = extraRuntimeCode != null ? extraRuntimeCode : new HashMap<>();
 		this.uri = uri;
 	}
 

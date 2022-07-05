@@ -129,7 +129,7 @@ public abstract class RuntimeTests {
 		String lexerName, parserName;
 		boolean useListenerOrVisitor;
 		String superClass;
-		if (descriptor.testType == GrammarType.Parser || descriptor.testType == GrammarType.CompositeParser) {
+		if (descriptor.testType == TestType.Parser || descriptor.testType == TestType.CompositeParser) {
 			lexerName = grammarName + "Lexer";
 			parserName = grammarName + "Parser";
 			useListenerOrVisitor = true;
@@ -141,7 +141,12 @@ public abstract class RuntimeTests {
 			}
 		}
 		else {
-			lexerName = grammarName;
+			if (grammar == null || grammar.length() == 0) {
+				lexerName = null;
+			}
+			else {
+				lexerName = grammarName;
+			}
 			parserName = null;
 			useListenerOrVisitor = false;
 			if (targetName.equals("Java")) {
@@ -151,6 +156,8 @@ public abstract class RuntimeTests {
 				superClass = null;
 			}
 		}
+
+		ExtraRuntimeCode extraRuntimeCode = descriptor.extraRuntimeCode.get(targetName);
 
 		RunOptions runOptions = new RunOptions(grammarName + ".g4",
 				grammar,
@@ -166,7 +173,9 @@ public abstract class RuntimeTests {
 				Stage.Execute,
 				false,
 				targetName,
-				superClass
+				superClass,
+				extraRuntimeCode != null ? extraRuntimeCode.declaration : null,
+				extraRuntimeCode != null ? extraRuntimeCode.call : null
 		);
 
 		State result = runner.run(runOptions);

@@ -25,13 +25,13 @@ public class GeneratedState extends State {
 
 	@Override
 	public boolean containsErrors() {
-		return errorQueue.errors.size() > 0 || super.containsErrors();
+		return errorQueue != null && errorQueue.errors.size() > 0 || super.containsErrors();
 	}
 
 	public String getErrorMessage() {
 		String result = super.getErrorMessage();
 
-		if (errorQueue.errors.size() > 0) {
+		if (errorQueue != null && errorQueue.errors.size() > 0) {
 			result = joinLines(result, errorQueue.toString(true));
 		}
 

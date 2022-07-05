@@ -73,14 +73,14 @@ public class JavaRunner extends RuntimeRunner {
 		String tempTestDir = getTempDirPath();
 
 		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		GeneratedFile firstFile = generatedFiles.get(0);
+		GeneratedFile firstGeneratedFile = generatedFiles.size() > 0 ? generatedFiles.get(0) : null;
 
-		if (!firstFile.isParser) {
+		if (firstGeneratedFile != null && !firstGeneratedFile.isParser) {
 			FileUtils.writeFile(tempTestDir, runtimeTestLexerName + ".java", testLexerContent);
 			try {
 				// superClass for combined grammar generates the same extends base class for Lexer and Parser
 				// So, for lexer it should be replaced on correct base lexer class
-				replaceInFile(Paths.get(getTempDirPath(), firstFile.name),
+				replaceInFile(Paths.get(getTempDirPath(), firstGeneratedFile.name),
 						"extends " + runtimeTestParserName + " {",
 						"extends " + runtimeTestLexerName + " {");
 			} catch (IOException e) {

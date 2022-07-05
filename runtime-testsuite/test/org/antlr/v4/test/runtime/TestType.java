@@ -6,7 +6,8 @@
 
 package org.antlr.v4.test.runtime;
 
-public enum GrammarType {
+public enum TestType {
+	Runtime,
 	Lexer,
 	Parser,
 	CompositeLexer,

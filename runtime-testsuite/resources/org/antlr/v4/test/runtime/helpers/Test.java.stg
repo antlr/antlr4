@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -22,7 +23,7 @@ public class Test {
 		lexer.addErrorListener(errorListener);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 <else>
-		CommonTokenStream tokens = null; // It's required for compilation
+		CommonTokenStream tokens = new CommonTokenStream(new ListTokenSource(new java.util.ArrayList\<>()));
 <endif>
 <if(parserName)>
 		<parserName> parser = new <parserName>(tokens);
@@ -42,13 +43,14 @@ public class Test {
 		outStream.println(Arrays.toString(profiler.getDecisionInfo()));
 <endif>
 		ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
-<else>
+<elseif(lexerName)>
 		tokens.fill();
 		for (Object t : tokens.getTokens()) outStream.println(t);
 <if(showDFA)>
 		outStream.print(lexer.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());
 <endif>
 <endif>
+		<extraCodeCall>
 	}
 
 	static class CustomStreamErrorListener extends BaseErrorListener {
@@ -86,4 +88,6 @@ public class Test {
 		}
 	}
 <endif>
+
+	<extraCodeDeclaration>
 }
