@@ -1,0 +1,86 @@
+[notes]
+Verifies that the visitor correctly dispatches calls for labeled outer alternatives.
+
+[type]
+Parser
+
+[grammar]
+grammar VisitorCalc;
+
+s
+	:	expr EOF
+	;
+
+expr
+	:	INT						# number
+	|	expr (MUL | DIV) expr	# multiply
+	|	expr (ADD | SUB) expr	# add
+	;
+
+INT : [0-9]+;
+MUL : '*';
+DIV : '/';
+ADD : '+';
+SUB : '-';
+WS : [ \t]+ -> channel(HIDDEN);
+
+[start]
+s
+
+[input]
+2 + 8 / 2
+
+[codeDeclaration]
+[Java]
+static class Calculator extends VisitorCalcBaseVisitor<Integer> {
+	@Override
+	public Integer visitS(VisitorCalcParser.SContext ctx) {
+		return visit(ctx.expr());
+	}
+
+	@Override
+	public Integer visitNumber(VisitorCalcParser.NumberContext ctx) {
+		return Integer.valueOf(ctx.INT().getText());
+	}
+
+	@Override
+	public Integer visitMultiply(VisitorCalcParser.MultiplyContext ctx) {
+		Integer left = visit(ctx.expr(0));
+		Integer right = visit(ctx.expr(1));
+		if (ctx.MUL() != null) {
+			return left * right;
+		}
+		else {
+			return left / right;
+		}
+	}
+
+	@Override
+	public Integer visitAdd(VisitorCalcParser.AddContext ctx) {
+		Integer left = visit(ctx.expr(0));
+		Integer right = visit(ctx.expr(1));
+		if (ctx.ADD() != null) {
+			return left + right;
+		}
+		else {
+			return left - right;
+		}
+	}
+
+	@Override
+	protected Integer defaultResult() {
+		throw new RuntimeException("Should not be reachable");
+	}
+
+	@Override
+	protected Integer aggregateResult(Integer aggregate, Integer nextResult) {
+		throw new RuntimeException("Should not be reachable");
+	}
+};
+
+[codeCall]
+[Java]
+outStream.print(new Calculator().visit(tree));
+
+[output]
+6

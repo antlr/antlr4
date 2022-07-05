@@ -1,0 +1,84 @@
+[type]
+Parser
+
+[grammar]
+grammar VisitorBasic;
+
+s
+:	'A' EOF
+;
+
+A : 'A';
+
+[start]
+s
+
+[input]
+A
+
+[codeDeclaration]
+[Java]
+static class VisitorBasicStringBaseVisitor extends VisitorBasicBaseVisitor<String> {
+    @Override
+    public String visitTerminal(TerminalNode node) {
+        return node.getSymbol().toString() + "\n";
+    }
+
+    @Override
+    protected String defaultResult() {
+        return "";
+    }
+
+    @Override
+    protected String aggregateResult(String aggregate, String nextResult) {
+        return aggregate + nextResult;
+    }
+}
+
+[CSharp]
+class VisitorBasicStringBaseVisitor : VisitorBasicBaseVisitor<String>
+{
+	public override string VisitTerminal(ITerminalNode node)
+	{
+		return node.Symbol + "\n";
+	}
+
+	protected override string AggregateResult(string aggregate, string nextResult)
+	{
+		return aggregate + nextResult;
+	}
+}
+
+[Dart]
+import 'VisitorBasicBaseVisitor.dart';
+
+class VisitorBasicStringBaseVisitor extends VisitorBasicBaseVisitor {
+  @override
+  visitTerminal(TerminalNode node) {
+    return node.symbol.toString() + "\n";
+  }
+
+  @override
+  defaultResult() {
+    return "";
+  }
+
+  @override
+  aggregateResult(aggregate, nextResult) {
+    return aggregate + nextResult;
+  }
+}
+
+[codeCall]
+[Java]
+outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
+
+[CSharp]
+Console.Write(new VisitorBasicStringBaseVisitor().Visit(tree));
+
+[Dart]
+TEST_platformStdoutWrite(VisitorBasicStringBaseVisitor().visit(tree));
+
+[output]
+[@0,0:0='A',<1>,1:0]
+[@1,1:0='<EOF>',<-1>,1:1]

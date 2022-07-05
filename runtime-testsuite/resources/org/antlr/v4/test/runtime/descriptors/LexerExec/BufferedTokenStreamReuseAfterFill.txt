@@ -1,0 +1,34 @@
+[notes]
+Targeted regression test for antlr/antlr4#1584 (BufferedTokenStream cannot be reused after EOF).
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar VisitorBasicLexer;
+
+A : 'A';
+
+[input]
+A
+
+[codeCall]
+[Java]
+CharStream firstInput = new ANTLRInputStream("A");
+BufferedTokenStream tokenStream = new BufferedTokenStream(new VisitorBasicLexer(firstInput));
+tokenStream.fill();
+assert 2 == tokenStream.size();
+assert VisitorBasicLexer.A == tokenStream.get(0).getType();
+assert Token.EOF == tokenStream.get(1).getType();
+
+CharStream secondInput = new ANTLRInputStream("AA");
+tokenStream.setTokenSource(new VisitorBasicLexer(secondInput));
+tokenStream.fill();
+assert 3 == tokenStream.size();
+assert VisitorBasicLexer.A == tokenStream.get(0).getType();
+assert VisitorBasicLexer.A == tokenStream.get(1).getType();
+assert Token.EOF == tokenStream.get(2).getType();
+
+[output]
+[@0,0:0='A',<1>,1:0]
+[@1,1:0='<EOF>',<-1>,1:1]
