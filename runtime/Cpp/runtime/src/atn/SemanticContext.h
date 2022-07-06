@@ -92,7 +92,7 @@ namespace atn {
     return !operator==(lhs, rhs);
   }
 
-  class ANTLR4CPP_PUBLIC SemanticContext::Empty final : public SemanticContext{
+  class ANTLR4CPP_PUBLIC SemanticContext::Empty : public SemanticContext{
   public:
     /**
      * The default {@link SemanticContext}, which is semantically equivalent to
