@@ -7,69 +7,178 @@ on:
     branches: [ dev ]
 
 jobs:
-  build:
-    runs-on: [self-hosted, windows, x64]
+  cpp-builds:
+    name: "windows-cpp (${{ matrix.compiler }})"
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
+        compiler: [ cl, clang ]
+
+    steps:
+    - name: Setup Clang
+      if: matrix.compiler == 'clang'
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 13
+        platform: x64
+        cygwin: 0
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Build
+      shell: cmd
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+
+        if "${{ matrix.compiler }}" EQU "cl" (
+          echo 'CC=cl' >> $GITHUB_ENV
+          echo 'CXX=cl' >> $GITHUB_ENV
+        ) else (
+          echo 'CC=clang' >> $GITHUB_ENV
+          echo 'CXX=clang++' >> $GITHUB_ENV
+        )
+
+        set
+        where cmake && cmake --version
+        where java && java -version
+        where ninja && ninja --version
+        where %CC% && %CC% -version
+        where %CXX% && %CXX% -version
+
+        cd runtime/Cpp
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake --build out/Debug -j %NUMBER_OF_PROCESSORS%
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake --build out/Release -j %NUMBER_OF_PROCESSORS%
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+    - name: Prepare artifacts
+      if: always()
+      run: |
+        cd ${{ github.workspace }}\..
+        tar czfp C:\antlr-windows-cpp-${{ matrix.compiler }}.tgz ${{ github.workspace }}
+
+    - name: Archive artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: antlr4-windows-cpp-${{ matrix.compiler }}
+        path: C:\antlr-windows-cpp-${{ matrix.compiler }}.tgz
+
+
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        TARGET: [
+          cpp,
+          csharp,
+          dart,
+          go,
+          java,
+          javascript,
+          python2,
+          python3,
+          php,
+        ]
+
     steps:
     - name: Check out code
       uses: actions/checkout@v2
+
     - name: Set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
+        distribution: 'zulu'
         java-version: 11
+
     - name: Set up Maven
-      uses: stCarolas/setup-maven@v4
+      uses: stCarolas/setup-maven@v4.4
       with:
         maven-version: 3.5.4
-#     fails due to permissions, use global install
-#    - name: Set up Python 2
-#      if: matrix.TARGET == 'python2'
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '2.x'
-#        architecture: 'x64'
-#     fails due to permissions, use global install
-#    - name: Set up Python 3
-#      if: matrix.TARGET == 'python3'
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '3.x'
-#        architecture: 'x64'
+
+    - name: Add msbuild to PATH
+      if: matrix.TARGET == 'cpp'
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Set up Python 2
+      if: matrix.TARGET == 'python2'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '2.x'
+        architecture: 'x64'
+
+    - name: Set up Python 3
+      if: matrix.TARGET == 'python3'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
     - name: Set up Node 14
       if: matrix.TARGET == 'javascript'
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '14'
+
     - name: Setup Dotnet
       if: matrix.TARGET == 'csharp'
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '6.0.x'
-#     fails due to os (Linux only), use global install
-#    - name: Setup Dart 2.12.1
-#      uses: dart-lang/setup-dart@v1
-#      with:
-#        sdk: 2.12.1
+
+    - name: Setup Dart 2.12.1
+      if: matrix.TARGET == 'dart'
+      uses: dart-lang/setup-dart@v1.3
+      with:
+        sdk: 2.12.1
+
     - name: Setup Go 1.13.1
       if: matrix.TARGET == 'go'
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: '^1.13.1'
-# requires manually setting up pwsh
-# fails due to incorrect script (missing printf)
-#    - name: Setup PHP 8.2
-#      if: matrix.TARGET == 'php'
-#      uses: shivammathur/setup-php@v2
-#      with:
-#        php-version: '8.2'
-#        extensions: mbstring
-#        tools: composer
+
+    - name: Setup PHP 8.2
+      if: matrix.TARGET == 'php'
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring
+        tools: composer
+
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
+
     - name: Test with Maven
-      run: .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
+      run: |
+        gci env:* | sort-object name
+        .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
       env:
         TARGET: ${{ matrix.TARGET }}
+        PYTHON_HOME: ${{ env.pythonLocation }}
+        CMAKE_GENERATOR: Ninja
+
+    - name: Prepare artifacts
+      if: always()
+      run: |
+        cd ${{ github.workspace }}\..
+        tar czfp C:\antlr-${{ matrix.TARGET }}.tgz ${{ github.workspace }}
+
+    - name: Archive artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: antlr4-${{ matrix.TARGET }}
+        path: C:\antlr-${{ matrix.TARGET }}.tgz
