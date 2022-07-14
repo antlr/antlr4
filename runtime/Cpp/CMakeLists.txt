@@ -50,10 +50,6 @@ if(CMAKE_VERSION VERSION_EQUAL "3.3.0" OR
   CMAKE_POLICY(SET CMP0054 OLD)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(UUID REQUIRED uuid)
-endif()
 if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation)
 endif()
