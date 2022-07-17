@@ -1,0 +1,7 @@
+{
+   "devDependencies": {
+    "typescript": "^4.7.4",
+    "@types/node": "^18.0.5",
+    "source-map-support": "^0.5.21"
+  }
+}

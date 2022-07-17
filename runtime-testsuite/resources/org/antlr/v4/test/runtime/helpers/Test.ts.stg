@@ -1,12 +1,12 @@
-import antlr4 from 'file://<runtimePath>/src/antlr4/index.js'
-import <lexerName> from './<lexerName>.js';
+import antlr4 from 'antlr4';
+import { <lexerName> } from './<lexerName>';
 <if(parserName)>
-import <parserName> from './<parserName>.js';
+import { <parserName> } from './<parserName>';
 <if(useListener)>
-import <grammarName>Listener from './<grammarName>Listener.js';
+import { <grammarName>Listener } from './<grammarName>Listener';
 <endif>
 <if(useVisitor)>
-import <grammarName>Visitor from './<grammarName>Visitor.js';
+import { <grammarName>Visitor } from './<grammarName>Visitor';
 <endif>
 
 class TreeShapeListener extends antlr4.tree.ParseTreeListener {
@@ -22,12 +22,12 @@ class TreeShapeListener extends antlr4.tree.ParseTreeListener {
 }
 <endif>
 
-function main(argv) {
-    var input = new antlr4.FileStream(argv[2], true);
-    var lexer = new <lexerName>(input);
-    var stream = new antlr4.CommonTokenStream(lexer);
+function main(argv: string[]): void {
+    const input = new antlr4.FileStream(argv[2], true);
+    const lexer = new <lexerName>(input);
+    const stream = new antlr4.CommonTokenStream(lexer);
 <if(parserName)>
-    var parser = new <parserName>(stream);
+    const parser = new <parserName>(stream);
 <if(debug)>
     parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
 <endif>
@@ -38,11 +38,11 @@ function main(argv) {
         return this;
     };
     parser.printer = new printer();
-    var tree = parser.<parserStartRuleName>();
+    const tree = parser.<parserStartRuleName>();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
 <else>
     stream.fill();
-    for(var i=0; i\<stream.tokens.length; i++) {
+    for(let i=0; i\<stream.tokens.length; i++) {
         console.log(stream.tokens[i].toString());
     }
 <if(showDFA)>

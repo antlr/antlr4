@@ -12,6 +12,6 @@ import org.antlr.v4.test.runtime.RuntimeTests;
 public class TypeScriptRuntimeTests extends RuntimeTests {
 	@Override
 	protected RuntimeRunner createRuntimeRunner() {
-		return new NodeRunner();
+		return new TscRunner();
 	}
 }
