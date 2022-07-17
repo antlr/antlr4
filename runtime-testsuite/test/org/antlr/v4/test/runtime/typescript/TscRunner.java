@@ -36,7 +36,7 @@ public class TscRunner extends RuntimeRunner {
 
 	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
-	private final static String antlrRuntimePath = normalizedRuntimePath + "/src/antlr4/index.js'";
+	private final static String antlrRuntimePath = normalizedRuntimePath + "/src/antlr4";
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
