@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 
-public class NodeRunner extends RuntimeRunner {
+public class TscRunner extends RuntimeRunner {
 	@Override
 	public String getLanguage() {
 		return "TypeScript";
@@ -32,14 +32,15 @@ public class NodeRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "node"; }
+	public String getRuntimeToolName() { return "ts-node"; }
 
+	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
-	private final static String newImportAntlrString =
-			"import antlr4 from 'file://" + normalizedRuntimePath + "/src/antlr4/index.js'";
+	private final static String antlrRuntimePath = normalizedRuntimePath + "/src/antlr4/index.js'";
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+		/*
 		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
 		for (GeneratedFile generatedFile : generatedFiles) {
 			try {
@@ -50,9 +51,13 @@ public class NodeRunner extends RuntimeRunner {
 				return new CompiledState(generatedState, e);
 			}
 		}
+		 */
 
 		writeFile(getTempDirPath(), "package.json",
-				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package.json"));
+				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_ts.json"));
+		String content = RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/tsconfig.json");
+
+		writeFile(getTempDirPath(), "tsconfig.json", content.replace("<antlr4>", antlrRuntimePath));
 		return new CompiledState(generatedState, null);
 	}
 
