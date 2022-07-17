@@ -1,0 +1,957 @@
+// Copyright 2016-2022 The ANTLR Project. All rights reserved.
+// Licensed under the BSD-3-Clause license. See LICENSE file in the project root for license information.
+
+javaTypeInitMap ::= [
+	"int":"0",
+	"long":"0",
+	"float":"0.0f",
+	"double":"0.0",
+	"boolean":"false",
+	"byte":"0",
+	"short":"0",
+	"char":"0",
+	default:"null" // anything other than a primitive type is an object
+]
+
+// args must be <object-model-object>, <fields-resulting-in-STs>
+
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<namedActions.header>
+
+import antlr4 from 'antlr4';
+
+<if(file.genListener)>
+import { <file.grammarName>Listener } from "./<file.grammarName>Listener";
+<endif>
+<if(file.genVisitor)>
+import { <file.grammarName>Visitor } from "./<file.grammarName>Visitor";
+<endif>
+
+<namedActions.beforeParser>
+
+<parser>
+
+<namedActions.afterParser>
+>>
+
+ListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<header>
+
+<file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+
+<namedActions.beforeListener>
+
+/**
+ * This interface defines a complete listener for a parse tree produced by
+ * `<file.parserName>`.
+ */
+export interface <file.grammarName>Listener extends ParseTreeListener {
+	<file.listenerNames:{lname |
+/**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Enter a parse tree produced by the `<lname>`
+ * labeled alternative in `<file.parserName>.<file.listenerLabelRuleNames.(lname)>`.
+<else>
+ * Enter a parse tree produced by `<file.parserName>.<lname>`.
+<endif>
+ * @param ctx the parse tree
+ */
+enter<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;
+/**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Exit a parse tree produced by the `<lname>`
+ * labeled alternative in `<file.parserName>.<file.listenerLabelRuleNames.(lname)>`.
+<else>
+ * Exit a parse tree produced by `<file.parserName>.<lname>`.
+<endif>
+ * @param ctx the parse tree
+ */
+exit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;}; separator="\n">
+}
+
+<namedActions.afterListener>
+>>
+
+VisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<header>
+
+<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+
+<namedActions.beforeVisitor>
+
+/**
+ * This interface defines a complete generic visitor for a parse tree produced
+ * by `<file.parserName>`.
+ *
+ * @param \<Result> The return type of the visit operation. Use `void` for
+ * operations with no return type.
+ */
+export interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
+	<file.visitorNames:{lname |
+/**
+<if(file.visitorLabelRuleNames.(lname))>
+ * Visit a parse tree produced by the `<lname>`
+ * labeled alternative in `<file.parserName>.<file.visitorLabelRuleNames.(lname)>`.
+<else>
+ * Visit a parse tree produced by `<file.parserName>.<lname>`.
+<endif>
+ * @param ctx the parse tree
+ * @return the visitor result
+ */
+visit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => Result;}; separator="\n">
+}
+
+<namedActions.afterVisitor>
+>>
+
+fileHeader(grammarFileName, ANTLRVersion) ::= <<
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+>>
+
+Parser(parser, funcs, atn, sempredFuncs, superClass, isLexer=false) ::= <<
+<Parser_(ctor="parser_ctor", ...)>
+>>
+
+Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
+export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass; null="Parser"> {
+	<if(parser.tokens)>
+	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
+	<endif>
+	<parser.rules:{r | public static readonly RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
+	// tslint:disable:no-trailing-whitespace
+	public static readonly ruleNames: string[] = [
+		<parser.ruleNames:{r | "<r>",}; separator=" ", wrap, anchor>
+	];
+
+	<vocabulary(parser.name, parser.literalNames, parser.symbolicNames)>
+	// tslint:enable:no-trailing-whitespace
+
+	// @Override
+	public get grammarFileName(): string { return "<parser.grammarFileName>"; }
+
+	// @Override
+	public get ruleNames(): string[] { return <parser.name>.ruleNames; }
+
+	// @Override
+	public get serializedATN(): string { return <parser.name>._serializedATN; }
+
+	protected createFailedPredicateException(predicate?: string, message?: string): FailedPredicateException {
+		return new FailedPredicateException(this, predicate, message);
+	}
+
+	<namedActions.members>
+	<parser:(ctor)()>
+	<funcs; separator="\n">
+
+<if(sempredFuncs)>
+	public sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
+		switch (ruleIndex) {
+		<parser.sempredFuncs.values:{f|
+case <f.ruleIndex>:
+	return this.<f.name>_sempred(_localctx as <f.ctxType>, predIndex);}; separator="\n">
+		}
+		return true;
+	}
+	<sempredFuncs.values; separator="\n">
+<endif>
+
+	<atn>
+}
+
+<! The argument must be called currentRule because AltLabelStructDecl looks it up by name. !>
+<funcs:{currentRule |
+<if(currentRule.ruleCtx)>
+<currentRule.ruleCtx>
+<endif>
+<if(currentRule.altLabelCtxs)>
+<currentRule.altLabelCtxs:{l | <currentRule.altLabelCtxs.(l)>}; separator="\n">
+<endif>
+}; separator="\n\n">
+>>
+
+vocabulary(className, literalNames, symbolicNames) ::= <<
+private static readonly _LITERAL_NAMES: Array\<string | undefined> = [
+	<literalNames:{t | <t>,}; null="undefined,", separator=" ", wrap, anchor>
+];
+private static readonly _SYMBOLIC_NAMES: Array\<string | undefined> = [
+	<symbolicNames:{t | <t>,}; null="undefined,", separator=" ", wrap, anchor>
+];
+public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(<className>._LITERAL_NAMES, <className>._SYMBOLIC_NAMES, []);
+
+// @Override
+// @NotNull
+public get vocabulary(): Vocabulary {
+	return <className>.VOCABULARY;
+}
+>>
+
+dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
+<if(actionFuncs)>
+// @Override
+public action(_localctx: RuleContext, ruleIndex: number, actionIndex: number): void {
+	switch (ruleIndex) {
+	<recog.actionFuncs.values:{f|
+case <f.ruleIndex>:
+	this.<f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, actionIndex);
+	break;}; separator="\n">
+	}
+}
+<actionFuncs.values; separator="\n">
+<endif>
+<if(sempredFuncs)>
+// @Override
+public sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
+	switch (ruleIndex) {
+	<recog.sempredFuncs.values:{f|
+case <f.ruleIndex>:
+	return this.<f.name>_sempred(_localctx<if(!recog.modes)> as <f.ctxType><endif>, predIndex);}; separator="\n">
+	}
+	return true;
+}
+<sempredFuncs.values; separator="\n">
+<endif>
+>>
+
+parser_ctor(p) ::= <<
+constructor(input: TokenStream) {
+	super(input);
+	this._interp = new ParserATNSimulator(<p.name>._ATN, this);
+}
+>>
+
+/* This generates a private method since the actionIndex is generated, making an
+ * overriding implementation impossible to maintain.
+ */
+RuleActionFunction(r, actions) ::= <<
+private <r.name>_action(_localctx: <r.ctxType>, actionIndex: number): void {
+	switch (actionIndex) {
+	<actions:{index|
+case <index>:
+	<actions.(index)>
+	break;}; separator="\n">
+	}
+}
+>>
+
+/* This generates a private method since the predIndex is generated, making an
+ * overriding implementation impossible to maintain.
+ */
+RuleSempredFunction(r, actions) ::= <<
+private <r.name>_sempred(_localctx: <r.ctxType>, predIndex: number): boolean {
+	switch (predIndex) {
+	<actions:{index|
+case <index>:
+	return <actions.(index)>;}; separator="\n">
+	}
+	return true;
+}
+>>
+
+RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
+// @RuleVersion(<namedActions.version; null="0">)
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.name>(<args; separator=",">): <currentRule.ctxType> {
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+<if(currentRule.hasLookaheadBlock)>
+		let _alt: number;
+<endif>
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	}
+	<if(exceptions)>
+	<exceptions; separator="\n">
+	<else>
+	catch (re) {
+		if (re instanceof RecognitionException) {
+			_localctx.exception = re;
+			this._errHandler.reportError(this, re);
+			this._errHandler.recover(this, re);
+		} else {
+			throw re;
+		}
+	}
+	<endif>
+	finally {
+		<finallyAction>
+		this.exitRule();
+	}
+	return _localctx;
+}
+>>
+
+LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction,postamble) ::=
+<<
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) {
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	this.enterLeftFactoredRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+<if(currentRule.hasLookaheadBlock)>
+		let _alt: number;
+<endif>
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	} catch (re) {
+		if (re instanceof RecognitionException) {
+			_localctx.exception = re;
+			this._errHandler.reportError(this, re);
+			this._errHandler.recover(this, re);
+		} else {
+			throw re;
+		}
+	}
+	finally {
+		<finallyAction>
+		this.exitRule();
+	}
+	return _localctx;
+}
+>>
+
+// This behaves similar to RuleFunction (enterRule is called, and no adjustments
+// are made to the parse tree), but since it's still a variant no context class
+// needs to be generated.
+LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction,postamble) ::=
+<<
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) {
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+<if(currentRule.hasLookaheadBlock)>
+		let _alt: number;
+<endif>
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	}
+	catch (re) {
+		if (re instanceof RecognitionException) {
+			_localctx.exception = re;
+			this._errHandler.reportError(this, re);
+			this._errHandler.recover(this, re);
+		} else {
+			throw re;
+		}
+	}
+	finally {
+		<finallyAction>
+		this.exitRule();
+	}
+	return _localctx;
+}
+>>
+
+LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
+	namedActions,finallyAction,postamble) ::=
+<<
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.name>(<args; separator=", ">): <currentRule.ctxType>;
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.name>(<args; separator=", "><if(args)>, <endif>_p: number): <currentRule.ctxType>;
+// @RuleVersion(<namedActions.version; null="0">)
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.name>(<args; separator=", "><if(args)>, <endif>_p?: number): <currentRule.ctxType> {
+	if (_p === undefined) {
+		_p = 0;
+	}
+
+	let _parentctx: ParserRuleContext = this._ctx;
+	let _parentState: number = this.state;
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, _parentState<currentRule.args:{a | , <a.name>}>);
+	let _prevctx: <currentRule.ctxType> = _localctx;
+	let _startState: number = <currentRule.startState>;
+	this.enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+<if(currentRule.hasLookaheadBlock)>
+		let _alt: number;
+<endif>
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	}
+	catch (re) {
+		if (re instanceof RecognitionException) {
+			_localctx.exception = re;
+			this._errHandler.reportError(this, re);
+			this._errHandler.recover(this, re);
+		} else {
+			throw re;
+		}
+	}
+	finally {
+		<finallyAction>
+		this.unrollRecursionContexts(_parentctx);
+	}
+	return _localctx;
+}
+>>
+
+CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
+<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
+this.enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
+<CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
+>>
+
+CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
+<if(!(locals || preamble || ops))>
+// tslint:disable-next-line:no-empty
+<endif>
+{
+<locals; separator="\n">
+<preamble; separator="\n">
+<ops; separator="\n">
+}
+>>
+
+LL1AltBlock(choice, preamble, alts, error) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+<if(choice.label)><labelref(choice.label)> = this._input.LT(1);<endif>
+<preamble; separator="\n">
+switch (this._input.LA(1)) {
+<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
+default:
+	<error>
+}
+>>
+
+LL1OptionalBlock(choice, alts, error) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+switch (this._input.LA(1)) {
+<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
+default:
+	break;
+}
+>>
+
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+<preamble; separator="\n">
+if (<expr>) {
+	<alts; separator="\n">
+}
+<!else if (!(<followExpr>)) <error>!>
+>>
+
+LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+<preamble; separator="\n">
+while (<loopExpr>) {
+	<alts; separator="\n">
+	this.state = <choice.loopBackStateNumber>;
+	this._errHandler.sync(this);
+	<iteration>
+}
+>>
+
+LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+this.state = <choice.blockStartStateNumber>;<! alt block decision !>
+this._errHandler.sync(this);
+<preamble; separator="\n">
+do {
+	<alts; separator="\n">
+	this.state = <choice.stateNumber>;<! loopback/exit decision !>
+	this._errHandler.sync(this);
+	<iteration>
+} while (<loopExpr>);
+>>
+
+// LL(*) stuff
+
+AltBlock(choice, preamble, alts, error) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+<if(choice.label)><labelref(choice.label)> = this._input.LT(1);<endif>
+<preamble; separator="\n">
+switch ( this.interpreter.adaptivePredict(this._input, <choice.decision>, this._ctx) ) {
+<alts:{alt |
+case <i>:
+	<alt>
+	break;}; separator="\n">
+}
+>>
+
+OptionalBlock(choice, alts, error) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+switch ( this.interpreter.adaptivePredict(this._input, <choice.decision>, this._ctx) ) {
+<alts:{alt |
+case <i><if(!choice.ast.greedy)> + 1<endif>:
+	<alt>
+	break;}; separator="\n">
+}
+>>
+
+StarBlock(choice, alts, sync, iteration) ::= <<
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+_alt = this.interpreter.adaptivePredict(this._input, <choice.decision>, this._ctx);
+while (_alt !== <choice.exitAlt> && _alt !== ATN.INVALID_ALT_NUMBER) {
+	if (_alt === 1<if(!choice.ast.greedy)> + 1<endif>) {
+		<iteration>
+		<alts><! should only be one !>
+	}
+	this.state = <choice.loopBackStateNumber>;
+	this._errHandler.sync(this);
+	_alt = this.interpreter.adaptivePredict(this._input, <choice.decision>, this._ctx);
+}
+>>
+
+PlusBlock(choice, alts, error) ::= <<
+this.state = <choice.blockStartStateNumber>;<! alt block decision !>
+this._errHandler.sync(this);
+_alt = 1<if(!choice.ast.greedy)> + 1<endif>;
+do {
+	switch (_alt) {
+	<alts:{alt|
+case <i><if(!choice.ast.greedy)> + 1<endif>:
+	<alt>
+	break;}; separator="\n">
+	default:
+		<error>
+	}
+	this.state = <choice.loopBackStateNumber>;<! loopback/exit decision !>
+	this._errHandler.sync(this);
+	_alt = this.interpreter.adaptivePredict(this._input, <choice.decision>, this._ctx);
+} while (_alt !== <choice.exitAlt> && _alt !== ATN.INVALID_ALT_NUMBER);
+>>
+
+Sync(s) ::= "this.sync(<s.expecting.name>);"
+
+ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
+
+TestSetInline(s) ::= <<
+<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+>>
+
+// Need a range test to make sure the shift amount will result in a testable bitmask
+testShiftInRange(shiftAmount) ::= <<
+((<shiftAmount>) & ~0x1F) === 0
+>>
+
+// produces smaller bytecode only when bits.ttypes contains more than two items
+bitsetBitfieldComparison(s, bits) ::= <%
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShift({<parser.name>.<ttype>}, bits.shift)>)}; separator=" | ">)) !== 0)
+%>
+
+isZero ::= [
+"0":true,
+default:false
+]
+
+offsetShift(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+%>
+
+// produces more efficient bytecode when bits.ttypes contains at most two items
+bitsetInlineComparison(s, bits) ::= <%
+<bits.ttypes:{ttype | <s.varName> === <parser.name>.<ttype>}; separator=" || ">
+%>
+
+cases(ttypes) ::= <<
+<ttypes:{t | case <parser.name>.<t>:}; separator="\n">
+>>
+
+InvokeRule(r, argExprsChunks) ::= <<
+this.state = <r.stateNumber>;
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.name>(<argExprsChunks><if(r.ast.options.p)><if(argExprsChunks)>,<endif><r.ast.options.p><endif>);
+>>
+
+MatchToken(m) ::= <<
+this.state = <m.stateNumber>;
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this.match(<parser.name>.<m.name>);
+>>
+
+MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
+
+MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
+
+CommonSetStuff(m, expr, capture, invert) ::= <<
+this.state = <m.stateNumber>;
+<if(m.labels)><m.labels:{l | <labelref(l)> = }>this._input.LT(1);<endif>
+<capture>
+if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
+	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
+} else {
+	if (this._input.LA(1) === Token.EOF) {
+		this.matchedEOF = true;
+	}
+
+	this._errHandler.reportMatch(this);
+	this.consume();
+}
+>>
+
+Wildcard(w) ::= <<
+this.state = <w.stateNumber>;
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>this.matchWildcard();
+>>
+
+// ACTION STUFF
+
+Action(a, foo, chunks) ::= "<chunks>"
+
+ArgAction(a, chunks) ::= "<chunks>"
+
+SemPred(p, chunks, failChunks) ::= <<
+this.state = <p.stateNumber>;
+if (!(<chunks>)) {
+	throw this.createFailedPredicateException(<p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
+}
+>>
+
+ExceptionClause(e, catchArg, catchAction) ::= <<
+catch (<catchArg>) {
+	<catchAction>
+}
+>>
+
+// lexer actions are not associated with model objects
+
+LexerSkipCommand()  ::= "this.skip();"
+LexerMoreCommand()  ::= "this.more();"
+LexerPopModeCommand() ::= "this.popMode();"
+
+LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>;"
+LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>);"
+
+ActionText(t) ::= "<t.text>"
+ActionTemplate(t) ::= "<t.st>"
+ArgRef(a) ::= "_localctx.<a.name>"
+LocalRef(a) ::= "_localctx.<a.name>"
+RetValueRef(a) ::= "_localctx.<a.name>"
+QRetValueRef(a) ::= "<ctx(a)>._<a.dict>.<a.name>"
+/** How to translate $tokenLabel */
+TokenRef(t) ::= "<ctx(t)>._<t.name>"
+LabelRef(t) ::= "<ctx(t)>._<t.name>"
+ListLabelRef(t) ::= "<ctx(t)>._<ListLabelName(t.name)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
+
+TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
+InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
+
+TokenPropertyRef_text(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.text : undefined)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.type : 0)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.line : 0)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.charPositionInLine : 0)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.channel : 0)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.tokenIndex : 0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>._<t.label> != null ? Number(<ctx(t)>._<t.label>.text) : 0)"
+
+RulePropertyRef_start(r) ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._start) : undefined)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._stop) : undefined)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getTextFromRange(<ctx(r)>._<r.label>._start, <ctx(r)>._<r.label>._stop) : undefined)"
+RulePropertyRef_ctx(r)	 ::= "<ctx(r)>._<r.label>"
+RulePropertyRef_parser(r)	 ::= "this"
+
+ThisRulePropertyRef_start(r) ::= "_localctx._start"
+ThisRulePropertyRef_stop(r)	 ::= "_localctx._stop"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getTextFromRange(_localctx._start, this._input.tryLT(-1))"
+ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
+ThisRulePropertyRef_parser(r)	 ::= "this"
+
+NonLocalAttrRef(s)		 ::= "(this.getInvokingContext(<s.ruleIndex>) as <s.ruleName; format=\"cap\">Context).<s.name>"
+SetNonLocalAttr(s, rhsChunks)	  ::=
+	"(this.getInvokingContext(<s.ruleIndex>) as <s.ruleName; format=\"cap\">Context).<s.name> = <rhsChunks>;"
+
+AddToLabelList(a) ::= "<ctx(a.label)>._<a.listName>.push(<labelref(a.label)>);"
+
+TokenDecl(t) ::= "_<t.name>!: <TokenLabelType()>"
+TokenTypeDecl(t) ::= "let <t.name>: number;"
+TokenListDecl(t) ::= "_<t.name>: Token[] = []"
+RuleContextDecl(r) ::= "_<r.name>!: <r.ctxName>"
+RuleContextListDecl(rdecl) ::= "_<rdecl.name>: <rdecl.ctxName>[] = []"
+
+ContextTokenGetterDecl(t)      ::=
+	"public <t.name>(): TerminalNode<if(t.optional)> | undefined<endif> { return this.<if(t.optional)>tryG<else>g<endif>etToken(<parser.name>.<t.name>, 0); }"
+ContextTokenListGetterDecl(t)  ::=
+    "public <t.name>(): TerminalNode[];"
+ContextTokenListIndexedGetterDecl(t)  ::= <<
+public <t.name>(i: number): TerminalNode;
+public <t.name>(i?: number): TerminalNode | TerminalNode[] {
+	if (i === undefined) {
+		return this.getTokens(<parser.name>.<t.name>);
+	} else {
+		return this.getToken(<parser.name>.<t.name>, i);
+	}
+}
+>>
+ContextRuleGetterDecl(r)       ::= <<
+public <r.name>(): <r.ctxName><if(r.optional)> | undefined<endif> {
+	return this.<if(r.optional)>tryG<else>g<endif>etRuleContext(0, <r.ctxName>);
+}
+>>
+ContextRuleListGetterDecl(r)   ::= <<
+public <r.name>(): <r.ctxName>[];
+>>
+ContextRuleListIndexedGetterDecl(r)   ::= <<
+public <r.name>(i: number): <r.ctxName>;
+public <r.name>(i?: number): <r.ctxName> | <r.ctxName>[] {
+	if (i === undefined) {
+		return this.getRuleContexts(<r.ctxName>);
+	} else {
+		return this.getRuleContext(i, <r.ctxName>);
+	}
+}
+>>
+
+LexerRuleContext() ::= "RuleContext"
+
+/** The rule context name is the rule followed by a suffix; e.g.,
+ *	r becomes rContext.
+ */
+RuleContextNameSuffix() ::= "Context"
+
+ImplicitTokenLabel(tokenName) ::= "<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
+ImplicitSetLabel(id)		  ::= "_tset<id>"
+ListLabelName(label)		  ::= "<label>"
+
+CaptureNextToken(d) ::= "<d.varName> = this._input.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
+
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
+	::= <<
+export class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+	<attrs:{a | public <a>;}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
+	constructor(parent: ParserRuleContext | undefined, invokingState: number<ctorAttrs:{a | , <a>}>) {
+		super(parent, invokingState);
+		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+	}
+	// @Override
+	public get ruleIndex(): number { return <parser.name>.RULE_<struct.derivedFromName>; }
+<if(struct.provideCopyFrom)><! don't need copy unless we have subclasses !>
+	public copyFrom(ctx: <struct.name>): void {
+		super.copyFrom(ctx);
+		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+	}
+<endif>
+	<dispatchMethods; separator="\n">
+	<extensionMembers; separator="\n">
+}
+>>
+
+AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+export class <struct.name> extends <currentRule.currentRule.name; format="cap">Context {
+	<attrs:{a | public <a>;}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
+	constructor(ctx: <currentRule.currentRule.name; format="cap">Context) {
+		super(ctx.parent, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
+		this.copyFrom(ctx);
+	}
+	<dispatchMethods; separator="\n">
+}
+>>
+
+ListenerDispatchMethod(method) ::= <<
+// @Override
+public <if(method.isEnter)>enter<else>exit<endif>Rule(listener: <parser.grammarName>Listener): void {
+	if (listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">) {
+		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
+	}
+}
+>>
+
+VisitorDispatchMethod(method) ::= <<
+// @Override
+public accept\<Result>(visitor: <parser.grammarName>Visitor\<Result>): Result {
+	if (visitor.visit<struct.derivedFromName; format="cap">) {
+		return visitor.visit<struct.derivedFromName; format="cap">(this);
+	} else {
+		return visitor.visitChildren(this);
+	}
+}
+>>
+
+AttributeDecl(d) ::= "<d.name>: <d.type><if(d.initValue)> = <d.initValue><endif>"
+
+/** If we don't know location of label def x, use this template */
+labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif>_<x.name>"
+
+/** For any action chunk, what is correctly-typed context struct ptr? */
+ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
+
+// only casts _localctx to the type when the cast isn't redundant (i.e. to a sub-context for a labeled alt)
+typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>(_localctx as <ctx.name>)<else>_localctx<endif>"
+
+// used for left-recursive rules
+recRuleAltPredicate(ruleName,opPrec)  ::= "this.precpred(this._ctx, <opPrec>)"
+recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
+recRuleSetStopToken()                 ::= "this._ctx._stop = this._input.tryLT(-1);"
+
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
+_localctx = new <ctxName>(_parentctx, _parentState);
+<if(label)>
+<if(isListLabel)>
+_localctx._<label>.push(_prevctx);
+<else>
+_localctx._<label> = _prevctx;
+<endif>
+<endif>
+this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>);
+>>
+
+recRuleLabeledAltStartAction(ruleName, ctxName, currentAltLabel, label, isListLabel) ::= <<
+_localctx = new <currentAltLabel; format="cap">Context(new <ctxName>(_parentctx, _parentState));
+<if(label)>
+<if(isListLabel)>
+(_localctx as <currentAltLabel; format="cap">Context)._<label>.push(_prevctx);
+<else>
+(_localctx as <currentAltLabel; format="cap">Context)._<label> = _prevctx;
+<endif>
+<endif>
+this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>);
+>>
+
+recRuleReplaceContext(ctxName) ::= <<
+_localctx = new <ctxName>Context(_localctx);
+this._ctx = _localctx;
+_prevctx = _localctx;
+>>
+
+recRuleSetPrevCtx() ::= <<
+if (this._parseListeners != null) {
+	this.triggerExitRuleEvent();
+}
+_prevctx = _localctx;
+>>
+
+
+LexerFile(file, lexer, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<namedActions.header>
+
+import antlr4 from 'antlr4';
+
+<namedActions.beforeLexer>
+
+<lexer>
+
+<namedActions.afterLexer>
+>>
+
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
+export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="Lexer"> {
+	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
+	<lexer.channels:{c | public static readonly <c> = <lexer.channels.(c)>;}; separator="\n">
+	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
+
+	// tslint:disable:no-trailing-whitespace
+	public static readonly channelNames: string[] = [
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN",<if(lexer.channels)> <lexer.channels:{c| "<c>",}; separator=" ", wrap, anchor><endif>
+	];
+
+	// tslint:disable:no-trailing-whitespace
+	public static readonly modeNames: string[] = [
+		<lexer.modes:{m| "<m>",}; separator=" ", wrap, anchor>
+	];
+
+	public static readonly ruleNames: string[] = [
+		<lexer.ruleNames:{r | "<r>",}; separator=" ", wrap, anchor>
+	];
+
+	<vocabulary(lexer.name, lexer.literalNames, lexer.symbolicNames)>
+	// tslint:enable:no-trailing-whitespace
+
+	<namedActions.members>
+
+	constructor(input: CharStream) {
+		super(input);
+		this._interp = new LexerATNSimulator(<lexer.name>._ATN, this);
+	}
+
+	// @Override
+	public get grammarFileName(): string { return "<lexer.grammarFileName>"; }
+
+	// @Override
+	public get ruleNames(): string[] { return <lexer.name>.ruleNames; }
+
+	// @Override
+	public get serializedATN(): string { return <lexer.name>._serializedATN; }
+
+	// @Override
+	public get channelNames(): string[] { return <lexer.name>.channelNames; }
+
+	// @Override
+	public get modeNames(): string[] { return <lexer.name>.modeNames; }
+
+	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
+	<atn>
+}
+>>
+
+SerializedATN(model, className={<if(isLexer)><lexer.name><else><parser.name><endif>}) ::= <<
+<if(rest(model.segments))>
+<! requires segmented representation !>
+private static readonly _serializedATNSegments: number = <length(model.segments)>;
+<model.segments:{segment|private static readonly _serializedATNSegment<i0>: string =
+	"<segment; wrap={" +<\n><\t>"}>";}; separator="\n">
+public static readonly _serializedATN: string = Utils.join(
+	[
+		<model.segments:{segment | <className>._serializedATNSegment<i0>,}; separator="\n">
+	],
+	"",
+);
+<else>
+<! only one segment, can be inlined !>
+public static readonly _serializedATN: string =
+	"<model.serialized; wrap={" +<\n><\t>"}>";
+<endif>
+public static __ATN: ATN;
+public static get _ATN(): ATN {
+	if (!<className>.__ATN) {
+		<className>.__ATN = new ATNDeserializer().deserialize(Utils.toCharArray(<className>._serializedATN));
+	}
+
+	return <className>.__ATN;
+}
+<!static {
+	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
+	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
+	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));
+}!>
+>>
+
+basePath() ::= <%
+<if(file.factory.grammar.ast.cmdLineOptions.("baseImportPath"))>
+<file.factory.grammar.ast.cmdLineOptions.("baseImportPath")>
+<else>
+antlr4ts
+<endif>
+%>
+
+/** Using a type to init value map, try to init a type; if not in table
+ *	must be an object, default value is "null".
+ */
+initValue(typeName) ::= <<
+<javaTypeInitMap.(typeName)>
+>>
+
+codeFileExtension() ::= ".ts"

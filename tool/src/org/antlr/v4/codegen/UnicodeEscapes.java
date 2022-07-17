@@ -33,6 +33,7 @@ public class UnicodeEscapes {
 				break;
 			case "Java":
 			case "JavaScript":
+			case "TypeScript":
 			case "Dart":
 			default:
 				if (Character.isSupplementaryCodePoint(codePoint)) {
