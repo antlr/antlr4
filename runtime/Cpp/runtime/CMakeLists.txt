@@ -28,6 +28,13 @@ file(GLOB libantlrcpp_SRC
 add_library(antlr4_shared SHARED ${libantlrcpp_SRC})
 add_library(antlr4_static STATIC ${libantlrcpp_SRC})
 
+# Make sure to link against threads (pthreads) library in order to be able to
+# make use of std::call_once in the code without producing runtime errors
+# (see also https://github.com/antlr/antlr4/issues/3708 and/or https://stackoverflow.com/q/51584960).
+find_package(Threads REQUIRED)
+target_link_libraries(antlr4_shared Threads::Threads)
+target_link_libraries(antlr4_static Threads::Threads)
+
 if (ANTLR_BUILD_CPP_TESTS)
   include(FetchContent)
 
