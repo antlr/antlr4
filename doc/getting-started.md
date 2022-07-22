@@ -22,6 +22,8 @@ Or just download in browser from website:
     [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
 and put it somewhere rational like `/usr/local/lib`.
 
+if you are using lower version jdk, just download from [website download](https://github.com/antlr/website-antlr4/tree/gh-pages/download) for previous version, and antlr version before 4.10.1 support jdk 1.8  
+
 2. Add `antlr-4.10.1-complete.jar` to your `CLASSPATH`:
 ```
 $ export CLASSPATH=".:/usr/local/lib/antlr-4.10.1-complete.jar:$CLASSPATH"
@@ -38,7 +40,7 @@ $ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.10.1-complete.jar:$CLASS
 
 (*Thanks to Graham Wideman*)
 
-0. Install Java (version 11 or higher)
+0. Install Java (version 1.7 or higher)
 1. Download antlr-4.10.1-complete.jar (or whatever version) from [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
 Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 2. Add `antlr-4.10.1-complete.jar` to CLASSPATH, either:
