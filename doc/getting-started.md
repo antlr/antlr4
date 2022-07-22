@@ -135,7 +135,12 @@ That pops up a dialog box showing that rule `r` matched keyword `hello` followed
 
 The book has lots and lots of examples that should be useful too. You can download them here for free:
 
-[http://pragprog.com/titles/tpantlr2/source_code](http://pragprog.com/titles/tpantlr2/source_code)
+[ANTLR reference book examples in Java](https://media.pragprog.com/titles/tpantlr2/code/tpantlr2-code.zip)<br>
+[ANTLR reference book examples in C#](https://github.com/Philippe-Laval/tpantlr2)
+
+
+[Language implementation patterns book examples in Java](https://media.pragprog.com/titles/tpdsl/code/tpdsl-code.zip)<br>
+[Language implementation patterns book examples in C#](https://github.com/Philippe-Laval/tpdsl)
 
 Also, there is a large collection of grammars for v4 at github:
 
