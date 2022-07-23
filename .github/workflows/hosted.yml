@@ -69,9 +69,13 @@ jobs:
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
         if "${{ matrix.compiler }}" EQU "cl" (
+          set CC=cl
+          set CXX=cl
           echo 'CC=cl' >> $GITHUB_ENV
           echo 'CXX=cl' >> $GITHUB_ENV
         ) else (
+          set CC=clang
+          set CXX=clang++
           echo 'CC=clang' >> $GITHUB_ENV
           echo 'CXX=clang++' >> $GITHUB_ENV
         )
@@ -158,10 +162,14 @@ jobs:
           go,
           java,
           javascript,
+          php,
           python2,
           python3,
-          php,
+          swift,
         ]
+        exclude:
+          - os: windows-latest
+            target: swift
 
     steps:
     - name: Install dependencies (Ubuntu)
@@ -235,10 +243,17 @@ jobs:
         extensions: mbstring
         tools: composer
 
+    - name: Setup Swift
+      if: matrix.target == 'swift'
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: '5.2'
+
     - name: Check out code
       uses: actions/checkout@v2
 
     - name: Checkout antlr PHP runtime
+      if: matrix.target == 'php'
       uses: actions/checkout@v2
       with:
         repository: antlr/antlr-php-runtime
@@ -247,7 +262,13 @@ jobs:
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
 
-    - name: Test with Maven (Windows)
+    - name: Test tool
+      if: matrix.target == 'java'
+      run: |
+        cd tool-testsuite
+        mvn test
+
+    - name: Test runtime (Windows)
       if: startsWith(matrix.os, 'windows')
       run: |
         gci env:* | sort-object name
@@ -263,7 +284,7 @@ jobs:
       env:
         CMAKE_GENERATOR: Ninja
 
-    - name: Test with Maven (non-Windows)
+    - name: Test runtime (non-Windows)
       if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
       run: |
         env
@@ -272,6 +293,7 @@ jobs:
         case ${{ matrix.target }} in
           python2) mvn -X '-Dantlr-python2-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python2.**' test ;;
           python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
+          swift) mvn -X -e '-Dtest=python3.**' test ;;
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
 
