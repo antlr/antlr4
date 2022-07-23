@@ -247,10 +247,10 @@ public class Interpreter {
 		}
 	}
 
-	protected static Object getValue(DecisionInfo decisionInfo,
-									 String[] ruleNamesByDecision,
-									 int decision,
-									 int col)
+	public static Object getValue(DecisionInfo decisionInfo,
+								  String[] ruleNamesByDecision,
+								  int decision,
+								  int col)
 	{
 		switch (col) { // laborious but more efficient than reflection
 			case 0:
