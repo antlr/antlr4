@@ -116,14 +116,39 @@ If your grammar is targeted to Python only, you may ignore the following. But if
 ID {$text.equals("test")}?
 ```
 
-Unfortunately, this is not portable, but you can work around it. The trick involves:
+Unfortunately, this is not portable, as Java and Python (and other target languages) have different syntaxes for all but the simplest language elements.  But you can work around it. The trick involves:
 
 * deriving your parser from a parser you provide, such as BaseParser
-* implementing utility methods in this BaseParser, such as "isEqualText"
-* adding a "self" field to the Java/C# BaseParser, and initialize it with "this"
+* implementing utility methods, such as "isEqualText", in this BaseParser, in different files for each target language
+* invoking your utility methods in the semantic predicate from the `$parser` object
 
 Thanks to the above, you should be able to rewrite the above semantic predicate as follows:
 
+File `MyGrammarParser.g4`:
 ```
-ID {$self.isEqualText($text,"test")}?
+options { superClass = MyGrammarBaseParser; }
+...
+ID {$parser.isEqualText($text,"test")}?
+```
+
+File `MyGrammarBaseParser.py`:
+```python
+from antlr4 import *
+
+class MyGrammarBaseParser(Parser):
+
+   def isEqualText(a, b):
+      return a is b
+```
+
+File `MyGrammarBaseParser.java`:
+```java
+import org.antlr.v4.runtime.*;
+
+public abstract class MyGrammarBaseParser extends Parser {
+
+   public static boolean isEqualText(a, b) {
+      return a.equals(b);
+   }
+}
 ```
