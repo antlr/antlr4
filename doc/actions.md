@@ -98,6 +98,7 @@ returnStat : 'return' expr {System.out.println("first token "+$start.getText());
 |start|Token|The first token to be potentially matched by the rule that is on the main token channel; in other words, this attribute is never a hidden token. For rules that end up matching no tokens, this attribute points at the first token that could have been matched by this rule. When referring to the current rule, this attribute is available to any action within the rule.|
 |stop|Token|The last nonhidden channel token to be matched by the rule. When referring to the current rule, this attribute is available only to the after and finally actions.|
 |ctx|ParserRuleContext|The rule context object associated with a rule invocation. All of the other attributes are available through this attribute. For example, `$ctx.start` accesses the start field within the current rules context object. It’s the same as `$start`.|
+|parser|Parser|The parser itself.  This attribute can be used, for example, to invoke a method defined in the parser's `@members` section from a semantic predicate.|
 
 ## Dynamically-Scoped Attributes
 
