@@ -223,6 +223,10 @@ func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []strin
 	return i.toIndexString()
 }
 
+func (i *IntervalSet) GetIntervals() []*Interval {
+	return i.intervals
+}
+
 func (i *IntervalSet) toCharString() string {
 	names := make([]string, len(i.intervals))
 
