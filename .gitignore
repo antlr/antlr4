@@ -24,6 +24,8 @@ user.build.properties
 __pycache__/
 *.py[cod]
 *$py.class
+# Build results
+*.egg-info/
 
 ## CSharp and VisualStudio, selected lines from https://raw.githubusercontent.com/github/gitignore/master/VisualStudio.gitignore
 # User-specific files

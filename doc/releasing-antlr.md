@@ -342,7 +342,13 @@ Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.
 
 ### Python
 
-The Python targets get deployed with `setup.py`. First, set up `~/.pypirc` with tight privileges:
+The Python targets get deployed with `setup.py` (Python 2), or `build` and `twine` (Python 3).
+Install them by
+```sh
+pip3 install build twine
+```
+
+First, set up `~/.pypirc` with tight privileges:
 
 ```bash
 beast:~ $ ls -l ~/.pypirc
@@ -372,12 +378,13 @@ cd ~/antlr/code/antlr4/runtime/Python2
 python setup.py sdist upload
 ```
 
-and do again for Python 3 target
+For Python 3 target, do
 
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python3
+python3 -m build
 # assume you have ~/.pypirc set up
-python3 setup.py sdist upload
+twine upload dist/antlr4-python3-runtime-<version>.tar.gz dist/antlr4_python3_runtime-<version>-py3-none-any.whl
 ```
 
 There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.
