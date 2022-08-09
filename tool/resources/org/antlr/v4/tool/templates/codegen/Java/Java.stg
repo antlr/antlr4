@@ -113,6 +113,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
+@SuppressWarnings("CheckReturnValue")
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /**
@@ -202,6 +203,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+@SuppressWarnings("CheckReturnValue")
 public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 /**
@@ -223,7 +225,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class <parser.name> extends <superClass; null="Parser"> {
 	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
@@ -784,6 +786,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
 	::= <<
+@SuppressWarnings("CheckReturnValue")
 public static class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -806,6 +809,7 @@ public static class <struct.escapedName> extends <if(contextSuperClass)><context
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+@SuppressWarnings("CheckReturnValue")
 public static class <struct.escapedName> extends <currentRule.name; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -898,7 +902,7 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class <lexer.name> extends <superClass; null="Lexer"> {
 	static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
