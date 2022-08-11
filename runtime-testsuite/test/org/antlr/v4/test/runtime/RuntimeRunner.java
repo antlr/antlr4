@@ -153,18 +153,24 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	}
 
 	public State run(RunOptions runOptions) {
-		List<String> options = new ArrayList<>();
-		if (runOptions.useVisitor) {
-			options.add("-visitor");
+		ErrorQueue grammarErrorQueue;
+		if (runOptions.grammarStr != null && runOptions.grammarStr.length() > 0) {
+			List<String> options = new ArrayList<>();
+			if (runOptions.useVisitor) {
+				options.add("-visitor");
+			}
+			if (runOptions.superClass != null && runOptions.superClass.length() > 0) {
+				options.add("-DsuperClass=" + runOptions.superClass);
+			}
+			grammarErrorQueue = Generator.antlrOnString(getTempDirPath(), getLanguage(),
+					runOptions.grammarFileName, runOptions.grammarStr, false, options.toArray(new String[0]));
 		}
-		if (runOptions.superClass != null && runOptions.superClass.length() > 0) {
-			options.add("-DsuperClass=" + runOptions.superClass);
+		else {
+			grammarErrorQueue = null;
 		}
-		ErrorQueue errorQueue = Generator.antlrOnString(getTempDirPath(), getLanguage(),
-				runOptions.grammarFileName, runOptions.grammarStr, false, options.toArray(new String[0]));
 
 		List<GeneratedFile> generatedFiles = getGeneratedFiles(runOptions);
-		GeneratedState generatedState = new GeneratedState(errorQueue, generatedFiles, null);
+		GeneratedState generatedState = new GeneratedState(grammarErrorQueue, generatedFiles, null);
 
 		if (generatedState.containsErrors() || runOptions.endStage == Stage.Generate) {
 			return generatedState;
@@ -190,6 +196,9 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	protected List<GeneratedFile> getGeneratedFiles(RunOptions runOptions) {
 		List<GeneratedFile> files = new ArrayList<>();
+		if (runOptions.grammarStr == null || runOptions.grammarStr.length() == 0) {
+			return files;
+		}
 		String extensionWithDot = "." + getExtension();
 		String fileGrammarName = grammarNameToFileName(runOptions.grammarName);
 		boolean isCombinedGrammarOrGo = runOptions.lexerName != null && runOptions.parserName != null || getLanguage().equals("Go");
@@ -228,6 +237,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		outputFileST.add("showDFA", runOptions.showDFA);
 		outputFileST.add("useListener", runOptions.useListener);
 		outputFileST.add("useVisitor", runOptions.useVisitor);
+		outputFileST.add("extraCodeDeclaration", runOptions.extraCodeDeclaration);
+		outputFileST.add("extraCodeCall", runOptions.extraCodeCall);
 		addExtraRecognizerParameters(outputFileST);
 		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
 	}

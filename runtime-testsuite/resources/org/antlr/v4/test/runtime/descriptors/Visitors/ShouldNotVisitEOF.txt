@@ -1,0 +1,45 @@
+[notes]
+Verifies that visitChildren does not call visit after shouldVisitNextChild returns false
+
+[type]
+Parser
+
+[grammar]
+grammar VisitorBasic;
+
+s
+:	'A' EOF
+;
+
+A : 'A';
+
+[start]
+s
+
+[input]
+A
+
+[codeDeclaration]
+[Java]
+static class VisitorBasicStringBaseVisitor extends VisitorBasicBaseVisitor<String> {
+	@Override
+	public String visitTerminal(TerminalNode node) {
+		return node.getSymbol().toString() + "\n";
+	}
+
+	@Override
+	protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
+		return currentResult == null || currentResult.isEmpty();
+	}
+}
+
+[codeCall]
+[Java]
+outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
+
+[output]
+"""[@0,0:0='A',<1>,1:0]
+"""
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

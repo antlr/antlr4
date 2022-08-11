@@ -13,7 +13,11 @@ import java.util.*;
 
 public class RuntimeTestDescriptorParser {
 	private final static Set<String> sections = new HashSet<>(Arrays.asList(
-			"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip"
+			"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip", "codeDeclaration", "codeCall"
+	));
+
+	private final static Set<String> runtimes = new HashSet<>(Arrays.asList(
+			"CSharp", "Java", "Cpp", "Dart", "Go", "JavaScript", "Php", "Python2", "Python3", "Swift"
 	));
 
 	/**  Read stuff like:
@@ -73,9 +77,9 @@ public class RuntimeTestDescriptorParser {
 		for (String line : lines) {
 			boolean newSection = false;
 			String sectionName = null;
-			if (line.startsWith("[") && line.length() > 2) {
+			if (line.startsWith("[") && line.length() > 2 && line.endsWith("]")) {
 				sectionName = line.substring(1, line.length() - 1);
-				newSection = sections.contains(sectionName);
+				newSection = sections.contains(sectionName) || runtimes.contains(sectionName);
 			}
 
 			if (newSection) {
@@ -93,7 +97,7 @@ public class RuntimeTestDescriptorParser {
 		pairs.add(new Pair<>(currentField, currentValue.toString()));
 
 		String notes = "";
-		GrammarType testType = GrammarType.Lexer;
+		TestType testType = TestType.Lexer;
 		String grammar = "";
 		String grammarName = "";
 		List<Pair<String, String>> slaveGrammars = new ArrayList<>();
@@ -104,6 +108,10 @@ public class RuntimeTestDescriptorParser {
 		boolean showDFA = false;
 		boolean showDiagnosticErrors = false;
 		String[] skipTargets = new String[0];
+		boolean isCodeDeclaration = false;
+		Map<String, String> codeDeclarations = new HashMap<>();
+		Map<String, String> codeCalls = new HashMap<>();
+
 		for (Pair<String,String> p : pairs) {
 			String section = p.a;
 			String value = "";
@@ -119,51 +127,83 @@ public class RuntimeTestDescriptorParser {
 			switch (section) {
 				case "notes":
 					notes = value;
-					break;
+					continue;
 				case "type":
-					testType = Enum.valueOf(GrammarType.class, value);
-					break;
+					testType = Enum.valueOf(TestType.class, value);
+					continue;
 				case "grammar":
 					grammarName = getGrammarName(value.split("\n")[0]);
 					grammar = value;
-					break;
+					continue;
 				case "slaveGrammar":
 					String gname = getGrammarName(value.split("\n")[0]);
 					slaveGrammars.add(new Pair<>(gname, value));
 				case "start":
 					startRule = value;
-					break;
+					continue;
 				case "input":
 					input = value;
-					break;
+					continue;
 				case "output":
 					output = value;
-					break;
+					continue;
 				case "errors":
 					errors = value;
-					break;
+					continue;
 				case "flags":
 					String[] flags = value.split("\n");
 					for (String f : flags) {
 						switch (f) {
 							case "showDFA":
 								showDFA = true;
-								break;
+								continue;
 							case "showDiagnosticErrors":
 								showDiagnosticErrors = true;
+								continue;
+							default:
 								break;
 						}
 					}
-					break;
+					continue;
 				case "skip":
-					skipTargets = value.split("\n");
-					break;
-				default:
-					throw new RuntimeException("Unknown descriptor section ignored: "+section);
+					skipTargets = value.split("\\s");
+					continue;
+				case "codeDeclaration":
+					isCodeDeclaration = true;
+					continue;
+				case "codeCall":
+					isCodeDeclaration = false;
+					continue;
+			}
+			if (runtimes.contains(section)) {
+				if (isCodeDeclaration) {
+					codeDeclarations.put(section, value);
+				} else {
+					codeCalls.put(section, value);
+				}
+			} else {
+				throw new RuntimeException("Unknown descriptor section ignored: " + section);
 			}
 		}
+
+		Map<String, ExtraRuntimeCode> extraRuntimeCode = new HashMap<>();
+		for (String runtime : runtimes) {
+			String codeDeclaration = codeDeclarations.get(runtime);
+			String codeCall = codeCalls.get(runtime);
+
+			if (codeDeclaration != null) {
+				if (codeCall == null) {
+					throw new RuntimeException("codeCall section must be defined is codeDeclaration is defined for runtime: " + runtime);
+				}
+			}
+
+			if (codeCall != null) {
+				extraRuntimeCode.put(runtime, new ExtraRuntimeCode(codeDeclaration, codeCall));
+			}
+		}
+
 		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets, uri);
+				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets, extraRuntimeCode, uri);
 	}
 
 	/** Get A, B, or C from:

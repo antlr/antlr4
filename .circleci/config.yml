@@ -7,8 +7,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build ANTLR4
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+          name: Build ANTLR4 tool tests
+          command: mvn -DskipTests -pl tool-testsuite -am install
       - run:
           name: test tool
           command: |
@@ -42,8 +42,8 @@ jobs:
             set -euo pipefail
             f=".circleci/scripts/install-linux-<<parameters.target>>.sh"; ! [ -x "$f" ] || "$f"
       - run:
-          name: Build ANTLR4
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+          name: Build ANTLR runtime tests
+          command: mvn -DskipTests -pl runtime-testsuite -am install
       - run:
           name: Test <<parameters.target>> runtime
           command: |

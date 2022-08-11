@@ -1132,8 +1132,8 @@ public class TestPerformance {
             ClassLoader loader = javaCompiledState.loader;
 			final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
-            final Constructor<? extends Lexer> lexerCtor = javaCompiledState.lexer.getConstructor(CharStream.class);
-            final Constructor<? extends Parser> parserCtor = javaCompiledState.parser.getConstructor(TokenStream.class);
+            final Constructor<? extends Lexer> lexerCtor = javaCompiledState.lexerClass.getConstructor(CharStream.class);
+            final Constructor<? extends Parser> parserCtor = javaCompiledState.parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
 			javaCompiledState.initializeLexerAndParser("");
@@ -1250,7 +1250,7 @@ public class TestPerformance {
 							parser.setErrorHandler(new BailErrorStrategy());
 						}
 
-                        Method parseMethod = javaCompiledState.parser.getMethod(entryPoint);
+                        Method parseMethod = javaCompiledState.parserClass.getMethod(entryPoint);
                         Object parseResult;
 
 						try {

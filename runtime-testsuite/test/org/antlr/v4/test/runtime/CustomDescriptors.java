@@ -30,7 +30,7 @@ public class CustomDescriptors {
 
 	private static RuntimeTestDescriptor getLineSeparatorLfDescriptor() {
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
+				TestType.Lexer,
 				"LineSeparatorLf",
 				"",
 				"1\n2\n3",
@@ -46,12 +46,12 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\n'+;\n" +
 						"SEPARATOR: '\\n';",
-				null, false, false, null, uri);
+				null, false, false, null, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLineSeparatorCrLfDescriptor() {
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
+				TestType.Lexer,
 				"LineSeparatorCrLf",
 				"",
 				"1\r\n2\r\n3",
@@ -67,7 +67,7 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\r'+;\n" +
 						"SEPARATOR: '\\r\\n';",
-				null, false, false, null, uri);
+				null, false, false, null, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLargeLexerDescriptor() {
@@ -82,7 +82,7 @@ public class CustomDescriptors {
 		}
 
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
+				TestType.Lexer,
 				"LargeLexer",
 				"This is a regression test for antlr/antlr4#76 \"Serialized ATN strings\n" +
 						"should be split when longer than 2^16 bytes (class file limitation)\"\n" +
@@ -94,7 +94,7 @@ public class CustomDescriptors {
 				"",
 				grammarName,
 				grammar.toString(),
-				null, false, false, null, uri);
+				null, false, false, null, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getAtnStatesSizeMoreThan65535Descriptor() {
@@ -134,7 +134,7 @@ public class CustomDescriptors {
 				.append("='<EOF>',<-1>,").append(tokensCount + 1).append(":0]\n");
 
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
+				TestType.Lexer,
 				"AtnStatesSizeMoreThan65535",
 				"Regression for https://github.com/antlr/antlr4/issues/1863",
 				input.toString(),
@@ -144,6 +144,6 @@ public class CustomDescriptors {
 				grammarName,
 				grammar.toString(),
 				null, false, false,
-				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"}, uri);
+				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"}, null, uri);
 	}
 }

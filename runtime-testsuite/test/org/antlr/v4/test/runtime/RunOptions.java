@@ -22,12 +22,15 @@ public class RunOptions {
 	public final Stage endStage;
 	public final boolean returnObject;
 	public final String superClass;
+	public final String extraCodeDeclaration;
+	public final String extraCodeCall;
 
 	public RunOptions(String grammarFileName, String grammarStr, String parserName, String lexerName,
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,
 					  boolean showDFA, Stage endStage, boolean returnObject,
-					  String language, String superClass) {
+					  String language, String superClass,
+					  String extraCodeDeclaration, String extraCodeCall) {
 		this.grammarFileName = grammarFileName;
 		this.grammarStr = grammarStr;
 		this.parserName = parserName;
@@ -65,5 +68,7 @@ public class RunOptions {
 		this.endStage = endStage;
 		this.returnObject = returnObject;
 		this.superClass = superClass;
+		this.extraCodeDeclaration = extraCodeDeclaration;
+		this.extraCodeCall= extraCodeCall;
 	}
 }

@@ -1,0 +1,50 @@
+[notes]
+Verifies that `shouldVisitNextChild` is called before visiting the first child.
+It also verifies that `defaultResult` provides the default return value for visiting a tree.
+
+[type]
+Parser
+
+[grammar]
+grammar VisitorBasic;
+
+s
+:	'A' EOF
+;
+
+A : 'A';
+
+[start]
+s
+
+[input]
+A
+
+[codeDeclaration]
+[Java]
+static class VisitorBasicStringBaseVisitor extends VisitorBasicBaseVisitor<String> {
+	@Override
+	public String visitTerminal(TerminalNode node) {
+		throw new RuntimeException("Should not be reachable");
+	}
+
+	@Override
+	protected String defaultResult() {
+		return "default result";
+	}
+
+	@Override
+	protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
+		return false;
+	}
+};
+
+[codeCall]
+[Java]
+outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
+
+[output]
+default result
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

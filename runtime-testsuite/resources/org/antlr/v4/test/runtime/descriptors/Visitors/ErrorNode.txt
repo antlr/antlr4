@@ -1,0 +1,49 @@
+[type]
+Parser
+
+[grammar]
+grammar VisitorBasic;
+
+s
+:	'A' EOF
+;
+
+A : 'A';
+
+[start]
+s
+
+[input]
+
+[codeDeclaration]
+[Java]
+static class VisitorBasicStringBaseVisitor extends VisitorBasicBaseVisitor<String> {
+	@Override
+	public String visitErrorNode(ErrorNode node) {
+		return "Error encountered: " + node.getSymbol();
+	}
+
+	@Override
+	protected String defaultResult() {
+		return "";
+	}
+
+	@Override
+	protected String aggregateResult(String aggregate, String nextResult) {
+		return aggregate + nextResult;
+	}
+};
+
+[codeCall]
+[Java]
+outStream.print(new VisitorBasicStringBaseVisitor().visit(tree));
+
+[errors]
+"""line 1:0 missing 'A' at '<EOF>'
+"""
+
+[output]
+Error encountered: [@-1,-1:-1='<missing 'A'>',<1>,1:0]
+
+[skip]
+CSharp Cpp Dart Go JavaScript PHP Python2 Python3 Swift

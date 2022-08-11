@@ -67,8 +67,8 @@ jobs:
 #        php-version: '8.2'
 #        extensions: mbstring
 #        tools: composer
-    - name: Build tool with Maven
-      run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
+    - name: Build ANTLR runtime tests
+      run: mvn -DskipTests -pl runtime-testsuite -am install
     - name: Test with Maven
       run: .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
       env:

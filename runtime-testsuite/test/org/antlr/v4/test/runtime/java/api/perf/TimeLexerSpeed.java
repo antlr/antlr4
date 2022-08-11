@@ -6,22 +6,19 @@
 
 package org.antlr.v4.test.runtime.java.api.perf;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.test.runtime.java.api.JavaLexer;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
+import org.antlr.v4.test.runtime.Stage;
+import org.antlr.v4.test.runtime.java.JavaRunner;
+import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.openjdk.jol.info.GraphLayout;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -173,6 +170,26 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	public boolean output = true;
 
 	public List<String> streamFootprints = new ArrayList<>();
+
+	private final static Class<? extends Lexer> graphemesLexerClass;
+	private final static Class<? extends Lexer> javaLexerClass;
+
+	static {
+		graphemesLexerClass = compileAndGetLexerClass("graphemes.g4");
+		javaLexerClass = compileAndGetLexerClass("Java.g4");
+	}
+
+	private static Class<? extends Lexer> compileAndGetLexerClass(String grammarName) {
+		String grammarStr = RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/grammars/" + grammarName);
+		RunOptions options = new RunOptions(grammarName, grammarStr, null, "graphemesLexer",
+				false, false, null,
+				null, false, false, false, Stage.Compile, true, "Java",
+				JavaRunner.runtimeTestParserName, null, null);
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaCompiledState compiledState = (JavaCompiledState) runner.run(options);
+			return compiledState.lexerClass;
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
@@ -367,8 +384,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		     InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 		     BufferedReader br = new BufferedReader(isr)) {
 			CharStream input = new ANTLRInputStream(br);
-			JavaLexer lexer = new JavaLexer(input);
-			double avg = tokenize(lexer, n, clearLexerDFACache);
+			double avg = tokenize(input, javaLexerClass, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 			if ( output ) System.out.printf("%27s average time %5dus over %4d runs of %5d symbols%s\n",
 							currentMethodName,
@@ -384,8 +400,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		try (InputStream is = loader.getResourceAsStream(Parser_java_file)) {
 			long size = getResourceSize(loader, Parser_java_file);
 			CharStream input = CharStreams.fromStream(is, StandardCharsets.UTF_8, size);
-			JavaLexer lexer = new JavaLexer(input);
-			double avg = tokenize(lexer, n, clearLexerDFACache);
+			double avg = tokenize(input, javaLexerClass, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 			if ( output ) System.out.printf("%27s average time %5dus over %4d runs of %5d symbols%s\n",
 							currentMethodName,
@@ -401,8 +416,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		     InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 		     BufferedReader br = new BufferedReader(isr)) {
 			CharStream input = new ANTLRInputStream(br);
-			graphemesLexer lexer = new graphemesLexer(input);
-			double avg = tokenize(lexer, n, clearLexerDFACache);
+			double avg = tokenize(input, graphemesLexerClass, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 			if ( output ) System.out.printf("%27s average time %5dus over %4d runs of %5d symbols from %s%s\n",
 							currentMethodName,
@@ -420,8 +434,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		try (InputStream is = loader.getResourceAsStream(resourceName)) {
 			long size = getResourceSize(loader, resourceName);
 			CharStream input = CharStreams.fromStream(is, StandardCharsets.UTF_8, size);
-			graphemesLexer lexer = new graphemesLexer(input);
-			double avg = tokenize(lexer, n, clearLexerDFACache);
+			double avg = tokenize(input, graphemesLexerClass, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 			if ( output ) System.out.printf("%27s average time %5dus over %4d runs of %5d symbols from %s%s\n",
 							currentMethodName,
@@ -433,7 +446,11 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		}
 	}
 
-	public double tokenize(Lexer lexer, int n, boolean clearLexerDFACache) {
+	public double tokenize(CharStream input, Class<? extends Lexer> lexerClass, int n, boolean clearLexerDFACache)
+			throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		Constructor<? extends Lexer> lexerConstructor = lexerClass.getConstructor(CharStream.class);
+		Lexer lexer = lexerConstructor.newInstance(input);
+
 		// always wipe the DFA before we begin tests so previous tests
 		// don't affect this run!
 		lexer.getInterpreter().clearDFA();
