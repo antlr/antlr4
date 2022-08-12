@@ -272,6 +272,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
+	/** Used to generate machine-readable output for comparison across targets */
+	public static final ATNSimulatorTracer tracer = new ATNSimulatorTracer(); // null;
+
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
 	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(getSafeEnv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
 
@@ -2089,6 +2092,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			from.edges[t+1] = to; // connect
+			if ( tracer!=null ) tracer.addDFAEdge(dfa, from, t, to);
 		}
 
 		if ( debug ) {
@@ -2120,7 +2124,10 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
-			if ( existing!=null ) return existing;
+			if ( existing!=null ) {
+				if ( tracer!=null ) tracer.addDFAState_existing(dfa, existing);
+				return existing;
+			}
 
 			D.stateNumber = dfa.states.size();
 			if (!D.configs.isReadonly()) {
@@ -2129,6 +2136,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
+			if ( tracer!=null ) tracer.addDFAState(dfa, D);
 			return D;
 		}
 	}
@@ -2193,7 +2201,8 @@ public class ParserATNSimulator extends ATNSimulator {
 					return System.getenv(envName);
 				}
 			});
-		} catch (SecurityException e) { }
+		}
+		catch (SecurityException e) { }
 		return null;
 	}
 }
