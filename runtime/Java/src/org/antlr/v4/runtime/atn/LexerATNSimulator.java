@@ -656,6 +656,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				p.edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
 			}
 			p.edges[t - MIN_DFA_EDGE] = q; // connect
+			trace_addDFAEdge(p, t, q);
 		}
 	}
 
@@ -689,7 +690,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFA dfa = decisionToDFA[mode];
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(proposed);
-			if ( existing!=null ) return existing;
+			if ( existing!=null ) {
+				trace_addDFAState_existing(existing);
+				return existing;
+			}
 
 			DFAState newState = proposed;
 
@@ -697,6 +701,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			configs.setReadonly(true);
 			newState.configs = configs;
 			dfa.states.put(newState, newState);
+			trace_addDFAState(newState);
 			return newState;
 		}
 	}
@@ -747,5 +752,35 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( t==-1 ) return "EOF";
 		//if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
 		return "'"+(char)t+"'";
+	}
+
+	/** Invoked after we have added state D to dfa (confirming that it does not already exist in dfa).
+	 *
+	 *  Java target: This call is synchronized on `dfa.states` state in {@link LexerATNSimulator#addDFAState}.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAState(DFAState D) {
+	}
+
+	/** Invoked in {@link LexerATNSimulator#addDFAState}
+	 *  after we discover that dfa already has a state that is equivalent to D. No DFA state was added to dfa.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAState_existing(DFAState D) {
+	}
+
+	/** Invoked after we have added from -> to edge in dfa.
+	 *
+	 *  Java target: This call is synchronized on `from` state in {@link LexerATNSimulator#addDFAEdge}.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAEdge(DFAState from, int t, DFAState to) {
+	}
+
+	public String trace_toString(DFAState D) {
+		return D.toString();
 	}
 }

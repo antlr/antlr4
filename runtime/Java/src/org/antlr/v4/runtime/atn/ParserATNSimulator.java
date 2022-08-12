@@ -272,11 +272,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	/** Used to generate machine-readable output for comparison across targets.
-	 *  To avoid runtime cost when not debugging, this is static final; must manually alter statically.
-	 */
-	public static final ATNSimulatorTracer tracer = new ATNSimulatorTracer(); // null;
-
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
 	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(getSafeEnv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
 
@@ -2094,7 +2089,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			from.edges[t+1] = to; // connect
-			if ( tracer!=null ) tracer.addDFAEdge(dfa, from, t, to);
+			trace_addDFAEdge(dfa, from, t, to);
 		}
 
 		if ( debug ) {
@@ -2127,7 +2122,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
 			if ( existing!=null ) {
-				if ( tracer!=null ) tracer.addDFAState_existing(dfa, existing);
+				trace_addDFAState_existing(dfa, existing);
 				return existing;
 			}
 
@@ -2138,7 +2133,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
-			if ( tracer!=null ) tracer.addDFAState(dfa, D);
+			trace_addDFAState(dfa, D);
 			return D;
 		}
 	}
@@ -2206,5 +2201,35 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		catch (SecurityException e) { }
 		return null;
+	}
+
+	/** Invoked after we have added state D to dfa (confirming that it does not already exist in dfa).
+	 *
+	 *  Java target: This call is synchronized on `dfa.states` in {@link ParserATNSimulator#addDFAState}.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAState(DFA dfa, DFAState D) {
+	}
+
+	/** Invoked in {@link ParserATNSimulator#addDFAState}
+	 *  after we discover that dfa already has a state that is equivalent to D. No DFA state was added to dfa.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAState_existing(DFA dfa, DFAState D) {
+	}
+
+	/** Invoked after we have added from -> to edge in dfa.
+	 *
+	 *  Java target: This call is synchronized on `from` in {@link ParserATNSimulator#addDFAEdge}.
+	 *
+	 * @since 4.10.2
+	 */
+	public void trace_addDFAEdge(DFA dfa, DFAState from, int t, DFAState to) {
+	}
+
+	public String trace_toString(DFAState D) {
+		return D.toString();
 	}
 }
