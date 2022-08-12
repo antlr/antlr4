@@ -272,7 +272,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	/** Used to generate machine-readable output for comparison across targets */
+	/** Used to generate machine-readable output for comparison across targets.
+	 *  To avoid runtime cost when not debugging, this is static final; must manually alter statically.
+	 */
 	public static final ATNSimulatorTracer tracer = new ATNSimulatorTracer(); // null;
 
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
