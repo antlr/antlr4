@@ -10,5 +10,5 @@ setup(
     package_dir={'': 'src'},
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
-    description=f'ANTLR {v} runtime for Python 2.7.12'
+    description='ANTLR %s runtime for Python 2.7.12' % v
 )
