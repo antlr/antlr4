@@ -29,7 +29,7 @@ type PredictionContext interface {
 	hash() int
 	GetParent(int) PredictionContext
 	getReturnState(int) int
-	equals(PredictionContext) bool
+	gequals(Collectable[PredictionContext]) bool
 	length() int
 	isEmpty() bool
 	hasEmptyPath() bool
@@ -86,7 +86,6 @@ func NewPredictionContextCache() *PredictionContextCache {
 // Add a context to the cache and return it. If the context already exists,
 // return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
-//
 func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	if ctx == BasePredictionContextEMPTY {
 		return BasePredictionContextEMPTY
@@ -159,8 +158,11 @@ func (b *BaseSingletonPredictionContext) getReturnState(index int) int {
 func (b *BaseSingletonPredictionContext) hasEmptyPath() bool {
 	return b.returnState == BasePredictionContextEmptyReturnState
 }
+func (b *BaseSingletonPredictionContext) equals(other interface{}) bool {
+	return b.gequals(other.(Collectable[PredictionContext]))
+}
 
-func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
+func (b *BaseSingletonPredictionContext) gequals(other Collectable[PredictionContext]) bool {
 	if b == other {
 		return true
 	} else if _, ok := other.(*BaseSingletonPredictionContext); !ok {
@@ -171,13 +173,13 @@ func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
 
 	otherP := other.(*BaseSingletonPredictionContext)
 
-	if b.returnState != other.getReturnState(0) {
+	if b.returnState != otherP.getReturnState(0) {
 		return false
 	} else if b.parentCtx == nil {
 		return otherP.parentCtx == nil
 	}
 
-	return b.parentCtx.equals(otherP.parentCtx)
+	return b.parentCtx.gequals(otherP.parentCtx)
 }
 
 func (b *BaseSingletonPredictionContext) hash() int {
@@ -230,8 +232,11 @@ func (e *EmptyPredictionContext) GetParent(index int) PredictionContext {
 func (e *EmptyPredictionContext) getReturnState(index int) int {
 	return e.returnState
 }
+func (e *EmptyPredictionContext) equals(other Collectable[PredictionContext]) bool {
+	return e == other
+}
 
-func (e *EmptyPredictionContext) equals(other PredictionContext) bool {
+func (e *EmptyPredictionContext) gequals(other Collectable[PredictionContext]) bool {
 	return e == other
 }
 
@@ -298,7 +303,11 @@ func (a *ArrayPredictionContext) getReturnState(index int) int {
 	return a.returnStates[index]
 }
 
-func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
+func (a *ArrayPredictionContext) equals(other interface{}) bool {
+	return a.gequals(other.(*ArrayPredictionContext))
+}
+
+func (a *ArrayPredictionContext) gequals(other Collectable[PredictionContext]) bool {
 	if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
 	} else if a.cachedHash != other.hash() {
@@ -390,7 +399,6 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 	return mergeArrays(a.(*ArrayPredictionContext), b.(*ArrayPredictionContext), rootIsWildcard, mergeCache)
 }
 
-//
 // Merge two {@link SingletonBasePredictionContext} instances.
 //
 // <p>Stack tops equal, parents merge is same return left graph.<br>
@@ -499,7 +507,6 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	return apc
 }
 
-//
 // Handle case where at least one of {@code a} or {@code b} is
 // {@link //EMPTY}. In the following diagrams, the symbol {@code $} is used
 // to represent {@link //EMPTY}.
@@ -561,7 +568,6 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 	return nil
 }
 
-//
 // Merge two {@link ArrayBasePredictionContext} instances.
 //
 // <p>Different tops, different parents.<br>
@@ -683,7 +689,6 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	return M
 }
 
-//
 // Make pass over all <em>M</em> {@code parents} merge any {@code equals()}
 // ones.
 // /

@@ -4,10 +4,6 @@
 
 package antlr
 
-import (
-	"sort"
-)
-
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState
@@ -15,8 +11,14 @@ type DFA struct {
 	decision int
 
 	// states is all the DFA states. Use Map to get the old state back; Set can only
-	// indicate whether it is there.
-	states map[int]*DFAState
+	// indicate whether it is there. Go maps implement key hash collisions and so on and are very
+	// good, but the DFAState is an object and can't be used directly as the key as it can in say JAva
+	// amd C#, whereby if the hashcode is the same for two objects, then equals() is called against them
+	// to see if they really are the same object.
+	//
+	//
+	states    *JStore[*DFAState, *DFAStateComparator[*DFAState]]
+	numstates int
 
 	s0 *DFAState
 
@@ -29,7 +31,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        make(map[int]*DFAState),
+		states:        NewJStore[*DFAState, *DFAStateComparator[*DFAState]](&DFAStateComparator[*DFAState]{}),
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
@@ -92,7 +94,8 @@ func (d *DFA) getPrecedenceDfa() bool {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
-		d.setStates(make(map[int]*DFAState))
+		d.states = NewJStore[*DFAState, *DFAStateComparator[*DFAState]](&DFAStateComparator[*DFAState]{})
+		d.numstates = 0
 
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
@@ -117,38 +120,12 @@ func (d *DFA) setS0(s *DFAState) {
 	d.s0 = s
 }
 
-func (d *DFA) getState(hash int) (*DFAState, bool) {
-	s, ok := d.states[hash]
-	return s, ok
-}
-
-func (d *DFA) setStates(states map[int]*DFAState) {
-	d.states = states
-}
-
-func (d *DFA) setState(hash int, state *DFAState) {
-	d.states[hash] = state
-}
-
-func (d *DFA) numStates() int {
-	return len(d.states)
-}
-
-type dfaStateList []*DFAState
-
-func (d dfaStateList) Len() int           { return len(d) }
-func (d dfaStateList) Less(i, j int) bool { return d[i].stateNumber < d[j].stateNumber }
-func (d dfaStateList) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
-
 // sortedStates returns the states in d sorted by their state number.
 func (d *DFA) sortedStates() []*DFAState {
-	vs := make([]*DFAState, 0, len(d.states))
 
-	for _, v := range d.states {
-		vs = append(vs, v)
-	}
-
-	sort.Sort(dfaStateList(vs))
+	vs := d.states.SortedSlice(func(i, j *DFAState) bool {
+		return i.stateNumber < j.stateNumber
+	})
 
 	return vs
 }

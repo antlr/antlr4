@@ -70,7 +70,6 @@ const (
 	PredictionModeLLExactAmbigDetection = 2
 )
 
-//
 // Computes the SLL prediction termination condition.
 //
 // <p>
@@ -108,9 +107,9 @@ const (
 // The single-alt-state thing lets prediction continue upon rules like
 // (otherwise, it would admit defeat too soon):</p>
 //
-// <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) '' }</p>
+// <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ” }</p>
 //
-// <p>When the ATN simulation reaches the state before {@code ''}, it has a
+// <p>When the ATN simulation reaches the state before {@code ”}, it has a
 // DFA state that looks like: {@code [12|1|[], 6|2|[], 12|2|[]]}. Naturally
 // {@code 12|1|[]} and {@code 12|2|[]} conflict, but we cannot stop
 // processing this node because alternative to has another way to continue,
@@ -152,16 +151,15 @@ const (
 //
 // <p>Before testing these configurations against others, we have to merge
 // {@code x} and {@code x'} (without modifying the existing configurations).
-// For example, we test {@code (x+x')==x''} when looking for conflicts in
+// For example, we test {@code (x+x')==x”} when looking for conflicts in
 // the following configurations.</p>
 //
-// <p>{@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})}</p>
+// <p>{@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x”, {})}</p>
 //
 // <p>If the configuration set has predicates (as indicated by
 // {@link ATNConfigSet//hasSemanticContext}), this algorithm makes a copy of
 // the configurations to strip out all of the predicates so that a standard
 // {@link ATNConfigSet} will merge everything ignoring predicates.</p>
-//
 func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConfigSet) bool {
 	// Configs in rule stop states indicate reaching the end of the decision
 	// rule (local context) or end of start rule (full context). If all
@@ -229,7 +227,6 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 	return true
 }
 
-//
 // Full LL prediction termination.
 //
 // <p>Can we stop looking ahead during ATN simulation or is there some
@@ -334,7 +331,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // </li>
 //
 // <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
-// {@code (s', 2, y)}, {@code (s'', 1, z)} yields non-conflicting set
+// {@code (s', 2, y)}, {@code (s”, 1, z)} yields non-conflicting set
 // {@code {1}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
 // {@code {1}} =&gt stop and predict 1</li>
 //
@@ -369,31 +366,26 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // two or one and three so we keep going. We can only stop prediction when
 // we need exact ambiguity detection when the sets look like
 // {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
-//
 func PredictionModeresolvesToJustOneViableAlt(altsets []*BitSet) int {
 	return PredictionModegetSingleViableAlt(altsets)
 }
 
-//
 // Determines if every alternative subset in {@code altsets} contains more
 // than one alternative.
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if every {@link BitSet} in {@code altsets} has
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
-//
 func PredictionModeallSubsetsConflict(altsets []*BitSet) bool {
 	return !PredictionModehasNonConflictingAltSet(altsets)
 }
 
-//
 // Determines if any single alternative subset in {@code altsets} contains
 // exactly one alternative.
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} 1, otherwise {@code false}
-//
 func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
 		alts := altsets[i]
@@ -404,14 +396,12 @@ func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 	return false
 }
 
-//
 // Determines if any single alternative subset in {@code altsets} contains
 // more than one alternative.
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
-//
 func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
 		alts := altsets[i]
@@ -422,13 +412,11 @@ func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	return false
 }
 
-//
 // Determines if every alternative subset in {@code altsets} is equivalent.
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if every member of {@code altsets} is equal to the
 // others, otherwise {@code false}
-//
 func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 	var first *BitSet
 
@@ -444,13 +432,11 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 	return true
 }
 
-//
 // Returns the unique alternative predicted by all alternative subsets in
 // {@code altsets}. If no such alternative exists, this method returns
 // {@link ATN//INVALID_ALT_NUMBER}.
 //
 // @param altsets a collection of alternative subsets
-//
 func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 	all := PredictionModeGetAlts(altsets)
 	if all.length() == 1 {
@@ -466,7 +452,6 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 //
 // @param altsets a collection of alternative subsets
 // @return the set of represented alternatives in {@code altsets}
-//
 func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 	all := NewBitSet()
 	for _, alts := range altsets {
@@ -475,7 +460,28 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 	return all
 }
 
-//
+type ATNComparator[T Collectable[T]] struct {
+}
+
+// NB This is the same as normal DFAState
+func (a *ATNComparator[T]) equals(o1, o2 ATNConfig) bool {
+	if o1 == o2 {
+		return true
+	}
+	if o1 != nil && o2 != nil {
+		return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber()
+	}
+	return false
+}
+
+// NB This is the same as normal DFAState
+func (a *ATNComparator[T]) hash(o ATNConfig) int {
+	h := murmurInit(7)
+	h = murmurUpdate(h, o.GetState().GetStateNumber())
+	h = murmurUpdate(h, o.GetContext().hash())
+	return murmurFinish(h, 2)
+}
+
 // This func gets the conflicting alt subsets from a configuration set.
 // For each configuration {@code c} in {@code configs}:
 //
@@ -483,36 +489,28 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
-//
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
-	configToAlts := make(map[int]*BitSet)
+	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNComparator[ATNConfig]](&ATNComparator[ATNConfig]{})
 
 	for _, c := range configs.GetItems() {
-		key := 31 * c.GetState().GetStateNumber() + c.GetContext().hash()
 
-		alts, ok := configToAlts[key]
+		alts, ok := configToAlts.Get(c)
 		if !ok {
 			alts = NewBitSet()
-			configToAlts[key] = alts
+			configToAlts.Put(c, alts)
 		}
 		alts.add(c.GetAlt())
 	}
 
-	values := make([]*BitSet, 0, 10)
-	for _, v := range configToAlts {
-		values = append(values, v)
-	}
-	return values
+	return configToAlts.Values()
 }
 
-//
 // Get a map from state to alt subset from a configuration set. For each
 // configuration {@code c} in {@code configs}:
 //
 // <pre>
 // map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
 // </pre>
-//
 func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
 	m := NewAltDict()
 

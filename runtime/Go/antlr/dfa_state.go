@@ -81,6 +81,45 @@ type DFAState struct {
 	predicates []*PredPrediction
 }
 
+type DFAStateComparator[T Collectable[T]] struct {
+}
+
+// NB This is the same as normal DFAState
+func (c *DFAStateComparator[T]) equals(o1, o2 T) bool {
+	return o1.gequals(o2)
+}
+
+// NB This is the same as normal DFAState
+func (c *DFAStateComparator[T]) hash(o T) int {
+	return o.hash()
+}
+
+// equals returns true if this DFA state is equal to another DFA state.
+// Two [DFAState] instances are equal if their ATN configuration sets
+// are the same. This method is used to see if a state already exists.
+//
+// Because the number of alternatives and number of ATN configurations are
+// finite, there is a finite number of DFA states that can be processed.
+// This is necessary to show that the algorithm terminates.
+//
+// Cannot test the DFA state numbers here because in [ParserATNSimulator.addDFAState]
+// we need to know if any other state exists that has this exact set of ATN configurations. The
+// [stateNumber] is irrelevant.
+func (d *DFAState) gequals(o Collectable[*DFAState]) bool {
+	if d == o {
+		return true
+	}
+
+	return d.configs.Equals(o.(*DFAState).configs)
+}
+func (d *DFAState) equals(o interface{}) bool {
+	if d == o {
+		return true
+	}
+
+	return d.configs.Equals(o.(*DFAState).configs)
+}
+
 func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 	if configs == nil {
 		configs = NewBaseATNConfigSet(false)
@@ -141,15 +180,15 @@ func (d *DFAState) setPrediction(v int) {
 // Cannot test the DFA state numbers here because in
 // ParserATNSimulator.addDFAState we need to know if any other state exists that
 // has d exact set of ATN configurations. The stateNumber is irrelevant.
-func (d *DFAState) equals(other interface{}) bool {
-	if d == other {
-		return true
-	} else if _, ok := other.(*DFAState); !ok {
-		return false
-	}
-
-	return d.configs.Equals(other.(*DFAState).configs)
-}
+// func (d *DFAState) equals(other interface{}) bool {
+//	if d == other {
+//		return true
+//	} else if _, ok := other.(*DFAState); !ok {
+//		return false
+//	}
+//
+//	return d.configs.Equals(other.(*DFAState).configs)
+//}
 
 func (d *DFAState) String() string {
 	var s string
@@ -168,4 +207,13 @@ func (d *DFAState) hash() int {
 	h := murmurInit(7)
 	h = murmurUpdate(h, d.configs.hash())
 	return murmurFinish(h, 1)
+}
+
+func (d *DFAState) Equals(o *DFAState) bool {
+
+	if d == o {
+		return true
+	}
+
+	return d.configs.Equals(o.configs)
 }
