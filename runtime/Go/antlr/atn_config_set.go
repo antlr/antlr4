@@ -214,6 +214,33 @@ func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
 	return false
 }
 
+// Compare is a hack function just to verify that adding DFAstares to the known
+// set works, so long as comparison of ATNConfigSet s works. For that to work, we
+// need to make sure that the set of ATNConfigs in two sets are equivalent. We can't
+// know the order, so we do this inefficient hack. If this proves the point, then
+// we can change the config set to a better structure.
+func (b *BaseATNConfigSet) Compare(bs *BaseATNConfigSet) bool {
+	if len(b.configs) != len(bs.configs) {
+		return false
+	}
+
+	for _, c := range b.configs {
+		found := false
+		for _, c2 := range bs.configs {
+			if c.equals(c2) {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return false
+		}
+
+	}
+	return true
+}
+
 func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 	if b == other {
 		return true
@@ -224,12 +251,12 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 	other2 := other.(*BaseATNConfigSet)
 
 	return b.configs != nil &&
-		// TODO: b.configs.equals(other2.configs) && // TODO: Is b necessary?
 		b.fullCtx == other2.fullCtx &&
 		b.uniqueAlt == other2.uniqueAlt &&
 		b.conflictingAlts == other2.conflictingAlts &&
 		b.hasSemanticContext == other2.hasSemanticContext &&
-		b.dipsIntoOuterContext == other2.dipsIntoOuterContext
+		b.dipsIntoOuterContext == other2.dipsIntoOuterContext &&
+		b.Compare(other2)
 }
 
 func (b *BaseATNConfigSet) hash() int {

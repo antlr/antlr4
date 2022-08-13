@@ -591,19 +591,24 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
 		proposed.setPrediction(l.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()])
 	}
-	hash := proposed.hash()
 	dfa := l.decisionToDFA[l.mode]
 
 	l.atn.stateMu.Lock()
 	defer l.atn.stateMu.Unlock()
-	existing, ok := dfa.getState(hash)
-	if ok {
+	existing, present := dfa.states.Put(proposed)
+	if present {
+
+		// This state was already present, so just return it.
+		//
 		proposed = existing
 	} else {
-		proposed.stateNumber = dfa.numStates()
+
+		// The proposed state has already been added to the DFA. We still have the pointer, so
+		// we can modify it even though it is stored already.
+		//
+		proposed.stateNumber = dfa.states.Len()
 		configs.SetReadOnly(true)
 		proposed.configs = configs
-		dfa.setState(hash, proposed)
 	}
 	if !suppressEdge {
 		dfa.setS0(proposed)

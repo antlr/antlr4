@@ -20,6 +20,8 @@ type comparable interface {
 type ATNConfig interface {
 	comparable
 
+	gequals(other Collectable[ATNConfig]) bool
+
 	hash() int
 
 	GetState() ATNState
@@ -47,7 +49,7 @@ type BaseATNConfig struct {
 	reachesIntoOuterContext    int
 }
 
-func NewBaseATNConfig7(old *BaseATNConfig) *BaseATNConfig { // TODO: Dup
+func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup
 	return &BaseATNConfig{
 		state:                   old.state,
 		alt:                     old.alt,
@@ -134,10 +136,13 @@ func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
 func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 	b.reachesIntoOuterContext = v
 }
+func (b *BaseATNConfig) equals(o interface{}) bool {
+	return b.gequals(o.(Collectable[ATNConfig]))
+}
 
 // An ATN configuration is equal to another if both have the same state, they
 // predict the same alternative, and syntactic/semantic contexts are the same.
-func (b *BaseATNConfig) equals(o interface{}) bool {
+func (b *BaseATNConfig) gequals(o Collectable[ATNConfig]) bool {
 	if b == o {
 		return true
 	}
@@ -153,7 +158,7 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	if b.context == nil {
 		equal = other.context == nil
 	} else {
-		equal = b.context.equals(other.context)
+		equal = b.context.gequals(other.context)
 	}
 
 	var (
@@ -262,6 +267,10 @@ func (l *LexerATNConfig) hash() int {
 }
 
 func (l *LexerATNConfig) equals(other interface{}) bool {
+	return l.gequals(other.(Collectable[ATNConfig]))
+}
+
+func (l *LexerATNConfig) gequals(other Collectable[ATNConfig]) bool {
 	var othert, ok = other.(*LexerATNConfig)
 
 	if l == other {
@@ -286,7 +295,6 @@ func (l *LexerATNConfig) equals(other interface{}) bool {
 
 	return l.BaseATNConfig.equals(othert.BaseATNConfig)
 }
-
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)

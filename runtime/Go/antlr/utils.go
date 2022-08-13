@@ -171,7 +171,7 @@ func (b *BitSet) equals(other interface{}) bool {
 
 	// We only compare set bits, so we cannot rely on the two slices having the same size. Its
 	// possible for two BitSets to have different slice lengths but the same set bits. So we only
-	// compare the relavent words and ignore the trailing zeros.
+	// compare the relevant words and ignore the trailing zeros.
 	bLen := b.minLen()
 	otherLen := otherBitSet.minLen()
 

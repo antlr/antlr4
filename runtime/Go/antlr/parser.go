@@ -91,7 +91,6 @@ func NewBaseParser(input TokenStream) *BaseParser {
 // bypass alternatives.
 //
 // @see ATNDeserializationOptions//isGenerateRuleBypassTransitions()
-//
 var bypassAltsAtnCache = make(map[string]int)
 
 // reset the parser's state//
@@ -230,7 +229,6 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 // @param listener the listener to add
 //
 // @panics nilPointerException if {@code} listener is {@code nil}
-//
 func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 	if listener == nil {
 		panic("listener")
@@ -241,13 +239,11 @@ func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 	p.parseListeners = append(p.parseListeners, listener)
 }
 
-//
 // Remove {@code listener} from the list of parse listeners.
 //
 // <p>If {@code listener} is {@code nil} or has not been added as a parse
 // listener, p.method does nothing.</p>
 // @param listener the listener to remove
-//
 func (p *BaseParser) RemoveParseListener(listener ParseTreeListener) {
 
 	if p.parseListeners != nil {
@@ -289,11 +285,9 @@ func (p *BaseParser) TriggerEnterRuleEvent() {
 	}
 }
 
-//
 // Notify any parse listeners of an exit rule event.
 //
 // @see //addParseListener
-//
 func (p *BaseParser) TriggerExitRuleEvent() {
 	if p.parseListeners != nil {
 		// reverse order walk of listeners
@@ -330,7 +324,6 @@ func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 //
 // @panics UnsupportedOperationException if the current parser does not
 // implement the {@link //getSerializedATN()} method.
-//
 func (p *BaseParser) GetATNWithBypassAlts() {
 
 	// TODO
@@ -402,7 +395,6 @@ func (p *BaseParser) SetTokenStream(input TokenStream) {
 
 // Match needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
-//
 func (p *BaseParser) GetCurrentToken() Token {
 	return p.input.LT(1)
 }
@@ -624,7 +616,6 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 // respectively.
 //
 // @see ATN//getExpectedTokens(int, RuleContext)
-//
 func (p *BaseParser) GetExpectedTokens() *IntervalSet {
 	return p.Interpreter.atn.getExpectedTokens(p.state, p.ctx)
 }
@@ -686,7 +677,7 @@ func (p *BaseParser) GetDFAStrings() string {
 func (p *BaseParser) DumpDFA() {
 	seenOne := false
 	for _, dfa := range p.Interpreter.decisionToDFA {
-		if dfa.numStates() > 0 {
+		if dfa.states.Len() > 0 {
 			if seenOne {
 				fmt.Println()
 			}
@@ -703,7 +694,6 @@ func (p *BaseParser) GetSourceName() string {
 
 // During a parse is sometimes useful to listen in on the rule entry and exit
 // events as well as token Matches. p.is for quick and dirty debugging.
-//
 func (p *BaseParser) SetTrace(trace *TraceListener) {
 	if trace == nil {
 		p.RemoveParseListener(p.tracer)
