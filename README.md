@@ -49,6 +49,8 @@ ANTLR project lead and supreme dictator for life
 * [Lingyu Li](https://github.com/lingyv-li) (Dart target)
 * [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and Target performance.
 * [Justin King](https://github.com/jcking) has done a huge amount of work across multiple targets, but especially for C++.
+* [Ken Domino](https://github.com/kaby76) has a knack for finding bugs/issues and analysis; also a major contributor on the [grammars-v4 repo](https://github.com/antlr/grammars-v4).
+* [Jim Idle](https://github.com/jimidle) has contributed to previous versions of ANTLR and recently jumped back in to solve a major problem with the Go target.
 
 
 ## Useful information
