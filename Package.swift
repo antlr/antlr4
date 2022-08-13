@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.6
 
 
 import PackageDescription
@@ -8,17 +8,29 @@ let package = Package(
     products: [
         .library(
             name: "Antlr4",
+            targets: ["Antlr4"]
+        ),
+        .library(
+            name: "Antlr4Dynamic",
             type: .dynamic,
-            targets: ["Antlr4"]),
+            targets: ["Antlr4"]
+        ),
+        .library(
+            name: "Antlr4Static",
+            type: .static,
+            targets: ["Antlr4"]
+        )
     ],
     targets: [
         .target(
             name: "Antlr4",
             dependencies: [],
-            path: "./runtime/Swift/Sources/Antlr4"),
+            path: "./runtime/Swift/Sources/Antlr4"
+        ),
         .testTarget(
             name: "Antlr4Tests",
             dependencies: ["Antlr4"],
-            path:"./runtime/Swift/Tests/Antlr4Tests"),
+            path:"./runtime/Swift/Tests/Antlr4Tests"
+        )
     ]
 )
