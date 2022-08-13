@@ -174,12 +174,12 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 // Reporting insufficient predicates
 
 // cover these cases:
-//    dead end
-//    single alt
-//    single alt + preds
-//    conflict
-//    conflict + preds
 //
+//	dead end
+//	single alt
+//	single alt + preds
+//	conflict
+//	conflict + preds
 func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, startIndex int, outerContext ParserRuleContext) int {
 
 	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
@@ -617,7 +617,6 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	return reach
 }
 
-//
 // Return a configuration set containing only the configurations from
 // {@code configs} which are in a {@link RuleStopState}. If all
 // configurations in {@code configs} are already in a rule stop state, p
@@ -636,7 +635,6 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 // @return {@code configs} if all configurations in {@code configs} are in a
 // rule stop state, otherwise return a Newconfiguration set containing only
 // the configurations from {@code configs} which are in a rule stop state
-//
 func (p *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs ATNConfigSet, lookToEndOfRule bool) ATNConfigSet {
 	if PredictionModeallConfigsInRuleStopStates(configs) {
 		return configs
@@ -671,7 +669,6 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	return configs
 }
 
-//
 // This method transforms the start state computed by
 // {@link //computeStartState} to the special start state used by a
 // precedence DFA for a particular precedence value. The transformation
@@ -726,7 +723,6 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // @return The transformed configuration set representing the start state
 // for a precedence DFA at a particular precedence level (determined by
 // calling {@link Parser//getPrecedence}).
-//
 func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConfigSet {
 
 	statesFromAlt1 := make(map[int]PredictionContext)
@@ -760,7 +756,7 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConf
 		// (basically a graph subtraction algorithm).
 		if !config.getPrecedenceFilterSuppressed() {
 			context := statesFromAlt1[config.GetState().GetStateNumber()]
-			if context != nil && context.equals(config.GetContext()) {
+			if context != nil && context.gequals(config.GetContext()) {
 				// eliminated
 				continue
 			}
@@ -824,7 +820,6 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 	return pairs
 }
 
-//
 // This method is used to improve the localization of error messages by
 // choosing an alternative rather than panicing a
 // {@link NoViableAltException} in particular prediction scenarios where the
@@ -869,7 +864,6 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 // @return The value to return from {@link //AdaptivePredict}, or
 // {@link ATN//INVALID_ALT_NUMBER} if a suitable alternative was not
 // identified and {@link //AdaptivePredict} should Report an error instead.
-//
 func (p *ParserATNSimulator) getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(configs ATNConfigSet, outerContext ParserRuleContext) int {
 	cfgs := p.splitAccordingToSemanticValidity(configs, outerContext)
 	semValidConfigs := cfgs[0]
@@ -938,11 +932,11 @@ func (p *ParserATNSimulator) splitAccordingToSemanticValidity(configs ATNConfigS
 }
 
 // Look through a list of predicate/alt pairs, returning alts for the
-//  pairs that win. A {@code NONE} predicate indicates an alt containing an
-//  unpredicated config which behaves as "always true." If !complete
-//  then we stop at the first predicate that evaluates to true. This
-//  includes pairs with nil predicates.
 //
+//	pairs that win. A {@code NONE} predicate indicates an alt containing an
+//	unpredicated config which behaves as "always true." If !complete
+//	then we stop at the first predicate that evaluates to true. This
+//	includes pairs with nil predicates.
 func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPrediction, outerContext ParserRuleContext, complete bool) *BitSet {
 	predictions := NewBitSet()
 	for i := 0; i < len(predPredictions); i++ {
@@ -1104,7 +1098,16 @@ func (p *ParserATNSimulator) canDropLoopEntryEdgeInLeftRecursiveRule(config ATNC
 	// left-recursion elimination. For efficiency, also check if
 	// the context has an empty stack case. If so, it would mean
 	// global FOLLOW so we can't perform optimization
-	if startLoop, ok := _p.(StarLoopEntryState); !ok || !startLoop.precedenceRuleDecision || config.GetContext().isEmpty() || config.GetContext().hasEmptyPath() {
+	if _p.GetStateType() != ATNStateStarLoopEntry {
+		return false
+	}
+	startLoop, ok := _p.(*StarLoopEntryState)
+	if !ok {
+		return false
+	}
+	if !startLoop.precedenceRuleDecision ||
+		config.GetContext().isEmpty() ||
+		config.GetContext().hasEmptyPath() {
 		return false
 	}
 
@@ -1117,8 +1120,8 @@ func (p *ParserATNSimulator) canDropLoopEntryEdgeInLeftRecursiveRule(config ATNC
 			return false
 		}
 	}
-
-	decisionStartState := _p.(BlockStartState).GetTransitions()[0].getTarget().(BlockStartState)
+	x := _p.GetTransitions()[0].getTarget()
+	decisionStartState := x.(BlockStartState)
 	blockEndStateNum := decisionStartState.getEndState().stateNumber
 	blockEndState := p.atn.states[blockEndStateNum].(*BlockEndState)
 
@@ -1372,9 +1375,9 @@ func (p *ParserATNSimulator) getLookaheadName(input TokenStream) string {
 }
 
 // Used for debugging in AdaptivePredict around execATN but I cut
-//  it out for clarity now that alg. works well. We can leave p
-//  "dead" code for a bit.
 //
+//	it out for clarity now that alg. works well. We can leave p
+//	"dead" code for a bit.
 func (p *ParserATNSimulator) dumpDeadEndConfigs(nvae *NoViableAltException) {
 
 	panic("Not implemented")
@@ -1421,7 +1424,6 @@ func (p *ParserATNSimulator) getUniqueAlt(configs ATNConfigSet) int {
 	return alt
 }
 
-//
 // Add an edge to the DFA, if possible. This method calls
 // {@link //addDFAState} to ensure the {@code to} state is present in the
 // DFA. If {@code from} is {@code nil}, or if {@code t} is outside the
@@ -1440,7 +1442,6 @@ func (p *ParserATNSimulator) getUniqueAlt(configs ATNConfigSet) int {
 // @return If {@code to} is {@code nil}, p method returns {@code nil}
 // otherwise p method returns the result of calling {@link //addDFAState}
 // on {@code to}
-//
 func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFAState) *DFAState {
 	if ParserATNSimulatorDebug {
 		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + p.GetTokenName(t))
@@ -1472,7 +1473,6 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 	return to
 }
 
-//
 // Add state {@code D} to the DFA if it is not already present, and return
 // the actual instance stored in the DFA. If a state equivalent to {@code D}
 // is already in the DFA, the existing state is returned. Otherwise p
@@ -1486,25 +1486,26 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 // @return The state stored in the DFA. This will be either the existing
 // state if {@code D} is already in the DFA, or {@code D} itself if the
 // state was not already present.
-//
 func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 	if d == ATNSimulatorError {
 		return d
 	}
-	hash := d.hash()
-	existing, ok := dfa.getState(hash)
-	if ok {
+	existing, present := dfa.states.Put(d)
+	if present {
 		return existing
 	}
-	d.stateNumber = dfa.numStates()
+
+	// The state was not present, so update it with configs
+	//
+	d.stateNumber = dfa.states.Len() - 1
 	if !d.configs.ReadOnly() {
 		d.configs.OptimizeConfigs(p.BaseATNSimulator)
 		d.configs.SetReadOnly(true)
 	}
-	dfa.setState(hash, d)
 	if ParserATNSimulatorDebug {
 		fmt.Println("adding NewDFA state: " + d.String())
 	}
+
 	return d
 }
 
