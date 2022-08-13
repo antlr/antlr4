@@ -229,11 +229,11 @@ jobs:
       with:
         sdk: 2.12.1
 
-    - name: Setup Go 1.13.1
+    - name: Setup Go 1.19
       if: matrix.target == 'go'
       uses: actions/setup-go@v3
       with:
-        go-version: '^1.13.1'
+        go-version: '^1.19'
 
     - name: Setup PHP 8.2
       if: matrix.target == 'php'
