@@ -74,7 +74,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
 	 * when we go readonly as this set becomes a DFA state.
 	 */
-	public AbstractConfigHashSet configLo
+	public AbstractConfigHashSet configLookup;
+
+	/** Track the elements as they are added to the set; supports get(i) */
+	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
