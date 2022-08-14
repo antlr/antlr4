@@ -1,0 +1,333 @@
+name: antlr4
+
+on:
+  push:
+    branches: [ master, dev, hostedci ]
+  pull_request:
+    branches: [ master, dev ]
+
+jobs:
+  cpp-builds:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          macos-latest,
+          ubuntu-latest,
+          windows-latest
+        ]
+        compiler: [ clang, gcc ]
+        exclude:
+          - os: windows-latest
+            compiler: gcc
+        include:
+          - os: windows-latest
+            compiler: cl
+
+    steps:
+    - name: Install dependencies (Ubuntu)
+      if: startswith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get update -qq
+        sudo apt install -y ninja-build
+
+    - name: Install dependencies (MacOS)
+      if: startswith(matrix.os, 'macos')
+      run: brew install ninja
+
+    - name: Setup Clang
+      if: (matrix.compiler == 'clang') && !startswith(matrix.os, 'macos')
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 13
+        platform: x64
+        cygwin: 0
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Use ccache
+      if: startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: ${{ matrix.os }}-${{ matrix.compiler }}
+
+    - name: Configure shell (Ubuntu)
+      if: startswith(matrix.os, 'ubuntu')
+      run: echo 'PATH=/usr/lib/ccache:'"$PATH" >> $GITHUB_ENV
+
+    - name: Configure shell (MacOS)
+      if: startswith(matrix.os, 'macos')
+      run: echo "PATH=$(brew --prefix)/opt/ccache/libexec:$PATH" >> $GITHUB_ENV
+
+    - name: Build (Windows)
+      if: startswith(matrix.os, 'windows')
+      shell: cmd
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+
+        if "${{ matrix.compiler }}" EQU "cl" (
+          set CC=cl
+          set CXX=cl
+          echo 'CC=cl' >> $GITHUB_ENV
+          echo 'CXX=cl' >> $GITHUB_ENV
+        ) else (
+          set CC=clang
+          set CXX=clang++
+          echo 'CC=clang' >> $GITHUB_ENV
+          echo 'CXX=clang++' >> $GITHUB_ENV
+        )
+
+        set
+        where cmake && cmake --version
+        where ninja && ninja --version
+        where %CC% && %CC% -version
+        where %CXX% && %CXX% -version
+
+        cd runtime/Cpp
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake --build out/Debug -j %NUMBER_OF_PROCESSORS%
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+        cmake --build out/Release -j %NUMBER_OF_PROCESSORS%
+        if %errorlevel% neq 0 exit /b %errorlevel%
+
+    - name: Build (non-Windows)
+      if: startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')
+      run: |
+        if [ "${{matrix.compiler}}" == "clang" ]; then
+          export CC=clang
+          export CXX=clang++
+          echo 'CC=clang' >> $GITHUB_ENV
+          echo 'CXX=clang++' >> $GITHUB_ENV
+        else
+          export CC=gcc-9
+          export CXX=g++-9
+          echo 'CC=gcc-9' >> $GITHUB_ENV
+          echo 'CXX=g++-9' >> $GITHUB_ENV
+        fi
+
+        env
+        which cmake && cmake --version
+        which ninja && ninja --version
+        which $CC && $CC --version
+        which $CXX && $CXX --version
+
+        cd runtime/Cpp
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
+        cmake --build out/Debug --parallel
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
+        cmake --build out/Release --parallel
+
+    - name: Prepare artifacts
+      if: always()
+      run: |
+        cd ${{ github.workspace }}/..
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz antlr4
+        mv antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz ${{ github.workspace }}/.
+
+    - name: Archive artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: antlr_${{ matrix.os }}_${{ matrix.compiler }}
+        path: antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz
+
+
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          macos-latest,
+          ubuntu-latest,
+          windows-latest
+        ]
+        target: [
+          cpp,
+          csharp,
+          dart,
+          go,
+          java,
+          javascript,
+          php,
+          python2,
+          python3,
+          swift,
+        ]
+        exclude:
+          - os: windows-latest
+            target: swift
+
+    steps:
+      # Check out the code before setting the environment since some
+      # of the actions actually parse the files to figure out the
+      # dependencies, for instance, the setup-java actually parses
+      # **/pom.xml files to decide what to cache.
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Checkout antlr PHP runtime
+      if: matrix.target == 'php'
+      uses: actions/checkout@v2
+      with:
+        repository: antlr/antlr-php-runtime
+        path: runtime/PHP
+
+    - name: Install dependencies (Ubuntu)
+      if: startswith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get update -qq
+        sudo apt install -y ninja-build
+
+    - name: Install dependencies (MacOS)
+      if: startswith(matrix.os, 'macos')
+      run: brew install ninja
+
+    - name: Set up JDK 11
+      id: setup-java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: 11
+        cache: 'maven'
+
+    - name: Set up Maven
+      if: steps.setup-java.outputs.cache-hit != 'true'
+      uses: stCarolas/setup-maven@v4.4
+      with:
+        maven-version: 3.5.4
+
+    - name: Add msbuild to PATH
+      if: startswith(matrix.os, 'windows') && (matrix.target == 'cpp')
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Set up Python 2
+      if: matrix.target == 'python2'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '2.x'
+        architecture: 'x64'
+
+    - name: Set up Python 3
+      if: matrix.target == 'python3'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Set up Node 14
+      if: matrix.target == 'javascript'
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Setup Dotnet
+      if: matrix.target == 'csharp'
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Setup Dart 2.12.1
+      if: matrix.target == 'dart'
+      uses: dart-lang/setup-dart@v1.3
+      with:
+        sdk: 2.12.1
+
+    - name: Setup Go 1.19
+      if: matrix.target == 'go'
+      uses: actions/setup-go@v3
+      with:
+        go-version: '^1.19'
+
+    - name: Setup PHP 8.2
+      if: matrix.target == 'php'
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring
+        tools: composer
+
+    - name: Setup Swift
+      if: matrix.target == 'swift'
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: '5.2'
+
+    - name: Use ccache
+      if: (startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')) && (matrix.target == 'cpp')
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: ${{ matrix.os }}-${{ matrix.target }}
+
+    - name: Configure shell (Ubuntu)
+      if: startswith(matrix.os, 'ubuntu') && (matrix.target == 'cpp')
+      run: echo 'PATH=/usr/lib/ccache:'"$PATH" >> $GITHUB_ENV
+
+    - name: Configure shell (MacOS)
+      if: startswith(matrix.os, 'macos') && (matrix.target == 'cpp')
+      run: echo "PATH=$(brew --prefix)/opt/ccache/libexec:$PATH" >> $GITHUB_ENV
+
+    - name: Build tool with Maven
+      run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
+
+    - name: Test tool
+      if: matrix.target == 'java'
+      run: |
+        cd tool-testsuite
+        mvn test
+
+    - name: Test runtime (Windows)
+      if: startsWith(matrix.os, 'windows')
+      run: |
+        gci env:* | sort-object name
+
+        cd runtime-testsuite
+        switch ("${{ matrix.target }}")
+        {
+          python2 { mvn -X '-Dantlr-python2-exec="${{ env.pythonLocation }}\python.exe"' '-Dtest=python2.**' test }
+          python3 { mvn -X '-Dantlr-python3-exec="${{ env.pythonLocation }}\python.exe"' '-Dtest=python3.**' test }
+          default { mvn -X '-Dtest=${{ matrix.target }}.**' test }
+        }
+
+      env:
+        CMAKE_GENERATOR: Ninja
+
+    - name: Test runtime (non-Windows)
+      if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
+      run: |
+        env
+
+        cd runtime-testsuite
+        case ${{ matrix.target }} in
+          python2) mvn -X '-Dantlr-python2-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python2.**' test ;;
+          python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
+          swift) mvn -X -e '-Dtest=python3.**' test ;;
+          *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
+        esac
+
+    - name: Prepare artifacts
+      if: always()
+      run: |
+        cd ${{ github.workspace }}/..
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz antlr4
+        mv antlr_${{ matrix.os }}_${{ matrix.target }}.tgz ${{ github.workspace }}/.
+
+    - name: Archive artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: antlr_${{ matrix.os }}_${{ matrix.target }}
+        path: antlr_${{ matrix.os }}_${{ matrix.target }}.tgz
