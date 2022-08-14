@@ -172,6 +172,20 @@ jobs:
             target: swift
 
     steps:
+      # Check out the code before setting the environment since some
+      # of the actions actually parse the files to figure out the
+      # dependencies, for instance, the setup-java actually parses
+      # **/pom.xml files to decide what to cache.
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Checkout antlr PHP runtime
+      if: matrix.target == 'php'
+      uses: actions/checkout@v2
+      with:
+        repository: antlr/antlr-php-runtime
+        path: runtime/PHP
+
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'ubuntu')
       run: |
@@ -183,12 +197,15 @@ jobs:
       run: brew install ninja
 
     - name: Set up JDK 11
+      id: setup-java
       uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: 11
+        cache: 'maven'
 
     - name: Set up Maven
+      if: steps.setup-java.outputs.cache-hit != 'true'
       uses: stCarolas/setup-maven@v4.4
       with:
         maven-version: 3.5.4
@@ -249,15 +266,19 @@ jobs:
       with:
         swift-version: '5.2'
 
-    - name: Check out code
-      uses: actions/checkout@v2
-
-    - name: Checkout antlr PHP runtime
-      if: matrix.target == 'php'
-      uses: actions/checkout@v2
+    - name: Use ccache
+      if: (startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')) && (matrix.target == 'cpp')
+      uses: hendrikmuhs/ccache-action@v1
       with:
-        repository: antlr/antlr-php-runtime
-        path: runtime/PHP
+        key: ${{ matrix.os }}-${{ matrix.target }}
+
+    - name: Configure shell (Ubuntu)
+      if: startswith(matrix.os, 'ubuntu') && (matrix.target == 'cpp')
+      run: echo 'PATH=/usr/lib/ccache:'"$PATH" >> $GITHUB_ENV
+
+    - name: Configure shell (MacOS)
+      if: startswith(matrix.os, 'macos') && (matrix.target == 'cpp')
+      run: echo "PATH=$(brew --prefix)/opt/ccache/libexec:$PATH" >> $GITHUB_ENV
 
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
