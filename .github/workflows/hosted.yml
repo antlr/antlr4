@@ -22,6 +22,8 @@ jobs:
         exclude:
           - os: windows-latest
             compiler: gcc
+          - os: windows-latest
+            compiler: clang
         include:
           - os: windows-latest
             compiler: cl
@@ -168,6 +170,30 @@ jobs:
           swift,
         ]
         exclude:
+          - os: macos-latest
+            target: dart
+          - os: macos-latest
+            target: python3
+          - os: macos-latest
+            target: swift
+
+          - os: ubuntu-latest
+            target: csharp
+          - os: ubuntu-latest
+            target: dart
+
+          - os: windows-latest
+            target: cpp
+          - os: windows-latest
+            target: csharp
+          - os: windows-latest
+            target: dart
+          - os: windows-latest
+            target: php
+          - os: windows-latest
+            target: python2
+          - os: windows-latest
+            target: python3
           - os: windows-latest
             target: swift
 
