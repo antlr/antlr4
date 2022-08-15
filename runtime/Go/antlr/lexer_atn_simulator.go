@@ -606,7 +606,7 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 		// The proposed state has already been added to the DFA. We still have the pointer, so
 		// we can modify it even though it is stored already.
 		//
-		proposed.stateNumber = dfa.states.Len()
+		proposed.stateNumber = dfa.states.Len() - 1
 		configs.SetReadOnly(true)
 		proposed.configs = configs
 	}
