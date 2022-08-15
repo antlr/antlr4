@@ -605,7 +605,7 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 
 		// We need to add the new state
 		//
-		proposed.stateNumber = dfa.states.Len()
+		proposed.stateNumber = dfa.states.Len() - 1
 		configs.SetReadOnly(true)
 		proposed.configs = configs
 		dfa.states.Put(proposed)
