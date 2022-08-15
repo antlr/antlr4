@@ -175,27 +175,35 @@ public abstract class PredictionContext {
 	 * Merge two {@link SingletonPredictionContext} instances.
 	 *
 	 * <p>Stack tops equal, parents merge is same; return left graph.<br>
-	 * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/SingletonMerge_SameRootSamePar.svg" 
+	 *      alt="Merge two SingletonPredictionContext instance, case 1."/>
+	 * </p>
 	 *
 	 * <p>Same stack top, parents differ; merge parents giving array node, then
 	 * remainders of those graphs. A new root node is created to point to the
 	 * merged parents.<br>
-	 * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/SingletonMerge_SameRootDiffPar.svg"
+	 *      alt="Merge two SingletonPredictionContext instance, case 2."/>
+	 * </p>  
 	 *
 	 * <p>Different stack tops pointing to same parent. Make array node for the
 	 * root where both element in the root point to the same (original)
 	 * parent.<br>
-	 * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/SingletonMerge_DiffRootSamePar.svg"
+	 *      alt="Merge two SingletonPredictionContext instance, case 3."/>
+	 * </p>  
 	 *
 	 * <p>Different stack tops pointing to different parents. Make array node for
 	 * the root where each element points to the corresponding original
 	 * parent.<br>
-	 * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/SingletonMerge_DiffRootDiffPar.svg"
+	 *      alt="Merge two SingletonPredictionContext instance, case 4"/>
+	 * </p>  
 	 *
 	 * @param a the first {@link SingletonPredictionContext}
 	 * @param b the second {@link SingletonPredictionContext}
 	 * @param rootIsWildcard {@code true} if this is a local-context merge,
-	 * otherwise false to indicate a full-context merge
+	 * otherwise {@code false} to indicate a full-context merge
 	 * @param mergeCache
 	 */
 	public static PredictionContext mergeSingletons(
@@ -269,33 +277,42 @@ public abstract class PredictionContext {
 	 * {@link EmptyPredictionContext#Instance}. In the following diagrams, the symbol {@code $} is used
 	 * to represent {@link EmptyPredictionContext#Instance}.
 	 *
-	 * <h2>Local-Context Merges</h2>
+	 * <h4>Local-Context Merges</h4>
 	 *
-	 * <p>These local-context merge operations are used when {@code rootIsWildcard}
-	 * is true.</p>
+	 * <p>These local-context merge operations are used when {@code rootIsWildcard} is true.</p>
 	 *
 	 * <p>{@link EmptyPredictionContext#Instance} is superset of any graph; return {@link EmptyPredictionContext#Instance}.<br>
-	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+	 * <img src="images/LocalMerge_EmptyRoot.svg"
+	 *      alt="Case where at least one of a or b is empty, subcase 1."/>
+	 * </p>  
 	 *
 	 * <p>{@link EmptyPredictionContext#Instance} and anything is {@code #EMPTY}, so merged parent is
 	 * {@code #EMPTY}; return left graph.<br>
-	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
+	 * <img src="images/LocalMerge_EmptyParent.svg"
+	 *      alt="Case where at least one of a or b is empty, subcase 2."/>
+	 * </p>  
 	 *
 	 * <p>Special case of last merge if local context.<br>
-	 * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
+	 * <img src="images/LocalMerge_DiffRoots.svg"
+	 *      alt="Case where at least one of a or b is empty, subcase 3."/>
+	 * </p>
 	 *
-	 * <h2>Full-Context Merges</h2>
+	 * <h4>Full-Context Merges</h4>
 	 *
-	 * <p>These full-context merge operations are used when {@code rootIsWildcard}
-	 * is false.</p>
+	 * <p>These full-context merge operations are used when {@code rootIsWildcard} is false.<br>
+	 * <img src="images/FullMerge_EmptyRoots.svg"
+	 *      alt="Full-context merge operations used when rootIsWildcard is false."/>
+	 * </p>
 	 *
-	 * <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
+	 * <p>Must keep all contexts; {@link EmptyPredictionContext#Instance} in array is a special value (and null parent).<br>
+	 * <img src="images/FullMerge_EmptyRoot.svg"
+	 *      alt="Must keep all contexts, empty root." />
+	 * </p>
 	 *
-	 * <p>Must keep all contexts; {@link EmptyPredictionContext#Instance} in array is a special value (and
-	 * null parent).<br>
-	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
-	 *
-	 * <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
+	 * <p>
+	 * <img src="images/FullMerge_SameRoot.svg"
+	 *      alt="Must keep all contexts, same root." />
+	 * </p>
 	 *
 	 * @param a the first {@link SingletonPredictionContext}
 	 * @param b the second {@link SingletonPredictionContext}
@@ -334,20 +351,30 @@ public abstract class PredictionContext {
 	 * Merge two {@link ArrayPredictionContext} instances.
 	 *
 	 * <p>Different tops, different parents.<br>
-	 * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/ArrayMerge_DiffTopDiffPar.svg"
+	 *      alt="Different tops, different parents." />
+	 * </p>
 	 *
 	 * <p>Shared top, same parents.<br>
-	 * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/ArrayMerge_ShareTopSamePar.svg"
+	 *      alt="Shared top, same parents." />
+	 * </p>
 	 *
 	 * <p>Shared top, different parents.<br>
-	 * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/ArrayMerge_ShareTopDiffPar.svg"
+	 *      alt="Shared top, different parents." />
+	 * </p>
 	 *
 	 * <p>Shared top, all shared parents.<br>
-	 * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
+	 * <img src="images/ArrayMerge_ShareTopSharePar.svg"
+	 *      alt="Shared top, all shared parents." />
+	 * </p>
 	 *
 	 * <p>Equal tops, merge parents and reduce top to
 	 * {@link SingletonPredictionContext}.<br>
-	 * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
+	 * <img src="images/ArrayMerge_EqualTop.svg"
+	 *      alt="Equal tops, merge parents and reduce top to SingletonPredictionContext." />
+	 * </p>
 	 */
 	public static PredictionContext mergeArrays(
 		ArrayPredictionContext a,

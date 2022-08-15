@@ -1102,14 +1102,12 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * The prediction context must be considered by this filter to address
 	 * situations like the following.
 	 * </p>
-	 * <code>
 	 * <pre>
 	 * grammar TA;
 	 * prog: statement* EOF;
 	 * statement: letterA | statement letterA 'b' ;
 	 * letterA: 'a';
 	 * </pre>
-	 * </code>
 	 * <p>
 	 * If the above grammar, the ATN state immediately before the token
 	 * reference {@code 'a'} in {@code letterA} is reachable from the left edge
