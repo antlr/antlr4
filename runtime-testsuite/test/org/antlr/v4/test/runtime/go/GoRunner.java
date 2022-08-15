@@ -10,7 +10,6 @@ import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,22 +24,34 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	public String getLexerSuffix() { return "_lexer"; }
+	public String getLexerSuffix() {
+		return "_lexer";
+	}
 
 	@Override
-	public String getParserSuffix() { return "_parser"; }
+	public String getParserSuffix() {
+		return "_parser";
+	}
 
 	@Override
-	public String getBaseListenerSuffix() { return "_base_listener"; }
+	public String getBaseListenerSuffix() {
+		return "_base_listener";
+	}
 
 	@Override
-	public String getListenerSuffix() { return "_listener"; }
+	public String getListenerSuffix() {
+		return "_listener";
+	}
 
 	@Override
-	public String getBaseVisitorSuffix() { return "_base_visitor"; }
+	public String getBaseVisitorSuffix() {
+		return "_base_visitor";
+	}
 
 	@Override
-	public String getVisitorSuffix() { return "_visitor"; }
+	public String getVisitorSuffix() {
+		return "_visitor";
+	}
 
 	@Override
 	protected String grammarNameToFileName(String grammarName) {
@@ -48,22 +59,24 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	public String[] getExtraRunArgs() { return new String[] { "run" }; }
+	public String[] getExtraRunArgs() {
+		return new String[]{"run"};
+	}
 
 	private final static String antlrTestPackageName = "antlr";
 	private static final String goModFileName = "go.mod";
 	private static final String GoRuntimeImportPath = "github.com/antlr/antlr4/runtime/Go/antlr";
-	private static final Path newGoRoot;
-	private static final String newGoRootString;
+	private static final Path packageBase;
+	private static final String packageBaseString;
 	private static String goModContent = null;
 
 	private final static Map<String, String> environment;
 
 	static {
-		newGoRoot = Paths.get(cacheDirectory, "Go");
-		newGoRootString = newGoRoot.toString();
+		packageBase = Paths.get(cacheDirectory, "Go");
+		packageBaseString = packageBase.toString();
 		environment = new HashMap<>();
-		environment.put("GOROOT", newGoRootString);
+		environment.put("GOWORK", "off");
 	}
 
 	@Override
@@ -77,37 +90,19 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-		String goRoot = runCommand(new String[]{getRuntimeToolPath(), "env", "GOROOT"}, null, "get GO root").output.trim();
 
-		try {
-			File newGoRootDirectory = newGoRoot.toFile();
-			if (newGoRootDirectory.exists())
-				FileUtils.deleteDirectory(newGoRootDirectory);
-			FileUtils.copyDirectory(Paths.get(goRoot), newGoRoot);
+		Path packageDir = Paths.get(packageBaseString, "src", antlrTestPackageName);
+		Path runtimeBase = Paths.get(getRuntimePath("Go"), "antlr");
 
-			String packageDir = Paths.get(newGoRootString, "src", antlrTestPackageName).toString();
-			FileUtils.mkdir(packageDir);
-			File[] runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr").toFile().listFiles(GoFileFilter.Instance);
-			if (runtimeFiles == null) {
-				throw new Exception("Go runtime file list is empty.");
-			}
-
-			for (File runtimeFile : runtimeFiles) {
-				File dest = new File(packageDir, runtimeFile.getName());
-				FileUtils.copyFile(runtimeFile, dest);
-			}
-		}
-		catch (IOException ioException) {
-			throw new Exception("update GO runtime in " + newGoRoot, ioException);
-		}
-
-		try {
-			new File(newGoRootString, goModFileName).deleteOnExit();
-			Processor.run(new String[]{getRuntimeToolPath(), "mod", "init", "test"}, newGoRootString);
-			goModContent = new String(Files.readAllBytes(Paths.get(newGoRootString, goModFileName)), StandardCharsets.UTF_8);
-		} catch (InterruptedException | IOException e) {
-			throw new RuntimeException(e);
-		}
+		// As we are using modules for the tests, we can use the `replace` directive to point
+		// the tests at the runtime we are testing. We could use GOWORK, but then we would
+		// have to remove each test module and add in the current one. So, we turn GOWORK off
+		// as developers are quite likely to have that from go 1.18 onwards so that their copy
+		// of the go runtime is source locally without messing with their go.mod files and
+		// accidentally checking them in with a `replace` directive in there.
+		//
+		// So here, we need do nothing to initialize the runtime.
+		//
 	}
 
 	static class GoFileFilter implements FilenameFilter {
@@ -120,31 +115,46 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
+
 		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
 		String tempDirPath = getTempDirPath();
+		Path runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr");
 		File generatedFir = new File(tempDirPath, "parser");
 		if (!generatedFir.mkdir()) {
 			return new CompiledState(generatedState, new Exception("can't make dir " + generatedFir));
 		}
+
+		// The generated files seem to need to be in the parser subdirectory.
+		// We have no need to change the import of the runtime because of go mod replace so, we could just generate them
+		// directly in to the parser subdir. But in case down the line, there is some reason to want to replace things in
+		// the generated code, then I will leave this here, and we can use replaceInFile()
+		//
 		for (GeneratedFile generatedFile : generatedFiles) {
 			try {
 				Path originalFile = Paths.get(tempDirPath, generatedFile.name);
-				replaceInFile(originalFile,
-						Paths.get(tempDirPath, "parser", generatedFile.name),
-						GoRuntimeImportPath, antlrTestPackageName);
-				originalFile.toFile().delete();
+				Files.move(originalFile, Paths.get(tempDirPath, "parser", generatedFile.name));
 			} catch (IOException e) {
 				return new CompiledState(generatedState, e);
 			}
 		}
 
-		try (PrintWriter out = new PrintWriter(Paths.get(tempDirPath, goModFileName).toString())) {
-			out.println(goModContent);
-		} catch (FileNotFoundException e) {
-			return new CompiledState(generatedState, e);
+		ProcessorResult pr = null;
+		try {
+			pr = Processor.run(new String[]{getRuntimeToolPath(), "mod", "init", "test"}, tempDirPath, environment);
+			pr = Processor.run(new String[]{getRuntimeToolPath(), "mod", "edit", "-replace="+GoRuntimeImportPath+"="+runtimeFiles.toString()}, tempDirPath, environment);
+			pr = Processor.run(new String[]{getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
+		} catch (InterruptedException | IOException e) {
+			System.out.println("Output:");
+			System.out.println(pr.output);
+			System.out.println("Errors:");
+			System.out.println(pr.errors);
+
+			throw new RuntimeException(e);
 		}
 
-		return new CompiledState(generatedState, null);
+
+
+				return new CompiledState(generatedState, null);
 	}
 
 	@Override
