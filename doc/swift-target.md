@@ -51,9 +51,9 @@ for information about this script.
 
 ### Xcode Projects
 
-Note that even if you are otherwise using ANTLR from a binary distribution,
-you should compile the ANTLR Swift runtime from source, because the Swift
-language does not yet have a stable ABI.
+Note that if you are otherwise using ANTLR from a binary distribution,
+you should make sure that BUILD_LIBRARY_FOR_DISTRIBUTION is set to YES to
+enable library evolution support.
 
 ANTLR uses Swift Package Manager to generate Xcode project files. 
 
@@ -133,6 +133,16 @@ Add Antlr4 as a dependency to your `Package.swift` file. For more information, p
 ```swift
 .package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.10.1"
 ```
+
+## CocoaPods
+
+Antlr4 runtime is available through [CocoaPods](https://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod 'Antlr4'
+```
+
 ## Swift access levels
 
 You may use the `accessLevel` option to control the access levels on generated

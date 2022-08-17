@@ -155,7 +155,7 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     antlr_says("Created local repository.")
     antlr_says("(swift-tools-version:3.0) " 
                "Put .Package(url: \"{}\", majorVersion: {}) in Package.swift.".format(os.getcwd(), MAJOR_VERSION))
-    antlr_says("(swift-tools-wersion:4.0) "
+    antlr_says("(swift-tools-version:4.0) "
                "Put .package(url: \"{}\", from: \"{}.0.0\") in Package.swift "
                "and add \"Antlr4\" to target dependencies. ".format(os.getcwd(), MAJOR_VERSION))
 

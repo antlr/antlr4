@@ -3,6 +3,8 @@ name: antlr4
 on:
   push:
     branches: [ master, dev, hostedci ]
+  tags:
+      - '*'
   pull_request:
     branches: [ master, dev ]
 
@@ -179,6 +181,15 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
+    - name: Get tag
+      id: tag
+      run: |
+        if [[ $GITHUB_REF == 'refs/tags/'* ]]; then
+            echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+        else
+            echo "TAG=" >> $GITHUB_ENV
+        fi
+
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
       uses: actions/checkout@v2
@@ -331,3 +342,14 @@ jobs:
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.target }}
         path: antlr_${{ matrix.os }}_${{ matrix.target }}.tgz
+
+    - name: Publish CocoaPod
+      if: (env.TAG != null) && startsWith(matrix.os, 'macos') && (matrix.target == 'swift')
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      run: |
+        cp runtime/Swift/Antlr4.podspec .
+        set -eo pipefail
+        export ANTLR4_VERSION=${{ env.TAG }}
+        pod lib lint --allow-warnings
+        pod trunk push --allow-warnings
