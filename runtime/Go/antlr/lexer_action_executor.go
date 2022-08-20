@@ -4,6 +4,8 @@
 
 package antlr
 
+import "golang.org/x/exp/slices"
+
 // Represents an executor for a sequence of lexer actions which traversed during
 // the Matching operation of a lexer rule (token).
 //
@@ -12,8 +14,8 @@ package antlr
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []LexerAction
-	cachedHash       int
+	lexerActions []LexerAction
+	cachedHash   int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -30,7 +32,7 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
 	l.cachedHash = murmurInit(57)
 	for _, a := range lexerActions {
-		l.cachedHash = murmurUpdate(l.cachedHash, a.hash())
+		l.cachedHash = murmurUpdate(l.cachedHash, a.Hash())
 	}
 
 	return l
@@ -151,14 +153,17 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}
 }
 
-func (l *LexerActionExecutor) hash() int {
+func (l *LexerActionExecutor) Hash() int {
 	if l == nil {
+		// TODO: Why is this here? l should not be nil
 		return 61
 	}
+
+	// TODO: This is created from the action itself when the struct is created - will this be an issue at some point? Java uses the runtime assign hashcode
 	return l.cachedHash
 }
 
-func (l *LexerActionExecutor) equals(other interface{}) bool {
+func (l *LexerActionExecutor) Equals(other interface{}) bool {
 	if l == other {
 		return true
 	}
@@ -169,5 +174,13 @@ func (l *LexerActionExecutor) equals(other interface{}) bool {
 	if othert == nil {
 		return false
 	}
-	return l.cachedHash == othert.cachedHash && &l.lexerActions == &othert.lexerActions
+	if l.cachedHash != othert.cachedHash {
+		return false
+	}
+	if len(l.lexerActions) != len(othert.lexerActions) {
+		return false
+	}
+	return slices.EqualFunc(l.lexerActions, othert.lexerActions, func(i, j LexerAction) bool {
+		return i.Equals(j)
+	})
 }

@@ -14,14 +14,15 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 	return la
 }
 
-//* Special value added to the lookahead sets to indicate that we hit
-//  a predicate during analysis if {@code seeThruPreds==false}.
-///
+//   - Special value added to the lookahead sets to indicate that we hit
+//     a predicate during analysis if {@code seeThruPreds==false}.
+//
+// /
 const (
 	LL1AnalyzerHitPred = TokenInvalidType
 )
 
-//*
+// *
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
 // of an {@link ATNState}. The returned array has one element for each
 // outgoing transition in {@code s}. If the closure from transition
@@ -38,7 +39,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	look := make([]*IntervalSet, count)
 	for alt := 0; alt < count; alt++ {
 		look[alt] = NewIntervalSet()
-		lookBusy := newArray2DHashSet(nil, nil)
+		lookBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](&ObjEqComparator[ATNConfig]{})
 		seeThruPreds := false // fail to get lookahead upon pred
 		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
@@ -50,7 +51,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	return look
 }
 
-//*
+// *
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 //
@@ -67,7 +68,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 //
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
-///
+// /
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
 	seeThruPreds := true // ignore preds get all lookahead
@@ -75,7 +76,7 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	la.look1(s, stopState, lookContext, r, newArray2DHashSet(nil, nil), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, NewJStore[ATNConfig, Comparator[ATNConfig]](&ObjEqComparator[ATNConfig]{}), NewBitSet(), seeThruPreds, true)
 	return r
 }
 
@@ -109,14 +110,14 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
+func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 }
 
-func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
 	c := NewBaseATNConfig6(s, 0, ctx)
 
@@ -124,8 +125,11 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		return
 	}
 
-	lookBusy.Add(c)
+	_, present := lookBusy.Put(c)
+	if present {
+		return
 
+	}
 	if s == stopState {
 		if ctx == nil {
 			look.addOne(TokenEpsilon)
@@ -198,7 +202,7 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 	}
 }
 
-func (la *LL1Analyzer) look3(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
+func (la *LL1Analyzer) look3(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
 
 	newContext := SingletonBasePredictionContextCreate(ctx, t1.followState.GetStateNumber())
 

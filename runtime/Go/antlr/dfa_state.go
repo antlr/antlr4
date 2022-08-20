@@ -81,45 +81,6 @@ type DFAState struct {
 	predicates []*PredPrediction
 }
 
-type DFAStateComparator[T Collectable[T]] struct {
-}
-
-// NB This is the same as normal DFAState
-func (c *DFAStateComparator[T]) equals(o1, o2 T) bool {
-	return o1.gequals(o2)
-}
-
-// NB This is the same as normal DFAState
-func (c *DFAStateComparator[T]) hash(o T) int {
-	return o.hash()
-}
-
-// equals returns true if this DFA state is equal to another DFA state.
-// Two [DFAState] instances are equal if their ATN configuration sets
-// are the same. This method is used to see if a state already exists.
-//
-// Because the number of alternatives and number of ATN configurations are
-// finite, there is a finite number of DFA states that can be processed.
-// This is necessary to show that the algorithm terminates.
-//
-// Cannot test the DFA state numbers here because in [ParserATNSimulator.addDFAState]
-// we need to know if any other state exists that has this exact set of ATN configurations. The
-// [stateNumber] is irrelevant.
-func (d *DFAState) gequals(o Collectable[*DFAState]) bool {
-	if d == o {
-		return true
-	}
-
-	return d.configs.Equals(o.(*DFAState).configs)
-}
-func (d *DFAState) equals(o interface{}) bool {
-	if d == o {
-		return true
-	}
-
-	return d.configs.Equals(o.(*DFAState).configs)
-}
-
 func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 	if configs == nil {
 		configs = NewBaseATNConfigSet(false)
@@ -129,16 +90,16 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 }
 
 // GetAltSet gets the set of all alts mentioned by all ATN configurations in d.
-func (d *DFAState) GetAltSet() Set {
-	alts := newArray2DHashSet(nil, nil)
+func (d *DFAState) GetAltSet() []int {
+	var alts []int
 
 	if d.configs != nil {
 		for _, c := range d.configs.GetItems() {
-			alts.Add(c.GetAlt())
+			alts = append(alts, c.GetAlt())
 		}
 	}
 
-	if alts.Len() == 0 {
+	if len(alts) == 0 {
 		return nil
 	}
 
@@ -169,17 +130,6 @@ func (d *DFAState) setPrediction(v int) {
 	d.prediction = v
 }
 
-// equals returns whether d equals other. Two DFAStates are equal if their ATN
-// configuration sets are the same. This method is used to see if a state
-// already exists.
-//
-// Because the number of alternatives and number of ATN configurations are
-// finite, there is a finite number of DFA states that can be processed. This is
-// necessary to show that the algorithm terminates.
-//
-// Cannot test the DFA state numbers here because in
-// ParserATNSimulator.addDFAState we need to know if any other state exists that
-// has d exact set of ATN configurations. The stateNumber is irrelevant.
 // func (d *DFAState) equals(other interface{}) bool {
 //	if d == other {
 //		return true
@@ -203,17 +153,28 @@ func (d *DFAState) String() string {
 	return fmt.Sprintf("%d:%s%s", d.stateNumber, fmt.Sprint(d.configs), s)
 }
 
-func (d *DFAState) hash() int {
+func (d *DFAState) Hash() int {
 	h := murmurInit(7)
-	h = murmurUpdate(h, d.configs.hash())
+	h = murmurUpdate(h, d.configs.Hash())
 	return murmurFinish(h, 1)
 }
 
-func (d *DFAState) Equals(o *DFAState) bool {
+// Equals returns whether d equals other. Two DFAStates are equal if their ATN
+// configuration sets are the same. This method is used to see if a state
+// already exists.
+//
+// Because the number of alternatives and number of ATN configurations are
+// finite, there is a finite number of DFA states that can be processed. This is
+// necessary to show that the algorithm terminates.
+//
+// Cannot test the DFA state numbers here because in
+// ParserATNSimulator.addDFAState we need to know if any other state exists that
+// has d exact set of ATN configurations. The stateNumber is irrelevant.
+func (d *DFAState) Equals(o Collectable[*DFAState]) bool {
 
 	if d == o {
 		return true
 	}
 
-	return d.configs.Equals(o.configs)
+	return d.configs.Equals(o.(*DFAState).configs)
 }

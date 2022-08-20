@@ -49,7 +49,8 @@ type ATNState interface {
 	AddTransition(Transition, int)
 
 	String() string
-	hash() int
+	Hash() int
+	Equals(Collectable[ATNState]) bool
 }
 
 type BaseATNState struct {
@@ -123,7 +124,7 @@ func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.NextTokenWithinRule = v
 }
 
-func (as *BaseATNState) hash() int {
+func (as *BaseATNState) Hash() int {
 	return as.stateNumber
 }
 
@@ -131,7 +132,7 @@ func (as *BaseATNState) String() string {
 	return strconv.Itoa(as.stateNumber)
 }
 
-func (as *BaseATNState) equals(other interface{}) bool {
+func (as *BaseATNState) Equals(other Collectable[ATNState]) bool {
 	if ot, ok := other.(ATNState); ok {
 		return as.stateNumber == ot.GetStateNumber()
 	}

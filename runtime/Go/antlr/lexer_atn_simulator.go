@@ -595,7 +595,7 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 
 	l.atn.stateMu.Lock()
 	defer l.atn.stateMu.Unlock()
-	existing, present := dfa.states.Put(proposed)
+	existing, present := dfa.states.Get(proposed)
 	if present {
 
 		// This state was already present, so just return it.
@@ -603,12 +603,12 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 		proposed = existing
 	} else {
 
-		// The proposed state has already been added to the DFA. We still have the pointer, so
-		// we can modify it even though it is stored already.
+		// We need to add the new state
 		//
-		proposed.stateNumber = dfa.states.Len() - 1
+		proposed.stateNumber = dfa.states.Len()
 		configs.SetReadOnly(true)
 		proposed.configs = configs
+		dfa.states.Put(proposed)
 	}
 	if !suppressEdge {
 		dfa.setS0(proposed)

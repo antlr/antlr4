@@ -47,28 +47,25 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-func standardEqualsFunction(a interface{}, b interface{}) bool {
+type comparable interface {
+	Equals(other Collectable[any]) bool
+}
 
-	ac, oka := a.(comparable)
-	bc, okb := b.(comparable)
+func standardEqualsFunction(a Collectable[any], b Collectable[any]) bool {
 
-	if !oka || !okb {
-		panic("Not Comparable")
-	}
-
-	return ac.equals(bc)
+	return a.Equals(b)
 }
 
 func standardHashFunction(a interface{}) int {
 	if h, ok := a.(hasher); ok {
-		return h.hash()
+		return h.Hash()
 	}
 
 	panic("Not Hasher")
 }
 
 type hasher interface {
-	hash() int
+	Hash() int
 }
 
 const bitsPerWord = 64
