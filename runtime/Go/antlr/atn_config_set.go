@@ -245,6 +245,7 @@ func (b *BaseATNConfigSet) Compare(bs *BaseATNConfigSet) bool {
 	return true
 }
 
+
 func (b *BaseATNConfigSet) Equals(other Collectable[ATNConfig]) bool {
 	if b == other {
 		return true

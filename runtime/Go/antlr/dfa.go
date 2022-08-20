@@ -18,6 +18,7 @@ type DFA struct {
 	//
 	//
 	states    *JStore[*DFAState, *ObjEqComparator[*DFAState]]
+
 	numstates int
 
 	s0 *DFAState

@@ -14,6 +14,7 @@ import (
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
+
 	Equals(o Collectable[ATNConfig]) bool
 	Hash() int
 
@@ -128,6 +129,9 @@ func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
 
 func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 	b.reachesIntoOuterContext = v
+}
+func (b *BaseATNConfig) equals(o interface{}) bool {
+	return b.gequals(o.(Collectable[ATNConfig]))
 }
 
 // Equals is the default comparison function for an ATNConfig when no specialist implementation is required
