@@ -3,16 +3,15 @@ package antlr
 import "sort"
 
 // Collectable is an interface that a struct should implement if it is to be
-// usable as a key in this collection. Cannot use the intuitive equals function
-// here because the non-generic runtime has already claimed it.
+// usable as a key in these collections.
 type Collectable[T any] interface {
-	hash() int
-	gequals(other Collectable[T]) bool
+	Hash() int
+	Equals(other Collectable[T]) bool
 }
 
 type Comparator[T any] interface {
-	hash(o T) int
-	equals(T, T) bool
+	Hash1(o T) int
+	Equals2(T, T) bool
 }
 
 // JStore implements a container that allows the use of a struct to calculate the key
@@ -20,7 +19,7 @@ type Comparator[T any] interface {
 // serve the needs of the ANTLR Go runtime.
 //
 // For ease of porting the logic of the runtime from the master target (Java), this collection
-// operates in a similar way to Java, in that it can use any struct that supplies a hash() and equals()
+// operates in a similar way to Java, in that it can use any struct that supplies a Hash() and Equals()
 // function as the key. The values are stored in a standard go map which internally is a form of hashmap
 // itself, the key for the go map is the hash supplied by the key object. The collection is able to deal with
 // hash conflicts by using a simple slice of values associated with the hash code indexed bucket. That isn't
@@ -58,11 +57,11 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T]) *JStore[T, C] {
 // If the given value is not present in the store, then the value is added to the store and returned as v and exists is set to false.
 func (s *JStore[T, C]) Put(value T) (v T, exists bool) { //nolint:ireturn
 
-	kh := s.comparator.hash(value)
+	kh := s.comparator.Hash1(value)
 
-	for _, v := range s.store[kh] {
-		if s.comparator.equals(value, v) {
-			return v, true
+	for _, v1 := range s.store[kh] {
+		if s.comparator.Equals2(value, v1) {
+			return v1, true
 		}
 	}
 	s.store[kh] = append(s.store[kh], value)
@@ -75,14 +74,21 @@ func (s *JStore[T, C]) Put(value T) (v T, exists bool) { //nolint:ireturn
 // generated using the object we are going to store.
 func (s *JStore[T, C]) Get(key T) (T, bool) { //nolint:ireturn
 
-	kh := s.comparator.hash(key)
+	kh := s.comparator.Hash1(key)
 
 	for _, v := range s.store[kh] {
-		if s.comparator.equals(key, v) {
+		if s.comparator.Equals2(key, v) {
 			return v, true
 		}
 	}
 	return key, false
+}
+
+// Contains returns true if the given key is present in the store
+func (s *JStore[T, C]) Contains(key T) bool { //nolint:ireturn
+
+	_, present := s.Get(key)
+	return present
 }
 
 func (s *JStore[T, C]) SortedSlice(less func(i, j T) bool) []T {
@@ -97,8 +103,26 @@ func (s *JStore[T, C]) SortedSlice(less func(i, j T) bool) []T {
 	return vs
 }
 
+func (s *JStore[T, C]) Each(f func(T) bool) {
+	for _, e := range s.store {
+		for _, v := range e {
+			f(v)
+		}
+	}
+}
+
 func (s *JStore[T, C]) Len() int {
 	return s.len
+}
+
+func (s *JStore[T, C]) Values() []T {
+	vs := make([]T, 0, len(s.store))
+	for _, e := range s.store {
+		for _, v := range e {
+			vs = append(vs, v)
+		}
+	}
+	return vs
 }
 
 type entry[K, V any] struct {
@@ -120,7 +144,7 @@ func NewJMap[K, V any, C Comparator[K]](comparator Comparator[K]) *JMap[K, V, C]
 }
 
 func (m *JMap[K, V, C]) Put(key K, val V) {
-	kh := m.comparator.hash(key)
+	kh := m.comparator.Hash1(key)
 	m.store[kh] = append(m.store[kh], &entry[K, V]{key, val})
 	m.len++
 }
@@ -138,9 +162,9 @@ func (m *JMap[K, V, C]) Values() []V {
 func (m *JMap[K, V, C]) Get(key K) (V, bool) {
 
 	var none V
-	kh := m.comparator.hash(key)
+	kh := m.comparator.Hash1(key)
 	for _, e := range m.store[kh] {
-		if m.comparator.equals(e.key, key) {
+		if m.comparator.Equals2(e.key, key) {
 			return e.val, true
 		}
 	}
@@ -152,9 +176,9 @@ func (m *JMap[K, V, C]) Len() int {
 }
 
 func (m *JMap[K, V, C]) Delete(key K) {
-	kh := m.comparator.hash(key)
+	kh := m.comparator.Hash1(key)
 	for i, e := range m.store[kh] {
-		if m.comparator.equals(e.key, key) {
+		if m.comparator.Equals2(e.key, key) {
 			m.store[kh] = append(m.store[kh][:i], m.store[kh][i+1:]...)
 			m.len--
 			return
