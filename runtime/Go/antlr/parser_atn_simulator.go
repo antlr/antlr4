@@ -570,7 +570,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	//
 	if reach == nil {
 		reach = NewBaseATNConfigSet(fullCtx)
-		closureBusy := newArray2DHashSet(nil, nil)
+		closureBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](&ObjEqComparator[ATNConfig]{})
 		treatEOFAsEpsilon := t == TokenEOF
 		amount := len(intermediate.configs)
 		for k := 0; k < amount; k++ {
@@ -663,7 +663,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
 		c := NewBaseATNConfig6(target, i+1, initialContext)
-		closureBusy := newArray2DHashSet(nil, nil)
+		closureBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](&BaseATNConfigComparator[ATNConfig]{})
 		p.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
 	return configs
@@ -756,7 +756,7 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConf
 		// (basically a graph subtraction algorithm).
 		if !config.getPrecedenceFilterSuppressed() {
 			context := statesFromAlt1[config.GetState().GetStateNumber()]
-			if context != nil && context.gequals(config.GetContext()) {
+			if context != nil && context.Equals(config.GetContext()) {
 				// eliminated
 				continue
 			}
@@ -966,13 +966,13 @@ func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredicti
 	return predictions
 }
 
-func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy Set, collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
 	initialDepth := 0
 	p.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 		fullCtx, initialDepth, treatEOFAsEpsilon)
 }
 
-func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	if ParserATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")")
 		fmt.Println("configs(" + configs.String() + ")")
@@ -1025,7 +1025,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 }
 
 // Do the actual work of walking epsilon edges//
-func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet, closureBusy Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	state := config.GetState()
 	// optimization
 	if !state.GetEpsilonOnlyTransitions() {
@@ -1060,7 +1060,8 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 
 				c.SetReachesIntoOuterContext(c.GetReachesIntoOuterContext() + 1)
 
-				if closureBusy.Add(c) != c {
+				_, present := closureBusy.Put(c)
+				if present {
 					// avoid infinite recursion for right-recursive rules
 					continue
 				}
@@ -1071,9 +1072,13 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 					fmt.Println("dips into outer ctx: " + c.String())
 				}
 			} else {
-				if !t.getIsEpsilon() && closureBusy.Add(c) != c {
-					// avoid infinite recursion for EOF* and EOF+
-					continue
+
+				if !t.getIsEpsilon() {
+					_, present := closureBusy.Put(c)
+					if present {
+						// avoid infinite recursion for EOF* and EOF+
+						continue
+					}
 				}
 				if _, ok := t.(*RuleTransition); ok {
 					// latch when newDepth goes negative - once we step out of the entry context we can't return
@@ -1490,18 +1495,19 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 	if d == ATNSimulatorError {
 		return d
 	}
-	existing, present := dfa.states.Put(d)
+	existing, present := dfa.states.Get(d)
 	if present {
 		return existing
 	}
 
 	// The state was not present, so update it with configs
 	//
-	d.stateNumber = dfa.states.Len() - 1
+	d.stateNumber = dfa.states.Len()
 	if !d.configs.ReadOnly() {
 		d.configs.OptimizeConfigs(p.BaseATNSimulator)
 		d.configs.SetReadOnly(true)
 	}
+	dfa.states.Put(d)
 	if ParserATNSimulatorDebug {
 		fmt.Println("adding NewDFA state: " + d.String())
 	}

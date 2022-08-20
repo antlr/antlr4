@@ -8,8 +8,6 @@ const (
 	_loadFactor           = 0.75
 )
 
-var _ Set = (*array2DHashSet)(nil)
-
 type Set interface {
 	Add(value interface{}) (added interface{})
 	Len() int
@@ -20,9 +18,9 @@ type Set interface {
 }
 
 type array2DHashSet struct {
-	buckets          [][]interface{}
+	buckets          [][]Collectable[any]
 	hashcodeFunction func(interface{}) int
-	equalsFunction   func(interface{}, interface{}) bool
+	equalsFunction   func(Collectable[any], Collectable[any]) bool
 
 	n         int // How many elements in set
 	threshold int // when to expand
@@ -61,11 +59,11 @@ func (as *array2DHashSet) Values() []interface{} {
 	return values
 }
 
-func (as *array2DHashSet) Contains(value interface{}) bool {
+func (as *array2DHashSet) Contains(value Collectable[any]) bool {
 	return as.Get(value) != nil
 }
 
-func (as *array2DHashSet) Add(value interface{}) interface{} {
+func (as *array2DHashSet) Add(value Collectable[any]) interface{} {
 	if as.n > as.threshold {
 		as.expand()
 	}
@@ -98,7 +96,7 @@ func (as *array2DHashSet) expand() {
 
 			b := as.getBuckets(o)
 			bucketLength := newBucketLengths[b]
-			var newBucket []interface{}
+			var newBucket []Collectable[any]
 			if bucketLength == 0 {
 				// new bucket
 				newBucket = as.createBucket(as.initialBucketCapacity)
@@ -107,7 +105,7 @@ func (as *array2DHashSet) expand() {
 				newBucket = newTable[b]
 				if bucketLength == len(newBucket) {
 					// expand
-					newBucketCopy := make([]interface{}, len(newBucket)<<1)
+					newBucketCopy := make([]Collectable[any], len(newBucket)<<1)
 					copy(newBucketCopy[:bucketLength], newBucket)
 					newBucket = newBucketCopy
 					newTable[b] = newBucket
@@ -124,7 +122,7 @@ func (as *array2DHashSet) Len() int {
 	return as.n
 }
 
-func (as *array2DHashSet) Get(o interface{}) interface{} {
+func (as *array2DHashSet) Get(o Collectable[any]) interface{} {
 	if o == nil {
 		return nil
 	}
@@ -147,7 +145,7 @@ func (as *array2DHashSet) Get(o interface{}) interface{} {
 	return nil
 }
 
-func (as *array2DHashSet) innerAdd(o interface{}) interface{} {
+func (as *array2DHashSet) innerAdd(o Collectable[any]) interface{} {
 	b := as.getBuckets(o)
 
 	bucket := as.buckets[b]
@@ -178,7 +176,7 @@ func (as *array2DHashSet) innerAdd(o interface{}) interface{} {
 
 	// full bucket, expand and add to end
 	oldLength := len(bucket)
-	bucketCopy := make([]interface{}, oldLength<<1)
+	bucketCopy := make([]Collectable[any], oldLength<<1)
 	copy(bucketCopy[:oldLength], bucket)
 	bucket = bucketCopy
 	as.buckets[b] = bucket
@@ -187,22 +185,22 @@ func (as *array2DHashSet) innerAdd(o interface{}) interface{} {
 	return o
 }
 
-func (as *array2DHashSet) getBuckets(value interface{}) int {
+func (as *array2DHashSet) getBuckets(value Collectable[any]) int {
 	hash := as.hashcodeFunction(value)
 	return hash & (len(as.buckets) - 1)
 }
 
-func (as *array2DHashSet) createBuckets(cap int) [][]interface{} {
-	return make([][]interface{}, cap)
+func (as *array2DHashSet) createBuckets(cap int) [][]Collectable[any] {
+	return make([][]Collectable[any], cap)
 }
 
-func (as *array2DHashSet) createBucket(cap int) []interface{} {
-	return make([]interface{}, cap)
+func (as *array2DHashSet) createBucket(cap int) []Collectable[any] {
+	return make([]Collectable[any], cap)
 }
 
 func newArray2DHashSetWithCap(
 	hashcodeFunction func(interface{}) int,
-	equalsFunction func(interface{}, interface{}) bool,
+	equalsFunction func(Collectable[any], Collectable[any]) bool,
 	initCap int,
 	initBucketCap int,
 ) *array2DHashSet {
@@ -231,7 +229,7 @@ func newArray2DHashSetWithCap(
 
 func newArray2DHashSet(
 	hashcodeFunction func(interface{}) int,
-	equalsFunction func(interface{}, interface{}) bool,
+	equalsFunction func(Collectable[any], Collectable[any]) bool,
 ) *array2DHashSet {
 	return newArray2DHashSetWithCap(hashcodeFunction, equalsFunction, _initalCapacity, _initalBucketCapacity)
 }

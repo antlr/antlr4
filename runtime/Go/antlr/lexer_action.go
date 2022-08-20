@@ -21,8 +21,8 @@ type LexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
-	hash() int
-	equals(other LexerAction) bool
+	Hash() int
+	Equals(other LexerAction) bool
 }
 
 type BaseLexerAction struct {
@@ -51,15 +51,14 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 	return b.isPositionDependent
 }
 
-func (b *BaseLexerAction) hash() int {
+func (b *BaseLexerAction) Hash() int {
 	return b.actionType
 }
 
-func (b *BaseLexerAction) equals(other LexerAction) bool {
+func (b *BaseLexerAction) Equals(other LexerAction) bool {
 	return b == other
 }
 
-//
 // Implements the {@code Skip} lexer action by calling {@link Lexer//Skip}.
 //
 // <p>The {@code Skip} command does not have any parameters, so l action is
@@ -85,7 +84,8 @@ func (l *LexerSkipAction) String() string {
 	return "skip"
 }
 
-//  Implements the {@code type} lexer action by calling {@link Lexer//setType}
+//	Implements the {@code type} lexer action by calling {@link Lexer//setType}
+//
 // with the assigned type.
 type LexerTypeAction struct {
 	*BaseLexerAction
@@ -104,14 +104,14 @@ func (l *LexerTypeAction) execute(lexer Lexer) {
 	lexer.SetType(l.thetype)
 }
 
-func (l *LexerTypeAction) hash() int {
+func (l *LexerTypeAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.thetype)
 	return murmurFinish(h, 2)
 }
 
-func (l *LexerTypeAction) equals(other LexerAction) bool {
+func (l *LexerTypeAction) Equals(other LexerAction) bool {
 	if l == other {
 		return true
 	} else if _, ok := other.(*LexerTypeAction); !ok {
@@ -148,14 +148,14 @@ func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.PushMode(l.mode)
 }
 
-func (l *LexerPushModeAction) hash() int {
+func (l *LexerPushModeAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.mode)
 	return murmurFinish(h, 2)
 }
 
-func (l *LexerPushModeAction) equals(other LexerAction) bool {
+func (l *LexerPushModeAction) Equals(other LexerAction) bool {
 	if l == other {
 		return true
 	} else if _, ok := other.(*LexerPushModeAction); !ok {
@@ -245,14 +245,14 @@ func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.SetMode(l.mode)
 }
 
-func (l *LexerModeAction) hash() int {
+func (l *LexerModeAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.mode)
 	return murmurFinish(h, 2)
 }
 
-func (l *LexerModeAction) equals(other LexerAction) bool {
+func (l *LexerModeAction) Equals(other LexerAction) bool {
 	if l == other {
 		return true
 	} else if _, ok := other.(*LexerModeAction); !ok {
@@ -303,7 +303,7 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
 
-func (l *LexerCustomAction) hash() int {
+func (l *LexerCustomAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.ruleIndex)
@@ -311,13 +311,14 @@ func (l *LexerCustomAction) hash() int {
 	return murmurFinish(h, 3)
 }
 
-func (l *LexerCustomAction) equals(other LexerAction) bool {
+func (l *LexerCustomAction) Equals(other LexerAction) bool {
 	if l == other {
 		return true
 	} else if _, ok := other.(*LexerCustomAction); !ok {
 		return false
 	} else {
-		return l.ruleIndex == other.(*LexerCustomAction).ruleIndex && l.actionIndex == other.(*LexerCustomAction).actionIndex
+		return l.ruleIndex == other.(*LexerCustomAction).ruleIndex &&
+			l.actionIndex == other.(*LexerCustomAction).actionIndex
 	}
 }
 
@@ -344,14 +345,14 @@ func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.SetChannel(l.channel)
 }
 
-func (l *LexerChannelAction) hash() int {
+func (l *LexerChannelAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.channel)
 	return murmurFinish(h, 2)
 }
 
-func (l *LexerChannelAction) equals(other LexerAction) bool {
+func (l *LexerChannelAction) Equals(other LexerAction) bool {
 	if l == other {
 		return true
 	} else if _, ok := other.(*LexerChannelAction); !ok {
@@ -412,10 +413,10 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	l.lexerAction.execute(lexer)
 }
 
-func (l *LexerIndexedCustomAction) hash() int {
+func (l *LexerIndexedCustomAction) Hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.offset)
-	h = murmurUpdate(h, l.lexerAction.hash())
+	h = murmurUpdate(h, l.lexerAction.Hash())
 	return murmurFinish(h, 2)
 }
 
@@ -425,6 +426,7 @@ func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {
 	} else if _, ok := other.(*LexerIndexedCustomAction); !ok {
 		return false
 	} else {
-		return l.offset == other.(*LexerIndexedCustomAction).offset && l.lexerAction == other.(*LexerIndexedCustomAction).lexerAction
+		return l.offset == other.(*LexerIndexedCustomAction).offset &&
+			l.lexerAction.Equals(other.(*LexerIndexedCustomAction).lexerAction)
 	}
 }

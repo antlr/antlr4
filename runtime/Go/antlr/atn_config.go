@@ -8,21 +8,14 @@ import (
 	"fmt"
 )
 
-type comparable interface {
-	equals(other interface{}) bool
-}
-
 // ATNConfig is a tuple: (ATN state, predicted alt, syntactic, semantic
 // context). The syntactic context is a graph-structured stack node whose
 // path(s) to the root is the rule invocation(s) chain used to arrive at the
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
-	comparable
-
-	gequals(other Collectable[ATNConfig]) bool
-
-	hash() int
+	Equals(o Collectable[ATNConfig]) bool
+	Hash() int
 
 	GetState() ATNState
 	GetAlt() int
@@ -136,15 +129,17 @@ func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
 func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 	b.reachesIntoOuterContext = v
 }
-func (b *BaseATNConfig) equals(o interface{}) bool {
-	return b.gequals(o.(Collectable[ATNConfig]))
-}
 
+// Equals is the default comparison function for an ATNConfig when no specialist implementation is required
+// for a collection.
+//
 // An ATN configuration is equal to another if both have the same state, they
 // predict the same alternative, and syntactic/semantic contexts are the same.
-func (b *BaseATNConfig) gequals(o Collectable[ATNConfig]) bool {
+func (b *BaseATNConfig) Equals(o Collectable[ATNConfig]) bool {
 	if b == o {
 		return true
+	} else if o == nil {
+		return false
 	}
 
 	var other, ok = o.(*BaseATNConfig)
@@ -158,30 +153,32 @@ func (b *BaseATNConfig) gequals(o Collectable[ATNConfig]) bool {
 	if b.context == nil {
 		equal = other.context == nil
 	} else {
-		equal = b.context.gequals(other.context)
+		equal = b.context.Equals(other.context)
 	}
 
 	var (
 		nums = b.state.GetStateNumber() == other.state.GetStateNumber()
 		alts = b.alt == other.alt
-		cons = b.semanticContext.equals(other.semanticContext)
+		cons = b.semanticContext.Equals(other.semanticContext)
 		sups = b.precedenceFilterSuppressed == other.precedenceFilterSuppressed
 	)
 
 	return nums && alts && cons && sups && equal
 }
 
-func (b *BaseATNConfig) hash() int {
+// Hash is the default hash function for BaseATNConfig, when no specialist hash function
+// is required for a collection
+func (b *BaseATNConfig) Hash() int {
 	var c int
 	if b.context != nil {
-		c = b.context.hash()
+		c = b.context.Hash()
 	}
 
 	h := murmurInit(7)
 	h = murmurUpdate(h, b.state.GetStateNumber())
 	h = murmurUpdate(h, b.alt)
 	h = murmurUpdate(h, c)
-	h = murmurUpdate(h, b.semanticContext.hash())
+	h = murmurUpdate(h, b.semanticContext.Hash())
 	return murmurFinish(h, 4)
 }
 
@@ -248,7 +245,9 @@ func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *Lex
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }
 
-func (l *LexerATNConfig) hash() int {
+// Hash is the default hash function for LexerATNConfig objects, it can be used directly or via
+// the default comparator [ObjEqComparator].
+func (l *LexerATNConfig) Hash() int {
 	var f int
 	if l.passedThroughNonGreedyDecision {
 		f = 1
@@ -258,19 +257,20 @@ func (l *LexerATNConfig) hash() int {
 	h := murmurInit(7)
 	h = murmurUpdate(h, l.state.GetStateNumber())
 	h = murmurUpdate(h, l.alt)
-	h = murmurUpdate(h, l.context.hash())
-	h = murmurUpdate(h, l.semanticContext.hash())
+	h = murmurUpdate(h, l.context.Hash())
+	h = murmurUpdate(h, l.semanticContext.Hash())
 	h = murmurUpdate(h, f)
-	h = murmurUpdate(h, l.lexerActionExecutor.hash())
+	h = murmurUpdate(h, l.lexerActionExecutor.Hash())
 	h = murmurFinish(h, 6)
 	return h
 }
 
-func (l *LexerATNConfig) equals(other interface{}) bool {
-	return l.gequals(other.(Collectable[ATNConfig]))
-}
-
-func (l *LexerATNConfig) gequals(other Collectable[ATNConfig]) bool {
+// Equals is the default comparison function for LexerATNConfig objects, it can be used directly or via
+// the default comparator [ObjEqComparator].
+func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
+	if l == other {
+		return true
+	}
 	var othert, ok = other.(*LexerATNConfig)
 
 	if l == other {
@@ -284,7 +284,7 @@ func (l *LexerATNConfig) gequals(other Collectable[ATNConfig]) bool {
 	var b bool
 
 	if l.lexerActionExecutor != nil {
-		b = !l.lexerActionExecutor.equals(othert.lexerActionExecutor)
+		b = !l.lexerActionExecutor.Equals(othert.lexerActionExecutor)
 	} else {
 		b = othert.lexerActionExecutor != nil
 	}
@@ -293,7 +293,7 @@ func (l *LexerATNConfig) gequals(other Collectable[ATNConfig]) bool {
 		return false
 	}
 
-	return l.BaseATNConfig.equals(othert.BaseATNConfig)
+	return l.BaseATNConfig.Equals(othert.BaseATNConfig)
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {

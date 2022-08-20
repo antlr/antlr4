@@ -13,11 +13,12 @@ type DFA struct {
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there. Go maps implement key hash collisions and so on and are very
 	// good, but the DFAState is an object and can't be used directly as the key as it can in say JAva
-	// amd C#, whereby if the hashcode is the same for two objects, then equals() is called against them
+	// amd C#, whereby if the hashcode is the same for two objects, then Equals() is called against them
 	// to see if they really are the same object.
 	//
 	//
-	states    *JStore[*DFAState, *DFAStateComparator[*DFAState]]
+	states    *JStore[*DFAState, *ObjEqComparator[*DFAState]]
+
 	numstates int
 
 	s0 *DFAState
@@ -31,7 +32,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        NewJStore[*DFAState, *DFAStateComparator[*DFAState]](&DFAStateComparator[*DFAState]{}),
+		states:        NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{}),
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
@@ -94,7 +95,7 @@ func (d *DFA) getPrecedenceDfa() bool {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
-		d.states = NewJStore[*DFAState, *DFAStateComparator[*DFAState]](&DFAStateComparator[*DFAState]{})
+		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{})
 		d.numstates = 0
 
 		if precedenceDfa {

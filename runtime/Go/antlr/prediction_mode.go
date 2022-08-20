@@ -460,29 +460,7 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 	return all
 }
 
-type ATNComparator[T Collectable[T]] struct {
-}
-
-// NB This is the same as normal DFAState
-func (a *ATNComparator[T]) equals(o1, o2 ATNConfig) bool {
-	if o1 == o2 {
-		return true
-	}
-	if o1 != nil && o2 != nil {
-		return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber()
-	}
-	return false
-}
-
-// NB This is the same as normal DFAState
-func (a *ATNComparator[T]) hash(o ATNConfig) int {
-	h := murmurInit(7)
-	h = murmurUpdate(h, o.GetState().GetStateNumber())
-	h = murmurUpdate(h, o.GetContext().hash())
-	return murmurFinish(h, 2)
-}
-
-// This func gets the conflicting alt subsets from a configuration set.
+// PredictionModegetConflictingAltSubsets gets the conflicting alt subsets from a configuration set.
 // For each configuration {@code c} in {@code configs}:
 //
 // <pre>
@@ -490,7 +468,7 @@ func (a *ATNComparator[T]) hash(o ATNConfig) int {
 // alt and not pred
 // </pre>
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
-	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNComparator[ATNConfig]](&ATNComparator[ATNConfig]{})
+	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](&ATNAltConfigComparator[ATNConfig]{})
 
 	for _, c := range configs.GetItems() {
 
@@ -505,7 +483,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 	return configToAlts.Values()
 }
 
-// Get a map from state to alt subset from a configuration set. For each
+// PredictionModeGetStateToAltMap gets a map from state to alt subset from a configuration set. For each
 // configuration {@code c} in {@code configs}:
 //
 // <pre>
