@@ -35,6 +35,7 @@ public class GoTarget extends Target {
 		"true", "false", "iota", "nil",
 		"append", "cap", "close", "complex", "copy", "delete", "imag", "len",
 		"make", "new", "panic", "print", "println", "real", "recover",
+		"string",
 
 		// interface definition of RuleContext from runtime/Go/antlr/rule_context.go
 		"Accept", "GetAltNumber", "GetBaseRuleContext", "GetChild", "GetChildCount",
