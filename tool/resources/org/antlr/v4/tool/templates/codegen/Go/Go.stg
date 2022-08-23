@@ -1348,9 +1348,15 @@ recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), 
 recRuleSetReturnAction(src, name) ::= "$<name> = $<src>.<name>" // TODO: Is this valid Go syntax?
 recRuleSetStopToken() ::= "p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))"
 
-recRuleAltStartAction(ruleName, ctxName, label) ::= <<
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 localctx = New<ctxName>Context(p, _parentctx, _parentState)
-<if(label)>localctx.(*<ctxName>Context).<label> = _prevctx<endif>
+<if(label)>
+<if(isListLabel)>
+localctx.(*<ctxName>Context).<label> = append(localctx.(*<ctxName>Context).<label>, _prevctx);
+<else>
+localctx.(*<ctxName>Context).<label> = _prevctx
+<endif>
+<endif>
 p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
 
