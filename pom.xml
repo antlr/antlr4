@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.10.2-SNAPSHOT</version>
+	<version>4.11-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
@@ -70,6 +70,7 @@
 			<url>https://www.linkedin.com/in/jimidle/</url>
 			<roles>
 				<role>Developer - Maven Plugin</role>
+				<role>Developer - Go runtime</role>
 			</roles>
 		</developer>
 		<developer>
