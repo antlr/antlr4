@@ -1,5 +1,9 @@
 package antlr
 
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+// Use of this file is governed by the BSD 3-clause license that
+// can be found in the LICENSE.txt file in the project root.
+
 // This file contains all the implementations of custom comparators used for generic collections when the
 // Hash() and Equals() funcs supplied by the struct objects themselves need to be overridden. Normally, we would
 // put the comparators in the source file for the struct themselves, but given the organization of this code is
