@@ -42,7 +42,7 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T]) *JStore[T, C] {
 	}
 
 	s := &JStore[T, C]{
-		store:      make(map[int][]T),
+		store:      make(map[int][]T, 1),
 		comparator: comparator,
 	}
 	return s
@@ -142,7 +142,7 @@ type JMap[K, V any, C Comparator[K]] struct {
 
 func NewJMap[K, V any, C Comparator[K]](comparator Comparator[K]) *JMap[K, V, C] {
 	return &JMap[K, V, C]{
-		store:      make(map[int][]*entry[K, V]),
+		store:      make(map[int][]*entry[K, V], 1),
 		comparator: comparator,
 	}
 }
