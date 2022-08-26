@@ -52,8 +52,8 @@ Match token T at the current input position. Tokens always begin with a capital 
 </tr>
 
 <tr>
-<td>’literal’</td><td>
-Match that character or sequence of characters. E.g., ’while’ or ’=’.</td>
+<td>'literal'</td><td>
+Match that character or sequence of characters. E.g., 'while' or '='.</td>
 </tr>
 
 <tr>
@@ -97,8 +97,8 @@ DASH : [---] ; // match a single -, i.e., "any character" between - and - (note 
 </tr>
 
 <tr>
-<td>’x’..’y’</td><td>
-Match any single character between range x and y, inclusively. E.g., ’a’..’z’. ’a’..’z’ is identical to [a-z].</td>
+<td>'x'..'y'</td><td>
+Match any single character between range x and y, inclusively. E.g., 'a'..'z'. 'a'..'z' is identical to [a-z].</td>
 </tr>
 
 <tr>
@@ -143,7 +143,7 @@ Evaluate semantic predicate «p». If «p» evaluates to false at runtime, the s
 
 <tr>
 <td>~x</td><td>
-Match any single character not in the set described by x. Set x can be a single character literal, a range, or a subrule set like ~(’x’|’y’|’z’) or ~[xyz]. Here is a rule that uses ~ to match any character other than characters using ~[\r\n]*:
+Match any single character not in the set described by x. Set x can be a single character literal, a range, or a subrule set like ~('x'|'y'|'z') or ~[xyz]. Here is a rule that uses ~ to match any character other than characters using ~[\r\n]*:
 <pre> 	
 COMMENT : '#' ~[\r\n]* '\r'? '\n' -> skip ;
 </pre>
@@ -176,7 +176,7 @@ mode STR;
 MASK : '&' ;
 ```
 
-A parser grammar cannot reference literal ’&’, but it can reference the name of the tokens:
+A parser grammar cannot reference literal '&', but it can reference the name of the tokens:
 
 ```
 parser grammar P;
