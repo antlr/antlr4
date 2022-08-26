@@ -98,7 +98,7 @@ Not every kind of grammar can import every other kind of grammar:
 * Parsers can import parsers.
 * Combined grammars can import parsers or lexers without modes.
 
-ANTLR adds imported rules to the end of the rule list in a main lexer grammar. That means lexer rules in the main grammar get precedence over imported rules. For example, if a main grammar defines rule `IF : ’if’ ;` and an imported grammar defines rule `ID : [a-z]+ ;` (which also recognizes `if`), the imported `ID` won’t hide the main grammar’s `IF` token definition.
+ANTLR adds imported rules to the end of the rule list in a main lexer grammar. That means lexer rules in the main grammar get precedence over imported rules. For example, if a main grammar defines rule `IF : 'if' ;` and an imported grammar defines rule `ID : [a-z]+ ;` (which also recognizes `if`), the imported `ID` won’t hide the main grammar’s `IF` token definition.
 
 ## Tokens Section
 

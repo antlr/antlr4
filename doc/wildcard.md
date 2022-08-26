@@ -61,7 +61,7 @@ END    : '>>' ;
 <p>After crossing through a nongreedy subrule within a lexical rule, all decision-making from then on is "first match wins."
 </p>
 <p>
-For example, literal `ab` in rule right-hand side (grammar fragment) `.*? (’a’|’ab’)` is dead code and can never be matched. If the input is ab, the first alternative, ’a’, matches the first character and therefore succeeds. (’a’|’ab’) by itself on the right-hand side of a rule properly matches the second alternative for input ab. This quirk arises from a nongreedy design decision that’s too complicated to go into here.</p>
+For example, literal `ab` in rule right-hand side (grammar fragment) `.*? ('a'|'ab')` is dead code and can never be matched. If the input is ab, the first alternative, 'a', matches the first character and therefore succeeds. ('a'|'ab') by itself on the right-hand side of a rule properly matches the second alternative for input ab. This quirk arises from a nongreedy design decision that’s too complicated to go into here.</p>
 <li>
 </ol>
 
@@ -74,7 +74,7 @@ ACTION3 : '<' ( STRING | ~[">] )* '>' ; // Doesn't allow <"foo>; greedy *
 STRING : '"' ( '\\"' | . )*? '"' ;
 ```
 
-Rule `ACTION1` allows unterminated strings, such as `"foo`, because input `"foo` matches to the wildcard part of the loop. It doesn’t have to go into rule `STRING` to match a quote. To fix that, rule `ACTION2` uses `~’"’` to match any character but the quote. Expression `~’"’` is still ambiguous with the `’]’` that ends the rule, but the fact that the subrule is nongreedy means that the lexer will exit the loop upon a right square bracket. To avoid a nongreedy subrule, make the alternatives explicit. Expression `~[">]` matches anything but the quote and right angle bracket. Here’s a sample run:
+Rule `ACTION1` allows unterminated strings, such as `"foo`, because input `"foo` matches to the wildcard part of the loop. It doesn’t have to go into rule `STRING` to match a quote. To fix that, rule `ACTION2` uses `~'"'` to match any character but the quote. Expression `~'"'` is still ambiguous with the `']'` that ends the rule, but the fact that the subrule is nongreedy means that the lexer will exit the loop upon a right square bracket. To avoid a nongreedy subrule, make the alternatives explicit. Expression `~[">]` matches anything but the quote and right angle bracket. Here’s a sample run:
 
 ```bash
 $ antlr4 Actions.g4

@@ -196,7 +196,7 @@ ANTLR generates a field holding the list of context objects:
 
 ## Rule Elements
 
-Rule elements specify what the parser should do at a given moment just like statements in a programming language. The elements can be rule, token, string literal like expression, ID, and ’return’. Here’s a complete list of the rule elements (we’ll look at actions and predicates in more detail later):
+Rule elements specify what the parser should do at a given moment just like statements in a programming language. The elements can be rule, token, string literal like expression, ID, and 'return'. Here’s a complete list of the rule elements (we’ll look at actions and predicates in more detail later):
 
 <table>
 <tr>
@@ -207,7 +207,7 @@ Rule elements specify what the parser should do at a given moment just like stat
 Match token T at the current input position. Tokens always begin with a capital letter.</td>
 </tr>
 <tr>
-<td>’literal’</td><td>
+<td>'literal'</td><td>
 Match the string literal at the current input position. A string literal is simply a token with a fixed string.</td>
 </tr>
 <tr>
@@ -232,7 +232,7 @@ Match any single token except for the end of file token. The “dot” operator 
 </tr>
 </table>
 
-When you want to match everything but a particular token or set of tokens, use the `~` “not” operator. This operator is rarely used in the parser but is available. `~INT` matches any token except the `INT` token. `~’,’` matches any token except the comma. `~(INT|ID)` matches any token except an INT or an ID.
+When you want to match everything but a particular token or set of tokens, use the `~` “not” operator. This operator is rarely used in the parser but is available. `~INT` matches any token except the `INT` token. `~','` matches any token except the comma. `~(INT|ID)` matches any token except an INT or an ID.
 
 Token, string literal, and semantic predicate rule elements can take options. See Rule Element Options.
 
