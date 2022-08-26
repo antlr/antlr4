@@ -67,4 +67,4 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ java, csharp, python2, python3, javascript, cpp, go, swift, php, dart ]
+              target: [ java, csharp, python2, python3, javascript, cpp, swift, php, dart ]
