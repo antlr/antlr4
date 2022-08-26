@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -232,8 +232,6 @@ func (b *BaseLexer) NextToken() Token {
 		}
 		return b.token
 	}
-
-	return nil
 }
 
 // Instruct the lexer to Skip creating a token for current lexer rule
@@ -342,7 +340,7 @@ func (b *BaseLexer) GetCharIndex() int {
 }
 
 // Return the text Matched so far for the current token or any text override.
-//Set the complete text of l token it wipes any previous changes to the text.
+// Set the complete text of l token it wipes any previous changes to the text.
 func (b *BaseLexer) GetText() string {
 	if b.text != "" {
 		return b.text

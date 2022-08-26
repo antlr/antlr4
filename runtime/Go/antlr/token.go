@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -158,7 +158,6 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // {@link Token//GetInputStream}.</p>
 //
 // @param oldToken The token to copy.
-//
 func (c *CommonToken) clone() *CommonToken {
 	t := NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
 	t.tokenIndex = c.GetTokenIndex()
