@@ -1104,7 +1104,7 @@ recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
 recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 
-recRuleAltStartAction(ruleName, ctxName, label) ::= <<
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = _tracker.createInstance\<<ctxName>Context>(parentContext, parentState);
 <if (label)>_localctx-><label> = previousContext;<endif>
 pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
