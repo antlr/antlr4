@@ -41,6 +41,5 @@ line 1:7 extraneous input '?' expecting '}'
 
 [skip]
 Cpp
-Go
 PHP
 
