@@ -922,7 +922,6 @@ _localctx.<label>.append(_prevctx)
 _localctx.<label> = _prevctx
 <endif>
 <endif>
-<if(label)>_localctx.<label> = _prevctx;<endif>
 try pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>)
 >>
 

@@ -709,7 +709,13 @@ recRuleSetStopToken()                 ::= "self._ctx.stop = self._input.LT(-1)"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 localctx = <parser.name>.<ctxName>Context(self, _parentctx, _parentState)
-<if(label)>localctx.<label> = _prevctx<endif>
+<if(label)>
+<if(isListLabel)>
+localctx.<label>.append(_prevctx)
+<else>
+localctx.<label> = _prevctx
+<endif>
+<endif>
 self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
 >>
 

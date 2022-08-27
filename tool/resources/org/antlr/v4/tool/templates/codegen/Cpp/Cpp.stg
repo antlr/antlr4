@@ -1106,7 +1106,13 @@ recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = _tracker.createInstance\<<ctxName>Context>(parentContext, parentState);
-<if (label)>_localctx-><label> = previousContext;<endif>
+<if(label)>
+<if(isListLabel)>
+_localctx-><label>.push_back(previousContext);
+<else>
+_localctx-><label> = previousContext;
+<endif>
+<endif>
 pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
 >>
 
