@@ -855,7 +855,6 @@ _localctx.<label>.add(_prevctx);
 _localctx.<label> = _prevctx;
 <endif>
 <endif>
-<if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
