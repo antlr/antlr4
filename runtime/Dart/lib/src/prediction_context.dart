@@ -427,7 +427,7 @@ abstract class PredictionContext {
         return a_;
       }
 
-      mergedParents = List.generate(k, (n) => mergedParents[n]!);
+      mergedParents = List.generate(k, (n) => mergedParents[n]);
       mergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]);
     }
 
