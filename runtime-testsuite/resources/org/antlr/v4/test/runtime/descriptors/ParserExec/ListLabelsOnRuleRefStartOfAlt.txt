@@ -6,11 +6,17 @@ Parser
 
 [grammar]
 grammar Test;
-expression: op=NOT args+=expression
-          | args+=expression (op=AND args+=expression)+
-          | args+=expression (op=OR args+=expression)+
-          | IDENTIFIER
-          ;
+
+expression
+@after {
+<AssertIsList("$args")>
+}
+    : op=NOT args+=expression
+    | args+=expression (op=AND args+=expression)+
+    | args+=expression (op=OR args+=expression)+
+    | IDENTIFIER
+    ;
+
 AND : 'and' ;
 OR : 'or' ;
 NOT : 'not' ;
