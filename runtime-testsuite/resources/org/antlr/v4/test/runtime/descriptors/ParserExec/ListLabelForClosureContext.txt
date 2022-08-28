@@ -33,3 +33,5 @@ expression
 [input]
 a
 
+[skip]
+Go
