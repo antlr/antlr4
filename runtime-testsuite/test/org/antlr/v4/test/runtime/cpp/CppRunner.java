@@ -21,6 +21,25 @@ import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.getOS;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
+/**
+ * For my own information on I'm recording what I needed to do to get a unit test to compile and run in C++ on the Mac.
+ * I got a segmentation violation and couldn't figure out how to get information about it, so I turned on debugging
+ * and then figured out lldb enough to create this issue: https://github.com/antlr/antlr4/issues/3845 on a bug.
+ *
+ * cd ~/antlr/code/antlr4/runtime/Cpp
+ * cmake . -D CMAKE_OSX_ARCHITECTURES="arm64; x86_64" -DCMAKE_BUILD_TYPE=Debug
+ * make -j 8
+ *
+ * In test dir with generated test code:
+ *
+ * clang++ -g -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src -L. -lantlr4-runtime *.cpp
+ * ./a.out input
+ *
+ * $ lldb ./a.out input
+ * (lldb) run
+ * ... crash ...
+ * (lldb) thread backtrace
+ */
 public class CppRunner extends RuntimeRunner {
 	@Override
 	public String getLanguage() {

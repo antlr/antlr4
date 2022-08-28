@@ -18,7 +18,7 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
+AssertIsList(v) ::= <<if ( !(<v> instanceof Array) ) {throw "value is not an array";}>>
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
