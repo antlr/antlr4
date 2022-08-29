@@ -19,8 +19,9 @@ public class Processor {
 	public final Map<String, String> environmentVariables;
 	public final boolean throwOnNonZeroErrorCode;
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables
-	) throws InterruptedException, IOException {
+	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables)
+			throws InterruptedException, IOException
+	{
 		return new Processor(arguments, workingDirectory, environmentVariables, true).start();
 	}
 

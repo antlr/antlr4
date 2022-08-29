@@ -18,7 +18,7 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-AssertIsList(v) ::= "System.Collections.IList __ttt__ = <v>;" // just use static type system
+AssertIsList(v) ::= "System.Collections.IList __ttt__ = (System.Collections.IList)<v>;" // just use static type system
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
