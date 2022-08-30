@@ -95,11 +95,6 @@ public class GoTarget extends Target {
 		}
 	}
 
-	@Override
-	public int getInlineTestSetWordSize() {
-		return 32;
-	}
-
 	public String getRecognizerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;

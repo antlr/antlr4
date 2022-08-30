@@ -730,12 +730,12 @@ TestSetInline(s) ::= <<
 
 // Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & -(0x1f+1)) == 0
+(int64(<shiftAmount>) & ^0x3f) == 0
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< uint(<offsetShiftVar(s.varName, bits.shift)>)) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((int64(1) \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) != 0
 %>
 
 isZero ::= [

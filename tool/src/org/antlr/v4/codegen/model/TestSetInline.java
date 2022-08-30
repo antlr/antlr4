@@ -7,6 +7,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -15,9 +16,9 @@ import java.util.List;
 
 /** */
 public class TestSetInline extends SrcOp {
-	public int bitsetWordSize;
-	public String varName;
-	public Bitset[] bitsets;
+	public final int bitsetWordSize;
+	public final String varName;
+	public final Bitset[] bitsets;
 
 	public TestSetInline(OutputModelFactory factory, GrammarAST ast, IntervalSet set, int wordSize) {
 		super(factory, ast);
@@ -32,29 +33,48 @@ public class TestSetInline extends SrcOp {
 										  IntervalSet set,
 										  int wordSize,
 										  boolean useZeroOffset) {
-		List<Bitset> bitsetList = new ArrayList<Bitset>();
+		List<Bitset> bitsetList = new ArrayList<>();
+		Target target = factory.getGenerator().getTarget();
+		Bitset current = null;
 		for (int ttype : set.toArray()) {
-			Bitset current = !bitsetList.isEmpty() ? bitsetList.get(bitsetList.size() - 1) : null;
 			if (current == null || ttype > (current.shift + wordSize-1)) {
-				current = new Bitset();
+				int shift;
 				if (useZeroOffset && ttype >= 0 && ttype < wordSize-1) {
-					current.shift = 0;
+					shift = 0;
 				}
 				else {
-					current.shift = ttype;
+					shift = ttype;
 				}
-
+				current = new Bitset(shift);
 				bitsetList.add(current);
 			}
 
-			current.ttypes.add(factory.getGenerator().getTarget().getTokenTypeAsTargetLabel(factory.getGrammar(), ttype));
+			current.addToken(ttype, target.getTokenTypeAsTargetLabel(factory.getGrammar(), ttype));
 		}
 
 		return bitsetList.toArray(new Bitset[0]);
 	}
 
 	public static final class Bitset {
-		public int shift;
-		public final List<String> ttypes = new ArrayList<String>();
+		public final int shift;
+		private final List<String> ttypes = new ArrayList<>();
+		private long calculated;
+
+		public Bitset(int shift) {
+			this.shift = shift;
+		}
+
+		public void addToken(int type, String name) {
+			ttypes.add(name);
+			calculated |= 1L << (type - shift);
+		}
+
+		public List<String> getTtypes() {
+			return ttypes;
+		}
+
+		public long getCalculated() {
+			return calculated;
+		}
 	}
 }
