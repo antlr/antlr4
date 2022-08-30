@@ -30,5 +30,4 @@ expression
 a and b
 
 [skip]
-Go
 Cpp

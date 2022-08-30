@@ -879,7 +879,7 @@ QRetValueRef(a) ::= "<ctx(a)>.Get<a.dict;format={cap}>().Get<a.escapedName;forma
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<ctx(t)>.Get<t.escapedName;format={cap}>()"
 LabelRef(t) ::= "<ctx(t)>.Get<t.escapedName;format={cap}>()"
-ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.escapedName);format={cap}>"
+ListLabelRef(t) ::= "<ctx(t)>.Get<t.escapedName;format={cap}>()"
 
 SetAttr(s, rhsChunks) ::= "<ctx(s)>.Set<s.escapedName; format={cap}>(<rhsChunks>)"
 

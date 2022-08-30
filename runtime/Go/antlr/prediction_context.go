@@ -376,10 +376,19 @@ func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) Predicti
 }
 
 func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
-	// share same graph if both same
-	if a == b {
+
+	// Share same graph if both same
+	//
+	if a == b || a.Equals(b) {
 		return a
 	}
+
+	// In Java, EmptyPredictionContext inherits from SingletonPredictionContext, and so the test
+	// in java for SingletonPredictionContext will succeed and a new ArrayPredictionContext will be created
+	// from it.
+	// In go, EmptyPredictionContext does not equate to SingletonPredictionContext and so that conversion
+	// will fail. We need to test for both Empty and Singleton and create an ArrayPredictionContext from
+	// either of them.
 
 	ac, ok1 := a.(*BaseSingletonPredictionContext)
 	bc, ok2 := b.(*BaseSingletonPredictionContext)
@@ -397,14 +406,30 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 			return b
 		}
 	}
-	// convert singleton so both are arrays to normalize
-	if _, ok := a.(*BaseSingletonPredictionContext); ok {
-		a = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
+
+	// Convert Singleton or Empty so both are arrays to normalize - We should not use the existing parameters
+	// here.
+	//
+	// TODO: I think that maybe the Prediction Context structs should be redone as there is a chance we will see this mess again - maybe redo the logic here
+
+	var arp, arb *ArrayPredictionContext
+	var ok bool
+	if arp, ok = a.(*ArrayPredictionContext); ok {
+	} else if _, ok = a.(*BaseSingletonPredictionContext); ok {
+		arp = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
+	} else if _, ok = a.(*EmptyPredictionContext); ok {
+		arp = NewArrayPredictionContext([]PredictionContext{}, []int{})
 	}
-	if _, ok := b.(*BaseSingletonPredictionContext); ok {
-		b = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
+
+	if arb, ok = b.(*ArrayPredictionContext); ok {
+	} else if _, ok = b.(*BaseSingletonPredictionContext); ok {
+		arb = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
+	} else if _, ok = b.(*EmptyPredictionContext); ok {
+		arb = NewArrayPredictionContext([]PredictionContext{}, []int{})
 	}
-	return mergeArrays(a.(*ArrayPredictionContext), b.(*ArrayPredictionContext), rootIsWildcard, mergeCache)
+
+	// Both arp and arb
+	return mergeArrays(arp, arb, rootIsWildcard, mergeCache)
 }
 
 // Merge two {@link SingletonBasePredictionContext} instances.
@@ -677,6 +702,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 
 	// if we created same array as a or b, return that instead
 	// TODO: track whether this is possible above during merge sort for speed
+	// TODO: In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
 	if M == a {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)
