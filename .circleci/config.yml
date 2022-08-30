@@ -48,7 +48,10 @@ jobs:
           name: Test <<parameters.target>> runtime
           command: |
             set -euo pipefail
-            if [ "<<parameters.target>>" == "swift" ]
+            if [ "<<parameters.target>>" == "go" ]
+            then
+              export PATH=$PATH:/usr/local/go/bin
+            elif [ "<<parameters.target>>" == "swift" ]
             then
               export PATH=$PATH:/usr/share/swift/usr/bin
             fi
@@ -67,4 +70,4 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ java, csharp, python2, python3, javascript, cpp, swift, php, dart ]
+              target: [ java, csharp, python2, python3, javascript, cpp, go, swift, php, dart ]
