@@ -324,7 +324,7 @@ self._errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 token = self._input.LA(1)
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
     <alt>
     pass}; separator="\nel">
 else:
@@ -336,7 +336,7 @@ LL1OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
 self._errHandler.sync(self)
 token = self._input.LA(1)
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
     <alt>
     pass}; separator="\nel">
 else:
@@ -443,7 +443,7 @@ Sync(s) ::= "sync(<s.expecting.name>)"
 ThrowNoViableAlt(t) ::= "raise NoViableAltException(self)"
 
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" or ">
+<s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" or ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
@@ -451,7 +451,6 @@ testShiftInRange(shiftAmount) ::= <<
 ((<shiftAmount>) & ~0x3f) == 0
 >>
 
-// produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
 <testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> and ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) != 0
 %>
@@ -469,13 +468,12 @@ offsetShiftType(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<parser.name>.<shiftAmount> - <offset>)<else><parser.name>.<shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<parser.name>.<ttype>}; separator=" or ">
+<bits.tokens:{t | <s.varName>==<t.type>}; separator=" or ">
 %>
 
-cases(ttypes) ::= <<
-if token in [<ttypes:{t | <parser.name>.<t>}; separator=", ">]:
+cases(tokens) ::= <<
+if token in [<tokens:{t | <t.type>}; separator=", ">]:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<

@@ -652,7 +652,7 @@ _errHandler->sync(this);
 <! TODO: untested !><if (choice.label)>LL1AltBlock(choice, preamble, alts, error) <labelref(choice.label)> = _input->LT(1);<endif>
 <preamble; separator="\n">
 switch (_input->LA(1)) {
-  <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
+  <choice.altLook, alts: {look, alt | <cases(tokens = look)> {
   <alt>
   break;
 \}
@@ -667,7 +667,7 @@ LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 switch (_input->LA(1)) {
-  <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
+  <choice.altLook, alts: {look, alt | <cases(tokens = look)> {
   <alt>
   break;
 \}
@@ -793,7 +793,7 @@ ThrowNoViableAlt(t) ::= "throw NoViableAltException(this);"
 
 TestSetInlineHeader(s) ::= "<! Required but unused. !>"
 TestSetInline(s) ::= <<
-<s.bitsets: {bits | <if (rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets: {bits | <if (rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
@@ -801,7 +801,6 @@ testShiftInRange(shiftAmount) ::= <<
 ((<shiftAmount> & ~ 0x3fULL) == 0)
 >>
 
-// produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <<
 <testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
   ((1ULL \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
@@ -816,13 +815,12 @@ offsetShift(shiftAmount, offset, prefix = false) ::= <%
 <if (!isZero.(offset))>(<if (prefix)><parser.name>::<endif><shiftAmount> - <offset>)<else><if (prefix)><parser.name>::<endif><shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes: {ttype | <s.varName> == <parser.name>::<ttype>}; separator = "\n\n|| ">
+<bits.tokens: {t | <s.varName> == <parser.name>::<t.name>}; separator = "\n\n|| ">
 %>
 
-cases(ttypes) ::= <<
-<ttypes: {t | case <parser.name>::<t>:}; separator="\n">
+cases(tokens) ::= <<
+<tokens: {t | case <parser.name>::<t.name>:}; separator="\n">
 >>
 
 InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"

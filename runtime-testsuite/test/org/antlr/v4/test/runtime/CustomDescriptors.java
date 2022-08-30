@@ -154,10 +154,11 @@ public class CustomDescriptors {
 	private static RuntimeTestDescriptor getMultiTokenAlternativeDescriptor() {
 		final int tokensCount = 64;
 
-		StringBuilder rule = new StringBuilder("t: ");
+		StringBuilder rule = new StringBuilder("r1: ");
 		StringBuilder tokens = new StringBuilder();
 		StringBuilder input = new StringBuilder();
 		StringBuilder output = new StringBuilder();
+
 		for (int i = 0; i < tokensCount; i++) {
 			String currentToken = "T" + i;
 			rule.append(currentToken);
@@ -170,9 +171,13 @@ public class CustomDescriptors {
 			input.append(currentToken).append(" ");
 			output.append(currentToken);
 		}
+		String currentToken = "T" + tokensCount;
+		tokens.append(currentToken).append(": '").append(currentToken).append("';\n");
+		input.append(currentToken).append(" ");
+		output.append(currentToken);
 
 		String grammar = "grammar P;\n" +
-				"r: t+ EOF {<writeln(\"$text\")>};\n" +
+				"r: (r1 | T" + tokensCount + ")+ EOF {<writeln(\"$text\")>};\n" +
 				rule + "\n" +
 				tokens + "\n" +
 				"WS: [ ]+ -> skip;";
@@ -180,7 +185,7 @@ public class CustomDescriptors {
 		return new RuntimeTestDescriptor(
 				GrammarType.Parser,
 				"MultiTokenAlternative",
-				"https://github.com/antlr/antlr4/issues/3698",
+				"https://github.com/antlr/antlr4/issues/3698, https://github.com/antlr/antlr4/issues/3703",
 				input.toString(),
 				output + "\n",
 				"",
