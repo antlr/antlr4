@@ -26,6 +26,10 @@ public class CustomDescriptors {
 						getLargeLexerDescriptor(),
 						getAtnStatesSizeMoreThan65535Descriptor()
 				});
+		descriptors.put("ParserExec",
+				new RuntimeTestDescriptor[] {
+						getMultiTokenAlternativeDescriptor()
+				});
 	}
 
 	private static RuntimeTestDescriptor getLineSeparatorLfDescriptor() {
@@ -145,5 +149,44 @@ public class CustomDescriptors {
 				grammar.toString(),
 				null, false, false,
 				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"}, uri);
+	}
+
+	private static RuntimeTestDescriptor getMultiTokenAlternativeDescriptor() {
+		final int tokensCount = 64;
+
+		StringBuilder rule = new StringBuilder("t: ");
+		StringBuilder tokens = new StringBuilder();
+		StringBuilder input = new StringBuilder();
+		StringBuilder output = new StringBuilder();
+		for (int i = 0; i < tokensCount; i++) {
+			String currentToken = "T" + i;
+			rule.append(currentToken);
+			if (i < tokensCount - 1) {
+				rule.append(" | ");
+			} else {
+				rule.append(";");
+			}
+			tokens.append(currentToken).append(": '").append(currentToken).append("';\n");
+			input.append(currentToken).append(" ");
+			output.append(currentToken);
+		}
+
+		String grammar = "grammar P;\n" +
+				"r: t+ EOF {<writeln(\"$text\")>};\n" +
+				rule + "\n" +
+				tokens + "\n" +
+				"WS: [ ]+ -> skip;";
+
+		return new RuntimeTestDescriptor(
+				GrammarType.Parser,
+				"MultiTokenAlternative",
+				"https://github.com/antlr/antlr4/issues/3698",
+				input.toString(),
+				output + "\n",
+				"",
+				"r",
+				"P",
+				grammar,
+				null, false, false, null, uri);
 	}
 }
