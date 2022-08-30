@@ -57,7 +57,7 @@ public class TestSetInline extends SrcOp {
 
 	public static final class Bitset {
 		public final int shift;
-		private final List<String> ttypes = new ArrayList<>();
+		private final List<TokenInfo> tokens = new ArrayList<>();
 		private long calculated;
 
 		public Bitset(int shift) {
@@ -65,12 +65,12 @@ public class TestSetInline extends SrcOp {
 		}
 
 		public void addToken(int type, String name) {
-			ttypes.add(name);
+			tokens.add(new TokenInfo(type, name));
 			calculated |= 1L << (type - shift);
 		}
 
-		public List<String> getTtypes() {
-			return ttypes;
+		public List<TokenInfo> getTokens() {
+			return tokens;
 		}
 
 		public long getCalculated() {

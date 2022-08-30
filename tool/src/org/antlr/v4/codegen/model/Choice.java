@@ -7,10 +7,13 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.TokenTypeDecl;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.ArrayList;
@@ -45,10 +48,17 @@ public abstract class Choice extends RuleElement {
 		preamble.add(op);
 	}
 
-	public List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
-		List<String[]> altLook = new ArrayList<String[]>();
+	public List<TokenInfo[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
+		List<TokenInfo[]> altLook = new ArrayList<>();
+		Target target = factory.getGenerator().getTarget();
+		Grammar grammar = factory.getGrammar();
 		for (IntervalSet s : altLookSets) {
-			altLook.add(factory.getGenerator().getTarget().getTokenTypesAsTargetLabels(factory.getGrammar(), s.toArray()));
+			IntegerList list = s.toIntegerList();
+			TokenInfo[] info = new TokenInfo[list.size()];
+			for (int i = 0; i < info.length; i++) {
+				info[i] = new TokenInfo(list.get(i), target.getTokenTypeAsTargetLabel(grammar, list.get(i)));
+			}
+			altLook.add(info);
 		}
 		return altLook;
 	}
