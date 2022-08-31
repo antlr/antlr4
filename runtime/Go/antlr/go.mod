@@ -1,4 +1,4 @@
-module github.com/antlr/antlr4/runtime/Go/antlr
+module github.com/antlr/antlr4/runtime/Go/antlr/v4
 
 go 1.18
 
