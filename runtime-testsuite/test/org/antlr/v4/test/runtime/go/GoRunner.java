@@ -65,7 +65,7 @@ public class GoRunner extends RuntimeRunner {
 
 	private final static String antlrTestPackageName = "antlr";
 	private static final String goModFileName = "go.mod";
-	private static final String GoRuntimeImportPath = "github.com/antlr/antlr4/runtime/Go/antlr";
+	private static final String GoRuntimeImportPath = "github.com/antlr/antlr4/runtime/Go/antlr/v4";
 	private static final Path packageBase;
 	private static final String packageBaseString;
 	private static String goModContent = null;
@@ -90,10 +90,6 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-
-		Path packageDir = Paths.get(packageBaseString, "src", antlrTestPackageName);
-		Path runtimeBase = Paths.get(getRuntimePath("Go"), "antlr");
-
 		// As we are using modules for the tests, we can use the `replace` directive to point
 		// the tests at the runtime we are testing. We could use GOWORK, but then we would
 		// have to remove each test module and add in the current one. So, we turn GOWORK off
@@ -118,7 +114,7 @@ public class GoRunner extends RuntimeRunner {
 
 		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
 		String tempDirPath = getTempDirPath();
-		Path runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr");
+		Path runtimeFiles = Paths.get(getRuntimePath("Go"), "antlr/v4");
 		File generatedFir = new File(tempDirPath, "parser");
 		if (!generatedFir.mkdir()) {
 			return new CompiledState(generatedState, new Exception("can't make dir " + generatedFir));
