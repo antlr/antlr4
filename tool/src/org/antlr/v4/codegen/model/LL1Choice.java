@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class LL1Choice extends Choice {
 	/** Token names for each alt 0..n-1 */
-	public List<String[]> altLook;
+	public List<TokenInfo[]> altLook;
 	@ModelElement public ThrowNoViableAlt error;
 
 	public LL1Choice(OutputModelFactory factory, GrammarAST blkAST,

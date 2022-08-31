@@ -391,7 +391,7 @@ errorHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = tokenStream.LT(1);<endif>
 <preamble; separator="\n">
 switch (tokenStream.LA(1)!) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
   <alt>
   break;}; separator="\n">
 default:
@@ -403,7 +403,7 @@ LL1OptionalBlock(choice, alts, error) ::= <<
 state = <choice.stateNumber>;
 errorHandler.sync(this);
 switch (tokenStream.LA(1)!) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
   <alt>
   break;}; separator="\n">
 default:
@@ -510,7 +510,7 @@ Sync(s) ::= "sync(<s.expecting.name>);"
 ThrowNoViableAlt(t) ::= "throw NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
@@ -518,9 +518,8 @@ testShiftInRange(shiftAmount) ::= <<
 ((<shiftAmount>) & ~0x3f) == 0
 >>
 
-// produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((BigInt.one \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (BigInt.one \<\< <offsetShift({TOKEN_<ttype>}, bits.shift)>)}; separator=" | ">)) != BigInt.zero)
+<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
 %>
 
 isZero ::= [
@@ -532,13 +531,12 @@ offsetShift(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> == TOKEN_<ttype>}; separator=" || ">
+<bits.tokens:{t | <s.varName> == TOKEN_<t.name>}; separator=" || ">
 %>
 
-cases(ttypes) ::= <<
-<ttypes:{t | case TOKEN_<t>:}; separator="\n">
+cases(tokens) ::= <<
+<tokens:{t | case TOKEN_<t.name>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::=<<

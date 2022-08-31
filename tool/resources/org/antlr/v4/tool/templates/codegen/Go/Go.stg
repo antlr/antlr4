@@ -553,7 +553,7 @@ p.GetErrorHandler().Sync(p)
 
 switch p.GetTokenStream().LA(1) {
 <if(choice.altLook && alts)>
-<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l>}; separator=", ">:
+<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l.name>}; separator=", ">:
 	<alt>}; separator="\n\n">
 
 
@@ -571,7 +571,7 @@ p.GetErrorHandler().Sync(p)
 
 switch p.GetTokenStream().LA(1) {
 <if(choice.altLook && alts)>
-<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l>}; separator=", ">:
+<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l.name>}; separator=", ">:
 	<alt>}; separator="\n\n">
 
 
@@ -725,17 +725,16 @@ Sync(s) ::= "Sync(<s.expecting.name>)"
 ThrowNoViableAlt(t) ::= "panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))"
 
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & -(0x1f+1)) == 0
+(int64(<shiftAmount>) & ^0x3f) == 0
 >>
 
-// produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< uint(<offsetShiftVar(s.varName, bits.shift)>)) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((int64(1) \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) != 0
 %>
 
 isZero ::= [
@@ -751,9 +750,8 @@ offsetShiftType(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<parser.name><shiftAmount> - <offset>)<else><parser.name><shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> == <parser.name><ttype>}; separator=" || ">
+<bits.tokens:{t | <s.varName> == <parser.name><t.name>}; separator=" || ">
 %>
 
 InvokeRule(r, argExprsChunks) ::= <<
