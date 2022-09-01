@@ -236,7 +236,7 @@ namespace Antlr4.Runtime
         /// </exception>
         public virtual void AddErrorListener(IAntlrErrorListener<Symbol> listener)
         {
-            Args.NotNull("listener", listener);
+            if (listener == null) throw new NullReferenceException(nameof(listener));
 
             IAntlrErrorListener<Symbol>[] listeners = _listeners;
             Array.Resize(ref listeners, listeners.Length + 1);

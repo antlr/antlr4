@@ -16,46 +16,17 @@ namespace Antlr4.Runtime.Misc
         }
     }
 
-    public class Utils
+    public static class Utils
     {
         public static string Join<T>(string separator, IEnumerable<T> items)
         {
             return string.Join(separator, items);
         }
 
-        public static int NumNonnull(object[] data)
-        {
-            int n = 0;
-            if (data == null)
-            {
-                return n;
-            }
-            foreach (object o in data)
-            {
-                if (o != null)
-                {
-                    n++;
-                }
-            }
-            return n;
-        }
-
-        public static void RemoveAllElements<T>(ICollection<T> data, T value)
-        {
-            if (data == null)
-            {
-                return;
-            }
-            while (data.Contains(value))
-            {
-                data.Remove(value);
-            }
-        }
-
         public static string EscapeWhitespace(string s, bool escapeSpaces)
         {
             StringBuilder buf = new StringBuilder();
-            foreach (char c in s.ToCharArray())
+            foreach (char c in s)
             {
                 if (c == ' ' && escapeSpaces)
                 {
@@ -88,27 +59,6 @@ namespace Antlr4.Runtime.Misc
                 }
             }
             return buf.ToString();
-        }
-
-        public static void RemoveAll<T>(IList<T> list, Predicate<T> predicate)
-        {
-            int j = 0;
-            for (int i = 0; i < list.Count; i++)
-            {
-                T item = list[i];
-                if (!predicate(item))
-                {
-                    if (j != i)
-                    {
-                        list[j] = item;
-                    }
-                    j++;
-                }
-            }
-            while (j < list.Count)
-            {
-                list.RemoveAt(list.Count - 1);
-            }
         }
 
         /// <summary>Convert array of strings to string&#x2192;index map.</summary>
