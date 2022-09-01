@@ -158,6 +158,7 @@ jobs:
           windows-latest
         ]
         target: [
+          tool,
           cpp,
           csharp,
           dart,
@@ -234,7 +235,7 @@ jobs:
       if: steps.setup-java.outputs.cache-hit != 'true'
       uses: stCarolas/setup-maven@v4.4
       with:
-        maven-version: 3.5.4
+        maven-version: 3.8.5
 
     - name: Add msbuild to PATH
       if: startswith(matrix.os, 'windows') && (matrix.target == 'cpp')
@@ -306,17 +307,17 @@ jobs:
       if: startswith(matrix.os, 'macos') && (matrix.target == 'cpp')
       run: echo "PATH=$(brew --prefix)/opt/ccache/libexec:$PATH" >> $GITHUB_ENV
 
-    - name: Build tool with Maven
+    - name: Build ANTLR with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
 
     - name: Test tool
-      if: matrix.target == 'java'
+      if: matrix.target == 'tool'
       run: |
         cd tool-testsuite
         mvn test
 
     - name: Test runtime (Windows)
-      if: startsWith(matrix.os, 'windows')
+      if: startsWith(matrix.os, 'windows') && (matrix.target != 'tool')
       run: |
         gci env:* | sort-object name
 
@@ -332,7 +333,7 @@ jobs:
         CMAKE_GENERATOR: Ninja
 
     - name: Test runtime (non-Windows)
-      if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
+      if: (startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos'))  && (matrix.target != 'tool')
       run: |
         env
 
