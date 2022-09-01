@@ -104,11 +104,9 @@ namespace Antlr4.Runtime.Atn
 			{
 				return a;
 			}
-			if (a is SingletonPredictionContext && b is SingletonPredictionContext)
+			if (a is SingletonPredictionContext aContext && b is SingletonPredictionContext predictionContext)
 			{
-				return MergeSingletons((SingletonPredictionContext)a,
-									   (SingletonPredictionContext)b,
-									   rootIsWildcard, mergeCache);
+				return MergeSingletons(aContext, predictionContext, rootIsWildcard, mergeCache);
 			}
 
 			// At least one of a or b is array
@@ -122,13 +120,13 @@ namespace Antlr4.Runtime.Atn
 			}
 
 			// convert singleton so both are arrays to normalize
-			if (a is SingletonPredictionContext)
+			if (a is SingletonPredictionContext singletonPredictionContext)
 			{
-				a = new ArrayPredictionContext((SingletonPredictionContext)a);
+				a = new ArrayPredictionContext(singletonPredictionContext);
 			}
-			if (b is SingletonPredictionContext)
+			if (b is SingletonPredictionContext bContext)
 			{
-				b = new ArrayPredictionContext((SingletonPredictionContext)b);
+				b = new ArrayPredictionContext(bContext);
 			}
 			return MergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b,
 							   rootIsWildcard, mergeCache);

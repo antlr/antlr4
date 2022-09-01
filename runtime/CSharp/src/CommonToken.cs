@@ -168,10 +168,10 @@ namespace Antlr4.Runtime
             _channel = oldToken.Channel;
             start = oldToken.StartIndex;
             stop = oldToken.StopIndex;
-            if (oldToken is Antlr4.Runtime.CommonToken)
+            if (oldToken is CommonToken token)
             {
-                _text = ((Antlr4.Runtime.CommonToken)oldToken)._text;
-                source = ((Antlr4.Runtime.CommonToken)oldToken).source;
+                _text = token._text;
+                source = token.source;
             }
             else
             {

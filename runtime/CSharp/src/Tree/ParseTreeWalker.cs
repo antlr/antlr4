@@ -21,16 +21,16 @@ namespace Antlr4.Runtime.Tree
         /// <param name="t">The parse tree to be walked on</param>
         public virtual void Walk(IParseTreeListener listener, IParseTree t)
         {
-            if (t is IErrorNode)
+            if (t is IErrorNode node)
             {
-                listener.VisitErrorNode((IErrorNode)t);
+                listener.VisitErrorNode(node);
                 return;
             }
             else
             {
-                if (t is ITerminalNode)
+                if (t is ITerminalNode terminalNode)
                 {
-                    listener.VisitTerminal((ITerminalNode)t);
+                    listener.VisitTerminal(terminalNode);
                     return;
                 }
             }

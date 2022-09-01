@@ -21,11 +21,11 @@ namespace Antlr4.Runtime
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
-                if (!(listener is IParserErrorListener))
+                if (!(listener is IParserErrorListener parserErrorListener))
                 {
                     continue;
                 }
-                IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
+
                 parserErrorListener.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
             }
         }
@@ -34,11 +34,11 @@ namespace Antlr4.Runtime
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
-                if (!(listener is IParserErrorListener))
+                if (!(listener is IParserErrorListener parserErrorListener))
                 {
                     continue;
                 }
-                IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
+
                 parserErrorListener.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
             }
         }
@@ -47,11 +47,11 @@ namespace Antlr4.Runtime
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
-                if (!(listener is IParserErrorListener))
+                if (!(listener is IParserErrorListener parserErrorListener))
                 {
                     continue;
                 }
-                IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
+
                 parserErrorListener.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, acceptState);
             }
         }

@@ -168,11 +168,11 @@ namespace Antlr4.Runtime.Atn
 		 */
 		public override bool Equals(Object o)
 		{
-			if (!(o is ATNConfig)) {
+			if (!(o is ATNConfig config)) {
 				return false;
 			}
 
-			return this.Equals((ATNConfig)o);
+			return Equals(config);
 		}
 
 		public virtual bool Equals(ATNConfig other)

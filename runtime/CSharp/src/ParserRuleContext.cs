@@ -243,12 +243,12 @@ namespace Antlr4.Runtime
             // what element have we found with ctxType?
             foreach (IParseTree o in children)
             {
-                if (o is T)
+                if (o is T tree)
                 {
                     j++;
                     if (j == i)
                     {
-                        return (T) o;
+                        return tree;
                     }
                 }
             }
@@ -267,9 +267,8 @@ namespace Antlr4.Runtime
             // what token with ttype have we found?
             foreach (IParseTree o in children)
             {
-                if (o is ITerminalNode)
+                if (o is ITerminalNode tnode)
                 {
-                    ITerminalNode tnode = (ITerminalNode) o;
                     IToken symbol = tnode.Symbol;
                     if (symbol.Type == ttype)
                     {
@@ -295,9 +294,8 @@ namespace Antlr4.Runtime
             List<ITerminalNode> tokens = null;
             foreach (IParseTree o in children)
             {
-                if (o is ITerminalNode)
+                if (o is ITerminalNode tnode)
                 {
-                    ITerminalNode tnode = (ITerminalNode) o;
                     IToken symbol = tnode.Symbol;
                     if (symbol.Type == ttype)
                     {
@@ -336,14 +334,14 @@ namespace Antlr4.Runtime
             List<T> contexts = null;
             foreach (IParseTree o in children)
             {
-                if (o is T)
+                if (o is T context)
                 {
                     if (contexts == null)
                     {
                         contexts = new List<T>();
                     }
 
-                    contexts.Add((T) o);
+                    contexts.Add(context);
                 }
             }
 

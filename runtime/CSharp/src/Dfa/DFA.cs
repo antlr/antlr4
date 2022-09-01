@@ -41,8 +41,8 @@ namespace Antlr4.Runtime.Dfa
 			this.atnStartState = atnStartState;
 			this.decision = decision;
 
-			this.precedenceDfa = false;
-			if (atnStartState is StarLoopEntryState && ((StarLoopEntryState)atnStartState).isPrecedenceDecision)
+			precedenceDfa = false;
+			if (atnStartState is StarLoopEntryState state && state.isPrecedenceDecision)
 			{
 				this.precedenceDfa = true;
 				DFAState precedenceState = new DFAState(new ATNConfigSet());

@@ -209,20 +209,20 @@ namespace Antlr4.Runtime.Atn
 			{
 				return true;
 			}
-			else if (!(o is ATNConfigSet))
+
+			if (!(o is ATNConfigSet other))
 			{
 				return false;
 			}
 
 			//		System.out.print("equals " + this + ", " + o+" = ");
-			ATNConfigSet other = (ATNConfigSet)o;
 			bool same = configs != null &&
-				configs.Equals(other.configs) &&  // includes stack context
-				this.fullCtx == other.fullCtx &&
-				this.uniqueAlt == other.uniqueAlt &&
-				this.conflictingAlts == other.conflictingAlts &&
-				this.hasSemanticContext == other.hasSemanticContext &&
-				this.dipsIntoOuterContext == other.dipsIntoOuterContext;
+			            configs.Equals(other.configs) &&  // includes stack context
+			            fullCtx == other.fullCtx &&
+			            uniqueAlt == other.uniqueAlt &&
+			            conflictingAlts == other.conflictingAlts &&
+			            hasSemanticContext == other.hasSemanticContext &&
+			            dipsIntoOuterContext == other.dipsIntoOuterContext;
 
 			//		System.out.println(same);
 			return same;

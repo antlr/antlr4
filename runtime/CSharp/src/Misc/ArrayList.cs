@@ -31,7 +31,7 @@ namespace Antlr4.Runtime.Misc
 		public override bool Equals(object o)
 		{
 			return o == this
-				|| (o is List<T> && this.Equals((List<T>)o));
+				|| (o is List<T> ts && Equals(ts));
 		}
 
 

@@ -76,19 +76,19 @@ namespace Antlr4.Runtime.Atn
 			{
 				return true;
 			}
-			else if (!(o is ArrayPredictionContext))
+
+			if (!(o is ArrayPredictionContext context))
 			{
 				return false;
 			}
 
-			if (this.GetHashCode() != o.GetHashCode())
+			if (GetHashCode() != context.GetHashCode())
 			{
 				return false; // can't be same if hash is different
 			}
 
-			ArrayPredictionContext a = (ArrayPredictionContext)o;
-			return Arrays.Equals(returnStates, a.returnStates) &&
-				   Arrays.Equals(parents, a.parents);
+			return Arrays.Equals(returnStates, context.returnStates) &&
+			       Arrays.Equals(parents, context.parents);
 		}
 
 

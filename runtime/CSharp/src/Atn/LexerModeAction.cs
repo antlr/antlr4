@@ -109,14 +109,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return true;
             }
-            else
+
+            if (!(obj is LexerModeAction action))
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerModeAction))
-                {
-                    return false;
-                }
+                return false;
             }
-            return mode == ((Antlr4.Runtime.Atn.LexerModeAction)obj).mode;
+            return mode == action.mode;
         }
 
         public override string ToString()

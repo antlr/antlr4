@@ -162,14 +162,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return true;
             }
-            else
+
+            if (!(obj is LexerIndexedCustomAction other))
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerIndexedCustomAction))
-                {
-                    return false;
-                }
+                return false;
             }
-            Antlr4.Runtime.Atn.LexerIndexedCustomAction other = (Antlr4.Runtime.Atn.LexerIndexedCustomAction)obj;
+
             return offset == other.offset && action.Equals(other.action);
         }
     }

@@ -90,31 +90,28 @@ namespace Antlr4.Runtime.Dfa
             {
                 return this;
             }
-            if (m is Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)
+            if (m is ArrayEdgeMap<T> map)
             {
-                Antlr4.Runtime.Dfa.ArrayEdgeMap<T> other = (Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)m;
-                int minOverlap = Math.Max(minIndex, other.minIndex);
-                int maxOverlap = Math.Min(maxIndex, other.maxIndex);
-                Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
+                int minOverlap = Math.Max(minIndex, map.minIndex);
+                int maxOverlap = Math.Min(maxIndex, map.maxIndex);
+                ArrayEdgeMap<T> result = this;
                 for (int i = minOverlap; i <= maxOverlap; i++)
                 {
-                    result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(i, m[i]));
+                    result = ((ArrayEdgeMap<T>)result.Put(i, map[i]));
                 }
                 return result;
             }
             else
             {
-                if (m is SingletonEdgeMap<T>)
+                if (m is SingletonEdgeMap<T> pairs)
                 {
-                    SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
-                    System.Diagnostics.Debug.Assert(!other.IsEmpty);
-                    return Put(other.Key, other.Value);
+                    System.Diagnostics.Debug.Assert(!pairs.IsEmpty);
+                    return Put(pairs.Key, pairs.Value);
                 }
                 else
                 {
-                    if (m is SparseEdgeMap<T>)
+                    if (m is SparseEdgeMap<T> other)
                     {
-                        SparseEdgeMap<T> other = (SparseEdgeMap<T>)m;
                         lock (other)
                         {
                             int[] keys = other.Keys;

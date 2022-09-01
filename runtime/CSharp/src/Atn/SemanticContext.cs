@@ -72,16 +72,16 @@ namespace Antlr4.Runtime.Atn
 
             public override bool Equals(object obj)
             {
-                if (!(obj is SemanticContext.Predicate))
+                if (!(obj is Predicate o))
                 {
                     return false;
                 }
-                if (this == obj)
+                if (this == o)
                 {
                     return true;
                 }
-                SemanticContext.Predicate p = (SemanticContext.Predicate)obj;
-                return this.ruleIndex == p.ruleIndex && this.predIndex == p.predIndex && this.isCtxDependent == p.isCtxDependent;
+
+                return ruleIndex == o.ruleIndex && predIndex == o.predIndex && isCtxDependent == o.isCtxDependent;
             }
 
             public override string ToString()
@@ -135,16 +135,16 @@ namespace Antlr4.Runtime.Atn
 
             public override bool Equals(object obj)
             {
-                if (!(obj is SemanticContext.PrecedencePredicate))
+                if (!(obj is SemanticContext.PrecedencePredicate other))
                 {
                     return false;
                 }
-                if (this == obj)
+                if (this == other)
                 {
                     return true;
                 }
-                SemanticContext.PrecedencePredicate other = (SemanticContext.PrecedencePredicate)obj;
-                return this.precedence == other.precedence;
+
+                return precedence == other.precedence;
             }
 
             public override string ToString()
@@ -171,17 +171,17 @@ namespace Antlr4.Runtime.Atn
             public AND(SemanticContext a, SemanticContext b)
             {
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is SemanticContext.AND)
+                if (a is AND aAnd)
                 {
-                    operands.UnionWith(((AND)a).opnds);
+                    operands.UnionWith(aAnd.opnds);
                 }
                 else
                 {
                     operands.Add(a);
                 }
-                if (b is SemanticContext.AND)
+                if (b is AND bAnd)
                 {
-                    operands.UnionWith(((AND)b).opnds);
+                    operands.UnionWith(bAnd.opnds);
                 }
                 else
                 {
@@ -211,12 +211,12 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                if (!(obj is SemanticContext.AND))
+                if (!(obj is AND other))
                 {
                     return false;
                 }
-                SemanticContext.AND other = (SemanticContext.AND)obj;
-                return Arrays.Equals(this.opnds, other.opnds);
+
+                return Arrays.Equals(opnds, other.opnds);
             }
 
             public override int GetHashCode()
@@ -289,17 +289,17 @@ namespace Antlr4.Runtime.Atn
             public OR(SemanticContext a, SemanticContext b)
             {
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is SemanticContext.OR)
+                if (a is OR aOr)
                 {
-                    operands.UnionWith(((OR)a).opnds);
+                    operands.UnionWith(aOr.opnds);
                 }
                 else
                 {
                     operands.Add(a);
                 }
-                if (b is SemanticContext.OR)
+                if (b is OR bOr)
                 {
-                    operands.UnionWith(((OR)b).opnds);
+                    operands.UnionWith(bOr.opnds);
                 }
                 else
                 {
@@ -329,12 +329,12 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                if (!(obj is SemanticContext.OR))
+                if (!(obj is SemanticContext.OR other))
                 {
                     return false;
                 }
-                SemanticContext.OR other = (SemanticContext.OR)obj;
-                return Arrays.Equals(this.opnds, other.opnds);
+
+                return Arrays.Equals(opnds, other.opnds);
             }
 
             public override int GetHashCode()
