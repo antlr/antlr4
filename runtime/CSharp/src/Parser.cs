@@ -75,9 +75,9 @@ namespace Antlr4.Runtime
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                if (ctx.children is List<IParseTree>)
+                if (ctx.children is List<IParseTree> list)
                 {
-                    ((List<IParseTree>)ctx.children).TrimExcess();
+                    list.TrimExcess();
                 }
             }
         }
@@ -574,9 +574,8 @@ namespace Antlr4.Runtime
             if (((ITokenStream)InputStream) != null)
             {
                 ITokenSource tokenSource = ((ITokenStream)InputStream).TokenSource;
-                if (tokenSource is Lexer)
+                if (tokenSource is Lexer lexer)
                 {
-                    Lexer lexer = (Lexer)tokenSource;
                     return CompileParseTreePattern(pattern, patternRuleIndex, lexer);
                 }
             }
@@ -1112,9 +1111,9 @@ namespace Antlr4.Runtime
             get
             {
                 ParserATNSimulator interp = Interpreter;
-                if (interp is ProfilingATNSimulator)
+                if (interp is ProfilingATNSimulator simulator)
                 {
-                    return new ParseInfo((ProfilingATNSimulator)interp);
+                    return new ParseInfo(simulator);
                 }
                 return null;
             }

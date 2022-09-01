@@ -239,11 +239,10 @@ namespace Antlr4.Runtime.Atn
 				for (int i_10 = 0; i_10 < state_1.NumberOfTransitions; i_10++)
 				{
 					Transition t = state_1.Transition(i_10);
-					if (!(t is RuleTransition))
+					if (!(t is RuleTransition ruleTransition))
 					{
 						continue;
 					}
-					RuleTransition ruleTransition = (RuleTransition)t;
 					int outermostPrecedenceReturn = -1;
 					if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule)
 					{
@@ -258,41 +257,39 @@ namespace Antlr4.Runtime.Atn
 			}
 			foreach (ATNState state_2 in atn.states)
 			{
-				if (state_2 is BlockStartState)
+				if (state_2 is BlockStartState state)
 				{
 					// we need to know the end state to set its start state
-					if (((BlockStartState)state_2).endState == null)
+					if (state.endState == null)
 					{
 						throw new InvalidOperationException();
 					}
 					// block end states can only be associated to a single block start state
-					if (((BlockStartState)state_2).endState.startState != null)
+					if (state.endState.startState != null)
 					{
 						throw new InvalidOperationException();
 					}
-					((BlockStartState)state_2).endState.startState = (BlockStartState)state_2;
+					state.endState.startState = state;
 				}
-				else if (state_2 is PlusLoopbackState)
+				else if (state_2 is PlusLoopbackState backState)
 				{
-					PlusLoopbackState loopbackState = (PlusLoopbackState)state_2;
-					for (int i_10 = 0; i_10 < loopbackState.NumberOfTransitions; i_10++)
+					for (int i_10 = 0; i_10 < backState.NumberOfTransitions; i_10++)
 					{
-						ATNState target = loopbackState.Transition(i_10).target;
-						if (target is PlusBlockStartState)
+						ATNState target = backState.Transition(i_10).target;
+						if (target is PlusBlockStartState startState)
 						{
-							((PlusBlockStartState)target).loopBackState = loopbackState;
+							startState.loopBackState = backState;
 						}
 					}
 				}
-				else if (state_2 is StarLoopbackState)
+				else if (state_2 is StarLoopbackState loopbackState)
 				{
-					StarLoopbackState loopbackState = (StarLoopbackState)state_2;
 					for (int i_10 = 0; i_10 < loopbackState.NumberOfTransitions; i_10++)
 					{
 						ATNState target = loopbackState.Transition(i_10).target;
-						if (target is StarLoopEntryState)
+						if (target is StarLoopEntryState entryState)
 						{
-							((StarLoopEntryState)target).loopBackState = loopbackState;
+							entryState.loopBackState = loopbackState;
 						}
 					}
 				}
@@ -365,13 +362,12 @@ namespace Antlr4.Runtime.Atn
 			atn.ruleToStopState = new RuleStopState[nrules];
 			foreach (ATNState state in atn.states)
 			{
-				if (!(state is RuleStopState))
+				if (!(state is RuleStopState stopState))
 				{
 					continue;
 				}
-				RuleStopState stopState = (RuleStopState)state;
-				atn.ruleToStopState[state.ruleIndex] = stopState;
-				atn.ruleToStartState[state.ruleIndex].stopState = stopState;
+				atn.ruleToStopState[stopState.ruleIndex] = stopState;
+				atn.ruleToStartState[stopState.ruleIndex].stopState = stopState;
 			}
 		}
 
@@ -406,10 +402,10 @@ namespace Antlr4.Runtime.Atn
 				}
 				else
 				{
-					if (s is BlockStartState)
+					if (s is BlockStartState state)
 					{
 						int endStateNumber = ReadInt();
-						endStateNumbers.Add(Tuple.Create((BlockStartState)s, endStateNumber));
+						endStateNumbers.Add(Tuple.Create(state, endStateNumber));
 					}
 				}
 				atn.AddState(s);
@@ -468,18 +464,18 @@ namespace Antlr4.Runtime.Atn
         {
             foreach (ATNState state in atn.states)
             {
-                if (!(state is StarLoopEntryState))
+                if (!(state is StarLoopEntryState entryState))
                 {
                     continue;
                 }
-                if (atn.ruleToStartState[state.ruleIndex].isPrecedenceRule)
+                if (atn.ruleToStartState[entryState.ruleIndex].isPrecedenceRule)
                 {
-                    ATNState maybeLoopEndState = state.Transition(state.NumberOfTransitions - 1).target;
+                    ATNState maybeLoopEndState = entryState.Transition(entryState.NumberOfTransitions - 1).target;
                     if (maybeLoopEndState is LoopEndState)
                     {
                         if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.Transition(0).target is RuleStopState)
                         {
-							((StarLoopEntryState)state).isPrecedenceDecision = true;
+							entryState.isPrecedenceDecision = true;
                         }
                     }
                 }
@@ -496,14 +492,13 @@ namespace Antlr4.Runtime.Atn
                     continue;
                 }
                 CheckCondition(state.OnlyHasEpsilonTransitions || state.NumberOfTransitions <= 1);
-                if (state is PlusBlockStartState)
+                if (state is PlusBlockStartState startState)
                 {
-                    CheckCondition(((PlusBlockStartState)state).loopBackState != null);
+                    CheckCondition(startState.loopBackState != null);
                 }
-                if (state is StarLoopEntryState)
+                if (state is StarLoopEntryState starLoopEntryState)
                 {
-                    StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
-                    CheckCondition(starLoopEntryState.loopBackState != null);
+	                CheckCondition(starLoopEntryState.loopBackState != null);
                     CheckCondition(starLoopEntryState.NumberOfTransitions == 2);
                     if (starLoopEntryState.Transition(0).target is StarBlockStartState)
                     {
@@ -528,26 +523,25 @@ namespace Antlr4.Runtime.Atn
                     CheckCondition(state.NumberOfTransitions == 1);
                     CheckCondition(state.Transition(0).target is StarLoopEntryState);
                 }
-                if (state is LoopEndState)
+                if (state is LoopEndState endState)
                 {
-                    CheckCondition(((LoopEndState)state).loopBackState != null);
+                    CheckCondition(endState.loopBackState != null);
                 }
-                if (state is RuleStartState)
+                if (state is RuleStartState ruleStartState)
                 {
-                    CheckCondition(((RuleStartState)state).stopState != null);
+                    CheckCondition(ruleStartState.stopState != null);
                 }
-                if (state is BlockStartState)
+                if (state is BlockStartState blockStartState)
                 {
-                    CheckCondition(((BlockStartState)state).endState != null);
+                    CheckCondition(blockStartState.endState != null);
                 }
-                if (state is BlockEndState)
+                if (state is BlockEndState blockEndState)
                 {
-                    CheckCondition(((BlockEndState)state).startState != null);
+                    CheckCondition(blockEndState.startState != null);
                 }
-                if (state is DecisionState)
+                if (state is DecisionState decisionState)
                 {
-                    DecisionState decisionState = (DecisionState)state;
-                    CheckCondition(decisionState.NumberOfTransitions <= 1 || decisionState.decision >= 0);
+	                CheckCondition(decisionState.NumberOfTransitions <= 1 || decisionState.decision >= 0);
                 }
                 else
                 {
@@ -625,7 +619,7 @@ namespace Antlr4.Runtime.Atn
                 for (int i_1 = 0; i_1 < state.NumberOfOptimizedTransitions; i_1++)
                 {
                     Transition transition = state.GetOptimizedTransition(i_1);
-                    if (!(transition is RuleTransition))
+                    if (!(transition is RuleTransition ruleTransition))
                     {
                         if (optimizedTransitions != null)
                         {
@@ -633,13 +627,13 @@ namespace Antlr4.Runtime.Atn
                         }
                         continue;
                     }
-                    RuleTransition ruleTransition = (RuleTransition)transition;
+
                     Transition effective = ruleToInlineTransition[ruleTransition.target.ruleIndex];
                     if (effective == null)
                     {
                         if (optimizedTransitions != null)
                         {
-                            optimizedTransitions.Add(transition);
+                            optimizedTransitions.Add(ruleTransition);
                         }
                         continue;
                     }
@@ -882,11 +876,10 @@ nextTransition_continue: ;
             {
                 foreach (Transition transition in state.transitions)
                 {
-                    if (!(transition is RuleTransition))
+                    if (!(transition is RuleTransition ruleTransition))
                     {
                         continue;
                     }
-                    RuleTransition ruleTransition = (RuleTransition)transition;
                     ruleTransition.tailCall = TestTailCall(atn, ruleTransition, false);
                     ruleTransition.optimizedTailCall = TestTailCall(atn, ruleTransition, true);
                 }
@@ -896,11 +889,11 @@ nextTransition_continue: ;
                 }
                 foreach (Transition transition_1 in state.optimizedTransitions)
                 {
-                    if (!(transition_1 is RuleTransition))
+                    if (!(transition_1 is RuleTransition ruleTransition))
                     {
                         continue;
                     }
-                    RuleTransition ruleTransition = (RuleTransition)transition_1;
+
                     ruleTransition.tailCall = TestTailCall(atn, ruleTransition, false);
                     ruleTransition.optimizedTailCall = TestTailCall(atn, ruleTransition, true);
                 }

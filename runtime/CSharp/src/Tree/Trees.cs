@@ -81,11 +81,11 @@ namespace Antlr4.Runtime.Tree
         {
             if (ruleNames != null)
             {
-                if (t is RuleContext)
+                if (t is RuleContext context)
                 {
-                    int ruleIndex = ((RuleContext)t).RuleIndex;
+                    int ruleIndex = context.RuleIndex;
                     string ruleName = ruleNames[ruleIndex];
-					int altNumber = ((RuleContext)t).getAltNumber();
+					int altNumber = context.getAltNumber();
 					if ( altNumber!=Atn.ATN.INVALID_ALT_NUMBER ) {
 						return ruleName+":"+altNumber;
 					}
@@ -99,9 +99,9 @@ namespace Antlr4.Runtime.Tree
                     }
                     else
                     {
-                        if (t is ITerminalNode)
+                        if (t is ITerminalNode node)
                         {
-                            IToken symbol = ((ITerminalNode)t).Symbol;
+                            IToken symbol = node.Symbol;
                             if (symbol != null)
                             {
                                 string s = symbol.Text;
@@ -113,9 +113,9 @@ namespace Antlr4.Runtime.Tree
             }
             // no recog for rule names
             object payload = t.Payload;
-            if (payload is IToken)
+            if (payload is IToken token)
             {
-                return ((IToken)payload).Text;
+                return token.Text;
             }
             return t.Payload.ToString();
         }
@@ -174,22 +174,20 @@ namespace Antlr4.Runtime.Tree
         private static void _findAllNodes(IParseTree t, int index, bool findTokens, IList<IParseTree> nodes)
         {
             // check this node (the root) first
-            if (findTokens && t is ITerminalNode)
+            if (findTokens && t is ITerminalNode tnode)
             {
-                ITerminalNode tnode = (ITerminalNode)t;
                 if (tnode.Symbol.Type == index)
                 {
-                    nodes.Add(t);
+                    nodes.Add(tnode);
                 }
             }
             else
             {
-                if (!findTokens && t is ParserRuleContext)
+                if (!findTokens && t is ParserRuleContext ctx)
                 {
-                    ParserRuleContext ctx = (ParserRuleContext)t;
                     if (ctx.RuleIndex == index)
                     {
-                        nodes.Add(t);
+                        nodes.Add(ctx);
                     }
                 }
             }

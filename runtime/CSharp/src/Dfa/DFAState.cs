@@ -132,12 +132,11 @@ namespace Antlr4.Runtime.Dfa
 			// compare set of ATN configurations in this set with other
 			if (this == o) return true;
 
-			if (!(o is DFAState))
+			if (!(o is DFAState other))
 			{
 				return false;
 			}
 
-			DFAState other = (DFAState)o;
 			// TODO (sam): what to do when configs==null?
 			bool sameSet = configSet.Equals(other.configSet);
 			//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);

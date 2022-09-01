@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Atn
         public override bool Equals(object o)
         {
             return o==this ||
-				(o is ATNState && stateNumber == ((ATNState)o).stateNumber);
+				(o is ATNState state && stateNumber == state.stateNumber);
         }
 
         public virtual bool IsNonGreedyExitState => false;

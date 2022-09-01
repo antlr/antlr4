@@ -203,9 +203,8 @@ namespace Antlr4.Runtime.Misc
             {
                 return this;
             }
-            if (set is IntervalSet)
+            if (set is IntervalSet other)
             {
-                IntervalSet other = (IntervalSet)set;
                 // walk set and add each interval
                 int n = other.intervals.Count;
                 for (int i = 0; i < n; i++)
@@ -241,9 +240,9 @@ namespace Antlr4.Runtime.Misc
             }
             // nothing in common with null set
             IntervalSet vocabularyIS;
-            if (vocabulary is IntervalSet)
+            if (vocabulary is IntervalSet set)
             {
-                vocabularyIS = (IntervalSet)vocabulary;
+                vocabularyIS = set;
             }
             else
             {
@@ -259,9 +258,9 @@ namespace Antlr4.Runtime.Misc
             {
                 return new IntervalSet(this);
             }
-            if (a is IntervalSet)
+            if (a is IntervalSet set)
             {
-                return Subtract(this, (IntervalSet)a);
+                return Subtract(this, set);
             }
             IntervalSet other = new IntervalSet();
             other.AddAll(a);
@@ -594,11 +593,11 @@ namespace Antlr4.Runtime.Misc
         /// </remarks>
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is IntervalSet))
+            if (obj == null || !(obj is IntervalSet other))
             {
                 return false;
             }
-            IntervalSet other = (IntervalSet)obj;
+
             return intervals.SequenceEqual(other.intervals);
         }
 

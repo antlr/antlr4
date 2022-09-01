@@ -61,12 +61,11 @@ namespace Antlr4.Runtime.Misc
 
         public override bool Equals(object o)
         {
-            if (!(o is Interval))
+            if (!(o is Interval other))
             {
                 return false;
             }
 
-            Interval other = (Interval)o;
             return a == other.a && b == other.b;
         }
 

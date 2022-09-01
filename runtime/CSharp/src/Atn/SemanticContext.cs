@@ -71,16 +71,16 @@ namespace Antlr4.Runtime.Atn
 
             public override bool Equals(object obj)
             {
-                if (!(obj is Predicate))
+                if (!(obj is Predicate o))
                 {
                     return false;
                 }
-                if (this == obj)
+                if (this == o)
                 {
                     return true;
                 }
-                Predicate p = (Predicate)obj;
-                return ruleIndex == p.ruleIndex && predIndex == p.predIndex && isCtxDependent == p.isCtxDependent;
+
+                return ruleIndex == o.ruleIndex && predIndex == o.predIndex && isCtxDependent == o.isCtxDependent;
             }
 
             public override string ToString()
@@ -134,15 +134,15 @@ namespace Antlr4.Runtime.Atn
 
             public override bool Equals(object obj)
             {
-                if (!(obj is PrecedencePredicate))
+                if (!(obj is PrecedencePredicate other))
                 {
                     return false;
                 }
-                if (this == obj)
+                if (this == other)
                 {
                     return true;
                 }
-                PrecedencePredicate other = (PrecedencePredicate)obj;
+
                 return precedence == other.precedence;
             }
 
@@ -170,17 +170,17 @@ namespace Antlr4.Runtime.Atn
             public AND(SemanticContext a, SemanticContext b)
             {
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is AND)
+                if (a is AND aAnd)
                 {
-                    operands.UnionWith(((AND)a).opnds);
+                    operands.UnionWith(aAnd.opnds);
                 }
                 else
                 {
                     operands.Add(a);
                 }
-                if (b is AND)
+                if (b is AND bAnd)
                 {
-                    operands.UnionWith(((AND)b).opnds);
+                    operands.UnionWith(bAnd.opnds);
                 }
                 else
                 {
@@ -204,11 +204,11 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                if (!(obj is AND))
+                if (!(obj is AND other))
                 {
                     return false;
                 }
-                AND other = (AND)obj;
+
                 return Arrays.Equals(opnds, other.opnds);
             }
 
@@ -282,17 +282,17 @@ namespace Antlr4.Runtime.Atn
             public OR(SemanticContext a, SemanticContext b)
             {
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is OR)
+                if (a is OR aOr)
                 {
-                    operands.UnionWith(((OR)a).opnds);
+                    operands.UnionWith(aOr.opnds);
                 }
                 else
                 {
                     operands.Add(a);
                 }
-                if (b is OR)
+                if (b is OR bOr)
                 {
-                    operands.UnionWith(((OR)b).opnds);
+                    operands.UnionWith(bOr.opnds);
                 }
                 else
                 {
@@ -316,11 +316,11 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                if (!(obj is OR))
+                if (!(obj is OR other))
                 {
                     return false;
                 }
-                OR other = (OR)obj;
+
                 return Arrays.Equals(opnds, other.opnds);
             }
 

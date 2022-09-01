@@ -114,7 +114,7 @@ namespace Antlr4.Runtime.Atn
 		private static bool checkNonGreedyDecision(LexerATNConfig source, ATNState target)
 		{
 			return source.passedThroughNonGreedyDecision
-				|| target is DecisionState && ((DecisionState)target).nonGreedy;
+				|| target is DecisionState decisionState && decisionState.nonGreedy;
 		}
 	}
 }

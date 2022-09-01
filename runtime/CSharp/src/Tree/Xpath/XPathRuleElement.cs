@@ -22,9 +22,8 @@ namespace Antlr4.Runtime.Tree.Xpath
             IList<IParseTree> nodes = new List<IParseTree>();
             foreach (ITree c in Trees.GetChildren(t))
             {
-                if (c is ParserRuleContext)
+                if (c is ParserRuleContext ctx)
                 {
-                    ParserRuleContext ctx = (ParserRuleContext)c;
                     if ((ctx.RuleIndex == ruleIndex && !invert) || (ctx.RuleIndex != ruleIndex && invert))
                     {
                         nodes.Add(ctx);

@@ -39,10 +39,10 @@ namespace Antlr4.Runtime
         {
             ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);
-            if (trans is PredicateTransition)
+            if (trans is PredicateTransition transition)
             {
-                ruleIndex = ((PredicateTransition)trans).ruleIndex;
-                predicateIndex = ((PredicateTransition)trans).predIndex;
+                ruleIndex = transition.ruleIndex;
+                predicateIndex = transition.predIndex;
             }
             else
             {
