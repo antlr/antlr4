@@ -58,13 +58,7 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </summary>
         /// <returns>The rule index for the custom action.</returns>
-        public int RuleIndex
-        {
-            get
-            {
-                return ruleIndex;
-            }
-        }
+        public int RuleIndex => ruleIndex;
 
         /// <summary>
         /// Gets the action index to use for calls to
@@ -72,13 +66,7 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </summary>
         /// <returns>The action index for the custom action.</returns>
-        public int ActionIndex
-        {
-            get
-            {
-                return actionIndex;
-            }
-        }
+        public int ActionIndex => actionIndex;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -86,13 +74,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Custom"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.Custom;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.Custom;
 
         /// <summary>Gets whether the lexer action is position-dependent.</summary>
         /// <remarks>
@@ -110,13 +92,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="true"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool IsPositionDependent => true;
 
         /// <summary>
         /// <inheritDoc/>

@@ -45,12 +45,6 @@ namespace Antlr4.Runtime
             this.ruleIndex = ruleIndex;
         }
 
-        public override int RuleIndex
-        {
-            get
-            {
-                return ruleIndex;
-            }
-        }
+        public override int RuleIndex => ruleIndex;
     }
 }

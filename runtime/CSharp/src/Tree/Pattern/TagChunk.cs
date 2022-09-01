@@ -116,13 +116,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Get the tag for this chunk.</remarks>
         /// <returns>The tag for the chunk.</returns>
         [NotNull]
-        public string Tag
-        {
-            get
-            {
-                return tag;
-            }
-        }
+        public string Tag => tag;
 
         /// <summary>Get the label, if any, assigned to this chunk.</summary>
         /// <remarks>Get the label, if any, assigned to this chunk.</remarks>
@@ -133,13 +127,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// assigned to the chunk.
         /// </returns>
         [Nullable]
-        public string Label
-        {
-            get
-            {
-                return label;
-            }
-        }
+        public string Label => label;
 
         /// <summary>This method returns a text representation of the tag chunk.</summary>
         /// <remarks>

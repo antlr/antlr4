@@ -63,13 +63,7 @@ namespace Antlr4.Runtime
         /// <p>Used for XPath and tree pattern compilation.</p>
         /// </remarks>
         [NotNull]
-        public virtual IDictionary<string, int> TokenTypeMap
-        {
-            get
-            {
-                return tokenTypeMapCache.GetValue(Vocabulary, CreateTokenTypeMap);
-            }
-        }
+        public virtual IDictionary<string, int> TokenTypeMap => tokenTypeMapCache.GetValue(Vocabulary, CreateTokenTypeMap);
 
         protected virtual IDictionary<string, int> CreateTokenTypeMap(IVocabulary vocabulary)
         {
@@ -134,10 +128,7 @@ namespace Antlr4.Runtime
         public virtual int[] SerializedAtn
         {
             [return: NotNull]
-            get
-            {
-                throw new NotSupportedException("there is no serialized ATN");
-            }
+            get => throw new NotSupportedException("there is no serialized ATN");
         }
 
         /// <summary>For debugging and other purposes, might want the grammar name.</summary>
@@ -160,13 +151,7 @@ namespace Antlr4.Runtime
         /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// used by the recognizer for prediction.
         /// </returns>
-        public virtual ATN Atn
-        {
-            get
-            {
-                return _interp.atn;
-            }
-        }
+        public virtual ATN Atn => _interp.atn;
 
         /// <summary>Get the ATN interpreter used by the recognizer for prediction.</summary>
         /// <remarks>Get the ATN interpreter used by the recognizer for prediction.</remarks>
@@ -179,14 +164,8 @@ namespace Antlr4.Runtime
         /// </value>
         public virtual ATNInterpreter Interpreter
         {
-            get
-            {
-                return _interp;
-            }
-            protected set
-            {
-				_interp = value;
-            }
+            get => _interp;
+            protected set => _interp = value;
         }
 
         /// <summary>
@@ -198,13 +177,7 @@ namespace Antlr4.Runtime
         /// for each decision in recognizer in a ParseInfo object.
         /// </remarks>
         /// <since>4.3</since>
-        public virtual Antlr4.Runtime.Atn.ParseInfo ParseInfo
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual Antlr4.Runtime.Atn.ParseInfo ParseInfo => null;
 
         /// <summary>What is the error header, normally line/character position information?</summary>
         [return: NotNull]
@@ -290,21 +263,9 @@ namespace Antlr4.Runtime
         }
 
         [NotNull]
-        public virtual IList<IAntlrErrorListener<Symbol>> ErrorListeners
-        {
-            get
-            {
-                return new List<IAntlrErrorListener<Symbol>>(_listeners);
-            }
-        }
+        public virtual IList<IAntlrErrorListener<Symbol>> ErrorListeners => new List<IAntlrErrorListener<Symbol>>(_listeners);
 
-        public virtual IAntlrErrorListener<Symbol> ErrorListenerDispatch
-        {
-            get
-            {
-                return new ProxyErrorListener<Symbol>(ErrorListeners);
-            }
-        }
+        public virtual IAntlrErrorListener<Symbol> ErrorListenerDispatch => new ProxyErrorListener<Symbol>(ErrorListeners);
 
         // subclass needs to override these if there are sempreds or actions
         // that the ATN interp needs to execute
@@ -336,10 +297,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         public int State
         {
-            get
-            {
-                return _stateNumber;
-            }
+            get => _stateNumber;
             set
             {
                 int atnState = value;

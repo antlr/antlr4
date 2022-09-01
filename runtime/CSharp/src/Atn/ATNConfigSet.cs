@@ -127,13 +127,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		/** Return a List holding list of configs */
-		public List<ATNConfig> Elements
-		{
-			get
-			{
-				return configs;
-			}
-		}
+		public List<ATNConfig> Elements => configs;
 
 		public HashSet<ATNState> GetStates()
 		{
@@ -242,22 +236,9 @@ namespace Antlr4.Runtime.Atn
 			return configs.GetHashCode();
 		}
 
-		public int Count
-		{
-			get
-			{
-				return configs.Count;
-			}
-		}
+		public int Count => configs.Count;
 
-		public bool Empty
-		{
-			get
-			{
-
-				return configs.Count == 0;
-			}
-		}
+		public bool Empty => configs.Count == 0;
 
 		public bool Contains(Object o)
 		{
@@ -281,10 +262,7 @@ namespace Antlr4.Runtime.Atn
 
 		public bool IsReadOnly
 		{
-			get
-			{
-				return readOnly;
-			}
+			get => readOnly;
 			set
 			{
 				this.readOnly = value;

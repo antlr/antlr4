@@ -182,13 +182,7 @@ namespace Antlr4.Runtime.Atn
             return null;
         }
 
-        public virtual int NumberOfDecisions
-        {
-            get
-            {
-                return decisionToState.Count;
-            }
-        }
+        public virtual int NumberOfDecisions => decisionToState.Count;
 
         /// <summary>
         /// Computes the set of input symbols which could follow ATN state number

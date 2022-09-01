@@ -131,21 +131,9 @@ namespace Antlr4.Runtime.Atn
 		 * as it existed prior to the introduction of the
 		 * {@link #isPrecedenceFilterSuppressed} method.
 		 */
-		public int OuterContextDepth
-		{
-			get
-			{
-				return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
-			}
-		}
+		public int OuterContextDepth => reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
 
-		public bool IsPrecedenceFilterSuppressed
-		{
-			get
-			{
-				return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
-			}
-		}
+		public bool IsPrecedenceFilterSuppressed => (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
 
 		public void SetPrecedenceFilterSuppressed(bool value)
 		{

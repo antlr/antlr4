@@ -14,20 +14,8 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public sealed class RuleStopState : ATNState
     {
-        public override int NonStopStateNumber
-        {
-            get
-            {
-                return -1;
-            }
-        }
+        public override int NonStopStateNumber => -1;
 
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.RuleStop;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.RuleStop;
     }
 }

@@ -35,34 +35,16 @@ namespace Antlr4.Runtime.Atn
             this.isCtxDependent = isCtxDependent;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.PREDICATE;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.PREDICATE;
 
-        public override bool IsEpsilon
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEpsilon => true;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {
             return false;
         }
 
-        public SemanticContext.Predicate Predicate
-        {
-            get
-            {
-                return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
-            }
-        }
+        public SemanticContext.Predicate Predicate => new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
 
         [return: NotNull]
         public override string ToString()

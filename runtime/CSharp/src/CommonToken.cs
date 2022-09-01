@@ -180,26 +180,14 @@ namespace Antlr4.Runtime
 
         public virtual int Type
         {
-            get
-            {
-                return _type;
-            }
-            set
-            {
- 				this._type = value;
-            }
+            get => _type;
+            set => this._type = value;
         }
 
         public virtual int Line
         {
-            get
-            {
-                return _line;
-            }
-            set
-            {
- 				this._line = value;
-            }
+            get => _line;
+            set => this._line = value;
         }
 
         /// <summary>Explicitly set the text for this token.</summary>
@@ -241,18 +229,12 @@ namespace Antlr4.Runtime
                     return "<EOF>";
                 }
             }
-            set
-            {
- 				this._text = value;
-            }
+            set => this._text = value;
         }
 
         public virtual int Column
         {
-            get
-            {
-                return charPositionInLine;
-            }
+            get => charPositionInLine;
             set
             {
                 int charPositionInLine = value;
@@ -262,22 +244,13 @@ namespace Antlr4.Runtime
 
         public virtual int Channel
         {
-            get
-            {
-                return _channel;
-            }
-            set
-            {
-                this._channel = value;
-            }
+            get => _channel;
+            set => this._channel = value;
         }
 
         public virtual int StartIndex
         {
-            get
-            {
-                return start;
-            }
+            get => start;
             set
             {
                 int start = value;
@@ -287,10 +260,7 @@ namespace Antlr4.Runtime
 
         public virtual int StopIndex
         {
-            get
-            {
-                return stop;
-            }
+            get => stop;
             set
             {
                 int stop = value;
@@ -300,10 +270,7 @@ namespace Antlr4.Runtime
 
         public virtual int TokenIndex
         {
-            get
-            {
-                return index;
-            }
+            get => index;
             set
             {
                 int index = value;
@@ -311,21 +278,9 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual ITokenSource TokenSource
-        {
-            get
-            {
-                return source.Item1;
-            }
-        }
+        public virtual ITokenSource TokenSource => source.Item1;
 
-        public virtual ICharStream InputStream
-        {
-            get
-            {
-                return source.Item2;
-            }
-        }
+        public virtual ICharStream InputStream => source.Item2;
 
         public override string ToString()
         {

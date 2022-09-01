@@ -7,20 +7,8 @@ namespace Antlr4.Runtime.Atn
 {
     public sealed class StarLoopbackState : ATNState
     {
-        public StarLoopEntryState LoopEntryState
-        {
-            get
-            {
-                return (StarLoopEntryState)Transition(0).target;
-            }
-        }
+        public StarLoopEntryState LoopEntryState => (StarLoopEntryState)Transition(0).target;
 
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.StarLoopBack;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.StarLoopBack;
     }
 }

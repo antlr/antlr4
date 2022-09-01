@@ -2308,14 +2308,8 @@ namespace Antlr4.Runtime.Atn
 
 		public PredictionMode PredictionMode
 		{
-			get
-			{
-				return this.mode;
-			}
-			set
-			{
-				this.mode = value;
-			}
+			get => this.mode;
+			set => this.mode = value;
 		}
 
 

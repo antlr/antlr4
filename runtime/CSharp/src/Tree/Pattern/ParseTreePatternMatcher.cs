@@ -334,13 +334,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// input stream is reset.
         /// </remarks>
         [NotNull]
-        public virtual Lexer Lexer
-        {
-            get
-            {
-                return lexer;
-            }
-        }
+        public virtual Lexer Lexer => lexer;
 
         /// <summary>
         /// Used to collect to the grammar file name, token names, rule names for
@@ -351,13 +345,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// used to parse the pattern into a parse tree.
         /// </remarks>
         [NotNull]
-        public virtual Parser Parser
-        {
-            get
-            {
-                return parser;
-            }
-        }
+        public virtual Parser Parser => parser;
 
         // ---- SUPPORT CODE ----
         /// <summary>

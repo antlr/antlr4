@@ -49,12 +49,6 @@ namespace Antlr4.Runtime
             n = data.Length;
         }
 
-        public override string SourceName
-        {
-            get
-            {
-                return fileName;
-            }
-        }
+        public override string SourceName => fileName;
     }
 }

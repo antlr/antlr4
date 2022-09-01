@@ -212,13 +212,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// pattern did not contain any rule or token tags, this map will be empty.
         /// </returns>
         [NotNull]
-        public virtual MultiMap<string, IParseTree> Labels
-        {
-            get
-            {
-                return labels;
-            }
-        }
+        public virtual MultiMap<string, IParseTree> Labels => labels;
 
         /// <summary>Get the node at which we first detected a mismatch.</summary>
         /// <remarks>Get the node at which we first detected a mismatch.</remarks>
@@ -228,13 +222,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// if the match was successful.
         /// </returns>
         [Nullable]
-        public virtual IParseTree MismatchedNode
-        {
-            get
-            {
-                return mismatchedNode;
-            }
-        }
+        public virtual IParseTree MismatchedNode => mismatchedNode;
 
         /// <summary>Gets a value indicating whether the match operation succeeded.</summary>
         /// <remarks>Gets a value indicating whether the match operation succeeded.</remarks>
@@ -245,25 +233,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public virtual bool Succeeded
-        {
-            get
-            {
-                return mismatchedNode == null;
-            }
-        }
+        public virtual bool Succeeded => mismatchedNode == null;
 
         /// <summary>Get the tree pattern we are matching against.</summary>
         /// <remarks>Get the tree pattern we are matching against.</remarks>
         /// <returns>The tree pattern we are matching against.</returns>
         [NotNull]
-        public virtual ParseTreePattern Pattern
-        {
-            get
-            {
-                return pattern;
-            }
-        }
+        public virtual ParseTreePattern Pattern => pattern;
 
         /// <summary>Get the parse tree we are trying to match to a pattern.</summary>
         /// <remarks>Get the parse tree we are trying to match to a pattern.</remarks>
@@ -273,13 +249,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// we are trying to match to a pattern.
         /// </returns>
         [NotNull]
-        public virtual IParseTree Tree
-        {
-            get
-            {
-                return tree;
-            }
-        }
+        public virtual IParseTree Tree => tree;
 
         /// <summary><inheritDoc/></summary>
         public override string ToString()

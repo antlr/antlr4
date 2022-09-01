@@ -20,21 +20,9 @@ namespace Antlr4.Runtime.Atn
             this.to = to;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.RANGE;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.RANGE;
 
-        public override IntervalSet Label
-        {
-            get
-            {
-                return IntervalSet.Of(from, to);
-            }
-        }
+        public override IntervalSet Label => IntervalSet.Of(from, to);
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

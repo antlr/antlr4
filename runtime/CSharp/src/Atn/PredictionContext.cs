@@ -75,21 +75,9 @@ namespace Antlr4.Runtime.Atn
 
 		public abstract int GetReturnState(int index);
 
-		public virtual bool IsEmpty
-		{
-			get
-			{
-				return this == EmptyPredictionContext.Instance;
-			}
-		}
+		public virtual bool IsEmpty => this == EmptyPredictionContext.Instance;
 
-		public virtual bool HasEmptyPath
-		{
-			get
-			{
-				return GetReturnState(Size - 1) == EMPTY_RETURN_STATE;
-			}
-		}
+		public virtual bool HasEmptyPath => GetReturnState(Size - 1) == EMPTY_RETURN_STATE;
 
 		public sealed override int GetHashCode()
 		{

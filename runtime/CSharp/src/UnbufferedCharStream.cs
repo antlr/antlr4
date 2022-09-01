@@ -345,13 +345,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual int Index
-        {
-            get
-            {
-                return currentCharIndex;
-            }
-        }
+        public virtual int Index => currentCharIndex;
 
         /// <summary>
         /// Seek to absolute character index, which might not be in the current
@@ -401,13 +395,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual int Size
-        {
-            get
-            {
-                throw new NotSupportedException("Unbuffered stream cannot know its size");
-            }
-        }
+        public virtual int Size => throw new NotSupportedException("Unbuffered stream cannot know its size");
 
         public virtual string SourceName
         {
@@ -449,12 +437,6 @@ namespace Antlr4.Runtime
             return sb.ToString();
         }
 
-        protected internal int BufferStartIndex
-        {
-            get
-            {
-                return currentCharIndex - p;
-            }
-        }
+        protected internal int BufferStartIndex => currentCharIndex - p;
     }
 }

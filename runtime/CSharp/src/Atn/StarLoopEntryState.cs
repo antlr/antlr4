@@ -26,12 +26,6 @@ namespace Antlr4.Runtime.Atn
         /// <seealso cref="Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()"/>
         public bool isPrecedenceDecision;
 
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.StarLoopEntry;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.StarLoopEntry;
     }
 }

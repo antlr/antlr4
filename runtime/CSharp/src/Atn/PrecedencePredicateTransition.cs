@@ -16,34 +16,16 @@ namespace Antlr4.Runtime.Atn
             this.precedence = precedence;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.PRECEDENCE;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.PRECEDENCE;
 
-        public override bool IsEpsilon
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEpsilon => true;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {
             return false;
         }
 
-        public SemanticContext.PrecedencePredicate Predicate
-        {
-            get
-            {
-                return new SemanticContext.PrecedencePredicate(precedence);
-            }
-        }
+        public SemanticContext.PrecedencePredicate Predicate => new SemanticContext.PrecedencePredicate(precedence);
 
         public override string ToString()
         {

@@ -43,13 +43,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.PopMode"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.PopMode;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.PopMode;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -57,13 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

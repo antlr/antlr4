@@ -45,13 +45,7 @@ namespace Antlr4.Runtime.Dfa
         /// the accept state will be determined by the result of predicate
         /// evaluation.
         /// </remarks>
-        public virtual int Prediction
-        {
-            get
-            {
-                return prediction;
-            }
-        }
+        public virtual int Prediction => prediction;
 
         /// <summary>
         /// Gets the
@@ -59,12 +53,6 @@ namespace Antlr4.Runtime.Dfa
         /// which can be used to execute actions
         /// and/or commands after the lexer matches a token.
         /// </summary>
-        public virtual Antlr4.Runtime.Atn.LexerActionExecutor LexerActionExecutor
-        {
-            get
-            {
-                return lexerActionExecutor;
-            }
-        }
+        public virtual Antlr4.Runtime.Atn.LexerActionExecutor LexerActionExecutor => lexerActionExecutor;
     }
 }

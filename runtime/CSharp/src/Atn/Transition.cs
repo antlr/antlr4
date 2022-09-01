@@ -60,21 +60,9 @@ namespace Antlr4.Runtime.Atn
         /// if traversing this
         /// transition consumes (matches) an input symbol.
         /// </returns>
-        public virtual bool IsEpsilon
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsEpsilon => false;
 
-        public virtual IntervalSet Label
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual IntervalSet Label => null;
 
         public abstract bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
     }

@@ -63,13 +63,7 @@ namespace Antlr4.Runtime.Dfa
 		 * {@code false}.
 		 * @see Parser#getPrecedence()
 		 */
-		public bool IsPrecedenceDfa
-		{
-			get
-			{
-				return precedenceDfa;
-			}
-		}
+		public bool IsPrecedenceDfa => precedenceDfa;
 
 		/**
 		 * Get the start state for a specific precedence value.

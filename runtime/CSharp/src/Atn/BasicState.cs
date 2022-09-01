@@ -8,12 +8,6 @@ namespace Antlr4.Runtime.Atn
     /// <author>Sam Harwell</author>
     public sealed class BasicState : ATNState
     {
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.Basic;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.Basic;
     }
 }

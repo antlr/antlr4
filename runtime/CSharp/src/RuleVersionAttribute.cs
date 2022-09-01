@@ -17,12 +17,6 @@ namespace Antlr4.Runtime
             _version = version;
         }
 
-        public int Version
-        {
-            get
-            {
-                return _version;
-            }
-        }
+        public int Version => _version;
     }
 }

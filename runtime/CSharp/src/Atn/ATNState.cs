@@ -32,13 +32,7 @@ namespace Antlr4.Runtime.Atn
 
         public IntervalSet nextTokenWithinRule;
 
-        public virtual int NonStopStateNumber
-        {
-            get
-            {
-                return stateNumber;
-            }
-        }
+        public virtual int NonStopStateNumber => stateNumber;
 
         public override int GetHashCode()
         {
@@ -51,34 +45,16 @@ namespace Antlr4.Runtime.Atn
 				(o is ATNState && stateNumber == ((ATNState)o).stateNumber);
         }
 
-        public virtual bool IsNonGreedyExitState
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsNonGreedyExitState => false;
 
         public override string ToString()
         {
             return stateNumber.ToString();
         }
 
-        public virtual Transition[] TransitionsArray
-        {
-            get
-            {
-                return transitions.ToArray();
-            }
-        }
+        public virtual Transition[] TransitionsArray => transitions.ToArray();
 
-        public virtual int NumberOfTransitions
-        {
-            get
-            {
-                return transitions.Count;
-            }
-        }
+        public virtual int NumberOfTransitions => transitions.Count;
 
         public virtual void AddTransition(Antlr4.Runtime.Atn.Transition e)
         {
@@ -122,34 +98,16 @@ namespace Antlr4.Runtime.Atn
             get;
         }
 
-        public bool OnlyHasEpsilonTransitions
-        {
-            get
-            {
-                return epsilonOnlyTransitions;
-            }
-        }
+        public bool OnlyHasEpsilonTransitions => epsilonOnlyTransitions;
 
         public virtual void SetRuleIndex(int ruleIndex)
         {
             this.ruleIndex = ruleIndex;
         }
 
-        public virtual bool IsOptimized
-        {
-            get
-            {
-                return optimizedTransitions != transitions;
-            }
-        }
+        public virtual bool IsOptimized => optimizedTransitions != transitions;
 
-        public virtual int NumberOfOptimizedTransitions
-        {
-            get
-            {
-                return optimizedTransitions.Count;
-            }
-        }
+        public virtual int NumberOfOptimizedTransitions => optimizedTransitions.Count;
 
         public virtual Antlr4.Runtime.Atn.Transition GetOptimizedTransition(int i)
         {

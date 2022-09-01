@@ -343,14 +343,8 @@ namespace Antlr4.Runtime
         /// </returns>
         public virtual bool BuildParseTree
         {
-            get
-            {
-                return _buildParseTrees;
-            }
-            set
-            {
-				this._buildParseTrees = value;
-            }
+            get => _buildParseTrees;
+            set => this._buildParseTrees = value;
         }
 
         /// <summary>Trim the internal lists of the parse tree during parsing to conserve memory.</summary>
@@ -379,10 +373,7 @@ namespace Antlr4.Runtime
         /// </returns>
         public virtual bool TrimParseTree
         {
-            get
-            {
-                return ParseListeners.Contains(Parser.TrimToSizeListener.Instance);
-            }
+            get => ParseListeners.Contains(Parser.TrimToSizeListener.Instance);
             set
             {
                 bool trimParseTrees = value;
@@ -529,21 +520,9 @@ namespace Antlr4.Runtime
         /// is called.
         /// </remarks>
         /// <seealso cref="NotifyErrorListeners(string)"/>
-        public virtual int NumberOfSyntaxErrors
-        {
-            get
-            {
-                return _syntaxErrors;
-            }
-        }
+        public virtual int NumberOfSyntaxErrors => _syntaxErrors;
 
-        public virtual ITokenFactory TokenFactory
-        {
-            get
-            {
-                return _input.TokenSource.TokenFactory;
-            }
-        }
+        public virtual ITokenFactory TokenFactory => _input.TokenSource.TokenFactory;
 
         /// <summary>
         /// The ATN with bypass alternatives is expensive to create so we create it
@@ -619,10 +598,7 @@ namespace Antlr4.Runtime
 
         public virtual IAntlrErrorStrategy ErrorHandler
         {
-            get
-            {
-                return _errHandler;
-            }
+            get => _errHandler;
             set
             {
                 IAntlrErrorStrategy handler = value;
@@ -630,21 +606,12 @@ namespace Antlr4.Runtime
             }
         }
 
-        public override IIntStream InputStream
-		{
-			get
-			{
-				return _input;
-			}
-		}
+        public override IIntStream InputStream => _input;
 
-		public ITokenStream TokenStream
+        public ITokenStream TokenStream
 		{
-			get
-			{
-				return _input;
-			}
-			set
+			get => _input;
+            set
 			{
 				this._input = null;
 				Reset ();
@@ -660,13 +627,7 @@ namespace Antlr4.Runtime
         /// Match needs to return the current input symbol, which gets put
         /// into the label for the associated token ref; e.g., x=ID.
         /// </remarks>
-        public virtual IToken CurrentToken
-        {
-            get
-            {
-                return _input.LT(1);
-            }
-        }
+        public virtual IToken CurrentToken => _input.LT(1);
 
         public void NotifyErrorListeners(string msg)
         {
@@ -943,10 +904,7 @@ namespace Antlr4.Runtime
 
         public virtual ParserRuleContext Context
         {
-            get
-            {
-                return _ctx;
-            }
+            get => _ctx;
             set
             {
                 ParserRuleContext ctx = value;
@@ -959,13 +917,7 @@ namespace Antlr4.Runtime
             return precedence >= _precedenceStack[_precedenceStack.Count - 1];
         }
 
-        public new IParserErrorListener ErrorListenerDispatch
-        {
-            get
-            {
-                return new ProxyParserErrorListener(ErrorListeners);
-            }
-        }
+        public new IParserErrorListener ErrorListenerDispatch => new ProxyParserErrorListener(ErrorListeners);
 
         public virtual bool InContext(string context)
         {
@@ -1068,13 +1020,7 @@ namespace Antlr4.Runtime
             return -1;
         }
 
-        public virtual ParserRuleContext RuleContext
-        {
-            get
-            {
-                return _ctx;
-            }
-        }
+        public virtual ParserRuleContext RuleContext => _ctx;
 
         /// <summary>
         /// Return List&lt;String&gt; of the rule names in your parser instance
@@ -1159,13 +1105,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual string SourceName
-        {
-            get
-            {
-                return _input.SourceName;
-            }
-        }
+        public virtual string SourceName => _input.SourceName;
 
         public override ParseInfo ParseInfo
         {

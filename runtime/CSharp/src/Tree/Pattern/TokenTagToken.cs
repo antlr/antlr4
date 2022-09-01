@@ -74,13 +74,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Gets the token name.</remarks>
         /// <returns>The token name.</returns>
         [NotNull]
-        public string TokenName
-        {
-            get
-            {
-                return tokenName;
-            }
-        }
+        public string TokenName => tokenName;
 
         /// <summary>Gets the label associated with the rule tag.</summary>
         /// <remarks>Gets the label associated with the rule tag.</remarks>
@@ -90,13 +84,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// if this is an unlabeled rule tag.
         /// </returns>
         [Nullable]
-        public string Label
-        {
-            get
-            {
-                return label;
-            }
-        }
+        public string Label => label;
 
         /// <summary>
         /// <inheritDoc/>

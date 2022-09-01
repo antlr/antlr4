@@ -254,10 +254,7 @@ outer_continue: ;
 
         public virtual ITokenFactory TokenFactory
         {
-            get
-            {
-                return _factory;
-            }
+            get => _factory;
             set
             {
                 ITokenFactory factory = value;
@@ -275,29 +272,11 @@ outer_continue: ;
             this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
         }
 
-        public virtual string SourceName
-        {
-            get
-            {
-                return _input.SourceName;
-            }
-        }
+        public virtual string SourceName => _input.SourceName;
 
-        public override IIntStream InputStream
-        {
-            get
-            {
-                return _input;
-            }
-        }
+        public override IIntStream InputStream => _input;
 
-        ICharStream ITokenSource.InputStream
-        {
-            get
-            {
-				return _input;
-            }
-        }
+        ICharStream ITokenSource.InputStream => _input;
 
         /// <summary>
         /// By default does not support multiple emits per nextToken invocation
@@ -344,10 +323,7 @@ outer_continue: ;
 
         public virtual int Line
         {
-            get
-            {
-                return Interpreter.Line;
-            }
+            get => Interpreter.Line;
             set
             {
                 int line = value;
@@ -357,10 +333,7 @@ outer_continue: ;
 
         public virtual int Column
         {
-            get
-            {
-                return Interpreter.Column;
-            }
+            get => Interpreter.Column;
             set
             {
                 int charPositionInLine = value;
@@ -369,37 +342,13 @@ outer_continue: ;
         }
 
         /// <summary>What is the index of the current character of lookahead?</summary>
-        public virtual int CharIndex
-        {
-            get
-            {
-                return _input.Index;
-            }
-        }
+        public virtual int CharIndex => _input.Index;
 
-		public virtual int TokenStartCharIndex
-		{
-			get
-			{
-				return _tokenStartCharIndex;
-			}
-		}
+        public virtual int TokenStartCharIndex => _tokenStartCharIndex;
 
-		public virtual int TokenStartLine
-		{
-			get
-			{
-				return _tokenStartLine;
-			}
-		}
+        public virtual int TokenStartLine => _tokenStartLine;
 
-		public virtual int TokenStartColumn
-		{
-			get
-			{
-				return _tokenStartColumn;
-			}
-		}
+        public virtual int TokenStartColumn => _tokenStartColumn;
 
         /// <summary>
         /// Return the text matched so far for the current token or any text
@@ -438,10 +387,7 @@ outer_continue: ;
         /// <remarks>Override if emitting multiple tokens.</remarks>
         public virtual IToken Token
         {
-            get
-            {
-                return _token;
-            }
+            get => _token;
             set
             {
                 IToken _token = value;
@@ -451,10 +397,7 @@ outer_continue: ;
 
         public virtual int Type
         {
-            get
-            {
-                return _type;
-            }
+            get => _type;
             set
             {
                 int ttype = value;
@@ -464,10 +407,7 @@ outer_continue: ;
 
         public virtual int Channel
         {
-            get
-            {
-                return _channel;
-            }
+            get => _channel;
             set
             {
                 int channel = value;
@@ -475,20 +415,11 @@ outer_continue: ;
             }
         }
 
-        public virtual Stack<int> ModeStack
-        {
-            get
-            {
-                return _modeStack;
-            }
-        }
+        public virtual Stack<int> ModeStack => _modeStack;
 
         public virtual int CurrentMode
         {
-            get
-            {
-                return _mode;
-            }
+            get => _mode;
             set
             {
                 int mode = value;
@@ -498,10 +429,7 @@ outer_continue: ;
 
         public virtual bool HitEOF
         {
-            get
-            {
-                return _hitEOF;
-            }
+            get => _hitEOF;
             set
             {
                 bool hitEOF = value;
@@ -509,21 +437,9 @@ outer_continue: ;
             }
         }
 
-        public virtual string[] ChannelNames
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual string[] ChannelNames => null;
 
-        public virtual string[] ModeNames
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual string[] ModeNames => null;
 
         /// <summary>Return a list of all Token objects in input char stream.</summary>
         /// <remarks>

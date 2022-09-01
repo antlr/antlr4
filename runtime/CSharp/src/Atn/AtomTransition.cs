@@ -20,21 +20,9 @@ namespace Antlr4.Runtime.Atn
 			this.token = token;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.ATOM;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.ATOM;
 
-        public override IntervalSet Label
-        {
-            get
-            {
-				return IntervalSet.Of(token);
-            }
-        }
+        public override IntervalSet Label => IntervalSet.Of(token);
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

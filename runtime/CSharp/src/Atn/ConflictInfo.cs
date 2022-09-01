@@ -22,13 +22,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Gets the set of conflicting alternatives for the configuration set.</summary>
         /// <remarks>Gets the set of conflicting alternatives for the configuration set.</remarks>
-        public BitSet ConflictedAlts
-        {
-            get
-            {
-                return conflictedAlts;
-            }
-        }
+        public BitSet ConflictedAlts => conflictedAlts;
 
         /// <summary>Gets whether or not the configuration conflict is an exact conflict.</summary>
         /// <remarks>
@@ -46,13 +40,7 @@ namespace Antlr4.Runtime.Atn
         /// accept states are conflicting but not exact are treated as non-accept
         /// states.</p>
         /// </remarks>
-        public bool IsExact
-        {
-            get
-            {
-                return exact;
-            }
-        }
+        public bool IsExact => exact;
 
         public override bool Equals(object obj)
         {

@@ -52,13 +52,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Gets the raw text of this chunk.</remarks>
         /// <returns>The text of the chunk.</returns>
         [NotNull]
-        public string Text
-        {
-            get
-            {
-                return text;
-            }
-        }
+        public string Text => text;
 
         /// <summary>
         /// <inheritDoc/>

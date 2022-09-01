@@ -27,21 +27,9 @@ namespace Antlr4.Runtime.Atn
             this.isCtxDependent = isCtxDependent;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.ACTION;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.ACTION;
 
-        public override bool IsEpsilon
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEpsilon => true;
 
         // we are to be ignored by analysis 'cept for predicates
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)

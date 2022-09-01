@@ -14,13 +14,7 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.NOT_SET;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.NOT_SET;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

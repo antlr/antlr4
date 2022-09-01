@@ -115,21 +115,9 @@ namespace Antlr4.Runtime
             this._tokenSource = tokenSource;
         }
 
-        public virtual ITokenSource TokenSource
-        {
-            get
-            {
-                return _tokenSource;
-            }
-        }
+        public virtual ITokenSource TokenSource => _tokenSource;
 
-        public virtual int Index
-        {
-            get
-            {
-                return p;
-            }
-        }
+        public virtual int Index => p;
 
         public virtual int Mark()
         {
@@ -152,13 +140,7 @@ namespace Antlr4.Runtime
             p = AdjustSeekIndex(index);
         }
 
-        public virtual int Size
-        {
-            get
-            {
-                return tokens.Count;
-            }
-        }
+        public virtual int Size => tokens.Count;
 
         public virtual void Consume()
         {
@@ -620,13 +602,7 @@ namespace Antlr4.Runtime
             return hidden;
         }
 
-        public virtual string SourceName
-        {
-            get
-            {
-                return _tokenSource.SourceName;
-            }
-        }
+        public virtual string SourceName => _tokenSource.SourceName;
 
         /// <summary>Get the text of all tokens in this buffer.</summary>
         /// <remarks>Get the text of all tokens in this buffer.</remarks>

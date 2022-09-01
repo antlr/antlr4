@@ -75,37 +75,13 @@ namespace Antlr4.Runtime
             Interpreter = new ParserATNSimulator(this, atn, _decisionToDFA, null);
         }
 
-        public override ATN Atn
-        {
-            get
-            {
-                return _atn;
-            }
-        }
+        public override ATN Atn => _atn;
 
-        public override IVocabulary Vocabulary
-        {
-            get
-            {
-                return vocabulary;
-            }
-        }
+        public override IVocabulary Vocabulary => vocabulary;
 
-        public override string[] RuleNames
-        {
-            get
-            {
-                return _ruleNames;
-            }
-        }
+        public override string[] RuleNames => _ruleNames;
 
-        public override string GrammarFileName
-        {
-            get
-            {
-                return _grammarFileName;
-            }
-        }
+        public override string GrammarFileName => _grammarFileName;
 
         /// <summary>Begin parsing at startRuleIndex</summary>
         public virtual ParserRuleContext Parse(int startRuleIndex)
@@ -172,13 +148,7 @@ namespace Antlr4.Runtime
             base.EnterRecursionRule(localctx, state, ruleIndex, precedence);
         }
 
-        protected internal virtual ATNState AtnState
-        {
-            get
-            {
-                return _atn.states[State];
-            }
-        }
+        protected internal virtual ATNState AtnState => _atn.states[State];
 
         protected internal virtual void VisitState(ATNState p)
         {

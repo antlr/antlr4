@@ -499,13 +499,7 @@ namespace Antlr4.Runtime.Misc
         /// <inheritDoc/>
         ///
         /// </summary>
-        public virtual bool IsNil
-        {
-            get
-            {
-                return intervals == null || intervals.Count == 0;
-            }
-        }
+        public virtual bool IsNil => intervals == null || intervals.Count == 0;
 
         /// <summary>
         /// <inheritDoc/>
@@ -856,14 +850,9 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public virtual bool IsReadOnly
-        {
-            get
-            {
-                // add [x+1..b]
-                return @readonly;
-            }
-        }
+        public virtual bool IsReadOnly =>
+            // add [x+1..b]
+            @readonly;
 
         public virtual void SetReadonly(bool @readonly)
         {

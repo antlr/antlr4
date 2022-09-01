@@ -149,14 +149,8 @@ namespace Antlr4.Runtime
 
         public virtual ITokenSource TokenSource
         {
-            get
-            {
-                return _tokenSource;
-            }
-			set
-			{
-				_tokenSource = value;
-			}
+            get => _tokenSource;
+            set => _tokenSource = value;
         }
 
         [return: NotNull]
@@ -312,13 +306,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual int Index
-        {
-            get
-            {
-                return currentTokenIndex;
-            }
-        }
+        public virtual int Index => currentTokenIndex;
 
         public virtual void Seek(int index)
         {
@@ -357,21 +345,9 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual int Size
-        {
-            get
-            {
-                throw new NotSupportedException("Unbuffered stream cannot know its size");
-            }
-        }
+        public virtual int Size => throw new NotSupportedException("Unbuffered stream cannot know its size");
 
-        public virtual string SourceName
-        {
-            get
-            {
-                return TokenSource.SourceName;
-            }
-        }
+        public virtual string SourceName => TokenSource.SourceName;
 
         [return: NotNull]
         public virtual string GetText(Interval interval)

@@ -38,13 +38,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Gets the type to assign to a token created by the lexer.</summary>
         /// <remarks>Gets the type to assign to a token created by the lexer.</remarks>
         /// <returns>The type to assign to a token created by the lexer.</returns>
-        public virtual int Type
-        {
-            get
-            {
-                return type;
-            }
-        }
+        public virtual int Type => type;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -52,13 +46,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Type"/>
         /// .
         /// </returns>
-        public virtual LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.Type;
-            }
-        }
+        public virtual LexerActionType ActionType => LexerActionType.Type;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -66,13 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public virtual bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

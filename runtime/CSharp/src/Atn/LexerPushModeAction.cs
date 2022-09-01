@@ -42,13 +42,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>pushMode</c>
         /// command.
         /// </returns>
-        public int Mode
-        {
-            get
-            {
-                return mode;
-            }
-        }
+        public int Mode => mode;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -56,13 +50,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.PushMode"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.PushMode;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.PushMode;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -70,13 +58,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

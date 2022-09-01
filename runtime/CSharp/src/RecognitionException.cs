@@ -95,10 +95,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         public int OffendingState
         {
-            get
-            {
-                return offendingState;
-            }
+            get => offendingState;
             protected set
             {
                 int offendingState = value;
@@ -150,13 +147,7 @@ namespace Antlr4.Runtime
         /// <see langword="null"/>
         /// .
         /// </returns>
-        public virtual RuleContext Context
-        {
-            get
-            {
-                return ctx;
-            }
-        }
+        public virtual RuleContext Context => ctx;
 
         /// <summary>
         /// Gets the input stream which is the symbol source for the recognizer where
@@ -176,20 +167,11 @@ namespace Antlr4.Runtime
         /// if the stream is not
         /// available.
         /// </returns>
-        public virtual IIntStream InputStream
-        {
-            get
-            {
-                return input;
-            }
-        }
+        public virtual IIntStream InputStream => input;
 
         public IToken OffendingToken
         {
-            get
-            {
-                return offendingToken;
-            }
+            get => offendingToken;
             protected set
             {
                 IToken offendingToken = value;
@@ -211,12 +193,6 @@ namespace Antlr4.Runtime
         /// if
         /// the recognizer is not available.
         /// </returns>
-        public virtual IRecognizer Recognizer
-        {
-            get
-            {
-                return recognizer;
-            }
-        }
+        public virtual IRecognizer Recognizer => recognizer;
     }
 }

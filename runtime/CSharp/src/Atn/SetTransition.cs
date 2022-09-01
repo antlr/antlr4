@@ -25,21 +25,9 @@ namespace Antlr4.Runtime.Atn
             this.set = set;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.SET;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.SET;
 
-        public override IntervalSet Label
-        {
-            get
-            {
-                return set;
-            }
-        }
+        public override IntervalSet Label => set;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

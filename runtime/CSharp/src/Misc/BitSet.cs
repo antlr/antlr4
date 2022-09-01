@@ -130,15 +130,9 @@ namespace Antlr4.Runtime.Misc
 
 		public bool this[int index]
 		{
-			get
-			{
-				return Get(index);
-			}
-			set
-			{
-				Set(index);
-			}
-		}
+			get => Get(index);
+            set => Set(index);
+        }
 
         public bool Get(int index)
         {

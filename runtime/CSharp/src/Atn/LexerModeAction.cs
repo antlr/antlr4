@@ -43,13 +43,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>mode</c>
         /// command.
         /// </returns>
-        public int Mode
-        {
-            get
-            {
-                return mode;
-            }
-        }
+        public int Mode => mode;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -57,13 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Mode"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.Mode;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.Mode;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -71,13 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

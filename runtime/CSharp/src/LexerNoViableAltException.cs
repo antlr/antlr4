@@ -27,30 +27,12 @@ namespace Antlr4.Runtime
             this.deadEndConfigs = deadEndConfigs;
         }
 
-        public virtual int StartIndex
-        {
-            get
-            {
-                return startIndex;
-            }
-        }
+        public virtual int StartIndex => startIndex;
 
         [Nullable]
-        public virtual ATNConfigSet DeadEndConfigs
-        {
-            get
-            {
-                return deadEndConfigs;
-            }
-        }
+        public virtual ATNConfigSet DeadEndConfigs => deadEndConfigs;
 
-        public override IIntStream InputStream
-        {
-            get
-            {
-                return (ICharStream)base.InputStream;
-            }
-        }
+        public override IIntStream InputStream => (ICharStream)base.InputStream;
 
         public override string ToString()
         {

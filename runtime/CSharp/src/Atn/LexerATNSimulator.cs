@@ -756,26 +756,14 @@ namespace Antlr4.Runtime.Atn
 
 		public int Line
 		{
-			get
-			{
-				return thisLine;
-			}
-			set
-			{
-				this.thisLine = value;
-			}
+			get => thisLine;
+			set => this.thisLine = value;
 		}
 
 		public int Column
 		{
-			get
-			{
-				return charPositionInLine;
-			}
-			set
-			{
-				this.charPositionInLine = value;
-			}
+			get => charPositionInLine;
+			set => this.charPositionInLine = value;
 		}
 
 

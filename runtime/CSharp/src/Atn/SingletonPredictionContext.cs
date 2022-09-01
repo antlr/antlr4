@@ -45,21 +45,9 @@ namespace Antlr4.Runtime.Atn
         }
 
 
-        public override int Size
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        public override int Size => 1;
 
-        public override bool IsEmpty
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool IsEmpty => false;
 
         public override bool Equals(object o)
         {

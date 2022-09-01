@@ -26,21 +26,9 @@ namespace Antlr4.Runtime.Dfa
             arrayData = new T[maxIndex - minIndex + 1];
         }
 
-        public override int Count
-        {
-            get
-            {
-                return Volatile.Read(ref size);
-            }
-        }
+        public override int Count => Volatile.Read(ref size);
 
-        public override bool IsEmpty
-        {
-            get
-            {
-                return Count == 0;
-            }
-        }
+        public override bool IsEmpty => Count == 0;
 
         public override bool ContainsKey(int key)
         {

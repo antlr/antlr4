@@ -28,13 +28,7 @@ namespace Antlr4.Runtime
             this.delegates = delegates;
         }
 
-        protected internal virtual IEnumerable<IAntlrErrorListener<Symbol>> Delegates
-        {
-            get
-            {
-                return delegates;
-            }
-        }
+        protected internal virtual IEnumerable<IAntlrErrorListener<Symbol>> Delegates => delegates;
 
         public virtual void SyntaxError(TextWriter output, IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {

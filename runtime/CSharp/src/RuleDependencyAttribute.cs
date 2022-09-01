@@ -31,36 +31,12 @@ namespace Antlr4.Runtime
             this._dependents = dependents | Dependents.Self;
         }
 
-        public Type Recognizer
-        {
-            get
-            {
-                return _recognizer;
-            }
-        }
+        public Type Recognizer => _recognizer;
 
-        public int Rule
-        {
-            get
-            {
-                return _rule;
-            }
-        }
+        public int Rule => _rule;
 
-        public int Version
-        {
-            get
-            {
-                return _version;
-            }
-        }
+        public int Version => _version;
 
-        public Dependents Dependents
-        {
-            get
-            {
-                return _dependents;
-            }
-        }
+        public Dependents Dependents => _dependents;
     }
 }

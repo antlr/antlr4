@@ -30,37 +30,13 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public int Key
-        {
-            get
-            {
-                return key;
-            }
-        }
+        public int Key => key;
 
-        public T Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public T Value => value;
 
-        public override int Count
-        {
-            get
-            {
-                return value != null ? 1 : 0;
-            }
-        }
+        public override int Count => value != null ? 1 : 0;
 
-        public override bool IsEmpty
-        {
-            get
-            {
-                return value == null;
-            }
-        }
+        public override bool IsEmpty => value == null;
 
         public override bool ContainsKey(int key)
         {

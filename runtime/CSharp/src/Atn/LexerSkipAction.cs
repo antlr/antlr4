@@ -43,13 +43,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Skip"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.Skip;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.Skip;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -57,13 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

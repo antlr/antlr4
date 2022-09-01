@@ -74,13 +74,7 @@ namespace Antlr4.Runtime.Atn
         /// at which the lexer
         /// action should be executed.
         /// </returns>
-        public int Offset
-        {
-            get
-            {
-                return offset;
-            }
-        }
+        public int Offset => offset;
 
         /// <summary>Gets the lexer action to execute.</summary>
         /// <remarks>Gets the lexer action to execute.</remarks>
@@ -90,13 +84,7 @@ namespace Antlr4.Runtime.Atn
         /// object which executes the lexer action.
         /// </returns>
         [NotNull]
-        public ILexerAction Action
-        {
-            get
-            {
-                return action;
-            }
-        }
+        public ILexerAction Action => action;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -108,13 +96,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Action()"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return action.ActionType;
-            }
-        }
+        public LexerActionType ActionType => action.ActionType;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -122,13 +104,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="true"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool IsPositionDependent => true;
 
         /// <summary>
         /// <inheritDoc/>

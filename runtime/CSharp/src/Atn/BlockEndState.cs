@@ -14,12 +14,6 @@ namespace Antlr4.Runtime.Atn
     {
         public BlockStartState startState;
 
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.BlockEnd;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.BlockEnd;
     }
 }

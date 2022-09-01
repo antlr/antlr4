@@ -105,14 +105,9 @@ namespace Antlr4.Runtime
         {
         }
 
-        public static Antlr4.Runtime.ParserRuleContext EmptyContext
-        {
-            get
-            {
-                //	public List<Integer> states;
-                return EMPTY;
-            }
-        }
+        public static Antlr4.Runtime.ParserRuleContext EmptyContext =>
+            //	public List<Integer> states;
+            EMPTY;
 
         /// <summary>
         /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
@@ -353,10 +348,7 @@ namespace Antlr4.Runtime
             return contexts.ToArray();
         }
 
-        public override int ChildCount
-        {
-            get { return children != null ? children.Count : 0; }
-        }
+        public override int ChildCount => children != null ? children.Count : 0;
 
         public override Interval SourceInterval
         {
@@ -373,14 +365,14 @@ namespace Antlr4.Runtime
 
         public virtual IToken Start
         {
-            get { return _start; }
-            set { _start = value; }
+            get => _start;
+            set => _start = value;
         }
 
         public virtual IToken Stop
         {
-            get { return _stop; }
-            set { _stop = value; }
+            get => _stop;
+            set => _stop = value;
         }
 
         /// <summary>Used for rule context info debugging during parse-time, not so much for ATN debugging</summary>

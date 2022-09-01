@@ -81,82 +81,29 @@ namespace Antlr4.Runtime
         /// A context is empty if there is no invoking state; meaning nobody call
         /// current context.
         /// </remarks>
-        public virtual bool IsEmpty
-        {
-            get
-            {
-                return invokingState == -1;
-            }
-        }
+        public virtual bool IsEmpty => invokingState == -1;
 
-        public virtual Interval SourceInterval
-        {
-            get
-            {
-                // satisfy the ParseTree / SyntaxTree interface
-                return Interval.Invalid;
-            }
-        }
+        public virtual Interval SourceInterval =>
+            // satisfy the ParseTree / SyntaxTree interface
+            Interval.Invalid;
 
-        RuleContext IRuleNode.RuleContext
-        {
-            get
-            {
-                return this;
-            }
-        }
+        RuleContext IRuleNode.RuleContext => this;
 
         public virtual Antlr4.Runtime.RuleContext Parent
         {
-            get
-            {
-                return _parent;
-            }
-			set
-			{
-				_parent = value;
-			}
+            get => _parent;
+            set => _parent = value;
         }
 
-        IRuleNode IRuleNode.Parent
-        {
-            get
-            {
-                return Parent;
-            }
-        }
+        IRuleNode IRuleNode.Parent => Parent;
 
-        IParseTree IParseTree.Parent
-        {
-            get
-            {
-                return Parent;
-            }
-        }
+        IParseTree IParseTree.Parent => Parent;
 
-        ITree ITree.Parent
-        {
-            get
-            {
-                return Parent;
-            }
-        }
+        ITree ITree.Parent => Parent;
 
-        public virtual Antlr4.Runtime.RuleContext Payload
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public virtual Antlr4.Runtime.RuleContext Payload => this;
 
-        object ITree.Payload
-        {
-            get
-            {
-                return Payload;
-            }
-        }
+        object ITree.Payload => Payload;
 
         /// <summary>Return the combined text of all child nodes.</summary>
         /// <remarks>
@@ -181,15 +128,9 @@ namespace Antlr4.Runtime
             return builder.ToString();
         }
 
-        public virtual int RuleIndex
-        {
-            get
-            {
-                return -1;
-            }
-        }
+        public virtual int RuleIndex => -1;
 
-	/* For rule associated with this parse tree internal node, return
+        /* For rule associated with this parse tree internal node, return
 	 * the outer alternative number used to match the input. Default
 	 * implementation does not compute nor store this alt num. Create
 	 * a subclass of ParserRuleContext with backing field and set
@@ -216,13 +157,7 @@ namespace Antlr4.Runtime
             return GetChild(i);
         }
 
-        public virtual int ChildCount
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public virtual int ChildCount => 0;
 
         public virtual T Accept<T>(IParseTreeVisitor<T> visitor)
         {

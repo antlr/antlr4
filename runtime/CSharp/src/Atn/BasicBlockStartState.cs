@@ -8,12 +8,6 @@ namespace Antlr4.Runtime.Atn
     /// <author>Sam Harwell</author>
     public sealed class BasicBlockStartState : BlockStartState
     {
-        public override Antlr4.Runtime.Atn.StateType StateType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.StateType.BlockStart;
-            }
-        }
+        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.BlockStart;
     }
 }

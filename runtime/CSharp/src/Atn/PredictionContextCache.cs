@@ -33,13 +33,6 @@ namespace Antlr4.Runtime.Atn
 			return cache.TryGetValue(ctx, out var result) ? result : null;
 		}
 
-		public int Count
-		{
-			get
-			{
-				return cache.Count;
-			}
-		}
-
+		public int Count => cache.Count;
 	}
 }

@@ -37,21 +37,9 @@ namespace Antlr4.Runtime.Atn
             this.followState = followState;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.RULE;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.RULE;
 
-        public override bool IsEpsilon
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEpsilon => true;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

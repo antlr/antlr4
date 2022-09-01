@@ -45,13 +45,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.IToken"/>
         /// created by the lexer.
         /// </returns>
-        public int Channel
-        {
-            get
-            {
-                return channel;
-            }
-        }
+        public int Channel => channel;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -59,13 +53,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Channel"/>
         /// .
         /// </returns>
-        public LexerActionType ActionType
-        {
-            get
-            {
-                return LexerActionType.Channel;
-            }
-        }
+        public LexerActionType ActionType => LexerActionType.Channel;
 
         /// <summary><inheritDoc/></summary>
         /// <returns>
@@ -73,13 +61,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        public bool IsPositionDependent
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsPositionDependent => false;
 
         /// <summary>
         /// <inheritDoc/>

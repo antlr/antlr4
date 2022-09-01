@@ -56,52 +56,16 @@ namespace Antlr4.Runtime
             this.Interpreter = new LexerATNSimulator(this, atn, decisionToDFA, sharedContextCache);
         }
 
-        public override ATN Atn
-        {
-            get
-            {
-                return atn;
-            }
-        }
+        public override ATN Atn => atn;
 
-        public override string GrammarFileName
-        {
-            get
-            {
-                return grammarFileName;
-            }
-        }
+        public override string GrammarFileName => grammarFileName;
 
-        public override string[] RuleNames
-        {
-            get
-            {
-                return ruleNames;
-            }
-        }
+        public override string[] RuleNames => ruleNames;
 
-        public override string[] ChannelNames
-        {
-            get
-            {
-                return channelNames;
-            }
-        }
+        public override string[] ChannelNames => channelNames;
 
-        public override string[] ModeNames
-        {
-            get
-            {
-                return modeNames;
-            }
-        }
+        public override string[] ModeNames => modeNames;
 
-        public override IVocabulary Vocabulary
-        {
-            get
-            {
-                return vocabulary;
-            }
-        }
+        public override IVocabulary Vocabulary => vocabulary;
     }
 }

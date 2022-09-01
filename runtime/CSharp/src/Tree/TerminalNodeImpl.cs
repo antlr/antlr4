@@ -27,57 +27,21 @@ namespace Antlr4.Runtime.Tree
             return GetChild(i);
         }
 
-        public virtual IToken Symbol
-        {
-            get
-            {
-                return _symbol;
-            }
-        }
+        public virtual IToken Symbol => _symbol;
 
         public virtual IRuleNode Parent
         {
-            get
-            {
-                return _parent;
-            }
-			set
-			{
-				_parent = value;
-			}
+            get => _parent;
+            set => _parent = value;
         }
 
-        IParseTree IParseTree.Parent
-        {
-            get
-            {
-                return Parent;
-            }
-        }
+        IParseTree IParseTree.Parent => Parent;
 
-        ITree ITree.Parent
-        {
-            get
-            {
-                return Parent;
-            }
-        }
+        ITree ITree.Parent => Parent;
 
-        public virtual IToken Payload
-        {
-            get
-            {
-                return Symbol;
-            }
-        }
+        public virtual IToken Payload => Symbol;
 
-        object ITree.Payload
-        {
-            get
-            {
-                return Payload;
-            }
-        }
+        object ITree.Payload => Payload;
 
         public virtual Interval SourceInterval
         {
@@ -92,13 +56,7 @@ namespace Antlr4.Runtime.Tree
             }
         }
 
-        public virtual int ChildCount
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public virtual int ChildCount => 0;
 
         public virtual T Accept<T>(IParseTreeVisitor<T> visitor)
         {

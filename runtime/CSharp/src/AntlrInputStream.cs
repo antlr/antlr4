@@ -94,21 +94,9 @@ namespace Antlr4.Runtime
         /// last symbol has been read.  The index is the index of char to
         /// be returned from LA(1).
         /// </remarks>
-        public virtual int Index
-        {
-            get
-            {
-                return p;
-            }
-        }
+        public virtual int Index => p;
 
-        public virtual int Size
-        {
-            get
-            {
-                return n;
-            }
-        }
+        public virtual int Size => n;
 
         /// <summary>mark/release do nothing; we have entire buffer</summary>
         public virtual int Mark()

@@ -29,29 +29,11 @@ namespace Antlr4.Runtime.Atn
         /// <seealso cref="ATNConfig.IsPrecedenceFilterSuppressed"/>
         /// <seealso cref="ParserATNSimulator.ApplyPrecedenceFilter(ATNConfigSet)"/>
         /// <since>4.4.1</since>
-        public int OutermostPrecedenceReturn
-        {
-            get
-            {
-                return outermostPrecedenceReturn;
-            }
-        }
+        public int OutermostPrecedenceReturn => outermostPrecedenceReturn;
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.EPSILON;
-            }
-        }
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.EPSILON;
 
-        public override bool IsEpsilon
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEpsilon => true;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

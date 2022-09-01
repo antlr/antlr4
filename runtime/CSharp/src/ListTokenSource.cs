@@ -304,10 +304,7 @@ namespace Antlr4.Runtime
         /// <summary><inheritDoc/></summary>
         public virtual ITokenFactory TokenFactory
         {
-            get
-            {
-                return _factory;
-            }
+            get => _factory;
             set
             {
                 ITokenFactory factory = value;

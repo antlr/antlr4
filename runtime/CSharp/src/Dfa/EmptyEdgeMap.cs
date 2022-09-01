@@ -41,34 +41,16 @@ namespace Antlr4.Runtime.Dfa
             return this;
         }
 
-        public override int Count
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public override int Count => 0;
 
-        public override bool IsEmpty
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsEmpty => true;
 
         public override bool ContainsKey(int key)
         {
             return false;
         }
 
-        public override T this[int key]
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public override T this[int key] => null;
 
         public override IReadOnlyDictionary<int, T> ToMap()
         {

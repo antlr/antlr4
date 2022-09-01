@@ -55,30 +55,12 @@ namespace Antlr4.Runtime
             this.OffendingToken = recognizer.CurrentToken;
         }
 
-        public virtual int RuleIndex
-        {
-            get
-            {
-                return ruleIndex;
-            }
-        }
+        public virtual int RuleIndex => ruleIndex;
 
-        public virtual int PredIndex
-        {
-            get
-            {
-                return predicateIndex;
-            }
-        }
+        public virtual int PredIndex => predicateIndex;
 
         [Nullable]
-        public virtual string Predicate
-        {
-            get
-            {
-                return predicate;
-            }
-        }
+        public virtual string Predicate => predicate;
 
         [return: NotNull]
         private static string FormatMessage(string predicate, string message)

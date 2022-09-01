@@ -41,21 +41,9 @@ namespace Antlr4.Runtime.Atn
         }
 
         [NotNull]
-        public static Antlr4.Runtime.Atn.ATNDeserializationOptions Default
-        {
-            get
-            {
-                return defaultOptions;
-            }
-        }
+        public static Antlr4.Runtime.Atn.ATNDeserializationOptions Default => defaultOptions;
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return readOnly;
-            }
-        }
+        public bool IsReadOnly => readOnly;
 
         public void MakeReadOnly()
         {
@@ -64,10 +52,7 @@ namespace Antlr4.Runtime.Atn
 
         public bool VerifyAtn
         {
-            get
-            {
-                return verifyATN;
-            }
+            get => verifyATN;
             set
             {
                 bool verifyATN = value;
@@ -78,10 +63,7 @@ namespace Antlr4.Runtime.Atn
 
         public bool GenerateRuleBypassTransitions
         {
-            get
-            {
-                return generateRuleBypassTransitions;
-            }
+            get => generateRuleBypassTransitions;
             set
             {
                 bool generateRuleBypassTransitions = value;
@@ -92,10 +74,7 @@ namespace Antlr4.Runtime.Atn
 
         public bool Optimize
         {
-            get
-            {
-                return optimize;
-            }
+            get => optimize;
             set
             {
                 bool optimize = value;

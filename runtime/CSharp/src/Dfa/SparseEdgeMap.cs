@@ -47,45 +47,15 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public int[] Keys
-        {
-            get
-            {
-                return keys;
-            }
-        }
+        public int[] Keys => keys;
 
-        public IList<T> Values
-        {
-            get
-            {
-                return values;
-            }
-        }
+        public IList<T> Values => values;
 
-        public int MaxSparseSize
-        {
-            get
-            {
-                return keys.Length;
-            }
-        }
+        public int MaxSparseSize => keys.Length;
 
-        public override int Count
-        {
-            get
-            {
-                return values.Count;
-            }
-        }
+        public override int Count => values.Count;
 
-        public override bool IsEmpty
-        {
-            get
-            {
-                return values.Count == 0;
-            }
-        }
+        public override bool IsEmpty => values.Count == 0;
 
         public override bool ContainsKey(int key)
         {

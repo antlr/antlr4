@@ -164,25 +164,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// pattern.
         /// </returns>
         [NotNull]
-        public virtual ParseTreePatternMatcher Matcher
-        {
-            get
-            {
-                return matcher;
-            }
-        }
+        public virtual ParseTreePatternMatcher Matcher => matcher;
 
         /// <summary>Get the tree pattern in concrete syntax form.</summary>
         /// <remarks>Get the tree pattern in concrete syntax form.</remarks>
         /// <returns>The tree pattern in concrete syntax form.</returns>
         [NotNull]
-        public virtual string Pattern
-        {
-            get
-            {
-                return pattern;
-            }
-        }
+        public virtual string Pattern => pattern;
 
         /// <summary>
         /// Get the parser rule which serves as the outermost rule for the tree
@@ -196,13 +184,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// The parser rule which serves as the outermost rule for the tree
         /// pattern.
         /// </returns>
-        public virtual int PatternRuleIndex
-        {
-            get
-            {
-                return patternRuleIndex;
-            }
-        }
+        public virtual int PatternRuleIndex => patternRuleIndex;
 
         /// <summary>
         /// Get the tree pattern as a
@@ -221,12 +203,6 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// .
         /// </returns>
         [NotNull]
-        public virtual IParseTree PatternTree
-        {
-            get
-            {
-                return patternTree;
-            }
-        }
+        public virtual IParseTree PatternTree => patternTree;
     }
 }
