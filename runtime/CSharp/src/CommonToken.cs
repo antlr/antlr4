@@ -10,8 +10,6 @@ namespace Antlr4.Runtime
     [Serializable]
     public class CommonToken : IWritableToken
     {
-        private const long serialVersionUID = -6708843461296520577L;
-
         /// <summary>
         /// An empty
         /// <see cref="Tuple{T1, T2}"/>

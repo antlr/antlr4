@@ -16,8 +16,6 @@ namespace Antlr4.Runtime
     [System.Serializable]
     public class InputMismatchException : RecognitionException
     {
-        private const long serialVersionUID = 1532568338707443067L;
-
         public InputMismatchException(Parser recognizer)
 			: base(recognizer, ((ITokenStream)recognizer.InputStream), recognizer.RuleContext)
         {

@@ -11,8 +11,6 @@ namespace Antlr4.Runtime
     [System.Serializable]
     public class LexerNoViableAltException : RecognitionException
     {
-        private const long serialVersionUID = -730999203913001726L;
-
         /// <summary>Matching attempted at what input index?</summary>
         private readonly int startIndex;
 

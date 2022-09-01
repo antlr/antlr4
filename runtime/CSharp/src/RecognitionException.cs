@@ -19,8 +19,6 @@ namespace Antlr4.Runtime
     [Serializable]
     public class RecognitionException : Exception
     {
-        private const long serialVersionUID = -3861826954750022374L;
-
         /// <summary>
         /// The
         /// <see cref="IRecognizer"/>

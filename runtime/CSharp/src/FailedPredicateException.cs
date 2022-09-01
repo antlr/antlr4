@@ -18,8 +18,6 @@ namespace Antlr4.Runtime
     [System.Serializable]
     public class FailedPredicateException : RecognitionException
     {
-        private const long serialVersionUID = 5379330841495778709L;
-
         private readonly int ruleIndex;
 
         private readonly int predicateIndex;

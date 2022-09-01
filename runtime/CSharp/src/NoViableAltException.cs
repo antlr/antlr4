@@ -21,8 +21,6 @@ namespace Antlr4.Runtime
     [System.Serializable]
     public class NoViableAltException : RecognitionException
     {
-        private const long serialVersionUID = 5096000008992867052L;
-
         /// <summary>Which configurations did we try at input.index() that couldn't match input.LT(1)?</summary>
         [Nullable]
         private readonly ATNConfigSet deadEndConfigs;
