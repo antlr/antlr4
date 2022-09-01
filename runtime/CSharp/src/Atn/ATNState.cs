@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -14,7 +13,8 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public static readonly ReadOnlyCollection<string> serializationNames = new ReadOnlyCollection<string>(Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
+        public static readonly ReadOnlyCollection<string> serializationNames = new ReadOnlyCollection<string>(
+            new [] { "INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END" });
 
         public const int InvalidStateNumber = -1;
 

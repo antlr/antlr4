@@ -6,7 +6,6 @@ using System;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -260,7 +259,7 @@ namespace Antlr4.Runtime
         {
             if (n >= tokens.Length)
             {
-                tokens = Arrays.CopyOf(tokens, tokens.Length * 2);
+                Array.Resize(ref tokens, tokens.Length * 2);
             }
             if (t is IWritableToken)
             {

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Antlr4.Runtime.Misc;
 using Interlocked = System.Threading.Interlocked;
 
 using Volatile = System.Threading.Volatile;
@@ -144,7 +145,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsEmpty)
             {
-                return Sharpen.Collections.EmptyMap<int, T>();
+                return Collections.EmptyMap<int, T>();
             }
 
             IDictionary<int, T> result = new SortedDictionary<int, T>();

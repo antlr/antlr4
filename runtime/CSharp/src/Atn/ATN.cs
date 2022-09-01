@@ -9,7 +9,6 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -162,7 +161,7 @@ namespace Antlr4.Runtime.Atn
         {
             modeNameToStartState[name] = s;
             modeToStartState.Add(s);
-            modeToDFA = Arrays.CopyOf(modeToDFA, modeToStartState.Count);
+            Array.Resize(ref modeToDFA, modeNameToStartState.Count);
             modeToDFA[modeToDFA.Length - 1] = new DFA(s);
             DefineDecisionState(s);
         }
@@ -171,7 +170,7 @@ namespace Antlr4.Runtime.Atn
         {
             decisionToState.Add(s);
             s.decision = decisionToState.Count - 1;
-            decisionToDFA = Arrays.CopyOf(decisionToDFA, decisionToState.Count);
+            Array.Resize(ref modeToDFA, modeNameToStartState.Count);
             decisionToDFA[decisionToDFA.Length - 1] = new DFA(s, s.decision);
             return s.decision;
         }

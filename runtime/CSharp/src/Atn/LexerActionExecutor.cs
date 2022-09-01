@@ -2,10 +2,11 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
+using System;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -98,9 +99,11 @@ namespace Antlr4.Runtime.Atn
             {
                 return new Antlr4.Runtime.Atn.LexerActionExecutor(new ILexerAction[] { lexerAction });
             }
-            ILexerAction[] lexerActions = Arrays.CopyOf(lexerActionExecutor.lexerActions, lexerActionExecutor.lexerActions.Length + 1);
-            lexerActions[lexerActions.Length - 1] = lexerAction;
-            return new Antlr4.Runtime.Atn.LexerActionExecutor(lexerActions);
+            var lexerActions = lexerActionExecutor.lexerActions;
+            ILexerAction[] newLexerActions  = new ILexerAction[lexerActions.Length + 1];
+            Array.Copy(lexerActions, newLexerActions, lexerActions.Length);
+            newLexerActions[newLexerActions.Length - 1] = lexerAction;
+            return new LexerActionExecutor(newLexerActions);
         }
 
         /// <summary>

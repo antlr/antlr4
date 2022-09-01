@@ -5,7 +5,6 @@
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -640,11 +639,11 @@ namespace Antlr4.Runtime.Atn
         ///
         /// <see langword="true"/>
         /// if every
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
+        /// <see cref="BitSet"/>
         /// in
         /// <paramref name="altsets"/>
         /// has
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
         /// <see langword="false"/>
         /// </returns>
@@ -666,9 +665,9 @@ namespace Antlr4.Runtime.Atn
         /// if
         /// <paramref name="altsets"/>
         /// contains a
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
+        /// <see cref="BitSet"/>
         /// with
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="BitSet.Cardinality()">cardinality</see>
         /// 1, otherwise
         /// <see langword="false"/>
         /// </returns>
@@ -697,9 +696,9 @@ namespace Antlr4.Runtime.Atn
         /// if
         /// <paramref name="altsets"/>
         /// contains a
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
+        /// <see cref="BitSet"/>
         /// with
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
         /// <see langword="false"/>
         /// </returns>
@@ -771,7 +770,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the complete set of represented alternatives for a collection of
         /// alternative subsets. This method returns the union of each
-        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
+        /// <see cref="BitSet"/>
         /// in
         /// <paramref name="altsets"/>
         /// .

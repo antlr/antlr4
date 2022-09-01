@@ -2,14 +2,15 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-namespace Antlr4.Runtime.Sharpen
-{
-    using System;
-    using System.Text;
 
+using System;
+using System.Text;
+
+namespace Antlr4.Runtime.Misc
+{
     public class BitSet
     {
-        private static readonly ulong[] EmptyBits = new ulong[0];
+        private static readonly ulong[] EmptyBits = Array.Empty<ulong>();
         private const int BitsPerElement = 8 * sizeof(ulong);
 
         private ulong[] _data = EmptyBits;

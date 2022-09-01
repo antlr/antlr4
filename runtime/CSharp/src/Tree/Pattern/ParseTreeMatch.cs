@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
 
@@ -143,11 +142,11 @@ namespace Antlr4.Runtime.Tree.Pattern
         [return: Nullable]
         public virtual IParseTree Get(string label)
         {
-            IList<IParseTree> parseTrees = labels.Get(label);
-            if (parseTrees == null || parseTrees.Count == 0)
+            if (!labels.TryGetValue(label, out var parseTrees) || parseTrees.Count == 0)
             {
                 return null;
             }
+
             return parseTrees[parseTrees.Count - 1];
         }
 
@@ -194,10 +193,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         [return: NotNull]
         public virtual IList<IParseTree> GetAll(string label)
         {
-            IList<IParseTree> nodes = labels.Get(label);
-            if (nodes == null)
+            if (!labels.TryGetValue(label, out var nodes))
             {
-                return Sharpen.Collections.EmptyList<IParseTree>();
+                return Array.Empty<IParseTree>();
             }
             return nodes;
         }

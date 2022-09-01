@@ -144,8 +144,7 @@ namespace Antlr4.Runtime
             public override string ToString()
             {
                 string opName = GetType().FullName;
-                int index = opName.IndexOf('$');
-                opName = Sharpen.Runtime.Substring(opName, index + 1, opName.Length);
+                opName = opName.Substring(opName.IndexOf('$') + 1);
                 return "<" + opName + "@" + tokens.Get(this.index) + ":\"" + text + "\">";
             }
         }

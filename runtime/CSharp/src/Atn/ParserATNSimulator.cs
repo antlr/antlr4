@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -2245,18 +2244,21 @@ namespace Antlr4.Runtime.Atn
 				return D;
 			}
 
-			lock (dfa.states)
+			var dfaStates = dfa.states;
+			lock (dfaStates)
 			{
-				DFAState existing = dfa.states.Get(D);
-				if (existing != null) return existing;
+				if (dfaStates.TryGetValue(D, out var existing))
+				{
+					return existing;
+				}
 
-				D.stateNumber = dfa.states.Count;
+				D.stateNumber = dfaStates.Count;
 				if (!D.configSet.IsReadOnly)
 				{
 					D.configSet.OptimizeConfigs(this);
 					D.configSet.IsReadOnly = true;
 				}
-				dfa.states.Put(D, D);
+				dfaStates.Add(D, D);
 				if (debug) Console.WriteLine("adding new DFA state: " + D);
 				return D;
 			}

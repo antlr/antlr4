@@ -5,7 +5,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
-using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime
 {
@@ -24,7 +24,7 @@ namespace Antlr4.Runtime
         /// will call either
         /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)"/>
         /// or
-        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
         /// .</p>
         /// <p>
         /// When
@@ -135,7 +135,7 @@ namespace Antlr4.Runtime
         /// will call either
         /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)"/>
         /// or
-        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
         /// .</p>
         /// <p>For prediction implementations that only evaluate full-context
         /// predictions when an SLL conflict is found (including the default
