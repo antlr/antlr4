@@ -32,11 +32,7 @@ namespace Antlr4.Runtime.Atn
 
         protected internal Transition(ATNState target)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException("target cannot be null.");
-            }
-            this.target = target;
+            this.target = target ?? throw new ArgumentNullException(nameof(target));
         }
 
         public abstract TransitionType TransitionType

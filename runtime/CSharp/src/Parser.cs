@@ -441,7 +441,7 @@ namespace Antlr4.Runtime
         {
             if (listener == null)
             {
-                throw new ArgumentNullException("listener");
+                throw new ArgumentNullException(nameof(listener));
             }
             if (_parseListeners == null)
             {

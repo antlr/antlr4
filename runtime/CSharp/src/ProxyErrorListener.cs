@@ -21,11 +21,7 @@ namespace Antlr4.Runtime
 
         public ProxyErrorListener(IEnumerable<IAntlrErrorListener<Symbol>> delegates)
         {
-            if (delegates == null)
-            {
-                throw new ArgumentNullException("delegates");
-            }
-            this.delegates = delegates;
+            this.delegates = delegates ?? throw new ArgumentNullException(nameof(delegates));
         }
 
         protected internal virtual IEnumerable<IAntlrErrorListener<Symbol>> Delegates => delegates;

@@ -108,11 +108,7 @@ namespace Antlr4.Runtime
 
         public BufferedTokenStream(ITokenSource tokenSource)
         {
-            if (tokenSource == null)
-            {
-                throw new ArgumentNullException("tokenSource cannot be null");
-            }
-            _tokenSource = tokenSource;
+            _tokenSource = tokenSource ?? throw new ArgumentNullException(nameof(tokenSource));
         }
 
         public virtual ITokenSource TokenSource => _tokenSource;

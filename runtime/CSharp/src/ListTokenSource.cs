@@ -130,11 +130,7 @@ namespace Antlr4.Runtime
         /// </exception>
         public ListTokenSource(IList<IToken> tokens, string sourceName)
         {
-            if (tokens == null)
-            {
-                throw new ArgumentNullException("tokens cannot be null");
-            }
-            this.tokens = tokens;
+            this.tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
             this.sourceName = sourceName;
         }
 

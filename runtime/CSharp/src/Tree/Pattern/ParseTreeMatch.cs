@@ -83,21 +83,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </exception>
         public ParseTreeMatch(IParseTree tree, ParseTreePattern pattern, MultiMap<string, IParseTree> labels, IParseTree mismatchedNode)
         {
-            if (tree == null)
-            {
-                throw new ArgumentException("tree cannot be null");
-            }
-            if (pattern == null)
-            {
-                throw new ArgumentException("pattern cannot be null");
-            }
-            if (labels == null)
-            {
-                throw new ArgumentException("labels cannot be null");
-            }
-            this.tree = tree;
-            this.pattern = pattern;
-            this.labels = labels;
+            this.tree = tree ?? throw new ArgumentNullException(nameof(tree));
+            this.pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
+            this.labels = labels ?? throw new ArgumentNullException(nameof(labels));
             this.mismatchedNode = mismatchedNode;
         }
 

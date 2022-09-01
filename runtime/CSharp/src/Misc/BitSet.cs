@@ -22,7 +22,7 @@ namespace Antlr4.Runtime.Misc
         public BitSet(int nbits)
         {
             if (nbits < 0)
-                throw new ArgumentOutOfRangeException("nbits");
+                throw new ArgumentOutOfRangeException(nameof(nbits));
 
             if (nbits > 0)
             {
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Misc
         public void Clear(int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             int element = index / BitsPerElement;
             if (element >= _data.Length)
@@ -137,7 +137,7 @@ namespace Antlr4.Runtime.Misc
         public bool Get(int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             int element = index / BitsPerElement;
             if (element >= _data.Length)
@@ -149,7 +149,7 @@ namespace Antlr4.Runtime.Misc
         public void Set(int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             int element = index / BitsPerElement;
             if (element >= _data.Length)
@@ -177,7 +177,7 @@ namespace Antlr4.Runtime.Misc
         public int NextSetBit(int fromIndex)
         {
             if (fromIndex < 0)
-                throw new ArgumentOutOfRangeException("fromIndex");
+                throw new ArgumentOutOfRangeException(nameof(fromIndex));
 
             if (IsEmpty())
                 return -1;
@@ -207,7 +207,7 @@ namespace Antlr4.Runtime.Misc
         public void And(BitSet set)
         {
             if (set == null)
-                throw new ArgumentNullException("set");
+                throw new ArgumentNullException(nameof(set));
 
             int length = Math.Min(_data.Length, set._data.Length);
             for (int i = 0; i < length; i++)
@@ -220,7 +220,7 @@ namespace Antlr4.Runtime.Misc
         public void Or(BitSet set)
         {
             if (set == null)
-                throw new ArgumentNullException("set");
+                throw new ArgumentNullException(nameof(set));
 
             if (set._data.Length > _data.Length)
                 Array.Resize(ref _data, set._data.Length);

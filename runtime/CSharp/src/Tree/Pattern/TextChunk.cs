@@ -41,11 +41,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </exception>
         public TextChunk(string text)
         {
-            if (text == null)
-            {
-                throw new ArgumentException("text cannot be null");
-            }
-            this.text = text;
+            this.text = text ?? throw new ArgumentNullException(nameof(text));
         }
 
         /// <summary>Gets the raw text of this chunk.</summary>
