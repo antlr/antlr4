@@ -26,7 +26,7 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>Provides a singleton instance of this parameterless lexer action.</summary>
         /// <remarks>Provides a singleton instance of this parameterless lexer action.</remarks>
-        public static readonly Antlr4.Runtime.Atn.LexerPopModeAction Instance = new Antlr4.Runtime.Atn.LexerPopModeAction();
+        public static readonly LexerPopModeAction Instance = new LexerPopModeAction();
 
         /// <summary>
         /// Constructs the singleton instance of the lexer

@@ -105,8 +105,8 @@ namespace Antlr4.Runtime
 
         public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
         {
-            this.TokenSource = tokenSource;
-            this.tokens = new IToken[bufferSize];
+            TokenSource = tokenSource;
+            tokens = new IToken[bufferSize];
             n = 0;
             Fill(1);
         }
@@ -297,7 +297,7 @@ namespace Antlr4.Runtime
                 {
                     // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
                     // p is last valid token; move nothing if p==n as we have no valid char
-                    System.Array.Copy(tokens, p, tokens, 0, n - p);
+                    Array.Copy(tokens, p, tokens, 0, n - p);
                     // shift n-p tokens from p to 0
                     n = n - p;
                     p = 0;

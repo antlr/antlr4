@@ -55,9 +55,9 @@ namespace Antlr4.Runtime.Atn
 	{
 		try
 		{
-			this.sllStopIndex = -1;
-			this.llStopIndex = -1;
-			this.currentDecision = decision;
+			sllStopIndex = -1;
+			llStopIndex = -1;
+			currentDecision = decision;
 				long start = DateTime.Now.ToFileTime(); // expensive but useful info
 			int alt = base.AdaptivePredict(input, decision, outerContext);
 			long stop = DateTime.Now.ToFileTime();
@@ -91,7 +91,7 @@ namespace Antlr4.Runtime.Atn
 		}
 		finally
 		{
-			this.currentDecision = -1;
+			currentDecision = -1;
 		}
 	}
 

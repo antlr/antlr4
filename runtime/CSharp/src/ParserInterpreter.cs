@@ -45,12 +45,12 @@ namespace Antlr4.Runtime
         public ParserInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)
         {
-            this._grammarFileName = grammarFileName;
-            this._atn = atn;
-            this._ruleNames = ruleNames.ToArray();
+            _grammarFileName = grammarFileName;
+            _atn = atn;
+            _ruleNames = ruleNames.ToArray();
             this.vocabulary = vocabulary;
             // identify the ATN states where pushNewRecursionContext must be called
-            this.pushRecursionContextStates = new BitSet(atn.states.Count);
+            pushRecursionContextStates = new BitSet(atn.states.Count);
             foreach (ATNState state in atn.states)
             {
                 if (!(state is StarLoopEntryState))
@@ -59,13 +59,13 @@ namespace Antlr4.Runtime
                 }
 				if (((StarLoopEntryState)state).isPrecedenceDecision)
                 {
-                    this.pushRecursionContextStates.Set(state.stateNumber);
+                    pushRecursionContextStates.Set(state.stateNumber);
                 }
             }
 			
             //init decision DFA
             int numberofDecisions = atn.NumberOfDecisions;
-            this._decisionToDFA = new Dfa.DFA[numberofDecisions];
+            _decisionToDFA = new Dfa.DFA[numberofDecisions];
             for (int i = 0; i < numberofDecisions; i++)
             {
                 DecisionState decisionState = atn.GetDecisionState(i);

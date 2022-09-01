@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Atn
             this.to = to;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.RANGE;
+        public override TransitionType TransitionType => TransitionType.RANGE;
 
         public override IntervalSet Label => IntervalSet.Of(from, to);
 

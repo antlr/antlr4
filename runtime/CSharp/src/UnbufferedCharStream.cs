@@ -337,7 +337,7 @@ namespace Antlr4.Runtime
                 // release buffer when we can, but don't do unnecessary work
                 // Copy data[p]..data[n-1] to data[0]..data[(n-1)-p], reset ptrs
                 // p is last valid char; move nothing if p==n as we have no valid char
-                System.Array.Copy(data, p, data, 0, n - p);
+                Array.Copy(data, p, data, 0, n - p);
                 // shift n-p char from p to 0
                 n = n - p;
                 p = 0;

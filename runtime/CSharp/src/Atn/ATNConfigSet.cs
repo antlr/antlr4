@@ -68,10 +68,10 @@ namespace Antlr4.Runtime.Atn
 			: this(old.fullCtx)
 		{
 			AddAll(old.configs);
-			this.uniqueAlt = old.uniqueAlt;
-			this.conflictingAlts = old.conflictingAlts;
-			this.hasSemanticContext = old.hasSemanticContext;
-			this.dipsIntoOuterContext = old.dipsIntoOuterContext;
+			uniqueAlt = old.uniqueAlt;
+			conflictingAlts = old.conflictingAlts;
+			hasSemanticContext = old.hasSemanticContext;
+			dipsIntoOuterContext = old.dipsIntoOuterContext;
 		}
 
 		public bool Add(ATNConfig config)
@@ -210,11 +210,11 @@ namespace Antlr4.Runtime.Atn
 			ATNConfigSet other = (ATNConfigSet)o;
 			bool same = configs != null &&
 				configs.Equals(other.configs) &&  // includes stack context
-				this.fullCtx == other.fullCtx &&
-				this.uniqueAlt == other.uniqueAlt &&
-				this.conflictingAlts == other.conflictingAlts &&
-				this.hasSemanticContext == other.hasSemanticContext &&
-				this.dipsIntoOuterContext == other.dipsIntoOuterContext;
+				fullCtx == other.fullCtx &&
+				uniqueAlt == other.uniqueAlt &&
+				conflictingAlts == other.conflictingAlts &&
+				hasSemanticContext == other.hasSemanticContext &&
+				dipsIntoOuterContext == other.dipsIntoOuterContext;
 
 			//		System.out.println(same);
 			return same;
@@ -265,7 +265,7 @@ namespace Antlr4.Runtime.Atn
 			get => readOnly;
 			set
 			{
-				this.readOnly = value;
+				readOnly = value;
 				configLookup = null; // can't mod, no need for lookup cache
 			}
 		}
@@ -307,7 +307,7 @@ namespace Antlr4.Runtime.Atn
 
 		public OrderedATNConfigSet()
 		{
-			this.configLookup = new LexerConfigHashSet();
+			configLookup = new LexerConfigHashSet();
 		}
 
 		public class LexerConfigHashSet : ConfigHashSet

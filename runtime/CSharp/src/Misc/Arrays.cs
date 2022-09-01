@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Misc
 
             for (int i = 0; i < left.Length; i++)
             {
-                if (!object.Equals(left[i], right[i]))
+                if (!Equals(left[i], right[i]))
                     return false;
             }
 

@@ -9,6 +9,6 @@ namespace Antlr4.Runtime.Atn
     {
         public StarLoopEntryState LoopEntryState => (StarLoopEntryState)Transition(0).target;
 
-        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.StarLoopBack;
+        public override StateType StateType => StateType.StarLoopBack;
     }
 }

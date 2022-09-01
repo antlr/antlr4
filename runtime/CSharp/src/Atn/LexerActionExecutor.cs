@@ -52,7 +52,7 @@ namespace Antlr4.Runtime.Atn
             {
                 hash = MurmurHash.Update(hash, lexerAction);
             }
-            this.hashCode = MurmurHash.Finish(hash, lexerActions.Length);
+            hashCode = MurmurHash.Finish(hash, lexerActions.Length);
         }
 
         /// <summary>
@@ -91,11 +91,11 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </returns>
         [return: NotNull]
-        public static Antlr4.Runtime.Atn.LexerActionExecutor Append(Antlr4.Runtime.Atn.LexerActionExecutor lexerActionExecutor, ILexerAction lexerAction)
+        public static LexerActionExecutor Append(LexerActionExecutor lexerActionExecutor, ILexerAction lexerAction)
         {
             if (lexerActionExecutor == null)
             {
-                return new Antlr4.Runtime.Atn.LexerActionExecutor(new ILexerAction[] { lexerAction });
+                return new LexerActionExecutor(new ILexerAction[] { lexerAction });
             }
             var lexerActions = lexerActionExecutor.lexerActions;
             ILexerAction[] newLexerActions  = new ILexerAction[lexerActions.Length + 1];
@@ -144,7 +144,7 @@ namespace Antlr4.Runtime.Atn
         /// which stores input stream offsets
         /// for all position-dependent lexer actions.
         /// </returns>
-        public virtual Antlr4.Runtime.Atn.LexerActionExecutor FixOffsetBeforeMatch(int offset)
+        public virtual LexerActionExecutor FixOffsetBeforeMatch(int offset)
         {
             ILexerAction[] updatedLexerActions = null;
             for (int i = 0; i < lexerActions.Length; i++)
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return this;
             }
-            return new Antlr4.Runtime.Atn.LexerActionExecutor(updatedLexerActions);
+            return new LexerActionExecutor(updatedLexerActions);
         }
 
         /// <summary>Gets the lexer actions to be executed by this executor.</summary>
@@ -244,7 +244,7 @@ namespace Antlr4.Runtime.Atn
 
         public override int GetHashCode()
         {
-            return this.hashCode;
+            return hashCode;
         }
 
         public override bool Equals(object obj)
@@ -255,12 +255,12 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerActionExecutor))
+                if (!(obj is LexerActionExecutor))
                 {
                     return false;
                 }
             }
-            Antlr4.Runtime.Atn.LexerActionExecutor other = (Antlr4.Runtime.Atn.LexerActionExecutor)obj;
+            LexerActionExecutor other = (LexerActionExecutor)obj;
             return hashCode == other.hashCode && Arrays.Equals(lexerActions, other.lexerActions);
         }
     }

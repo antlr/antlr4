@@ -60,7 +60,7 @@ namespace Antlr4.Runtime.Atn
 				outerContext = ParserRuleContext.EMPTY;
 			if (outerContext.Parent == null || outerContext == ParserRuleContext.EMPTY)
 				return EmptyPredictionContext.Instance;
-			PredictionContext parent = PredictionContext.FromRuleContext(atn, outerContext.Parent);
+			PredictionContext parent = FromRuleContext(atn, outerContext.Parent);
 			ATNState state = atn.states[outerContext.invokingState];
 			RuleTransition transition = (RuleTransition)state.Transition(0);
 			return parent.GetChild(transition.followState.stateNumber);
@@ -387,7 +387,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 
-		public static PredictionContext GetCachedContext(PredictionContext context, PredictionContextCache contextCache, PredictionContext.IdentityHashMap visited)
+		public static PredictionContext GetCachedContext(PredictionContext context, PredictionContextCache contextCache, IdentityHashMap visited)
 		{
 			if (context.IsEmpty)
 			{
@@ -542,14 +542,14 @@ namespace Antlr4.Runtime.Atn
 		public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext>
 		{
 			public IdentityHashMap()
-				: base(PredictionContext.IdentityEqualityComparator.Instance)
+				: base(IdentityEqualityComparator.Instance)
 			{
 			}
 		}
 
 		public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext>
 		{
-			public static readonly PredictionContext.IdentityEqualityComparator Instance = new PredictionContext.IdentityEqualityComparator();
+			public static readonly IdentityEqualityComparator Instance = new IdentityEqualityComparator();
 
 			private IdentityEqualityComparator()
 			{

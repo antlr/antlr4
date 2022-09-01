@@ -43,16 +43,16 @@ namespace Antlr4.Runtime
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);
             if (trans is PredicateTransition)
             {
-                this.ruleIndex = ((PredicateTransition)trans).ruleIndex;
-                this.predicateIndex = ((PredicateTransition)trans).predIndex;
+                ruleIndex = ((PredicateTransition)trans).ruleIndex;
+                predicateIndex = ((PredicateTransition)trans).predIndex;
             }
             else
             {
-                this.ruleIndex = 0;
-                this.predicateIndex = 0;
+                ruleIndex = 0;
+                predicateIndex = 0;
             }
             this.predicate = predicate;
-            this.OffendingToken = recognizer.CurrentToken;
+            OffendingToken = recognizer.CurrentToken;
         }
 
         public virtual int RuleIndex => ruleIndex;

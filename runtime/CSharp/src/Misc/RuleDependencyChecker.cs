@@ -222,7 +222,7 @@ namespace Antlr4.Runtime.Misc
                     try
                     {
                         string name = field.Name.Substring("RULE_".Length);
-                        if (name.Length == 0 || !System.Char.IsLower(name[0]))
+                        if (name.Length == 0 || !Char.IsLower(name[0]))
                         {
                             continue;
                         }
@@ -327,7 +327,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        private static RuleDependencyChecker.RuleRelations ExtractRuleRelations(TypeInfo recognizer)
+        private static RuleRelations ExtractRuleRelations(TypeInfo recognizer)
         {
             int[] serializedATN = GetSerializedATN(recognizer);
             if (serializedATN == null)
@@ -335,7 +335,7 @@ namespace Antlr4.Runtime.Misc
                 return null;
             }
             ATN atn = new ATNDeserializer().Deserialize(serializedATN);
-            RuleDependencyChecker.RuleRelations relations = new RuleDependencyChecker.RuleRelations(atn.ruleToStartState.Length);
+            RuleRelations relations = new RuleRelations(atn.ruleToStartState.Length);
             foreach (ATNState state in atn.states)
             {
                 if (!state.epsilonOnlyTransitions)

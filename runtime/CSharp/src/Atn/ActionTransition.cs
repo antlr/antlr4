@@ -27,7 +27,7 @@ namespace Antlr4.Runtime.Atn
             this.isCtxDependent = isCtxDependent;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.ACTION;
+        public override TransitionType TransitionType => TransitionType.ACTION;
 
         public override bool IsEpsilon => true;
 

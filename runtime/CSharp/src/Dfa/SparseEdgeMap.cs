@@ -27,11 +27,11 @@ namespace Antlr4.Runtime.Dfa
         public SparseEdgeMap(int minIndex, int maxIndex, int maxSparseSize)
             : base(minIndex, maxIndex)
         {
-            this.keys = new int[maxSparseSize];
-            this.values = new List<T>(maxSparseSize);
+            keys = new int[maxSparseSize];
+            values = new List<T>(maxSparseSize);
         }
 
-        private SparseEdgeMap(Antlr4.Runtime.Dfa.SparseEdgeMap<T> map, int maxSparseSize)
+        private SparseEdgeMap(SparseEdgeMap<T> map, int maxSparseSize)
             : base(map.minIndex, map.maxIndex)
         {
             lock (map)
@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Dfa
                 // Special property of this collection: values are only even added to
                 // the end, else a new object is returned from put(). Therefore no lock
                 // is required in this method.
-                int index = System.Array.BinarySearch(keys, 0, Count, key);
+                int index = Array.BinarySearch(keys, 0, Count, key);
                 if (index < 0)
                 {
                     return null;
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Dfa
             }
             lock (this)
             {
-                int index = System.Array.BinarySearch(keys, 0, Count, key);
+                int index = Array.BinarySearch(keys, 0, Count, key);
                 if (index >= 0)
                 {
                     // replace existing entry
@@ -118,8 +118,8 @@ namespace Antlr4.Runtime.Dfa
                 }
                 else
                 {
-                    Antlr4.Runtime.Dfa.SparseEdgeMap<T> resized = new Antlr4.Runtime.Dfa.SparseEdgeMap<T>(this, desiredSize);
-                    System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, Count - insertIndex);
+                    SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
+                    Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, Count - insertIndex);
                     resized.keys[insertIndex] = key;
                     resized.values.Insert(insertIndex, value);
                     return resized;
@@ -131,13 +131,13 @@ namespace Antlr4.Runtime.Dfa
         {
             lock (this)
             {
-                int index = System.Array.BinarySearch(keys, 0, Count, key);
+                int index = Array.BinarySearch(keys, 0, Count, key);
                 if (index < 0)
                 {
                     return this;
                 }
-                Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap<T>(this, MaxSparseSize);
-                System.Array.Copy(result.keys, index + 1, result.keys, index, Count - index - 1);
+                SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, MaxSparseSize);
+                Array.Copy(result.keys, index + 1, result.keys, index, Count - index - 1);
                 result.values.RemoveAt(index);
                 return result;
             }

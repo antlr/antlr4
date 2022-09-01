@@ -40,15 +40,15 @@ namespace Antlr4.Runtime.Dfa
 			this.atnStartState = atnStartState;
 			this.decision = decision;
 
-			this.precedenceDfa = false;
+			precedenceDfa = false;
 			if (atnStartState is StarLoopEntryState && ((StarLoopEntryState)atnStartState).isPrecedenceDecision)
 			{
-				this.precedenceDfa = true;
+				precedenceDfa = true;
 				DFAState precedenceState = new DFAState(new ATNConfigSet());
 				precedenceState.edges = new DFAState[0];
 				precedenceState.isAcceptState = false;
 				precedenceState.requiresFullContext = false;
-				this.s0 = precedenceState;
+				s0 = precedenceState;
 			}
 		}
 

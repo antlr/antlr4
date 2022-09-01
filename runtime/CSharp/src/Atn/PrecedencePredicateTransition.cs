@@ -16,7 +16,7 @@ namespace Antlr4.Runtime.Atn
             this.precedence = precedence;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.PRECEDENCE;
+        public override TransitionType TransitionType => TransitionType.PRECEDENCE;
 
         public override bool IsEpsilon => true;
 

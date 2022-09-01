@@ -37,7 +37,7 @@ namespace Antlr4.Runtime.Atn
             this.followState = followState;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.RULE;
+        public override TransitionType TransitionType => TransitionType.RULE;
 
         public override bool IsEpsilon => true;
 

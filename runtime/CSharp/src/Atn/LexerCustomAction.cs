@@ -123,12 +123,12 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerCustomAction))
+                if (!(obj is LexerCustomAction))
                 {
                     return false;
                 }
             }
-            Antlr4.Runtime.Atn.LexerCustomAction other = (Antlr4.Runtime.Atn.LexerCustomAction)obj;
+            LexerCustomAction other = (LexerCustomAction)obj;
             return ruleIndex == other.ruleIndex && actionIndex == other.actionIndex;
         }
     }

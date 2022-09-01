@@ -11,6 +11,6 @@ namespace Antlr4.Runtime.Atn
     {
         public ATNState loopBackState;
 
-        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.LoopEnd;
+        public override StateType StateType => StateType.LoopEnd;
     }
 }

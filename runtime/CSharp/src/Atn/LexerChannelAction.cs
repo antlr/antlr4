@@ -93,12 +93,12 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerChannelAction))
+                if (!(obj is LexerChannelAction))
                 {
                     return false;
                 }
             }
-            return channel == ((Antlr4.Runtime.Atn.LexerChannelAction)obj).channel;
+            return channel == ((LexerChannelAction)obj).channel;
         }
 
         public override string ToString()

@@ -56,12 +56,12 @@ namespace Antlr4.Runtime.Atn
 
         public virtual int NumberOfTransitions => transitions.Count;
 
-        public virtual void AddTransition(Antlr4.Runtime.Atn.Transition e)
+        public virtual void AddTransition(Transition e)
         {
             AddTransition(transitions.Count, e);
         }
 
-        public virtual void AddTransition(int index, Antlr4.Runtime.Atn.Transition e)
+        public virtual void AddTransition(int index, Transition e)
         {
             if (transitions.Count == 0)
             {
@@ -71,19 +71,19 @@ namespace Antlr4.Runtime.Atn
             {
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
-                    System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions.", stateNumber);
+                    Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions.", stateNumber);
                     epsilonOnlyTransitions = false;
                 }
             }
             transitions.Insert(index, e);
         }
 
-        public virtual Antlr4.Runtime.Atn.Transition Transition(int i)
+        public virtual Transition Transition(int i)
         {
             return transitions[i];
         }
 
-        public virtual void SetTransition(int i, Antlr4.Runtime.Atn.Transition e)
+        public virtual void SetTransition(int i, Transition e)
         {
             transitions[i] = e;
         }
@@ -93,7 +93,7 @@ namespace Antlr4.Runtime.Atn
             transitions.RemoveAt(index);
         }
 
-        public abstract Antlr4.Runtime.Atn.StateType StateType
+        public abstract StateType StateType
         {
             get;
         }
@@ -109,21 +109,21 @@ namespace Antlr4.Runtime.Atn
 
         public virtual int NumberOfOptimizedTransitions => optimizedTransitions.Count;
 
-        public virtual Antlr4.Runtime.Atn.Transition GetOptimizedTransition(int i)
+        public virtual Transition GetOptimizedTransition(int i)
         {
             return optimizedTransitions[i];
         }
 
-        public virtual void AddOptimizedTransition(Antlr4.Runtime.Atn.Transition e)
+        public virtual void AddOptimizedTransition(Transition e)
         {
             if (!IsOptimized)
             {
-                optimizedTransitions = new List<Antlr4.Runtime.Atn.Transition>();
+                optimizedTransitions = new List<Transition>();
             }
             optimizedTransitions.Add(e);
         }
 
-        public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e)
+        public virtual void SetOptimizedTransition(int i, Transition e)
         {
             if (!IsOptimized)
             {

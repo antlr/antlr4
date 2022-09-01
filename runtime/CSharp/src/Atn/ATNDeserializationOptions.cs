@@ -10,11 +10,11 @@ namespace Antlr4.Runtime.Atn
     /// <author>Sam Harwell</author>
     public class ATNDeserializationOptions
     {
-        private static readonly Antlr4.Runtime.Atn.ATNDeserializationOptions defaultOptions;
+        private static readonly ATNDeserializationOptions defaultOptions;
 
         static ATNDeserializationOptions()
         {
-            defaultOptions = new Antlr4.Runtime.Atn.ATNDeserializationOptions();
+            defaultOptions = new ATNDeserializationOptions();
             defaultOptions.MakeReadOnly();
         }
 
@@ -28,20 +28,20 @@ namespace Antlr4.Runtime.Atn
 
         public ATNDeserializationOptions()
         {
-            this.verifyATN = true;
-            this.generateRuleBypassTransitions = false;
-            this.optimize = true;
+            verifyATN = true;
+            generateRuleBypassTransitions = false;
+            optimize = true;
         }
 
-        public ATNDeserializationOptions(Antlr4.Runtime.Atn.ATNDeserializationOptions options)
+        public ATNDeserializationOptions(ATNDeserializationOptions options)
         {
-            this.verifyATN = options.verifyATN;
-            this.generateRuleBypassTransitions = options.generateRuleBypassTransitions;
-            this.optimize = options.optimize;
+            verifyATN = options.verifyATN;
+            generateRuleBypassTransitions = options.generateRuleBypassTransitions;
+            optimize = options.optimize;
         }
 
         [NotNull]
-        public static Antlr4.Runtime.Atn.ATNDeserializationOptions Default => defaultOptions;
+        public static ATNDeserializationOptions Default => defaultOptions;
 
         public bool IsReadOnly => readOnly;
 

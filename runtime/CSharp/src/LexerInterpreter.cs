@@ -48,12 +48,12 @@ namespace Antlr4.Runtime
             this.channelNames = channelNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
-            this.decisionToDFA = new DFA[atn.NumberOfDecisions];
+            decisionToDFA = new DFA[atn.NumberOfDecisions];
             for (int i = 0; i < decisionToDFA.Length; i++)
             {
                 decisionToDFA[i] = new DFA(atn.GetDecisionState(i), i);
             }
-            this.Interpreter = new LexerATNSimulator(this, atn, decisionToDFA, sharedContextCache);
+            Interpreter = new LexerATNSimulator(this, atn, decisionToDFA, sharedContextCache);
         }
 
         public override ATN Atn => atn;

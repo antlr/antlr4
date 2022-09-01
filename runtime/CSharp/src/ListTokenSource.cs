@@ -308,7 +308,7 @@ namespace Antlr4.Runtime
             set
             {
                 ITokenFactory factory = value;
-                this._factory = factory;
+                _factory = factory;
             }
         }
     }

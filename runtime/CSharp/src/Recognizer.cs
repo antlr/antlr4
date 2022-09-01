@@ -177,7 +177,7 @@ namespace Antlr4.Runtime
         /// for each decision in recognizer in a ParseInfo object.
         /// </remarks>
         /// <since>4.3</since>
-        public virtual Antlr4.Runtime.Atn.ParseInfo ParseInfo => null;
+        public virtual ParseInfo ParseInfo => null;
 
         /// <summary>What is the error header, normally line/character position information?</summary>
         [return: NotNull]

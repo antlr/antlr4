@@ -232,7 +232,7 @@ loop_break: ;
 
         public static ICollection<IParseTree> FindAll(IParseTree tree, string xpath, Parser parser)
         {
-            Antlr4.Runtime.Tree.Xpath.XPath p = new Antlr4.Runtime.Tree.Xpath.XPath(parser, xpath);
+            XPath p = new XPath(parser, xpath);
             return p.Evaluate(tree);
         }
 

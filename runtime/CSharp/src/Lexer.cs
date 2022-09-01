@@ -85,7 +85,7 @@ namespace Antlr4.Runtime
 
         private readonly Stack<int> _modeStack = new Stack<int>();
 
-		private int _mode = Antlr4.Runtime.Lexer.DEFAULT_MODE;
+		private int _mode = DEFAULT_MODE;
 
         /// <summary>
         /// You can set the text for the current token to override what is in
@@ -101,10 +101,10 @@ namespace Antlr4.Runtime
 
         public Lexer(ICharStream input, TextWriter output, TextWriter errorOutput)
         {
-            this._input = input;
-            this.Output = output;
-            this.ErrorOutput = errorOutput;
-            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
+            _input = input;
+            Output = output;
+            ErrorOutput = errorOutput;
+            _tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
         }
 
         public virtual void Reset()
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
             _tokenStartLine = -1;
             _text = null;
             _hitEOF = false;
-            _mode = Antlr4.Runtime.Lexer.DEFAULT_MODE;
+            _mode = DEFAULT_MODE;
             _modeStack.Clear();
             Interpreter.Reset();
         }
@@ -258,18 +258,18 @@ outer_continue: ;
             set
             {
                 ITokenFactory factory = value;
-                this._factory = factory;
+                _factory = factory;
             }
         }
 
         /// <summary>Set the char stream and reset the lexer</summary>
         public virtual void SetInputStream(ICharStream input)
         {
-            this._input = null;
-            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
+            _input = null;
+            _tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
             Reset();
-            this._input = input;
-            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
+            _input = input;
+            _tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
         }
 
         public virtual string SourceName => _input.SourceName;
@@ -291,7 +291,7 @@ outer_continue: ;
         public virtual void Emit(IToken token)
         {
             //System.err.println("emit "+token);
-            this._token = token;
+            _token = token;
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ outer_continue: ;
             set
             {
                 string text = value;
-                this._text = text;
+                _text = text;
             }
         }
 

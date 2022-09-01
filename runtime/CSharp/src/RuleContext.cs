@@ -31,7 +31,7 @@ namespace Antlr4.Runtime
     public class RuleContext : IRuleNode
     {
         /// <summary>What context invoked this rule?</summary>
-        private Antlr4.Runtime.RuleContext _parent;
+        private RuleContext _parent;
 
         /// <summary>
         /// What state invoked the rule associated with this context?
@@ -49,22 +49,22 @@ namespace Antlr4.Runtime
         {
         }
 
-        public RuleContext(Antlr4.Runtime.RuleContext parent, int invokingState)
+        public RuleContext(RuleContext parent, int invokingState)
         {
-            this._parent = parent;
+            _parent = parent;
             //if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
             this.invokingState = invokingState;
         }
 
-        public static Antlr4.Runtime.RuleContext GetChildContext(Antlr4.Runtime.RuleContext parent, int invokingState)
+        public static RuleContext GetChildContext(RuleContext parent, int invokingState)
         {
-            return new Antlr4.Runtime.RuleContext(parent, invokingState);
+            return new RuleContext(parent, invokingState);
         }
 
         public virtual int Depth()
         {
             int n = 0;
-            Antlr4.Runtime.RuleContext p = this;
+            RuleContext p = this;
             while (p != null)
             {
                 p = p._parent;
@@ -89,7 +89,7 @@ namespace Antlr4.Runtime
 
         RuleContext IRuleNode.RuleContext => this;
 
-        public virtual Antlr4.Runtime.RuleContext Parent
+        public virtual RuleContext Parent
         {
             get => _parent;
             set => _parent = value;
@@ -101,7 +101,7 @@ namespace Antlr4.Runtime
 
         ITree ITree.Parent => Parent;
 
-        public virtual Antlr4.Runtime.RuleContext Payload => this;
+        public virtual RuleContext Payload => this;
 
         object ITree.Payload => Payload;
 
@@ -198,7 +198,7 @@ namespace Antlr4.Runtime
 
         public override string ToString()
         {
-            return ToString((IList<string>)null, (Antlr4.Runtime.RuleContext)null);
+            return ToString((IList<string>)null, (RuleContext)null);
         }
 
         public string ToString(IRecognizer recog)
@@ -212,15 +212,15 @@ namespace Antlr4.Runtime
         }
 
         // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-        public virtual string ToString(IRecognizer recog, Antlr4.Runtime.RuleContext stop)
+        public virtual string ToString(IRecognizer recog, RuleContext stop)
         {
             return ToString(recog?.RuleNames, stop);
         }
 
-        public virtual string ToString(IList<string> ruleNames, Antlr4.Runtime.RuleContext stop)
+        public virtual string ToString(IList<string> ruleNames, RuleContext stop)
         {
             StringBuilder buf = new StringBuilder();
-            Antlr4.Runtime.RuleContext p = this;
+            RuleContext p = this;
             buf.Append("[");
             while (p != null && p != stop)
             {

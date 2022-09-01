@@ -7,7 +7,7 @@ namespace Antlr4.Runtime.Tree
 {
     public interface IRuleNode : IParseTree
     {
-        Antlr4.Runtime.RuleContext RuleContext
+        RuleContext RuleContext
         {
             get;
         }

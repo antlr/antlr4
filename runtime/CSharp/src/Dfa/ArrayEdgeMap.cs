@@ -79,15 +79,15 @@ namespace Antlr4.Runtime.Dfa
             {
                 return this;
             }
-            if (m is Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)
+            if (m is ArrayEdgeMap<T>)
             {
-                Antlr4.Runtime.Dfa.ArrayEdgeMap<T> other = (Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)m;
+                ArrayEdgeMap<T> other = (ArrayEdgeMap<T>)m;
                 int minOverlap = Math.Max(minIndex, other.minIndex);
                 int maxOverlap = Math.Min(maxIndex, other.maxIndex);
-                Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
+                ArrayEdgeMap<T> result = this;
                 for (int i = minOverlap; i <= maxOverlap; i++)
                 {
-                    result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(i, m[i]));
+                    result = ((ArrayEdgeMap<T>)result.Put(i, m[i]));
                 }
                 return result;
             }
@@ -108,10 +108,10 @@ namespace Antlr4.Runtime.Dfa
                         {
                             int[] keys = other.Keys;
                             IList<T> values = other.Values;
-                            Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
+                            ArrayEdgeMap<T> result = this;
                             for (int i = 0; i < values.Count; i++)
                             {
-                                result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(keys[i], values[i]));
+                                result = ((ArrayEdgeMap<T>)result.Put(keys[i], values[i]));
                             }
                             return result;
                         }

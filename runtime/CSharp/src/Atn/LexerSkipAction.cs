@@ -26,7 +26,7 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>Provides a singleton instance of this parameterless lexer action.</summary>
         /// <remarks>Provides a singleton instance of this parameterless lexer action.</remarks>
-        public static readonly Antlr4.Runtime.Atn.LexerSkipAction Instance = new Antlr4.Runtime.Atn.LexerSkipAction();
+        public static readonly LexerSkipAction Instance = new LexerSkipAction();
 
         /// <summary>
         /// Constructs the singleton instance of the lexer

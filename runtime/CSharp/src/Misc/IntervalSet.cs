@@ -27,9 +27,9 @@ namespace Antlr4.Runtime.Misc
     /// </summary>
     public class IntervalSet : IIntSet
     {
-        public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet.Of(Lexer.MinCharValue, Lexer.MaxCharValue);
+        public static readonly IntervalSet CompleteCharSet = Of(Lexer.MinCharValue, Lexer.MaxCharValue);
 
-        public static readonly Antlr4.Runtime.Misc.IntervalSet EmptySet = new Antlr4.Runtime.Misc.IntervalSet();
+        public static readonly IntervalSet EmptySet = new IntervalSet();
 
         static IntervalSet()
         {
@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Misc
             this.intervals = intervals;
         }
 
-        public IntervalSet(Antlr4.Runtime.Misc.IntervalSet set)
+        public IntervalSet(IntervalSet set)
             : this()
         {
             AddAll(set);
@@ -74,17 +74,17 @@ namespace Antlr4.Runtime.Misc
         /// <summary>Create a set with a single element, el.</summary>
         /// <remarks>Create a set with a single element, el.</remarks>
         [return: NotNull]
-        public static Antlr4.Runtime.Misc.IntervalSet Of(int a)
+        public static IntervalSet Of(int a)
         {
-            Antlr4.Runtime.Misc.IntervalSet s = new Antlr4.Runtime.Misc.IntervalSet();
+            IntervalSet s = new IntervalSet();
             s.Add(a);
             return s;
         }
 
         /// <summary>Create a set with all ints within range [a..b] (inclusive)</summary>
-        public static Antlr4.Runtime.Misc.IntervalSet Of(int a, int b)
+        public static IntervalSet Of(int a, int b)
         {
-            Antlr4.Runtime.Misc.IntervalSet s = new Antlr4.Runtime.Misc.IntervalSet();
+            IntervalSet s = new IntervalSet();
             s.Add(a, b);
             return s;
         }
@@ -187,31 +187,31 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>combine all sets in the array returned the or'd value</summary>
-        public static Antlr4.Runtime.Misc.IntervalSet Or(Antlr4.Runtime.Misc.IntervalSet[] sets)
+        public static IntervalSet Or(IntervalSet[] sets)
         {
-            Antlr4.Runtime.Misc.IntervalSet r = new Antlr4.Runtime.Misc.IntervalSet();
-            foreach (Antlr4.Runtime.Misc.IntervalSet s in sets)
+            IntervalSet r = new IntervalSet();
+            foreach (IntervalSet s in sets)
             {
                 r.AddAll(s);
             }
             return r;
         }
 
-        public virtual Antlr4.Runtime.Misc.IntervalSet AddAll(IIntSet set)
+        public virtual IntervalSet AddAll(IIntSet set)
         {
             if (set == null)
             {
                 return this;
             }
-            if (set is Antlr4.Runtime.Misc.IntervalSet)
+            if (set is IntervalSet)
             {
-                Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)set;
+                IntervalSet other = (IntervalSet)set;
                 // walk set and add each interval
                 int n = other.intervals.Count;
                 for (int i = 0; i < n; i++)
                 {
                     Interval I = other.intervals[i];
-                    this.Add(I.a, I.b);
+                    Add(I.a, I.b);
                 }
             }
             else
@@ -224,46 +224,46 @@ namespace Antlr4.Runtime.Misc
             return this;
         }
 
-        public virtual Antlr4.Runtime.Misc.IntervalSet Complement(int minElement, int maxElement)
+        public virtual IntervalSet Complement(int minElement, int maxElement)
         {
-            return this.Complement(Antlr4.Runtime.Misc.IntervalSet.Of(minElement, maxElement));
+            return Complement(Of(minElement, maxElement));
         }
 
         /// <summary>
         /// <inheritDoc/>
         ///
         /// </summary>
-        public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IIntSet vocabulary)
+        public virtual IntervalSet Complement(IIntSet vocabulary)
         {
             if (vocabulary == null || vocabulary.IsNil)
             {
                 return null;
             }
             // nothing in common with null set
-            Antlr4.Runtime.Misc.IntervalSet vocabularyIS;
-            if (vocabulary is Antlr4.Runtime.Misc.IntervalSet)
+            IntervalSet vocabularyIS;
+            if (vocabulary is IntervalSet)
             {
-                vocabularyIS = (Antlr4.Runtime.Misc.IntervalSet)vocabulary;
+                vocabularyIS = (IntervalSet)vocabulary;
             }
             else
             {
-                vocabularyIS = new Antlr4.Runtime.Misc.IntervalSet();
+                vocabularyIS = new IntervalSet();
                 vocabularyIS.AddAll(vocabulary);
             }
             return vocabularyIS.Subtract(this);
         }
 
-        public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IIntSet a)
+        public virtual IntervalSet Subtract(IIntSet a)
         {
             if (a == null || a.IsNil)
             {
-                return new Antlr4.Runtime.Misc.IntervalSet(this);
+                return new IntervalSet(this);
             }
-            if (a is Antlr4.Runtime.Misc.IntervalSet)
+            if (a is IntervalSet)
             {
-                return Subtract(this, (Antlr4.Runtime.Misc.IntervalSet)a);
+                return Subtract(this, (IntervalSet)a);
             }
-            Antlr4.Runtime.Misc.IntervalSet other = new Antlr4.Runtime.Misc.IntervalSet();
+            IntervalSet other = new IntervalSet();
             other.AddAll(a);
             return Subtract(this, other);
         }
@@ -278,13 +278,13 @@ namespace Antlr4.Runtime.Misc
         /// , it is treated as though it was an empty set.
         /// </remarks>
         [return: NotNull]
-        public static Antlr4.Runtime.Misc.IntervalSet Subtract(Antlr4.Runtime.Misc.IntervalSet left, Antlr4.Runtime.Misc.IntervalSet right)
+        public static IntervalSet Subtract(IntervalSet left, IntervalSet right)
         {
             if (left == null || left.IsNil)
             {
-                return new Antlr4.Runtime.Misc.IntervalSet();
+                return new IntervalSet();
             }
-            Antlr4.Runtime.Misc.IntervalSet result = new Antlr4.Runtime.Misc.IntervalSet(left);
+            IntervalSet result = new IntervalSet(left);
             if (right == null || right.IsNil)
             {
                 // right set has no elements; just return the copy of the current set
@@ -359,9 +359,9 @@ namespace Antlr4.Runtime.Misc
             return result;
         }
 
-        public virtual Antlr4.Runtime.Misc.IntervalSet Or(IIntSet a)
+        public virtual IntervalSet Or(IIntSet a)
         {
-            Antlr4.Runtime.Misc.IntervalSet o = new Antlr4.Runtime.Misc.IntervalSet();
+            IntervalSet o = new IntervalSet();
             o.AddAll(this);
             o.AddAll(a);
             return o;
@@ -371,7 +371,7 @@ namespace Antlr4.Runtime.Misc
         /// <inheritDoc/>
         ///
         /// </summary>
-        public virtual Antlr4.Runtime.Misc.IntervalSet And(IIntSet other)
+        public virtual IntervalSet And(IIntSet other)
         {
             if (other == null)
             {
@@ -379,9 +379,9 @@ namespace Antlr4.Runtime.Misc
                 return null;
             }
             // nothing in common with null set
-            IList<Interval> myIntervals = this.intervals;
-            IList<Interval> theirIntervals = ((Antlr4.Runtime.Misc.IntervalSet)other).intervals;
-            Antlr4.Runtime.Misc.IntervalSet intersection = null;
+            IList<Interval> myIntervals = intervals;
+            IList<Interval> theirIntervals = ((IntervalSet)other).intervals;
+            IntervalSet intersection = null;
             int mySize = myIntervals.Count;
             int theirSize = theirIntervals.Count;
             int i = 0;
@@ -411,7 +411,7 @@ namespace Antlr4.Runtime.Misc
                             // overlap, add intersection, get next theirs
                             if (intersection == null)
                             {
-                                intersection = new Antlr4.Runtime.Misc.IntervalSet();
+                                intersection = new IntervalSet();
                             }
                             intersection.Add(mine.Intersection(theirs));
                             j++;
@@ -423,7 +423,7 @@ namespace Antlr4.Runtime.Misc
                                 // overlap, add intersection, get next mine
                                 if (intersection == null)
                                 {
-                                    intersection = new Antlr4.Runtime.Misc.IntervalSet();
+                                    intersection = new IntervalSet();
                                 }
                                 intersection.Add(mine.Intersection(theirs));
                                 i++;
@@ -435,7 +435,7 @@ namespace Antlr4.Runtime.Misc
                                     // overlap, add intersection
                                     if (intersection == null)
                                     {
-                                        intersection = new Antlr4.Runtime.Misc.IntervalSet();
+                                        intersection = new IntervalSet();
                                     }
                                     intersection.Add(mine.Intersection(theirs));
                                     // Move the iterator of lower range [a..b], but not
@@ -464,7 +464,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (intersection == null)
             {
-                return new Antlr4.Runtime.Misc.IntervalSet();
+                return new IntervalSet();
             }
             return intersection;
         }
@@ -594,12 +594,12 @@ namespace Antlr4.Runtime.Misc
         /// </remarks>
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Antlr4.Runtime.Misc.IntervalSet))
+            if (obj == null || !(obj is IntervalSet))
             {
                 return false;
             }
-            Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)obj;
-            return this.intervals.SequenceEqual(other.intervals);
+            IntervalSet other = (IntervalSet)obj;
+            return intervals.SequenceEqual(other.intervals);
         }
 
         public override string ToString()
@@ -610,11 +610,11 @@ namespace Antlr4.Runtime.Misc
         public virtual string ToString(bool elemAreChar)
         {
             StringBuilder buf = new StringBuilder();
-            if (this.intervals == null || this.intervals.Count == 0)
+            if (intervals == null || intervals.Count == 0)
             {
                 return "{}";
             }
-            if (this.Count > 1)
+            if (Count > 1)
             {
                 buf.Append("{");
             }
@@ -658,7 +658,7 @@ namespace Antlr4.Runtime.Misc
                     }
                 }
             }
-            if (this.Count > 1)
+            if (Count > 1)
             {
                 buf.Append("}");
             }
@@ -668,11 +668,11 @@ namespace Antlr4.Runtime.Misc
         public virtual string ToString(IVocabulary vocabulary)
         {
             StringBuilder buf = new StringBuilder();
-            if (this.intervals == null || this.intervals.Count == 0)
+            if (intervals == null || intervals.Count == 0)
             {
                 return "{}";
             }
-            if (this.Count > 1)
+            if (Count > 1)
             {
                 buf.Append("{");
             }
@@ -702,7 +702,7 @@ namespace Antlr4.Runtime.Misc
                     }
                 }
             }
-            if (this.Count > 1)
+            if (Count > 1)
             {
                 buf.Append("}");
             }
@@ -737,7 +737,7 @@ namespace Antlr4.Runtime.Misc
                 int numIntervals = intervals.Count;
                 if (numIntervals == 1)
                 {
-                    Interval firstInterval = this.intervals[0];
+                    Interval firstInterval = intervals[0];
                     return firstInterval.b - firstInterval.a + 1;
                 }
                 for (int i = 0; i < numIntervals; i++)

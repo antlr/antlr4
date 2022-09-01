@@ -197,15 +197,15 @@ namespace Antlr4.Runtime
         /// <summary>Copy data in string to a local char array</summary>
         public AntlrInputStream(string input)
         {
-            this.data = input.ToCharArray();
-            this.n = input.Length;
+            data = input.ToCharArray();
+            n = input.Length;
         }
 
         /// <summary>This is the preferred constructor for strings as no data is copied</summary>
         public AntlrInputStream(char[] data, int numberOfActualCharsInArray)
         {
             this.data = data;
-            this.n = numberOfActualCharsInArray;
+            n = numberOfActualCharsInArray;
         }
 
         /// <exception cref="System.IO.IOException"/>
@@ -285,7 +285,7 @@ namespace Antlr4.Runtime
 
         public CodePointCharStream(string input)
         {
-            this.data = new int[input.Length];
+            data = new int[input.Length];
             int dataIdx = 0;
             for (int i = 0; i < input.Length; ) {
                 var codePoint = Char.ConvertToUtf32(input, i);
@@ -295,7 +295,7 @@ namespace Antlr4.Runtime
                 }
                 i += codePoint <= 0xFFFF ? 1 : 2;
             }
-            this.n = dataIdx;
+            n = dataIdx;
         }
 
         protected override int ValueAt(int i)

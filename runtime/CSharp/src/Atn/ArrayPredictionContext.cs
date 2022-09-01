@@ -70,7 +70,7 @@ namespace Antlr4.Runtime.Atn
 				return false;
 			}
 
-			if (this.GetHashCode() != o.GetHashCode())
+			if (GetHashCode() != o.GetHashCode())
 			{
 				return false; // can't be same if hash is different
 			}

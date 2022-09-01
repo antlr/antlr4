@@ -20,15 +20,15 @@ namespace Antlr4.Runtime.Dfa
     {
         private readonly int prediction;
 
-        private readonly Antlr4.Runtime.Atn.LexerActionExecutor lexerActionExecutor;
+        private readonly Atn.LexerActionExecutor lexerActionExecutor;
 
         public AcceptStateInfo(int prediction)
         {
             this.prediction = prediction;
-            this.lexerActionExecutor = null;
+            lexerActionExecutor = null;
         }
 
-        public AcceptStateInfo(int prediction, Antlr4.Runtime.Atn.LexerActionExecutor lexerActionExecutor)
+        public AcceptStateInfo(int prediction, Atn.LexerActionExecutor lexerActionExecutor)
         {
             this.prediction = prediction;
             this.lexerActionExecutor = lexerActionExecutor;
@@ -53,6 +53,6 @@ namespace Antlr4.Runtime.Dfa
         /// which can be used to execute actions
         /// and/or commands after the lexer matches a token.
         /// </summary>
-        public virtual Antlr4.Runtime.Atn.LexerActionExecutor LexerActionExecutor => lexerActionExecutor;
+        public virtual Atn.LexerActionExecutor LexerActionExecutor => lexerActionExecutor;
     }
 }

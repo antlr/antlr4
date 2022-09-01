@@ -13,7 +13,7 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.WILDCARD;
+        public override TransitionType TransitionType => TransitionType.WILDCARD;
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {

@@ -32,7 +32,7 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class ParserRuleContext : RuleContext
     {
-        public static readonly Antlr4.Runtime.ParserRuleContext EMPTY = new Antlr4.Runtime.ParserRuleContext();
+        public static readonly ParserRuleContext EMPTY = new ParserRuleContext();
 
         /// <summary>
         /// If we are debugging or building a parse tree for a visitor,
@@ -105,7 +105,7 @@ namespace Antlr4.Runtime
         {
         }
 
-        public static Antlr4.Runtime.ParserRuleContext EmptyContext =>
+        public static ParserRuleContext EmptyContext =>
             //	public List<Integer> states;
             EMPTY;
 
@@ -121,13 +121,13 @@ namespace Antlr4.Runtime
         /// to the generic XContext so this function must copy those nodes to
         /// the YContext as well else they are lost!
         /// </summary>
-        public virtual void CopyFrom(Antlr4.Runtime.ParserRuleContext ctx)
+        public virtual void CopyFrom(ParserRuleContext ctx)
         {
             // from RuleContext
-            this.Parent = ctx.Parent;
-            this.invokingState = ctx.invokingState;
-            this._start = ctx._start;
-            this._stop = ctx._stop;
+            Parent = ctx.Parent;
+            invokingState = ctx.invokingState;
+            _start = ctx._start;
+            _stop = ctx._stop;
 
             // copy any error nodes to alt label node
             if (ctx.children != null)
@@ -146,7 +146,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber)
+        public ParserRuleContext(ParserRuleContext parent, int invokingStateNumber)
             : base(parent, invokingStateNumber)
         {
         }
@@ -313,13 +313,13 @@ namespace Antlr4.Runtime
         }
 
         public virtual T GetRuleContext<T>(int i)
-            where T : Antlr4.Runtime.ParserRuleContext
+            where T : ParserRuleContext
         {
             return GetChild<T>(i);
         }
 
         public virtual T[] GetRuleContexts<T>()
-            where T : Antlr4.Runtime.ParserRuleContext
+            where T : ParserRuleContext
         {
             if (children == null)
             {

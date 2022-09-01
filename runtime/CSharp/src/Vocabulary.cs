@@ -102,7 +102,7 @@ namespace Antlr4.Runtime
             this.literalNames = literalNames != null ? literalNames : EmptyNames;
             this.symbolicNames = symbolicNames != null ? symbolicNames : EmptyNames;
             this.displayNames = displayNames != null ? displayNames : EmptyNames;
-			this.maxTokenType =
+			maxTokenType =
 				System.Math.Max(this.displayNames.Length,
 						 System.Math.Max(this.literalNames.Length, this.symbolicNames.Length)) - 1;
 

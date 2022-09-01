@@ -67,11 +67,11 @@ namespace Antlr4.Runtime.Atn
 
 		public ATNConfig(ATNConfig old)
 		{ // dup
-			this.state = old.state;
-			this.alt = old.alt;
-			this.context = old.context;
-			this.semanticContext = old.semanticContext;
-			this.reachesIntoOuterContext = old.reachesIntoOuterContext;
+			state = old.state;
+			alt = old.alt;
+			context = old.context;
+			semanticContext = old.semanticContext;
+			reachesIntoOuterContext = old.reachesIntoOuterContext;
 		}
 
 		public ATNConfig(ATNState state,
@@ -120,10 +120,10 @@ namespace Antlr4.Runtime.Atn
 						 SemanticContext semanticContext)
 		{
 			this.state = state;
-			this.alt = c.alt;
+			alt = c.alt;
 			this.context = context;
 			this.semanticContext = semanticContext;
-			this.reachesIntoOuterContext = c.reachesIntoOuterContext;
+			reachesIntoOuterContext = c.reachesIntoOuterContext;
 		}
 
 		/**
@@ -139,10 +139,10 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (value)
 			{
-				this.reachesIntoOuterContext |= SUPPRESS_PRECEDENCE_FILTER;
+				reachesIntoOuterContext |= SUPPRESS_PRECEDENCE_FILTER;
 			}
 			else {
-				this.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+				reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace Antlr4.Runtime.Atn
 				return false;
 			}
 
-			return this.Equals((ATNConfig)o);
+			return Equals((ATNConfig)o);
 		}
 
 		public virtual bool Equals(ATNConfig other)
@@ -170,11 +170,11 @@ namespace Antlr4.Runtime.Atn
 				return false;
 			}
 
-			return this.state.stateNumber == other.state.stateNumber
-				&& this.alt == other.alt
-				&& (this.context == other.context || (this.context != null && this.context.Equals(other.context)))
-				&& this.semanticContext.Equals(other.semanticContext)
-				&& this.IsPrecedenceFilterSuppressed == other.IsPrecedenceFilterSuppressed;
+			return state.stateNumber == other.state.stateNumber
+				&& alt == other.alt
+				&& (context == other.context || (context != null && context.Equals(other.context)))
+				&& semanticContext.Equals(other.semanticContext)
+				&& IsPrecedenceFilterSuppressed == other.IsPrecedenceFilterSuppressed;
 		}
 
 		public override int GetHashCode()

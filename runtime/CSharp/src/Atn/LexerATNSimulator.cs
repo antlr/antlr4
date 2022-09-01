@@ -64,10 +64,10 @@ namespace Antlr4.Runtime.Atn
 
         public void CopyState(LexerATNSimulator simulator)
 		{
-			this.charPositionInLine = simulator.charPositionInLine;
-			this.thisLine = simulator.thisLine;
-			this.mode = simulator.mode;
-			this.startIndex = simulator.startIndex;
+			charPositionInLine = simulator.charPositionInLine;
+			thisLine = simulator.thisLine;
+			mode = simulator.mode;
+			startIndex = simulator.startIndex;
 		}
 
 		public int Match(ICharStream input, int mode)
@@ -76,8 +76,8 @@ namespace Antlr4.Runtime.Atn
 			int mark = input.Mark();
 			try
 			{
-				this.startIndex = input.Index;
-				this.prevAccept.Reset();
+				startIndex = input.Index;
+				prevAccept.Reset();
 				DFA dfa = decisionToDFA[mode];
 				if (dfa.s0 == null)
 				{
@@ -359,8 +359,8 @@ namespace Antlr4.Runtime.Atn
 
 			// seek to after last char in token
 			input.Seek(index);
-			this.thisLine = line;
-			this.charPositionInLine = charPos;
+			thisLine = line;
+			charPositionInLine = charPos;
 
 			if (lexerActionExecutor != null && recog != null)
 			{
@@ -757,13 +757,13 @@ namespace Antlr4.Runtime.Atn
 		public int Line
 		{
 			get => thisLine;
-			set => this.thisLine = value;
+			set => thisLine = value;
 		}
 
 		public int Column
 		{
 			get => charPositionInLine;
-			set => this.charPositionInLine = value;
+			set => charPositionInLine = value;
 		}
 
 

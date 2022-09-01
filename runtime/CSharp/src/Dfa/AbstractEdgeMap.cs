@@ -23,16 +23,16 @@ namespace Antlr4.Runtime.Dfa
             this.maxIndex = maxIndex;
         }
 
-        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Put(int key, T value);
+        public abstract AbstractEdgeMap<T> Put(int key, T value);
 
         IEdgeMap<T> IEdgeMap<T>.Put(int key, T value)
         {
             return Put(key, value);
         }
 
-        public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll(IEdgeMap<T> m)
+        public virtual AbstractEdgeMap<T> PutAll(IEdgeMap<T> m)
         {
-            Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
+            AbstractEdgeMap<T> result = this;
             foreach (KeyValuePair<int, T> entry in m)
             {
                 result = result.Put(entry.Key, entry.Value);
@@ -45,14 +45,14 @@ namespace Antlr4.Runtime.Dfa
             return PutAll(m);
         }
 
-        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Clear();
+        public abstract AbstractEdgeMap<T> Clear();
 
         IEdgeMap<T> IEdgeMap<T>.Clear()
         {
             return Clear();
         }
 
-        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Remove(int key);
+        public abstract AbstractEdgeMap<T> Remove(int key);
 
         IEdgeMap<T> IEdgeMap<T>.Remove(int key)
         {

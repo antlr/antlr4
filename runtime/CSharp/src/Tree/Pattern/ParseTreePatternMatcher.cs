@@ -125,7 +125,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// </summary>
     public class ParseTreePatternMatcher
     {
-        [System.Serializable]
+        [Serializable]
         public class CannotInvokeStartRule : Exception
         {
             public CannotInvokeStartRule(Exception e)
@@ -134,7 +134,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             }
         }
 
-        [System.Serializable]
+        [Serializable]
         public class StartRuleDoesNotConsumeFullPattern : Exception
         {
             // Fixes https://github.com/antlr/antlr4/issues/413
@@ -218,7 +218,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             }
             this.start = start;
             this.stop = stop;
-            this.escape = escapeLeft;
+            escape = escapeLeft;
         }
 
         /// <summary>
@@ -318,12 +318,12 @@ namespace Antlr4.Runtime.Tree.Pattern
             }
             catch (Exception e)
             {
-                throw new ParseTreePatternMatcher.CannotInvokeStartRule(e);
+                throw new CannotInvokeStartRule(e);
             }
             // Make sure tree pattern compilation checks for a complete parse
             if (tokens.LA(1) != TokenConstants.EOF)
             {
-                throw new ParseTreePatternMatcher.StartRuleDoesNotConsumeFullPattern();
+                throw new StartRuleDoesNotConsumeFullPattern();
             }
             return new ParseTreePattern(this, pattern, patternRuleIndex, tree);
         }
@@ -515,7 +515,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 {
                     TagChunk tagChunk = (TagChunk)chunk;
                     // add special rule token or conjure up new token from name
-                    if (System.Char.IsUpper(tagChunk.Tag[0]))
+                    if (Char.IsUpper(tagChunk.Tag[0]))
                     {
                         int ttype = parser.GetTokenType(tagChunk.Tag);
                         if (ttype == TokenConstants.InvalidType)
@@ -527,7 +527,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     }
                     else
                     {
-                        if (System.Char.IsLower(tagChunk.Tag[0]))
+                        if (Char.IsLower(tagChunk.Tag[0]))
                         {
                             int ruleIndex = parser.GetRuleIndex(tagChunk.Tag);
                             if (ruleIndex == -1)

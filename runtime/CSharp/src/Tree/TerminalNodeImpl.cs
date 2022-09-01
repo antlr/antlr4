@@ -14,7 +14,7 @@ namespace Antlr4.Runtime.Tree
 
         public TerminalNodeImpl(IToken symbol)
         {
-            this._symbol = symbol;
+            _symbol = symbol;
         }
 
         public virtual IParseTree GetChild(int i)

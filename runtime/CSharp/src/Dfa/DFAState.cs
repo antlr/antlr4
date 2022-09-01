@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Dfa
 
 		public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-		public DFAState(ATNConfigSet configs) { this.configSet = configs; }
+		public DFAState(ATNConfigSet configs) { configSet = configs; }
 
 		/** Get the set of all alts mentioned by all ATN configurations in this
 		 *  DFA state.
@@ -139,7 +139,7 @@ namespace Antlr4.Runtime.Dfa
 
 			DFAState other = (DFAState)o;
 			// TODO (sam): what to do when configs==null?
-			bool sameSet = this.configSet.Equals(other.configSet);
+			bool sameSet = configSet.Equals(other.configSet);
 			//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 			return sameSet;
 		}

@@ -50,12 +50,12 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!(obj is Antlr4.Runtime.Atn.ConflictInfo))
+                if (!(obj is ConflictInfo))
                 {
                     return false;
                 }
             }
-            Antlr4.Runtime.Atn.ConflictInfo other = (Antlr4.Runtime.Atn.ConflictInfo)obj;
+            ConflictInfo other = (ConflictInfo)obj;
             return IsExact == other.IsExact && Utils.Equals(ConflictedAlts, other.ConflictedAlts);
         }
 

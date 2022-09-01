@@ -173,7 +173,7 @@ namespace Antlr4.Runtime
                     }
                     else
                     {
-                        System.Console.Error.WriteLine("unknown recognition error type: " + e.GetType().FullName);
+                        Console.Error.WriteLine("unknown recognition error type: " + e.GetType().FullName);
                         NotifyErrorListeners(recognizer, e.Message, e);
                     }
                 }

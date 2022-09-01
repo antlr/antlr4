@@ -16,7 +16,7 @@ namespace Antlr4.Runtime
     /// in the input, where it is in the ATN, the rule invocation stack,
     /// and what kind of problem occurred.
     /// </remarks>
-    [System.Serializable]
+    [Serializable]
     public class RecognitionException : Exception
     {
         private const long serialVersionUID = -3861826954750022374L;
@@ -49,9 +49,9 @@ namespace Antlr4.Runtime
 
         public RecognitionException(Lexer lexer, ICharStream input)
         {
-            this.recognizer = lexer;
+            recognizer = lexer;
             this.input = input;
-            this.ctx = null;
+            ctx = null;
         }
 
         public RecognitionException(IRecognizer recognizer, IIntStream input, ParserRuleContext ctx)
@@ -61,7 +61,7 @@ namespace Antlr4.Runtime
             this.ctx = ctx;
             if (recognizer != null)
             {
-                this.offendingState = recognizer.State;
+                offendingState = recognizer.State;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
             this.ctx = ctx;
             if (recognizer != null)
             {
-                this.offendingState = recognizer.State;
+                offendingState = recognizer.State;
             }
         }
 

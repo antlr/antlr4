@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Atn
 			this.token = token;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.ATOM;
+        public override TransitionType TransitionType => TransitionType.ATOM;
 
         public override IntervalSet Label => IntervalSet.Of(token);
 

@@ -2110,7 +2110,7 @@ namespace Antlr4.Runtime.Atn
 		 */
 		public void DumpDeadEndConfigs(NoViableAltException nvae)
 		{
-            System.Console.Error.WriteLine("dead end configs: ");
+            Console.Error.WriteLine("dead end configs: ");
             foreach (ATNConfig c in nvae.DeadEndConfigs.configs)
 			{
 				String trans = "no edges";
@@ -2130,7 +2130,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 
-                System.Console.Error.WriteLine(c.ToString(parser, true) + ":" + trans);
+                Console.Error.WriteLine(c.ToString(parser, true) + ":" + trans);
 			}
 		}
 
@@ -2308,8 +2308,8 @@ namespace Antlr4.Runtime.Atn
 
 		public PredictionMode PredictionMode
 		{
-			get => this.mode;
-			set => this.mode = value;
+			get => mode;
+			set => mode = value;
 		}
 
 

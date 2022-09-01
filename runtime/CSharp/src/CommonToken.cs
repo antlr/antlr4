@@ -7,7 +7,7 @@ using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime
 {
-    [System.Serializable]
+    [Serializable]
     public class CommonToken : IWritableToken
     {
         private const long serialVersionUID = -6708843461296520577L;
@@ -90,21 +90,21 @@ namespace Antlr4.Runtime
         public CommonToken(int type)
         {
             // set to invalid position
-            this._type = type;
-            this.source = EmptySource;
+            _type = type;
+            source = EmptySource;
         }
 
         public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel, int start, int stop)
         {
             this.source = source;
-            this._type = type;
-            this._channel = channel;
+            _type = type;
+            _channel = channel;
             this.start = start;
             this.stop = stop;
             if (source.Item1 != null)
             {
-                this._line = source.Item1.Line;
-                this.charPositionInLine = source.Item1.Column;
+                _line = source.Item1.Line;
+                charPositionInLine = source.Item1.Column;
             }
         }
 
@@ -118,10 +118,10 @@ namespace Antlr4.Runtime
         /// <param name="text">The text of the token.</param>
         public CommonToken(int type, string text)
         {
-            this._type = type;
-            this._channel = TokenConstants.DefaultChannel;
-            this._text = text;
-            this.source = EmptySource;
+            _type = type;
+            _channel = TokenConstants.DefaultChannel;
+            _text = text;
+            source = EmptySource;
         }
 
         /// <summary>
@@ -166,10 +166,10 @@ namespace Antlr4.Runtime
             _channel = oldToken.Channel;
             start = oldToken.StartIndex;
             stop = oldToken.StopIndex;
-            if (oldToken is Antlr4.Runtime.CommonToken)
+            if (oldToken is CommonToken)
             {
-                _text = ((Antlr4.Runtime.CommonToken)oldToken)._text;
-                source = ((Antlr4.Runtime.CommonToken)oldToken).source;
+                _text = ((CommonToken)oldToken)._text;
+                source = ((CommonToken)oldToken).source;
             }
             else
             {
@@ -181,13 +181,13 @@ namespace Antlr4.Runtime
         public virtual int Type
         {
             get => _type;
-            set => this._type = value;
+            set => _type = value;
         }
 
         public virtual int Line
         {
             get => _line;
-            set => this._line = value;
+            set => _line = value;
         }
 
         /// <summary>Explicitly set the text for this token.</summary>
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime
                     return "<EOF>";
                 }
             }
-            set => this._text = value;
+            set => _text = value;
         }
 
         public virtual int Column
@@ -245,7 +245,7 @@ namespace Antlr4.Runtime
         public virtual int Channel
         {
             get => _channel;
-            set => this._channel = value;
+            set => _channel = value;
         }
 
         public virtual int StartIndex

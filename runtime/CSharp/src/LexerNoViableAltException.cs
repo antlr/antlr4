@@ -42,7 +42,7 @@ namespace Antlr4.Runtime
                 symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
-            return string.Format(CultureInfo.CurrentCulture, "{0}('{1}')", typeof(Antlr4.Runtime.LexerNoViableAltException).Name, symbol);
+            return string.Format(CultureInfo.CurrentCulture, "{0}('{1}')", typeof(LexerNoViableAltException).Name, symbol);
         }
     }
 }

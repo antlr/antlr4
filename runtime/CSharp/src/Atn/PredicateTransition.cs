@@ -35,7 +35,7 @@ namespace Antlr4.Runtime.Atn
             this.isCtxDependent = isCtxDependent;
         }
 
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType => Antlr4.Runtime.Atn.TransitionType.PREDICATE;
+        public override TransitionType TransitionType => TransitionType.PREDICATE;
 
         public override bool IsEpsilon => true;
 

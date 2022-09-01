@@ -63,7 +63,7 @@ namespace Antlr4.Runtime.Dfa
             }
             if (key == this.key || this.value == null)
             {
-                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
+                return new SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
             }
             else
             {
@@ -83,7 +83,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override AbstractEdgeMap<T> Remove(int key)
         {
-            if (key == this.key && this.value != null)
+            if (key == this.key && value != null)
             {
                 return new EmptyEdgeMap<T>(minIndex, maxIndex);
             }
@@ -92,7 +92,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override AbstractEdgeMap<T> Clear()
         {
-            if (this.value != null)
+            if (value != null)
             {
                 return new EmptyEdgeMap<T>(minIndex, maxIndex);
             }

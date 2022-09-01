@@ -28,12 +28,12 @@ namespace Antlr4.Runtime
 
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                _output.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                _output.WriteLine("enter   " + _enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + _enclosing._input.LT(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                _output.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                _output.WriteLine("exit    " + _enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + _enclosing._input.LT(1).Text);
             }
 
             public virtual void VisitErrorNode(IErrorNode node)
@@ -44,7 +44,7 @@ namespace Antlr4.Runtime
             {
                 ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
                 IToken token = node.Symbol;
-                _output.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
+                _output.WriteLine("consume " + token + " rule " + _enclosing.RuleNames[parent.RuleIndex]);
             }
 
             internal TraceListener(Parser _enclosing)
@@ -59,7 +59,7 @@ namespace Antlr4.Runtime
 
         public class TrimToSizeListener : IParseTreeListener
         {
-            public static readonly Parser.TrimToSizeListener Instance = new Parser.TrimToSizeListener();
+            public static readonly TrimToSizeListener Instance = new TrimToSizeListener();
 
             public virtual void VisitTerminal(ITerminalNode node)
             {
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
         /// implemented as a parser listener so this field is not directly used by
         /// other parser methods.
         /// </summary>
-        private Parser.TraceListener _tracer;
+        private TraceListener _tracer;
 
         /// <summary>
         /// The list of
@@ -344,7 +344,7 @@ namespace Antlr4.Runtime
         public virtual bool BuildParseTree
         {
             get => _buildParseTrees;
-            set => this._buildParseTrees = value;
+            set => _buildParseTrees = value;
         }
 
         /// <summary>Trim the internal lists of the parse tree during parsing to conserve memory.</summary>
@@ -373,7 +373,7 @@ namespace Antlr4.Runtime
         /// </returns>
         public virtual bool TrimParseTree
         {
-            get => ParseListeners.Contains(Parser.TrimToSizeListener.Instance);
+            get => ParseListeners.Contains(TrimToSizeListener.Instance);
             set
             {
                 bool trimParseTrees = value;
@@ -383,11 +383,11 @@ namespace Antlr4.Runtime
                     {
                         return;
                     }
-                    AddParseListener(Parser.TrimToSizeListener.Instance);
+                    AddParseListener(TrimToSizeListener.Instance);
                 }
                 else
                 {
-                    RemoveParseListener(Parser.TrimToSizeListener.Instance);
+                    RemoveParseListener(TrimToSizeListener.Instance);
                 }
             }
         }
@@ -447,7 +447,7 @@ namespace Antlr4.Runtime
             {
                 _parseListeners = new List<IParseTreeListener>();
             }
-            this._parseListeners.Add(listener);
+            _parseListeners.Add(listener);
         }
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace Antlr4.Runtime
             set
             {
                 IAntlrErrorStrategy handler = value;
-                this._errHandler = handler;
+                _errHandler = handler;
             }
         }
 
@@ -613,9 +613,9 @@ namespace Antlr4.Runtime
 			get => _input;
             set
 			{
-				this._input = null;
+				_input = null;
 				Reset ();
-				this._input = value;
+				_input = value;
 			}
 		}
 
@@ -1158,7 +1158,7 @@ namespace Antlr4.Runtime
             {
                 foreach (object o in ParseListeners)
                 {
-                    if (o is Parser.TraceListener)
+                    if (o is TraceListener)
                     {
                         return true;
                     }
@@ -1181,7 +1181,7 @@ namespace Antlr4.Runtime
                     }
                     else
                     {
-                        _tracer = new Parser.TraceListener(this);
+                        _tracer = new TraceListener(this);
                     }
                     AddParseListener(_tracer);
                 }

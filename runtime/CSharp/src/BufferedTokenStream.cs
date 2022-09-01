@@ -112,7 +112,7 @@ namespace Antlr4.Runtime
             {
                 throw new ArgumentNullException("tokenSource cannot be null");
             }
-            this._tokenSource = tokenSource;
+            _tokenSource = tokenSource;
         }
 
         public virtual ITokenSource TokenSource => _tokenSource;
@@ -348,10 +348,10 @@ namespace Antlr4.Runtime
         /// <remarks>Reset this token stream by setting its token source.</remarks>
         public virtual void SetTokenSource(ITokenSource tokenSource)
         {
-            this._tokenSource = tokenSource;
+            _tokenSource = tokenSource;
             tokens.Clear();
             p = -1;
-			this.fetchedEOF = false;
+			fetchedEOF = false;
         }
 
         public virtual IList<IToken> GetTokens()

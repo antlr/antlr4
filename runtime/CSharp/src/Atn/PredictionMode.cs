@@ -91,14 +91,14 @@ namespace Antlr4.Runtime.Atn
         internal class AltAndContextMap : Dictionary<ATNConfig, BitSet>
         {
             public AltAndContextMap()
-                : base(PredictionMode.AltAndContextConfigEqualityComparator.Instance)
+                : base(AltAndContextConfigEqualityComparator.Instance)
             {
             }
         }
 
         private sealed class AltAndContextConfigEqualityComparator : EqualityComparer<ATNConfig>
         {
-            public static readonly PredictionMode.AltAndContextConfigEqualityComparator Instance = new PredictionMode.AltAndContextConfigEqualityComparator();
+            public static readonly AltAndContextConfigEqualityComparator Instance = new AltAndContextConfigEqualityComparator();
 
             private AltAndContextConfigEqualityComparator()
             {
@@ -245,7 +245,7 @@ namespace Antlr4.Runtime.Atn
                 return true;
             }
             // pure SLL mode parsing
-            if (mode == PredictionMode.SLL)
+            if (mode == SLL)
             {
                 // Don't bother with combining configs from different semantic
                 // contexts if we can fail over to full LL; costs more time
@@ -807,7 +807,7 @@ namespace Antlr4.Runtime.Atn
         [return: NotNull]
         public static ICollection<BitSet> GetConflictingAltSubsets(IEnumerable<ATNConfig> configs)
         {
-            PredictionMode.AltAndContextMap configToAlts = new PredictionMode.AltAndContextMap();
+            AltAndContextMap configToAlts = new AltAndContextMap();
             foreach (ATNConfig c in configs)
             {
                 BitSet alts;

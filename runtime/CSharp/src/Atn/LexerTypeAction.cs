@@ -86,12 +86,12 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerTypeAction))
+                if (!(obj is LexerTypeAction))
                 {
                     return false;
                 }
             }
-            return type == ((Antlr4.Runtime.Atn.LexerTypeAction)obj).type;
+            return type == ((LexerTypeAction)obj).type;
         }
 
         public override string ToString()

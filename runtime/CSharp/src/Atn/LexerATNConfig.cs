@@ -22,8 +22,8 @@ namespace Antlr4.Runtime.Atn
 							  PredictionContext context)
 				: base(state, alt, context/*, SemanticContext.Empty.Instance*/) // TODO
 		{
-			this.passedThroughNonGreedyDecision = false;
-			this.lexerActionExecutor = null;
+			passedThroughNonGreedyDecision = false;
+			lexerActionExecutor = null;
 		}
 
 		public LexerATNConfig(ATNState state,
@@ -33,14 +33,14 @@ namespace Antlr4.Runtime.Atn
 			: base(state, alt, context, SemanticContext.Empty.Instance)
 		{
 			this.lexerActionExecutor = lexerActionExecutor;
-			this.passedThroughNonGreedyDecision = false;
+			passedThroughNonGreedyDecision = false;
 		}
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state)
 			: base(c, state, c.context, c.semanticContext)
 		{
-			this.lexerActionExecutor = c.lexerActionExecutor;
-			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+			lexerActionExecutor = c.lexerActionExecutor;
+			passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 		}
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state,
@@ -48,15 +48,15 @@ namespace Antlr4.Runtime.Atn
 			: base(c, state, c.context, c.semanticContext)
 		{
 			this.lexerActionExecutor = lexerActionExecutor;
-			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+			passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 		}
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state,
 							  PredictionContext context)
 			: base(c, state, context, c.semanticContext)
 		{
-			this.lexerActionExecutor = c.lexerActionExecutor;
-			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+			lexerActionExecutor = c.lexerActionExecutor;
+			passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 		}
 
 		/**

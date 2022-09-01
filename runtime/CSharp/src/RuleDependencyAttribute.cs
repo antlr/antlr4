@@ -17,18 +17,18 @@ namespace Antlr4.Runtime
 
         public RuleDependencyAttribute(Type recognizer, int rule, int version)
         {
-            this._recognizer = recognizer;
-            this._rule = rule;
-            this._version = version;
-            this._dependents = Dependents.Parents | Dependents.Self;
+            _recognizer = recognizer;
+            _rule = rule;
+            _version = version;
+            _dependents = Dependents.Parents | Dependents.Self;
         }
 
         public RuleDependencyAttribute(Type recognizer, int rule, int version, Dependents dependents)
         {
-            this._recognizer = recognizer;
-            this._rule = rule;
-            this._version = version;
-            this._dependents = dependents | Dependents.Self;
+            _recognizer = recognizer;
+            _rule = rule;
+            _version = version;
+            _dependents = dependents | Dependents.Self;
         }
 
         public Type Recognizer => _recognizer;

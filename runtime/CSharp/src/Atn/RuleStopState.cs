@@ -16,6 +16,6 @@ namespace Antlr4.Runtime.Atn
     {
         public override int NonStopStateNumber => -1;
 
-        public override Antlr4.Runtime.Atn.StateType StateType => Antlr4.Runtime.Atn.StateType.RuleStop;
+        public override StateType StateType => StateType.RuleStop;
     }
 }
