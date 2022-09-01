@@ -1011,8 +1011,7 @@ namespace Antlr4.Runtime
         /// </summary>
         public virtual int GetRuleIndex(string ruleName)
         {
-            int ruleIndex;
-            if (RuleIndexMap.TryGetValue(ruleName, out ruleIndex))
+            if (RuleIndexMap.TryGetValue(ruleName, out var ruleIndex))
             {
                 return ruleIndex;
             }

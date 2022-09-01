@@ -12,8 +12,7 @@ namespace Antlr4.Runtime.Misc
     {
         public virtual void Map(K key, V value)
         {
-            IList<V> elementsForKey;
-            if (!TryGetValue(key, out elementsForKey))
+            if (!TryGetValue(key, out var elementsForKey))
             {
                 elementsForKey = new ArrayList<V>();
                 this[key] = elementsForKey;

@@ -27,8 +27,7 @@ namespace Antlr4.Runtime.Tree
 
         public virtual V Get(IParseTree node)
         {
-            V value;
-            if (!annotations.TryGetValue(node, out value))
+            if (!annotations.TryGetValue(node, out var value))
                 return default(V);
 
             return value;
@@ -41,8 +40,7 @@ namespace Antlr4.Runtime.Tree
 
         public virtual V RemoveFrom(IParseTree node)
         {
-            V value;
-            if (!annotations.TryRemove(node, out value))
+            if (!annotations.TryRemove(node, out var value))
                 return default(V);
 
             return value;

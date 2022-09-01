@@ -245,8 +245,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         public virtual void Rollback(string programName, int instructionIndex)
         {
-            IList<RewriteOperation> @is;
-            if (programs.TryGetValue(programName, out @is))
+            if (programs.TryGetValue(programName, out var @is))
             {
                 programs[programName] = new List<RewriteOperation>(@is.Skip(MinTokenIndex).Take(instructionIndex - MinTokenIndex));
             }
@@ -378,8 +377,7 @@ namespace Antlr4.Runtime
 
         protected internal virtual int GetLastRewriteTokenIndex(string programName)
         {
-            int I;
-            if (!lastRewriteTokenIndexes.TryGetValue(programName, out I))
+            if (!lastRewriteTokenIndexes.TryGetValue(programName, out var I))
             {
                 return -1;
             }
@@ -393,8 +391,7 @@ namespace Antlr4.Runtime
 
         protected internal virtual IList<RewriteOperation> GetProgram(string name)
         {
-            IList<RewriteOperation> @is;
-            if (!programs.TryGetValue(name, out @is))
+            if (!programs.TryGetValue(name, out var @is))
             {
                 @is = InitializeProgram(name);
             }
@@ -442,8 +439,7 @@ namespace Antlr4.Runtime
 
         public virtual string GetText(string programName, Interval interval)
         {
-            IList<RewriteOperation> rewrites;
-            if (!programs.TryGetValue(programName, out rewrites))
+            if (!programs.TryGetValue(programName, out var rewrites))
                 rewrites = null;
 
             int start = interval.a;
@@ -469,8 +465,7 @@ namespace Antlr4.Runtime
             int i = start;
             while (i <= stop && i < tokens.Size)
             {
-                RewriteOperation op;
-                if (indexToOp.TryGetValue(i, out op))
+                if (indexToOp.TryGetValue(i, out var op))
                     indexToOp.Remove(i);
 
                 // remove so any left have index size-1

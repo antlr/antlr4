@@ -13,11 +13,9 @@ namespace Antlr4.Runtime.Atn
 
 		public PredictionContext Get(PredictionContext a, PredictionContext b)
 		{
-			Dictionary<PredictionContext, PredictionContext> first;
-			if (!data.TryGetValue(a, out first))
+			if (!data.TryGetValue(a, out var first))
 				return null;
-			PredictionContext value;
-			if (first.TryGetValue(b, out value))
+			if (first.TryGetValue(b, out var value))
 				return value;
 			else
 				return null;
@@ -26,8 +24,7 @@ namespace Antlr4.Runtime.Atn
 
 		public void Put(PredictionContext a, PredictionContext b, PredictionContext value)
 		{
-			Dictionary<PredictionContext, PredictionContext> first;
-			if (!data.TryGetValue(a, out first))
+			if (!data.TryGetValue(a, out var first))
 			{
 				first = new Dictionary<PredictionContext, PredictionContext>();
 				data[a] = first;

@@ -725,8 +725,7 @@ namespace Antlr4.Runtime.Atn
 			DFA dfa = decisionToDFA[mode];
 			lock (dfa.states)
 			{
-				DFAState existing;
-				if(dfa.states.TryGetValue(proposed, out existing))
+				if(dfa.states.TryGetValue(proposed, out var existing))
 					return existing;
 
 				DFAState newState = proposed;

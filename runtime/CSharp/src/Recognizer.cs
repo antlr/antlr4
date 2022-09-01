@@ -107,8 +107,7 @@ namespace Antlr4.Runtime
 
         public virtual int GetTokenType(string tokenName)
         {
-            int ttype;
-            if (TokenTypeMap.TryGetValue(tokenName, out ttype))
+            if (TokenTypeMap.TryGetValue(tokenName, out var ttype))
             {
                 return ttype;
             }

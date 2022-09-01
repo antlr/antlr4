@@ -1202,8 +1202,7 @@ namespace Antlr4.Runtime.Atn
 					 * filter the prediction context for alternatives predicting alt>1
 					 * (basically a graph subtraction algorithm).
 					 */
-					PredictionContext ctx;
-					if (statesFromAlt1.TryGetValue(config.state.stateNumber, out ctx))
+					if (statesFromAlt1.TryGetValue(config.state.stateNumber, out var ctx))
 					{
 						if (ctx != null && ctx.Equals(config.context))
 						{
