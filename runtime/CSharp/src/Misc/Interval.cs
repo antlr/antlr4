@@ -8,7 +8,7 @@ namespace Antlr4.Runtime.Misc
 {
     /// <summary>An immutable inclusive interval a..b.</summary>
     /// <remarks>An immutable inclusive interval a..b.</remarks>
-    public struct Interval
+    public readonly struct Interval
     {
         public static readonly Interval Invalid = new Interval(-1, -2);
 
