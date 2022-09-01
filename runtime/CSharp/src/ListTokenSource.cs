@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using Antlr4.Runtime;
 
 namespace Antlr4.Runtime
 {

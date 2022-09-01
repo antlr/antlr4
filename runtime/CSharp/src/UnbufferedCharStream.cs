@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Text;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime

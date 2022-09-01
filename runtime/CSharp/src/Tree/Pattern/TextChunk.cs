@@ -4,7 +4,6 @@
  */
 using System;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree.Pattern;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {

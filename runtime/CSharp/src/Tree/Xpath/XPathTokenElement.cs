@@ -3,8 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Tree;
-using Antlr4.Runtime.Tree.Xpath;
 
 namespace Antlr4.Runtime.Tree.Xpath
 {

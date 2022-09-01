@@ -2,11 +2,9 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-using System;
+
 using System.IO;
 using System.Text;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime
 {

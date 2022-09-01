@@ -3,8 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-using Antlr4.Runtime.Tree.Pattern;
-
 namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
