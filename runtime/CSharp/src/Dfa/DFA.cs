@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -45,7 +46,7 @@ namespace Antlr4.Runtime.Dfa
 			{
 				precedenceDfa = true;
 				DFAState precedenceState = new DFAState(new ATNConfigSet());
-				precedenceState.edges = new DFAState[0];
+				precedenceState.edges = EmptyArray<DFAState>.Value;
 				precedenceState.isAcceptState = false;
 				precedenceState.requiresFullContext = false;
 				s0 = precedenceState;

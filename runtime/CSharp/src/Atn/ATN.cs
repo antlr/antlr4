@@ -73,11 +73,10 @@ namespace Antlr4.Runtime.Atn
 
         private readonly PredictionContextCache contextCache = new PredictionContextCache();
 
-        [NotNull]
-		public DFA[] decisionToDFA = new DFA[0];
+        [NotNull] public DFA[] decisionToDFA = EmptyArray<DFA>.Value;
 
         [NotNull]
-		public DFA[] modeToDFA = new DFA[0];
+		public DFA[] modeToDFA = EmptyArray<DFA>.Value;
 
         protected internal readonly ConcurrentDictionary<int, int> LL1Table = new ConcurrentDictionary<int, int>();
 

@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+using System;
 using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime
@@ -15,7 +16,7 @@ namespace Antlr4.Runtime
     /// <author>Sam Harwell</author>
     public class Vocabulary : IVocabulary
     {
-        private static readonly string[] EmptyNames = new string[0];
+        private static readonly string[] EmptyNames = EmptyArray<String>.Value;
 
         /// <summary>
         /// Gets an empty

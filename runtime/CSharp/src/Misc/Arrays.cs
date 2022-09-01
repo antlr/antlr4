@@ -6,6 +6,13 @@ namespace Antlr4.Runtime.Misc
 {
     using StringBuilder = System.Text.StringBuilder;
 
+    internal static class EmptyArray<T>
+    {
+        // net45 doesn't support Array.Empty<T>()
+        // ReSharper disable once UseArrayEmptyMethod
+        public static readonly T[] Value = new T[0];
+    }
+    
     internal static class Arrays
     {
         public static bool Equals<T>(T[] left, T[] right)
