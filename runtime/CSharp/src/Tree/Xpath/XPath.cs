@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Xpath;
 
@@ -253,7 +252,7 @@ loop_break: ;
         public virtual ICollection<IParseTree> Evaluate(IParseTree t)
         {
             ParserRuleContext dummyRoot = new ParserRuleContext();
-            dummyRoot.children = Antlr4.Runtime.Sharpen.Collections.SingletonList(t);
+            dummyRoot.children = new [] { t };
             // don't set t's parent.
             ICollection<IParseTree> work = new[] { dummyRoot };
             int i = 0;

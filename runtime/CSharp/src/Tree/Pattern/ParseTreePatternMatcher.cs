@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
 
@@ -303,7 +302,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
             ParserInterpreter parserInterp = new ParserInterpreter(parser.GrammarFileName,
                                                                    parser.Vocabulary,
-                                                                   Arrays.AsList(parser.RuleNames),
+                                                                   parser.RuleNames,
                                                                    parser.GetATNWithBypassAlts(),
                                                                    tokens);
             IParseTree tree = null;
@@ -648,32 +647,34 @@ namespace Antlr4.Runtime.Tree.Pattern
             // collect into chunks now
             if (ntags == 0)
             {
-                string text = Sharpen.Runtime.Substring(pattern, 0, n);
-                chunks.Add(new TextChunk(text));
+                chunks.Add(new TextChunk(pattern));
             }
             if (ntags > 0 && starts[0] > 0)
             {
                 // copy text up to first tag into chunks
-                string text = Sharpen.Runtime.Substring(pattern, 0, starts[0]);
+                string text = pattern.Substring(0, starts[0]);
                 chunks.Add(new TextChunk(text));
             }
             for (int i_1 = 0; i_1 < ntags; i_1++)
             {
                 // copy inside of <tag>
-                string tag = Sharpen.Runtime.Substring(pattern, starts[i_1] + start.Length, stops[i_1]);
+                int offset = starts[i_1] + start.Length;
+                string tag = pattern.Substring(offset, stops[i_1] - offset);
                 string ruleOrToken = tag;
                 string label = null;
                 int colon = tag.IndexOf(':');
                 if (colon >= 0)
                 {
-                    label = Sharpen.Runtime.Substring(tag, 0, colon);
-                    ruleOrToken = Sharpen.Runtime.Substring(tag, colon + 1, tag.Length);
+                    label = tag.Substring(0, colon);
+                    offset = colon + 1;
+                    ruleOrToken = tag.Substring(offset, tag.Length - offset);
                 }
                 chunks.Add(new TagChunk(label, ruleOrToken));
                 if (i_1 + 1 < ntags)
                 {
                     // copy from end of <tag> to start of next
-                    string text = Sharpen.Runtime.Substring(pattern, stops[i_1] + stop.Length, starts[i_1 + 1]);
+                    offset = stops[i_1] + stop.Length;
+                    string text = pattern.Substring(offset, starts[i_1 + 1] - offset);
                     chunks.Add(new TextChunk(text));
                 }
             }
@@ -683,8 +684,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 if (afterLastTag < n)
                 {
                     // copy text from end of last tag to end
-                    string text = Sharpen.Runtime.Substring(pattern, afterLastTag, n);
-                    chunks.Add(new TextChunk(text));
+                    chunks.Add(new TextChunk(pattern.Substring(afterLastTag)));
                 }
             }
             // strip out the escape sequences from text chunks but not tags
@@ -697,7 +697,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     string unescaped = tc.Text.Replace(escape, string.Empty);
                     if (unescaped.Length < tc.Text.Length)
                     {
-                        chunks.Set(i_2, new TextChunk(unescaped));
+                        chunks[i_2] = new TextChunk(unescaped);
                     }
                 }
             }

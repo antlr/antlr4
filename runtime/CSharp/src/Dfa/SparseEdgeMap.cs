@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -40,7 +40,8 @@ namespace Antlr4.Runtime.Dfa
                 {
                     throw new ArgumentException();
                 }
-                keys = Arrays.CopyOf(map.keys, maxSparseSize);
+                keys = new int[maxSparseSize];
+                Array.Copy(map.keys, keys, map.keys.Length);
                 values = new List<T>(maxSparseSize);
                 values.AddRange(map.Values);
             }
@@ -185,7 +186,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsEmpty)
             {
-                return Sharpen.Collections.EmptyMap<int, T>();
+                return Collections.EmptyMap<int, T>();
             }
             lock (this)
             {

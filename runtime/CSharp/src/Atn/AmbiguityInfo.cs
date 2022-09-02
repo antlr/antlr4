@@ -4,7 +4,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -36,8 +36,8 @@ namespace Antlr4.Runtime.Atn
     /// they cannot use the two-stage parsing strategy to improve parsing performance
     /// for that input.</p>
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.ReportAmbiguity(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet)"/>
-    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportAmbiguity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet)"/>
+    /// <seealso cref="ParserATNSimulator.ReportAmbiguity(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, int, int, bool, BitSet, ATNConfigSet)"/>
+    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportAmbiguity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, BitSet, ATNConfigSet)"/>
     /// <since>4.3</since>
     public class AmbiguityInfo : DecisionEventInfo
     {
