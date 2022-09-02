@@ -23,7 +23,7 @@
 	<inceptionYear>2009</inceptionYear>
 
 	<properties>
-		<jUnitVersion>5.8.2</jUnitVersion>
+		<jUnitVersion>5.9.0</jUnitVersion>
 	</properties>
 
 	<dependencies>
