@@ -286,7 +286,7 @@ namespace Antlr4.Runtime
 
         public virtual void RemoveErrorListeners()
         {
-            _listeners = new IAntlrErrorListener<Symbol>[0];
+            _listeners = Array.Empty<IAntlrErrorListener<Symbol>>();
         }
 
         [NotNull]
