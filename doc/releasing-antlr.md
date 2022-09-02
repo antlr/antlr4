@@ -32,7 +32,13 @@ $ git push upstream :refs/tags/4.10.1
 
 ### Go release tags
 
-It seems that [Go needs a `v` in the release git tag](https://go.dev/ref/mod#glos-version) so make sure that we double up with 4.10.1 and v4.10.1.
+It seems that [Go needs a `v` in the release git tag](https://go.dev/ref/mod#glos-version) so make sure that we double up with 4.11.0 and v4.11.0.
+
+```
+$ git tag -a runtime/Go/antlr/v4/v4.11.0 -m "Go runtime module only" 
+$ git push upstream runtime/Go/antlr/v4/v4.11.0
+$ git push origin runtime/Go/antlr/v4/v4.11.0
+```
 
 
 ## Bump version in code and other files
