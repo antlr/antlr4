@@ -1,8 +1,12 @@
-// import Lexer from './Lexer';
+import Lexer from './Lexer';
 
-// @ts-ignore
-import { BufferedTokenStream } from './BufferedTokenStream';
+import BufferedTokenStream from './BufferedTokenStream';
 
-declare class CommonTokenStream implements BufferedTokenStream {
-    constructor(lexer: any, channel: number);
+export default class CommonTokenStream implements BufferedTokenStream {
+    // properties
+    tokens: string[];
+    // methods
+    constructor(lexer: Lexer);
+    constructor(lexer: Lexer, channel: number);
+    fill(): void;
 }

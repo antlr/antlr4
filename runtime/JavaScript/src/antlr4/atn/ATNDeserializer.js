@@ -58,8 +58,8 @@ function initArray( length, value) {
 }
 
 export default class ATNDeserializer {
-    constructor(options) {
 
+    constructor(options) {
         if ( options=== undefined || options === null ) {
             options = ATNDeserializationOptions.defaultOptions;
         }

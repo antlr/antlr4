@@ -1,3 +1,3 @@
-export default class InputStream {
+export default class CharStream {
     constructor(data: string, decodeToUnicodeCodePoints: boolean);
 }
