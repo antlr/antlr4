@@ -102,22 +102,14 @@ PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 
-PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
+resetAcceptPosition (index: number, line: number, column: number) : void {
 	this._input.seek(index);
 	this.line = line;
 	this.column = column;
 	this._interp.consume(this._input);
-};
+}
 
-PositionAdjustingLexer.prototype.nextToken = function() {
-	if (!("resetAcceptPosition" in this._interp)) {
-		var lexer = this;
-		this._interp.resetAcceptPosition = function(index, line, column) { lexer.resetAcceptPosition(index, line, column); };
-	}
-	return antlr4.Lexer.prototype.nextToken.call(this);
-};
-
-PositionAdjustingLexer.prototype.emit = function() {
+emit () : any /* should be Token */ {
 	switch(this._type) {
 	case PositionAdjustingLexer.TOKENS:
 		this.handleAcceptPositionForKeyword("tokens");
@@ -126,39 +118,38 @@ PositionAdjustingLexer.prototype.emit = function() {
 		this.handleAcceptPositionForIdentifier();
 		break;
 	}
-	return antlr4.Lexer.prototype.emit.call(this);
-};
+	return super.emit();
+}
 
-PositionAdjustingLexer.prototype.handleAcceptPositionForIdentifier = function() {
+handleAcceptPositionForIdentifier () : boolean {
 	var tokenText = this.text;
 	var identifierLength = 0;
-	while (identifierLength \< tokenText.length &&
-		PositionAdjustingLexer.isIdentifierChar(tokenText[identifierLength])
+	while (identifierLength \< tokenText.length && PositionAdjustingLexer.isIdentifierChar(tokenText[identifierLength])
 	) {
 		identifierLength += 1;
 	}
 	if (this._input.index > this._tokenStartCharIndex + identifierLength) {
 		var offset = identifierLength - 1;
-		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset,
+		this.resetAcceptPosition(this._tokenStartCharIndex + offset,
 				this._tokenStartLine, this._tokenStartColumn + offset);
 		return true;
 	} else {
 		return false;
 	}
-};
+}
 
-PositionAdjustingLexer.prototype.handleAcceptPositionForKeyword = function(keyword) {
+handleAcceptPositionForKeyword (keyword: string) : boolean {
 	if (this._input.index > this._tokenStartCharIndex + keyword.length) {
 		var offset = keyword.length - 1;
-		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset,
+		this.resetAcceptPosition(this._tokenStartCharIndex + offset,
 			this._tokenStartLine, this._tokenStartColumn + offset);
 		return true;
 	} else {
 		return false;
 	}
-};
+}
 
-PositionAdjustingLexer.isIdentifierChar = function(c) {
+static isIdentifierChar (c: string) {
 	return c.match(/^[0-9a-zA-Z_]+$/);
 }
 

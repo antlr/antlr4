@@ -98,7 +98,7 @@ public class FileUtils {
 	}
 
 	public static void deleteDirectory(File f) throws IOException {
-		if (f.isDirectory()) {
+		if (f.isDirectory() && !Files.isSymbolicLink(f.toPath())) {
 			File[] files = f.listFiles();
 			if (files != null) {
 				for (File c : files)

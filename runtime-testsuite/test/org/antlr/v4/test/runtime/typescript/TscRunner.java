@@ -10,20 +10,42 @@ import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
+import java.io.File;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 
 public class TscRunner extends RuntimeRunner {
+
+	/* TypeScript runtime is the same as JavaScript runtime */
+	private final static String NORMALIZED_JAVASCRIPT_RUNTIME_PATH = getRuntimePath("JavaScript").replace('\\', '/');
+
 	@Override
 	public String getLanguage() {
 		return "TypeScript";
 	}
 
 	@Override
+	protected void initRuntime() throws Exception {
+		npmLinkRuntime();
+	}
+
+	private void npmLinkRuntime() throws Exception {
+		File dir = new File(NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		if(!dir.exists())
+			throw new RuntimeException("Can't locate JavaScript runtime!");
+		ProcessBuilder pb = new ProcessBuilder()
+				.command("npm", "--silent", "link")
+				.directory(dir)
+				.inheritIO();
+		Process p = pb.start();
+		p.waitFor();
+	}
+
+	@Override
 	public String getExtension() { return "ts"; }
+
+	@Override
+	protected String getExecFileName() { return getTestFileName() + ".js"; }
 
 	@Override
 	public String getBaseListenerSuffix() { return null; }
@@ -32,37 +54,61 @@ public class TscRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "ts-node"; }
-
-	/* TypeScript runtime is the same as JavaScript runtime */
-	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
-	private final static String antlrRuntimePath = normalizedRuntimePath + "/src/antlr4";
+	public String getRuntimeToolName() { return "node"; }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		/*
-		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		for (GeneratedFile generatedFile : generatedFiles) {
-			try {
-				FileUtils.replaceInFile(Paths.get(getTempDirPath(), generatedFile.name),
-						"import antlr4 from 'antlr4';",
-						newImportAntlrString);
-			} catch (IOException e) {
-				return new CompiledState(generatedState, e);
-			}
+
+		try {
+			writeFile(getTempDirPath(), "package.json",
+					RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_ts.json"));
+
+			writeFile(getTempDirPath(), "tsconfig.json",
+					RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/tsconfig.json"));
+
+			npmInstall();
+
+			npmLinkAntlr4();
+
+			tscCompile();
+
+			return new CompiledState(generatedState, null);
+
+		} catch (Exception e) {
+			return new CompiledState(generatedState, e);
 		}
-		 */
 
-		writeFile(getTempDirPath(), "package.json",
-				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_ts.json"));
-		String content = RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/tsconfig.json");
+	}
 
-		writeFile(getTempDirPath(), "tsconfig.json", content.replace("<antlr4>", antlrRuntimePath));
-		return new CompiledState(generatedState, null);
+	private void npmInstall() throws Exception {
+		ProcessBuilder pb = new ProcessBuilder()
+				.command("npm", "--silent", "install")
+				.directory(new File(getTempDirPath()))
+				.inheritIO();
+		Process p = pb.start();
+		p.waitFor();
+	}
+
+	private void npmLinkAntlr4() throws Exception {
+		ProcessBuilder pb = new ProcessBuilder()
+				.command("npm", "--silent", "link", "antlr4")
+				.directory(new File(getTempDirPath()))
+				.inheritIO();
+		Process p = pb.start();
+		p.waitFor();
+	}
+
+	private void tscCompile() throws Exception {
+		ProcessBuilder pb = new ProcessBuilder()
+				.command("tsc", "--project", "tsconfig.json")
+				.directory(new File(getTempDirPath()))
+				.inheritIO();
+		Process p = pb.start();
+		p.waitFor();
 	}
 
 	@Override
 	protected void addExtraRecognizerParameters(ST template) {
-		template.add("runtimePath", normalizedRuntimePath);
+		template.add("runtimePath", NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 }
