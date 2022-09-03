@@ -52,5 +52,6 @@ Go
 Python2
 Python3
 JavaScript
+TypeScript
 PHP
 
