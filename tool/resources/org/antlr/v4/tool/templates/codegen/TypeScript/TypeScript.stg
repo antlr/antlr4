@@ -881,7 +881,7 @@ export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 SerializedATN(model, className={<if(isLexer)><lexer.name><else><parser.name><endif>}) ::= <<
 public static readonly _serializedATN: number[] = [<model.serialized: {s | <s>}; separator=",", wrap>];
 
-public static __ATN: antlr4.atn.ATN;
+private static __ATN: antlr4.atn.ATN;
 public static get _ATN(): antlr4.atn.ATN {
 	if (!<className>.__ATN) {
 		<className>.__ATN = new antlr4.atn.ATNDeserializer().deserialize(<className>._serializedATN);
@@ -889,11 +889,7 @@ public static get _ATN(): antlr4.atn.ATN {
 
 	return <className>.__ATN;
 }
-<!static {
-	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
-	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
-	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));
-}!>
+
 >>
 
 basePath() ::= <%
@@ -908,7 +904,7 @@ antlr4ts
  *	must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-<javaTypeInitMap.(typeName)>
+<typescriptTypeInitMap.(typeName)>
 >>
 
 codeFileExtension() ::= ".ts"
