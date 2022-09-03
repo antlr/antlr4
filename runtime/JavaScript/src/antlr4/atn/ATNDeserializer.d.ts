@@ -3,5 +3,5 @@ import ATN from "./ATN";
 
 export default class ATNDeserializer {
     constructor(options?: ATNDeserializationOptions);
-    deserialize(data: Uint16Array) : ATN;
+    deserialize(data:  number[]) : ATN;
 }

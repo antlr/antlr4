@@ -1,16 +1,12 @@
 // Copyright 2016-2022 The ANTLR Project. All rights reserved.
 // Licensed under the BSD-3-Clause license. See LICENSE file in the project root for license information.
 
-javaTypeInitMap ::= [
+typescriptTypeInitMap ::= [
+	"bool":"false",
 	"int":"0",
-	"long":"0",
-	"float":"0.0f",
-	"double":"0.0",
-	"boolean":"false",
-	"byte":"0",
-	"short":"0",
-	"char":"0",
-	default:"null" // anything other than a primitive type is an object
+	"float":"0.0",
+	"str":"",
+	default:"{}" // anything other than a primitive type is an object
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
@@ -20,7 +16,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.header>
 
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 
 <if(file.genListener)>
 import { <file.grammarName>Listener } from "./<file.grammarName>Listener";
@@ -129,9 +125,6 @@ export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 		<parser.ruleNames:{r | "<r>",}; separator=" ", wrap, anchor>
 	];
 
-	<vocabulary(parser.name, parser.literalNames, parser.symbolicNames)>
-	// tslint:enable:no-trailing-whitespace
-
 	// @Override
 	public get grammarFileName(): string { return "<parser.grammarFileName>"; }
 
@@ -173,22 +166,6 @@ case <f.ruleIndex>:
 <currentRule.altLabelCtxs:{l | <currentRule.altLabelCtxs.(l)>}; separator="\n">
 <endif>
 }; separator="\n\n">
->>
-
-vocabulary(className, literalNames, symbolicNames) ::= <<
-private static readonly _LITERAL_NAMES: Array\<string | undefined> = [
-	<literalNames:{t | <t>,}; null="undefined,", separator=" ", wrap, anchor>
-];
-private static readonly _SYMBOLIC_NAMES: Array\<string | undefined> = [
-	<symbolicNames:{t | <t>,}; null="undefined,", separator=" ", wrap, anchor>
-];
-public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(<className>._LITERAL_NAMES, <className>._SYMBOLIC_NAMES, []);
-
-// @Override
-// @NotNull
-public get vocabulary(): Vocabulary {
-	return <className>.VOCABULARY;
-}
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -848,7 +825,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 
 <namedActions.header>
 
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 
 <namedActions.beforeLexer>
 
@@ -858,7 +835,7 @@ import antlr4 from 'antlr4';
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
-export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="Lexer"> {
+export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
 	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
 	<lexer.channels:{c | public static readonly <c> = <lexer.channels.(c)>;}; separator="\n">
 	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
@@ -877,57 +854,37 @@ export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 		<lexer.ruleNames:{r | "<r>",}; separator=" ", wrap, anchor>
 	];
 
-	<vocabulary(lexer.name, lexer.literalNames, lexer.symbolicNames)>
-	// tslint:enable:no-trailing-whitespace
-
 	<namedActions.members>
 
-	constructor(input: CharStream) {
+	constructor(input: antlr4.CharStream) {
 		super(input);
-		this._interp = new LexerATNSimulator(<lexer.name>._ATN, this);
+		this._interp = new antlr4.atn.LexerATNSimulator(this, <lexer.name>._ATN, <lexer.name>.DecisionsToDFA, new antlr4.atn.PredictionContextCache());
 	}
 
-	// @Override
 	public get grammarFileName(): string { return "<lexer.grammarFileName>"; }
 
-	// @Override
 	public get ruleNames(): string[] { return <lexer.name>.ruleNames; }
 
-	// @Override
-	public get serializedATN(): string { return <lexer.name>._serializedATN; }
+	public get serializedATN(): number[] { return <lexer.name>._serializedATN; }
 
-	// @Override
 	public get channelNames(): string[] { return <lexer.name>.channelNames; }
 
-	// @Override
 	public get modeNames(): string[] { return <lexer.name>.modeNames; }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
+
+	static DecisionsToDFA = <lexer.name>._ATN.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
 }
 >>
 
 SerializedATN(model, className={<if(isLexer)><lexer.name><else><parser.name><endif>}) ::= <<
-<if(rest(model.segments))>
-<! requires segmented representation !>
-private static readonly _serializedATNSegments: number = <length(model.segments)>;
-<model.segments:{segment|private static readonly _serializedATNSegment<i0>: string =
-	"<segment; wrap={" +<\n><\t>"}>";}; separator="\n">
-public static readonly _serializedATN: string = Utils.join(
-	[
-		<model.segments:{segment | <className>._serializedATNSegment<i0>,}; separator="\n">
-	],
-	"",
-);
-<else>
-<! only one segment, can be inlined !>
-public static readonly _serializedATN: string =
-	"<model.serialized; wrap={" +<\n><\t>"}>";
-<endif>
-public static __ATN: ATN;
-public static get _ATN(): ATN {
+public static readonly _serializedATN: number[] = [<model.serialized: {s | <s>}; separator=",", wrap>];
+
+public static __ATN: antlr4.atn.ATN;
+public static get _ATN(): antlr4.atn.ATN {
 	if (!<className>.__ATN) {
-		<className>.__ATN = new ATNDeserializer().deserialize(Utils.toCharArray(<className>._serializedATN));
+		<className>.__ATN = new antlr4.atn.ATNDeserializer().deserialize(<className>._serializedATN);
 	}
 
 	return <className>.__ATN;
