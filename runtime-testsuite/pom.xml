@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.3.3</version>
+			<version>4.3.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
