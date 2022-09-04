@@ -1,22 +1,17 @@
 #!/bin/bash
 
 # Clean left overs from previous builds if there are any
-rm -f -R antlr4-runtime build lib 2> /dev/null
-rm antlr4-cpp-runtime-macos.zip 2> /dev/null
+rm -rf antlr4-runtime build lib
+rm -f antlr4-cpp-runtime-macos.zip
 
 # Binaries
-xcodebuild -project runtime/antlrcpp.xcodeproj \
-           -target antlr4                      \
-           # GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS USE_UTF8_INSTEAD_OF_CODECVT' \
-           -configuration Release
-xcodebuild -project runtime/antlrcpp.xcodeproj \
-           -target antlr4_static               \
-           # GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS USE_UTF8_INSTEAD_OF_CODECVT' \
-           -configuration Release
-rm -f -R lib
+cmake . -D CMAKE_OSX_ARCHITECTURES="arm64; x86_64" -DCMAKE_BUILD_TYPE=Release &> /dev/null
+make -j 8
+
+rm -rf lib
 mkdir lib
-mv runtime/build/Release/libantlr4-runtime.a lib/
-mv runtime/build/Release/libantlr4-runtime.dylib lib/
+cp runtime/libantlr4-runtime.dylib lib
+cp runtime/libantlr4-runtime.a lib
 
 # Headers
 rm -f -R antlr4-runtime
