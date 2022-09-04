@@ -136,10 +136,6 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
         <namedActions.members>
     }
 
-    get atn() {
-        return atn;
-    }
-
     <if(sempredFuncs)>
     sempred(localctx, ruleIndex, predIndex) {
     	switch(ruleIndex) {
@@ -810,10 +806,6 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
         super(input)
         this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.atn.PredictionContextCache());
         <namedActions.members>
-    }
-
-    get atn() {
-        return atn;
     }
 }
 

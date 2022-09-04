@@ -142,6 +142,10 @@ export default class Recognizer {
         return true;
     }
 
+    get atn() {
+        return this._interp.atn;
+    }
+
     get state(){
         return this._stateNumber;
     }

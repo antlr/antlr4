@@ -648,13 +648,13 @@ TokenPropertyRef_int(t) ::= "(<ctx(t)>._<t.label> != null ? Number(<ctx(t)>._<t.
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._start) : undefined)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._stop) : undefined)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getTextFromRange(<ctx(r)>._<r.label>._start, <ctx(r)>._<r.label>._stop) : undefined)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText(<ctx(r)>._<r.label>._start, <ctx(r)>._<r.label>._stop) : undefined)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>._<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx._start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx._stop"
-ThisRulePropertyRef_text(r)	 ::= "this._input.getTextFromRange(_localctx._start, this._input.tryLT(-1))"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getText(_localctx._start, this._input.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 

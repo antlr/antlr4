@@ -1,6 +1,6 @@
 import RuleContext from "./RuleContext";
 import Token from "../Token";
-import {RecognitionException} from "../error";
+import RecognitionException from "../error/RecognitionException";
 import ParseTree from "../tree/ParseTree";
 
 export default class ParserRuleContext extends RuleContext {

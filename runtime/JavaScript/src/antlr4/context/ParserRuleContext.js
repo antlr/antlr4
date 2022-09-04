@@ -38,7 +38,6 @@ export default class ParserRuleContext extends RuleContext {
 		parent = parent || null;
 		invokingStateNumber = invokingStateNumber || null;
 		super(parent, invokingStateNumber);
-		this.ruleIndex = -1;
 		/**
 		 * If we are debugging or building a parse tree for a visitor,
 		 * we need to track all of the tokens and rule invocations associated
