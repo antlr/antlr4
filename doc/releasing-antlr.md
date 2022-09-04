@@ -80,8 +80,14 @@ We only have to copy the PHP runtime into the ANTLR repository to run the unitte
 ```
 cd ~/antlr/code/antlr-php-runtime/src
 git checkout dev # Should be the default
+git pull origin dev
 ... vi RuntimeMetaData.php ...
 git commit -a -m "Update PHP Runtime to latest version"
+git push origin dev
+git checkout master
+git pull origin master
+git merge dev
+git push origin master
 ```
 
 ## Build XPath parsers

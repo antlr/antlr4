@@ -8,6 +8,8 @@
 docker/Dockerfile
 runtime/Go/antlr/recognizer.go
 runtime/Go/antlr/v4/recognizer.go
+runtime/Go/antlr/v4/antlrdoc.go
+runtime/Go/antlr/antlrdoc.go
 runtime/Python3/setup.py
 runtime/Python3/src/antlr4/Recognizer.py
 runtime/Python2/setup.py
@@ -32,7 +34,6 @@ runtime/JavaScript/src/antlr4/Recognizer.js
 
 # Allow doc files to have multiple values updated
 * doc/swift-target.md
-* doc/dart-target.md
 # doc/releasing-antlr.md
 * doc/getting-started.md
 * doc/swift-target.md

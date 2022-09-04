@@ -31,7 +31,9 @@ class RuntimeMetaDataTests: XCTestCase {
         doGetMajorMinorVersionTest("4.10-SNAPSHOT", "4.10")
         doGetMajorMinorVersionTest("4.10.1", "4.10")
         doGetMajorMinorVersionTest("4.11.0", "4.11")
-        doGetMajorMinorVersionTest("4.11-SNAPSHOT", "4.11")
+        doGetMajorMinorVersionTest("4.11.1", "4.11")
+        doGetMajorMinorVersionTest("4.11.0-SNAPSHOT", "4.11")
+        doGetMajorMinorVersionTest("4.11.1-SNAPSHOT", "4.11")
     }
 }
 
