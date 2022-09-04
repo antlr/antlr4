@@ -7,6 +7,7 @@
 
 docker/Dockerfile
 runtime/Go/antlr/recognizer.go
+runtime/Go/antlr/v4/recognizer.go
 runtime/Python3/setup.py
 runtime/Python3/src/antlr4/Recognizer.py
 runtime/Python2/setup.py
@@ -32,12 +33,12 @@ runtime/JavaScript/src/antlr4/Recognizer.js
 # Allow doc files to have multiple values updated
 * doc/swift-target.md
 * doc/dart-target.md
-doc/releasing-antlr.md  # Do this one manually; it'll fail because of multiple lines but we get warning
+# doc/releasing-antlr.md
 * doc/getting-started.md
 * doc/swift-target.md
 * doc/getting-started.md
 
-#runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
+# runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
 
 # Just documenting that these are generated...
 
