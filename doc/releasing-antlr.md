@@ -531,6 +531,18 @@ git push origin gh-pages
 ```
 -->
 
+## Get fresh dev branch
+
+```bash
+git checkout master
+git pull upstream master
+git checkout dev
+git pull upstream dev
+git merge master
+git push origin dev
+git push upstream dev
+```
+
 ## Update Intellij plug-in
 
 Rebuild antlr plugin with new antlr jar.
