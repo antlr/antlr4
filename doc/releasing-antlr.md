@@ -58,6 +58,12 @@ Ok, not cleaning antlr4 dir
 4.10 not in /tmp/antlr4/doc/releasing-antlr.md
 ```
 
+Make sure this file doesn't have `-SNAPSHOT` when releasing!
+
+```
+runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
+```
+
 It's also worth doing a quick check to see if you find any other references to a version:
 
 ```bash
