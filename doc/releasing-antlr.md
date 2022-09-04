@@ -252,6 +252,7 @@ All releases should be here: [https://repo1.maven.org/maven2/org/antlr/antlr4-ru
 cd ~/antlr/code/antlr4/runtime/JavaScript
 npm update
 npm install
+rm -rf node_modules
 npm run build 
 npm login     # asks for username/password/2FA (npmjs.com)
 npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
