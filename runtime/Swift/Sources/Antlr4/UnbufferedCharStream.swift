@@ -334,17 +334,15 @@ fileprivate struct UInt8StreamIterator: IteratorProtocol {
         }
 
         switch stream.streamStatus {
-        case .notOpen, .writing, .closed:
-            preconditionFailure()
-        case .atEnd:
-            return nil
-        case .error:
-            hasErrorOccurred = true
-            return nil
-        case .opening, .open, .reading:
-            break
-        @unknown default:
-            fatalError()
+            case .notOpen, .writing, .closed:
+                preconditionFailure()
+            case .atEnd:
+                return nil
+            case .error:
+                hasErrorOccurred = true
+                return nil
+            case .opening, .open, .reading:
+                break
         }
 
         let count = stream.read(&buffer, maxLength: buffer.count)

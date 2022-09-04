@@ -14,8 +14,7 @@ import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.InstanceScope;
 import org.stringtemplate.v4.Interpreter;
@@ -30,16 +29,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestCodeGeneration extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
+public class TestCodeGeneration {
 	@Test public void testArgDecl() throws Exception { // should use template not string
 		/*ErrorQueue equeue = */new ErrorQueue();
 		String g =
@@ -49,7 +42,7 @@ public class TestCodeGeneration extends BaseJavaToolTest {
 		System.out.println(evals);
 		for (int i = 0; i < evals.size(); i++) {
 			String eval = evals.get(i);
-			assertFalse("eval should not be POJO: "+eval, eval.startsWith("<pojo:"));
+			assertFalse(eval.startsWith("<pojo:"), "eval should not be POJO: "+eval);
 		}
 	}
 

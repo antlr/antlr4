@@ -1,0 +1,85 @@
+\<?xml version="1.0" encoding="utf-8"?>
+\<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  \<ItemGroup Label="ProjectConfigurations">
+    \<ProjectConfiguration Include="Release|x64">
+      \<Configuration>Release\</Configuration>
+      \<Platform>x64\</Platform>
+    \</ProjectConfiguration>
+  \</ItemGroup>
+  \<PropertyGroup Label="Globals">
+    \<VCProjectVersion>16.0\</VCProjectVersion>
+    \<Keyword>Win32Proj\</Keyword>
+    \<ProjectGuid>{f3708606-c8fb-45ca-ae36-b729f91e972b}\</ProjectGuid>
+    \<RootNamespace>Test\</RootNamespace>
+    \<WindowsTargetPlatformVersion>10.0\</WindowsTargetPlatformVersion>
+  \</PropertyGroup>
+  \<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
+
+  \<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    \<ConfigurationType>Application\</ConfigurationType>
+    \<UseDebugLibraries>false\</UseDebugLibraries>
+    \<PlatformToolset>v143\</PlatformToolset>
+    \<WholeProgramOptimization>false\</WholeProgramOptimization> \<!-- compile time is more important than run time for tests -->
+    \<CharacterSet>Unicode\</CharacterSet>
+  \</PropertyGroup>
+
+  \<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.props" />
+  \<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    \<Import Project="$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  \</ImportGroup>
+
+  \<PropertyGroup>
+    \<LinkIncremental>false\</LinkIncremental>
+    \<IncludePath><runtimeSourcePath>;$(IncludePath)\</IncludePath>
+    \<ReferencePath>$(VC_ReferencesPath_x64);<runtimeBinaryPath>\</ReferencePath>
+    \<OutDir>$(SolutionDir)\</OutDir>
+  \</PropertyGroup>
+
+  \<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    \<ClCompile>
+      \<WarningLevel>TurnOffAllWarnings\</WarningLevel>
+      \<FunctionLevelLinking>false\</FunctionLevelLinking>
+      \<IntrinsicFunctions>false\</IntrinsicFunctions>
+      \<SDLCheck>false\</SDLCheck>
+      \<PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)\</PreprocessorDefinitions>
+      \<ConformanceMode>true\</ConformanceMode>
+      \<LanguageStandard>stdcpp17\</LanguageStandard>
+      \<DebugInformationFormat>None\</DebugInformationFormat>
+    \</ClCompile>
+    \<Link>
+      \<SubSystem>Console\</SubSystem>
+      \<EnableCOMDATFolding>true\</EnableCOMDATFolding>
+      \<OptimizeReferences>false\</OptimizeReferences>
+      \<GenerateDebugInformation>false\</GenerateDebugInformation>
+      \<AdditionalDependencies>"<runtimeBinaryPath>\\antlr4-runtime.lib";%(AdditionalDependencies)\</AdditionalDependencies>
+    \</Link>
+  \</ItemDefinitionGroup>
+
+  \<ItemGroup>
+    \<ClInclude Include="<lexerName>.h" />
+    \<ClCompile Include="<lexerName>.cpp" />
+
+<if(parserName)>
+    \<ClInclude Include="<parserName>.h" />
+    \<ClCompile Include="<parserName>.cpp" />
+<endif>
+
+<if(useListener)>
+    \<ClInclude Include="<grammarName>BaseListener.h" />
+    \<ClCompile Include="<grammarName>BaseListener.cpp" />
+    \<ClInclude Include="<grammarName>Listener.h" />
+    \<ClCompile Include="<grammarName>Listener.cpp" />
+<endif>
+
+<if(useVisitor)>
+    \<ClInclude Include="<grammarName>BaseVisitor.h" />
+    \<ClCompile Include="<grammarName>BaseVisitor.cpp" />
+    \<ClInclude Include="<grammarName>Visitor.h" />
+    \<ClCompile Include="<grammarName>Visitor.cpp" />
+<endif>
+
+    \<ClCompile Include="Test.cpp" />
+  \</ItemGroup>
+
+  \<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.targets" />
+\</Project>

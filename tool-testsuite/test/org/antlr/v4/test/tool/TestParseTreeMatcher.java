@@ -6,38 +6,29 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.pattern.ParseTreeMatch;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.Stage;
+import org.antlr.v4.test.runtime.java.JavaRunner;
+import org.antlr.v4.test.runtime.states.JavaCompiledState;
+import org.antlr.v4.test.runtime.states.JavaExecutedState;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestParseTreeMatcher extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test public void testChunking() throws Exception {
+public class TestParseTreeMatcher {
+	@Test public void testChunking() {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
 		assertEquals("[' ', ID, ' = ', expr]", m.split(" <ID> = <expr>").toString());
@@ -47,7 +38,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		assertEquals("['foo <x> bar ', tag]", m.split("foo \\<x\\> bar <tag>").toString());
 	}
 
-	@Test public void testDelimiters() throws Exception {
+	@Test public void testDelimiters() {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		m.setDelimiters("<<", ">>", "$");
 		String result = m.split("<<ID>> = <<expr>> ;$<< ick $>>").toString();
@@ -101,16 +92,10 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X1.g4", grammar, "X1Parser", "X1Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X1");
+		ParseTreePatternMatcher m = getPatternMatcher("X1.g4", grammar, "X1Parser", "X1Lexer", "s");
 
 		List<? extends Token> tokens = m.tokenize("<ID> = <expr> ;");
-		String results = tokens.toString();
-		String expected = "[ID:3, [@-1,1:1='=',<1>,1:1], expr:7, [@-1,1:1=';',<2>,1:1]]";
-		assertEquals(expected, results);
+		assertEquals("[ID:3, [@-1,1:1='=',<1>,1:1], expr:7, [@-1,1:1=';',<2>,1:1]]", tokens.toString());
 	}
 
 	@Test
@@ -122,16 +107,10 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		ParseTreePattern t = m.compile("<ID> = <expr> ;", m.getParser().getRuleIndex("s"));
-		String results = t.getPatternTree().toStringTree(m.getParser());
-		String expected = "(s <ID> = (expr <expr>) ;)";
-		assertEquals(expected, results);
+		assertEquals("(s <ID> = (expr <expr>) ;)", t.getPatternTree().toStringTree(m.getParser()));
 	}
 
 	@Test
@@ -143,11 +122,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		boolean failed = false;
 		try {
@@ -168,11 +143,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		boolean failed = false;
 		try {
@@ -193,11 +164,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		boolean failed = false;
 		try {
@@ -218,16 +185,10 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> channel(HIDDEN) ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m = getPatternMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		ParseTreePattern t = m.compile("<ID> = <expr> ;", m.getParser().getRuleIndex("s"));
-		String results = t.getPatternTree().toStringTree(m.getParser());
-		String expected = "(s <ID> = (expr <expr>) ;)";
-		assertEquals(expected, results);
+		assertEquals("(s <ID> = (expr <expr>) ;)", t.getPatternTree().toStringTree(m.getParser()));
 	}
 
 	@Test
@@ -237,11 +198,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 			"s : ID '=' ID ';' ;\n" +
 			"ID : [a-z]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher m =	getPatternMatcher("X2");
+		ParseTreePatternMatcher m =	getPatternMatcher("X2.g4", grammar, "X2Parser", "X2Lexer", "s");
 
 		ParseTreePattern t = m.compile("<ID> = <ID> ;", m.getParser().getRuleIndex("s"));
 		String results = t.getPatternTree().toStringTree(m.getParser());
@@ -417,7 +374,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		checkPatternMatch(grammar, "expr", input, pattern, "X6");
 	}
 
-	public ParseTreeMatch checkPatternMatch(String grammar, String startRule,
+	private static ParseTreeMatch checkPatternMatch(String grammar, String startRule,
 											String input, String pattern,
 											String grammarName)
 		throws Exception
@@ -425,7 +382,7 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		return checkPatternMatch(grammar, startRule, input, pattern, grammarName, false);
 	}
 
-	public ParseTreeMatch checkPatternMatch(String grammar, String startRule,
+	private static ParseTreeMatch checkPatternMatch(String grammar, String startRule,
 											String input, String pattern,
 											String grammarName, boolean invertMatch)
 		throws Exception
@@ -433,45 +390,36 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		String grammarFileName = grammarName+".g4";
 		String parserName = grammarName+"Parser";
 		String lexerName = grammarName+"Lexer";
-		boolean ok =
-			rawGenerateAndBuildRecognizer(grammarFileName, grammar, parserName, lexerName, false);
-		assertTrue(ok);
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
+				false, false, startRule, input,
+				false, false, Stage.Execute, true);
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
+			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
+			Parser parser = compiledState.initializeLexerAndParser("").b;
 
-		ParseTree result = execParser(startRule, input, parserName, lexerName);
+			ParseTreePattern p = parser.compileParseTreePattern(pattern, parser.getRuleIndex(startRule));
 
-		ParseTreePattern p = getPattern(grammarName, pattern, startRule);
-		ParseTreeMatch match = p.match(result);
-		boolean matched = match.succeeded();
-		if ( invertMatch ) assertFalse(matched);
-		else assertTrue(matched);
-		return match;
+			ParseTreeMatch match = p.match(executedState.parseTree);
+			boolean matched = match.succeeded();
+			if ( invertMatch ) assertFalse(matched);
+			else assertTrue(matched);
+			return match;
+		}
 	}
 
-	public ParseTreePattern getPattern(String grammarName, String pattern, String ruleName)
-		throws Exception
-	{
-		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(grammarName + "Lexer");
-		Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
-		Lexer lexer = ctor.newInstance((CharStream) null);
+	private static ParseTreePatternMatcher getPatternMatcher(
+			String grammarFileName, String grammar, String parserName, String lexerName, String startRule
+	) throws Exception {
+		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
+				false, false, startRule, null,
+				false, false, Stage.Compile, false);
+		try (JavaRunner runner = new JavaRunner()) {
+			JavaCompiledState compiledState = (JavaCompiledState) runner.run(runOptions);
 
-		Class<? extends Parser> parserClass = loadParserClassFromTempDir(grammarName + "Parser");
-		Constructor<? extends Parser> pctor = parserClass.getConstructor(TokenStream.class);
-		Parser parser = pctor.newInstance(new CommonTokenStream(lexer));
+			Pair<Lexer, Parser> lexerParserPair = compiledState.initializeLexerAndParser("");
 
-		return parser.compileParseTreePattern(pattern, parser.getRuleIndex(ruleName));
-	}
-
-	public ParseTreePatternMatcher getPatternMatcher(String grammarName)
-		throws Exception
-	{
-		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(grammarName + "Lexer");
-		Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
-		Lexer lexer = ctor.newInstance((CharStream) null);
-
-		Class<? extends Parser> parserClass = loadParserClassFromTempDir(grammarName + "Parser");
-		Constructor<? extends Parser> pctor = parserClass.getConstructor(TokenStream.class);
-		Parser parser = pctor.newInstance(new CommonTokenStream(lexer));
-
-		return new ParseTreePatternMatcher(lexer, parser);
+			return new ParseTreePatternMatcher(lexerParserPair.a, lexerParserPair.b);
+		}
 	}
 }

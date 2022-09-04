@@ -3,30 +3,31 @@ package org.antlr.v4.test.tool;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestUtils {
 	@Test
 	public void testStripFileExtension() {
-		Assert.assertNull(Utils.stripFileExtension(null));
-		Assert.assertEquals("foo", Utils.stripFileExtension("foo"));
-		Assert.assertEquals("foo", Utils.stripFileExtension("foo.txt"));
+		assertNull(Utils.stripFileExtension(null));
+		assertEquals("foo", Utils.stripFileExtension("foo"));
+		assertEquals("foo", Utils.stripFileExtension("foo.txt"));
 	}
 
 	@Test
 	public void testJoin() {
-		Assert.assertEquals("foobbar",
+		assertEquals("foobbar",
 			Utils.join(new String[]{"foo", "bar"}, "b"));
-		Assert.assertEquals("foo,bar",
+		assertEquals("foo,bar",
 			Utils.join(new String[]{"foo", "bar"}, ","));
 	}
 
 	@Test
 	public void testSortLinesInString() {
-		Assert.assertEquals("bar\nbaz\nfoo\n",
+		assertEquals("bar\nbaz\nfoo\n",
 			Utils.sortLinesInString("foo\nbar\nbaz"));
 	}
 
@@ -37,18 +38,18 @@ public class TestUtils {
 		values.add(new GrammarAST(Token.DOWN));
 		values.add(new GrammarAST(Token.UP));
 
-		Assert.assertNull(Utils.nodesToStrings(null));
-		Assert.assertNotNull(Utils.nodesToStrings(values));
+		assertNull(Utils.nodesToStrings(null));
+		assertNotNull(Utils.nodesToStrings(values));
 	}
 
 	@Test
 	public void testCapitalize() {
-		Assert.assertEquals("Foo", Utils.capitalize("foo"));
+		assertEquals("Foo", Utils.capitalize("foo"));
 	}
 
 	@Test
 	public void testDecapitalize() {
-		Assert.assertEquals("fOO", Utils.decapitalize("FOO"));
+		assertEquals("fOO", Utils.decapitalize("FOO"));
 	}
 
 	@Test
@@ -68,8 +69,8 @@ public class TestUtils {
 		retval.add("baz");
 		retval.add("baz");
 
-		Assert.assertEquals(retval, Utils.select(strings, func1));
-		Assert.assertNull(Utils.select(null, null));
+		assertEquals(retval, Utils.select(strings, func1));
+		assertNull(Utils.select(null, null));
 	}
 
 	@Test
@@ -77,9 +78,9 @@ public class TestUtils {
 		ArrayList<String> strings = new ArrayList<>();
 		strings.add("foo");
 		strings.add("bar");
-		Assert.assertEquals("foo", Utils.find(strings, String.class));
+		assertEquals("foo", Utils.find(strings, String.class));
 
-		Assert.assertNull(Utils.find(new ArrayList<>(), String.class));
+		assertNull(Utils.find(new ArrayList<>(), String.class));
 	}
 
 	@Test
@@ -93,8 +94,8 @@ public class TestUtils {
 				return true;
 			}
 		};
-		Assert.assertEquals(0, Utils.indexOf(strings, filter));
-		Assert.assertEquals(-1, Utils.indexOf(new ArrayList<>(), null));
+		assertEquals(0, Utils.indexOf(strings, filter));
+		assertEquals(-1, Utils.indexOf(new ArrayList<>(), null));
 	}
 
 	@Test
@@ -108,8 +109,8 @@ public class TestUtils {
 				return true;
 			}
 		};
-		Assert.assertEquals(1, Utils.lastIndexOf(strings, filter));
-		Assert.assertEquals(-1, Utils.lastIndexOf(new ArrayList<>(), null));
+		assertEquals(1, Utils.lastIndexOf(strings, filter));
+		assertEquals(-1, Utils.lastIndexOf(new ArrayList<>(), null));
 	}
 
 	@Test
@@ -118,12 +119,12 @@ public class TestUtils {
 		strings.add("foo");
 		strings.add("bar");
 		strings.add("baz");
-		Assert.assertEquals(3, strings.size());
+		assertEquals(3, strings.size());
 
 		Utils.setSize(strings, 2);
-		Assert.assertEquals(2, strings.size());
+		assertEquals(2, strings.size());
 
 		Utils.setSize(strings, 4);
-		Assert.assertEquals(4, strings.size());
+		assertEquals(4, strings.size());
 	}
 }

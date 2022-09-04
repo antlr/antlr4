@@ -1238,11 +1238,11 @@ namespace Antlr4.Runtime.Atn
 			/* altToPred starts as an array of all null contexts. The entry at index i
 			 * corresponds to alternative i. altToPred[i] may have one of three values:
 			 *   1. null: no ATNConfig c is found such that c.alt==i
-			 *   2. SemanticContext.NONE: At least one ATNConfig c exists such that
-			 *      c.alt==i and c.semanticContext==SemanticContext.NONE. In other words,
+			 *   2. SemanticContext.Empty.Instance: At least one ATNConfig c exists such that
+			 *      c.alt==i and c.semanticContext==SemanticContext.Empty.Instance. In other words,
 			 *      alt i has at least one unpredicated config.
 			 *   3. Non-NONE Semantic Context: There exists at least one, and for all
-			 *      ATNConfig c such that c.alt==i, c.semanticContext!=SemanticContext.NONE.
+			 *      ATNConfig c such that c.alt==i, c.semanticContext!=SemanticContext.Empty.Instance.
 			 *
 			 * From this, it is clear that NONE||anything==NONE.
 			 */
@@ -1260,9 +1260,9 @@ namespace Antlr4.Runtime.Atn
 			{
 				if (altToPred[i] == null)
 				{
-					altToPred[i] = SemanticContext.NONE;
+					altToPred[i] = SemanticContext.Empty.Instance;
 				}
-				else if (altToPred[i] != SemanticContext.NONE)
+				else if (altToPred[i] != SemanticContext.Empty.Instance)
 				{
 					nPredAlts++;
 				}
@@ -1288,13 +1288,13 @@ namespace Antlr4.Runtime.Atn
 			{
 				SemanticContext pred = altToPred[i];
 
-				// unpredicated is indicated by SemanticContext.NONE
+				// unpredicated is indicated by SemanticContext.Empty.Instance
 
 				if (ambigAlts != null && ambigAlts[i])
 				{
 					pairs.Add(new PredPrediction(pred, i));
 				}
-				if (pred != SemanticContext.NONE) containsPredicate = true;
+				if (pred != SemanticContext.Empty.Instance) containsPredicate = true;
 			}
 
 			if (!containsPredicate)
@@ -1407,7 +1407,7 @@ namespace Antlr4.Runtime.Atn
 			ATNConfigSet failed = new ATNConfigSet(configSet.fullCtx);
 			foreach (ATNConfig c in configSet.configs)
 			{
-				if (c.semanticContext != SemanticContext.NONE)
+				if (c.semanticContext != SemanticContext.Empty.Instance)
 				{
 					bool predicateEvaluationResult = EvalSemanticContext(c.semanticContext, outerContext, c.alt, configSet.fullCtx);
 					if (predicateEvaluationResult)
@@ -1438,7 +1438,7 @@ namespace Antlr4.Runtime.Atn
 			BitSet predictions = new BitSet();
 			foreach (PredPrediction pair in predPredictions)
 			{
-				if (pair.pred == SemanticContext.NONE)
+				if (pair.pred == SemanticContext.Empty.Instance)
 				{
 					predictions[pair.alt] = true;
 					if (!complete)
@@ -1547,7 +1547,7 @@ namespace Antlr4.Runtime.Atn
 						{
 							if (fullCtx)
 							{
-								configSet.Add(new ATNConfig(config, config.state, PredictionContext.EMPTY), mergeCache);
+								configSet.Add(new ATNConfig(config, config.state, EmptyPredictionContext.Instance), mergeCache);
 								continue;
 							}
 							else {

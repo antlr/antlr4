@@ -1,89 +1,117 @@
+/*
+ * Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
-import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class RuntimeTestUtils {
+	public static final String NewLine = System.getProperty("line.separator");
+	public static final String PathSeparator = System.getProperty("path.separator");
+	public static final String FileSeparator = System.getProperty("file.separator");
+	public static final String TempDirectory = System.getProperty("java.io.tmpdir");
 
-	/** Sort a list */
-	public static <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>(data);
-		dup.addAll(data);
-		Collections.sort(dup);
-		return dup;
-	}
+	public final static Path runtimePath;
+	public final static Path runtimeTestsuitePath;
+	public final static Path resourcePath;
 
-	/** Return map sorted by key */
-	public static <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
-		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>(data.keySet());
-		Collections.sort(keys);
-		for (K k : keys) {
-			dup.put(k, data.get(k));
+	private final static Map<String, String> resourceCache = new HashMap<>();
+	private static OSType detectedOS;
+	private static Boolean isWindows;
+
+	static {
+		String locationPath = RuntimeTestUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (isWindows()) {
+			locationPath = locationPath.replaceFirst("/", "");
 		}
-		return dup;
+		Path potentialRuntimeTestsuitePath = Paths.get(locationPath, "..", "..").normalize();
+		Path potentialResourcePath = Paths.get(potentialRuntimeTestsuitePath.toString(), "resources");
+
+		if (Files.exists(potentialResourcePath)) {
+			runtimeTestsuitePath = potentialRuntimeTestsuitePath;
+		}
+		else {
+			runtimeTestsuitePath = Paths.get("..", "runtime-testsuite").normalize();
+		}
+
+		runtimePath = Paths.get(runtimeTestsuitePath.toString(), "..", "runtime").normalize();
+		resourcePath = Paths.get(runtimeTestsuitePath.toString(), "resources");
 	}
 
-	public static List<String> getTokenTypes(LexerGrammar lg,
-									  ATN atn,
-									  CharStream input) {
-		LexerATNSimulator interp = new LexerATNSimulator(atn, new DFA[]{new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE))}, null);
-		List<String> tokenTypes = new ArrayList<String>();
-		int ttype;
-		boolean hitEOF = false;
-		do {
-			if ( hitEOF ) {
-				tokenTypes.add("EOF");
-				break;
+	public static boolean isWindows() {
+		if (isWindows == null) {
+			isWindows = getOS() == OSType.Windows;
+		}
+
+		return isWindows;
+	}
+
+	public static OSType getOS() {
+		if (detectedOS == null) {
+			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+			if (os.contains("mac") || os.contains("darwin")) {
+				detectedOS = OSType.Mac;
 			}
-			int t = input.LA(1);
-			ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			if ( ttype==Token.EOF ) {
-				tokenTypes.add("EOF");
+			else if (os.contains("win")) {
+				detectedOS = OSType.Windows;
+			}
+			else if (os.contains("nux")) {
+				detectedOS = OSType.Linux;
 			}
 			else {
-				tokenTypes.add(lg.typeToTokenList.get(ttype));
+				detectedOS = OSType.Unknown;
 			}
-
-			if ( t== IntStream.EOF ) {
-				hitEOF = true;
-			}
-		} while ( ttype!=Token.EOF );
-		return tokenTypes;
-	}
-
-	public static IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
-		ANTLRInputStream in = new ANTLRInputStream(input);
-		IntegerList tokenTypes = new IntegerList();
-		int ttype;
-		do {
-			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
-			tokenTypes.add(ttype);
-		} while ( ttype!= Token.EOF );
-		return tokenTypes;
-	}
-
-	public static void copyFile(File source, File dest) throws IOException {
-		InputStream is = new FileInputStream(source);
-		OutputStream os = new FileOutputStream(dest);
-		byte[] buf = new byte[4 << 10];
-		int l;
-		while ((l = is.read(buf)) > -1) {
-			os.write(buf, 0, l);
 		}
-		is.close();
-		os.close();
+		return detectedOS;
 	}
 
-    public static void mkdir(String dir) {
-        File f = new File(dir);
-        f.mkdirs();
-    }
+	public static synchronized String getTextFromResource(String name) {
+		try {
+			String text = resourceCache.get(name);
+			if (text == null) {
+				Path path = Paths.get(resourcePath.toString(), name);
+				text = new String(Files.readAllBytes(path));
+				resourceCache.put(name, text);
+			}
+			return text;
+		}
+		catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public static void checkRuleATN(Grammar g, String ruleName, String expecting) {
+		Rule r = g.getRule(ruleName);
+		ATNState startState = g.getATN().ruleToStartState[r.index];
+		ATNPrinter serializer = new ATNPrinter(g, startState);
+		String result = serializer.asString();
+
+		assertEquals(expecting, result);
+	}
+
+	public static String joinLines(Object... args) {
+		StringBuilder result = new StringBuilder();
+		for (Object arg : args) {
+			String str = arg.toString();
+			result.append(str);
+			if (!str.endsWith("\n"))
+				result.append("\n");
+		}
+		return result.toString();
+	}
 }

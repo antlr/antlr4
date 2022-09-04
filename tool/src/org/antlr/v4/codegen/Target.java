@@ -18,12 +18,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.stringtemplate.v4.NumberRenderer;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.STMessage;
 
 import java.util.HashMap;
@@ -32,8 +27,9 @@ import java.util.Set;
 
 /** */
 public abstract class Target {
+	private final static Map<String, STGroup> languageTemplates = new HashMap<>();
+
 	protected final CodeGenerator gen;
-	private STGroup templates;
 
 	protected static final Map<Character, String> defaultCharValueEscape;
 	static {
@@ -91,15 +87,18 @@ public abstract class Target {
 		return Tool.VERSION;
 	}
 
-	public STGroup getTemplates() {
+	public synchronized STGroup getTemplates() {
+		String language = getLanguage();
+		STGroup templates = languageTemplates.get(language);
+
 		if (templates == null) {
 			String version = getVersion();
-			if ( version==null ||
-				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
-			{
-				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getLanguage());
+			if (version == null ||
+					!RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION))) {
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
 			}
 			templates = loadTemplates();
+			languageTemplates.put(language, templates);
 		}
 
 		return templates;

@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.10.2-SNAPSHOT</version>
+    <version>4.11.0-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
@@ -22,54 +22,60 @@
 
   <inceptionYear>2009</inceptionYear>
 
+  <properties>
+    <jUnitVersion>5.9.0</jUnitVersion>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
-      <version>4.3.1</version>
+      <version>4.3.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
-			<scope>test</scope>
-			<type>test-jar</type>
+      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <version>${jUnitVersion}</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
+        <version>2.22.2</version>
         <configuration>
           <!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
           <argLine>-Dfile.encoding=UTF-8</argLine>
-          <includes>
-            <include>**/Test*.java</include>
-          </includes>
-          <systemPropertyVariables>
-            <antlr-python2-runtime>../../antlr4-python2/src</antlr-python2-runtime>
-            <antlr-python3-runtime>../../antlr4-python3/src</antlr-python3-runtime>
-            <antlr-cpp-runtime>../../antlr4-cpp/src</antlr-cpp-runtime>
-            <antlr-javascript-runtime>../../antlr4-javascript/src</antlr-javascript-runtime>
-          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>

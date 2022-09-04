@@ -15,15 +15,15 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarParserInterpreter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestUnicodeGrammar extends BaseJavaToolTest {
+public class TestUnicodeGrammar {
 	@Test
 	public void unicodeBMPLiteralInGrammar() throws Exception {
 		String grammarText =

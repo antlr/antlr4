@@ -383,7 +383,7 @@ namespace Antlr4.Runtime.Atn
 		protected ATNConfigSet ComputeStartState(ICharStream input,
 												 ATNState p)
 		{
-			PredictionContext initialContext = PredictionContext.EMPTY;
+			PredictionContext initialContext = EmptyPredictionContext.Instance;
 			ATNConfigSet configs = new OrderedATNConfigSet();
 			for (int i = 0; i < p.NumberOfTransitions; i++)
 			{
@@ -432,7 +432,7 @@ namespace Antlr4.Runtime.Atn
 						return true;
 					}
 					else {
-						configs.Add(new LexerATNConfig(config, config.state, PredictionContext.EMPTY));
+						configs.Add(new LexerATNConfig(config, config.state, EmptyPredictionContext.Instance));
 						currentAltReachedAcceptState = true;
 					}
 				}

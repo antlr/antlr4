@@ -6,22 +6,13 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.tool.ErrorType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
 
 /** Test errors with the set stuff in lexer and parser */
-public class TestErrorSets extends BaseJavaToolTest {
+public class TestErrorSets {
 	protected boolean debug = false;
-
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	/** Public default constructor used by TestRig */
-	public TestErrorSets() {
-	}
 
 	@Test public void testNotCharSetWithRuleRef() throws Exception {
 		// might be a useful feature to add someday
@@ -32,7 +23,7 @@ public class TestErrorSets extends BaseJavaToolTest {
 			"B : 'b' ;\n",
 			"error(" + ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET.code + "): T.g4:3:10: rule reference B is not currently supported in a set\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
 
 	@Test public void testNotCharSetWithString() throws Exception {
@@ -44,8 +35,6 @@ public class TestErrorSets extends BaseJavaToolTest {
 			"B : 'b' ;\n",
 			"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
 		};
-		super.testErrors(pair, true);
+		testErrors(pair, true);
 	}
-
-
 }

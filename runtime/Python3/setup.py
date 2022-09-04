@@ -1,6 +1,6 @@
 from setuptools import setup
 
-v = '4.10.1'
+v = '4.11.0'
 
 setup(
     name='antlr4-python3-runtime',
@@ -15,5 +15,5 @@ setup(
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
     entry_points={'console_scripts': ['pygrun=antlr4._pygrun:main']},
-    description=f'ANTLR {v} runtime for Python 3'
+    description='ANTLR %s runtime for Python 3' % v
 )

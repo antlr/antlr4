@@ -1,0 +1,25 @@
+﻿\<Project Sdk="Microsoft.NET.Sdk">
+
+  \<PropertyGroup>
+    \<TargetFramework>net6.0\</TargetFramework>
+    \<NoWarn>$(NoWarn);CS3021\</NoWarn>
+    \<AssemblyName>Test\</AssemblyName>
+    \<OutputType>Exe\</OutputType>
+    \<OutDir>.\</OutDir>
+    \<PackageId>Antlr4.Test\</PackageId>
+    \<GenerateAssemblyTitleAttribute>false\</GenerateAssemblyTitleAttribute>
+    \<GenerateAssemblyDescriptionAttribute>false\</GenerateAssemblyDescriptionAttribute>
+    \<GenerateAssemblyConfigurationAttribute>false\</GenerateAssemblyConfigurationAttribute>
+    \<GenerateAssemblyCompanyAttribute>false\</GenerateAssemblyCompanyAttribute>
+    \<GenerateAssemblyProductAttribute>false\</GenerateAssemblyProductAttribute>
+    \<GenerateAssemblyCopyrightAttribute>false\</GenerateAssemblyCopyrightAttribute>
+    \<GenerateAssemblyVersionAttribute>false\</GenerateAssemblyVersionAttribute>
+  \</PropertyGroup>
+
+  \<ItemGroup>
+    \<Reference Include="Antlr4.Runtime">
+      \<HintPath><runtimeLibraryPath>\</HintPath>
+    \</Reference>
+  \</ItemGroup>
+
+\</Project>

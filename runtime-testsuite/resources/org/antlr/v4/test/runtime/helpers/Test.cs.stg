@@ -1,0 +1,47 @@
+using System;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
+using System.Text;
+
+public class Test {
+	public static void Main(string[] args) {
+		Console.OutputEncoding = Encoding.UTF8;
+		Console.InputEncoding = Encoding.UTF8;
+		var input = CharStreams.fromPath(args[0]);
+		var lex = new <lexerName>(input);
+		var tokens = new CommonTokenStream(lex);
+<if(parserName)>
+		var parser = new <parserName>(tokens);
+<if(debug)>
+		parser.AddErrorListener(new DiagnosticErrorListener());
+<endif>
+		parser.BuildParseTree = true;
+		var tree = parser.<parserStartRuleName>();
+		ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);
+<else>
+		tokens.Fill();
+		foreach (object t in tokens.GetTokens())
+			Console.Out.WriteLine(t);
+<if(showDFA)>
+		Console.Out.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());
+<endif>
+<endif>
+	}
+}
+
+<if(parserName)>
+class TreeShapeListener : IParseTreeListener {
+	public void VisitTerminal(ITerminalNode node) { }
+	public void VisitErrorNode(IErrorNode node) { }
+	public void ExitEveryRule(ParserRuleContext ctx) { }
+
+	public void EnterEveryRule(ParserRuleContext ctx) {
+		for (int i = 0; i \< ctx.ChildCount; i++) {
+			IParseTree parent = ctx.GetChild(i).Parent;
+			if (!(parent is IRuleNode) || ((IRuleNode)parent).RuleContext != ctx) {
+				throw new Exception("Invalid parse tree shape detected.");
+			}
+		}
+	}
+}
+<endif>

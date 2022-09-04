@@ -7,36 +7,26 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ArrayPredictionContext;
+import org.antlr.v4.runtime.atn.EmptyPredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContext;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SingletonPredictionContext;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestGraphNodes {
-	PredictionContextCache contextCache;
-
-	@Before
-	public void setUp() {
-		PredictionContext.globalNodeCount = 1;
-		contextCache = new PredictionContextCache();
-	}
-
 	public boolean rootIsWildcard() { return true; }
 	public boolean fullCtx() { return false; }
 
 	@Test public void test_$_$() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
-													  PredictionContext.EMPTY,
-													  rootIsWildcard(), null);
+		PredictionContext r = PredictionContext.merge(
+				EmptyPredictionContext.Instance, EmptyPredictionContext.Instance, rootIsWildcard(), null);
 //		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
@@ -47,9 +37,8 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_$_$_fullctx() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
-													  PredictionContext.EMPTY,
-													  fullCtx(), null);
+		PredictionContext r = PredictionContext.merge(
+				EmptyPredictionContext.Instance, EmptyPredictionContext.Instance, fullCtx(), null);
 //		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
@@ -60,7 +49,7 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_x_$() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, rootIsWildcard(), null);
+		PredictionContext r = PredictionContext.merge(x(), EmptyPredictionContext.Instance, rootIsWildcard(), null);
 //		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
@@ -71,7 +60,7 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_x_$_fullctx() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, fullCtx(), null);
+		PredictionContext r = PredictionContext.merge(x(), EmptyPredictionContext.Instance, fullCtx(), null);
 //		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
@@ -84,7 +73,7 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_$_x() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), rootIsWildcard(), null);
+		PredictionContext r = PredictionContext.merge(EmptyPredictionContext.Instance, x(), rootIsWildcard(), null);
 //		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
@@ -95,7 +84,7 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_$_x_fullctx() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), fullCtx(), null);
+		PredictionContext r = PredictionContext.merge(EmptyPredictionContext.Instance, x(), fullCtx(), null);
 //		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
@@ -171,7 +160,7 @@ public class TestGraphNodes {
 	}
 
 	@Test public void test_aa$_a$_$_fullCtx() {
-		PredictionContext empty = PredictionContext.EMPTY;
+		PredictionContext empty = EmptyPredictionContext.Instance;
 		PredictionContext child1 = createSingleton(empty, 8);
 		PredictionContext right = PredictionContext.merge(empty, child1, false, null);
 		PredictionContext left = createSingleton(right, 8);
@@ -403,7 +392,7 @@ public class TestGraphNodes {
 		assertEquals(expecting, toDOTString(r, fullCtx()));
 	}
 
-	@Ignore("Known inefficiency but deferring resolving the issue for now")
+	@Disabled("Known inefficiency but deferring resolving the issue for now")
 	@Test public void test_aex_bfx() {
 		// TJP: this is inefficient as it leaves the top x nodes unmerged.
 		PredictionContext x1 = x();
@@ -434,8 +423,8 @@ public class TestGraphNodes {
 	// Array merges
 
 	@Test public void test_A$_A$_fullctx() {
-		ArrayPredictionContext A1 = array(PredictionContext.EMPTY);
-		ArrayPredictionContext A2 = array(PredictionContext.EMPTY);
+		ArrayPredictionContext A1 = array(EmptyPredictionContext.Instance);
+		ArrayPredictionContext A2 = array(EmptyPredictionContext.Instance);
 		PredictionContext r = PredictionContext.merge(A1, A2, fullCtx(), null);
 //		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
@@ -757,39 +746,39 @@ public class TestGraphNodes {
 	// ------------ SUPPORT -------------------------
 
 	protected SingletonPredictionContext a() {
-		return createSingleton(PredictionContext.EMPTY, 1);
+		return createSingleton(EmptyPredictionContext.Instance, 1);
 	}
 
 	private SingletonPredictionContext b() {
-		return createSingleton(PredictionContext.EMPTY, 2);
+		return createSingleton(EmptyPredictionContext.Instance, 2);
 	}
 
 	private SingletonPredictionContext c() {
-		return createSingleton(PredictionContext.EMPTY, 3);
+		return createSingleton(EmptyPredictionContext.Instance, 3);
 	}
 
 	private SingletonPredictionContext d() {
-		return createSingleton(PredictionContext.EMPTY, 4);
+		return createSingleton(EmptyPredictionContext.Instance, 4);
 	}
 
 	private SingletonPredictionContext u() {
-		return createSingleton(PredictionContext.EMPTY, 6);
+		return createSingleton(EmptyPredictionContext.Instance, 6);
 	}
 
 	private SingletonPredictionContext v() {
-		return createSingleton(PredictionContext.EMPTY, 7);
+		return createSingleton(EmptyPredictionContext.Instance, 7);
 	}
 
 	private SingletonPredictionContext w() {
-		return createSingleton(PredictionContext.EMPTY, 8);
+		return createSingleton(EmptyPredictionContext.Instance, 8);
 	}
 
 	private SingletonPredictionContext x() {
-		return createSingleton(PredictionContext.EMPTY, 9);
+		return createSingleton(EmptyPredictionContext.Instance, 9);
 	}
 
 	private SingletonPredictionContext y() {
-		return createSingleton(PredictionContext.EMPTY, 10);
+		return createSingleton(EmptyPredictionContext.Instance, 10);
 	}
 
 	public SingletonPredictionContext createSingleton(PredictionContext parent, int payload) {

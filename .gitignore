@@ -1,3 +1,6 @@
+# Nuget packages
+*.nupkg
+
 # Maven build folders
 target/
 # ... but not code generation targets
@@ -29,9 +32,8 @@ __pycache__/
 *.userosscache
 *.sln.docstates
 
-# User-specific files (MonoDevelop/Xamarin Studio)
+# User-specific files (MonoDevelop/Xamarin Studio/Visual Studio)
 *.userprefs
-*.user
 .vs/
 project.lock.json
 
@@ -46,9 +48,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-
-# Visual Studio 2015 cache/options directory
-.vs/
 
 # NetBeans user configuration files
 nbactions*.xml
@@ -102,3 +101,26 @@ javac-services.0.log.lck
 !runtime/Python3/test/
 Antlr4.sln
 runtime/PHP
+
+# Swift binaries
+.build/
+
+# Cpp generated build files
+runtime/Cpp/CMakeCache.txt
+runtime/Cpp/CMakeFiles/
+runtime/Cpp/CPackConfig.cmake
+runtime/Cpp/CPackSourceConfig.cmake
+runtime/Cpp/CTestTestfile.cmake
+runtime/Cpp/Makefile
+runtime/Cpp/_deps/
+runtime/Cpp/cmake_install.cmake
+runtime/Cpp/runtime/CMakeFiles/
+runtime/Cpp/runtime/CTestTestfile.cmake
+runtime/Cpp/runtime/Makefile
+runtime/Cpp/runtime/antlr4_tests
+runtime/Cpp/runtime/antlr4_tests\[1]_include.cmake
+runtime/Cpp/runtime/antlr4_tests\[1]_tests.cmake
+runtime/Cpp/runtime/cmake_install.cmake
+runtime/Cpp/runtime/libantlr4-runtime.4.10.1.dylib
+runtime/Cpp/runtime/libantlr4-runtime.a
+runtime/Cpp/runtime/libantlr4-runtime.dylib

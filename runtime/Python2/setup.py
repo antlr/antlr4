@@ -1,6 +1,6 @@
 from setuptools import setup
 
-v = '4.10.1'
+v = '4.11.0'
 setup(
     name='antlr4-python2-runtime',
     version=v,
@@ -10,5 +10,5 @@ setup(
     package_dir={'': 'src'},
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
-    description='ANTLR %s runtime for Python 2.7.12' % v
+    description='ANTLR '+v+' runtime for Python 2.7.12'
 )

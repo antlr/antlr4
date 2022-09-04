@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.7)
 
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
+
 include(ExternalProject)
 
 set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime/src/antlr4_runtime)
@@ -10,6 +14,10 @@ if(NOT DEFINED ANTLR4_TAG)
   # Set to commit hash to keep the build stable and does not need to rebuild after 'clean'
   set(ANTLR4_TAG master)
 endif()
+
+# Ensure that the include dir already exists at configure time (to avoid cmake erroring
+# on non-existent include dirs)
+file(MAKE_DIRECTORY "${ANTLR4_INCLUDE_DIRS}")
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
   set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(Configuration))
@@ -38,7 +46,7 @@ else()
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
     set(ANTLR4_RUNTIME_LIBRARIES
-        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.10.1.dll)
+        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.11.0.dll)
   elseif(APPLE)
     set(ANTLR4_RUNTIME_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dylib)
@@ -88,6 +96,7 @@ if(ANTLR4_ZIP_REPOSITORY)
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          -DDISABLE_WARNINGS:BOOL=ON
           # -DCMAKE_CXX_STANDARD:STRING=17 # if desired, compile the runtime with a different C++ standard
           # -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD} # alternatively, compile the runtime with the same C++ standard as the outer project
       INSTALL_COMMAND ""
@@ -106,6 +115,7 @@ else()
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          -DDISABLE_WARNINGS:BOOL=ON
           # -DCMAKE_CXX_STANDARD:STRING=17 # if desired, compile the runtime with a different C++ standard
           # -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD} # alternatively, compile the runtime with the same C++ standard as the outer project
       INSTALL_COMMAND ""
@@ -135,6 +145,10 @@ add_library(antlr4_static STATIC IMPORTED)
 add_dependencies(antlr4_static antlr4_runtime-build_static)
 set_target_properties(antlr4_static PROPERTIES
                       IMPORTED_LOCATION ${ANTLR4_STATIC_LIBRARIES})
+target_include_directories(antlr4_static
+    INTERFACE
+        ${ANTLR4_INCLUDE_DIRS}
+)
 
 ExternalProject_Add_Step(
     antlr4_runtime
@@ -152,6 +166,11 @@ add_library(antlr4_shared SHARED IMPORTED)
 add_dependencies(antlr4_shared antlr4_runtime-build_shared)
 set_target_properties(antlr4_shared PROPERTIES
                       IMPORTED_LOCATION ${ANTLR4_RUNTIME_LIBRARIES})
+target_include_directories(antlr4_shared
+    INTERFACE
+        ${ANTLR4_INCLUDE_DIRS}
+)
+
 if(ANTLR4_SHARED_LIBRARIES)
   set_target_properties(antlr4_shared PROPERTIES
                         IMPORTED_IMPLIB ${ANTLR4_SHARED_LIBRARIES})

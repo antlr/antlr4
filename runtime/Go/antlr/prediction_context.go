@@ -1,10 +1,11 @@
-// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
 package antlr
 
 import (
+	"golang.org/x/exp/slices"
 	"strconv"
 )
 
@@ -26,10 +27,10 @@ var (
 )
 
 type PredictionContext interface {
-	hash() int
+	Hash() int
+	Equals(interface{}) bool
 	GetParent(int) PredictionContext
 	getReturnState(int) int
-	equals(PredictionContext) bool
 	length() int
 	isEmpty() bool
 	hasEmptyPath() bool
@@ -53,7 +54,7 @@ func (b *BasePredictionContext) isEmpty() bool {
 
 func calculateHash(parent PredictionContext, returnState int) int {
 	h := murmurInit(1)
-	h = murmurUpdate(h, parent.hash())
+	h = murmurUpdate(h, parent.Hash())
 	h = murmurUpdate(h, returnState)
 	return murmurFinish(h, 2)
 }
@@ -86,7 +87,6 @@ func NewPredictionContextCache() *PredictionContextCache {
 // Add a context to the cache and return it. If the context already exists,
 // return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
-//
 func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	if ctx == BasePredictionContextEMPTY {
 		return BasePredictionContextEMPTY
@@ -160,28 +160,28 @@ func (b *BaseSingletonPredictionContext) hasEmptyPath() bool {
 	return b.returnState == BasePredictionContextEmptyReturnState
 }
 
-func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
+func (b *BaseSingletonPredictionContext) Hash() int {
+	return b.cachedHash
+}
+
+func (b *BaseSingletonPredictionContext) Equals(other interface{}) bool {
 	if b == other {
 		return true
-	} else if _, ok := other.(*BaseSingletonPredictionContext); !ok {
+	}
+	if _, ok := other.(*BaseSingletonPredictionContext); !ok {
 		return false
-	} else if b.hash() != other.hash() {
-		return false // can't be same if hash is different
 	}
 
 	otherP := other.(*BaseSingletonPredictionContext)
 
-	if b.returnState != other.getReturnState(0) {
+	if b.returnState != otherP.getReturnState(0) {
 		return false
-	} else if b.parentCtx == nil {
+	}
+	if b.parentCtx == nil {
 		return otherP.parentCtx == nil
 	}
 
-	return b.parentCtx.equals(otherP.parentCtx)
-}
-
-func (b *BaseSingletonPredictionContext) hash() int {
-	return b.cachedHash
+	return b.parentCtx.Equals(otherP.parentCtx)
 }
 
 func (b *BaseSingletonPredictionContext) String() string {
@@ -215,7 +215,7 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 	p := new(EmptyPredictionContext)
 
 	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEmptyReturnState)
-
+	p.cachedHash = calculateEmptyHash()
 	return p
 }
 
@@ -231,7 +231,11 @@ func (e *EmptyPredictionContext) getReturnState(index int) int {
 	return e.returnState
 }
 
-func (e *EmptyPredictionContext) equals(other PredictionContext) bool {
+func (e *EmptyPredictionContext) Hash() int {
+	return e.cachedHash
+}
+
+func (e *EmptyPredictionContext) Equals(other interface{}) bool {
 	return e == other
 }
 
@@ -254,7 +258,7 @@ func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) 
 	hash := murmurInit(1)
 
 	for _, parent := range parents {
-		hash = murmurUpdate(hash, parent.hash())
+		hash = murmurUpdate(hash, parent.Hash())
 	}
 
 	for _, returnState := range returnStates {
@@ -298,18 +302,31 @@ func (a *ArrayPredictionContext) getReturnState(index int) int {
 	return a.returnStates[index]
 }
 
-func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
-	if _, ok := other.(*ArrayPredictionContext); !ok {
-		return false
-	} else if a.cachedHash != other.hash() {
-		return false // can't be same if hash is different
-	} else {
-		otherP := other.(*ArrayPredictionContext)
-		return &a.returnStates == &otherP.returnStates && &a.parents == &otherP.parents
+// Equals is the default comparison function for ArrayPredictionContext when no specialized
+// implementation is needed for a collection
+func (a *ArrayPredictionContext) Equals(o interface{}) bool {
+	if a == o {
+		return true
 	}
+	other, ok := o.(*ArrayPredictionContext)
+	if !ok {
+		return false
+	}
+	if a.cachedHash != other.Hash() {
+		return false // can't be same if hash is different
+	}
+
+	// Must compare the actual array elements and not just the array address
+	//
+	return slices.Equal(a.returnStates, other.returnStates) &&
+		slices.EqualFunc(a.parents, other.parents, func(x, y PredictionContext) bool {
+			return x.Equals(y)
+		})
 }
 
-func (a *ArrayPredictionContext) hash() int {
+// Hash is the default hash function for ArrayPredictionContext when no specialized
+// implementation is needed for a collection
+func (a *ArrayPredictionContext) Hash() int {
 	return a.BasePredictionContext.cachedHash
 }
 
@@ -343,11 +360,11 @@ func (a *ArrayPredictionContext) String() string {
 // /
 func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
-		outerContext = RuleContextEmpty
+		outerContext = ParserRuleContextEmpty
 	}
 	// if we are in RuleContext of start rule, s, then BasePredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
-	if outerContext.GetParent() == nil || outerContext == RuleContextEmpty {
+	if outerContext.GetParent() == nil || outerContext == ParserRuleContextEmpty {
 		return BasePredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a BasePredictionContext graph
@@ -359,10 +376,19 @@ func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) Predicti
 }
 
 func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
-	// share same graph if both same
-	if a == b {
+
+	// Share same graph if both same
+	//
+	if a == b || a.Equals(b) {
 		return a
 	}
+
+	// In Java, EmptyPredictionContext inherits from SingletonPredictionContext, and so the test
+	// in java for SingletonPredictionContext will succeed and a new ArrayPredictionContext will be created
+	// from it.
+	// In go, EmptyPredictionContext does not equate to SingletonPredictionContext and so that conversion
+	// will fail. We need to test for both Empty and Singleton and create an ArrayPredictionContext from
+	// either of them.
 
 	ac, ok1 := a.(*BaseSingletonPredictionContext)
 	bc, ok2 := b.(*BaseSingletonPredictionContext)
@@ -380,17 +406,32 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 			return b
 		}
 	}
-	// convert singleton so both are arrays to normalize
-	if _, ok := a.(*BaseSingletonPredictionContext); ok {
-		a = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
+
+	// Convert Singleton or Empty so both are arrays to normalize - We should not use the existing parameters
+	// here.
+	//
+	// TODO: I think that maybe the Prediction Context structs should be redone as there is a chance we will see this mess again - maybe redo the logic here
+
+	var arp, arb *ArrayPredictionContext
+	var ok bool
+	if arp, ok = a.(*ArrayPredictionContext); ok {
+	} else if _, ok = a.(*BaseSingletonPredictionContext); ok {
+		arp = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
+	} else if _, ok = a.(*EmptyPredictionContext); ok {
+		arp = NewArrayPredictionContext([]PredictionContext{}, []int{})
 	}
-	if _, ok := b.(*BaseSingletonPredictionContext); ok {
-		b = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
+
+	if arb, ok = b.(*ArrayPredictionContext); ok {
+	} else if _, ok = b.(*BaseSingletonPredictionContext); ok {
+		arb = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
+	} else if _, ok = b.(*EmptyPredictionContext); ok {
+		arb = NewArrayPredictionContext([]PredictionContext{}, []int{})
 	}
-	return mergeArrays(a.(*ArrayPredictionContext), b.(*ArrayPredictionContext), rootIsWildcard, mergeCache)
+
+	// Both arp and arb
+	return mergeArrays(arp, arb, rootIsWildcard, mergeCache)
 }
 
-//
 // Merge two {@link SingletonBasePredictionContext} instances.
 //
 // <p>Stack tops equal, parents merge is same return left graph.<br>
@@ -423,11 +464,11 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 // /
 func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
-		previous := mergeCache.Get(a.hash(), b.hash())
+		previous := mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
-		previous = mergeCache.Get(b.hash(), a.hash())
+		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
@@ -436,7 +477,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	rootMerge := mergeRoot(a, b, rootIsWildcard)
 	if rootMerge != nil {
 		if mergeCache != nil {
-			mergeCache.set(a.hash(), b.hash(), rootMerge)
+			mergeCache.set(a.Hash(), b.Hash(), rootMerge)
 		}
 		return rootMerge
 	}
@@ -456,7 +497,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		// Newjoined parent so create Newsingleton pointing to it, a'
 		spc := SingletonBasePredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
-			mergeCache.set(a.hash(), b.hash(), spc)
+			mergeCache.set(a.Hash(), b.Hash(), spc)
 		}
 		return spc
 	}
@@ -478,7 +519,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		parents := []PredictionContext{singleParent, singleParent}
 		apc := NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
-			mergeCache.set(a.hash(), b.hash(), apc)
+			mergeCache.set(a.Hash(), b.Hash(), apc)
 		}
 		return apc
 	}
@@ -494,12 +535,11 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	}
 	apc := NewArrayPredictionContext(parents, payloads)
 	if mergeCache != nil {
-		mergeCache.set(a.hash(), b.hash(), apc)
+		mergeCache.set(a.Hash(), b.Hash(), apc)
 	}
 	return apc
 }
 
-//
 // Handle case where at least one of {@code a} or {@code b} is
 // {@link //EMPTY}. In the following diagrams, the symbol {@code $} is used
 // to represent {@link //EMPTY}.
@@ -561,7 +601,6 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 	return nil
 }
 
-//
 // Merge two {@link ArrayBasePredictionContext} instances.
 //
 // <p>Different tops, different parents.<br>
@@ -583,11 +622,11 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 // /
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
-		previous := mergeCache.Get(a.hash(), b.hash())
+		previous := mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
-		previous = mergeCache.Get(b.hash(), a.hash())
+		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
@@ -608,7 +647,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 			payload := a.returnStates[i]
 			// $+$ = $
 			bothDollars := payload == BasePredictionContextEmptyReturnState && aParent == nil && bParent == nil
-			axAX := (aParent != nil && bParent != nil && aParent == bParent) // ax+ax
+			axAX := aParent != nil && bParent != nil && aParent == bParent // ax+ax
 			// ->
 			// ax
 			if bothDollars || axAX {
@@ -651,7 +690,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 		if k == 1 { // for just one merged element, return singleton top
 			pc := SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
-				mergeCache.set(a.hash(), b.hash(), pc)
+				mergeCache.set(a.Hash(), b.Hash(), pc)
 			}
 			return pc
 		}
@@ -663,27 +702,27 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 
 	// if we created same array as a or b, return that instead
 	// TODO: track whether this is possible above during merge sort for speed
+	// TODO: In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
 	if M == a {
 		if mergeCache != nil {
-			mergeCache.set(a.hash(), b.hash(), a)
+			mergeCache.set(a.Hash(), b.Hash(), a)
 		}
 		return a
 	}
 	if M == b {
 		if mergeCache != nil {
-			mergeCache.set(a.hash(), b.hash(), b)
+			mergeCache.set(a.Hash(), b.Hash(), b)
 		}
 		return b
 	}
 	combineCommonParents(mergedParents)
 
 	if mergeCache != nil {
-		mergeCache.set(a.hash(), b.hash(), M)
+		mergeCache.set(a.Hash(), b.Hash(), M)
 	}
 	return M
 }
 
-//
 // Make pass over all <em>M</em> {@code parents} merge any {@code equals()}
 // ones.
 // /

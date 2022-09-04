@@ -43,9 +43,9 @@ If you are compiling with cmake, the minimum version required is cmake 2.8.
 By default, the libraries produced by the CMake build target C++11. If you want to target a different C++ standard, you can explicitly pass the standard - e.g. `-DCMAKE_CXX_STANDARD=17`.
 
 #### Compiling on Windows with Visual Studio using he Visual Studio projects
-Simply open the VS project from the runtime folder (VS 2013+) and build it.
+Simply open the VS project from the runtime folder (VS 2019+) and build it.
 
-#### Compiling on Windows using cmake with Visual Studio VS2017 and later
+#### Compiling on Windows using cmake with Visual Studio VS2019 and later
 Use the "Open Folder" Feature from the File->Open->Folder menu to open the runtime/Cpp directory.
 It will automatically use the CMake description to open up a Visual Studio Solution.
 

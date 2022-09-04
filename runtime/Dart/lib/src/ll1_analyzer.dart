@@ -38,7 +38,7 @@ class LL1Analyzer {
       _LOOK(
         s.transition(n).target,
         null,
-        PredictionContext.EMPTY,
+        EmptyPredictionContext.Instance,
         lookAlt,
         lookBusy,
         BitSet(),
@@ -154,7 +154,7 @@ class LL1Analyzer {
         return;
       }
 
-      if (ctx != PredictionContext.EMPTY) {
+      if (ctx != EmptyPredictionContext.Instance) {
         // run thru all possible stack tops in ctx
         final removed = calledRuleStack[s.ruleIndex];
         try {

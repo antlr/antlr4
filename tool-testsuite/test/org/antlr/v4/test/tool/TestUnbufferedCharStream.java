@@ -14,23 +14,17 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unused")
-public class TestUnbufferedCharStream extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test public void testNoChar() throws Exception {
+public class TestUnbufferedCharStream {
+	@Test public void testNoChar() {
 		CharStream input = createStream("");
 		assertEquals(IntStream.EOF, input.LA(1));
 		assertEquals(IntStream.EOF, input.LA(2));
@@ -41,18 +35,17 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	 * EOF symbol is consumed, but {@link UnbufferedCharStream} handles this
 	 * particular case by throwing an {@link IllegalStateException}.
 	 */
-	@Test(expected = IllegalStateException.class)
-	public void testConsumeEOF() throws Exception {
+	@Test
+	public void testConsumeEOF() {
 		CharStream input = createStream("");
 		assertEquals(IntStream.EOF, input.LA(1));
-		input.consume();
-		input.consume();
+		assertThrows(IllegalStateException.class, input::consume);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testNegativeSeek() {
 		CharStream input = createStream("");
-		input.seek(-1);
+		assertThrows(IllegalArgumentException.class, () -> input.seek(-1));
 	}
 
 	@Test
@@ -69,12 +62,12 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	 * {@link UnbufferedCharStream} handles this case by throwing an
 	 * {@link IllegalStateException}.
 	 */
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testMarkReleaseOutOfOrder() {
 		CharStream input = createStream("");
 		int m1 = input.mark();
 		int m2 = input.mark();
-		input.release(m1);
+		assertThrows(IllegalStateException.class, () -> input.release(m1));
 	}
 
 	/**
@@ -82,12 +75,12 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	 * is released twice, but {@link UnbufferedCharStream} handles this case by
 	 * throwing an {@link IllegalStateException}.
 	 */
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testMarkReleasedTwice() {
 		CharStream input = createStream("");
 		int m1 = input.mark();
 		input.release(m1);
-		input.release(m1);
+		assertThrows(IllegalStateException.class, () -> input.release(m1));
 	}
 
 	/**
@@ -95,13 +88,13 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	 * is released twice, but {@link UnbufferedCharStream} handles this case by
 	 * throwing an {@link IllegalStateException}.
 	 */
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testNestedMarkReleasedTwice() {
 		CharStream input = createStream("");
 		int m1 = input.mark();
 		int m2 = input.mark();
 		input.release(m2);
-		input.release(m2);
+		assertThrows(IllegalStateException.class, () -> input.release(m2));
 	}
 
 	/**
@@ -109,30 +102,30 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	 * {@link UnbufferedCharStream} creates marks in such a way that this
 	 * invalid usage results in an {@link IllegalArgumentException}.
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMarkPassedToSeek() {
 		CharStream input = createStream("");
 		int m1 = input.mark();
-		input.seek(m1);
+		assertThrows(IllegalArgumentException.class, () -> input.seek(m1));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSeekBeforeBufferStart() {
 		CharStream input = createStream("xyz");
 		input.consume();
 		int m1 = input.mark();
 		assertEquals(1, input.index());
 		input.consume();
-		input.seek(0);
+		assertThrows(IllegalArgumentException.class, () -> input.seek(0));
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void testGetTextBeforeBufferStart() {
 		CharStream input = createStream("xyz");
 		input.consume();
 		int m1 = input.mark();
 		assertEquals(1, input.index());
-		input.getText(new Interval(0, 1));
+		assertThrows(UnsupportedOperationException.class, () -> input.getText(new Interval(0, 1)));
 	}
 
 	@Test
@@ -322,19 +315,19 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 		assertEquals("\uFFFF", input.getBuffer());
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testDanglingHighSurrogateAtEOFThrows() throws Exception {
-		createStream("\uD83C");
+	@Test
+	public void testDanglingHighSurrogateAtEOFThrows() {
+		assertThrows(RuntimeException.class, () -> createStream("\uD83C"));
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testDanglingHighSurrogateThrows() throws Exception {
-		createStream("\uD83C\u0123");
+	@Test
+	public void testDanglingHighSurrogateThrows() {
+		assertThrows(RuntimeException.class, () -> createStream("\uD83C\u0123"));
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testDanglingLowSurrogateThrows() throws Exception {
-		createStream("\uDF0E");
+	@Test
+	public void testDanglingLowSurrogateThrows() {
+		assertThrows(RuntimeException.class, () -> createStream("\uDF0E"));
 	}
 
 	protected static TestingUnbufferedCharStream createStream(String text) {

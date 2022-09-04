@@ -25,9 +25,8 @@
 
 #pragma once
 
-#include <unordered_set>
-
 #include "atn/PredictionContext.h"
+#include "FlatHashSet.h"
 
 namespace antlr4 {
 namespace atn {
@@ -56,8 +55,8 @@ namespace atn {
                       const Ref<const PredictionContext> &rhs) const;
     };
 
-    std::unordered_set<Ref<const PredictionContext>,
-                       PredictionContextHasher, PredictionContextComparer> _data;
+    FlatHashSet<Ref<const PredictionContext>,
+                PredictionContextHasher, PredictionContextComparer> _data;
   };
 
 }  // namespace atn

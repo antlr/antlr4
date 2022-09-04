@@ -62,7 +62,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 *  validDelegations.get(LEXER) gives list of the kinds of delegators
 	 *  that can import lexers.
 	 */
-	public static MultiMap<Integer,Integer> validImportTypes =
+	public final static MultiMap<Integer,Integer> validImportTypes =
 		new MultiMap<Integer,Integer>() {
 			{
 				map(ANTLRParser.LEXER, ANTLRParser.LEXER);

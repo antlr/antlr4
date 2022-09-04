@@ -488,7 +488,7 @@ try _errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = try _input.LT(1)<endif>
 <preamble; separator="\n">
 switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
-<choice.altLook,alts:{look,alt | <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt | <cases(tokens=look)>
 	<alt>
 	break}; separator="\n">
 default:
@@ -500,7 +500,7 @@ LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>)
 try _errHandler.sync(self)
 switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
  	<alt>
 	break}; separator="\n">
 default:
@@ -609,55 +609,36 @@ Sync(s) ::= "sync(<s.expecting.name>);"
 ThrowNoViableAlt(t) ::= "throw ANTLRException.recognition(e: NoViableAltException(self))"
 
 TestSetInline(s) ::= <<
-<!<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">!>
- //closure
- { () -> Bool in
-      <if(rest(s.bitsets))>var<else>let<endif> testSet: Bool = <first(s.bitsets):{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}>
-          <rest(s.bitsets):{bits | testSet = testSet || <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator="\n">
-      return testSet
- }()
+<s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & ~0x3f) == 0
+(Int64(<shiftAmount>) & ~0x3f) == 0
 >>
 
-// produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <<
-<!(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)!>
-{  () -> Bool in
-    <! let test: Bool = (<testShiftInRange({<offsetShift(s.varName, bits.shift)>})>)!>
-   <!var temp: Int64 =  Int64(<offsetShift(s.varName, bits.shift)>)!>
-   <!temp = (temp \< 0) ? (64 + (temp % 64 )) : (temp % 64)!>
-   <!let test1: Int64 = (Int64(1) \<\< temp)!>
-   <!var test2: Int64 = (<first(bits.ttypes):{ttype | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}>)!>
-   <!<rest(bits.ttypes):{ttype | test2 = test2 | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}; separator="\n">!>
-   let testArray: [Int] = [<s.varName>, <bits.ttypes:{ttype |<parserName(ttype)>}; separator=",">]
-   <!var test2: Int64 = Utils.testBitLeftShiftArray(testArray)!>
-    return  Utils.testBitLeftShiftArray(testArray, <bits.shift>)
-}()
+<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((Int64(1) \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
 >>
 
 isZero ::= [
 "0": true,
 default: false
 ]
-parserName(ttype) ::= <%
- <parser.name>.Tokens.<ttype>.rawValue
+parserName(t) ::= <%
+ <parser.name>.Tokens.<t.name>.rawValue
 %>
 offsetShift(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> == <parser.name>.Tokens.<ttype>.rawValue}; separator=" || ">
+<bits.tokens:{t | <s.varName> == <parser.name>.Tokens.<t.name>.rawValue}; separator=" || ">
 %>
 
-cases(ttypes) ::= <<
-<trunc(ttypes): {t | case .<t>:fallthrough}  ; separator="\n">
-<last(ttypes): {t | case .<t>:}  ; separator="\n">
+cases(tokens) ::= <<
+<trunc(tokens): {t | case .<t.name>:fallthrough}  ; separator="\n">
+<last(tokens): {t | case .<t.name>:}  ; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -922,7 +903,6 @@ _localctx.<label>.append(_prevctx)
 _localctx.<label> = _prevctx
 <endif>
 <endif>
-<if(label)>_localctx.<label> = _prevctx;<endif>
 try pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>)
 >>
 

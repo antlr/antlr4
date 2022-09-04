@@ -48,7 +48,7 @@ public class DOTGenerator {
 	protected String rankdir="LR";
 
 	/** Library of output templates; use {@code <attrname>} format. */
-    public static STGroup stlib = new STGroupFile("org/antlr/v4/tool/templates/dot/graphs.stg");
+    public final static STGroup stlib = new STGroupFile("org/antlr/v4/tool/templates/dot/graphs.stg");
 
     protected Grammar grammar;
 

@@ -6,19 +6,25 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.analysis.AnalysisPipeline;
+import org.antlr.v4.automata.ATNFactory;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.antlr.v4.tool.LexerGrammar;
+import org.junit.jupiter.api.Test;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupString;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
+public class TestActionTranslation {
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
 		"parser grammar A;\n"+
@@ -217,188 +223,39 @@ public class TestActionTranslation extends BaseJavaToolTest {
 	    Grammar g = new Grammar(gS);
     }
 
+	private static void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
+		int lp = templates.indexOf('(');
+		String name = templates.substring(0, lp);
+		STGroup group = new STGroupString(templates);
+		ST st = group.getInstanceOf(name);
+		st.add(actionName, action);
+		String grammar = st.render();
+		ErrorQueue equeue = new ErrorQueue();
+		Grammar g = new Grammar(grammar, equeue);
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
 
-/*
-    @Test public void testSimplePlusEqualLabel() throws Exception {
-        String action = "$ids.size();"; // must be qualified
-    }
-    @Test public void testPlusEqualStringLabel() throws Exception {
-        String action = "$ids.size();"; // must be qualified
-    }
-    @Test public void testPlusEqualSetLabel() throws Exception {
-        String action = "$ids.size();"; // must be qualified
-    }
-    @Test public void testPlusEqualWildcardLabel() throws Exception {
-        String action = "$ids.size();"; // must be qualified
-    }
-    @Test public void testImplicitTokenLabel() throws Exception {
-        String action = "$ID; $ID.text; $ID.getText()";
-    }
+			ATNFactory factory = new ParserATNFactory(g);
+			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+			g.atn = factory.createATN();
 
-    @Test public void testImplicitRuleLabel() throws Exception {
-        String action = "$r.start;";
-    }
+			AnalysisPipeline anal = new AnalysisPipeline(g);
+			anal.process();
 
-    @Test public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
-        String action = "$r.start;";
-    }
-
-    @Test public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
-        String action = "$r.start;";
-    }
-
-    @Test public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
-        String action = "$ID.text;";
-    }
-
-    @Test public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
-        String action = "$ID.text;";
-    }
-
-    @Test public void testRuleLabelWithoutOutputOption() throws Exception {
-    }
-    @Test public void testMissingArgs() throws Exception {
-    }
-    @Test public void testArgsWhenNoneDefined() throws Exception {
-    }
-    @Test public void testReturnInitValue() throws Exception {
-    }
-    @Test public void testMultipleReturnInitValue() throws Exception {
-    }
-    @Test public void testCStyleReturnInitValue() throws Exception {
-    }
-    @Test public void testArgsWithInitValues() throws Exception {
-    }
-    @Test public void testArgsOnToken() throws Exception {
-    }
-    @Test public void testArgsOnTokenInLexer() throws Exception {
-    }
-    @Test public void testLabelOnRuleRefInLexer() throws Exception {
-        String action = "$i.text";
-    }
-
-    @Test public void testRefToRuleRefInLexer() throws Exception {
-        String action = "$ID.text";
-    }
-
-    @Test public void testRefToRuleRefInLexerNoAttribute() throws Exception {
-        String action = "$ID";
-    }
-
-    @Test public void testCharLabelInLexer() throws Exception {
-    }
-    @Test public void testCharListLabelInLexer() throws Exception {
-    }
-    @Test public void testWildcardCharLabelInLexer() throws Exception {
-    }
-    @Test public void testWildcardCharListLabelInLexer() throws Exception {
-    }
-    @Test public void testMissingArgsInLexer() throws Exception {
-    }
-    @Test public void testLexerRulePropertyRefs() throws Exception {
-        String action = "$text $type $line $pos $channel $index $start $stop";
-    }
-
-    @Test public void testLexerLabelRefs() throws Exception {
-        String action = "$a $b.text $c $d.text";
-    }
-
-    @Test public void testSettingLexerRulePropertyRefs() throws Exception {
-        String action = "$text $type=1 $line=1 $pos=1 $channel=1 $index";
-    }
-
-    @Test public void testArgsOnTokenInLexerRuleOfCombined() throws Exception {
-    }
-    @Test public void testMissingArgsOnTokenInLexerRuleOfCombined() throws Exception {
-    }
-    @Test public void testTokenLabelTreeProperty() throws Exception {
-        String action = "$id.tree;";
-    }
-
-    @Test public void testTokenRefTreeProperty() throws Exception {
-        String action = "$ID.tree;";
-    }
-
-    @Test public void testAmbiguousTokenRef() throws Exception {
-        String action = "$ID;";
-    }
-
-    @Test public void testAmbiguousTokenRefWithProp() throws Exception {
-        String action = "$ID.text;";
-    }
-
-    @Test public void testRuleRefWithDynamicScope() throws Exception {
-        String action = "$field::x = $field.st;";
-    }
-
-    @Test public void testAssignToOwnRulenameAttr() throws Exception {
-        String action = "$rule.tree = null;";
-    }
-
-    @Test public void testAssignToOwnParamAttr() throws Exception {
-        String action = "$rule.i = 42; $i = 23;";
-    }
-
-    @Test public void testIllegalAssignToOwnRulenameAttr() throws Exception {
-        String action = "$rule.stop = 0;";
-    }
-
-    @Test public void testIllegalAssignToLocalAttr() throws Exception {
-        String action = "$tree = null; $st = null; $start = 0; $stop = 0; $text = 0;";
-    }
-
-    @Test public void testIllegalAssignRuleRefAttr() throws Exception {
-        String action = "$other.tree = null;";
-    }
-
-    @Test public void testIllegalAssignTokenRefAttr() throws Exception {
-        String action = "$ID.text = \"test\";";
-    }
-
-    @Test public void testAssignToTreeNodeAttribute() throws Exception {
-        String action = "$tree.scope = localScope;";
-    }
-
-    @Test public void testDoNotTranslateAttributeCompare() throws Exception {
-        String action = "$a.line == $b.line";
-    }
-
-    @Test public void testDoNotTranslateScopeAttributeCompare() throws Exception {
-        String action = "if ($rule::foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
-    }
-
-    @Test public void testTreeRuleStopAttributeIsInvalid() throws Exception {
-        String action = "$r.x; $r.start; $r.stop";
-    }
-
-    @Test public void testRefToTextAttributeForCurrentTreeRule() throws Exception {
-        String action = "$text";
-    }
-
-    @Test public void testTypeOfGuardedAttributeRefIsCorrect() throws Exception {
-        String action = "int x = $b::n;";
-    }
-
-	@Test public void testBracketArgParsing() throws Exception {
+			CodeGenerator gen = CodeGenerator.create(g);
+			ST outputFileST = gen.generateParser(false);
+			String output = outputFileST.render();
+			//System.out.println(output);
+			String b = "#" + actionName + "#";
+			int start = output.indexOf(b);
+			String e = "#end-" + actionName + "#";
+			int end = output.indexOf(e);
+			String snippet = output.substring(start+b.length(),end);
+			assertEquals(expected, snippet);
+		}
+		if ( equeue.size()>0 ) {
+//			System.err.println(equeue.toString());
+		}
 	}
-
-	@Test public void testStringArgParsing() throws Exception {
-		String action = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
-	}
-	@Test public void testComplicatedSingleArgParsing() throws Exception {
-		String action = "(*a).foo(21,33,\",\")";
-	}
-	@Test public void testArgWithLT() throws Exception {
-		String action = "34<50";
-	}
-	@Test public void testGenericsAsArgumentDefinition() throws Exception {
-		String action = "$foo.get(\"ick\");";
-	}
-	@Test public void testGenericsAsArgumentDefinition2() throws Exception {
-		String action = "$foo.get(\"ick\"); x=3;";
-	}
-	@Test public void testGenericsAsReturnValue() throws Exception {
-	}
-*/
-	// TODO: nonlocal $rule::x
 }

@@ -18,7 +18,16 @@ AppendStr(a,b) ::= "<a> + <b>"
 
 Concat(a,b) ::= "<a><b>"
 
-AssertIsList(v) ::= ""
+AssertIsList(v) ::= <<
+// A noddy range over the list will not compile if it is not getting a slice
+// however, Go will not compile the generated code if the slice vs single value is wrong.
+// Makes the Java based tests suite work though.
+j1__ := make([]interface{}, len(<v>))
+j2__ := <v>
+for j3__ := range j2__ {
+   j1__[j3__] = j2__[j3__]
+}
+>>
 
 AssignLocal(s, v) ::= "<s> = <v>;"
 
@@ -236,7 +245,7 @@ func NewLeafListener() *LeafListener {
 
 func (*LeafListener) ExitA(ctx *AContext) {
 	if ctx.GetChildCount() == 2 {
-		fmt.Printf("%s %s %s", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), antlr.PrintArrayJavaStyle(antlr.TerminalNodeToStringArray(ctx.AllINT())))
+		fmt.Printf("%s %s %s\n", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), antlr.PrintArrayJavaStyle(antlr.TerminalNodeToStringArray(ctx.AllINT())))
 	} else {
 		fmt.Println(ctx.ID().GetSymbol())
 	}
@@ -256,7 +265,7 @@ func NewLeafListener() *LeafListener {
 
 func (*LeafListener) ExitA(ctx *AContext) {
 	if ctx.GetChildCount() == 2 {
-		fmt.Printf("%s %s %s", ctx.B(0).GetStart().GetText(), ctx.B(1).GetStart().GetText(), ctx.AllB()[0].GetStart().GetText())
+		fmt.Printf("%s %s %s\n", ctx.B(0).GetStart().GetText(), ctx.B(1).GetStart().GetText(), ctx.AllB()[0].GetStart().GetText())
 	} else {
 		fmt.Println(ctx.B(0).GetStart().GetText())
 	}
@@ -295,7 +304,7 @@ func NewLeafListener() *LeafListener {
 }
 
 func (*LeafListener) ExitCall(ctx *CallContext) {
-	fmt.Printf("%s %s", ctx.E().GetStart().GetText(), ctx.EList().String(nil, nil))
+	fmt.Printf("%s %s\n", ctx.E().GetStart().GetText(), ctx.EList().String(nil, nil))
 }
 
 func (*LeafListener) ExitInt(ctx *IntContext) {

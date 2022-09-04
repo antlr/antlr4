@@ -31,7 +31,7 @@ namespace Antlr4.Runtime.Atn
         /// . Note that other ATN
         /// configurations may predict the same alternative which are guarded by
         /// other semantic contexts and/or
-        /// <see cref="SemanticContext.NONE"/>
+        /// <see cref="SemanticContext.Empty.Instance"/>
         /// .
         /// </summary>
         public readonly int predictedAlt;

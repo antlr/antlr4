@@ -35,5 +35,4 @@ root
 for for break break for if if for continue
 
 [output]
-"""for for break break for if if for continue
-"""
+"""for for break break for if if for continue"""

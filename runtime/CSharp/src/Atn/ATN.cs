@@ -104,7 +104,7 @@ namespace Antlr4.Runtime.Atn
         /// If
         /// <paramref name="ctx"/>
         /// is
-        /// <see cref="PredictionContext.EMPTY"/>
+        /// <see cref="EmptyPredictionContext.Instance"/>
         /// , the set of tokens will not include what can follow
         /// the rule surrounding
         /// <paramref name="s"/>

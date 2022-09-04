@@ -9,23 +9,14 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestIntervalSet extends BaseJavaToolTest {
+public class TestIntervalSet {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {
-	}
-
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
 	}
 
 	@Test public void testSingleElement() throws Exception {
@@ -431,6 +422,4 @@ public class TestIntervalSet extends BaseJavaToolTest {
         String result = s.toString();
         assertEquals(expecting, result);
     }
-
-
 }

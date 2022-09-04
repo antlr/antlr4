@@ -21,7 +21,7 @@ public class LexerATNConfig extends ATNConfig {
 						  int alt,
 						  PredictionContext context)
 	{
-		super(state, alt, context, SemanticContext.NONE);
+		super(state, alt, context, SemanticContext.Empty.Instance);
 		this.passedThroughNonGreedyDecision = false;
 		this.lexerActionExecutor = null;
 	}
@@ -31,7 +31,7 @@ public class LexerATNConfig extends ATNConfig {
 						  PredictionContext context,
 						  LexerActionExecutor lexerActionExecutor)
 	{
-		super(state, alt, context, SemanticContext.NONE);
+		super(state, alt, context, SemanticContext.Empty.Instance);
 		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = false;
 	}

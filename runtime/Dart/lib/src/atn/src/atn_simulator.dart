@@ -77,7 +77,7 @@ class PredictionContextCache {
   ///  return that one instead and do not add a new context to the cache.
   ///  Protect shared cache from unsafe thread access.
   PredictionContext add(PredictionContext ctx) {
-    if (ctx == PredictionContext.EMPTY) return PredictionContext.EMPTY;
+    if (ctx == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance;
     final existing = cache[ctx];
     if (existing != null) {
 //			System.out.println(name+" reuses "+existing);

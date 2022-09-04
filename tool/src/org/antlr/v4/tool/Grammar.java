@@ -371,11 +371,15 @@ public class Grammar implements AttributeResolver {
 		typeToTokenList.add(null);
 	}
 
-    public void loadImportedGrammars() {
+
+	public void loadImportedGrammars() {
+		this.loadImportedGrammars(new HashSet<>());
+	}
+
+    private void loadImportedGrammars(Set<String> visited) {
 		if ( ast==null ) return;
         GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
         if ( i==null ) return;
-	    Set<String> visited = new HashSet<>();
 	    visited.add(this.name);
         importedGrammars = new ArrayList<Grammar>();
         for (Object c : i.getChildren()) {
@@ -407,7 +411,7 @@ public class Grammar implements AttributeResolver {
 			if ( g == null ) continue;
 			g.parent = this;
 			importedGrammars.add(g);
-			g.loadImportedGrammars(); // recursively pursue any imports in this import
+			g.loadImportedGrammars(visited); // recursively pursue any imports in this import
         }
     }
 

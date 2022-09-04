@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
-                Look_(s.Transition(alt).target, null, PredictionContext.EMPTY, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
+                Look_(s.Transition(alt).target, null, EmptyPredictionContext.Instance, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
                 if (look[alt].Count == 0 || look[alt].Contains(HitPred))
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime.Atn
                     look.Add(TokenConstants.EOF);
                     return;
                 }
-                if (ctx != PredictionContext.EMPTY)
+                if (ctx != EmptyPredictionContext.Instance)
                 {
                     bool removed = calledRuleStack.Get(s.ruleIndex);
                     try

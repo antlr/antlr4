@@ -11,15 +11,10 @@ public class Interval {
 
 	public static final Interval INVALID = new Interval(-1,-2);
 
-	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
+	static final Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
 	public int a;
 	public int b;
-
-	public static int creates = 0;
-	public static int misses = 0;
-	public static int hits = 0;
-	public static int outOfRange = 0;
 
 	public Interval(int a, int b) { this.a=a; this.b=b; }
 

@@ -6,31 +6,16 @@
 #include "atn/ATNDeserializationOptions.h"
 #include "Exceptions.h"
 
-#include <memory>
-#include <mutex>
-
 using namespace antlr4;
 using namespace antlr4::atn;
-
-namespace {
-
-std::once_flag defaultATNDeserializationOptionsOnceFlag;
-std::unique_ptr<ATNDeserializationOptions> defaultATNDeserializationOptions;
-
-void initializeDefaultATNDeserializationOptions() {
-  defaultATNDeserializationOptions.reset(new ATNDeserializationOptions());
-}
-
-}
 
 ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options)
     : _readOnly(false), _verifyATN(options->_verifyATN),
       _generateRuleBypassTransitions(options->_generateRuleBypassTransitions) {}
 
 const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {
-  std::call_once(defaultATNDeserializationOptionsOnceFlag,
-                 initializeDefaultATNDeserializationOptions);
-  return *defaultATNDeserializationOptions;
+  static const ATNDeserializationOptions* const defaultOptions = new ATNDeserializationOptions();
+  return *defaultOptions;
 }
 
 void ATNDeserializationOptions::makeReadOnly() {

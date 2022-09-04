@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.10.2-SNAPSHOT</version>
+		<version>4.11.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>antlr4-runtime</artifactId>
@@ -85,6 +85,7 @@
 							<instructions>
 								<Automatic-Module-Name>org.antlr.antlr4.runtime</Automatic-Module-Name>
 								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
+								<Import-Package>org.antlr.v4.gui;resolution:=optional, *</Import-Package>
 							</instructions>
 						</configuration>
 						<goals>

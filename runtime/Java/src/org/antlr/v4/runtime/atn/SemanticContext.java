@@ -29,12 +29,6 @@ import java.util.Set;
  */
 public abstract class SemanticContext {
 	/**
-	 * The default {@link SemanticContext}, which is semantically equivalent to
-	 * a predicate of the form {@code {true}?}.
-	 */
-    public static final SemanticContext NONE = new Predicate();
-
-	/**
 	 * For context independent predicates, we evaluate them without a local
 	 * context (i.e., null context). That way, we can evaluate them without
 	 * having to create proper rule-specific context during prediction (as
@@ -57,7 +51,7 @@ public abstract class SemanticContext {
 	 * @return The simplified semantic context after precedence predicates are
 	 * evaluated, which will be one of the following values.
 	 * <ul>
-	 * <li>{@link #NONE}: if the predicate simplifies to {@code true} after
+	 * <li>{@link Empty#Instance}: if the predicate simplifies to {@code true} after
 	 * precedence predicates are evaluated.</li>
 	 * <li>{@code null}: if the predicate simplifies to {@code false} after
 	 * precedence predicates are evaluated.</li>
@@ -69,6 +63,19 @@ public abstract class SemanticContext {
 	 */
 	public SemanticContext evalPrecedence(Recognizer<?,?> parser, RuleContext parserCallStack) {
 		return this;
+	}
+
+	public static class Empty extends SemanticContext {
+		/**
+		 * The default {@link SemanticContext}, which is semantically equivalent to
+		 * a predicate of the form {@code {true}?}.
+		 */
+		public static final Empty Instance = new Empty();
+
+		@Override
+		public boolean eval(Recognizer<?, ?> parser, RuleContext parserCallStack) {
+			return false;
+		}
 	}
 
     public static class Predicate extends SemanticContext {
@@ -139,7 +146,7 @@ public abstract class SemanticContext {
 		@Override
 		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext parserCallStack) {
 			if (parser.precpred(parserCallStack, precedence)) {
-				return SemanticContext.NONE;
+				return Empty.Instance;
 			}
 			else {
 				return null;
@@ -266,7 +273,7 @@ public abstract class SemanticContext {
 					// The AND context is false if any element is false
 					return null;
 				}
-				else if (evaluated != NONE) {
+				else if (evaluated != Empty.Instance) {
 					// Reduce the result by skipping true elements
 					operands.add(evaluated);
 				}
@@ -278,7 +285,7 @@ public abstract class SemanticContext {
 
 			if (operands.isEmpty()) {
 				// all elements were true, so the AND context is true
-				return NONE;
+				return Empty.Instance;
 			}
 
 			SemanticContext result = operands.get(0);
@@ -359,9 +366,9 @@ public abstract class SemanticContext {
 			for (SemanticContext context : opnds) {
 				SemanticContext evaluated = context.evalPrecedence(parser, parserCallStack);
 				differs |= (evaluated != context);
-				if (evaluated == NONE) {
+				if (evaluated == Empty.Instance) {
 					// The OR context is true if any element is true
-					return NONE;
+					return Empty.Instance;
 				}
 				else if (evaluated != null) {
 					// Reduce the result by skipping false elements
@@ -393,8 +400,8 @@ public abstract class SemanticContext {
     }
 
 	public static SemanticContext and(SemanticContext a, SemanticContext b) {
-		if ( a == null || a == NONE ) return b;
-		if ( b == null || b == NONE ) return a;
+		if ( a == null || a == Empty.Instance ) return b;
+		if ( b == null || b == Empty.Instance ) return a;
 		AND result = new AND(a, b);
 		if (result.opnds.length == 1) {
 			return result.opnds[0];
@@ -410,7 +417,7 @@ public abstract class SemanticContext {
 	public static SemanticContext or(SemanticContext a, SemanticContext b) {
 		if ( a == null ) return b;
 		if ( b == null ) return a;
-		if ( a == NONE || b == NONE ) return NONE;
+		if ( a == Empty.Instance || b == Empty.Instance ) return Empty.Instance;
 		OR result = new OR(a, b);
 		if (result.opnds.length == 1) {
 			return result.opnds[0];

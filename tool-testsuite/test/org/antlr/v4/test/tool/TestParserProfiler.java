@@ -6,40 +6,46 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.atn.DecisionInfo;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.Stage;
+import org.antlr.v4.test.runtime.java.JavaRunner;
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestParserProfiler extends BaseJavaToolTest {
-	LexerGrammar lg;
+public class TestParserProfiler {
+	final static LexerGrammar lg;
 
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-		lg = new LexerGrammar(
-				"lexer grammar L;\n" +
-				"WS : [ \\r\\t\\n]+ -> channel(HIDDEN) ;\n" +
-				"SEMI : ';' ;\n" +
-				"DOT : '.' ;\n" +
-				"ID : [a-zA-Z]+ ;\n" +
-				"INT : [0-9]+ ;\n" +
-				"PLUS : '+' ;\n" +
-				"MULT : '*' ;\n");
+	static {
+		try {
+			lg = new LexerGrammar(
+					"lexer grammar L;\n" +
+							"WS : [ \\r\\t\\n]+ -> channel(HIDDEN) ;\n" +
+							"SEMI : ';' ;\n" +
+							"DOT : '.' ;\n" +
+							"ID : [a-zA-Z]+ ;\n" +
+							"INT : [0-9]+ ;\n" +
+							"PLUS : '+' ;\n" +
+							"MULT : '*' ;\n");
+		} catch (RecognitionException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test public void testLL1() throws Exception {
@@ -157,7 +163,7 @@ public class TestParserProfiler extends BaseJavaToolTest {
 		assertEquals(expecting, info[1].toString());
 	}
 
-	@Ignore
+	@Disabled
 	@Test public void testSimpleLanguage() throws Exception {
 		Grammar g = new Grammar(TestXPath.grammar);
 		String input =
@@ -174,7 +180,7 @@ public class TestParserProfiler extends BaseJavaToolTest {
 		assertEquals(1, info.length);
 	}
 
-	@Ignore
+	@Disabled
 	@Test public void testDeepLookahead() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar T;\n" +
@@ -200,7 +206,7 @@ public class TestParserProfiler extends BaseJavaToolTest {
 		assertEquals(expecting, Arrays.toString(info));
 	}
 
-	@Test public void testProfilerGeneratedCode() throws Exception {
+	@Test public void testProfilerGeneratedCode() {
 		String grammar =
 			"grammar T;\n" +
 			"s : a+ ID EOF ;\n" +
@@ -215,15 +221,19 @@ public class TestParserProfiler extends BaseJavaToolTest {
 			"PLUS : '+' ;\n" +
 			"MULT : '*' ;\n";
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", null, null, "s",
-								  "xyz;abc;z.q", false, true);
-		String expecting =
-			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
-			"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +
-			" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
-			"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
-		assertEquals(expecting, found);
-		assertEquals(null, getParseErrors());
+		RunOptions runOptions = createOptionsForJavaToolTests("T.g4", grammar, "TParser", "TLexer",
+				false, false, "s", "xyz;abc;z.q",
+				true, false, Stage.Execute, false);
+		try (JavaRunner runner = new JavaRunner()) {
+			ExecutedState state = (ExecutedState) runner.run(runOptions);
+			String expecting =
+					"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
+							"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +
+							" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
+							"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
+			assertEquals(expecting, state.output);
+			assertEquals("", state.errors);
+		}
 	}
 
 	public DecisionInfo[] interpAndGetDecisionInfo(

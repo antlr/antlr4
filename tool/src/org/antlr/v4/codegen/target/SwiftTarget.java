@@ -10,22 +10,14 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 public class SwiftTarget extends Target {
-    /**
-     * The Swift target can cache the code generation templates.
-     */
-    private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<>();
-
 	protected static final Map<Character, String> targetCharValueEscape;
 	static {
 		// https://docs.swift.org/swift-book/LanguageGuide/StringsAndCharacters.html
@@ -76,30 +68,6 @@ public class SwiftTarget extends Target {
     @Override
     protected void genFile(Grammar g, ST outputFileST, String fileName) {
         super.genFile(g,outputFileST,fileName);
-    }
-
-    @Override
-    protected STGroup loadTemplates() {
-        STGroup result = targetTemplates.get();
-        if (result == null) {
-            result = super.loadTemplates();
-            result.registerRenderer(String.class, new SwiftStringRenderer(), true);
-            targetTemplates.set(result);
-        }
-
-        return result;
-    }
-
-    protected static class SwiftStringRenderer extends StringRenderer {
-        @Override
-        public String toString(Object o, String formatString, Locale locale) {
-            if ("java-escape".equals(formatString)) {
-                // 5C is the hex code for the \ itself
-                return ((String)o).replace("\\u", "\\u005Cu");
-            }
-
-            return super.toString(o, formatString, locale);
-        }
     }
 
 	@Override

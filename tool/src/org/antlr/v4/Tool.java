@@ -113,7 +113,7 @@ public class Tool {
 	public boolean longMessages = false;
 	public boolean exact_output_dir = false;
 
-    public static Option[] optionDefs = {
+    public final static Option[] optionDefs = {
 		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
 		new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
 		new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
@@ -138,10 +138,6 @@ public class Tool {
 	// helper vars for option management
 	protected boolean haveOutputDir = false;
 	protected boolean return_dont_exit = false;
-
-    // The internal options are for my use on the command line during dev
-    public static boolean internalOption_PrintGrammarTree = false;
-    public static boolean internalOption_ShowATNConfigsInDFA = false;
 
 
 	public final String[] args;
@@ -365,7 +361,6 @@ public class Tool {
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
 		if ( g.ast==null || g.ast.hasErrors ) return;
-		if ( internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 
 		boolean ruleFail = checkForRuleIssues(g);
 		if ( ruleFail ) return;

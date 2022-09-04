@@ -94,6 +94,9 @@ def filterPrecedencePredicates(collection:set):
     return [context for context in collection if isinstance(context, PrecedencePredicate)]
 
 
+class EmptySemanticContext(SemanticContext):
+    pass
+
 class Predicate(SemanticContext):
     __slots__ = ('ruleIndex', 'predIndex', 'isCtxDependent')
 
@@ -320,4 +323,4 @@ class OR (SemanticContext):
             return buf.getvalue()
 
 
-SemanticContext.NONE = Predicate()
+SemanticContext.NONE = EmptySemanticContext()

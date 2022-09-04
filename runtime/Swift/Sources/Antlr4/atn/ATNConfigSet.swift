@@ -1,23 +1,23 @@
-/// 
+///
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// 
+///
 
 
-/// 
+///
 /// Specialized _java.util.Set_`<`_org.antlr.v4.runtime.atn.ATNConfig_`>` that can track
 /// info about the set, with support for combining similar configurations using a
 /// graph-structured stack.
 ///
 public final class ATNConfigSet: Hashable, CustomStringConvertible {
-    /// 
+    ///
     /// The reason that we need this is because we don't want the hash map to use
     /// the standard hash code and equals. We need all configurations with the same
     /// `(s,i,_,semctx)` to be equal. Unfortunately, this key effectively doubles
     /// the number of objects associated with ATNConfigs. The other solution is to
     /// use a hash table that lets us specify the equals/hashcode operation.
-    /// 
+    ///
 
 
     ///
@@ -29,27 +29,27 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     ///
     private var readonly = false
 
-    /// 
+    ///
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
-    /// 
+    ///
     private var configLookup: LookupDictionary
 
-    /// 
+    ///
     /// Track the elements as they are added to the set; supports get(i)
-    /// 
+    ///
     public private(set) var configs = [ATNConfig]()
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
     public internal(set) var uniqueAlt = ATN.INVALID_ALT_NUMBER
     //TODO no default
-    /// 
+    ///
     /// Currently this is only used when we detect SLL conflict; this does
     /// not necessarily represent the ambiguous alternatives. In fact,
     /// I should also point out that this seems to include predicated alternatives
     /// that have predicates that evaluate to false. Computed in computeTargetState().
-    /// 
+    ///
     internal var conflictingAlts: BitSet?
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -59,11 +59,11 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     public internal(set) var dipsIntoOuterContext = false
     //TODO no default
 
-    /// 
+    ///
     /// Indicates that this configuration set is part of a full context
     /// LL prediction. It will be used to determine how to merge $. With SLL
     /// it's a wildcard whereas it is not for LL context merge.
-    /// 
+    ///
     public let fullCtx: Bool
 
     private var cachedHashCode = -1
@@ -80,16 +80,16 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return try add(config, &mergeCache)
     }
 
-    /// 
+    ///
     /// Adding a new config means merging contexts with existing configs for
     /// `(s, i, pi, _)`, where `s` is the
     /// _org.antlr.v4.runtime.atn.ATNConfig#state_, `i` is the _org.antlr.v4.runtime.atn.ATNConfig#alt_, and
     /// `pi` is the _org.antlr.v4.runtime.atn.ATNConfig#semanticContext_. We use
     /// `(s,i,pi)` as key.
-    /// 
+    ///
     /// This method updates _#dipsIntoOuterContext_ and
     /// _#hasSemanticContext_ when necessary.
-    /// 
+    ///
     @discardableResult
     public func add(
         _ config: ATNConfig,
@@ -98,7 +98,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
                 throw ANTLRError.illegalState(msg: "This set is readonly")
             }
 
-            if config.semanticContext != SemanticContext.NONE {
+            if config.semanticContext != SemanticContext.Empty.Instance {
                 hasSemanticContext = true
             }
             if config.getOuterContextDepth() > 0 {
@@ -137,9 +137,9 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
 
-    /// 
+    ///
     /// Return a List holding list of configs
-    /// 
+    ///
     public func elements() -> [ATNConfig] {
         return configs
     }
@@ -152,14 +152,14 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return states
     }
 
-    /// 
+    ///
     /// Gets the complete set of represented alternatives for the configuration
     /// set.
-    /// 
+    ///
     /// - returns: the set of represented alternatives in this configuration set
-    /// 
+    ///
     /// - since: 4.3
-    /// 
+    ///
     public func getAlts() -> BitSet {
         let alts = BitSet()
         for config in configs {
@@ -171,7 +171,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     public func getPredicates() -> [SemanticContext] {
         var preds = [SemanticContext]()
         for config in configs {
-            if config.semanticContext != SemanticContext.NONE {
+            if config.semanticContext != SemanticContext.Empty.Instance {
                 preds.append(config.semanticContext)
             }
         }
@@ -279,11 +279,11 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return buf
     }
 
-    /// 
+    ///
     /// override
     /// public <T> func toArray(a : [T]) -> [T] {
     /// return configLookup.toArray(a);
-    /// 
+    ///
     private func configHash(_ stateNumber: Int,_ context: PredictionContext?) -> Int{
         var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, stateNumber)
@@ -428,11 +428,11 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
             }
 
             if !config.isPrecedenceFilterSuppressed() {
-                /// 
+                ///
                 /// In the future, this elimination step could be updated to also
                 /// filter the prediction context for alternatives predicting alt>1
                 /// (basically a graph subtraction algorithm).
-                /// 
+                ///
                 let context = statesFromAlt1[config.state.stateNumber]
                 if context != nil && context == config.context {
                     // eliminated
@@ -456,9 +456,9 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         var nPredAlts = 0
         for i in 1...nalts {
             if altToPred[i] == nil {
-                altToPred[i] = SemanticContext.NONE
+                altToPred[i] = SemanticContext.Empty.Instance
             }
-            else if altToPred[i] != SemanticContext.NONE {
+            else if altToPred[i] != SemanticContext.Empty.Instance {
                 nPredAlts += 1
             }
         }
@@ -487,23 +487,23 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return alts.getMinElement()
     }
 
-    /// 
+    ///
     /// Walk the list of configurations and split them according to
     /// those that have preds evaluating to true/false.  If no pred, assume
     /// true pred and include in succeeded set.  Returns Pair of sets.
-    /// 
+    ///
     /// Create a new set so as not to alter the incoming parameter.
-    /// 
+    ///
     /// Assumption: the input stream has been restored to the starting point
     /// prediction, which is where predicates need to evaluate.
-    /// 
+    ///
     public func splitAccordingToSemanticValidity(
         _ outerContext: ParserRuleContext,
         _ evalSemanticContext: (SemanticContext, ParserRuleContext, Int, Bool) throws -> Bool) rethrows -> (ATNConfigSet, ATNConfigSet) {
         let succeeded = ATNConfigSet(fullCtx)
         let failed = ATNConfigSet(fullCtx)
         for config in configs {
-            if config.semanticContext != SemanticContext.NONE {
+            if config.semanticContext != SemanticContext.Empty.Instance {
                 let predicateEvaluationResult = try evalSemanticContext(config.semanticContext, outerContext, config.alt,fullCtx)
                 if predicateEvaluationResult {
                     try! succeeded.add(config)
@@ -520,7 +520,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     public func dupConfigsWithoutSemanticPredicates() -> ATNConfigSet {
         let dup = ATNConfigSet()
         for config in configs {
-            let c = ATNConfig(config, SemanticContext.NONE)
+            let c = ATNConfig(config, SemanticContext.Empty.Instance)
             try! dup.add(c)
         }
         return dup

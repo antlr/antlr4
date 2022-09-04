@@ -4,6 +4,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+import 'package:antlr4/src/atn/src/atn_simulator.dart';
 import 'package:collection/collection.dart';
 
 import '../../recognizer.dart';
@@ -17,10 +18,6 @@ import '../../util/murmur_hash.dart';
 ///  <p>I have scoped the [AND], [OR], and [Predicate] subclasses of
 ///  [SemanticContext] within the scope of this outer class.</p>
 abstract class SemanticContext {
-  /// The default [SemanticContext], which is semantically equivalent to
-  /// a predicate of the form {@code {true}?}.
-  static const SemanticContext NONE = Predicate();
-
   const SemanticContext();
 
   /// For context independent predicates, we evaluate them without a local
@@ -60,8 +57,8 @@ abstract class SemanticContext {
   }
 
   static SemanticContext? and(SemanticContext? a, SemanticContext? b) {
-    if (a == null || a == NONE) return b;
-    if (b == null || b == NONE) return a;
+    if (a == null || a == EmptySemanticContext.Instance) return b;
+    if (b == null || b == EmptySemanticContext.Instance) return a;
     final result = AND(a, b);
     if (result.opnds.length == 1) {
       return result.opnds[0];
@@ -75,7 +72,7 @@ abstract class SemanticContext {
   static SemanticContext? or(SemanticContext? a, SemanticContext? b) {
     if (a == null) return b;
     if (b == null) return a;
-    if (a == NONE || b == NONE) return NONE;
+    if (a == EmptySemanticContext.Instance || b == EmptySemanticContext.Instance) return EmptySemanticContext.Instance;
     final result = OR(a, b);
     if (result.opnds.length == 1) {
       return result.opnds[0];
@@ -92,6 +89,17 @@ abstract class SemanticContext {
   static Iterable<SemanticContext> filterNonPrecedencePredicates(
       Iterable<SemanticContext> collection) {
     return collection.where((e) => e is! PrecedencePredicate);
+  }
+}
+
+class EmptySemanticContext extends SemanticContext {
+  /// The default [SemanticContext], which is semantically equivalent to
+  /// a predicate of the form {@code {true}?}.
+  static const SemanticContext Instance = Predicate();
+
+  @override
+  bool eval(Recognizer<ATNSimulator> parser, RuleContext? parserCallStack) {
+    return false;
   }
 }
 
@@ -150,7 +158,7 @@ class PrecedencePredicate extends SemanticContext
     RuleContext? parserCallStack,
   ) {
     if (parser.precpred(parserCallStack, precedence)) {
-      return SemanticContext.NONE;
+      return EmptySemanticContext.Instance;
     } else {
       return null;
     }
@@ -273,7 +281,7 @@ class AND extends Operator {
       if (evaluated == null) {
         // The AND context is false if any element is false
         return null;
-      } else if (evaluated != SemanticContext.NONE) {
+      } else if (evaluated != EmptySemanticContext.Instance) {
         // Reduce the result by skipping true elements
         operands.add(evaluated);
       }
@@ -285,7 +293,7 @@ class AND extends Operator {
 
     if (operands.isEmpty) {
       // all elements were true, so the AND context is true
-      return SemanticContext.NONE;
+      return EmptySemanticContext.Instance;
     }
 
     SemanticContext? result = operands[0];
@@ -374,9 +382,9 @@ class OR extends Operator {
     for (var context in opnds) {
       final evaluated = context.evalPrecedence(parser, parserCallStack);
       differs |= (evaluated != context);
-      if (evaluated == SemanticContext.NONE) {
+      if (evaluated == EmptySemanticContext.Instance) {
         // The OR context is true if any element is true
-        return SemanticContext.NONE;
+        return EmptySemanticContext.Instance;
       } else if (evaluated != null) {
         // Reduce the result by skipping false elements
         operands.add(evaluated);

@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -873,16 +874,20 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
     }
 
-	/** For debugging and other purposes. */
 	public void dumpDFA() {
+		dumpDFA(System.out);
+	}
+
+	/** For debugging and other purposes. */
+	public void dumpDFA(PrintStream dumpStream) {
 		synchronized (_interp.decisionToDFA) {
 			boolean seenOne = false;
 			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
 				DFA dfa = _interp.decisionToDFA[d];
 				if ( !dfa.states.isEmpty() ) {
-					if ( seenOne ) System.out.println();
-					System.out.println("Decision " + dfa.decision + ":");
-					System.out.print(dfa.toString(getVocabulary()));
+					if ( seenOne ) dumpStream.println();
+					dumpStream.println("Decision " + dfa.decision + ":");
+					dumpStream.print(dfa.toString(getVocabulary()));
 					seenOne = true;
 				}
 			}

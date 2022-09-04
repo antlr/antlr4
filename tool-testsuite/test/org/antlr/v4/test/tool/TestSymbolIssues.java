@@ -8,14 +8,15 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.antlr.v4.test.tool.ToolTestUtils.realElements;
+import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** */
-public class TestSymbolIssues extends BaseJavaToolTest {
-    static String[] A = {
+public class TestSymbolIssues {
+    final static String[] A = {
         // INPUT
         "grammar A;\n" +
         "options { opt='sss'; k=3; }\n" +
@@ -43,7 +44,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"error(" + ErrorType.MISSING_RULE_ARGS.code + "): A.g4:10:31: missing argument(s) on rule reference: a\n"
     };
 
-    static String[] B = {
+	final static String[] B = {
         // INPUT
         "parser grammar B;\n" +
         "tokens { ID, FOO, X, Y }\n" +
@@ -61,7 +62,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"error(" + ErrorType.IMPLICIT_STRING_DEFINITION.code + "): B.g4:4:20: cannot create implicit token for string literal in non-combined grammar: '.'\n"
     };
 
-    static String[] D = {
+	final static String[] D = {
         // INPUT
         "parser grammar D;\n" +
 		"tokens{ID}\n" +
@@ -78,7 +79,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"error(" + ErrorType.RETVAL_CONFLICTS_WITH_ARG.code + "): D.g4:6:22: return value i conflicts with parameter with same name\n"
     };
 
-	static String[] E = {
+	final static String[] E = {
 		// INPUT
 		"grammar E;\n" +
 		"tokens {\n" +
@@ -92,7 +93,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"warning(" + ErrorType.TOKEN_NAME_REASSIGNMENT.code + "): E.g4:3:4: token name A is already defined\n"
 	};
 
-	static String[] F = {
+	final static String[] F = {
 		// INPUT
 		"lexer grammar F;\n" +
 		"A: 'a';\n" +
@@ -106,17 +107,11 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
 	};
 
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-    @Test public void testA() { super.testErrors(A, false); }
-    @Test public void testB() { super.testErrors(B, false); }
-	@Test public void testD() { super.testErrors(D, false); }
-	@Test public void testE() { super.testErrors(E, false); }
-	@Test public void testF() { super.testErrors(F, false); }
+    @Test public void testA() { testErrors(A, false); }
+    @Test public void testB() { testErrors(B, false); }
+	@Test public void testD() { testErrors(D, false); }
+	@Test public void testE() { testErrors(E, false); }
+	@Test public void testF() { testErrors(F, false); }
 
 	@Test public void testStringLiteralRedefs() throws Exception {
 		String grammar =

@@ -1,15 +1,15 @@
-/// 
+///
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// 
+///
 
 
 public class LL1Analyzer {
-    /// 
+    ///
     /// Special value added to the lookahead sets to indicate that we hit
     /// a predicate during analysis if `seeThruPreds==false`.
-    /// 
+    ///
     public let HIT_PRED: Int = CommonToken.INVALID_TYPE
 
     public let atn: ATN
@@ -18,18 +18,18 @@ public class LL1Analyzer {
         self.atn = atn
     }
 
-    /// 
+    ///
     /// Calculates the SLL(1) expected lookahead set for each outgoing transition
     /// of an _org.antlr.v4.runtime.atn.ATNState_. The returned array has one element for each
     /// outgoing transition in `s`. If the closure from transition
     /// __i__ leads to a semantic predicate before matching a symbol, the
     /// element at index __i__ of the result will be `null`.
-    /// 
+    ///
     /// - parameter s: the ATN state
     /// - returns: the expected symbols for each outgoing transition of `s`.
-    /// 
+    ///
     public func getDecisionLookahead(_ s: ATNState?) -> [IntervalSet?]? {
-        
+
         guard let s = s else {
              return nil
         }
@@ -39,7 +39,7 @@ public class LL1Analyzer {
             look[alt] = IntervalSet()
             var lookBusy = Set<ATNConfig>()
             let seeThruPreds = false // fail to get lookahead upon pred
-            _LOOK(s.transition(alt).target, nil, PredictionContext.EMPTY,
+            _LOOK(s.transition(alt).target, nil, EmptyPredictionContext.Instance,
                     look[alt]!, &lookBusy, BitSet(), seeThruPreds, false)
             // Wipe out lookahead for this alternative if we found nothing
             // or we had a predicate when we !seeThruPreds
@@ -50,44 +50,44 @@ public class LL1Analyzer {
         return look
     }
 
-    /// 
+    ///
     /// Compute set of tokens that can follow `s` in the ATN in the
     /// specified `ctx`.
-    /// 
+    ///
     /// If `ctx` is `null` and the end of the rule containing
     /// `s` is reached, _org.antlr.v4.runtime.Token#EPSILON_ is added to the result set.
     /// If `ctx` is not `null` and the end of the outermost rule is
     /// reached, _org.antlr.v4.runtime.Token#EOF_ is added to the result set.
-    /// 
+    ///
     /// - parameter s: the ATN state
     /// - parameter ctx: the complete parser context, or `null` if the context
     /// should be ignored
-    /// 
+    ///
     /// - returns: The set of tokens that can follow `s` in the ATN in the
     /// specified `ctx`.
-    /// 
+    ///
     public func LOOK(_ s: ATNState, _ ctx: RuleContext?) -> IntervalSet {
         return LOOK(s, nil, ctx)
     }
 
-    /// 
+    ///
     /// Compute set of tokens that can follow `s` in the ATN in the
     /// specified `ctx`.
-    /// 
+    ///
     /// If `ctx` is `null` and the end of the rule containing
     /// `s` is reached, _org.antlr.v4.runtime.Token#EPSILON_ is added to the result set.
     /// If `ctx` is not `null` and the end of the outermost rule is
     /// reached, _org.antlr.v4.runtime.Token#EOF_ is added to the result set.
-    /// 
+    ///
     /// - parameter s: the ATN state
     /// - parameter stopState: the ATN state to stop at. This can be a
     /// _org.antlr.v4.runtime.atn.BlockEndState_ to detect epsilon paths through a closure.
     /// - parameter ctx: the complete parser context, or `null` if the context
     /// should be ignored
-    /// 
+    ///
     /// - returns: The set of tokens that can follow `s` in the ATN in the
     /// specified `ctx`.
-    /// 
+    ///
 
     public func LOOK(_ s: ATNState, _ stopState: ATNState?, _ ctx: RuleContext?) -> IntervalSet {
         let r = IntervalSet()
@@ -98,16 +98,16 @@ public class LL1Analyzer {
         return r
     }
 
-    /// 
+    ///
     /// Compute set of tokens that can follow `s` in the ATN in the
     /// specified `ctx`.
-    /// 
+    ///
     /// If `ctx` is `null` and `stopState` or the end of the
     /// rule containing `s` is reached, _org.antlr.v4.runtime.Token#EPSILON_ is added to
     /// the result set. If `ctx` is not `null` and `addEOF` is
     /// `true` and `stopState` or the end of the outermost rule is
     /// reached, _org.antlr.v4.runtime.Token#EOF_ is added to the result set.
-    /// 
+    ///
     /// - parameter s: the ATN state.
     /// - parameter stopState: the ATN state to stop at. This can be a
     /// _org.antlr.v4.runtime.atn.BlockEndState_ to detect epsilon paths through a closure.
@@ -127,7 +127,7 @@ public class LL1Analyzer {
     /// - parameter addEOF: Add _org.antlr.v4.runtime.Token#EOF_ to the result if the end of the
     /// outermost context is reached. This parameter has no effect if `ctx`
     /// is `null`.
-    /// 
+    ///
     internal func _LOOK(_ s: ATNState,
                         _ stopState: ATNState?,
                         _ ctx: PredictionContext?,
@@ -168,7 +168,7 @@ public class LL1Analyzer {
                 return
             }
 
-            if ctx != PredictionContext.EMPTY {
+            if ctx != EmptyPredictionContext.Instance {
                 let removed = try! calledRuleStack.get(s.ruleIndex!)
                 try! calledRuleStack.clear(s.ruleIndex!)
                 defer {

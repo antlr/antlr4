@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Atn
 		public ATNConfig(ATNState state,
 						 int alt,
 						 PredictionContext context)
-			: this(state, alt, context, SemanticContext.NONE)
+			: this(state, alt, context, SemanticContext.Empty.Instance)
 		{
 		}
 
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Atn
 				buf.Append(context.ToString());
 				buf.Append("]");
 			}
-			if (semanticContext != null && semanticContext != SemanticContext.NONE)
+			if (semanticContext != null && semanticContext != SemanticContext.Empty.Instance)
 			{
 				buf.Append(",");
 				buf.Append(semanticContext);

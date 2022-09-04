@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -43,7 +43,7 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
-  if (config->semanticContext != SemanticContext::NONE) {
+  if (config->semanticContext != SemanticContext::Empty::Instance) {
     hasSemanticContext = true;
   }
   if (config->getOuterContextDepth() > 0) {
@@ -114,7 +114,7 @@ std::vector<Ref<const SemanticContext>> ATNConfigSet::getPredicates() const {
   std::vector<Ref<const SemanticContext>> preds;
   preds.reserve(configs.size());
   for (const auto &c : configs) {
-    if (c->semanticContext != SemanticContext::NONE) {
+    if (c->semanticContext != SemanticContext::Empty::Instance) {
       preds.push_back(c->semanticContext);
     }
   }

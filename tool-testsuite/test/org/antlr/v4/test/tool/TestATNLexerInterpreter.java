@@ -6,20 +6,22 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.runtime.RuntimeTestUtils;
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.LexerGrammar;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.antlr.v4.test.tool.ToolTestUtils.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Lexer rules are little quirky when it comes to wildcards. Problem
@@ -34,13 +36,7 @@ import static org.junit.Assert.assertEquals;
  * want, but occasionally there are some quirks as you'll see from
  * the tests below.
  */
-public class TestATNLexerInterpreter extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
+public class TestATNLexerInterpreter {
 	@Test public void testLexerTwoRules() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -429,9 +425,9 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
 				"LITERAL_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
-		execLexer("L.g4", grammar, "L", "F");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "F");
 
-		assertEquals("line 1:0 token recognition error at: 'F'\n", getParseErrors());
+		assertEquals("line 1:0 token recognition error at: 'F'\n", executedState.errors);
 	}
 
 	@Test public void testLexerCaseInsensitiveSetWithNegation() {
@@ -439,9 +435,9 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
 				"SET_WITH_NOT: ~[a-c];\n";        // ~[a-cA-C]
-		execLexer("L.g4", grammar, "L", "B");
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "B");
 
-		assertEquals("line 1:0 token recognition error at: 'B'\n", getParseErrors());
+		assertEquals("line 1:0 token recognition error at: 'B'\n", executedState.errors);
 	}
 
 	@Test public void testLexerCaseInsensitiveFragments() throws Exception {
@@ -521,22 +517,47 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 				"options { caseInsensitive=true; }\n" +
 				"STRING options { caseInsensitive=false; } : 'N'? '\\'' (~'\\'' | '\\'\\'')* '\\'';\n";
 
-		execLexer("L.g4", grammar, "L", "n'sample'");
-		assertEquals("line 1:0 token recognition error at: 'n'\n", getParseErrors());
+		ExecutedState executedState = execLexer("L.g4", grammar, "L", "n'sample'");
+		assertEquals("line 1:0 token recognition error at: 'n'\n", executedState.errors);
 	}
 
-	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
+	private void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = CharStreams.fromString(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
 //		System.out.println(dot.getDOT(startState, true));
 
-		List<String> tokenTypes = RuntimeTestUtils.getTokenTypes(lg, atn, input);
+		List<String> tokenTypes = getTokenTypes(lg, atn, input);
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
 //		System.out.println(tokenTypes);
 		assertEquals(expecting, result);
 	}
 
+	private static List<String> getTokenTypes(LexerGrammar lg, ATN atn, CharStream input) {
+		LexerATNSimulator interp = new LexerATNSimulator(atn, new DFA[]{new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE))}, null);
+		List<String> tokenTypes = new ArrayList<>();
+		int ttype;
+		boolean hitEOF = false;
+		do {
+			if ( hitEOF ) {
+				tokenTypes.add("EOF");
+				break;
+			}
+			int t = input.LA(1);
+			ttype = interp.match(input, Lexer.DEFAULT_MODE);
+			if ( ttype== Token.EOF ) {
+				tokenTypes.add("EOF");
+			}
+			else {
+				tokenTypes.add(lg.typeToTokenList.get(ttype));
+			}
+
+			if ( t== IntStream.EOF ) {
+				hitEOF = true;
+			}
+		} while ( ttype!=Token.EOF );
+		return tokenTypes;
+	}
 }

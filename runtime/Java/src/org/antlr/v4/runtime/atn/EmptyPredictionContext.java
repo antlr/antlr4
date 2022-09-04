@@ -7,7 +7,13 @@
 package org.antlr.v4.runtime.atn;
 
 public class EmptyPredictionContext extends SingletonPredictionContext {
-	public EmptyPredictionContext() {
+	/**
+	 * Represents {@code $} in local context prediction, which means wildcard.
+	 * {@code *+x = *}.
+	 */
+	public static final EmptyPredictionContext Instance = new EmptyPredictionContext();
+
+	private EmptyPredictionContext() {
 		super(null, EMPTY_RETURN_STATE);
 	}
 

@@ -1,0 +1,55 @@
+import antlr4 from 'file://<runtimePath>/src/antlr4/index.js'
+import <lexerName> from './<lexerName>.js';
+<if(parserName)>
+import <parserName> from './<parserName>.js';
+<if(useListener)>
+import <grammarName>Listener from './<grammarName>Listener.js';
+<endif>
+<if(useVisitor)>
+import <grammarName>Visitor from './<grammarName>Visitor.js';
+<endif>
+
+class TreeShapeListener extends antlr4.tree.ParseTreeListener {
+    enterEveryRule(ctx) {
+        for (let i = 0; i \< ctx.getChildCount; i++) {
+            const child = ctx.getChild(i)
+            const parent = child.parentCtx
+            if (parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {
+                throw `Invalid parse tree shape detected.`
+            }
+        }
+    }
+}
+<endif>
+
+function main(argv) {
+    var input = new antlr4.FileStream(argv[2], true);
+    var lexer = new <lexerName>(input);
+    var stream = new antlr4.CommonTokenStream(lexer);
+<if(parserName)>
+    var parser = new <parserName>(stream);
+<if(debug)>
+    parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
+<endif>
+    parser.buildParseTrees = true;
+    const printer = function() {
+        this.println = function(s) { console.log(s); }
+        this.print = function(s) { process.stdout.write(s); }
+        return this;
+    };
+    parser.printer = new printer();
+    var tree = parser.<parserStartRuleName>();
+    antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
+<else>
+    stream.fill();
+    for(var i=0; i\<stream.tokens.length; i++) {
+        console.log(stream.tokens[i].toString());
+    }
+<if(showDFA)>
+    process.stdout.write(lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString());
+<endif>
+<endif>
+}
+
+main(process.argv);
+

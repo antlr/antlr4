@@ -6,13 +6,21 @@
             "generator": "Ninja",
             "configurationType": "Debug",
             "inheritEnvironments": [ "msvc_x86" ],
-            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
-            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
             "cmakeCommandArgs": "",
             "variables": [
                 {
                     "name": "ANTLR4_INSTALL",
                     "value": "1"
+                },
+                {
+                    "name": "WITH_STATIC_CRT",
+                    "value": "OFF"
+                },
+                {
+                    "name": "WITH_DEMO",
+                    "value": "OFF"
                 }
             ],
             "buildCommandArgs": "-v",
@@ -23,13 +31,21 @@
             "generator": "Ninja",
             "configurationType": "RelWithDebInfo",
             "inheritEnvironments": [ "msvc_x86" ],
-            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
-            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
             "cmakeCommandArgs": "",
             "variables": [
                 {
                     "name": "ANTLR4_INSTALL",
                     "value": "1"
+                },
+                {
+                    "name": "WITH_STATIC_CRT",
+                    "value": "OFF"
+                },
+                {
+                    "name": "WITH_DEMO",
+                    "value": "OFF"
                 }
             ],
             "buildCommandArgs": "-v",
@@ -40,13 +56,21 @@
             "generator": "Ninja",
             "configurationType": "Debug",
             "inheritEnvironments": [ "msvc_x64_x64" ],
-            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
-            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
             "cmakeCommandArgs": "",
             "variables": [
                 {
                     "name": "ANTLR4_INSTALL",
                     "value": "1"
+                },
+                {
+                    "name": "WITH_STATIC_CRT",
+                    "value": "OFF"
+                },
+                {
+                    "name": "WITH_DEMO",
+                    "value": "OFF"
                 }
             ],
             "buildCommandArgs": "-v",
@@ -57,13 +81,21 @@
             "generator": "Ninja",
             "configurationType": "RelWithDebInfo",
             "inheritEnvironments": [ "msvc_x64_x64" ],
-            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
-            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
             "cmakeCommandArgs": "",
             "variables": [
                 {
                     "name": "ANTLR4_INSTALL",
                     "value": "1"
+                },
+                {
+                    "name": "WITH_STATIC_CRT",
+                    "value": "OFF"
+                },
+                {
+                    "name": "WITH_DEMO",
+                    "value": "OFF"
                 }
             ],
             "buildCommandArgs": "-v",

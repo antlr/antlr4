@@ -13,10 +13,6 @@ import 'rule_context.dart';
 import 'util/murmur_hash.dart';
 
 abstract class PredictionContext {
-  /// Represents {@code $} in local context prediction, which means wildcard.
-  /// {@code *+x = *}.
-  static final EmptyPredictionContext EMPTY = EmptyPredictionContext();
-
   /// Represents {@code $} in an array in full context mode, when {@code $}
   /// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
   /// {@code $} = {@link #EMPTY_RETURN_STATE}.
@@ -58,11 +54,11 @@ abstract class PredictionContext {
     // if we are in RuleContext of start rule, s, then PredictionContext
     // is EMPTY. Nobody called us. (if we are empty, return empty)
     if (outerContext.parent == null || outerContext == RuleContext.EMPTY) {
-      return PredictionContext.EMPTY;
+      return EmptyPredictionContext.Instance;
     }
 
     // If we have a parent, convert it to a PredictionContext graph
-    PredictionContext parent = EMPTY;
+    PredictionContext parent = EmptyPredictionContext.Instance;
     parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
 
     final state = atn.states[outerContext.invokingState]!;
@@ -81,7 +77,7 @@ abstract class PredictionContext {
 
   /// This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
   bool get isEmpty {
-    return this == EMPTY;
+    return this == EmptyPredictionContext.Instance;
   }
 
   bool hasEmptyPath() {
@@ -298,18 +294,18 @@ abstract class PredictionContext {
     bool rootIsWildcard,
   ) {
     if (rootIsWildcard) {
-      if (a == EMPTY) return EMPTY; // * + b = *
-      if (b == EMPTY) return EMPTY; // a + * = *
+      if (a == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance; // * + b = *
+      if (b == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance; // a + * = *
     } else {
-      if (a == EMPTY && b == EMPTY) return EMPTY; // $ + $ = $
-      if (a == EMPTY) {
+      if (a == EmptyPredictionContext.Instance && b == EmptyPredictionContext.Instance) return EmptyPredictionContext.Instance; // $ + $ = $
+      if (a == EmptyPredictionContext.Instance) {
         // $ + x = [x,$]
         final payloads = <int>[b.returnState, EMPTY_RETURN_STATE];
         final parents = <PredictionContext?>[b.parent, null];
         PredictionContext joined = ArrayPredictionContext(parents, payloads);
         return joined;
       }
-      if (b == EMPTY) {
+      if (b == EmptyPredictionContext.Instance) {
         // x + $ = [x,$] ($ is always last if present)
         final payloads = <int>[a.returnState, EMPTY_RETURN_STATE];
         final parents = [a.parent, null];
@@ -431,7 +427,7 @@ abstract class PredictionContext {
         return a_;
       }
 
-      mergedParents = List.generate(k, (n) => mergedParents[n]!);
+      mergedParents = List.generate(k, (n) => mergedParents[n]);
       mergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]);
     }
 
@@ -518,7 +514,7 @@ abstract class PredictionContext {
     }
 
     for (var current in nodes) {
-      if (current == EMPTY) continue;
+      if (current == EmptyPredictionContext.Instance) continue;
       for (var i = 0; i < current.length; i++) {
         if (current.getParent(i) == null) continue;
         final s = current.id.toString();
@@ -590,7 +586,7 @@ abstract class PredictionContext {
 
     PredictionContext updated;
     if (parents.isEmpty) {
-      updated = EMPTY;
+      updated = EmptyPredictionContext.Instance;
     } else if (parents.length == 1) {
       updated = SingletonPredictionContext.create(
           parents[0], context.getReturnState(0));
@@ -706,7 +702,7 @@ abstract class PredictionContext {
           }
         }
         stateNumber = p.getReturnState(index);
-        p = p.getParent(index) ?? EMPTY;
+        p = p.getParent(index) ?? EmptyPredictionContext.Instance;
       }
       localBuffer.write(']');
       result.add(localBuffer.toString());
@@ -737,7 +733,7 @@ class SingletonPredictionContext extends PredictionContext {
   ) {
     if (returnState == PredictionContext.EMPTY_RETURN_STATE && parent == null) {
       // someone can pass in the bits of an array ctx that mean $
-      return PredictionContext.EMPTY;
+      return EmptyPredictionContext.Instance;
     }
     return SingletonPredictionContext(parent, returnState);
   }
@@ -789,6 +785,10 @@ class SingletonPredictionContext extends PredictionContext {
 }
 
 class EmptyPredictionContext extends SingletonPredictionContext {
+  /// Represents {@code $} in local context prediction, which means wildcard.
+  /// {@code *+x = *}.
+  static final EmptyPredictionContext Instance = EmptyPredictionContext();
+
   EmptyPredictionContext() : super(null, PredictionContext.EMPTY_RETURN_STATE);
 
   @override

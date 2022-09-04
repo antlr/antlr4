@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -20,12 +20,6 @@ namespace atn {
   ///  SemanticContext within the scope of this outer class.
   class ANTLR4CPP_PUBLIC SemanticContext : public std::enable_shared_from_this<SemanticContext> {
   public:
-    /**
-     * The default {@link SemanticContext}, which is semantically equivalent to
-     * a predicate of the form {@code {true}?}.
-     */
-    static const Ref<const SemanticContext> NONE;
-
     virtual ~SemanticContext() = default;
 
     SemanticContextType getContextType() const { return _contextType; }
@@ -76,6 +70,7 @@ namespace atn {
     /// See also: ParserATNSimulator::getPredsForAmbigAlts.
     static Ref<const SemanticContext> Or(Ref<const SemanticContext> a, Ref<const SemanticContext> b);
 
+    class Empty;
     class Predicate;
     class PrecedencePredicate;
     class Operator;
@@ -96,6 +91,15 @@ namespace atn {
   inline bool operator!=(const SemanticContext &lhs, const SemanticContext &rhs) {
     return !operator==(lhs, rhs);
   }
+
+  class ANTLR4CPP_PUBLIC SemanticContext::Empty : public SemanticContext{
+  public:
+    /**
+     * The default {@link SemanticContext}, which is semantically equivalent to
+     * a predicate of the form {@code {true}?}.
+     */
+    static const Ref<const SemanticContext> Instance;
+  };
 
   class ANTLR4CPP_PUBLIC SemanticContext::Predicate final : public SemanticContext {
   public:

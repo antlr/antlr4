@@ -13,32 +13,25 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestATNConstruction extends BaseJavaToolTest {
-	@Before
-	@Override
-	public void testSetUp() throws Exception {
-		super.testSetUp();
-	}
-
-	@Test
-	public void testA() throws Exception {
+public class TestATNConstruction {
+	@Test public void testA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A;");
@@ -47,7 +40,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 			"s2-A->s3\n" +
 			"s3->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s4\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAB() throws Exception {
 		Grammar g = new Grammar(
@@ -59,7 +52,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s3-B->s4\n" +
 				"s4->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorB() throws Exception {
 		Grammar g = new Grammar(
@@ -74,7 +67,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"BlockEnd_6->RuleStop_a_1\n" +
 				"s4-action_0:-1->BlockEnd_6\n" +
 				"RuleStop_a_1-EOF->s7\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testSetAorB() throws Exception {
 		Grammar g = new Grammar(
@@ -85,7 +78,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s2-{A, B}->s3\n" +
 				"s3->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s4\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testLexerIsntSetMultiCharString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
@@ -265,7 +258,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s2-{'b', A}->s3\n" +
 				"s3->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s4\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testABorCD() throws Exception {
 		Grammar g = new Grammar(
@@ -281,7 +274,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s5-D->BlockEnd_7\n" +
 				"BlockEnd_7->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s8\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testbA() throws Exception {
 		Grammar g = new Grammar(
@@ -294,13 +287,13 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s5-A->s6\n" +
 				"s6->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s9\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 		expecting =
 			"RuleStart_b_2->s7\n" +
 				"s7-B->s8\n" +
 				"s8->RuleStop_b_3\n" +
 				"RuleStop_b_3->s5\n";
-		checkRuleATN(g, "b", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "b", expecting);
 	}
 	@Test public void testFollow() throws Exception {
 		Grammar g = new Grammar(
@@ -314,7 +307,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s10->RuleStop_b_3\n" +
 				"RuleStop_b_3->s7\n" +
 				"RuleStop_b_3->s12\n";
-		checkRuleATN(g, "b", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "b", expecting);
 	}
 	@Test public void testAorEpsilon() throws Exception {
 		Grammar g = new Grammar(
@@ -328,7 +321,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s3->BlockEnd_5\n" +
 				"BlockEnd_5->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s6\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
@@ -341,7 +334,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s2-A->BlockEnd_4\n" +
 				"BlockEnd_4->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorBoptional() throws Exception {
 		Grammar g = new Grammar(
@@ -357,7 +350,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"BlockEnd_6->RuleStop_a_1\n" +
 				"s3-action_0:-1->BlockEnd_6\n" +
 				"RuleStop_a_1-EOF->s7\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testSetAorBoptional() throws Exception {
 		Grammar g = new Grammar(
@@ -370,7 +363,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s2-{A, B}->BlockEnd_4\n" +
 				"BlockEnd_4->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorBthenC() throws Exception {
 		Grammar g = new Grammar(
@@ -382,7 +375,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s3-C->s4\n" +
 				"s4->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAplus() throws Exception {
 		Grammar g = new Grammar(
@@ -397,7 +390,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"PlusLoopBack_5->s6\n" +
 				"s6->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s7\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAplusSingleAltHasPlusASTPointingAtLoopBackState() throws Exception {
 		Grammar g = new Grammar(
@@ -413,7 +406,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 			"PlusLoopBack_10->s11\n" +
 			"s11->RuleStop_a_3\n" +
 			"RuleStop_a_3->s5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 		// Get all AST -> ATNState relationships. Make sure loopback is covered when no loop entry decision
 		List<GrammarAST> ruleNodes = g.ast.getNodesWithType(ANTLRParser.RULE);
 		RuleAST a = (RuleAST)ruleNodes.get(1);
@@ -442,7 +435,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"PlusLoopBack_7->s8\n" +
 				"s8->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s9\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorBorEmptyPlus() throws Exception {
 		Grammar g = new Grammar(
@@ -461,7 +454,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"PlusLoopBack_7->s8\n" +
 				"s8->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s9\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testEmptyOrEmpty() throws Exception {
 		Grammar g = new Grammar(
@@ -475,7 +468,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 			"s3->BlockEnd_5\n"+
 			"BlockEnd_5->RuleStop_a_1\n"+
 			"RuleStop_a_1-EOF->s6\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAStar() throws Exception {
 		Grammar g = new Grammar(
@@ -491,7 +484,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"RuleStop_a_1-EOF->s8\n" +
 				"BlockEnd_4->StarLoopBack_7\n" +
 				"StarLoopBack_7->StarLoopEntry_5\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testNestedAstar() throws Exception {
 		Grammar g = new Grammar(
@@ -514,7 +507,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"BlockEnd_5->StarLoopBack_8\n" +
 				"StarLoopBack_13->StarLoopEntry_11\n" +
 				"StarLoopBack_8->StarLoopEntry_6\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorBstar() throws Exception {
 		Grammar g = new Grammar(
@@ -533,7 +526,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"BlockEnd_6->StarLoopBack_9\n" +
 				"s4-action_0:-1->BlockEnd_6\n" +
 				"StarLoopBack_9->StarLoopEntry_7\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testPredicatedAorB() throws Exception {
 		Grammar g = new Grammar(
@@ -549,7 +542,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s5-B->BlockEnd_7\n" +
 				"BlockEnd_7->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s8\n";
-		checkRuleATN(g, "a", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testParserRuleRefInLexerRule() throws Exception {
@@ -638,7 +631,7 @@ public class TestATNConstruction extends BaseJavaToolTest {
 			"StarLoopBack_29->StarLoopEntry_27\n"+
 			"s20-e->RuleStart_e_2\n"+
 			"s21->BlockEnd_26\n";
-		checkRuleATN(g, "e", expecting);
+		RuntimeTestUtils.checkRuleATN(g, "e", expecting);
 	}
 
 

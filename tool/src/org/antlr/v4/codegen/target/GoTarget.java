@@ -35,6 +35,7 @@ public class GoTarget extends Target {
 		"true", "false", "iota", "nil",
 		"append", "cap", "close", "complex", "copy", "delete", "imag", "len",
 		"make", "new", "panic", "print", "println", "real", "recover",
+		"string",
 
 		// interface definition of RuleContext from runtime/Go/antlr/rule_context.go
 		"Accept", "GetAltNumber", "GetBaseRuleContext", "GetChild", "GetChildCount",
@@ -94,18 +95,6 @@ public class GoTarget extends Target {
 		}
 	}
 
-	@Override
-	public int getInlineTestSetWordSize() {
-		return 32;
-	}
-
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new JavaStringRenderer(), true);
-		return result;
-	}
-
 	public String getRecognizerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -163,18 +152,5 @@ public class GoTarget extends Target {
 		Grammar g = gen.g;
 		assert g.name != null;
 		return g.name.toLowerCase()+"_base_visitor.go";
-	}
-
-	protected static class JavaStringRenderer extends StringRenderer {
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-
-			if ("java-escape".equals(formatString)) {
-				// 5C is the hex code for the \ itself
-				return ((String)o).replace("\\u", "\\u005Cu");
-			}
-
-			return super.toString(o, formatString, locale);
-		}
 	}
 }

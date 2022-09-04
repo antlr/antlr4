@@ -1,0 +1,68 @@
+\<?php
+
+declare(strict_types=1);
+
+use Antlr\Antlr4\Runtime\CommonTokenStream;
+use Antlr\Antlr4\Runtime\Error\Listeners\ConsoleErrorListener;
+use Antlr\Antlr4\Runtime\InputStream;
+use Antlr\Antlr4\Runtime\Lexer;
+use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
+use Antlr\Antlr4\Runtime\ParserRuleContext;
+use Antlr\Antlr4\Runtime\Tree\ErrorNode;
+use Antlr\Antlr4\Runtime\Tree\ParseTreeListener;
+use Antlr\Antlr4\Runtime\Tree\ParseTreeWalker;
+use Antlr\Antlr4\Runtime\Tree\RuleNode;
+use Antlr\Antlr4\Runtime\Tree\TerminalNode;
+
+$runtime = \getenv('RUNTIME');
+
+\spl_autoload_register(function (string $class) use ($runtime) : void {
+    $file = \str_replace('\\\', \DIRECTORY_SEPARATOR, \str_replace('Antlr\Antlr4\Runtime\\\', $runtime . '\\\src\\\', $class)) . '.php';
+
+    if (\file_exists($file)) {
+        require_once $file;
+    }
+});
+
+<if(parserName)>
+final class TreeShapeListener implements ParseTreeListener {
+    public function visitTerminal(TerminalNode $node) : void {}
+    public function visitErrorNode(ErrorNode $node) : void {}
+    public function exitEveryRule(ParserRuleContext $ctx) : void {}
+
+    public function enterEveryRule(ParserRuleContext $ctx) : void {
+        for ($i = 0, $count = $ctx->getChildCount(); $i \< $count; $i++) {
+            $parent = $ctx->getChild($i)->getParent();
+
+            if (!($parent instanceof RuleNode) || $parent->getRuleContext() !== $ctx) {
+                throw new RuntimeException('Invalid parse tree shape detected.');
+            }
+        }
+    }
+}
+<endif>
+
+$input = InputStream::fromPath($argv[1]);
+$lexer = new <lexerName>($input);
+$lexer->addErrorListener(new ConsoleErrorListener());
+$tokens = new CommonTokenStream($lexer);
+<if(parserName)>
+$parser = new <parserName>($tokens);
+<if(debug)>
+$parser->addErrorListener(new DiagnosticErrorListener());
+<endif>
+$parser->addErrorListener(new ConsoleErrorListener());
+$parser->setBuildParseTree(true);
+$tree = $parser-><parserStartRuleName>();
+
+ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);
+<else>
+$tokens->fill();
+
+foreach ($tokens->getAllTokens() as $token) {
+    echo $token . \PHP_EOL;
+}
+<if(showDFA)>
+echo $lexer->getInterpreter()->getDFA(Lexer::DEFAULT_MODE)->toLexerString();
+<endif>
+<endif>
