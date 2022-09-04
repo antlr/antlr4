@@ -462,11 +462,6 @@ Otherwise enter `N` to ignore the warning.
 
 ### javadoc for runtime and tool
 
-```bash
-cd ~/antlr/code/antlr4
-mvn -DskipTests javadoc:jar -q install # get lots of errors but works
-```
-
 Jars are in:
 
 ```
