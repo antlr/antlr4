@@ -62,7 +62,7 @@ It's also worth doing a quick check to see if you find any other references to a
 
 ```bash
 mvn clean
-find . -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
+find . -type f -exec grep -l '4\.10.1' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
 ```
 
 Commit to repository.
