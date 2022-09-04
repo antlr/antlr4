@@ -2,7 +2,7 @@ import Lexer from './Lexer';
 
 import BufferedTokenStream from './BufferedTokenStream';
 
-export default class CommonTokenStream implements BufferedTokenStream {
+export default class CommonTokenStream extends BufferedTokenStream {
     // properties
     tokens: string[];
     // methods

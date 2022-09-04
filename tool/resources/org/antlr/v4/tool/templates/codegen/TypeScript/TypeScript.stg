@@ -35,6 +35,8 @@ import { <file.grammarName>Visitor } from "./<file.grammarName>Visitor";
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
+import { default as antlr4 } from 'antlr4';
+
 <header>
 
 <file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
@@ -45,7 +47,7 @@ ListenerFile(file, header, namedActions) ::= <<
  * This interface defines a complete listener for a parse tree produced by
  * `<file.parserName>`.
  */
-export interface <file.grammarName>Listener extends ParseTreeListener {
+export interface <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -75,6 +77,8 @@ exit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;}; separ
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
+import { default as antlr4 } from 'antlr4';
+
 <header>
 
 <file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
@@ -88,7 +92,7 @@ VisitorFile(file, header, namedActions) ::= <<
  * @param \<Result> The return type of the visit operation. Use `void` for
  * operations with no return type.
  */
-export interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
+export interface <file.grammarName>Visitor\<Result> extends antlr4.tree.ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
 <if(file.visitorLabelRuleNames.(lname))>
@@ -115,7 +119,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass, isLexer=false) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass; null="Parser"> {
+export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass; null="antlr4.Parser"> {
 	<if(parser.tokens)>
 	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 	<endif>
@@ -132,10 +136,10 @@ export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	public get ruleNames(): string[] { return <parser.name>.ruleNames; }
 
 	// @Override
-	public get serializedATN(): string { return <parser.name>._serializedATN; }
+	public get serializedATN(): number[] { return <parser.name>._serializedATN; }
 
-	protected createFailedPredicateException(predicate?: string, message?: string): FailedPredicateException {
-		return new FailedPredicateException(this, predicate, message);
+	protected createFailedPredicateException(predicate?: string, message?: string): antlr4.error.FailedPredicateException {
+		return new antlr4.error.FailedPredicateException(this, predicate, message);
 	}
 
 	<namedActions.members>
@@ -155,6 +159,8 @@ case <f.ruleIndex>:
 <endif>
 
 	<atn>
+
+	static DecisionsToDFA = <parser.name>._ATN.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
 }
 
 <! The argument must be called currentRule because AltLabelStructDecl looks it up by name. !>
@@ -196,9 +202,9 @@ case <f.ruleIndex>:
 >>
 
 parser_ctor(p) ::= <<
-constructor(input: TokenStream) {
+constructor(input: antlr4.TokenStream) {
 	super(input);
-	this._interp = new ParserATNSimulator(<p.name>._ATN, this);
+	this._interp = new antlr4.atn.ParserATNSimulator(this, <p.name>._ATN, <p.name>.DecisionsToDFA, new antlr4.atn.PredictionContextCache());
 }
 >>
 
@@ -249,7 +255,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	<exceptions; separator="\n">
 	<else>
 	catch (re) {
-		if (re instanceof RecognitionException) {
+		if (re instanceof antlr4.error.RecognitionException) {
 			_localctx.exception = re;
 			this._errHandler.reportError(this, re);
 			this._errHandler.recover(this, re);
@@ -346,7 +352,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 		_p = 0;
 	}
 
-	let _parentctx: ParserRuleContext = this._ctx;
+	let _parentctx: antlr4.context.ParserRuleContext = this._ctx;
 	let _parentState: number = this.state;
 	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	let _prevctx: <currentRule.ctxType> = _localctx;
@@ -573,7 +579,7 @@ this.state = <m.stateNumber>;
 if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
 } else {
-	if (this._input.LA(1) === Token.EOF) {
+	if (this._input.LA(1) === antlr4.Token.EOF) {
 		this.matchedEOF = true;
 	}
 
@@ -714,10 +720,10 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
 	::= <<
-export class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+export class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.context.ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	constructor(parent: ParserRuleContext | undefined, invokingState: number<ctorAttrs:{a | , <a>}>) {
+	constructor(parent: antlr4.context.ParserRuleContext | undefined, invokingState: number<ctorAttrs:{a | , <a>}>) {
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}

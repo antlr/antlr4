@@ -3,7 +3,7 @@ import CharStream from "./CharStream";
 import LexerATNSimulator from "./atn/LexerATNSimulator";
 import Token from './Token'
 
-export default class Lexer implements Recognizer {
+export default class Lexer extends Recognizer {
 
     _input: CharStream;
     _interp: LexerATNSimulator;

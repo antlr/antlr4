@@ -10,12 +10,12 @@ import { <grammarName>Visitor } from './<grammarName>Visitor.js';
 <endif>
 
 class TreeShapeListener extends antlr4.tree.ParseTreeListener {
-    enterEveryRule(ctx) {
-        for (let i = 0; i \< ctx.getChildCount; i++) {
-            const child = ctx.getChild(i)
-            const parent = child.parentCtx
-            if (parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {
-                throw `Invalid parse tree shape detected.`
+    enterEveryRule(ctx: antlr4.context.ParserRuleContext) {
+        for (let i = 0; i \< ctx.getChildCount(); i++) {
+            const child = ctx.getChild(i) as antlr4.context.RuleContext;
+            const parent = child.parentCtx;
+            if (parent!.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {
+                throw `Invalid parse tree shape detected.`;
             }
         }
     }
@@ -32,12 +32,10 @@ function main(argv: string[]): void {
     parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
 <endif>
     parser.buildParseTrees = true;
-    const printer = function() {
-        this.println = function(s) { console.log(s); }
-        this.print = function(s) { process.stdout.write(s); }
-        return this;
+    parser.printer = {
+        println : function(s: string) { console.log(s); },
+        print : function(s: string) { process.stdout.write(s); }
     };
-    parser.printer = new printer();
     const tree = parser.<parserStartRuleName>();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
 <else>

@@ -12,9 +12,11 @@ import RecognitionException from "./RecognitionException.js";
  * prediction.
  */
 export default class FailedPredicateException extends RecognitionException {
+
     constructor(recognizer, predicate, message) {
         super({
-            message: formatMessage(predicate, message || null), recognizer: recognizer,
+            message: formatMessage(predicate, message || null),
+            recognizer: recognizer,
             input: recognizer.getInputStream(), ctx: recognizer._ctx
         });
         const s = recognizer._interp.atn.states[recognizer.state]
