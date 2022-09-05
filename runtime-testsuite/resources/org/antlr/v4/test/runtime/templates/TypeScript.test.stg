@@ -90,7 +90,7 @@ Result(r) ::= <%<r>%>
 
 ParserPropertyMember() ::= <<
 @members {
-this.Property = function() {
+public Property() {
     return true;
 }
 }

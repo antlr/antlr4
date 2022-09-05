@@ -14,14 +14,21 @@ export default class Parser extends Recognizer {
     _ctx: ParserRuleContext;
     _interp: ParserATNSimulator;
     _errHandler: ErrorStrategy;
+    _parseListeners?: any[];
     matchedEOF: boolean;
     buildParseTrees: boolean;
     printer?: Printer;
 
     constructor(input: TokenStream);
     match(ttype: number): Token;
+    matchWildcard(): Token;
     consume(): Token;
     enterRule(localctx: ParserRuleContext, state: number, ruleIndex: number): void;
     exitRule() : void;
+    triggerExitRuleEvent() : void;
     enterOuterAlt(localctx: ParserRuleContext, altNum: number): void;
+    enterRecursionRule(localctx: ParserRuleContext, state: number, ruleIndex: number, precedence: number): void;
+    pushNewRecursionContext(localctx: ParserRuleContext, state: number, ruleIndex: number): void;
+    unrollRecursionContexts(parentCtx: ParserRuleContext): void;
+    precpred(localctx: ParserRuleContext, precedence: number): boolean;
 }
