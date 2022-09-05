@@ -8,6 +8,8 @@ import Printer from "./utils/Printer";
 
 export default class Parser extends Recognizer {
 
+    static EOF: number;
+
     _input: TokenStream;
     _ctx: ParserRuleContext;
     _interp: ParserATNSimulator;
@@ -17,6 +19,7 @@ export default class Parser extends Recognizer {
     printer?: Printer;
 
     constructor(input: TokenStream);
+    match(ttype: number): Token;
     consume(): Token;
     enterRule(localctx: ParserRuleContext, state: number, ruleIndex: number): void;
     exitRule() : void;

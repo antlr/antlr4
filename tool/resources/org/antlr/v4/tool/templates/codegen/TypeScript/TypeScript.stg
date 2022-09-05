@@ -123,6 +123,7 @@ export <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	<if(parser.tokens)>
 	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 	<endif>
+	public static readonly EOF = antlr4.Token.EOF;
 	<parser.rules:{r | public static readonly RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
@@ -161,6 +162,7 @@ case <f.ruleIndex>:
 	<atn>
 
 	static DecisionsToDFA = <parser.name>._ATN.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
+
 }
 
 <! The argument must be called currentRule because AltLabelStructDecl looks it up by name. !>
@@ -524,7 +526,7 @@ case <i><if(!choice.ast.greedy)> + 1<endif>:
 
 Sync(s) ::= "this.sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
+ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
@@ -635,8 +637,8 @@ LabelRef(t) ::= "<ctx(t)>._<t.name>"
 ListLabelRef(t) ::= "<ctx(t)>._<ListLabelName(t.name)>"
 SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 
-TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
-InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
+TokenLabelType() ::= "<file.TokenLabelType; null={antlr4.Token}>"
+InputSymbolType() ::= "<file.InputSymbolType; null={antlr4.Token}>"
 
 TokenPropertyRef_text(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.text : undefined)"
 TokenPropertyRef_type(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.type : 0)"
@@ -646,15 +648,15 @@ TokenPropertyRef_channel(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.lab
 TokenPropertyRef_index(t) ::= "(<ctx(t)>._<t.label> != null ? <ctx(t)>._<t.label>.tokenIndex : 0)"
 TokenPropertyRef_int(t) ::= "(<ctx(t)>._<t.label> != null ? Number(<ctx(t)>._<t.label>.text) : 0)"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._start) : undefined)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>._stop) : undefined)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText(<ctx(r)>._<r.label>._start, <ctx(r)>._<r.label>._stop) : undefined)"
+RulePropertyRef_start(r) ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>.start) : undefined)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>.stop) : undefined)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText(new antlr4.misc.Interval(<ctx(r)>._<r.label>.start.tokenIndex, <ctx(r)>._<r.label>.stop!.tokenIndex)) : undefined)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>._<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
-ThisRulePropertyRef_start(r) ::= "_localctx._start"
-ThisRulePropertyRef_stop(r)	 ::= "_localctx._stop"
-ThisRulePropertyRef_text(r)	 ::= "this._input.getText(_localctx._start, this._input.LT(-1))"
+ThisRulePropertyRef_start(r) ::= "_localctx.start"
+ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.misc.Interval(_localctx.start.tokenIndex, this._input.LT(-1)!.tokenIndex))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
@@ -666,17 +668,17 @@ AddToLabelList(a) ::= "<ctx(a.label)>._<a.listName>.push(<labelref(a.label)>);"
 
 TokenDecl(t) ::= "_<t.name>!: <TokenLabelType()>"
 TokenTypeDecl(t) ::= "let <t.name>: number;"
-TokenListDecl(t) ::= "_<t.name>: Token[] = []"
+TokenListDecl(t) ::= "_<t.name>: antlr4.Token[] = []"
 RuleContextDecl(r) ::= "_<r.name>!: <r.ctxName>"
 RuleContextListDecl(rdecl) ::= "_<rdecl.name>: <rdecl.ctxName>[] = []"
 
 ContextTokenGetterDecl(t)      ::=
-	"public <t.name>(): TerminalNode<if(t.optional)> | undefined<endif> { return this.<if(t.optional)>tryG<else>g<endif>etToken(<parser.name>.<t.name>, 0); }"
+	"public <t.name>(): antlr4.tree.TerminalNode<if(t.optional)> | undefined<endif> { return this.<if(t.optional)>tryG<else>g<endif>etToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public <t.name>(): TerminalNode[];"
+    "public <t.name>(): antlr4.tree.TerminalNode[];"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public <t.name>(i: number): TerminalNode;
-public <t.name>(i?: number): TerminalNode | TerminalNode[] {
+public <t.name>(i: number): antlr4.tree.TerminalNode;
+public <t.name>(i?: number): antlr4.tree.TerminalNode | antlr4.tree.TerminalNode[] {
 	if (i === undefined) {
 		return this.getTokens(<parser.name>.<t.name>);
 	} else {
@@ -686,7 +688,7 @@ public <t.name>(i?: number): TerminalNode | TerminalNode[] {
 >>
 ContextRuleGetterDecl(r)       ::= <<
 public <r.name>(): <r.ctxName><if(r.optional)> | undefined<endif> {
-	return this.<if(r.optional)>tryG<else>g<endif>etRuleContext(0, <r.ctxName>);
+	return this.getTypedRuleContext(<r.ctxName>, 0) as <r.ctxName>;
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
@@ -696,9 +698,9 @@ ContextRuleListIndexedGetterDecl(r)   ::= <<
 public <r.name>(i: number): <r.ctxName>;
 public <r.name>(i?: number): <r.ctxName> | <r.ctxName>[] {
 	if (i === undefined) {
-		return this.getRuleContexts(<r.ctxName>);
+		return this.getTypedRuleContexts(<r.ctxName>) as <r.ctxName>[];
 	} else {
-		return this.getRuleContext(i, <r.ctxName>);
+		return this.getTypedRuleContext(<r.ctxName>, i) as <r.ctxName>;
 	}
 }
 >>
@@ -745,7 +747,7 @@ export class <struct.name> extends <currentRule.currentRule.name; format="cap">C
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	constructor(ctx: <currentRule.currentRule.name; format="cap">Context) {
-		super(ctx.parent, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
+		super(ctx.parentCtx, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
 		this.copyFrom(ctx);
 	}
 	<dispatchMethods; separator="\n">
@@ -786,7 +788,7 @@ typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>(_localctx as <ctx.name>)<else>_
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "this.precpred(this._ctx, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
-recRuleSetStopToken()                 ::= "this._ctx._stop = this._input.tryLT(-1);"
+recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = new <ctxName>(_parentctx, _parentState);
@@ -843,6 +845,7 @@ import { default as antlr4 } from 'antlr4';
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
 export <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
 	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
+	public static readonly EOF = antlr4.Token.EOF;
 	<lexer.channels:{c | public static readonly <c> = <lexer.channels.(c)>;}; separator="\n">
 	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
 

@@ -14,7 +14,7 @@ class TreeShapeListener extends antlr4.tree.ParseTreeListener {
         for (let i = 0; i \< ctx.getChildCount(); i++) {
             const child = ctx.getChild(i) as antlr4.context.RuleContext;
             const parent = child.parentCtx;
-            if (parent!.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {
+            if (parent!.ruleContext !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {
                 throw `Invalid parse tree shape detected.`;
             }
         }

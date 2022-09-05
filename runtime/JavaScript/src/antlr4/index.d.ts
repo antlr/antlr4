@@ -12,9 +12,11 @@ import { default as dfa } from "./dfa";
 // @ts-ignore
 import { default as context } from "./context";
 // @ts-ignore
+import { default as misc } from './misc';
+// @ts-ignore
 import { default as tree } from './tree';
 // @ts-ignore
 import { default as error } from './error';
 import { default as Utils } from './utils';
 
-export { atn, dfa, error, tree, context, Utils, FileStream, CharStream, TokenStream, CommonTokenStream, Token, Lexer, Parser };
+export { atn, dfa, error, tree, misc, context, Utils, FileStream, CharStream, TokenStream, CommonTokenStream, Token, Lexer, Parser };

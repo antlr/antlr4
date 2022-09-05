@@ -8,6 +8,7 @@ import FromCodePoint from './polyfills/fromcodepoint.js';
 import { default as atn } from './atn/index.js';
 import { default as dfa } from './dfa/index.js';
 import { default as context } from './context/index.js';
+import { default as misc } from './misc/index.js';
 import { default as tree } from './tree/index.js';
 import { default as error } from './error/index.js';
 import Token from './Token.js';
@@ -26,7 +27,7 @@ import LL1Analyzer from './atn/LL1Analyzer.js';
 import { default as Utils } from './utils/index.js';
 
 const antlr4 = {
-    atn, dfa, context, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
+    atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
 };
 

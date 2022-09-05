@@ -39,7 +39,7 @@ export default class ParseTreeWalker {
      * @param r The grammar rule containing the rule context
      */
     enterRule(listener, r) {
-        const ctx = r.getRuleContext();
+        const ctx = r.ruleContext;
         listener.enterEveryRule(ctx);
         ctx.enterRule(listener);
     }
@@ -51,7 +51,7 @@ export default class ParseTreeWalker {
      * @param r The grammar rule containing the rule context
      */
     exitRule(listener, r) {
-        const ctx = r.getRuleContext();
+        const ctx = r.ruleContext;
         ctx.exitRule(listener);
         listener.exitEveryRule(ctx);
     }
