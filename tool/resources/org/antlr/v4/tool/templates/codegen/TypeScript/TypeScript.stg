@@ -236,7 +236,7 @@ case <index>:
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 // @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>: <a.type>}; separator=", ">): <currentRule.ctxType> {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
 	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -524,17 +524,17 @@ Sync(s) ::= "this.sync(<s.expecting.name>);"
 ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
-// Need a range test to make sure the shift amount will result in a testable bitmask
+// Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
 ((<shiftAmount>) & ~0x1F) === 0
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShift({<parser.name>.<ttype>}, bits.shift)>)}; separator=" | ">)) !== 0)
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) !== 0)
 %>
 
 isZero ::= [
@@ -542,22 +542,26 @@ isZero ::= [
 default:false
 ]
 
-offsetShift(shiftAmount, offset) ::= <%
+offsetShiftVar(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
-// produces more efficient bytecode when bits.ttypes contains at most two items
-bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> === <parser.name>.<ttype>}; separator=" || ">
+offsetShiftType(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>(<parser.name>.<shiftAmount> - <offset>)<else><parser.name>.<shiftAmount><endif>
 %>
 
-cases(ttypes) ::= <<
-<ttypes:{t | case <parser.name>.<t>:}; separator="\n">
+
+bitsetInlineComparison(s, bits) ::= <%
+<bits.tokens:{t | <s.varName>===<t.type>}; separator=" || ">
+%>
+
+cases(tokens) ::= <<
+<tokens:{t | case <t.type>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
 this.state = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.escapedName>(<argExprsChunks><if(r.ast.options.p)><if(argExprsChunks)>,<endif><r.ast.options.p><endif>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -573,15 +577,12 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 this.state = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>this._input.LT(1);<endif>
 <capture>
-if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
-} else {
-	if (this._input.LA(1) === antlr4.Token.EOF) {
-		this.matchedEOF = true;
-	}
-
+<if(invert)>if(<m.varName>\<=0 || <expr>)<else>if(!(<expr>))<endif> {
+    <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
+}
+else {
 	this._errHandler.reportMatch(this);
-	this.consume();
+    this.consume();
 }
 >>
 
@@ -614,7 +615,6 @@ catch (<catchArg>) {
 LexerSkipCommand()  ::= "this.skip();"
 LexerMoreCommand()  ::= "this.more();"
 LexerPopModeCommand() ::= "this.popMode();"
-
 LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>;"
 LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>;"
 LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>;"
@@ -657,14 +657,14 @@ ThisRulePropertyRef_parser(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 ::= "(this.getInvokingContext(<s.ruleIndex>) as <s.ruleName; format=\"cap\">Context).<s.escapedName>"
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	"(this.getInvokingContext(<s.ruleIndex>) as <s.ruleName; format=\"cap\">Context).<s.escapedName> = <rhsChunks>;"
+	"(this.getInvokingContext(<s.ruleIndex>) as <s.escapedName>Context).<s.escapedName> = <rhsChunks>;"
 
 AddToLabelList(a) ::= "<ctx(a.label)>._<a.listName>.push(<labelref(a.label)>);"
 
 TokenDecl(t) ::= "_<t.escapedName>!: <TokenLabelType()>"
 TokenTypeDecl(t) ::= "let <t.escapedName>: number;"
 TokenListDecl(t) ::= "_<t.escapedName>: antlr4.Token[] = []"
-RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName>"
+RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName> = null;"
 RuleContextListDecl(rdecl) ::= "_<rdecl.escapedName>: <rdecl.ctxName>[] = []"
 
 ContextTokenGetterDecl(t)      ::=
@@ -718,11 +718,13 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
 	::= <<
 export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.context.ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+	static readonly ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	constructor(parent: antlr4.context.ParserRuleContext | undefined, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
+	constructor(parser: <parser.name>, parent: antlr4.context.ParserRuleContext | undefined, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
 		super(parent, invokingState);
-		<struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
+    	this.parser = parser;
+        <struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
 	// @Override
 	public get ruleIndex(): number { return <parser.name>.RULE_<struct.derivedFromName>; }
@@ -738,22 +740,21 @@ export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperCl
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-export class <struct.escapedName> extends <currentRule.currentRule.name; format="cap">Context {
+export class <struct.escapedName> extends <struct.parentRule; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	constructor(ctx: <currentRule.currentRule.name; format="cap">Context) {
+	constructor(parser, ctx: <currentRule.currentRule.name; format="cap">Context) {
 		super(ctx.parentCtx, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
-		this.copyFrom(ctx);
+		super.copyFrom(ctx);
 	}
 	<dispatchMethods; separator="\n">
 }
 >>
 
 ListenerDispatchMethod(method) ::= <<
-// @Override
 public <if(method.isEnter)>enter<else>exit<endif>Rule(listener: <parser.grammarName>Listener): void {
-	if (listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">) {
-		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
+    if(listener instanceof <parser.grammarName>Listener ) {
+ 		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 	}
 }
 >>
@@ -786,7 +787,7 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _parentState);
+_localctx = new <ctxName>Context(this, _parentctx, _parentState);
 <if(label)>
 <if(isListLabel)>
 _localctx._<label>.push(_prevctx);
@@ -798,7 +799,7 @@ this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleNam
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
+_localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(_parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
 (_localctx as <currentAltLabel; format="cap">Context)._<label>.push(_prevctx);
@@ -810,7 +811,7 @@ this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleNam
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-_localctx = new <ctxName>Context(_localctx);
+_localctx = new <ctxName>Context(this, _localctx);
 this._ctx = _localctx;
 _prevctx = _localctx;
 >>
@@ -823,8 +824,8 @@ _prevctx = _localctx;
 >>
 
 
-LexerFile(file, lexer, namedActions) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+LexerFile(lexerFile, lexer, namedActions) ::= <<
+<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
 
 import { default as antlr4 } from 'antlr4';
 
