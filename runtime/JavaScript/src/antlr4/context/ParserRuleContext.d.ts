@@ -3,12 +3,14 @@ import Token from "../Token";
 import RecognitionException from "../error/RecognitionException";
 import ParseTree from "../tree/ParseTree";
 import TerminalNode from "../tree/TerminalNode";
+import Parser from "../Parser";
 
 export default class ParserRuleContext extends RuleContext {
     start: Token;
     stop: Token | undefined;
     parentCtx: ParserRuleContext | undefined;
     exception?: RecognitionException;
+    parser: Parser;
 
     constructor();
     constructor(parent: ParserRuleContext | undefined, invokingStateNumber: number | undefined)
