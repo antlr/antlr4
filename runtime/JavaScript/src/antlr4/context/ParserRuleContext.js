@@ -34,9 +34,8 @@ import Interval from "../misc/Interval.js";
  *  satisfy the superclass interface.
  */
 export default class ParserRuleContext extends RuleContext {
+
 	constructor(parent, invokingStateNumber) {
-		parent = parent || null;
-		invokingStateNumber = invokingStateNumber || null;
 		super(parent, invokingStateNumber);
 		/**
 		 * If we are debugging or building a parse tree for a visitor,
