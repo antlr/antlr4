@@ -1,12 +1,12 @@
 import { default as antlr4 } from 'antlr4';
-import { <lexerName> } from './<lexerName>.js';
+import <lexerName> from './<lexerName>.js';
 <if(parserName)>
-import { <parserName> } from './<parserName>.js';
+import <parserName> from './<parserName>.js';
 <if(useListener)>
-import { <grammarName>Listener } from './<grammarName>Listener.js';
+import <grammarName>Listener from './<grammarName>Listener.js';
 <endif>
 <if(useVisitor)>
-import { <grammarName>Visitor } from './<grammarName>Visitor.js';
+import <grammarName>Visitor from './<grammarName>Visitor.js';
 <endif>
 
 class TreeShapeListener extends antlr4.tree.ParseTreeListener {
