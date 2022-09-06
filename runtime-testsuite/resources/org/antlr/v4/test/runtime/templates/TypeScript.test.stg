@@ -18,13 +18,13 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
+AssertIsList(v) ::= <%if ( !(<v> instanceof Array) ) {throw "value is not an array";}%>
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
-InitIntMember(n,v) ::= <%this.<n> : number = <v>;%>
+InitIntMember(n,v) ::= <%<n> : number = <v>;%>
 
-InitBooleanMember(n,v) ::= <%this.<n> = <v>;%>
+InitBooleanMember(n,v) ::= <%<n> : boolean = <v>;%>
 
 InitIntVar(n,v) ::= <%let <n> : number = <v>;%>
 
@@ -280,10 +280,12 @@ Declare_foo() ::= "this.foo = function() {console.log('foo');};"
 
 Invoke_foo() ::= "this.foo();"
 
-Declare_pred() ::= <<this.pred = function(v) {
-	console.log("eval=" + v.toString());
-	return v;
-};
+Declare_pred() ::= <<
+
+	pred(v: any) {
+		console.log("eval=" + v.toString());
+		return v;
+	}
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
