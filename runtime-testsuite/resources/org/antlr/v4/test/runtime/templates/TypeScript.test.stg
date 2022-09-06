@@ -269,14 +269,14 @@ class LeafListener extends <X>Listener {
 >>
 
 DeclareContextListGettersFunction() ::= <<
-	function foo() {
+	foo() {
 		var s = new SContext();
 	    var a = s.a();
 	    var b = s.b();
     };
 >>
 
-Declare_foo() ::= "this.foo = function() {console.log('foo');};"
+Declare_foo() ::= "foo() {console.log('foo');}"
 
 Invoke_foo() ::= "this.foo();"
 
