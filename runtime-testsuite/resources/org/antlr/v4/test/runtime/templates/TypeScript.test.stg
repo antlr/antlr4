@@ -22,13 +22,13 @@ AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
-InitIntMember(n,v) ::= <%this.<n> = <v>;%>
+InitIntMember(n,v) ::= <%this.<n> : number = <v>;%>
 
 InitBooleanMember(n,v) ::= <%this.<n> = <v>;%>
 
-InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+InitIntVar(n,v) ::= <%let <n> : number = <v>;%>
 
-IntArg(n) ::= "<n>"
+IntArg(n) ::= "<n>: number"
 
 VarRef(n) ::= "<n>"
 
@@ -156,21 +156,20 @@ static isIdentifierChar (c: string) {
 >>
 
 BasicListener(X) ::= <<
-@parser::members {
-this.LeafListener = function() {
-    this.visitTerminal = function(node) {
-    	console.log(node.symbol.text);
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
+@parser::header {
+import <X>Listener from '<X>Listener';
+class LeafListener extends <X>Listener {
+	visitTerminal(node: TerminalNode) {
+		console.log(node.symbol.text);
+	}
+}
+
 }
 >>
 
 WalkListener(s) ::= <<
 var walker = new antlr4.tree.ParseTreeWalker();
-walker.walk(new this.LeafListener(), <s>);
+walker.walk(new LeafListener(), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
@@ -194,9 +193,11 @@ class MyRuleNode extends antlr4.ParserRuleContext {
 >>
 
 TokenGetterListener(X) ::= <<
-@parser::members {
-this.LeafListener = function() {
-    this.exitA = function(ctx) {
+@parser::header {
+import <X>Listener from '<X>Listener';
+class LeafListener extends <X>Listener {
+
+	exitA(ctx) {
     	var str;
         if(ctx.getChildCount()===2) {
             str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
@@ -204,18 +205,18 @@ this.LeafListener = function() {
             str = ctx.ID().symbol.toString();
         }
     	console.log(str);
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
+    }
+
+}
+
 }
 >>
 
 RuleGetterListener(X) ::= <<
-@parser::members {
-this.LeafListener = function() {
-    this.exitA = function(ctx) {
+@parser::header {
+// import <X>Listener from "<X>Listener";
+class LeafListener extends <X>Listener {
+	exitA (ctx) {
     	var str;
         if(ctx.getChildCount()===2) {
             str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
@@ -223,18 +224,17 @@ this.LeafListener = function() {
             str = ctx.b(0).start.text;
         }
     	console.log(str);
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
+    }
+}
 }
 >>
 
 LRListener(X) ::= <<
-@parser::members {
-this.LeafListener = function() {
-    this.exitE = function(ctx) {
+@parser::header {
+import <X>Listener from '<X>Listener';
+class LeafListener extends <X>Listener {
+
+	exitE(ctx) {
     	var str;
         if(ctx.getChildCount()===3) {
             str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
@@ -242,29 +242,29 @@ this.LeafListener = function() {
             str = ctx.INT().symbol.text;
         }
     	console.log(str);
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
+    }
+}
+
 }
 >>
 
 LRWithLabelsListener(X) ::= <<
-@parser::members {
-this.LeafListener = function() {
-    this.exitCall = function(ctx) {
+@parser::header {
+import <X>Listener from '<X>Listener';
+class LeafListener extends <X>Listener {
+
+    exitCall(ctx) {
     	var str = ctx.e().start.text + ' ' + ctx.eList();
     	console.log(str);
-    };
-    this.exitInt = function(ctx) {
+    }
+
+    exitInt(ctx) {
         var str = ctx.INT().symbol.text;
         console.log(str);
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
+    }
+
+}
+
 }
 >>
 
@@ -289,5 +289,5 @@ Declare_pred() ::= <<this.pred = function(v) {
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
-StringType() ::= "String"
+StringType() ::= "string"
 ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

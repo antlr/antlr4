@@ -14,13 +14,7 @@ typescriptTypeInitMap ::= [
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-// for running tests with parameters, TODO: discuss strategy for typed parametes in CI
-type int = number;
-
-<namedActions.header>
-
 import { default as antlr4 } from 'antlr4';
-
 <if(file.genListener)>
 import { <file.grammarName>Listener } from "./<file.grammarName>Listener";
 <endif>
@@ -28,11 +22,11 @@ import { <file.grammarName>Listener } from "./<file.grammarName>Listener";
 import { <file.grammarName>Visitor } from "./<file.grammarName>Visitor";
 <endif>
 
-<namedActions.beforeParser>
+// for running tests with parameters, TODO: discuss strategy for typed parameters in CI
+type int = number;
 
+<namedActions.header>
 <parser>
-
-<namedActions.afterParser>
 >>
 
 ListenerFile(file, header, namedActions) ::= <<
@@ -522,7 +516,7 @@ case <i><if(!choice.ast.greedy)> + 1<endif>:
 	this.state = <choice.loopBackStateNumber>;<! loopback/exit decision !>
 	this._errHandler.sync(this);
 	_alt = this._interp.adaptivePredict(this._input, <choice.decision>, this._ctx);
-} while (_alt !== <choice.exitAlt> && _alt !== ATN.INVALID_ALT_NUMBER);
+} while (_alt !== <choice.exitAlt> && _alt !== antlr4.atn.ATN.INVALID_ALT_NUMBER);
 >>
 
 Sync(s) ::= "this.sync(<s.expecting.name>);"
@@ -832,15 +826,10 @@ _prevctx = _localctx;
 LexerFile(file, lexer, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-<namedActions.header>
-
 import { default as antlr4 } from 'antlr4';
 
-<namedActions.beforeLexer>
-
+<namedActions.header>
 <lexer>
-
-<namedActions.afterLexer>
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
