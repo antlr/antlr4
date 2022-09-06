@@ -273,7 +273,7 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
 	this.enterLeftFactoredRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -308,7 +308,7 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
 	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -351,7 +351,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 	let _parentctx: antlr4.context.ParserRuleContext = this._ctx;
 	let _parentState: number = this.state;
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this._ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
+	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
 	let _prevctx: <currentRule.ctxType> = _localctx;
 	let _startState: number = <currentRule.startState>;
 	this.enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
@@ -383,7 +383,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(this, _localctx);<endif>
 this.enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -405,7 +405,7 @@ this._errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = this._input.LT(1);<endif>
 <preamble; separator="\n">
 switch (this._input.LA(1)) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
 	<alt>
 	break;}; separator="\n">
 default:
@@ -417,7 +417,7 @@ LL1OptionalBlock(choice, alts, error) ::= <<
 this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 switch (this._input.LA(1)) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt| <cases(tokens=look)>
 	<alt>
 	break;}; separator="\n">
 default:
@@ -664,7 +664,7 @@ AddToLabelList(a) ::= "<ctx(a.label)>._<a.listName>.push(<labelref(a.label)>);"
 TokenDecl(t) ::= "_<t.escapedName>!: <TokenLabelType()>"
 TokenTypeDecl(t) ::= "let <t.escapedName>: number;"
 TokenListDecl(t) ::= "_<t.escapedName>: antlr4.Token[] = []"
-RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName> = null;"
+RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName>"
 RuleContextListDecl(rdecl) ::= "_<rdecl.escapedName>: <rdecl.ctxName>[] = []"
 
 ContextTokenGetterDecl(t)      ::=
@@ -743,8 +743,8 @@ AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 export class <struct.escapedName> extends <struct.parentRule; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	constructor(parser, ctx: <currentRule.currentRule.name; format="cap">Context) {
-		super(ctx.parentCtx, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
+	constructor(parser: <parser.name>, ctx: <currentRule.currentRule.name; format="cap">Context) {
+		super(parser, ctx.parentCtx, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
 		super.copyFrom(ctx);
 	}
 	<dispatchMethods; separator="\n">
@@ -753,7 +753,7 @@ export class <struct.escapedName> extends <struct.parentRule; format="cap">Conte
 
 ListenerDispatchMethod(method) ::= <<
 public <if(method.isEnter)>enter<else>exit<endif>Rule(listener: <parser.grammarName>Listener): void {
-    if(listener instanceof <parser.grammarName>Listener ) {
+    if(listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">) {
  		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 	}
 }
@@ -799,7 +799,7 @@ this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleNam
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(_parentctx, _parentState));
+_localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(this, _parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
 (_localctx as <currentAltLabel; format="cap">Context)._<label>.push(_prevctx);
