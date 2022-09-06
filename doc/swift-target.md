@@ -131,8 +131,9 @@ Add Antlr4 as a dependency to your `Package.swift` file. For more information, p
 
 
 ```swift
-.package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.11.1"
+.package(url: "https://github.com/antlr/antlr4", from: "4.11.1")
 ```
+
 ## Swift access levels
 
 You may use the `accessLevel` option to control the access levels on generated
