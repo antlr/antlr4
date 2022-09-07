@@ -9,14 +9,14 @@ on:
 jobs:
   cpp-builds:
     runs-on: ${{ matrix.os }}
-
+    if: ${{ false }}  # disable for now
     strategy:
       fail-fast: false
       matrix:
         os: [
-#          macos-latest,
-#          ubuntu-latest,
-#          windows-latest
+          macos-latest,
+          ubuntu-latest,
+          windows-latest
         ]
         compiler: [ clang, gcc ]
         exclude:
