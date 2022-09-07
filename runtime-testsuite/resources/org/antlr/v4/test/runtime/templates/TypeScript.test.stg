@@ -214,18 +214,19 @@ class LeafListener extends <X>Listener {
 
 RuleGetterListener(X) ::= <<
 @parser::header {
-// import <X>Listener from "<X>Listener";
+
 class LeafListener extends <X>Listener {
-	exitA (ctx) {
+	exitA? = (ctx: AContext) => {
     	var str;
         if(ctx.getChildCount()===2) {
-            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
+            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b_list()[0].start.text;
         } else {
             str = ctx.b(0).start.text;
         }
     	console.log(str);
-    }
+    };
 }
+
 }
 >>
 

@@ -593,7 +593,7 @@ ContextTokenGetterDecl(t)      ::= <<
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
-<t.name>_list() {
+<t.escapedName>_list() {
     return this.getTokens(<parser.name>.<t.name>);
 }
 >>
@@ -620,7 +620,7 @@ ContextRuleGetterDecl(r)       ::= <<
 
 // should never be called
 ContextRuleListGetterDecl(r)   ::= <<
-<r.name>_list() {
+<r.escapedName>_list() {
     return this.getTypedRuleContexts(<parser.name>.<r.ctxName>);
 }
 >>

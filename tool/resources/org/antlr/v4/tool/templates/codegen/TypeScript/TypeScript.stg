@@ -44,7 +44,7 @@ import { default as antlr4 } from 'antlr4';
  * This interface defines a complete listener for a parse tree produced by
  * `<file.parserName>`.
  */
-export default interface <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
+export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -89,7 +89,7 @@ import { default as antlr4 } from 'antlr4';
  * @param \<Result> The return type of the visit operation. Use `void` for
  * operations with no return type.
  */
-export default interface <file.grammarName>Visitor\<Result> extends antlr4.tree.ParseTreeVisitor\<Result> {
+export default class <file.grammarName>Visitor\<Result> extends antlr4.tree.ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
 <if(file.visitorLabelRuleNames.(lname))>
@@ -143,11 +143,11 @@ export default <if(parser.abstractRecognizer)>abstract <endif>class <parser.name
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public sempred(_localctx: antlr4.context.RuleContext, ruleIndex: number, predIndex: number): boolean {
+	public sempred(localctx: antlr4.context.RuleContext, ruleIndex: number, predIndex: number): boolean {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-	return this.<f.name>_sempred(_localctx as <f.ctxType>, predIndex);}; separator="\n">
+	return this.<f.name>_sempred(localctx as <f.ctxType>, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -174,11 +174,11 @@ case <f.ruleIndex>:
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 // @Override
-public action(_localctx: RuleContext, ruleIndex: number, actionIndex: number): void {
+public action(localctx: RuleContext, ruleIndex: number, actionIndex: number): void {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
-	this.<f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, actionIndex);
+	this.<f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>localctx, actionIndex);
 	break;}; separator="\n">
 	}
 }
@@ -186,11 +186,11 @@ case <f.ruleIndex>:
 <endif>
 <if(sempredFuncs)>
 // @Override
-public sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
+public sempred(localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-	return this.<f.name>_sempred(_localctx<if(!recog.modes)> as <f.ctxType><endif>, predIndex);}; separator="\n">
+	return this.<f.name>_sempred(localctx<if(!recog.modes)> as <f.ctxType><endif>, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -209,7 +209,7 @@ constructor(input: antlr4.TokenStream) {
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-private <r.name>_action(_localctx: <r.ctxType>, actionIndex: number): void {
+private <r.name>_action(localctx: <r.ctxType>, actionIndex: number): void {
 	switch (actionIndex) {
 	<actions:{index|
 case <index>:
@@ -223,7 +223,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private <r.name>_sempred(_localctx: <r.ctxType>, predIndex: number): boolean {
+private <r.name>_sempred(localctx: <r.ctxType>, predIndex: number): boolean {
 	switch (predIndex) {
 	<actions:{index|
 case <index>:
@@ -236,8 +236,8 @@ case <index>:
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 // @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>: <a.type>}; separator=", ">): <currentRule.ctxType> {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
-	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
+	let localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
+	this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -253,7 +253,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	<else>
 	catch (re) {
 		if (re instanceof antlr4.error.RecognitionException) {
-			_localctx.exception = re;
+			localctx.exception = re;
 			this._errHandler.reportError(this, re);
 			this._errHandler.recover(this, re);
 		} else {
@@ -265,7 +265,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 		<finallyAction>
 		this.exitRule();
 	}
-	return _localctx;
+	return localctx;
 }
 >>
 
@@ -273,8 +273,8 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
-	this.enterLeftFactoredRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
+	let localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
+	this.enterLeftFactoredRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -286,7 +286,7 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 		<namedActions.after>
 	} catch (re) {
 		if (re instanceof antlr4.error.RecognitionException) {
-			_localctx.exception = re;
+			localctx.exception = re;
 			this._errHandler.reportError(this, re);
 			this._errHandler.recover(this, re);
 		} else {
@@ -297,7 +297,7 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 		<finallyAction>
 		this.exitRule();
 	}
-	return _localctx;
+	return localctx;
 }
 >>
 
@@ -308,8 +308,8 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) {
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
-	this.enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
+	let localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -322,7 +322,7 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 	}
 	catch (re) {
 		if (re instanceof antlr4.error.RecognitionException) {
-			_localctx.exception = re;
+			localctx.exception = re;
 			this._errHandler.reportError(this, re);
 			this._errHandler.recover(this, re);
 		} else {
@@ -333,7 +333,7 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 		<finallyAction>
 		this.exitRule();
 	}
-	return _localctx;
+	return localctx;
 }
 >>
 
@@ -351,10 +351,10 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 	let _parentctx: antlr4.context.ParserRuleContext = this._ctx;
 	let _parentState: number = this.state;
-	let _localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
-	let _prevctx: <currentRule.ctxType> = _localctx;
+	let localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
+	let _prevctx: <currentRule.ctxType> = localctx;
 	let _startState: number = <currentRule.startState>;
-	this.enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
+	this.enterRecursionRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -367,7 +367,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	}
 	catch (re) {
 		if (re instanceof antlr4.error.RecognitionException) {
-			_localctx.exception = re;
+			localctx.exception = re;
 			this._errHandler.reportError(this, re);
 			this._errHandler.recover(this, re);
 		} else {
@@ -378,13 +378,13 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 		<finallyAction>
 		this.unrollRecursionContexts(_parentctx);
 	}
-	return _localctx;
+	return localctx;
 }
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(this, _localctx);<endif>
-this.enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
+<if(currentOuterMostAltCodeBlock.altLabel)>localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(this, localctx);<endif>
+this.enterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
 
@@ -622,9 +622,9 @@ LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "_localctx.<a.escapedName>"
-LocalRef(a) ::= "_localctx.<a.escapedName>"
-RetValueRef(a) ::= "_localctx.<a.escapedName>"
+ArgRef(a) ::= "localctx.<a.escapedName>"
+LocalRef(a) ::= "localctx.<a.escapedName>"
+RetValueRef(a) ::= "localctx.<a.escapedName>"
 QRetValueRef(a) ::= "<ctx(a)>._<a.dict>.<a.escapedName>"
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<ctx(t)>._<t.escapedName>"
@@ -649,10 +649,10 @@ RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>._<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
-ThisRulePropertyRef_start(r) ::= "_localctx.start"
-ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.misc.Interval(_localctx.start, this._input.LT(-1)))"
-ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
+ThisRulePropertyRef_start(r) ::= "localctx.start"
+ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.misc.Interval(localctx.start, this._input.LT(-1)))"
+ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 ::= "(this.getInvokingContext(<s.ruleIndex>) as <s.ruleName; format=\"cap\">Context).<s.escapedName>"
@@ -670,15 +670,10 @@ RuleContextListDecl(rdecl) ::= "_<rdecl.escapedName>: <rdecl.ctxName>[] = []"
 ContextTokenGetterDecl(t)      ::=
 	"public <t.escapedName>(): antlr4.tree.TerminalNode<if(t.optional)> | undefined<endif> { return this.getToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public <t.name>(): antlr4.tree.TerminalNode[];"
+    "public <t.escapedName>_list(): antlr4.tree.TerminalNode[];"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public <t.escapedName>(i: number): antlr4.tree.TerminalNode;
-public <t.escapedName>(i?: number): antlr4.tree.TerminalNode | antlr4.tree.TerminalNode[] {
-	if (i === undefined) {
-		return this.getTokens(<parser.name>.<t.name>);
-	} else {
-		return this.getToken(<parser.name>.<t.name>, i);
-	}
+public <t.escapedName>(i: number): antlr4.tree.TerminalNode {
+	return this.getToken(<parser.name>.<t.name>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
@@ -687,16 +682,13 @@ public <r.escapedName>(): <r.ctxName><if(r.optional)> | undefined<endif> {
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public <r.name>(): <r.ctxName>[];
+public <r.escapedName>_list(): <r.ctxName>[] {
+	return this.getTypedRuleContexts(<r.ctxName>) as <r.ctxName>[];
+}
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-public <r.escapedName>(i: number): <r.ctxName>;
-public <r.escapedName>(i?: number): <r.ctxName> | <r.ctxName>[] {
-	if (i === undefined) {
-		return this.getTypedRuleContexts(<r.ctxName>) as <r.ctxName>[];
-	} else {
-		return this.getTypedRuleContext(<r.ctxName>, i) as <r.ctxName>;
-	}
+public <r.escapedName>(i: number): <r.ctxName> {
+	return this.getTypedRuleContext(<r.ctxName>, i) as <r.ctxName>;
 }
 >>
 
@@ -778,8 +770,8 @@ labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif>_<x.escapedName>"
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
 
-// only casts _localctx to the type when the cast isn't redundant (i.e. to a sub-context for a labeled alt)
-typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>(_localctx as <ctx.name>)<else>_localctx<endif>"
+// only casts localctx to the type when the cast isn't redundant (i.e. to a sub-context for a labeled alt)
+typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>(localctx as <ctx.name>)<else>localctx<endif>"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "this.precpred(this._ctx, <opPrec>)"
@@ -787,40 +779,40 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
-_localctx = new <ctxName>Context(this, _parentctx, _parentState);
+localctx = new <ctxName>Context(this, _parentctx, _parentState);
 <if(label)>
 <if(isListLabel)>
-_localctx._<label>.push(_prevctx);
+localctx._<label>.push(_prevctx);
 <else>
-_localctx._<label> = _prevctx;
+localctx._<label> = _prevctx;
 <endif>
 <endif>
-this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>);
+this.pushNewRecursionContext(localctx, _startState, <parser.name>.RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(this, _parentctx, _parentState));
+localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(this, _parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
-(_localctx as <currentAltLabel; format="cap">Context)._<label>.push(_prevctx);
+(localctx as <currentAltLabel; format="cap">Context)._<label>.push(_prevctx);
 <else>
-(_localctx as <currentAltLabel; format="cap">Context)._<label> = _prevctx;
+(localctx as <currentAltLabel; format="cap">Context)._<label> = _prevctx;
 <endif>
 <endif>
-this.pushNewRecursionContext(_localctx, _startState, <parser.name>.RULE_<ruleName>);
+this.pushNewRecursionContext(localctx, _startState, <parser.name>.RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-_localctx = new <ctxName>Context(this, _localctx);
-this._ctx = _localctx;
-_prevctx = _localctx;
+localctx = new <ctxName>Context(this, localctx);
+this._ctx = localctx;
+_prevctx = localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
 if (this._parseListeners != null) {
 	this.triggerExitRuleEvent();
 }
-_prevctx = _localctx;
+_prevctx = localctx;
 >>
 
 
