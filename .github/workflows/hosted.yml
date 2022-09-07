@@ -14,9 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-latest,
-          ubuntu-latest,
-          windows-latest
+#          macos-latest,
+#          ubuntu-latest,
+#          windows-latest
         ]
         compiler: [ clang, gcc ]
         exclude:
