@@ -71,8 +71,10 @@ public class StructDecl extends Decl {
 	public void addDecl(Decl d) {
 		d.ctx = this;
 
-		if ( d instanceof ContextGetterDecl ) getters.add(d);
-		else attrs.add(d);
+		if ( d instanceof ContextGetterDecl )
+			getters.add(d);
+		else
+			attrs.add(d);
 
 		// add to specific "lists"
 		if ( d instanceof TokenTypeDecl ) {
