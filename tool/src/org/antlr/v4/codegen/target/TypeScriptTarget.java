@@ -193,7 +193,7 @@ public class TypeScriptTarget extends Target {
 
 	@Override
 	public boolean supportsOverloadedMethods() {
-		return false;
+		return true;
 	}
 
 	@Override

@@ -10,7 +10,7 @@ Not(v) ::= "!<v>"
 
 Assert(s) ::= <<console.assert(<s>);>>
 
-Cast(t,v) ::= "<v>"
+Cast(t,v) ::= "(<v> as <t>)"
 
 Append(a,b) ::= "<a> + <b>"
 
@@ -157,7 +157,7 @@ static isIdentifierChar (c: string) {
 
 BasicListener(X) ::= <<
 @parser::header {
-import <X>Listener from '<X>Listener';
+
 class LeafListener extends <X>Listener {
 	visitTerminal(node: TerminalNode) {
 		console.log(node.symbol.text);
@@ -194,18 +194,18 @@ class MyRuleNode extends antlr4.ParserRuleContext {
 
 TokenGetterListener(X) ::= <<
 @parser::header {
-import <X>Listener from '<X>Listener';
+
 class LeafListener extends <X>Listener {
 
-	exitA(ctx) {
+	exitA? = (ctx: AContext) => {
     	var str;
         if(ctx.getChildCount()===2) {
-            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT_list());
         } else {
-            str = ctx.ID().symbol.toString();
+            str = ctx.ID()!.symbol.toString();
         }
     	console.log(str);
-    }
+    };
 
 }
 
@@ -232,18 +232,18 @@ class LeafListener extends <X>Listener {
 
 LRListener(X) ::= <<
 @parser::header {
-import <X>Listener from '<X>Listener';
+
 class LeafListener extends <X>Listener {
 
-	exitE(ctx) {
+	exitE? = (ctx: EContext) => {
     	var str;
         if(ctx.getChildCount()===3) {
-            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
+            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e_list()[0].start.text;
         } else {
             str = ctx.INT().symbol.text;
         }
     	console.log(str);
-    }
+    };
 }
 
 }
@@ -251,15 +251,15 @@ class LeafListener extends <X>Listener {
 
 LRWithLabelsListener(X) ::= <<
 @parser::header {
-import <X>Listener from '<X>Listener';
+
 class LeafListener extends <X>Listener {
 
-    exitCall(ctx) {
+    exitCall? = (ctx: CallContext) => {
     	var str = ctx.e().start.text + ' ' + ctx.eList();
     	console.log(str);
-    }
+    };
 
-    exitInt(ctx) {
+    exitInt? = (ctx: IntContext) => {
         var str = ctx.INT().symbol.text;
         console.log(str);
     }
@@ -293,4 +293,6 @@ Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "string"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, member) ::= "<ctx>._<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>._<member>"

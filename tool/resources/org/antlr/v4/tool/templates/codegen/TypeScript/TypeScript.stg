@@ -16,10 +16,10 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 import { default as antlr4 } from 'antlr4';
 <if(file.genListener)>
-import <file.grammarName>Listener from "./<file.grammarName>Listener";
+import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
 <endif>
 <if(file.genVisitor)>
-import <file.grammarName>Visitor from "./<file.grammarName>Visitor";
+import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
@@ -36,7 +36,7 @@ import { default as antlr4 } from 'antlr4';
 
 <header>
 
-<file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+<file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>.js";}; separator="\n">
 
 <namedActions.beforeListener>
 
@@ -78,7 +78,7 @@ import { default as antlr4 } from 'antlr4';
 
 <header>
 
-<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>.js";}; separator="\n">
 
 <namedActions.beforeVisitor>
 
@@ -667,10 +667,16 @@ TokenListDecl(t) ::= "_<t.escapedName>: antlr4.Token[] = []"
 RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName>"
 RuleContextListDecl(rdecl) ::= "_<rdecl.escapedName>: <rdecl.ctxName>[] = []"
 
-ContextTokenGetterDecl(t)      ::=
-	"public <t.escapedName>(): antlr4.tree.TerminalNode<if(t.optional)> | undefined<endif> { return this.getToken(<parser.name>.<t.name>, 0); }"
-ContextTokenListGetterDecl(t)  ::=
-    "public <t.escapedName>_list(): antlr4.tree.TerminalNode[];"
+ContextTokenGetterDecl(t)      ::= <<
+public <t.escapedName>(): antlr4.tree.TerminalNode<if(t.optional)> | undefined<endif> {
+	return this.getToken(<parser.name>.<t.name>, 0);
+}
+>>
+ContextTokenListGetterDecl(t)  ::= <<
+public <t.escapedName>_list(): antlr4.tree.TerminalNode[] {
+    	return this.getTokens(<parser.name>.<t.name>);
+}
+>>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public <t.escapedName>(i: number): antlr4.tree.TerminalNode {
 	return this.getToken(<parser.name>.<t.name>, i);
@@ -710,16 +716,16 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
 	::= <<
 export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.context.ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
-	static readonly ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
 	<attrs:{a | public <a>;}; separator="\n">
-	<getters:{g | <g>}; separator="\n">
 	constructor(parser: <parser.name>, parent: antlr4.context.ParserRuleContext | undefined, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
 		super(parent, invokingState);
     	this.parser = parser;
         <struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
-	// @Override
-	public get ruleIndex(): number { return <parser.name>.RULE_<struct.derivedFromName>; }
+	<getters:{g | <g>}; separator="\n">
+    public get ruleIndex(): number {
+    	return <parser.name>.RULE_<struct.derivedFromName>;
+	}
 <if(struct.provideCopyFrom)><! don't need copy unless we have subclasses !>
 	public copyFrom(ctx: <struct.name>): void {
 		super.copyFrom(ctx);
@@ -734,11 +740,11 @@ export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperCl
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 export class <struct.escapedName> extends <struct.parentRule; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
-	<getters:{g | <g>}; separator="\n">
 	constructor(parser: <parser.name>, ctx: <currentRule.currentRule.name; format="cap">Context) {
 		super(parser, ctx.parentCtx, ctx.invokingState<currentRule.ruleCtx.ctorAttrs:{a | , ctx.<a.d.name>}>);
 		super.copyFrom(ctx);
 	}
+	<getters:{g | <g>}; separator="\n">
 	<dispatchMethods; separator="\n">
 }
 >>
