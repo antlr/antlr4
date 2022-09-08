@@ -11,8 +11,12 @@ import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
 
 public class TscRunner extends RuntimeRunner {
 
@@ -80,8 +84,37 @@ public class TscRunner extends RuntimeRunner {
 
 	}
 
+	// speed-up npm install by caching it across tests
+	// this is risk less since all tests use the same package.json
+	private static String cached_node_modules_dir = null;
+
 	private void npmInstall() throws Exception {
-		Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
+		synchronized(this) {
+			checkValidNodeModulesCache();
+			createNodeModulesCache();
+		}
+		linkNodeModulesToNodeModulesCache();
+	}
+
+	private void linkNodeModulesToNodeModulesCache() throws Exception {
+		Processor.run(new String[] {"ln", "-s", cached_node_modules_dir, "node_modules"}, getTempDirPath());
+	}
+
+	private void createNodeModulesCache() throws Exception {
+		if(cached_node_modules_dir == null) {
+			Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
+			String parentDir = Files.createTempDirectory("TscRunner-cached-node_modules-").toFile().getAbsolutePath();
+			Processor.run(new String[] {"mv", "node_modules", parentDir}, getTempDirPath());
+			cached_node_modules_dir = parentDir + "/node_modules";
+		}
+	}
+
+	private void checkValidNodeModulesCache() {
+		if(cached_node_modules_dir != null) {
+			File file = new File(cached_node_modules_dir);
+			if(!file.exists())
+				cached_node_modules_dir = null;
+		}
 	}
 
 	private void npmLinkAntlr4() throws Exception {
