@@ -26,19 +26,19 @@ public class TscRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
+		installTsc();
 		npmLinkRuntime();
+	}
+
+	private void installTsc() throws Exception {
+		Processor.run(new String[] {"npm", "--silent", "install", "typescript", "--save-dev"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
 	private void npmLinkRuntime() throws Exception {
 		File dir = new File(NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 		if(!dir.exists())
 			throw new RuntimeException("Can't locate JavaScript runtime!");
-		ProcessBuilder pb = new ProcessBuilder()
-				.command("npm", "--silent", "link")
-				.directory(dir)
-				.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
+		Processor.run(new String[] {"npm", "--silent", "link"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
 	@Override
@@ -81,30 +81,15 @@ public class TscRunner extends RuntimeRunner {
 	}
 
 	private void npmInstall() throws Exception {
-		ProcessBuilder pb = new ProcessBuilder()
-				.command("npm", "--silent", "install")
-				.directory(new File(getTempDirPath()))
-				.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
+		Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
 	}
 
 	private void npmLinkAntlr4() throws Exception {
-		ProcessBuilder pb = new ProcessBuilder()
-				.command("npm", "--silent", "link", "antlr4")
-				.directory(new File(getTempDirPath()))
-				.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
+		Processor.run(new String[] {"npm", "--silent", "link", "antlr4"}, getTempDirPath());
 	}
 
 	private void tscCompile() throws Exception {
-		ProcessBuilder pb = new ProcessBuilder()
-				.command("tsc", "--project", "tsconfig.json")
-				.directory(new File(getTempDirPath()))
-				.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
+		Processor.run(new String[] {"tsc", "--project", "tsconfig.json"}, getTempDirPath());
 	}
 
 	@Override
