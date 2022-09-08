@@ -46,7 +46,7 @@ public class ListenerFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
-		namedActions = buildNamedActions(factory.getGrammar());
+		namedActions = buildNamedActions(factory.getGrammar(), ast -> ast.getScope() == null);
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {

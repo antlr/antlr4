@@ -13,6 +13,7 @@ import org.antlr.v4.tool.ast.ActionAST;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public abstract class OutputFile extends OutputModelObject {
 	public final String fileName;
@@ -32,10 +33,15 @@ public abstract class OutputFile extends OutputModelObject {
     }
 
 	public Map<String, Action> buildNamedActions(Grammar g) {
+		return buildNamedActions(g, null);
+	}
+
+	public Map<String, Action> buildNamedActions(Grammar g, Predicate<ActionAST> filter) {
 		Map<String, Action> namedActions = new HashMap<String, Action>();
 		for (String name : g.namedActions.keySet()) {
 			ActionAST ast = g.namedActions.get(name);
-			namedActions.put(name, new Action(factory, ast));
+			if(filter==null || filter.test(ast))
+				namedActions.put(name, new Action(factory, ast));
 		}
 		return namedActions;
 	}
