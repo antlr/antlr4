@@ -35,7 +35,7 @@ public class TscRunner extends RuntimeRunner {
 	}
 
 	private void installTsc() throws Exception {
-		Processor.run(new String[] {"npm", "--silent", "install", "typescript", "--save-dev"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {"npm", "--silent", "install", "-g", "typescript"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
 	private void npmLinkRuntime() throws Exception {

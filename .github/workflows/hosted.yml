@@ -154,8 +154,8 @@ jobs:
       matrix:
         os: [
           macos-latest,
-          ubuntu-latest,
-          windows-latest
+#          ubuntu-latest,
+#          windows-latest
         ]
         target: [
 #          tool,
