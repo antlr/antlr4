@@ -10,15 +10,14 @@ export default class ParserRuleContext extends RuleContext {
     stop: Token | undefined;
     parentCtx: ParserRuleContext | undefined;
     exception?: RecognitionException;
-    parser: Parser;
+    parser?: Parser;
 
-    constructor();
-    constructor(parent: ParserRuleContext | undefined, invokingStateNumber: number | undefined)
+    constructor(parent?: ParserRuleContext, invokingStateNumber?: number);
     copyFrom(ctx: ParserRuleContext): void;
     getChildCount() : number;
     getChild(i: number) : ParseTree;
     getToken(ttype: number, i: number): TerminalNode;
     getTokens(ttype: number): TerminalNode[];
-    getTypedRuleContext<T extends ParserRuleContext>(ctxType: { new (parser: Parser, parent: ParserRuleContext, invokingState: number, ...args: any[]) : T}, i: number): T;
-    getTypedRuleContexts<T extends ParserRuleContext>(ctxType: { new (parser: Parser, parent: ParserRuleContext, invokingState: number, ...args: any[]) : T}): T[];
+    getTypedRuleContext<T extends ParserRuleContext>(ctxType: { new (parser?: Parser, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}, i: number): T;
+    getTypedRuleContexts<T extends ParserRuleContext>(ctxType: { new (parser?: Parser, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}): T[];
 }

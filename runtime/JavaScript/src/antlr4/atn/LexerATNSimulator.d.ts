@@ -7,7 +7,9 @@ import CharStream from "../CharStream";
 
 export default class LexerATNSimulator implements ATNSimulator {
 
-    constructor(recog: Recognizer, atn: ATN, decisionToDFA: DFA[], sharedContextCache: PredictionContextCache);
+    decisionToDFA: DFA[];
+
+    constructor(recog: Recognizer<number>, atn: ATN, decisionToDFA: DFA[], sharedContextCache: PredictionContextCache);
     consume(input: CharStream) : void;
 
 }

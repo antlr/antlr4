@@ -48,7 +48,7 @@ DumpDFA() ::= "this.dumpDFA();"
 
 Pass() ::= ""
 
-StringList() ::= "list"
+StringList() ::= "string[]"
 
 BuildParseTrees() ::= "this.buildParseTrees = true;"
 
@@ -159,7 +159,7 @@ BasicListener(X) ::= <<
 @parser::header {
 
 class LeafListener extends <X>Listener {
-	visitTerminal(node: TerminalNode) {
+	visitTerminal(node: antlr4.tree.TerminalNode) {
 		console.log(node.symbol.text);
 	}
 }
@@ -174,17 +174,20 @@ walker.walk(new LeafListener(), <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::header {
-class MyRuleNode extends antlr4.ParserRuleContext {
-    constructor(parent, invokingState) {
+class MyRuleNode extends antlr4.context.ParserRuleContext {
+
+    altNum: number;
+
+    constructor(parent?: antlr4.context.ParserRuleContext, invokingState?: number) {
         super(parent, invokingState);
         this.altNum = 0;
     }
 
-    getAltNumber() {
+    getAltNumber(): number {
         return this.altNum;
     }
 
-    setAltNumber(altNumber){
+    setAltNumber(altNumber: number){
         this.altNum = altNumber;
     }
 };
@@ -240,7 +243,7 @@ class LeafListener extends <X>Listener {
         if(ctx.getChildCount()===3) {
             str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e_list()[0].start.text;
         } else {
-            str = ctx.INT().symbol.text;
+            str = ctx.INT()!.symbol.text;
         }
     	console.log(str);
     };
@@ -272,8 +275,8 @@ class LeafListener extends <X>Listener {
 DeclareContextListGettersFunction() ::= <<
 	foo() {
 		var s = new SContext();
-	    var a = s.a();
-	    var b = s.b();
+	    var a = s.a_list();
+	    var b = s.b_list();
     };
 >>
 
@@ -292,7 +295,7 @@ Declare_pred() ::= <<
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
-StringType() ::= "string"
+StringType() ::= "string | undefined"
 ContextMember(ctx, member) ::= "<ctx>._<member>"
 SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
 SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>._<member>"

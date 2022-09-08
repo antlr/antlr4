@@ -174,7 +174,7 @@ case <f.ruleIndex>:
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 // @Override
-public action(localctx: RuleContext, ruleIndex: number, actionIndex: number): void {
+public action(localctx: antlr4.context.RuleContext, ruleIndex: number, actionIndex: number): void {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
@@ -186,7 +186,7 @@ case <f.ruleIndex>:
 <endif>
 <if(sempredFuncs)>
 // @Override
-public sempred(localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
+public sempred(localctx: antlr4.context.RuleContext, ruleIndex: number, predIndex: number): boolean {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
@@ -668,7 +668,7 @@ RuleContextDecl(r) ::= "_<r.escapedName>!: <r.ctxName>"
 RuleContextListDecl(rdecl) ::= "_<rdecl.escapedName>: <rdecl.ctxName>[] = []"
 
 ContextTokenGetterDecl(t)      ::= <<
-public <t.escapedName>(): antlr4.tree.TerminalNode<if(t.optional)> | undefined<endif> {
+public <t.escapedName>(): antlr4.tree.TerminalNode {
 	return this.getToken(<parser.name>.<t.name>, 0);
 }
 >>
@@ -683,7 +683,7 @@ public <t.escapedName>(i: number): antlr4.tree.TerminalNode {
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
-public <r.escapedName>(): <r.ctxName><if(r.optional)> | undefined<endif> {
+public <r.escapedName>(): <r.ctxName> {
 	return this.getTypedRuleContext(<r.ctxName>, 0) as <r.ctxName>;
 }
 >>
@@ -698,7 +698,7 @@ public <r.escapedName>(i: number): <r.ctxName> {
 }
 >>
 
-LexerRuleContext() ::= "RuleContext"
+LexerRuleContext() ::= "antlr4.context.RuleContext"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
@@ -717,11 +717,18 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 	::= <<
 export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.context.ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
-	constructor(parser: <parser.name>, parent: antlr4.context.ParserRuleContext | undefined, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
+	<if(struct.ctorAttrs)>
+	constructor(parser: <parser.name>, parent: antlr4.context.ParserRuleContext, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
 		super(parent, invokingState);
     	this.parser = parser;
         <struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
+	<else>
+	constructor(parser?: <parser.name>, parent?: antlr4.context.ParserRuleContext, invokingState?: number) {
+		super(parent, invokingState);
+    	this.parser = parser;
+	}
+	<endif>
 	<getters:{g | <g>}; separator="\n">
     public get ruleIndex(): number {
     	return <parser.name>.RULE_<struct.derivedFromName>;

@@ -5,8 +5,9 @@ import ParserATNSimulator from "./atn/ParserATNSimulator";
 import ErrorStrategy from "./error/ErrorStrategy";
 import Token from "./Token";
 import Printer from "./utils/Printer";
+import IntervalSet from "./misc/IntervalSet";
 
-export default class Parser extends Recognizer {
+export default class Parser extends Recognizer<Token> {
 
     static EOF: number;
 
@@ -31,4 +32,7 @@ export default class Parser extends Recognizer {
     pushNewRecursionContext(localctx: ParserRuleContext, state: number, ruleIndex: number): void;
     unrollRecursionContexts(parentCtx: ParserRuleContext): void;
     precpred(localctx: ParserRuleContext, precedence: number): boolean;
+    getRuleInvocationStack(): string[];
+    dumpDFA(): void;
+    getExpectedTokens(): IntervalSet;
 }

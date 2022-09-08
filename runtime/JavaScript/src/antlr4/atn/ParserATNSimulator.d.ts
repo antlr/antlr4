@@ -5,9 +5,14 @@ import DFA from "../dfa/DFA";
 import PredictionContextCache from "./PredictionContextCache";
 import ParserRuleContext from "../context/ParserRuleContext";
 import TokenStream from "../TokenStream";
+import Token from "../Token";
+import PredictionMode from "./PredictionMode";
 
 export default class ParserATNSimulator extends ATNSimulator {
 
-    constructor(recog: Recognizer, atn: ATN, decisionToDFA: DFA[], sharedContextCache: PredictionContextCache);
+    predictionMode: PredictionMode;
+    decisionToDFA: DFA[];
+
+    constructor(recog: Recognizer<Token>, atn: ATN, decisionToDFA: DFA[], sharedContextCache: PredictionContextCache);
     adaptivePredict(input: TokenStream, decision: number, outerContext: ParserRuleContext) : number;
 }

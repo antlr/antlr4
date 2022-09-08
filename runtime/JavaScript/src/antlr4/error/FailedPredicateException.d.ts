@@ -1,7 +1,7 @@
 import RecognitionException from "./RecognitionException";
-import Recognizer from "../Recognizer";
+import Parser from "../Parser";
 
 export default class FailedPredicateException extends RecognitionException {
 
-    constructor(recognizer: Recognizer, predicate: string | undefined, message: string | undefined);
+    constructor(recognizer: Parser, predicate: string | undefined, message: string | undefined);
 }

@@ -1,3 +1,4 @@
 import Interval from './Interval'
+import IntervalSet from './IntervalSet';
 
-export { Interval }
+export { Interval, IntervalSet }
