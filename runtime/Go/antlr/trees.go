@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -9,8 +9,9 @@ import "fmt"
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 
 // Print out a whole tree in LISP form. {@link //getNodeText} is used on the
-//  node payloads to get the text for the nodes.  Detect
-//  parse trees and extract data appropriately.
+//
+//	node payloads to get the text for the nodes.  Detect
+//	parse trees and extract data appropriately.
 func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 
 	if recog != nil {
@@ -80,8 +81,8 @@ func TreesGetChildren(t Tree) []Tree {
 }
 
 // Return a list of all ancestors of this node.  The first node of
-//  list is the root and the last is the parent of this node.
 //
+//	list is the root and the last is the parent of this node.
 func TreesgetAncestors(t Tree) []Tree {
 	ancestors := make([]Tree, 0)
 	t = t.GetParent()

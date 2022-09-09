@@ -29,7 +29,7 @@ Creating a new target involves the following key elements:
 6. Create test files under [/runtime-testsuite/test/org/antlr/v4/test/runtime](../runtime-testsuite/test/org/antlr/v4/test/runtime).
    They will load defined test cases in each test descriptor.
    Also add the `/runtime-testsuite/test/org/antlr/v4/test/runtime/X/BaseXTest.java` which defines how test cases will execute and output.
-7. Create/edit shell scripts in [/.github](../.github) and [/.circleci](../.circleci) to run tests in CI pipelines.
+7. Create/edit shell scripts in [/.github](../.github) to run tests in CI pipelines.
 
 ## Getting started
 

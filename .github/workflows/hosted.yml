@@ -9,6 +9,7 @@ on:
 jobs:
   cpp-builds:
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -21,8 +22,6 @@ jobs:
         exclude:
           - os: windows-latest
             compiler: gcc
-          - os: windows-latest
-            compiler: clang
         include:
           - os: windows-latest
             compiler: cl
@@ -164,37 +163,12 @@ jobs:
           go,
           java,
           javascript,
-          typescript,
-         php,
+          php,
           python2,
           python3,
           swift,
         ]
         exclude:
-          - os: macos-latest
-            target: dart
-          - os: macos-latest
-            target: python3
-          - os: macos-latest
-            target: swift
-
-          - os: ubuntu-latest
-            target: csharp
-          - os: ubuntu-latest
-            target: dart
-
-          - os: windows-latest
-            target: cpp
-          - os: windows-latest
-            target: csharp
-          - os: windows-latest
-            target: dart
-          - os: windows-latest
-            target: php
-          - os: windows-latest
-            target: python2
-          - os: windows-latest
-            target: python3
           - os: windows-latest
             target: swift
 
@@ -256,7 +230,7 @@ jobs:
         architecture: 'x64'
 
     - name: Set up Node 14
-      if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
+      if: matrix.target == 'javascript'
       uses: actions/setup-node@v3
       with:
         node-version: '14'

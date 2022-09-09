@@ -67,7 +67,7 @@ public class RuntimeMetaData {
 	 * omitted.</li>
 	 * </ul>
 	 */
-	public static final String VERSION = "4.11.1-SNAPSHOT";
+	public static final String VERSION = "4.11.2-SNAPSHOT";
 
 	/**
 	 * Gets the currently executing version of the ANTLR 4 runtime library.

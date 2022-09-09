@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -130,16 +130,6 @@ func (d *DFAState) setPrediction(v int) {
 	d.prediction = v
 }
 
-// func (d *DFAState) equals(other interface{}) bool {
-//	if d == other {
-//		return true
-//	} else if _, ok := other.(*DFAState); !ok {
-//		return false
-//	}
-//
-//	return d.configs.Equals(other.(*DFAState).configs)
-//}
-
 func (d *DFAState) String() string {
 	var s string
 	if d.isAcceptState {
@@ -171,7 +161,6 @@ func (d *DFAState) Hash() int {
 // ParserATNSimulator.addDFAState we need to know if any other state exists that
 // has d exact set of ATN configurations. The stateNumber is irrelevant.
 func (d *DFAState) Equals(o Collectable[*DFAState]) bool {
-
 	if d == o {
 		return true
 	}
