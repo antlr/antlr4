@@ -163,6 +163,7 @@ jobs:
           go,
           java,
           javascript,
+          typescript,
           php,
           python2,
           python3,
@@ -230,7 +231,7 @@ jobs:
         architecture: 'x64'
 
     - name: Set up Node 14
-      if: matrix.target == 'javascript'
+      if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
       uses: actions/setup-node@v3
       with:
         node-version: '14'
