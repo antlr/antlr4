@@ -9,7 +9,7 @@ Parser
 grammar T;
 ifStatement
 @after {
-<AssertIsList({<ContextRuleFunction("$ctx", "elseIfStatement(0)")>})>
+<AssertIsList({<ContextRuleFunction("$ctx", <ContextList("elseIfStatement")>)>})>
 }
     : 'if' expression
       ( ( 'then'
