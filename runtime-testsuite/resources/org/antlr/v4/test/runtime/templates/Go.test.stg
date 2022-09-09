@@ -340,8 +340,8 @@ func pred(v bool) bool {
 
 Invoke_pred(v) ::= <<pred(<v>)>>
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 StringType() ::= "string"
-ContextList(member) ::= "<member>()"
 ContextMember(ctx, member) ::= "<ctx>.<member>"
 SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local; format={cap}>"
 SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"

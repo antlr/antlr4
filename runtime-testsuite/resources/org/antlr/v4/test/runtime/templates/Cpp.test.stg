@@ -274,8 +274,8 @@ bool pred(bool v) {
 Invoke_pred(v) ::= <<pred(<v>)>>
 
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>-><rule>()"
 StringType() ::= "std::string"
-ContextList(member) ::= "<member>()"
 ContextMember(ctx, member) ::= "<ctx>-><member>"
 SubContextLocal(ctx, subctx, local) ::= "<ctx>-><subctx>-><local>"
 SubContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
