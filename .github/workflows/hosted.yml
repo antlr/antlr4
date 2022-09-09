@@ -155,7 +155,7 @@ jobs:
         os: [
           macos-latest,
           ubuntu-latest,
-          windows-latest
+#          windows-latest
         ]
         target: [
 #          tool,
