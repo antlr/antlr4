@@ -84,11 +84,24 @@ public class TscRunner extends RuntimeRunner {
 
 	}
 
+	private static final boolean ENABLE_NODE_MODULES_CACHE = false;
+
 	// speed-up npm install by caching it across tests
 	// this is risk less since all tests use the same package.json
 	private static String cached_node_modules_dir = null;
 
 	private void npmInstall() throws Exception {
+		if (ENABLE_NODE_MODULES_CACHE)
+			npmInstallUsingCache();
+		else
+			npmInstallNormally();
+	}
+
+	private void npmInstallNormally() throws Exception {
+		Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
+	}
+
+	private void npmInstallUsingCache() throws Exception {
 		synchronized(this) {
 			checkValidNodeModulesCache();
 			createNodeModulesCache();
