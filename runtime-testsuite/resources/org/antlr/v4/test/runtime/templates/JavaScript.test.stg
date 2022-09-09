@@ -1,5 +1,5 @@
-writeln(s) ::= <<console.log(<s>);>>
-write(s) ::= <<process.stdout.write(<s>);>>
+writeln(s) ::= <<console.log(<s> || '');>>
+write(s) ::= <<process.stdout.write(<s> || '');>>
 writeList(s) ::= <<console.log(<s; separator="+">);>>
 
 False() ::= "false"
