@@ -147,7 +147,7 @@ func (prc *BaseParserRuleContext) AddErrorNode(badToken Token) *ErrorNodeImpl {
 }
 
 func (prc *BaseParserRuleContext) GetChild(i int) Tree {
-	if prc.children != nil && len(prc.children) >= i {
+	if prc.children != nil && len(prc.children) > i {
 		return prc.children[i]
 	}
 
