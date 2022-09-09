@@ -55,7 +55,7 @@ public class FileUtils {
 	}
 
 	public static void deleteDirectory(File f) throws IOException {
-		if (f.isDirectory() && !Files.isSymbolicLink(f.toPath())) {
+		if (f.isDirectory() && !isLink(f.toPath())) {
 			File[] files = f.listFiles();
 			if (files != null) {
 				for (File c : files)
@@ -64,5 +64,9 @@ public class FileUtils {
 		}
 		if (!f.delete())
 			throw new IOException("Failed to delete file: " + f);
+	}
+
+	public static boolean isLink(Path path) throws IOException {
+		return Files.isSymbolicLink(path) || path.compareTo(path.toRealPath())!=0;
 	}
 }
