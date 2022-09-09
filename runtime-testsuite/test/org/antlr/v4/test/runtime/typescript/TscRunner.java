@@ -8,41 +8,41 @@ package org.antlr.v4.test.runtime.typescript;
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
-import org.stringtemplate.v4.ST;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
 public class TscRunner extends RuntimeRunner {
 
 	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String NORMALIZED_JAVASCRIPT_RUNTIME_PATH = getRuntimePath("JavaScript").replace('\\', '/');
+	private final static String NPM_EXEC = "npm" + (isWindows() ? ".cmd" : "");
+	private final static String TSC_EXEC = "tsc" + (isWindows() ? ".cmd" : "");
 
 	@Override
 	public String getLanguage() {
 		return "TypeScript";
 	}
 
+
 	@Override
 	protected void initRuntime() throws Exception {
-		installTsc();
-		npmLinkRuntime();
+		synchronized(this.getClass()) {
+			installTsc();
+			npmLinkRuntime();
+		}
 	}
 
 	private void installTsc() throws Exception {
-		Processor.run(new String[] {"npm", "--silent", "install", "-g", "typescript"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
-		File dir = new File(NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
-		if(!dir.exists())
-			throw new RuntimeException("Can't locate JavaScript runtime!");
-		Processor.run(new String[] {"npm", "--silent", "link"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "link"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class TscRunner extends RuntimeRunner {
 	}
 
 	private void npmInstallNormally() throws Exception {
-		Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, getTempDirPath());
 	}
 
 	private void npmInstallUsingCache() throws Exception {
@@ -115,7 +115,7 @@ public class TscRunner extends RuntimeRunner {
 
 	private void createNodeModulesCache() throws Exception {
 		if(cached_node_modules_dir == null) {
-			Processor.run(new String[] {"npm", "--silent", "install"}, getTempDirPath());
+			Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, getTempDirPath());
 			String parentDir = Files.createTempDirectory("TscRunner-cached-node_modules-").toFile().getAbsolutePath();
 			Processor.run(new String[] {"mv", "node_modules", parentDir}, getTempDirPath());
 			cached_node_modules_dir = parentDir + "/node_modules";
@@ -131,15 +131,16 @@ public class TscRunner extends RuntimeRunner {
 	}
 
 	private void npmLinkAntlr4() throws Exception {
-		Processor.run(new String[] {"npm", "--silent", "link", "antlr4"}, getTempDirPath());
+		Processor.run(new String[] {NPM_EXEC, "--silent", "link", "antlr4"}, getTempDirPath());
+	}
+
+	private void npmUnlinkAntlr4() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "unlink", "antlr4"}, getTempDirPath());
 	}
 
 	private void tscCompile() throws Exception {
-		Processor.run(new String[] {"tsc", "--project", "tsconfig.json"}, getTempDirPath());
+		Processor.run(new String[] {TSC_EXEC, "--project", "tsconfig.json"}, getTempDirPath());
 	}
 
-	@Override
-	protected void addExtraRecognizerParameters(ST template) {
-		template.add("runtimePath", NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
-	}
+
 }
