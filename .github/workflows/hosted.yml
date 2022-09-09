@@ -9,7 +9,6 @@ on:
 jobs:
   cpp-builds:
     runs-on: ${{ matrix.os }}
-    if: ${{ false }}  # disable for now
     strategy:
       fail-fast: false
       matrix:
@@ -155,21 +154,21 @@ jobs:
         os: [
           macos-latest,
           ubuntu-latest,
-#          windows-latest
+          windows-latest
         ]
         target: [
-#          tool,
-#          cpp,
-#          csharp,
-#          dart,
-#          go,
-#          java,
-#          javascript,
+          tool,
+          cpp,
+          csharp,
+          dart,
+          go,
+          java,
+          javascript,
           typescript,
-#         php,
-#          python2,
-#          python3,
-#          swift,
+         php,
+          python2,
+          python3,
+          swift,
         ]
         exclude:
           - os: macos-latest
