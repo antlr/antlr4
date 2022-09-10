@@ -279,61 +279,24 @@ zip -r ~/antlr/sites/website-antlr4/download/antlr-javascript-runtime-4.11.1.zip
 
 ### CSharp
 
+As of writing, you can only release from a Windows box, because Visual Studio for Mac can only build the netstandard2.0 version
+
 **Install the pre-requisites**
 
-You need Mono and `nuget` to be installed. On mac:
-
-- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/) (I need dotnet 5 and 3.1 versions)
-- nuget - download [nuget.exe](https://www.nuget.org/downloads)
-- dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
-
-Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
-
-You also need to enable .NET Framework 3.5 support in Windows "Programs and Features".
+You need 'msbuild' and `nuget` to be installed. 
 
 **Creating the signed assembly**
 
-From Mac:
+cd ~/antlr/code/antlr4/runtime/CSharp/src
+dotnet build -c Release Antlr4.csproj
 
-```bash
-critter:~ $ cd ~/antlr/code/antlr4/runtime/CSharp/src
-critter:~/antlr/code/antlr4/runtime/CSharp/src $ dotnet build -c Release Antlr4.csproj
-Microsoft (R) Build Engine version 16.7.2+b60ddb6f4 for .NET
-Copyright (C) Microsoft Corporation. All rights reserved.
+check that the bin/Release folder contains both the netstandard2.0 and the net45 builds
+the binaries are already signed, but it's worth double checking
 
-  Determining projects to restore...
-  Restored /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/Antlr4.csproj (in 340 ms).
-  Antlr4 -> /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll
-  Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/Antlr4.Runtime.Standard.4.11.1.0.nupkg'.
+sn -v bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll
+sn -v bin/Release/net45/Antlr4.Runtime.Standard.dll
 
-Build succeeded.
-    0 Warning(s)
-    0 Error(s)
-
-Time Elapsed 00:00:06.77
-critter:~/antlr/code/antlr4/runtime/CSharp/src $ /Library/Frameworks/Mono.framework/Versions/Current/Commands/sn -R bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll Antlr4.snk
-Mono StrongName - version 6.12.0.0
-StrongName utility for signing assemblies
-Copyright 2002, 2003 Motus Technologies. Copyright 2004-2008 Novell. BSD licensed.
-
-Assembly bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll signed.
-critter:~/antlr/code/antlr4/runtime/CSharp/src $ /Library/Frameworks/Mono.framework/Versions/Current/Commands/sn -v bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll
-Mono StrongName - version 6.12.0.0
-StrongName utility for signing assemblies
-Copyright 2002, 2003 Motus Technologies. Copyright 2004-2008 Novell. BSD licensed.
-
-Assembly bin/Release/netstandard2.0/Antlr4.Runtime.Standard.dll is strongnamed.
-$ tree /Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/
-/Users/parrt/antlr/code/antlr4/runtime/CSharp/src/bin/Release/
-├── Antlr4.Runtime.Standard.4.11.1.0.nupkg
-└── netstandard2.0
-    ├── Antlr4.Runtime.Standard.deps.json
-    ├── Antlr4.Runtime.Standard.dll
-    ├── Antlr4.Runtime.Standard.pdb
-    └── Antlr4.Runtime.Standard.xml
-
-1 directory, 5 files
-```
+both should say the dll is valid
 
 **Publishing to NuGet**
 
@@ -345,9 +308,6 @@ Alternately, you can publish from the cmd line. You need to get your NuGet key f
 ```cmd
 nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
-
-Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). 
-
 
 ### Python
 
