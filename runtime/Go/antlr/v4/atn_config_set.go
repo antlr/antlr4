@@ -4,7 +4,10 @@
 
 package antlr
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type ATNConfigSet interface {
 	Hash() int
@@ -103,7 +106,7 @@ func (b *BaseATNConfigSet) Alts() *BitSet {
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
 		cachedHash:   -1,
-		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](&ATNConfigComparator[ATNConfig]{}),
+		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst),
 		fullCtx:      fullCtx,
 	}
 }
@@ -159,7 +162,7 @@ func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 
 	// states uses the standard comparator provided by the ATNState instance
 	//
-	states := NewJStore[ATNState, Comparator[ATNState]](&ObjEqComparator[ATNState]{})
+	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst)
 
 	for i := 0; i < len(b.configs); i++ {
 		states.Put(b.configs[i].GetState())
@@ -275,12 +278,11 @@ func (b *BaseATNConfigSet) Hash() int {
 	return b.hashCodeConfigs()
 }
 
+// TODO: This is terrible. Many config sets hash to the same thing. Fix it Jim
 func (b *BaseATNConfigSet) hashCodeConfigs() int {
-	h := 1
-	for _, config := range b.configs {
-		h = 31*h + config.Hash()
-	}
-	return h
+	as := fmt.Sprintf("%p", b.configs)
+	h, _ := strconv.ParseInt(as[2:], 16, 64)
+	return int(h)
 }
 
 func (b *BaseATNConfigSet) Length() int {
@@ -314,7 +316,7 @@ func (b *BaseATNConfigSet) Clear() {
 
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](&BaseATNConfigComparator[ATNConfig]{})
+	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](atnConfCompInst)
 }
 
 func (b *BaseATNConfigSet) FullContext() bool {
@@ -397,7 +399,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	b := NewBaseATNConfigSet(false)
 
 	// This set uses the standard Hash() and Equals() from ATNConfig
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](&ObjEqComparator[ATNConfig]{})
+	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
 
 	return &OrderedATNConfigSet{BaseATNConfigSet: b}
 }
