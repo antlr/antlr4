@@ -4,7 +4,7 @@ Hi and welcome to the version 4 release of ANTLR! See [Why do we need ANTLR v4?]
 
 ## Getting started the easy way using antlr4-tools
 
-To play around with ANTLR without having to worry about installing it and the Java needed to execute it, use [antlr4-tools](https://github.com/antlr/antlr4-tools). The only requirement is Python3, which is typically installed on all developer machines on all operating systems.
+To play around with ANTLR without having to worry about installing it and the Java needed to execute it, use [antlr4-tools](https://github.com/antlr/antlr4-tools). The only requirement is Python3, which is typically installed on all developer machines on all operating systems. (See below for Windows issue.)
 
 ```bash
 $ pip install antlr4-tools
@@ -23,8 +23,6 @@ ANTLR Parser Generator  Version 4.11.1
 ...
 ```
 
-On Windows, the `pip` command doesn't just work---you need to add the `...\local-packages\python38\scripts` dir to your `PATH`, which itself might require a fun reboot.  If you use WSL on Windows, then the pip install will also properly at the scripts directly (if you run from bash shell).
-
 Let's play with a simple grammar:
 
 ```
@@ -38,6 +36,22 @@ expr:	expr ('*'|'/') expr
 NEWLINE : [\r\n]+ -> skip;
 INT     : [0-9]+ ;
 ```
+
+### Windows-specific issues
+
+On Windows, the `pip` command doesn't just work---you need to add the `...\local-packages\python38\scripts` dir to your `PATH`, which itself might require a fun reboot.  If you use WSL on Windows, then the pip install will also properly at the scripts directly (if you run from bash shell).
+
+
+1. Go to the Microsoft Store
+2. Search in Microsoft Store for Python
+3. Select the newest version of Python (3.10).
+4. Click the "Get" button. Store installs python and pip at "c:\Users...\AppData\Local\Microsoft\WindowsApps\python.exe" and "c:\Users...\AppData\Local\Microsoft\WindowsApps\pip.exe", respectively. And, it updates the search path immediately with the install.
+5. Open a "cmd" terminal.
+6. You can now type "python" and "pip", and "pip install antlr4-tools". 7. Unfortunately, it does not add that to the search path.
+7. Update the search path to contain `c:\Users...\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p8\LocalCache\local-packages\Python310\Scripts`. You may need to install MSYS2, then do a `find /c/ -name antlr4.exe 2> /dev/null` and enter that path.
+8. Or, you can set up an alias to antlr4.exe on that path.
+
+The good news is that the ANTLR4 Python tool downloads the ANTLR jar in a standard location, and you don't need to do that manually. It's also possible to go in a browser, go to python.org, and download the python package. But, it's likely you will need to update the path for antlr4.exe as before.
 
 ### Try parsing with a sample grammar
 
