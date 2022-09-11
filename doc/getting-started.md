@@ -56,6 +56,7 @@ Here's how to get the tokens and trace through the parse:
 ```bash
 $ antlr4-parse Expr.g4 prog -tokens -trace
 10+20*30
+^D
 [@0,0:1='10',<INT>,1:0]
 [@1,2:2='+',<'+'>,1:2]
 [@2,3:4='20',<INT>,1:3]
@@ -85,6 +86,7 @@ Here's how to get a visual tree view:
 ```bash
 $ antlr4-parse Expr.g4 prog -gui
 10+20*30
+^D
 ```
 
 The following will pop up in a Java-based GUI window:
