@@ -48,9 +48,9 @@ namespace antlr4 {
   using FlatHashMap = absl::flat_hash_map<Key, Value, Hash, Equal, Allocator>;
 #else
   template <typename Key, typename Value,
-            typename Hash = typename std::unordered_map<Key, Value>::hasher,
-            typename Equal = typename std::unordered_map<Key, Value>::key_equal,
-            typename Allocator = typename std::unordered_map<Key, Value>::allocator_type>
+            typename Hash = std::hash<Key>,
+            typename Equal = std::equal_to<Key>,
+            typename Allocator = std::allocator<std::pair<const Key, Value>>>
   using FlatHashMap = std::unordered_map<Key, Value, Hash, Equal, Allocator>;
 #endif
 
