@@ -30,10 +30,8 @@ public class TscRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-		synchronized(this.getClass()) {
-			installTsc();
-			npmLinkRuntime();
-		}
+		installTsc();
+		npmLinkRuntime();
 	}
 
 	private void installTsc() throws Exception {
@@ -84,63 +82,17 @@ public class TscRunner extends RuntimeRunner {
 
 	}
 
-	private static final boolean ENABLE_NODE_MODULES_CACHE = false;
-
-	// speed-up npm install by caching it across tests
-	// this is risk less since all tests use the same package.json
-	private static String cached_node_modules_dir = null;
-
 	private void npmInstall() throws Exception {
-		if (ENABLE_NODE_MODULES_CACHE)
-			npmInstallUsingCache();
-		else
-			npmInstallNormally();
-	}
-
-	private void npmInstallNormally() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, getTempDirPath());
 	}
 
-	private void npmInstallUsingCache() throws Exception {
-		synchronized(this) {
-			checkValidNodeModulesCache();
-			createNodeModulesCache();
-		}
-		linkNodeModulesToNodeModulesCache();
-	}
-
-	private void linkNodeModulesToNodeModulesCache() throws Exception {
-		Processor.run(new String[] {"ln", "-s", cached_node_modules_dir, "node_modules"}, getTempDirPath());
-	}
-
-	private void createNodeModulesCache() throws Exception {
-		if(cached_node_modules_dir == null) {
-			Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, getTempDirPath());
-			String parentDir = Files.createTempDirectory("TscRunner-cached-node_modules-").toFile().getAbsolutePath();
-			Processor.run(new String[] {"mv", "node_modules", parentDir}, getTempDirPath());
-			cached_node_modules_dir = parentDir + "/node_modules";
-		}
-	}
-
-	private void checkValidNodeModulesCache() {
-		if(cached_node_modules_dir != null) {
-			File file = new File(cached_node_modules_dir);
-			if(!file.exists())
-				cached_node_modules_dir = null;
-		}
-	}
 
 	private void npmLinkAntlr4() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "link", "antlr4"}, getTempDirPath());
 	}
 
-	private void npmUnlinkAntlr4() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "unlink", "antlr4"}, getTempDirPath());
-	}
-
 	private void tscCompile() throws Exception {
 		Processor.run(new String[] {TSC_EXEC, "--project", "tsconfig.json"}, getTempDirPath());
 	}
-
 
 }
