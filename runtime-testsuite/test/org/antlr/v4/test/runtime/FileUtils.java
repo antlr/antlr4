@@ -11,6 +11,8 @@ import org.antlr.v4.runtime.misc.Utils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributes;
 
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
 
@@ -67,6 +69,11 @@ public class FileUtils {
 	}
 
 	public static boolean isLink(Path path) throws IOException {
-		return Files.isSymbolicLink(path) || path.compareTo(path.toRealPath())!=0;
+		try {
+			BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+			return attrs.isSymbolicLink() || (attrs instanceof DosFileAttributes && attrs.isOther());
+		} catch (IOException ignored) {
+			return false;
+		}
 	}
 }
