@@ -430,10 +430,6 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-	public void removeParserHeader() {
-		namedActions.remove("header");
-	}
-
 	/**
 	 * Define the specified rule in the grammar. This method assigns the rule's
 	 * {@link Rule#index} according to the {@link #ruleNumber} field, and adds

@@ -50,8 +50,6 @@ public class CodeGenPipeline {
 				writeRecognizer(parser, gen, false);
 			}
 
-			g.removeParserHeader();
-
 			if ( g.tool.gen_listener ) {
 				if (gen.getTarget().needsHeader()) {
 					ST listener = gen.generateListener(true);
