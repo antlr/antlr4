@@ -41,7 +41,7 @@ public class VisitorFile extends OutputFile {
 	public VisitorFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
-		namedActions = buildNamedActions(g);
+		namedActions = buildNamedActions(g, ast -> ast.getScope()==null);
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
