@@ -126,7 +126,7 @@ public abstract class Target {
 	 *  to a token type in the generated code.
 	 */
 	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
-		String name = g.getTokenName(ttype);
+	    String name = this.escapeIfNeeded(g.getTokenName(ttype));
 		// If name is not valid, return the token type instead
 		if ( Grammar.INVALID_TOKEN_NAME.equals(name) ) {
 			return String.valueOf(ttype);
@@ -167,6 +167,7 @@ public abstract class Target {
 			return null;
 		}
 
+		s = escapeIfNeeded(s);
 		StringBuilder buf = new StringBuilder();
 		if ( quoted ) {
 			buf.append('"');
@@ -242,6 +243,7 @@ public abstract class Target {
 	{
 		StringBuilder sb = new StringBuilder();
 
+		literal = escapeIfNeeded(literal);
 		if ( addQuotes ) sb.append('"');
 
 		for (int i = 1; i < literal.length() -1; ) {
