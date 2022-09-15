@@ -243,6 +243,7 @@ public abstract class Target {
 	{
 		StringBuilder sb = new StringBuilder();
 
+		literal = escapeIfNeeded(literal);
 		if ( addQuotes ) sb.append('"');
 
 		for (int i = 1; i < literal.length() -1; ) {
