@@ -13,7 +13,8 @@ import java.util.List;
 
 public class ActionAST extends GrammarASTWithOptions implements RuleElementAST {
     // Alt, rule, grammar space
-    public AttributeResolver resolver;
+	GrammarAST scope = null;
+	public AttributeResolver resolver;
 	public List<Token> chunks; // useful for ANTLR IDE developers
 
 	public ActionAST(ActionAST node) {
@@ -31,4 +32,14 @@ public class ActionAST extends GrammarASTWithOptions implements RuleElementAST {
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
+
+	public void setScope(GrammarAST scope) {
+		this.scope = scope;
+	}
+
+	public GrammarAST getScope() {
+		return scope;
+	}
+
+
 }

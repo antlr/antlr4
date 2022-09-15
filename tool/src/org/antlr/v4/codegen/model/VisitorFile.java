@@ -58,7 +58,8 @@ public class VisitorFile extends OutputFile {
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");
-		if ( ast!=null ) header = new Action(factory, ast);
+		if ( ast!=null && ast.getScope()==null)
+			header = new Action(factory, ast);
 		genPackage = g.tool.genPackage;
 		accessLevel = g.getOptionString("accessLevel");
 		exportMacro = g.getOptionString("exportMacro");
