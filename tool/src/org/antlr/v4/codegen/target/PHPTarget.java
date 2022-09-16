@@ -77,13 +77,6 @@ public class PHPTarget extends Target {
 	}
 
 	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
-		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(literal, addQuotes, escapeSpecial);
-		targetStringLiteral = targetStringLiteral.replace("$", "\\$");
-		return targetStringLiteral;
-	}
-
-	@Override
 	public boolean isATNSerializedAsInts() {
 		return true;
 	}

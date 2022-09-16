@@ -234,11 +234,12 @@ public abstract class Target {
 	 * around.
 	 * </p>
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
+	public final String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
 		StringBuilder sb = new StringBuilder();
 
 		if ( addQuotes ) sb.append('"');
 
+		Map<Character, String> targetCharValueEscape = getTargetCharValueEscape();
 		for (int i = 1; i < literal.length() -1; ) {
 			int codePoint = literal.codePointAt(i);
 			int toAdvance = Character.charCount(codePoint);
@@ -297,10 +298,9 @@ public abstract class Target {
 				}
 			}
 			else {
-				if (codePoint == 0x22) {
-					// ANTLR doesn't escape " in literal strings,
-					// but every other language needs to do so.
-					sb.append("\\\"");
+				String targetEscapedChar = targetCharValueEscape.get((char) codePoint);
+				if (targetEscapedChar != null) {
+					sb.append(targetEscapedChar);
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
 					appendUnicodeEscapedCodePoint(codePoint, sb, escapeSpecial);
