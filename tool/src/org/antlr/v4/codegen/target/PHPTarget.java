@@ -77,9 +77,8 @@ public class PHPTarget extends Target {
 	}
 
 	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
-															   boolean escapeSpecial) {
-		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
+	public String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
+		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(literal, addQuotes, escapeSpecial);
 		targetStringLiteral = targetStringLiteral.replace("$", "\\$");
 		return targetStringLiteral;
 	}

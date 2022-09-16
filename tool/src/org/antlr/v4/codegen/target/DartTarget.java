@@ -49,9 +49,8 @@ public class DartTarget extends Target {
 	}
 
 	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
-															   boolean escapeSpecial) {
-		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial).replace("$", "\\$");
+	public String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
+		return super.getTargetStringLiteralFromANTLRStringLiteral(literal, addQuotes, escapeSpecial).replace("$", "\\$");
 	}
 
 	public Set<String> getReservedWords() {

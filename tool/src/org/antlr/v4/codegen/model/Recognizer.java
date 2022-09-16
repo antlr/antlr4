@@ -108,7 +108,7 @@ public abstract class Recognizer extends OutputModelObject {
 
 		if (tokenName.charAt(0) == '\'') {
 			String targetString =
-				gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen, tokenName, false, true);
+				gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(tokenName, false, true);
 			return "\"'" + targetString + "'\"";
 		}
 		else {

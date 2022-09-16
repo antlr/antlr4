@@ -234,12 +234,7 @@ public abstract class Target {
 	 * around.
 	 * </p>
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(
-		CodeGenerator generator,
-		String literal,
-		boolean addQuotes,
-		boolean escapeSpecial)
-	{
+	public String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
 		StringBuilder sb = new StringBuilder();
 
 		if ( addQuotes ) sb.append('"');
