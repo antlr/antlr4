@@ -48,7 +48,7 @@ public class Python3Target extends Target {
 		HashMap<Character, String> map = new HashMap<>();
 		addEscapedChar(map, '\\');
 		addEscapedChar(map, '\'');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, (char)0x0007, 'a');
 		addEscapedChar(map, (char)0x0008, 'b');
 		addEscapedChar(map, '\f', 'f');

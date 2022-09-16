@@ -104,7 +104,7 @@ public class CSharpTarget extends Target {
 		// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/strings/#string-escape-sequences
 		HashMap<Character, String> map = new HashMap<>();
 		addEscapedChar(map, '\'');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\\');
 		addEscapedChar(map, '\0', '0');
 		addEscapedChar(map, (char)0x0007, 'a');

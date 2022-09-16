@@ -53,7 +53,7 @@ public class PHPTarget extends Target {
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\\');
 		addEscapedChar(map, '$');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		targetCharValueEscape = map;
 	}
 

@@ -27,7 +27,7 @@ public class SwiftTarget extends Target {
 		addEscapedChar(map, '\t', 't');
 		addEscapedChar(map, '\n', 'n');
 		addEscapedChar(map, '\r', 'r');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\'');
 		targetCharValueEscape = map;
 	}

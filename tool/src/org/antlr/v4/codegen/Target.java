@@ -41,7 +41,7 @@ public abstract class Target {
 		addEscapedChar(map, '\r', 'r');
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\'');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\\');
 		defaultCharValueEscape = map;
 	}

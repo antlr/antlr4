@@ -24,7 +24,7 @@ public class CppTarget extends Target {
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\r', 'r');
 		addEscapedChar(map, (char)0x001B, 'e');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\'');
 		addEscapedChar(map, '?');
 		addEscapedChar(map, '\\');
