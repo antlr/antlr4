@@ -214,10 +214,6 @@ public abstract class Target {
 		return getTargetStringLiteralFromString(s, true);
 	}
 
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
-		return getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, false);
-	}
-
 	/**
 	 * <p>Convert from an ANTLR string literal found in a grammar file to an
 	 * equivalent string literal in the target language.
@@ -234,7 +230,7 @@ public abstract class Target {
 	 * around.
 	 * </p>
 	 */
-	public final String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes, boolean escapeSpecial) {
+	public final String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes) {
 		StringBuilder sb = new StringBuilder();
 
 		if ( addQuotes ) sb.append('"');
@@ -262,7 +258,7 @@ public abstract class Target {
 					case    'f':
 					case    '\\':
 						// Pass the escape through
-						if (escapeSpecial && escapedCodePoint != '\\') {
+						if (escapedCodePoint != '\\') {
 							sb.append('\\');
 						}
 						sb.append('\\');
@@ -281,15 +277,12 @@ public abstract class Target {
 						}
 						if ( i+toAdvance <= literal.length() ) { // we might have an invalid \\uAB or something
 							String fullEscape = literal.substring(i, i+toAdvance);
-							appendUnicodeEscapedCodePoint(
-								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
-								sb,
-								escapeSpecial);
+							appendUnicodeEscapedCodePoint(CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape), sb);
 						}
 						break;
 					default:
 						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
-							appendUnicodeEscapedCodePoint(escapedCodePoint, sb, escapeSpecial);
+							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
 						}
 						else {
 							sb.appendCodePoint(escapedCodePoint);
@@ -303,7 +296,7 @@ public abstract class Target {
 					sb.append(targetEscapedChar);
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
-					appendUnicodeEscapedCodePoint(codePoint, sb, escapeSpecial);
+					appendUnicodeEscapedCodePoint(codePoint, sb);
 				}
 				else {
 					sb.appendCodePoint(codePoint);
