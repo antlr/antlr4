@@ -228,35 +228,33 @@ public abstract class Target {
 		sb.append('"');
 
 		Map<Character, String> targetCharValueEscape = getTargetCharValueEscape();
-		for (int i = 1; i < literal.length() -1; ) {
+		for (int i = 0; i < literal.length(); ) {
 			int codePoint = literal.codePointAt(i);
 			int toAdvance = Character.charCount(codePoint);
 			if  (codePoint == '\\') {
 				// Anything escaped is what it is! We assume that
-				// people know how to escape characters correctly. However
+				// people know how to escape characters correctly. However,
 				// we catch anything that does not need an escape in Java (which
 				// is what the default implementation is dealing with and remove
-				// the escape. The C target does this for instance.
+				// the escape.
 				//
 				int escapedCodePoint = literal.codePointAt(i+toAdvance);
 				toAdvance++;
 				switch (escapedCodePoint) {
 					// Pass through any escapes that Java also needs
-					//
 					case    'n':
 					case    'r':
 					case    't':
 					case    'b':
 					case    'f':
-					case    '\\':
-						// Pass the escape through
-						if (escapedCodePoint != '\\') {
-							sb.append('\\');
-						}
-						sb.append('\\');
-						sb.appendCodePoint(escapedCodePoint);
+						sb.append("\\\\").appendCodePoint(escapedCodePoint);
 						break;
-
+					case    '\'':
+						sb.append('\''); // No need to escaped single quote since all strings in targets are enclosed in double quotes
+						break;
+					case    '\\':
+						sb.append("\\\\");
+						break;
 					case    'u':    // Either unnnn or u{nnnnnn}
 						if (literal.charAt(i+toAdvance) == '{') {
 							while (literal.charAt(i+toAdvance) != '}') {
@@ -267,24 +265,18 @@ public abstract class Target {
 						else {
 							toAdvance += 4;
 						}
-						if ( i+toAdvance <= literal.length() ) { // we might have an invalid \\uAB or something
-							String fullEscape = literal.substring(i, i+toAdvance);
-							appendUnicodeEscapedCodePoint(CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape), sb);
-						}
+						assert i+toAdvance <= literal.length();  // invalid \\uAB or something should be reported before
+						String fullEscape = literal.substring(i, i+toAdvance);
+						sb.append('\\');
+						appendUnicodeEscapedCodePoint(CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape), sb);
 						break;
 					default:
-						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
-							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
-						}
-						else {
-							sb.appendCodePoint(escapedCodePoint);
-						}
-						break;
+						assert false : "Invalid escape sequence should be checked before";
 				}
 			}
 			else {
 				String targetEscapedChar = targetCharValueEscape.get((char) codePoint);
-				if (targetEscapedChar != null) {
+				if (codePoint != '\'' && targetEscapedChar != null) { // No need to escaped single quote since all strings in targets are enclosed in double quotes
 					sb.append(targetEscapedChar);
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
