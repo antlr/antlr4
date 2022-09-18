@@ -1,1 +1,1 @@
-export default interface Tree {}
+export default class Tree {}

@@ -1,3 +1,3 @@
 import Tree from "./Tree";
 
-export default interface SyntaxTree extends Tree {}
+export default class SyntaxTree extends Tree {}

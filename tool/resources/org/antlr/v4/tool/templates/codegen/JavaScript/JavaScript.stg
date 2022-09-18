@@ -789,8 +789,8 @@ import antlr4 from 'antlr4';
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
 import <superClass> from './<superClass>.js';
-<endif>
 
+<endif>
 <atn>
 
 const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);

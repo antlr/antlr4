@@ -35,4 +35,5 @@ export default class Parser extends Recognizer<Token> {
     getRuleInvocationStack(): string[];
     dumpDFA(): void;
     getExpectedTokens(): IntervalSet;
+    getTokenStream(): TokenStream;
 }

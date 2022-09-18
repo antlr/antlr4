@@ -2,7 +2,7 @@ import Parser from "../Parser";
 import Token from "../Token";
 import RecognitionException from "./RecognitionException";
 
-export default interface ErrorStrategy {
+export default class ErrorStrategy {
     reset(recognizer: Parser): void;
     sync(recognizer: Parser): void;
     recover(recognizer: Parser, e: RecognitionException): void;

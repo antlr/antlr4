@@ -1,10 +1,8 @@
 import TokenStream from './TokenStream';
-import Token from "./Token";
-import Interval from './misc/Interval';
+import Lexer from "./Lexer";
 
-export default class BufferedTokenStream implements TokenStream {
-    LA(i: number): number;
-    LT(k: number): Token;
-    getText(): string;
-    getText(interval: Interval): string;
+export default class BufferedTokenStream extends TokenStream {
+
+    tokenSource: Lexer;
+
 }

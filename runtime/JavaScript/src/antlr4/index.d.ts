@@ -1,6 +1,8 @@
+import InputStream from "./InputStream";
 import FileStream from "./FileStream";
 import CharStream from "./CharStream";
 import TokenStream from "./TokenStream";
+import BufferedTokenStream from "./BufferedTokenStream";
 import CommonTokenStream from "./CommonTokenStream";
 import Lexer from "./Lexer";
 import Parser from "./Parser";
@@ -19,4 +21,4 @@ import { default as tree } from './tree';
 import { default as error } from './error';
 import { default as Utils } from './utils';
 
-export { atn, dfa, error, tree, misc, context, Utils, FileStream, CharStream, TokenStream, CommonTokenStream, Token, Lexer, Parser };
+export { atn, dfa, error, tree, misc, context, Utils, InputStream, FileStream, CharStream, TokenStream, CommonTokenStream, BufferedTokenStream, Token, Lexer, Parser };
