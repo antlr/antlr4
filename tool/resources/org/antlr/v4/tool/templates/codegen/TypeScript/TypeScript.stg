@@ -842,12 +842,11 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
 export default class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
 	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
 	public static readonly EOF = antlr4.Token.EOF;
-	<lexer.channels:{c | public static readonly <c> = <lexer.channels.(c)>;}; separator="\n">
 	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
 
 	// tslint:disable:no-trailing-whitespace
 	public static readonly channelNames: string[] = [
-		"DEFAULT_TOKEN_CHANNEL", "HIDDEN",<if(lexer.channels)> <lexer.channels:{c| "<c>",}; separator=" ", wrap, anchor><endif>
+    	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	];
 	public static readonly literalNames = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 	public static readonly symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
