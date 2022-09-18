@@ -1,4 +1,4 @@
-import { default as antlr4 } from 'antlr4';
+import antlr4 from 'antlr4';
 import <lexerName> from './<lexerName>.js';
 <if(parserName)>
 import <parserName> from './<parserName>.js';
