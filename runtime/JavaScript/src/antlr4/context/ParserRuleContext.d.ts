@@ -8,6 +8,7 @@ import Parser from "../Parser";
 export default class ParserRuleContext extends RuleContext {
     start: Token;
     stop: Token | undefined;
+    children: ParseTree[] | null;
     parentCtx: ParserRuleContext | undefined;
     exception?: RecognitionException;
     parser?: Parser;
