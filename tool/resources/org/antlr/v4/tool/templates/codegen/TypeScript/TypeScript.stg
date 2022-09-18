@@ -116,7 +116,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass, isLexer=false) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-export default <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass; null="antlr4.Parser"> {
+export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 	<if(parser.tokens)>
 	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 	<endif>
@@ -839,7 +839,7 @@ import { default as antlr4 } from 'antlr4';
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
-export default <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
+export default class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
 	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
 	public static readonly EOF = antlr4.Token.EOF;
 	<lexer.channels:{c | public static readonly <c> = <lexer.channels.(c)>;}; separator="\n">
