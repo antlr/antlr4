@@ -16,10 +16,10 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 import antlr4 from 'antlr4';
 <if(file.genListener)>
-import <file.grammarName>Listener from "./<file.grammarName>Listener";
+import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
 <endif>
 <if(file.genVisitor)>
-import <file.grammarName>Visitor from "./<file.grammarName>Visitor";
+import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
@@ -118,7 +118,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass, isLexer=false) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-import <superClass> from './<superClass>';
+import <superClass> from './<superClass>.js';
 <endif>
 
 export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
@@ -845,7 +845,7 @@ import antlr4 from 'antlr4';
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
 <if(superClass)>
-import <superClass> from './<superClass>';
+import <superClass> from './<superClass>.js';
 
 <endif>
 export default class <lexer.name> extends <superClass; null="antlr4.Lexer"> {
