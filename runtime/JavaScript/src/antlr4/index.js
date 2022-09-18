@@ -2,9 +2,6 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import StringHashCode from './utils/stringHashCode.js';
-import CodePointAt from './polyfills/codepointat.js';
-import FromCodePoint from './polyfills/fromcodepoint.js';
 import { default as atn } from './atn/index.js';
 import { default as dfa } from './dfa/index.js';
 import { default as context } from './context/index.js';
@@ -32,3 +29,8 @@ const antlr4 = {
 };
 
 export default antlr4;
+/* eslint no-unused-vars: [ "off"] */
+// need to import unused to force loading
+import StringHashCode from './utils/stringHashCode.js';
+import CodePointAt from './polyfills/codepointat.js';
+import FromCodePoint from './polyfills/fromcodepoint.js';
