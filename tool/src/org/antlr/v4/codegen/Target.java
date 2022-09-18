@@ -162,15 +162,13 @@ public abstract class Target {
 	 *
 	 *  depending on the quoted arg.
 	 */
-	public String getTargetStringLiteralFromString(String s, boolean quoted) {
+	public String getTargetStringLiteralFromString(String s) {
 		if ( s==null ) {
 			return null;
 		}
 
 		StringBuilder buf = new StringBuilder();
-		if ( quoted ) {
-			buf.append('"');
-		}
+		buf.append('"');
 		for (int i=0; i < s.length(); ) {
 			int c = s.codePointAt(i);
 			String escaped = c <= Character.MAX_VALUE ? getTargetCharValueEscape().get((char)c) : null;
@@ -186,9 +184,7 @@ public abstract class Target {
 			}
 			i += Character.charCount(c);
 		}
-		if ( quoted ) {
-			buf.append('"');
-		}
+		buf.append('"');
 		return buf.toString();
 	}
 
@@ -210,10 +206,6 @@ public abstract class Target {
 		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
 	}
 
-	public String getTargetStringLiteralFromString(String s) {
-		return getTargetStringLiteralFromString(s, true);
-	}
-
 	/**
 	 * <p>Convert from an ANTLR string literal found in a grammar file to an
 	 * equivalent string literal in the target language.
@@ -230,10 +222,10 @@ public abstract class Target {
 	 * around.
 	 * </p>
 	 */
-	public final String getTargetStringLiteralFromANTLRStringLiteral(String literal, boolean addQuotes) {
+	public final String getTargetStringLiteralFromANTLRStringLiteral(String literal) {
 		StringBuilder sb = new StringBuilder();
 
-		if ( addQuotes ) sb.append('"');
+		sb.append('"');
 
 		Map<Character, String> targetCharValueEscape = getTargetCharValueEscape();
 		for (int i = 1; i < literal.length() -1; ) {
@@ -305,7 +297,7 @@ public abstract class Target {
 			i += toAdvance;
 		}
 
-		if ( addQuotes ) sb.append('"');
+		sb.append('"');
 
 		return sb.toString();
 	}
