@@ -107,10 +107,10 @@ public abstract class Recognizer extends OutputModelObject {
 		}
 
 		if (tokenName.charAt(0) == '\'') {
-			return gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(tokenName);
+			return gen.getTarget().getTargetStringLiteralFromAntlrGrammar(tokenName, true);
 		}
 		else {
-			return gen.getTarget().getTargetStringLiteralFromString(tokenName);
+			return "\"" + tokenName + "\"";
 		}
 	}
 

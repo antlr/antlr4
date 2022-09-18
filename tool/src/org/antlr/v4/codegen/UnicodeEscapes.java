@@ -17,6 +17,9 @@ public class UnicodeEscapes {
 		return result.toString();
 	}
 
+	/**
+	 * Escape the Unicode code point appropriately for this language and append the escaped value to {@code sb}.
+	 */
 	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, String language) {
 		switch (language) {
 			case "CSharp":
