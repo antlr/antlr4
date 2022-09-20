@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type ATNConfigSet interface {
@@ -278,11 +277,12 @@ func (b *BaseATNConfigSet) Hash() int {
 	return b.hashCodeConfigs()
 }
 
-// TODO: This is terrible. Many config sets hash to the same thing. Fix it Jim
 func (b *BaseATNConfigSet) hashCodeConfigs() int {
-	as := fmt.Sprintf("%p", b.configs)
-	h, _ := strconv.ParseInt(as[2:], 16, 64)
-	return int(h)
+	h := 1
+	for _, config := range b.configs {
+		h = 31*h + config.Hash()
+	}
+	return h
 }
 
 func (b *BaseATNConfigSet) Length() int {
