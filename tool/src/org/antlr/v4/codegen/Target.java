@@ -167,7 +167,6 @@ public abstract class Target {
 			return null;
 		}
 
-		s = escapeIfNeeded(s);
 		StringBuilder buf = new StringBuilder();
 		if ( quoted ) {
 			buf.append('"');
