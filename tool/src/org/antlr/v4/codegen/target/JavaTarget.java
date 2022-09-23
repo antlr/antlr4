@@ -14,11 +14,6 @@ import org.stringtemplate.v4.StringRenderer;
 import java.util.*;
 
 public class JavaTarget extends Target {
-	/**
-	 * The Java target can cache the code generation templates.
-	 */
-	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
-
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
 		"char", "class", "const", "continue", "default", "do", "double", "else",

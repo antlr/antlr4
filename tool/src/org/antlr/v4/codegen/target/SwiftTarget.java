@@ -65,16 +65,6 @@ public class SwiftTarget extends Target {
 		return "`" + word + "`";
 	}
 
-    @Override
-    protected void genFile(Grammar g, ST outputFileST, String fileName) {
-        super.genFile(g,outputFileST,fileName);
-    }
-
-	@Override
-	public boolean isATNSerializedAsInts() {
-		return true;
-	}
-
 	@Override
 	protected String escapeChar(int v) {
 		return String.format("\\u{%X}", v);
