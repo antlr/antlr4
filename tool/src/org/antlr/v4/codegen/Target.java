@@ -135,14 +135,6 @@ public abstract class Target {
 		return name;
 	}
 
-	public String[] getTokenTypesAsTargetLabels(Grammar g, int[] ttypes) {
-		String[] labels = new String[ttypes.length];
-		for (int i=0; i<ttypes.length; i++) {
-			labels[i] = getTokenTypeAsTargetLabel(g, ttypes[i]);
-		}
-		return labels;
-	}
-
 	/**
 	 * <p>Convert from an ANTLR string literal or predicate content found in a grammar file to an
 	 * equivalent string literal in the target language. The returning string is double-quoted
