@@ -1,5 +1,5 @@
 [notes]
-https://github.com/antlr/antlr4/issues/1070
+https://github.com/antlr/antlr4/pull/3889
 
 [type]
 Lexer
