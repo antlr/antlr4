@@ -10,13 +10,7 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 public class GoTarget extends Target {
@@ -56,6 +50,7 @@ public class GoTarget extends Target {
 		return reservedWords;
 	}
 
+	@Override
 	public String getRecognizerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -75,43 +70,23 @@ public class GoTarget extends Target {
 		}
 	}
 
-	/** A given grammar T, return the listener name such as
-	 *  TListener.java, if we're using the Java target.
- 	 */
+	@Override
 	public String getListenerFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name.toLowerCase()+"_listener.go";
+		return gen.g.name.toLowerCase()+"_listener.go";
 	}
 
-	/** A given grammar T, return the visitor name such as
-	 *  TVisitor.java, if we're using the Java target.
- 	 */
+	@Override
 	public String getVisitorFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name.toLowerCase()+"_visitor.go";
+		return gen.g.name.toLowerCase()+"_visitor.go";
 	}
 
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
+	@Override
 	public String getBaseListenerFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name.toLowerCase()+"_base_listener.go";
+		return gen.g.name.toLowerCase()+"_base_listener.go";
 	}
 
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
+	@Override
 	public String getBaseVisitorFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name.toLowerCase()+"_base_visitor.go";
+		return gen.g.name.toLowerCase()+"_base_visitor.go";
 	}
 }
