@@ -9,6 +9,10 @@ let package = Package(
             name: "Antlr4",
             type: .dynamic,
             targets: ["Antlr4"]),
+        .library(
+            name: "Antlr4Static",
+            type: .static,
+            targets: ["Antlr4"]),
     ],
     targets: [
         .target(
