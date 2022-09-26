@@ -30,3 +30,8 @@ const antlr4 = {
 };
 
 export default antlr4;
+
+export {
+    atn, dfa, tree, error, Token, CommonToken, CharStreams, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
+    PredictionContextCache, ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
+}
