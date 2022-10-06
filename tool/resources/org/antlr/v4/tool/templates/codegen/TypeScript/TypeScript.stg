@@ -526,7 +526,7 @@ case <i><if(!choice.ast.greedy)> + 1<endif>:
 
 Sync(s) ::= "this.sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException({this);"
+ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
