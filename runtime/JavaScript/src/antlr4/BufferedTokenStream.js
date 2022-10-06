@@ -378,3 +378,9 @@ export default class BufferedTokenStream extends TokenStream {
 		while (this.fetch(1000) === 1000);
 	}
 }
+
+Object.defineProperty(BufferedTokenStream, "size", {
+	get: function() {
+		return this.tokens.length;
+	}
+})

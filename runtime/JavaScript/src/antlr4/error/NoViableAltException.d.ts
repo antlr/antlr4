@@ -1,7 +1,11 @@
 import RecognitionException from "./RecognitionException";
-import Parser from "../Parser";
+import {ATNConfigSet} from "../atn";
+import Recognizer from "../Recognizer";
 
 export default class NoViableAltException extends RecognitionException {
 
-    constructor(recognizer: Parser);
+    deadEndConfigs: ATNConfigSet;
+
+    constructor(recognizer: Recognizer<any>);
+
 }

@@ -6,4 +6,5 @@ export default class CharStream {
     constructor(data: string, decodeToUnicodeCodePoints: boolean);
     seek(index: number) : void;
     consume() : void;
+    getText(start: number, stop: number): string;
 }
