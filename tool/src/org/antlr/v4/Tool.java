@@ -387,7 +387,7 @@ public class Tool {
 
 		if (gencode && g.tool.getNumErrors()==0 ) {
 			String interpFile = generateInterpreterData(g);
-			try (Writer fw = getOutputFileWriter(g, g.name + ".interp")) {
+			try (Writer fw = getOutputFileWriter(g, getInterpFileName(g))) {
 				fw.write(interpFile);
 			}
 			catch (IOException ioe) {
@@ -408,6 +408,11 @@ public class Tool {
 			CodeGenPipeline gen = new CodeGenPipeline(g, codeGenerator);
 			gen.process();
 		}
+	}
+
+	// Don't inline: used in https://github.com/antlr/antlr4/issues/3874
+	protected static String getInterpFileName(Grammar g){
+		return g.name + ".interp";
 	}
 
 	/**
