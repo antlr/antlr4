@@ -812,7 +812,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = try _input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures,
            superClass={ParserRuleContext}) ::= <<
 
 <accessLevelNotOpen(parser)> class <struct.escapedName>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {

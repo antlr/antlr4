@@ -858,7 +858,7 @@ ListLabelName(label)		  ::= "_<label>"
 CaptureNextToken(d) ::= "<d.varName> = TokenStream.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures,
            superClass={ParserRuleContext}) ::= <<
 public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">

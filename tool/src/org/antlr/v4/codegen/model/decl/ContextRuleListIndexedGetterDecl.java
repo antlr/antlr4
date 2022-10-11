@@ -10,11 +10,20 @@ import org.antlr.v4.codegen.OutputModelFactory;
 
 public class ContextRuleListIndexedGetterDecl extends ContextRuleListGetterDecl {
 	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String ctxName) {
-		super(factory, name, ctxName);
+		this(factory, name, ctxName, false);
+	}
+
+	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean signature) {
+		super(factory, name, ctxName, signature);
 	}
 
 	@Override
 	public String getArgType() {
 		return "int";
+	}
+
+	@Override
+	public ContextGetterDecl getSignatureDecl() {
+		return new ContextRuleListIndexedGetterDecl(factory, name, ctxName, true);
 	}
 }

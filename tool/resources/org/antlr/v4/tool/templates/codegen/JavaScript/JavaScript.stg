@@ -657,7 +657,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
 
     constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.escapedName>}>) {

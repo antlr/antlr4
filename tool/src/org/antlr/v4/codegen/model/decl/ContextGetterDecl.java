@@ -11,13 +11,22 @@ import org.antlr.v4.runtime.misc.MurmurHash;
 
 public abstract class ContextGetterDecl extends Decl {
 	public ContextGetterDecl(OutputModelFactory factory, String name) {
+		this(factory, name, false);
+	}
+
+	public ContextGetterDecl(OutputModelFactory factory, String name, boolean signature) {
 		super(factory, name);
+		this.signature = signature;
 	}
 
 	/** Not used for output; just used to distinguish between decl types
 	 *  to avoid dups.
 	 */
 	public String getArgType() { return ""; }; // assume no args
+
+	private boolean signature = false;
+	public boolean getSignature() { return signature; }
+	abstract ContextGetterDecl getSignatureDecl();
 
 	@Override
 	public int hashCode() {

@@ -919,25 +919,25 @@ RuleContextListDecl(rdecl) ::= "<rdecl.escapedName> []I<rdecl.ctxName>"
 AttributeDecl(d) ::= "<d.escapedName> <d.type><if(d.initValue)>// TODO = <d.initValue><endif>"
 
 ContextTokenGetterDecl(t) ::= <<
-<t.escapedName; format="cap">() antlr.TerminalNode {
+<t.escapedName; format="cap">() antlr.TerminalNode<if(!t.signature)> {
 	return s.GetToken(<parser.name><t.escapedName>, 0)
-}
+}<endif>
 >>
 
 ContextTokenListGetterDecl(t) ::= <<
-All<t.escapedName; format="cap">() []antlr.TerminalNode {
+All<t.escapedName; format="cap">() []antlr.TerminalNode<if(!t.signature)> {
 	return s.GetTokens(<parser.name><t.escapedName>)
-}
+}<endif>
 >>
 
 ContextTokenListIndexedGetterDecl(t) ::= <<
-<t.escapedName; format="cap">(i int) antlr.TerminalNode {
+<t.escapedName; format="cap">(i int) antlr.TerminalNode<if(!t.signature)> {
 	return s.GetToken(<parser.name><t.escapedName>, i)
-}
+}<endif>
 >>
 
 ContextRuleGetterDecl(r) ::= <<
-<r.escapedName; format="cap">() I<r.ctxName> {
+<r.escapedName; format="cap">() I<r.ctxName><if(!r.signature)> {
 	var t antlr.RuleContext;
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(I<r.ctxName>); ok {
@@ -951,11 +951,11 @@ ContextRuleGetterDecl(r) ::= <<
 	}
 
 	return t.(I<r.ctxName>)
-}
+}<endif>
 >>
 
 ContextRuleListGetterDecl(r) ::= <<
-All<r.escapedName; format="cap">() []I<r.ctxName> {
+All<r.escapedName; format="cap">() []I<r.ctxName><if(!r.signature)> {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -974,11 +974,11 @@ All<r.escapedName; format="cap">() []I<r.ctxName> {
 	}
 
 	return tst
-}
+}<endif>
 >>
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
-<r.escapedName; format="cap">(i int) I<r.ctxName> {
+<r.escapedName; format="cap">(i int) I<r.ctxName><if(!r.signature)> {
 	var t antlr.RuleContext;
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -996,7 +996,7 @@ ContextRuleListIndexedGetterDecl(r) ::= <<
 	}
 
 	return t.(I<r.ctxName>)
-}
+}<endif>
 >>
 
 LexerRuleContext() ::= "RuleContext"
@@ -1014,7 +1014,7 @@ ListLabelName(label) ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, signatures) ::= <<
 // I<struct.escapedName> is an interface to support dynamic dispatch.
 type I<struct.escapedName> interface {
 	antlr.ParserRuleContext
@@ -1093,6 +1093,11 @@ Get<a.escapedName; format="cap">() <a.type>}; separator="\n\n">
 Set<a.escapedName; format="cap">(<a.type>)}; separator="\n\n">
 	<endif>
 
+	<if(signatures)>
+
+	// Getter signatures
+	<signatures:{s | <s>}; separator="\n">
+	<endif>
 
 	// Is<struct.escapedName> differentiates from other interfaces.
 	Is<struct.escapedName>()
