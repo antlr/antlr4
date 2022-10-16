@@ -1,3 +1,2 @@
-import DFA from './DFA';
+export * from './DFA';
 
-export { DFA }

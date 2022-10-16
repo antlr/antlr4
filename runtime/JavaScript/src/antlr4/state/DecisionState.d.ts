@@ -1,6 +1,6 @@
 import {ATNState} from "./index";
 
-export default class DecisionState extends ATNState {
+export declare class DecisionState extends ATNState {
     decision: number;
     nonGreedy: boolean;
 }

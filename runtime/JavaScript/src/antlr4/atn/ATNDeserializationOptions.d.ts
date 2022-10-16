@@ -1,4 +1,4 @@
-export default class ATNDeserializationOptions {
+export declare class ATNDeserializationOptions {
     readOnly?: boolean;
     verifyATN?: boolean;
     generateRuleBypassTransitions?: boolean;

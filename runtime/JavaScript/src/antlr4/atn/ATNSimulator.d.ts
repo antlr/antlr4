@@ -1,3 +1,3 @@
-export default class ATNSimulator {
+export declare class ATNSimulator {
 
 }

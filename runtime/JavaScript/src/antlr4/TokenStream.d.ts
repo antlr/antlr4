@@ -1,8 +1,7 @@
-import { Interval } from "./misc";
-import Token from "./Token";
-import TokenSource from "./TokenSource";
+import {Interval} from "./misc";
+import {Token} from "./Token";
 
-export default class TokenStream {
+export declare class TokenStream {
 
     index: number;
     size: number;

@@ -1,6 +1,6 @@
-import CharStream from "./CharStream";
+import {CharStream} from "./CharStream";
 
-export default class Token {
+export declare class Token {
 
     static EOF: number;
 

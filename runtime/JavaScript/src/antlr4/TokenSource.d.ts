@@ -1,3 +1,3 @@
-export default class TokenSource {
+export declare class TokenSource {
 
 }

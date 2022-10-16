@@ -1,5 +1,5 @@
-import ATNConfig from "./ATNConfig";
+import {ATNConfig} from "./ATNConfig";
 
-export default class ATNConfigSet {
+export declare class ATNConfigSet {
     configs: ATNConfig[];
 }

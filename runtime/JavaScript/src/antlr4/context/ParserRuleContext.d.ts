@@ -1,11 +1,10 @@
-import RuleContext from "./RuleContext";
-import Token from "../Token";
-import RecognitionException from "../error/RecognitionException";
-import ParseTree from "../tree/ParseTree";
-import TerminalNode from "../tree/TerminalNode";
-import Parser from "../Parser";
+import {RuleContext} from "./RuleContext";
+import {ParseTree, TerminalNode} from "../tree";
+import {RecognitionException} from "../error";
+import {Token} from "../Token";
+import {Parser} from "../Parser";
 
-export default class ParserRuleContext extends RuleContext {
+export declare class ParserRuleContext extends RuleContext {
     start: Token;
     stop: Token | undefined;
     children: ParseTree[] | null;

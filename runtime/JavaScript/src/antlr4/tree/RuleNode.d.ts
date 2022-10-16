@@ -1,5 +1,5 @@
-import ParseTree from "./ParseTree";
+import {ParseTree} from "./ParseTree";
 
-export default abstract class RuleNode extends ParseTree {
+export declare abstract class RuleNode extends ParseTree {
 
 }

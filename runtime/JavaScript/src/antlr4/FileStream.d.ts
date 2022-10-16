@@ -1,6 +1,6 @@
-import CharStream from './CharStream';
+import {CharStream} from "./CharStream";
 
-export default class FileStream extends CharStream {
+export declare class FileStream extends CharStream {
 
     index: number; // defined as property
 

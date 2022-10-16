@@ -1,4 +1,4 @@
-export default class InputStream {
+export declare class InputStream {
     constructor(data: string);
     constructor(data: string, decodeToUnicodeCodePoints: boolean);
 }

@@ -1,8 +1,8 @@
-import ParseTree from "./ParseTree";
-import Token from "../Token";
 import {ParserRuleContext} from "../context";
+import {ParseTree} from "./ParseTree";
+import {Token} from "../Token";
 
-export default class TerminalNode extends ParseTree {
+export declare class TerminalNode extends ParseTree {
     symbol: Token;
     parentCtx: ParserRuleContext;
 }

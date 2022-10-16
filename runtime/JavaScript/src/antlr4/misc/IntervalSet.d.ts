@@ -1,6 +1,6 @@
-import Interval from "./Interval";
+import {Interval} from "./Interval";
 
-export default class IntervalSet {
+export declare class IntervalSet {
 
     isNil: boolean;
     size: number;

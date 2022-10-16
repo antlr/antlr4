@@ -1,7 +1,7 @@
-import RuleNode from "../tree/RuleNode";
-import Parser from "../Parser";
+import {RuleNode} from "../tree";
+import {Parser} from "../Parser";
 
-export default class RuleContext extends RuleNode {
+export declare class RuleContext extends RuleNode {
     parentCtx: RuleContext | undefined;
     invokingState: number;
 

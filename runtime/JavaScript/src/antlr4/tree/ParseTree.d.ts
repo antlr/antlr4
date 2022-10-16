@@ -1,5 +1,5 @@
-import SyntaxTree from "./SyntaxTree";
+import {SyntaxTree} from "./SyntaxTree";
 
-export default class ParseTree extends SyntaxTree {
+export declare class ParseTree extends SyntaxTree {
     getText(): string;
 }

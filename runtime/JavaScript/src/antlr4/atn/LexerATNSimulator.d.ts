@@ -1,11 +1,11 @@
-import ATNSimulator from "./ATNSimulator";
-import Recognizer from "../Recognizer";
-import ATN from "./ATN";
-import DFA from "../dfa/DFA";
-import PredictionContextCache from "./PredictionContextCache";
-import CharStream from "../CharStream";
+import {Recognizer} from "../Recognizer";
+import {ATNSimulator} from "./ATNSimulator";
+import {ATN} from "./ATN";
+import {PredictionContextCache} from "./PredictionContextCache";
+import {DFA} from "../dfa";
+import {CharStream} from "../CharStream";
 
-export default class LexerATNSimulator implements ATNSimulator {
+export declare class LexerATNSimulator implements ATNSimulator {
 
     decisionToDFA: DFA[];
 

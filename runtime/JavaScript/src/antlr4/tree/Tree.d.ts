@@ -1,1 +1,1 @@
-export default class Tree {}
+export declare class Tree {}

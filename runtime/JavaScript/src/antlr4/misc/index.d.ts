@@ -1,4 +1,3 @@
-import Interval from './Interval'
-import IntervalSet from './IntervalSet';
+export * from './Interval'
+export * from './IntervalSet';
 
-export { Interval, IntervalSet }

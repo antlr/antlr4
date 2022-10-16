@@ -1,6 +1,6 @@
-import DefaultErrorStrategy from "./DefaultErrorStrategy";
+import {DefaultErrorStrategy} from "./DefaultErrorStrategy";
 
-export default class BailErrorStrategy extends DefaultErrorStrategy {
+export declare class BailErrorStrategy extends DefaultErrorStrategy {
 
     constructor();
 

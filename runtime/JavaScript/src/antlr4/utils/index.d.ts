@@ -1,5 +1,4 @@
-import stringToCharArray from "./stringToCharArray";
-import arrayToString from "./arrayToString";
+export * from "./stringToCharArray";
+export * from "./arrayToString";
+export * from "./Printer";
 
-// @ts-ignore
-export default { stringToCharArray, arrayToString };

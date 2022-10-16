@@ -1,13 +1,14 @@
-import Recognizer from "./Recognizer";
-import TokenStream from "./TokenStream";
-import ParserRuleContext from './context/ParserRuleContext';
-import ParserATNSimulator from "./atn/ParserATNSimulator";
-import ErrorStrategy from "./error/ErrorStrategy";
-import Token from "./Token";
+import {TokenStream} from "./TokenStream";
+import {Recognizer} from "./Recognizer";
+import {ErrorStrategy} from "./error";
+import {IntervalSet} from "./misc";
+import {ParserATNSimulator} from "./atn";
 import Printer from "./utils/Printer";
-import IntervalSet from "./misc/IntervalSet";
+import {Token} from "./Token";
+import {ParserRuleContext} from "./context";
 
-export default class Parser extends Recognizer<Token> {
+
+export declare class Parser extends Recognizer<Token> {
 
     static EOF: number;
 

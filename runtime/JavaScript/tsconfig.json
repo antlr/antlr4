@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
+    "target": "ES6",
+    "module": "ES2020",
+    "moduleResolution": "Node",
     "sourceMap": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
     "esModuleInterop":true,
-    "target": "ES2020",
     "lib": [
       "ES2020"
     ],
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "declaration": false,
     "preserveConstEnums": true,
     "typeRoots": [
       "./node_modules/@types"
@@ -20,7 +19,7 @@
     ],
   },
   "include": [
-    "**/*.ts"
+    "**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

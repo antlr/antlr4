@@ -1,8 +1,8 @@
-import RecognitionException from "./RecognitionException";
 import {ATNConfigSet} from "../atn";
-import Recognizer from "../Recognizer";
+import {Recognizer} from "../Recognizer";
+import {RecognitionException} from "./RecognitionException";
 
-export default class NoViableAltException extends RecognitionException {
+export declare class NoViableAltException extends RecognitionException {
 
     deadEndConfigs: ATNConfigSet;
 

@@ -1,14 +1,14 @@
-import ATNSimulator from "./ATNSimulator";
-import Recognizer from "../Recognizer";
-import ATN from "./ATN";
-import DFA from "../dfa/DFA";
-import PredictionContextCache from "./PredictionContextCache";
-import ParserRuleContext from "../context/ParserRuleContext";
-import TokenStream from "../TokenStream";
-import Token from "../Token";
+import {ATNSimulator} from "./ATNSimulator";
+import {ParserRuleContext} from "../context";
+import {TokenStream} from "../TokenStream";
+import {Recognizer} from "../Recognizer";
+import {ATN} from "./ATN";
+import {PredictionContextCache} from "./PredictionContextCache";
+import {DFA} from "../dfa";
 import PredictionMode from "./PredictionMode";
+import {Token} from "../Token";
 
-export default class ParserATNSimulator extends ATNSimulator {
+export declare class ParserATNSimulator extends ATNSimulator {
 
     predictionMode: PredictionMode;
     decisionToDFA: DFA[];

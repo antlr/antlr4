@@ -1,7 +1,7 @@
-import ParseTree from "./ParseTree";
 import ParseTreeListener from "./ParseTreeListener";
+import {ParseTree} from "./ParseTree";
 
-export default class ParseTreeWalker {
+export declare class ParseTreeWalker {
     static DEFAULT: ParseTreeWalker;
 
     walk<T extends ParseTreeListener>(listener: T, t: ParseTree): void;

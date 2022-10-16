@@ -1,8 +1,8 @@
 import {ParserRuleContext} from "../context";
-import ErrorNode from "./ErrorNode";
-import TerminalNode from "./TerminalNode";
+import {ErrorNode} from "./ErrorNode";
+import {TerminalNode} from "./TerminalNode";
 
-export default abstract class ParseTreeListener {
+export declare abstract class ParseTreeListener {
     visitTerminal(node: TerminalNode) : void;
     visitErrorNode(node: ErrorNode) : void;
     enterEveryRule(ctx: ParserRuleContext) : void;

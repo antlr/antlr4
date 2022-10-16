@@ -1,6 +1,6 @@
-import Token from "../Token";
+import {Token} from "../Token";
 
-export default class Interval {
+export declare class Interval {
 
     start: number;
     stop: number;

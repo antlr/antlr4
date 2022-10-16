@@ -1,6 +1,6 @@
-import ErrorListener from "./error/ErrorListener";
+import {ErrorListener} from "./error";
 
-export default class Recognizer<TSymbol> {
+export declare class Recognizer<TSymbol> {
 
     state: number;
 

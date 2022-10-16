@@ -1,4 +1,3 @@
-import RuleContext from './RuleContext';
-import ParserRuleContext from './ParserRuleContext';
+export * from './RuleContext';
+export * from './ParserRuleContext';
 
-export { RuleContext, ParserRuleContext }
