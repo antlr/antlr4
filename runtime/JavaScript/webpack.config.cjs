@@ -20,7 +20,7 @@ module.exports = {
             fs: false
         }
     },
-    target: "web",
+    target: "node16",
     module: {
         rules: [{
             test: /\.js$/,
@@ -34,6 +34,8 @@ module.exports = {
     },
     plugins: [ new ESLintPlugin() ],
     experiments: {
-        outputModule: true
-    }
+        outputModule: true,
+        topLevelAwait: true
+    },
+    devtool: "source-map"
 };

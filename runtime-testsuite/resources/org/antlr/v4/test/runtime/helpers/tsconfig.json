@@ -1,32 +1,11 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
     "module": "ES2020",
     "moduleResolution": "node",
-    "esModuleInterop":true,
-    "target": "ES2020",
-    "lib": [
-      "ES2020"
-    ],
+    "target": "ES6",
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "declaration": false,
-    "preserveConstEnums": true,
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
-    "types": [
-      "node"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "antlr4": [ "<antlr4>" ]
-    }
   },
-  "include": [
-    "./*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "ts-node": {
+    "esm": true
+  }
 }

@@ -15,12 +15,11 @@ import java.nio.file.Files;
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
-public class TscRunner extends RuntimeRunner {
+public class TsNodeRunner extends RuntimeRunner {
 
 	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String NORMALIZED_JAVASCRIPT_RUNTIME_PATH = getRuntimePath("JavaScript").replace('\\', '/');
 	private final static String NPM_EXEC = "npm" + (isWindows() ? ".cmd" : "");
-	private final static String TSC_EXEC = "tsc" + (isWindows() ? ".cmd" : "");
 
 	@Override
 	public String getLanguage() {
@@ -36,6 +35,7 @@ public class TscRunner extends RuntimeRunner {
 
 	private void installTsc() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript"}, null);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "ts-node"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
@@ -47,7 +47,7 @@ public class TscRunner extends RuntimeRunner {
 	public String getExtension() { return "ts"; }
 
 	@Override
-	protected String getExecFileName() { return getTestFileName() + ".js"; }
+	protected String getExecFileName() { return getTestFileName() + ".ts"; }
 
 	@Override
 	public String getBaseListenerSuffix() { return null; }
@@ -56,7 +56,7 @@ public class TscRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "node"; }
+	public String getRuntimeToolName() { return "ts-node"; }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
@@ -71,8 +71,6 @@ public class TscRunner extends RuntimeRunner {
 			npmInstall();
 
 			npmLinkAntlr4();
-
-			tscCompile();
 
 			return new CompiledState(generatedState, null);
 
@@ -91,8 +89,5 @@ public class TscRunner extends RuntimeRunner {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "link", "antlr4"}, getTempDirPath());
 	}
 
-	private void tscCompile() throws Exception {
-		Processor.run(new String[] {TSC_EXEC, "--project", "tsconfig.json"}, getTempDirPath());
-	}
 
 }
