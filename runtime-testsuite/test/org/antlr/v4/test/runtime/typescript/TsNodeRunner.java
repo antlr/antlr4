@@ -30,13 +30,12 @@ public class TsNodeRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime() throws Exception {
-		installTsc();
+		npmInstallTsNodeAndWebpack();
 		npmLinkRuntime();
 	}
 
-	private void installTsc() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript"}, null);
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "ts-node"}, null);
+	private void npmInstallTsNodeAndWebpack() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "webpack-cli"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
@@ -58,7 +57,7 @@ public class TsNodeRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "ts-node"; }
+	public String getRuntimeToolName() { return "ts-node"  + (isWindows() ? ".cmd" : ""); }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
