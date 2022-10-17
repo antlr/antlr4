@@ -52,7 +52,7 @@ StringList() ::= "string[]"
 
 BuildParseTrees() ::= "this.buildParseTrees = true;"
 
-BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
+BailErrorStrategy() ::= <%this._errHandler = new BailErrorStrategy();%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(null, this)%>
 
@@ -78,9 +78,14 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
-RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"
+ImportRuleInvocationStack() ::= <<
+@parser::header {
+	import { arrayToString } from 'antlr4';
+}>>
 
-LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+RuleInvocationStack() ::= "arrayToString(this.getRuleInvocationStack())"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
@@ -157,9 +162,10 @@ static isIdentifierChar (c: string) {
 
 BasicListener(X) ::= <<
 @parser::header {
+import { ParseTreeWalker } from 'antlr4';
 
 class LeafListener extends <X>Listener {
-	visitTerminal(node: antlr4.tree.TerminalNode) {
+	visitTerminal(node: TerminalNode) {
 		console.log(node.symbol.text);
 	}
 }
@@ -168,17 +174,17 @@ class LeafListener extends <X>Listener {
 >>
 
 WalkListener(s) ::= <<
-var walker = new antlr4.tree.ParseTreeWalker();
+var walker = new ParseTreeWalker();
 walker.walk(new LeafListener(), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::header {
-class MyRuleNode extends antlr4.context.ParserRuleContext {
+class MyRuleNode extends ParserRuleContext {
 
     altNum: number;
 
-    constructor(parent?: antlr4.context.ParserRuleContext, invokingState?: number) {
+    constructor(parent?: ParserRuleContext, invokingState?: number) {
         super(parent, invokingState);
         this.altNum = 0;
     }
@@ -197,13 +203,14 @@ class MyRuleNode extends antlr4.context.ParserRuleContext {
 
 TokenGetterListener(X) ::= <<
 @parser::header {
+import { arrayToString, ParseTreeWalker } from 'antlr4';
 
 class LeafListener extends <X>Listener {
 
 	exitA? = (ctx: AContext) => {
     	var str;
         if(ctx.getChildCount()===2) {
-            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT_list());
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + arrayToString(ctx.INT_list());
         } else {
             str = ctx.ID()!.symbol.toString();
         }
@@ -217,6 +224,7 @@ class LeafListener extends <X>Listener {
 
 RuleGetterListener(X) ::= <<
 @parser::header {
+import { ParseTreeWalker } from 'antlr4';
 
 class LeafListener extends <X>Listener {
 	exitA? = (ctx: AContext) => {
@@ -235,6 +243,7 @@ class LeafListener extends <X>Listener {
 
 LRListener(X) ::= <<
 @parser::header {
+import { ParseTreeWalker } from 'antlr4';
 
 class LeafListener extends <X>Listener {
 
@@ -254,6 +263,7 @@ class LeafListener extends <X>Listener {
 
 LRWithLabelsListener(X) ::= <<
 @parser::header {
+import { ParseTreeWalker } from 'antlr4';
 
 class LeafListener extends <X>Listener {
 

@@ -1,4 +1,5 @@
-declare enum PredictionMode {
-    SLL, LL, LL_EXACT_AMBIG_DETECTION
+export declare class PredictionMode {
+    static SLL: number;
+    static LL: number;
+    static LL_EXACT_AMBIG_DETECTION: number;
 }
-export default PredictionMode;

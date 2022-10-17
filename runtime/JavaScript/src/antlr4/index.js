@@ -23,6 +23,7 @@ import Parser from './Parser.js';
 import RuleContext from './context/RuleContext.js';
 import ParserRuleContext from './context/ParserRuleContext.js';
 import ATN from './atn/ATN.js';
+import PredictionMode from './atn/PredictionMode.js';
 import LL1Analyzer from './atn/LL1Analyzer.js';
 import ATNDeserializer from './atn/ATNDeserializer.js';
 import LexerATNSimulator from './atn/LexerATNSimulator.js';
@@ -32,10 +33,15 @@ import DFA from "./dfa/DFA.js";
 import RecognitionException from "./error/RecognitionException.js";
 import FailedPredicateException from "./error/FailedPredicateException.js";
 import NoViableAltException from "./error/NoViableAltException.js";
+import BailErrorStrategy from "./error/BailErrorStrategy.js";
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import ParseTreeListener from "./tree/ParseTreeListener.js";
 import ParseTreeWalker from "./tree/ParseTreeWalker.js";
+import DiagnosticErrorListener from "./error/DiagnosticErrorListener.js"
+import RuleNode from "./tree/RuleNode.js"
+import TerminalNode from "./tree/TerminalNode.js"
+import arrayToString from "./utils/arrayToString.js"
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
@@ -44,9 +50,10 @@ export default {
 
 export {
     Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
-    RuleContext, ParserRuleContext, Interval, IntervalSet,
-    LL1Analyzer, ParseTreeListener, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator,
-    DFA, RecognitionException, NoViableAltException, FailedPredicateException, ParseTreeWalker
+    RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
+    PredictionMode, LL1Analyzer, ParseTreeListener, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
+    RecognitionException, NoViableAltException, FailedPredicateException, DiagnosticErrorListener, BailErrorStrategy,
+    arrayToString
 }
 
 /* eslint no-unused-vars: [ "off"] */

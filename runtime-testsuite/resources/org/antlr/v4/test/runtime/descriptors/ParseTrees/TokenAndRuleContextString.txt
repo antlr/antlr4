@@ -3,6 +3,8 @@ Parser
 
 [grammar]
 grammar T;
+<ImportRuleInvocationStack()>
+
 s
 @init {
 <BuildParseTrees()>

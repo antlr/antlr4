@@ -18,18 +18,18 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 import {
 	ATN,
 	ATNDeserializer, DecisionState, DFA, FailedPredicateException,
-	NoViableAltException,
+	RecognitionException, NoViableAltException, BailErrorStrategy,
 	Parser, ParserATNSimulator,
-	ParserRuleContext, PredictionContextCache, RecognitionException,
-	RuleContext, TerminalNode,
-	Token,
-	TokenStream
+	RuleContext, ParserRuleContext, PredictionMode, PredictionContextCache,
+	TerminalNode, RuleNode,
+	Token, TokenStream,
+	Interval, IntervalSet
 } from 'antlr4';
 <if(file.genListener)>
-import <file.grammarName>Listener from "./<file.grammarName>Listener";
+import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
 <endif>
 <if(file.genVisitor)>
-import <file.grammarName>Visitor from "./<file.grammarName>Visitor";
+import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
@@ -43,7 +43,7 @@ type int = number;
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-import {ParseTreeListener} from "antlr4/src/antlr4/tree";
+import {ParseTreeListener} from "antlr4";
 
 <header>
 
@@ -85,7 +85,7 @@ exit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;}; separ
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-import antlr4 from 'antlr4';
+import {ParseTreeVisitor} from 'antlr4';
 
 <header>
 
@@ -137,8 +137,8 @@ export default class <parser.name> extends <superClass; null="Parser"> {
 	<endif>
 	public static readonly EOF = Token.EOF;
 	<parser.rules:{r | public static readonly RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
-	public static readonly literalNames = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-	public static readonly symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+	public static readonly literalNames: string[] = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+	public static readonly symbolicNames: string[] = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
 		<parser.ruleNames:{r | "<r>",}; separator=" ", wrap, anchor>
@@ -660,13 +660,13 @@ TokenPropertyRef_int(t) ::= "(<ctx(t)>._<t.label> != null ? Number(<ctx(t)>._<t.
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>.start) : undefined)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>._<r.label> != null ? (<ctx(r)>._<r.label>.stop) : undefined)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText(new misc.Interval(<ctx(r)>._<r.label>.start, <ctx(r)>._<r.label>.stop)) : undefined)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>._<r.label> != null ? this._input.getText(new Interval(<ctx(r)>._<r.label>.start, <ctx(r)>._<r.label>.stop)) : undefined)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>._<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new misc.Interval(localctx.start, this._input.LT(-1)))"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new Interval(localctx.start, this._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
@@ -854,6 +854,7 @@ import {
 	DecisionState, DFA,
 	Lexer,
 	LexerATNSimulator,
+	RuleContext,
 	PredictionContextCache,
 	Token
 } from "antlr4";
