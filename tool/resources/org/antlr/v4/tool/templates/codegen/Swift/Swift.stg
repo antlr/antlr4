@@ -618,7 +618,7 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <<
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((Int64(1) \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((Int64(1) \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0)
 >>
 
 isZero ::= [

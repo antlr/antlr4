@@ -686,7 +686,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.tokens contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>L) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>L) != 0)
 %>
 
 isZero ::= [
