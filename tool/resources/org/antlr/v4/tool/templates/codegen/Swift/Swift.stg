@@ -224,7 +224,7 @@ import Antlr4
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -268,7 +268,7 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
                     accessLevelNotOpen(parser))>
 
 	override <accessLevelOpenOK(parser)>
-	func getGrammarFileName() -> String { return "<parser.grammarFileName; format="java-escape">" }
+	func getGrammarFileName() -> String { return "<parser.grammarFileName>" }
 
 	override <accessLevelOpenOK(parser)>
 	func getRuleNames() -> [String] { return <parser.name>.ruleNames }

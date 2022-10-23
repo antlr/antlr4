@@ -1,5 +1,5 @@
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Code generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>. DO NOT EDIT.
+// Code generated from <grammarFileName> by ANTLR <ANTLRVersion>. DO NOT EDIT.
 >>
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
@@ -208,7 +208,7 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this.RuleNames = staticData.ruleNames
 	this.LiteralNames = staticData.literalNames
 	this.SymbolicNames = staticData.symbolicNames
-	this.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
+	this.GrammarFileName = "<parser.grammarFileName>"
 
 	return this
 }

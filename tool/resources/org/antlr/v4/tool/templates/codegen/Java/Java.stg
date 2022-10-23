@@ -217,7 +217,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -250,7 +250,7 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
 	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
