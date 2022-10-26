@@ -3,10 +3,9 @@ import {Recognizer} from "./Recognizer";
 import {ErrorStrategy} from "./error";
 import {IntervalSet} from "./misc";
 import {ParserATNSimulator} from "./atn";
-import Printer from "./utils/Printer";
 import {Token} from "./Token";
 import {ParserRuleContext} from "./context";
-
+import {Printer} from "./utils";
 
 export declare class Parser extends Recognizer<Token> {
 

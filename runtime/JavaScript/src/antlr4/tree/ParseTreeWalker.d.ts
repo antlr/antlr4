@@ -1,4 +1,4 @@
-import ParseTreeListener from "./ParseTreeListener";
+import {ParseTreeListener} from "./ParseTreeListener";
 import {ParseTree} from "./ParseTree";
 
 export declare class ParseTreeWalker {

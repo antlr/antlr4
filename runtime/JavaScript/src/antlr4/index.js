@@ -38,6 +38,7 @@ import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import ParseTreeListener from "./tree/ParseTreeListener.js";
 import ParseTreeWalker from "./tree/ParseTreeWalker.js";
+import ErrorListener from "./error/ErrorListener.js"
 import DiagnosticErrorListener from "./error/DiagnosticErrorListener.js"
 import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
@@ -52,7 +53,7 @@ export {
     Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
-    RecognitionException, NoViableAltException, FailedPredicateException, DiagnosticErrorListener, BailErrorStrategy,
+    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
     arrayToString
 }
 

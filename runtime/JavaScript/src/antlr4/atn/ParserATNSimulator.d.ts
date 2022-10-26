@@ -5,7 +5,7 @@ import {Recognizer} from "../Recognizer";
 import {ATN} from "./ATN";
 import {PredictionContextCache} from "./PredictionContextCache";
 import {DFA} from "../dfa";
-import PredictionMode from "./PredictionMode";
+import {PredictionMode} from "./PredictionMode";
 import {Token} from "../Token";
 
 export declare class ParserATNSimulator extends ATNSimulator {
