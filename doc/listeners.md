@@ -19,7 +19,7 @@ public interface JavaListener extends ParseTreeListener<Token> {
 }
 ```
 
-where there is an enter and exit method for each rule in the parser grammar. ANTLR also generates a base listener with the fall empty implementations of all listener interface methods, in this case called JavaBaseListener. You can build your listener by subclassing this base and overriding the methods of interest.
+where there is an enter and exit method for each rule in the parser grammar. ANTLR also generates a base listener with empty implementations of all listener interface methods, in this case called JavaBaseListener. You can build your listener by subclassing this base and overriding the methods of interest.
 
 Assuming you've created a listener object called `MyListener`, here is how to call the Java parser and walk the parse tree:
 
@@ -97,7 +97,7 @@ assertEquals(3, counter.nums);
 assertEquals(true, counter.execExitS);
 ```
 
-One should not do very complicated work during the parse because the parser is throwing exception to handle syntax tears. If you're complicated code throws different kind of exception it will screw up the parsing and things will go nuts. If you want to catch and properly handle exceptions in your listener code during the parse, you should override this method from `Parser`:
+One should not do very complicated work during the parse because the parser is throwing exception to handle syntax errors. If you're complicated code throws different kind of exception it will screw up the parsing and things will go nuts. If you want to catch and properly handle exceptions in your listener code during the parse, you should override this method from `Parser`:
 
 ```java
 protected boolean listenerExceptionOccurred = false;
