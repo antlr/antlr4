@@ -575,7 +575,7 @@ public:
 
 >>
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, signatures) ::= <<
 //----------------- <struct.escapedName> ------------------------------------------------------------------
 
 <if (ctorAttrs)>

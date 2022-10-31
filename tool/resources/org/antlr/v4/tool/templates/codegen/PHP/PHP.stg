@@ -923,7 +923,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "$<d.varName> = \$this->input->LT(1);"
 CaptureNextTokenType(d) ::= "$<d.varName> = $this->input->LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif>
 {
 <PropertiesDecl(struct)>
