@@ -24,8 +24,7 @@ public abstract class ContextGetterDecl extends Decl {
 	 */
 	public String getArgType() { return ""; }; // assume no args
 
-	private boolean signature = false;
-	public boolean getSignature() { return signature; }
+	public final boolean signature;
 	abstract ContextGetterDecl getSignatureDecl();
 
 	@Override
