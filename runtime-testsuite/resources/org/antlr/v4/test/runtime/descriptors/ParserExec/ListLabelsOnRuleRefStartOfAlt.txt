@@ -11,9 +11,7 @@ expression
 @after {
 <AssertIsList("$args")>
 }
-    : op=NOT args+=expression
-    | args+=expression (op=AND args+=expression)+
-    | args+=expression (op=OR args+=expression)+
+    : args+=expression (op=AND args+=expression)+
     | IDENTIFIER
     ;
 
@@ -28,6 +26,3 @@ expression
 
 [input]
 a and b
-
-[skip]
-Cpp

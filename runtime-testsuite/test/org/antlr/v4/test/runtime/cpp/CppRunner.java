@@ -32,7 +32,8 @@ import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
  *
  * In test dir with generated test code:
  *
- * clang++ -g -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src -L. -lantlr4-runtime *.cpp
+ * clang++ -g -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src \
+ *         -L/Users/parrt/antlr/code/antlr4/runtime/Cpp/dist -lantlr4-runtime *.cpp
  * ./a.out input
  *
  * $ lldb ./a.out input
