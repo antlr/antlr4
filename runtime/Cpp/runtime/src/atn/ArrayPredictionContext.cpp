@@ -22,12 +22,10 @@ namespace {
   }
 
   bool predictionContextEqual(const Ref<const PredictionContext> &lhs, const Ref<const PredictionContext> &rhs) {
-    if (lhs == nullptr && rhs == nullptr)
-        return true;
-    if (lhs == nullptr && !(rhs == nullptr))
-        return false;
-    if (!(lhs == nullptr) && rhs == nullptr)
-        return false;
+    if (lhs == nullptr)
+      return rhs == nullptr;
+    else if (rhs == nullptr)
+      return false;
     return *lhs == *rhs;
   }
 
