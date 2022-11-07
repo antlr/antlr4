@@ -148,7 +148,7 @@ public class CustomDescriptors {
 				grammarName,
 				grammar.toString(),
 				null, false, false,
-				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Dart"}, uri);
+				new String[] {"CSharp", "Python2", "Python3", "PHP", "Swift", "JavaScript", "Dart"}, uri);
 	}
 
 	private static RuntimeTestDescriptor getMultiTokenAlternativeDescriptor() {

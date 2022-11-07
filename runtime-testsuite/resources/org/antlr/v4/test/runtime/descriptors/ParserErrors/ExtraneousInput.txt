@@ -24,7 +24,6 @@ baa
 [skip]
 Cpp
 CSharp
-Go
 JavaScript
 PHP
 Python2

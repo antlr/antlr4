@@ -37,7 +37,6 @@ x
 Cpp
 CSharp
 Dart
-Go
 JavaScript
 PHP
 Python2
