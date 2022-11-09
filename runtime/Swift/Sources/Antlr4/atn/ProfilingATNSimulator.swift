@@ -45,7 +45,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
         numDecisions = atn.decisionToState.count
         for i in 0..<numDecisions {
-            decisions[i] = DecisionInfo(i)
+            decisions.append(DecisionInfo(i))
         }
 
 
