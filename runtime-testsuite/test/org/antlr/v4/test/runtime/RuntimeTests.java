@@ -162,6 +162,7 @@ public abstract class RuntimeTests {
 				descriptor.input,
 				false,
 				descriptor.showDiagnosticErrors,
+				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
 				false,
