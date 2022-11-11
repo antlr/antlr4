@@ -12,7 +12,7 @@ void main(List\<String> args) async {
   final tokens = CommonTokenStream(lex);
 <if(parserName)>
   final parser = <parserName>(tokens);
-<if(debug)>
+<if(showDiagnosticErrors)>
   parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
 <if(profile)>

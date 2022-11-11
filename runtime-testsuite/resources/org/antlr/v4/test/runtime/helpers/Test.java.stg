@@ -29,7 +29,7 @@ public class Test {
 		parser.setOutStream(outStream);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errorListener);
-<if(debug)>
+<if(showDiagnosticErrors)>
 		parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
 		parser.setBuildParseTree(true);

@@ -28,7 +28,7 @@ function main(argv) {
     var stream = new antlr4.CommonTokenStream(lexer);
 <if(parserName)>
     var parser = new <parserName>(stream);
-<if(debug)>
+<if(showDiagnosticErrors)>
     parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
 <endif>
     parser.buildParseTrees = true;

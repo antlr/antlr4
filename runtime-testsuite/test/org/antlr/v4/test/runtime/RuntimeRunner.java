@@ -223,7 +223,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		outputFileST.add("lexerName", runOptions.lexerName);
 		outputFileST.add("parserName", runOptions.parserName);
 		outputFileST.add("parserStartRuleName", grammarParseRuleToRecognizerName(runOptions.startRuleName));
-		outputFileST.add("debug", runOptions.showDiagnosticErrors);
+		outputFileST.add("showDiagnosticErrors", runOptions.showDiagnosticErrors);
 		outputFileST.add("profile", runOptions.profile);
 		outputFileST.add("showDFA", runOptions.showDFA);
 		outputFileST.add("useListener", runOptions.useListener);

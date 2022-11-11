@@ -48,7 +48,7 @@ $lexer->addErrorListener(new ConsoleErrorListener());
 $tokens = new CommonTokenStream($lexer);
 <if(parserName)>
 $parser = new <parserName>($tokens);
-<if(debug)>
+<if(showDiagnosticErrors)>
 $parser->addErrorListener(new DiagnosticErrorListener());
 <endif>
 $parser->addErrorListener(new ConsoleErrorListener());

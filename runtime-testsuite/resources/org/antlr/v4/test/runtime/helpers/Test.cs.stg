@@ -12,7 +12,7 @@ public class Test {
 		var tokens = new CommonTokenStream(lex);
 <if(parserName)>
 		var parser = new <parserName>(tokens);
-<if(debug)>
+<if(showDiagnosticErrors)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>
 		parser.BuildParseTree = true;

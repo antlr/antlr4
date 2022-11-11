@@ -32,7 +32,7 @@ def main(argv):
     stream = CommonTokenStream(lexer)
 <if(parserName)>
     parser = <parserName>(stream)
-<if(debug)>
+<if(showDiagnosticErrors)>
     parser.addErrorListener(DiagnosticErrorListener())
 <endif>
     parser.buildParseTrees = True

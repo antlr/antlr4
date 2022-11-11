@@ -36,7 +36,7 @@ func main() {
 	stream := antlr.NewCommonTokenStream(lexer,0)
 <if(parserName)>
 	p := parser.New<parserName>(stream)
-<if(debug)>
+<if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>
 	p.BuildParseTrees = true
