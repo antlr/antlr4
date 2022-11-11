@@ -268,8 +268,8 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  */
 public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean debug = false;
-	public static final boolean debug_list_atn_decisions = false;
-	public static final boolean dfa_debug = false;
+	public static boolean debug_list_atn_decisions = false;
+	public static boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
