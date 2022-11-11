@@ -32,6 +32,10 @@ public class Test {
 <if(showDiagnosticErrors)>
 		parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
+<if(traceATN)>
+		ParserATNSimulator.debug = true;
+		ParserATNSimulator.debug_list_atn_decisions = true;
+<endif>
 		parser.setBuildParseTree(true);
 <if(profile)>
 		ProfilingATNSimulator profiler = new ProfilingATNSimulator(parser);

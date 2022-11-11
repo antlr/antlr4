@@ -267,7 +267,7 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  * the input.</p>
  */
 public class ParserATNSimulator extends ATNSimulator {
-	public static final boolean debug = false;
+	public static boolean debug = false;
 	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
