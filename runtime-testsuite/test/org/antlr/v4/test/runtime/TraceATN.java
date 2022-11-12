@@ -16,7 +16,25 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /** Run a lexer/parser and dump ATN debug/trace information
  *
- *  $ java org.antlr.v4.test.runtime.TraceATN [X.g4|XParser.g4 XLexer.g4] startRuleName -target [Java|Cpp|...] inputFileName
+ *  java org.antlr.v4.test.runtime.TraceATN [X.g4|XParser.g4 XLexer.g4] startRuleName -target [Java|Cpp|...] inputFileName
+ *
+ *
+ * In preparation, run this so we get right jars before trying this script:
+ *
+ * cd ANTLR-ROOT-DIR
+ * mvn install -DskipTests=true
+ * cd runtime-tests
+ * mvn install jar:test-jar -DskipTests=true
+ *
+ * Run shell script with
+ *
+ * scripts/traceatn.sh /tmp/JSON.g4 json /tmp/foo.json
+ *
+ * Here is scripts/traceatn.sh:
+ *
+ * export ANTLRJAR=/Users/parrt/.m2/repository/org/antlr/antlr4/4.11.2-SNAPSHOT/antlr4-4.11.2-SNAPSHOT-complete.jar
+ * export TESTJAR=/Users/parrt/.m2/repository/org/antlr/antlr4-runtime-testsuite/4.11.2-SNAPSHOT/antlr4-runtime-testsuite-4.11.2-SNAPSHOT-tests.jar
+ * java -classpath $ANTLRJAR:$TESTJAR org.antlr.v4.test.runtime.TraceATN $@
  */
 public class TraceATN {
 	protected static class IgnoreTokenVocabGrammar extends Grammar {
