@@ -36,10 +36,18 @@
 
 #include "atn/ParserATNSimulator.h"
 
+#ifndef DEBUG_ATN
 #define DEBUG_ATN 0
+#endif
+#ifndef DEBUG_LIST_ATN_DECISIONS
 #define DEBUG_LIST_ATN_DECISIONS 0
+#endif
+#ifndef DEBUG_DFA
 #define DEBUG_DFA 0
+#endif
+#ifndef RETRY_DEBUG
 #define RETRY_DEBUG 0
+#endif
 
 using namespace antlr4;
 using namespace antlr4::atn;

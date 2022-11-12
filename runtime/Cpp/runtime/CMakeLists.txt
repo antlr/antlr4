@@ -1,4 +1,5 @@
 option(ANTLR_BUILD_CPP_TESTS "Build C++ tests." ON)
+option(TRACE_ATN "Trace ATN simulation" OFF)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
@@ -34,6 +35,11 @@ add_library(antlr4_static STATIC ${libantlrcpp_SRC})
 find_package(Threads REQUIRED)
 target_link_libraries(antlr4_shared Threads::Threads)
 target_link_libraries(antlr4_static Threads::Threads)
+
+IF(TRACE_ATN)
+    ADD_DEFINITIONS(-DDEBUG_ATN=1)
+    ADD_DEFINITIONS(-DDEBUG_LIST_ATN_DECISIONS=1)
+ENDIF(TRACE_ATN)
 
 if (ANTLR_BUILD_CPP_TESTS)
   include(FetchContent)
