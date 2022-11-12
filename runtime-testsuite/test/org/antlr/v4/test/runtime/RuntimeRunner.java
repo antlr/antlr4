@@ -299,7 +299,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
 			output = result.output;
 			errors = result.errors;
-		} catch (InterruptedException | IOException e) {
+		}
+		catch (InterruptedException | IOException e) {
 			exception = e;
 		}
 		return new ExecutedState(compiledState, output, errors, exception);
@@ -312,8 +313,14 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	protected ProcessorResult runCommand(String[] command, String workPath, String description) throws Exception {
 		try {
 			return Processor.run(command, workPath);
-		} catch (InterruptedException | IOException e) {
-			throw description != null ? new Exception("can't " + description, e) : e;
+		}
+		catch (InterruptedException | IOException e) {
+			String cmd = String.join(" ", command);
+			String msg = "command \""+cmd+"\"\n  in "+workPath+" failed";
+			if ( description != null ) {
+				msg += ":\n  can't "+description;
+			}
+			throw new Exception(msg, e);
 		}
 	}
 
@@ -323,7 +330,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			if (dirFile.exists()) {
 				try {
 					deleteDirectory(dirFile);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
