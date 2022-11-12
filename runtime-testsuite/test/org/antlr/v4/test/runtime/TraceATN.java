@@ -3,6 +3,7 @@ package org.antlr.v4.test.runtime;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.test.runtime.csharp.CSharpRunner;
 import org.antlr.v4.test.runtime.java.JavaRunner;
+import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.State;
 import org.antlr.v4.test.runtime.swift.SwiftRunner;
 import org.antlr.v4.tool.*;
@@ -162,7 +163,17 @@ public class TraceATN {
 
 		State result = runner.run(runOptions);
 
-		return RuntimeTests.assertCorrectOutput(descriptor, targetName, result);
+		ExecutedState executedState;
+		if (result instanceof ExecutedState) {
+			executedState = (ExecutedState)result;
+			if (executedState.exception != null) {
+				return result.getErrorMessage();
+			}
+			return executedState.output;
+		}
+		else {
+			return result.getErrorMessage();
+		}
 	}
 
 	void execParse() throws Exception {
@@ -203,11 +214,8 @@ public class TraceATN {
 
 			RuntimeRunner runner = getRunner(targetName);
 
-			String errorMessage = test(descriptor, runner, targetName);
-			if (errorMessage != null) {
-				runner.setSaveTestDir(true);
-				fail(joinLines("Test: " + descriptor.name + "; " + errorMessage, "Test directory: " + runner.getTempDirPath()));
-			}
+			String result = test(descriptor, runner, targetName);
+			System.out.println(result);
 		}
 	}
 
