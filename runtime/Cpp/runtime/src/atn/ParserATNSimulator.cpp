@@ -176,7 +176,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
   dfa::DFAState *previousD = s0;
 
 #if DEBUG_ATN == 1
-    std::cout << "s0 = " << s0 << std::endl;
+    std::cout << "s0 = " << s0->toString() << std::endl;
 #endif
 
   size_t t = input->LA(1);
@@ -838,7 +838,7 @@ void ParserATNSimulator::closure(Ref<ATNConfig> const& config, ATNConfigSet *con
 void ParserATNSimulator::closureCheckingStopState(Ref<ATNConfig> const& config, ATNConfigSet *configs,
   ATNConfig::Set &closureBusy, bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
 
-#if DEBUG_ATN == 1
+#if DEBUG_LIST_ATN_DECISIONS == 1
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
 #endif
 

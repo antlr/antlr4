@@ -33,7 +33,6 @@ public class Test {
 		parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
 <if(traceATN)>
-		ParserATNSimulator.debug = true;
 		ParserATNSimulator.debug_list_atn_decisions = true;
 <endif>
 		parser.setBuildParseTree(true);

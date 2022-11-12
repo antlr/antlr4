@@ -1462,7 +1462,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											int depth,
 											boolean treatEofAsEpsilon)
 	{
-		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
+		if ( debug_list_atn_decisions ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
