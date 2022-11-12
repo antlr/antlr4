@@ -1,0 +1,24 @@
+[notes]
+There is no traceATN output since decision is LL(1) and we do static analysis.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : t EOF ;
+t : ID | INT ;
+ID  : [a-zA-Z]+ ;
+INT : [0-9]+ ;
+WS  : [ \r\n\t]+ -> skip ;
+
+[start]
+s
+
+[input]
+xyz
+
+[output]
+
+[flags]
+traceATN

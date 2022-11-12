@@ -1,0 +1,22 @@
+[notes]
+There is no decision so there is no traceATN output
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : ID EOF ;
+ID  : [a-zA-Z]+ ;
+WS  : [ \r\n\t]+ -> skip ;
+
+[start]
+s
+
+[input]
+xyz
+
+[output]
+
+[flags]
+traceATN
