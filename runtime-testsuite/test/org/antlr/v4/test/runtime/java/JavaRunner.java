@@ -185,21 +185,14 @@ public class JavaRunner extends RuntimeRunner {
 			stdoutReader.start();
 			stderrReader.start();
 
-			PrintStream saveStdout = System.out;
-			ByteArrayOutputStream captureNormalStdout = new ByteArrayOutputStream();
-			System.setOut(new PrintStream(captureNormalStdout));
-
 			recognizeMethod.invoke(null, new File(getTempDirPath(), "input").getAbsolutePath(),
 					new PrintStream(stdoutOut), new PrintStream(stderrOut));
-
-			System.setOut(saveStdout);
 
 			stdoutOut.close();
 			stderrOut.close();
 			stdoutReader.join();
 			stderrReader.join();
-			// include normal stdout to get print statements from ATN simulation debugging
-			output = stdoutReader.toString() + captureNormalStdout;
+			output = stdoutReader.toString();
 			errors = stderrReader.toString();
 		} catch (Exception ex) {
 			exception = ex;
