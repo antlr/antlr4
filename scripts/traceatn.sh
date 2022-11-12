@@ -10,4 +10,6 @@
 
 export ANTLRJAR=/Users/parrt/.m2/repository/org/antlr/antlr4/4.11.2-SNAPSHOT/antlr4-4.11.2-SNAPSHOT-complete.jar
 export TESTJAR=/Users/parrt/.m2/repository/org/antlr/antlr4-runtime-testsuite/4.11.2-SNAPSHOT/antlr4-runtime-testsuite-4.11.2-SNAPSHOT-tests.jar
-java -classpath $ANTLRJAR:$TESTJAR org.antlr.v4.test.runtime.TraceATN $@
+export JUPITER=/Users/parrt/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.0/junit-jupiter-api-5.9.0.jar
+export OPENTEST=/Users/parrt/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar
+java -classpath $ANTLRJAR:$TESTJAR:$JUPITER:$OPENTEST org.antlr.v4.test.runtime.TraceATN $@
