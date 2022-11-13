@@ -363,12 +363,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
-				if ( debug || trace_atn_sim )  {
-					System.out.println("predictATN decision "+ dfa.decision+
-									   " exec LA(1)=="+ getLookaheadName(input) +
-									   ", outerContext="+ outerContext.toString(parser));
-				}
-
 				boolean fullCtx = false;
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState,
@@ -439,15 +433,15 @@ public class ParserATNSimulator extends ATNSimulator {
 					   TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
-		if ( debug || trace_atn_sim) {
+		if ( debug || trace_atn_sim ) {
 			System.out.println("execATN decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input)+
+							   ", DFA state "+s0+
+							   ", LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+
 		}
 
 		DFAState previousD = s0;
-
-		if ( debug ) System.out.println("s0 = "+s0);
 
 		int t = input.LA(1);
 
@@ -896,6 +890,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
+		if ( trace_atn_sim ) {
+			System.out.println("computeReachSet "+closure+" -> "+reach);
+		}
+
 		if ( reach.isEmpty() ) return null;
 		return reach;
 	}
@@ -946,12 +944,16 @@ public class ParserATNSimulator extends ATNSimulator {
 
 
 	protected ATNConfigSet computeStartState(ATNState p,
-										  RuleContext ctx,
-										  boolean fullCtx)
+										     RuleContext ctx,
+										     boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
 		PredictionContext initialContext = PredictionContext.fromRuleContext(atn, ctx);
 		ATNConfigSet configs = new ATNConfigSet(fullCtx);
+
+		if ( trace_atn_sim )  {
+			System.out.println("computeStartState from ATN state "+p+" initialContext="+initialContext.toString(parser));
+		}
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -2120,13 +2122,21 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
-			if ( existing!=null ) return existing;
+
+			if ( existing!=null ) {
+				if ( trace_atn_sim ) System.out.println("addDFAState " + D + " exists");
+				return existing;
+			}
 
 			D.stateNumber = dfa.states.size();
+
 			if (!D.configs.isReadonly()) {
 				D.configs.optimizeConfigs(this);
 				D.configs.setReadonly(true);
 			}
+
+			if ( trace_atn_sim ) System.out.println("addDFAState new "+D);
+
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
