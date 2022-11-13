@@ -268,7 +268,7 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  */
 public class ParserATNSimulator extends ATNSimulator {
 	public static boolean debug = false;
-	public static boolean debug_list_atn_decisions = false;
+	public static boolean trace_atn_sim = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
@@ -332,7 +332,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int adaptivePredict(TokenStream input, int decision,
 							   ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions )  {
+		if ( debug || trace_atn_sim )  {
 			System.out.println("adaptivePredict decision "+decision+
 								   " exec LA(1)=="+ getLookaheadName(input)+
 								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
@@ -363,7 +363,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
-				if ( debug || debug_list_atn_decisions )  {
+				if ( debug || trace_atn_sim )  {
 					System.out.println("predictATN decision "+ dfa.decision+
 									   " exec LA(1)=="+ getLookaheadName(input) +
 									   ", outerContext="+ outerContext.toString(parser));
@@ -439,7 +439,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					   TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions) {
+		if ( debug || trace_atn_sim) {
 			System.out.println("execATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
@@ -650,7 +650,7 @@ public class ParserATNSimulator extends ATNSimulator {
 										 TokenStream input, int startIndex,
 										 ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions ) {
+		if ( debug || trace_atn_sim ) {
 			System.out.println("execATNWithFullContext "+s0);
 		}
 		boolean fullCtx = true;
@@ -1462,7 +1462,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											int depth,
 											boolean treatEofAsEpsilon)
 	{
-		if ( debug_list_atn_decisions ) System.out.println("closure("+config.toString(parser,true)+")");
+		if ( trace_atn_sim ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it

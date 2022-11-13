@@ -283,7 +283,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         this.debug = false;
         this.debug_closure = false;
         this.debug_add = false;
-        this.debug_list_atn_decisions = false;
+        this.trace_atn_sim = false;
         this.dfa_debug = false;
         this.retry_debug = false;
     }
@@ -291,7 +291,7 @@ export default class ParserATNSimulator extends ATNSimulator {
     reset() {}
 
     adaptivePredict(input, decision, outerContext) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("adaptivePredict decision " + decision +
                                    " exec LA(1)==" + this.getLookaheadName(input) +
                                    " line " + input.LT(1).line + ":" +
@@ -322,7 +322,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                 if (outerContext===null) {
                     outerContext = RuleContext.EMPTY;
                 }
-                if (this.debug || this.debug_list_atn_decisions) {
+                if (this.debug || this.trace_atn_sim) {
                     console.log("predictATN decision " + dfa.decision +
                                        " exec LA(1)==" + this.getLookaheadName(input) +
                                        ", outerContext=" + outerContext.toString(this.parser.ruleNames));
@@ -393,7 +393,7 @@ export default class ParserATNSimulator extends ATNSimulator {
      *
      */
     execATN(dfa, s0, input, startIndex, outerContext ) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("execATN decision " + dfa.decision +
                     " exec LA(1)==" + this.getLookaheadName(input) +
                     " line " + input.LT(1).line + ":" + input.LT(1).column);
@@ -590,7 +590,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                          input,
                                          startIndex,
                                          outerContext) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("execATNWithFullContext "+s0);
         }
         const fullCtx = true;

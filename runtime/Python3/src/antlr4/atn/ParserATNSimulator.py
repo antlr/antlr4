@@ -261,7 +261,7 @@ class ParserATNSimulator(ATNSimulator):
     )
 
     debug = False
-    debug_list_atn_decisions = False
+    trace_atn_sim = False
     dfa_debug = False
     retry_debug = False
 
@@ -292,7 +292,7 @@ class ParserATNSimulator(ATNSimulator):
         pass
 
     def adaptivePredict(self, input:TokenStream, decision:int, outerContext:ParserRuleContext):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("adaptivePredict decision " + str(decision) +
                                    " exec LA(1)==" + self.getLookaheadName(input) +
                                    " line " + str(input.LT(1).line) + ":" +
@@ -320,7 +320,7 @@ class ParserATNSimulator(ATNSimulator):
             if s0 is None:
                 if outerContext is None:
                     outerContext = ParserRuleContext.EMPTY
-                if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+                if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
                     print("predictATN decision " + str(dfa.decision) +
                                        " exec LA(1)==" + self.getLookaheadName(input) +
                                        ", outerContext=" + outerContext.toString(self.parser.literalNames, None))
@@ -384,7 +384,7 @@ class ParserATNSimulator(ATNSimulator):
     #    conflict + preds
     #
     def execATN(self, dfa:DFA, s0:DFAState, input:TokenStream, startIndex:int, outerContext:ParserRuleContext ):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("execATN decision " + str(dfa.decision) +
                     " exec LA(1)==" + self.getLookaheadName(input) +
                     " line " + str(input.LT(1).line) + ":" + str(input.LT(1).column))
@@ -562,7 +562,7 @@ class ParserATNSimulator(ATNSimulator):
                                          input:TokenStream,
                                          startIndex:int,
                                          outerContext:ParserRuleContext):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("execATNWithFullContext", str(s0))
         fullCtx = True
         foundExactAmbig = False

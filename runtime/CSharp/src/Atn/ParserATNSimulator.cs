@@ -241,7 +241,7 @@ namespace Antlr4.Runtime.Atn
 	public class ParserATNSimulator : ATNSimulator
 	{
 		public static readonly bool debug = false;
-		public static readonly bool debug_list_atn_decisions = false;
+		public static readonly bool trace_atn_sim = false;
 		public static readonly bool dfa_debug = false;
 		public static readonly bool retry_debug = false;
 
@@ -304,7 +304,7 @@ namespace Antlr4.Runtime.Atn
 		public virtual int AdaptivePredict(ITokenStream input, int decision,
 								   ParserRuleContext outerContext)
 		{
-			if (debug || debug_list_atn_decisions)
+			if (debug || trace_atn_sim)
 			{
 				Console.WriteLine("adaptivePredict decision " + decision +
 									   " exec LA(1)==" + GetLookaheadName(input) +
@@ -339,7 +339,7 @@ namespace Antlr4.Runtime.Atn
 				if (s0 == null)
 				{
 					if (outerContext == null) outerContext = ParserRuleContext.EmptyContext;
-					if (debug || debug_list_atn_decisions)
+					if (debug || trace_atn_sim)
 					{
 						Console.WriteLine("predictATN decision " + dfa.decision +
 										   " exec LA(1)==" + GetLookaheadName(input) +
@@ -419,7 +419,7 @@ namespace Antlr4.Runtime.Atn
 						   ITokenStream input, int startIndex,
 						   ParserRuleContext outerContext)
 		{
-			if (debug || debug_list_atn_decisions)
+			if (debug || trace_atn_sim)
 			{
 				Console.WriteLine("execATN decision " + dfa.decision +
 								   " exec LA(1)==" + GetLookaheadName(input) +
@@ -654,7 +654,7 @@ namespace Antlr4.Runtime.Atn
 											 ITokenStream input, int startIndex,
 											 ParserRuleContext outerContext)
 		{
-			if (debug || debug_list_atn_decisions)
+			if (debug || trace_atn_sim)
 			{
 				Console.WriteLine("execATNWithFullContext " + s0);
 			}
