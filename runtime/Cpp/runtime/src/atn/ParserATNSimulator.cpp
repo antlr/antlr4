@@ -169,7 +169,8 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
                                    ParserRuleContext *outerContext) {
 
 #if DEBUG_ATN == 1 || TRACE_ATN_SIM == 1
-    std::cout << "execATN decision " << dfa.decision << " exec LA(1)==" << getLookaheadName(input) <<
+    std::cout << "execATN decision " << dfa.decision << ", DFA state " << s0->toString() <<
+      ", LA(1)==" << getLookaheadName(input) <<
       " line " << input->LT(1)->getLine() << ":" << input->LT(1)->getCharPositionInLine() << std::endl;
 #endif
 
@@ -349,6 +350,10 @@ void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionStat
 
 size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
   TokenStream *input, size_t startIndex, ParserRuleContext *outerContext) {
+
+#if TRACE_ATN_SIM == 1
+    std::cout << "execATNWithFullContext " << s0->toString() << std::endl;
+#endif
 
   bool fullCtx = true;
   bool foundExactAmbig = false;
@@ -571,7 +576,11 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
     }
   }
 
-  if (reach->isEmpty()) {
+#if DEBUG_ATN == 1 || TRACE_ATN_SIM == 1
+    std::cout << "computeReachSet " << closure_->toString() << " -> " << reach->toString() << std::endl;
+#endif
+
+    if (reach->isEmpty()) {
     return nullptr;
   }
   return reach;
@@ -608,7 +617,11 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p,
   Ref<const PredictionContext> initialContext = PredictionContext::fromRuleContext(atn, ctx);
   std::unique_ptr<ATNConfigSet> configs(new ATNConfigSet(fullCtx));
 
-  for (size_t i = 0; i < p->transitions.size(); i++) {
+#if DEBUG_ATN == 1 || TRACE_ATN_SIM == 1
+    std::cout << "computeStartState from ATN state " << p->toString() << " initialContext=" << initialContext->toString() << std::endl;
+#endif
+
+    for (size_t i = 0; i < p->transitions.size(); i++) {
     ATNState *target = p->transitions[i]->target;
     Ref<ATNConfig> c = std::make_shared<ATNConfig>(target, (int)i + 1, initialContext);
     ATNConfig::Set closureBusy;
@@ -1304,12 +1317,20 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
   // which will only succeed if an equivalent DFAState does not already exist.
   auto [existing, inserted] = dfa.states.insert(D);
   if (!inserted) {
+#if TRACE_ATN_SIM == 1
+      std::cout << "addDFAState " << D->toString() << " exists" << std::endl;
+#endif
     return *existing;
   }
 
   // Previously we did a lookup, then set fields, then inserted. It was `dfa.states.size()`, since
   // we already inserted we need to subtract one.
   D->stateNumber = static_cast<int>(dfa.states.size() - 1);
+
+#if TRACE_ATN_SIM == 1
+    std::cout << "addDFAState new " << D->toString() << std::endl;
+#endif
+
   if (!D->configs->isReadonly()) {
     D->configs->optimizeConfigs(this);
     D->configs->setReadonly(true);

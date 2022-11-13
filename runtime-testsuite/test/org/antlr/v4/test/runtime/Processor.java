@@ -61,7 +61,7 @@ public class Processor {
 		String output = stdoutReader.toString();
 		String errors = stderrReader.toString();
 		if (throwOnNonZeroErrorCode && process.exitValue() != 0) {
-			throw new InterruptedException("Exit code "+process.exitValue()+" with output: "+joinLines(output, errors));
+			throw new InterruptedException("Exit code "+process.exitValue()+" with output:\n"+joinLines(output, errors));
 		}
 		return new ProcessorResult(process.exitValue(), output, errors);
 	}

@@ -197,6 +197,7 @@ std::string ATNConfigSet::toString() const {
   std::stringstream ss;
   ss << "[";
   for (size_t i = 0; i < configs.size(); i++) {
+    if ( i>0 ) ss << ", ";
     ss << configs[i]->toString();
   }
   ss << "]";
@@ -209,12 +210,12 @@ std::string ATNConfigSet::toString() const {
   }
 
   if (conflictingAlts.count() > 0) {
-    ss << ",conflictingAlts = ";
+    ss << ",conflictingAlts=";
     ss << conflictingAlts.toString();
   }
 
   if (dipsIntoOuterContext) {
-    ss << ", dipsIntoOuterContext";
+    ss << ",dipsIntoOuterContext";
   }
   return ss.str();
 }

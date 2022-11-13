@@ -37,7 +37,6 @@ target_link_libraries(antlr4_shared Threads::Threads)
 target_link_libraries(antlr4_static Threads::Threads)
 
 IF(TRACE_ATN)
-    ADD_DEFINITIONS(-DDEBUG_ATN=1)
     ADD_DEFINITIONS(-DTRACE_ATN_SIM=1)
 ENDIF(TRACE_ATN)
 
