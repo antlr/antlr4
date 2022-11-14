@@ -405,10 +405,6 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
 
   ArrayPredictionContext m(std::move(mergedParents), std::move(mergedReturnStates));
 
-#if TRACE_ATN_SIM == 1
-    std::cout << "mergeArrays equals() a=" << a->toString() << ",b=" << b->toString() << std::endl;
-#endif
-
   // if we created same array as a or b, return that instead
   // TODO: track whether this is possible above during merge sort for speed
   if (m == *a) {
