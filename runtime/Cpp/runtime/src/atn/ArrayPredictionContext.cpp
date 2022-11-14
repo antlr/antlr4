@@ -25,9 +25,9 @@ namespace {
     // parent PredictionContext pointers can be null during full context mode and
     // the ctxs are in an ArrayPredictionContext.  If both are null, return true
     // if just one is null, return false. If both are non-null, do comparison.
-    if (lhs == nullptr && rhs == nullptr) return true;
-    if (lhs != nullptr || rhs != nullptr) return false;
-    return *lhs == *rhs;
+    if ( lhs == nullptr ) return rhs == nullptr;
+    if ( rhs == nullptr ) return false; // lhs!=null and rhs==null
+    return *lhs == *rhs;                // both nonnull
   }
 
 }
