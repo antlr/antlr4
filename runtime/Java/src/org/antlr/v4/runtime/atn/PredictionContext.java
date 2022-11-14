@@ -445,16 +445,23 @@ public abstract class PredictionContext {
 		// TODO: track whether this is possible above during merge sort for speed
 		if ( M.equals(a) ) {
 			if ( mergeCache!=null ) mergeCache.put(a,b,a);
+			if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> a");
 			return a;
 		}
 		if ( M.equals(b) ) {
 			if ( mergeCache!=null ) mergeCache.put(a,b,b);
+			if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> b");
 			return b;
 		}
 
 		combineCommonParents(mergedParents);
 
 		if ( mergeCache!=null ) mergeCache.put(a,b,M);
+
+		if ( ParserATNSimulator.trace_atn_sim ) {
+			System.out.println("mergeArrays a="+a+",b="+b+" -> "+M);
+		}
+
 		return M;
 	}
 

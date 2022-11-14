@@ -325,7 +325,6 @@ Ref<const PredictionContext> PredictionContext::mergeRoot(Ref<const SingletonPre
 
 Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredictionContext> a, Ref<const ArrayPredictionContext> b,
                                                             bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
-
   if (mergeCache) {
     auto existing = mergeCache->get(a, b);
     if (existing) {
@@ -406,23 +405,44 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
 
   ArrayPredictionContext m(std::move(mergedParents), std::move(mergedReturnStates));
 
+#if TRACE_ATN_SIM == 1
+    std::cout << "mergeArrays equals() a=" << a->toString() << ",b=" << b->toString() << std::endl;
+#endif
+
   // if we created same array as a or b, return that instead
   // TODO: track whether this is possible above during merge sort for speed
   if (m == *a) {
     if (mergeCache) {
+#if TRACE_ATN_SIM == 1
+      std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> a" << std::endl;
+#endif
       return mergeCache->put(a, b, a);
     }
+#if TRACE_ATN_SIM == 1
+    std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> a" << std::endl;
+#endif
     return a;
   }
   if (m == *b) {
     if (mergeCache) {
+#if TRACE_ATN_SIM == 1
+        std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> b" << std::endl;
+#endif
       return mergeCache->put(a, b, b);
     }
+#if TRACE_ATN_SIM == 1
+      std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> b" << std::endl;
+#endif
     return b;
   }
 
   combineCommonParents(m.parents);
   auto c = std::make_shared<ArrayPredictionContext>(std::move(m));
+
+#if TRACE_ATN_SIM == 1
+    std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> " << c->toString() << std::endl;
+#endif
+
   if (mergeCache) {
     return mergeCache->put(a, b, std::move(c));
   }
