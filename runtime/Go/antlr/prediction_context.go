@@ -5,6 +5,7 @@
 package antlr
 
 import (
+	"fmt"
 	"golang.org/x/exp/slices"
 	"strconv"
 )
@@ -624,10 +625,16 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	if mergeCache != nil {
 		previous := mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
+			if ParserATNSimulatorTraceATNSim {
+				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
+			}
 			return previous.(PredictionContext)
 		}
 		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
+			if ParserATNSimulatorTraceATNSim {
+				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
+			}
 			return previous.(PredictionContext)
 		}
 	}
@@ -707,11 +714,17 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)
 		}
+		if ParserATNSimulatorTraceATNSim {
+			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> a")
+		}
 		return a
 	}
 	if M == b {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), b)
+		}
+		if ParserATNSimulatorTraceATNSim {
+			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> b")
 		}
 		return b
 	}
@@ -719,6 +732,9 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 
 	if mergeCache != nil {
 		mergeCache.set(a.Hash(), b.Hash(), M)
+	}
+	if ParserATNSimulatorTraceATNSim {
+		fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> " + M.String())
 	}
 	return M
 }
