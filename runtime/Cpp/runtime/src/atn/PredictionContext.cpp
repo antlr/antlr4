@@ -328,10 +328,16 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
   if (mergeCache) {
     auto existing = mergeCache->get(a, b);
     if (existing) {
+#if TRACE_ATN_SIM == 1
+      std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> previous" << std::endl;
+#endif
       return existing;
     }
     existing = mergeCache->get(b, a);
     if (existing) {
+#if TRACE_ATN_SIM == 1
+        std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> previous" << std::endl;
+#endif
       return existing;
     }
   }

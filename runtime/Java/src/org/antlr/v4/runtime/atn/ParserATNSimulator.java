@@ -6,17 +6,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -26,16 +16,7 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
 
@@ -2138,7 +2119,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( trace_atn_sim ) System.out.println("addDFAState new "+D);
 
 			dfa.states.put(D, D);
-			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
 		}
 	}
