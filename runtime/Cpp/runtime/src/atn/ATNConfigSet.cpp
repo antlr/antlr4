@@ -203,10 +203,10 @@ std::string ATNConfigSet::toString() const {
   ss << "]";
 
   if (hasSemanticContext) {
-    ss << ",hasSemanticContext = " <<  hasSemanticContext;
+    ss << ",hasSemanticContext=" << (hasSemanticContext?"true":"false");
   }
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
-    ss << ",uniqueAlt = " << uniqueAlt;
+    ss << ",uniqueAlt=" << uniqueAlt;
   }
 
   if (conflictingAlts.count() > 0) {
