@@ -3,7 +3,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-package org.antlr.v4.test.runtime.javascript;
+package org.antlr.v4.test.runtime.node;
 
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.CompiledState;
