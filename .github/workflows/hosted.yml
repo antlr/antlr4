@@ -315,7 +315,7 @@ jobs:
         case ${{ matrix.target }} in
           python2) mvn -X '-Dantlr-python2-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python2.**' test ;;
           python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
-          swift) mvn -X -e '-Dtest=python3.**' test ;;
+          swift) mvn -X -e '-Dtest=swift.**' test ;;
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
 
