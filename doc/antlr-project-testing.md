@@ -98,7 +98,7 @@ From the `runtime-testsuite` dir
 ```bash
 $ cd runtime-testsuite
 $ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
-$ mvn -Dtest=java.** test
+$ mvn -Dtest='java.**' test
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
