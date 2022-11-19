@@ -45,7 +45,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
         numDecisions = atn.decisionToState.count
         for i in 0..<numDecisions {
-            decisions[i] = DecisionInfo(i)
+            decisions.append(DecisionInfo(i))
         }
 
 
@@ -57,10 +57,10 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         self._sllStopIndex = -1
         self._llStopIndex = -1
         self.currentDecision = decision
-        let start: Int64 = Int64(Date().timeIntervalSince1970) //System.nanoTime(); // expensive but useful info
+        let start = ProcessInfo.processInfo.systemUptime //System.nanoTime(); // expensive but useful info
         let alt: Int = try  super.adaptivePredict(input, decision, outerContext)
-        let stop: Int64 = Int64(Date().timeIntervalSince1970)  //System.nanoTime();
-        decisions[decision].timeInPrediction += (stop - start)
+        let stop = ProcessInfo.processInfo.systemUptime  //System.nanoTime();
+        decisions[decision].timeInPrediction += Int64((stop - start) * TimeInterval(NSEC_PER_SEC))
         decisions[decision].invocations += 1
 
         let SLL_k: Int64 = Int64(_sllStopIndex - _startIndex + 1)
