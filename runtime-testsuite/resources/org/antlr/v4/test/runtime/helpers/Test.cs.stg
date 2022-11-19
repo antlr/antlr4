@@ -1,5 +1,6 @@
 using System;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Tree;
 using System.Text;
 
@@ -14,6 +15,9 @@ public class Test {
 		var parser = new <parserName>(tokens);
 <if(showDiagnosticErrors)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
+<endif>
+<if(traceATN)>
+	    ParserATNSimulator.trace_atn_sim = true;
 <endif>
 		parser.BuildParseTree = true;
 		var tree = parser.<parserStartRuleName>();

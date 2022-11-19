@@ -241,7 +241,7 @@ namespace Antlr4.Runtime.Atn
 	public class ParserATNSimulator : ATNSimulator
 	{
 		public static readonly bool debug = false;
-		public static readonly bool trace_atn_sim = false;
+		public static bool trace_atn_sim = false;
 		public static readonly bool dfa_debug = false;
 		public static readonly bool retry_debug = false;
 
@@ -339,7 +339,7 @@ namespace Antlr4.Runtime.Atn
 				if (s0 == null)
 				{
 					if (outerContext == null) outerContext = ParserRuleContext.EmptyContext;
-					if (debug || trace_atn_sim)
+					if (debug)
 					{
 						Console.WriteLine("predictATN decision " + dfa.decision +
 										   " exec LA(1)==" + GetLookaheadName(input) +
@@ -422,8 +422,9 @@ namespace Antlr4.Runtime.Atn
 			if (debug || trace_atn_sim)
 			{
 				Console.WriteLine("execATN decision " + dfa.decision +
-								   " exec LA(1)==" + GetLookaheadName(input) +
-								   " line " + input.LT(1).Line + ":" + input.LT(1).Column);
+				                  ", DFA state " + s0 +
+								  ", LA(1)==" + GetLookaheadName(input) +
+								  " line " + input.LT(1).Line + ":" + input.LT(1).Column);
 			}
 
 			DFAState previousD = s0;
@@ -921,7 +922,11 @@ namespace Antlr4.Runtime.Atn
 				}
 			}
 
-			if (reach.Empty)
+            if ( trace_atn_sim ) {
+                Console.WriteLine("computeReachSet "+closure+" -> "+reach);
+            }
+
+    		if (reach.Empty)
 				return null;
 			return reach;
 		}
@@ -984,6 +989,11 @@ namespace Antlr4.Runtime.Atn
 			// always at least the implicit call to start rule
 			PredictionContext initialContext = PredictionContext.FromRuleContext(atn, ctx);
 			ATNConfigSet configs = new ATNConfigSet(fullCtx);
+
+            if ( trace_atn_sim )  {
+                Console.WriteLine("computeStartState from ATN state "+p+" initialContext="+initialContext);
+            }
+
 
 			for (int i = 0; i < p.NumberOfTransitions; i++)
 			{
@@ -1532,7 +1542,7 @@ namespace Antlr4.Runtime.Atn
 												int depth,
 												bool treatEofAsEpsilon)
 		{
-			if (debug)
+			if (trace_atn_sim)
 				Console.WriteLine("closure(" + config.ToString(parser, true) + ")");
 
 			if (config.state is RuleStopState)
@@ -2249,7 +2259,10 @@ namespace Antlr4.Runtime.Atn
 			lock (dfa.states)
 			{
 				DFAState existing = dfa.states.Get(D);
-				if (existing != null) return existing;
+				if (existing != null) {
+    				if ( trace_atn_sim ) Console.WriteLine("addDFAState " + D + " exists");
+    				return existing;
+				}
 
 				D.stateNumber = dfa.states.Count;
 				if (!D.configSet.IsReadOnly)
@@ -2258,7 +2271,8 @@ namespace Antlr4.Runtime.Atn
 					D.configSet.IsReadOnly = true;
 				}
 				dfa.states.Put(D, D);
-				if (debug) Console.WriteLine("adding new DFA state: " + D);
+
+  				if ( trace_atn_sim ) Console.WriteLine("addDFAState new " + D);
 				return D;
 			}
 		}
