@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -385,16 +384,11 @@ namespace Antlr4.Runtime.Atn
 
 		public ATNConfig GetOrAdd(ATNConfig config)
 		{
-			ATNConfig existing;
-			if (this.TryGetValue(config, out existing))
+			if (TryGetValue(config, out var existing))
 				return existing;
-			else
-			{
-				this.Put(config, config);
-				return config;
-			}
+			Add(config, config);
+			return config;
 		}
-
 	}
 
 	public class ConfigEqualityComparator : IEqualityComparer<ATNConfig>

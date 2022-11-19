@@ -2,10 +2,11 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -36,9 +37,7 @@ namespace Antlr4.Runtime.Tree
         /// </remarks>
         public static string ToStringTree(ITree t, Parser recog)
         {
-            string[] ruleNames = recog != null ? recog.RuleNames : null;
-            IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
-            return ToStringTree(t, ruleNamesList);
+            return ToStringTree(t, recog?.RuleNames);
         }
 
         /// <summary>Print out a whole tree in LISP form.</summary>
@@ -75,9 +74,7 @@ namespace Antlr4.Runtime.Tree
 
         public static string GetNodeText(ITree t, Parser recog)
         {
-            string[] ruleNames = recog != null ? recog.RuleNames : null;
-            IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
-            return GetNodeText(t, ruleNamesList);
+            return GetNodeText(t, recog?.RuleNames);
         }
 
         public static string GetNodeText(ITree t, IList<string> ruleNames)
@@ -144,7 +141,7 @@ namespace Antlr4.Runtime.Tree
         {
             if (t.Parent == null)
             {
-                return Collections.EmptyList<ITree>();
+                return Array.Empty<ITree>();
             }
             IList<ITree> ancestors = new List<ITree>();
             t = t.Parent;

@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -21,18 +20,17 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (ctx == EmptyPredictionContext.Instance)
 				return EmptyPredictionContext.Instance;
-			PredictionContext existing = cache.Get(ctx);
-			if (existing != null)
+			if (cache.TryGetValue(ctx, out var existing))
 			{
 				return existing;
 			}
-			cache.Put(ctx, ctx);
+			cache.Add(ctx, ctx);
 			return ctx;
 		}
 
 		public PredictionContext Get(PredictionContext ctx)
 		{
-			return cache.Get(ctx);
+			return cache.TryGetValue(ctx, out var result) ? result : null;
 		}
 
 		public int Count

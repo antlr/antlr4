@@ -7,7 +7,6 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime
@@ -282,9 +281,7 @@ namespace Antlr4.Runtime
         // recog null unless ParserRuleContext, in which case we use subclass toString(...)
         public virtual string ToString(IRecognizer recog, Antlr4.Runtime.RuleContext stop)
         {
-            string[] ruleNames = recog != null ? recog.RuleNames : null;
-            IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
-            return ToString(ruleNamesList, stop);
+            return ToString(recog?.RuleNames, stop);
         }
 
         public virtual string ToString(IList<string> ruleNames, Antlr4.Runtime.RuleContext stop)

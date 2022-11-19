@@ -2,10 +2,11 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -315,8 +316,8 @@ namespace Antlr4.Runtime.Atn
 					if (mergeCache != null) mergeCache.Put(a, b, a_);
 					return a_;
 				}
-				mergedParents = Arrays.CopyOf(mergedParents, k);
-				mergedReturnStates = Arrays.CopyOf(mergedReturnStates, k);
+				Array.Resize(ref mergedParents, k);
+				Array.Resize(ref mergedReturnStates, k);
 			}
 
 			PredictionContext M = new ArrayPredictionContext(mergedParents, mergedReturnStates);
@@ -352,15 +353,15 @@ namespace Antlr4.Runtime.Atn
 				PredictionContext parent = parents[p];
 				if (parent!=null && !uniqueParents.ContainsKey(parent))
 				{ // don't replace
-					uniqueParents.Put(parent, parent);
+					uniqueParents.Add(parent, parent);
 				}
 			}
 
 			for (int p = 0; p < parents.Length; p++)
 			{
 				PredictionContext parent = parents[p];
-				if (parent!=null)
-					parents[p] = uniqueParents.Get(parent);
+				if (parent != null)
+					parents[p] = uniqueParents.TryGetValue(parent, out var uniqueParent) ? uniqueParent : null;
 			}
 		}
 
@@ -405,8 +406,7 @@ namespace Antlr4.Runtime.Atn
 				return context;
 			}
 
-			PredictionContext existing = visited.Get(context);
-			if (existing != null)
+			if (visited.TryGetValue(context, out var existing))
 			{
 				return existing;
 			}
@@ -414,7 +414,7 @@ namespace Antlr4.Runtime.Atn
 			existing = contextCache.Get(context);
 			if (existing != null)
 			{
-				visited.Put(context, existing);
+				visited.Add(context, existing);
 				return existing;
 			}
 
@@ -443,7 +443,7 @@ namespace Antlr4.Runtime.Atn
 			if (!changed)
 			{
 				contextCache.Add(context);
-				visited.Put(context, context);
+				visited.Add(context, context);
 				return context;
 			}
 
@@ -462,8 +462,8 @@ namespace Antlr4.Runtime.Atn
 			}
 
 			contextCache.Add(updated);
-			visited.Put(updated, updated);
-			visited.Put(context, updated);
+			visited[updated] = updated;
+			visited.Add(context, updated);
 
 			return updated;
 		}

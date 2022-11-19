@@ -4,7 +4,7 @@
  */
 using System;
 using Antlr4.Runtime.Dfa;
-using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime.Atn
 {

@@ -9,7 +9,6 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -33,7 +32,7 @@ namespace Antlr4.Runtime
 
         [Obsolete("Use constructor with channelNames argument")]
         public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
-            : this(grammarFileName, vocabulary, ruleNames, new string[0], modeNames, atn, input)
+            : this(grammarFileName, vocabulary, ruleNames, Array.Empty<string>(), modeNames, atn, input)
         {
         }
 

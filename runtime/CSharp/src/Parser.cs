@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
 
@@ -409,7 +408,7 @@ namespace Antlr4.Runtime
                 IList<IParseTreeListener> listeners = _parseListeners;
                 if (listeners == null)
                 {
-                    return Sharpen.Collections.EmptyList<IParseTreeListener>();
+                    return Array.Empty<IParseTreeListener>();
                 }
                 return listeners;
             }

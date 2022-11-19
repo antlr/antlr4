@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -197,13 +196,7 @@ namespace Antlr4.Runtime.Atn
                 opnds = operands.ToArray();
             }
 
-            public override ICollection<SemanticContext> Operands
-            {
-                get
-                {
-                    return Arrays.AsList(opnds);
-                }
-            }
+            public override ICollection<SemanticContext> Operands => opnds;
 
             public override bool Equals(object obj)
             {
@@ -315,13 +308,7 @@ namespace Antlr4.Runtime.Atn
                 this.opnds = operands.ToArray();
             }
 
-            public override ICollection<SemanticContext> Operands
-            {
-                get
-                {
-                    return Arrays.AsList(opnds);
-                }
-            }
+            public override ICollection<SemanticContext> Operands => opnds;
 
             public override bool Equals(object obj)
             {
@@ -442,7 +429,7 @@ namespace Antlr4.Runtime.Atn
         private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates(HashSet<SemanticContext> collection)
         {
             if (!collection.OfType<PrecedencePredicate>().Any())
-                Collections.EmptyList<PrecedencePredicate>();
+                return Array.Empty<PrecedencePredicate>();
 
             List<PrecedencePredicate> result = collection.OfType<PrecedencePredicate>().ToList();
             collection.ExceptWith(result);

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime
@@ -289,7 +288,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Collections.EmptyList<ITerminalNode>();
+                return Array.Empty<ITerminalNode>();
             }
 
             List<ITerminalNode> tokens = null;
@@ -313,7 +312,7 @@ namespace Antlr4.Runtime
 
             if (tokens == null)
             {
-                return Collections.EmptyList<ITerminalNode>();
+                return Array.Empty<ITerminalNode>();
             }
 
             return tokens.ToArray();
@@ -330,7 +329,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Collections.EmptyList<T>();
+                return Array.Empty<T>();
             }
 
             List<T> contexts = null;
@@ -349,7 +348,7 @@ namespace Antlr4.Runtime
 
             if (contexts == null)
             {
-                return Collections.EmptyList<T>();
+                return Array.Empty<T>();
             }
 
             return contexts.ToArray();
