@@ -88,7 +88,7 @@ export function merge(a, b, rootIsWildcard, mergeCache) {
         return mergeSingletons(a, b, rootIsWildcard, mergeCache);
     }
     // At least one of a or b is array
-    // If one is $ and rootIsWildcard, return $ as// wildcard
+    // If one is $ and rootIsWildcard, return $ as * wildcard
     if (rootIsWildcard) {
         if (a instanceof EmptyPredictionContext) {
             return a;
@@ -144,8 +144,8 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     let j = 0; // walks b
     let k = 0; // walks target M array
 
-    let mergedReturnStates = [];
-    let mergedParents = [];
+    let mergedReturnStates = new Array(a.returnStates.length + b.returnStates.length).fill(0);
+    let mergedParents = new Array(a.returnStates.length + b.returnStates.length).fill(null);
     // walk and merge to yield mergedParents, mergedReturnStates
     while (i < a.returnStates.length && j < b.returnStates.length) {
         const a_parent = a.parents[i];
