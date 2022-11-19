@@ -19,6 +19,16 @@
 [![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
 -->
 
+## Versioning
+
+ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique highly available feature.
+To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
+As such, ANTLR versioning does not strictly follow semver semantics:
+ - a component may be released with the latest version number even though nothing has changed within that component
+ - minor version updates may include minor breaking changes, the policy is to regenerate parsers with every release
+ - major version is bumped only when new grammar features are released
+If you use a semver verifier in your CI, you probably want to apply special rules for ANTLR, such as treating minor change as a major change.
+
 ## Repo branch structure
 
 The default branch for this repo is [`master`](https://github.com/antlr/antlr4/tree/master), which is the latest stable release and has tags for the various releases; e.g., see release tag [4.9.3](https://github.com/antlr/antlr4/tree/4.9.3).  Branch [`dev`](https://github.com/antlr/antlr4/tree/dev) is where development occurs between releases and all pull requests should be derived from that branch. The `dev` branch is merged back into `master` to cut a release and the release state is tagged (e.g., with `4.10-rc1` or `4.10`.) Visually our process looks roughly like this:
