@@ -197,24 +197,25 @@ std::string ATNConfigSet::toString() const {
   std::stringstream ss;
   ss << "[";
   for (size_t i = 0; i < configs.size(); i++) {
+    if ( i>0 ) ss << ", ";
     ss << configs[i]->toString();
   }
   ss << "]";
 
   if (hasSemanticContext) {
-    ss << ",hasSemanticContext = " <<  hasSemanticContext;
+    ss << ",hasSemanticContext=" << (hasSemanticContext?"true":"false");
   }
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
-    ss << ",uniqueAlt = " << uniqueAlt;
+    ss << ",uniqueAlt=" << uniqueAlt;
   }
 
-  if (conflictingAlts.size() > 0) {
-    ss << ",conflictingAlts = ";
+  if (conflictingAlts.count() > 0) {
+    ss << ",conflictingAlts=";
     ss << conflictingAlts.toString();
   }
 
   if (dipsIntoOuterContext) {
-    ss << ", dipsIntoOuterContext";
+    ss << ",dipsIntoOuterContext";
   }
   return ss.str();
 }

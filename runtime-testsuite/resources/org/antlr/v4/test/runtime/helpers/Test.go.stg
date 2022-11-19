@@ -27,6 +27,9 @@ func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 <endif>
 
 func main() {
+<if(traceATN)>
+    antlr.ParserATNSimulatorTraceATNSim = true
+<endif>
 	input, err := antlr.NewFileStream(os.Args[1])
 		if err != nil {
 		fmt.Printf("Failed to find file: %v", err)
@@ -36,7 +39,7 @@ func main() {
 	stream := antlr.NewCommonTokenStream(lexer,0)
 <if(parserName)>
 	p := parser.New<parserName>(stream)
-<if(debug)>
+<if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>
 	p.BuildParseTrees = true

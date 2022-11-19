@@ -51,6 +51,8 @@ public class RuntimeTestDescriptor {
 	/** For parsing, engage the DiagnosticErrorListener, dumping results to stderr */
 	public final boolean showDiagnosticErrors;
 
+	public final boolean traceATN;
+
 	public final String[] skipTargets;
 
 	public final URI uri;
@@ -59,7 +61,7 @@ public class RuntimeTestDescriptor {
 								 String input, String output, String errors,
 								 String startRule,
 								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
-								 boolean showDFA, boolean showDiagnosticErrors, String[] skipTargets,
+								 boolean showDiagnosticErrors, boolean traceATN, boolean showDFA, String[] skipTargets,
 								 URI uri) {
 		this.testType = testType;
 		this.name = name;
@@ -73,6 +75,7 @@ public class RuntimeTestDescriptor {
 		this.slaveGrammars = slaveGrammars;
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
+		this.traceATN = traceATN;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
 		this.uri = uri;
 	}

@@ -162,6 +162,7 @@ public abstract class RuntimeTests {
 				descriptor.input,
 				false,
 				descriptor.showDiagnosticErrors,
+				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
 				false,
@@ -209,7 +210,7 @@ public abstract class RuntimeTests {
 		return grammarST.render();
 	}
 
-	private static String assertCorrectOutput(RuntimeTestDescriptor descriptor, String targetName, State state) {
+	public static String assertCorrectOutput(RuntimeTestDescriptor descriptor, String targetName, State state) {
 		ExecutedState executedState;
 		if (state instanceof ExecutedState) {
 			executedState = (ExecutedState)state;

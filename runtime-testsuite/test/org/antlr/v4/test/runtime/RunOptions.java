@@ -18,6 +18,7 @@ public class RunOptions {
 	public final String input;
 	public final boolean profile;
 	public final boolean showDiagnosticErrors;
+	public final boolean traceATN;
 	public final boolean showDFA;
 	public final Stage endStage;
 	public final boolean returnObject;
@@ -26,7 +27,7 @@ public class RunOptions {
 	public RunOptions(String grammarFileName, String grammarStr, String parserName, String lexerName,
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,
-					  boolean showDFA, Stage endStage, boolean returnObject,
+					  boolean traceATN, boolean showDFA, Stage endStage, boolean returnObject,
 					  String language, String superClass) {
 		this.grammarFileName = grammarFileName;
 		this.grammarStr = grammarStr;
@@ -61,6 +62,7 @@ public class RunOptions {
 		this.input = input;
 		this.profile = profile;
 		this.showDiagnosticErrors = showDiagnosticErrors;
+		this.traceATN = traceATN;
 		this.showDFA = showDFA;
 		this.endStage = endStage;
 		this.returnObject = returnObject;

@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 std::string DecisionState::toString() const {
-  return "DECISION " + ATNState::toString();
+  return ATNState::toString();
 }

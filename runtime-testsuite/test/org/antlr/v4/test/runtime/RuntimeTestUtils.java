@@ -39,17 +39,17 @@ public abstract class RuntimeTestUtils {
 		if (isWindows()) {
 			locationPath = locationPath.replaceFirst("/", "");
 		}
-		Path potentialRuntimeTestsuitePath = Paths.get(locationPath, "..", "..").normalize();
+		Path potentialRuntimeTestsuitePath = Paths.get(locationPath, "..", "..").normalize().toAbsolutePath();
 		Path potentialResourcePath = Paths.get(potentialRuntimeTestsuitePath.toString(), "resources");
 
 		if (Files.exists(potentialResourcePath)) {
 			runtimeTestsuitePath = potentialRuntimeTestsuitePath;
 		}
 		else {
-			runtimeTestsuitePath = Paths.get("..", "runtime-testsuite").normalize();
+			runtimeTestsuitePath = Paths.get("..", "runtime-testsuite").normalize().toAbsolutePath();
 		}
 
-		runtimePath = Paths.get(runtimeTestsuitePath.toString(), "..", "runtime").normalize();
+		runtimePath = Paths.get(runtimeTestsuitePath.toString(), "..", "runtime").normalize().toAbsolutePath();
 		resourcePath = Paths.get(runtimeTestsuitePath.toString(), "resources");
 	}
 

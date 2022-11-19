@@ -260,7 +260,7 @@ class ParserATNSimulator extends ATNSimulator {
     'ANTLR_PARSER_DEBUG',
     defaultValue: false,
   );
-  static const bool debug_list_atn_decisions = bool.fromEnvironment(
+  static const bool trace_atn_sim = bool.fromEnvironment(
     'ANTLR_PARSER_LIST_ATN_DECISIONS_DEBUG',
     defaultValue: false,
   );
@@ -323,7 +323,7 @@ class ParserATNSimulator extends ATNSimulator {
     int decision,
     ParserRuleContext? outerContext,
   ) {
-    if (debug || debug_list_atn_decisions) {
+    if (debug || trace_atn_sim) {
       log('adaptivePredict decision $decision' ' exec LA(1)==' +
           getLookaheadName(input_) +
           ' line ${input_.LT(1)!.line}:${input_.LT(1)!.charPositionInLine}');
@@ -353,7 +353,7 @@ class ParserATNSimulator extends ATNSimulator {
 
       if (s0 == null) {
         outerContext ??= ParserRuleContext.EMPTY;
-        if (debug || debug_list_atn_decisions) {
+        if (debug || trace_atn_sim) {
           log('predictATN decision ${dfa.decision}' ' exec LA(1)==' +
               getLookaheadName(input_) +
               ', outerContext=' +
@@ -430,7 +430,7 @@ class ParserATNSimulator extends ATNSimulator {
   ///
   int execATN(DFA dfa, DFAState s0, TokenStream input, int startIndex,
       ParserRuleContext outerContext) {
-    if (debug || debug_list_atn_decisions) {
+    if (debug || trace_atn_sim) {
       log('execATN decision ${dfa.decision}' ' exec LA(1)==' +
           getLookaheadName(input) +
           ' line ${input.LT(1)!.line}' +
@@ -674,7 +674,7 @@ class ParserATNSimulator extends ATNSimulator {
       TokenStream input,
       int startIndex,
       ParserRuleContext outerContext) {
-    if (debug || debug_list_atn_decisions) {
+    if (debug || trace_atn_sim) {
       log('execATNWithFullContext $s0');
     }
     final fullCtx = true;

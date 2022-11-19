@@ -3,18 +3,19 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 
-#
-# Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
-# info about the set, with support for combining similar configurations using a
-# graph-structured stack.
-#/
-from functools import reduce
-from io import StringIO
 from antlr4.PredictionContext import merge
 from antlr4.Utils import str_list
 from antlr4.atn.ATN import ATN
 from antlr4.atn.SemanticContext import SemanticContext
 from antlr4.error.Errors import UnsupportedOperationException, IllegalStateException
+#
+# Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
+# info about the set, with support for combining similar configurations using a
+# graph-structured stack.
+# /
+from functools import reduce
+from io import StringIO
+
 
 class ATNConfigSet(object):
     #
@@ -188,13 +189,13 @@ class ATNConfigSet(object):
             buf.write(str_list(self.configs))
             if self.hasSemanticContext:
                 buf.write(u",hasSemanticContext=")
-                buf.write(unicode(self.hasSemanticContext))
+                buf.write(unicode(self.hasSemanticContext).lower())
             if self.uniqueAlt!=ATN.INVALID_ALT_NUMBER:
                 buf.write(u",uniqueAlt=")
                 buf.write(unicode(self.uniqueAlt))
             if self.conflictingAlts is not None:
                 buf.write(u",conflictingAlts=")
-                buf.write(unicode(self.conflictingAlts))
+                buf.write(u"{"+unicode(', '.join(str(a) for a in self.conflictingAlts))+u"}")
             if self.dipsIntoOuterContext:
                 buf.write(u",dipsIntoOuterContext")
             return buf.getvalue()
