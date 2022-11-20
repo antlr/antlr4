@@ -14,6 +14,17 @@
 [![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
 -->
 
+## Versioning
+
+ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique and highly useful feature.
+To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
+As such, ANTLR versioning does not strictly follow semver semantics:
+- a component may be released with the latest version number even though nothing has changed within that component since the previous release
+- major version is bumped only when new grammar features are released (such as ANTLR3 -> ANTLR4)
+- minor version updates may include minor breaking changes, the policy is to regenerate parsers with every release
+- backwards compatibility is only guaranteed for patch version bumps 
+If you use a semver verifier in your CI, you probably want to apply special rules for ANTLR, such as treating minor change as a major change.
+
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
 [![Donate](https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BF92STRXT8F8Q)
