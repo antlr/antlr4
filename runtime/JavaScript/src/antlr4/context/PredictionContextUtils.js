@@ -213,14 +213,14 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 
     // if we created same array as a or b, return that instead
     // TODO: track whether this is possible above during merge sort for speed
-    if (M === a) {
+    if (M.equals(a)) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, a);
         }
         if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> a");
         return a;
     }
-    if (M === b) {
+    if (M.equals(b)) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, b);
         }
