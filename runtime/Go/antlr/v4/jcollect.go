@@ -4,7 +4,9 @@ package antlr
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
-import "sort"
+import (
+	"sort"
+)
 
 // Collectable is an interface that a struct should implement if it is to be
 // usable as a key in these collections.
@@ -149,6 +151,7 @@ func NewJMap[K, V any, C Comparator[K]](comparator Comparator[K]) *JMap[K, V, C]
 
 func (m *JMap[K, V, C]) Put(key K, val V) {
 	kh := m.comparator.Hash1(key)
+
 	m.store[kh] = append(m.store[kh], &entry[K, V]{key, val})
 	m.len++
 }

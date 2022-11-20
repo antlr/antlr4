@@ -468,7 +468,7 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // alt and not pred
 // </pre>
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
-	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](&ATNAltConfigComparator[ATNConfig]{})
+	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](atnAltCfgEqInst)
 
 	for _, c := range configs.GetItems() {
 
