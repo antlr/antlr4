@@ -35,12 +35,12 @@ The C++ target has been the work of the following people:
 
 ### Build + Usage Notes
 
-The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supplied projects can built the runtime either as static or dynamic library, as both 32bit and 64bit arch. The macOS project contains a target for iOS and can also be built using cmake (instead of XCode).
+The minimum C++ version to compile the ANTLR C++ runtime with is C++17. The supplied projects can built the runtime either as static or dynamic library, as both 32bit and 64bit arch. The macOS project contains a target for iOS and can also be built using cmake (instead of XCode).
 
 Include the antlr4-runtime.h umbrella header in your target application to get everything needed to use the library.
 
 If you are compiling with cmake, the minimum version required is cmake 2.8.
-By default, the libraries produced by the CMake build target C++11. If you want to target a different C++ standard, you can explicitly pass the standard - e.g. `-DCMAKE_CXX_STANDARD=17`.
+By default, the libraries produced by the CMake build target C++17. If you want to target a different C++ standard, you can explicitly pass the standard - e.g. `-DCMAKE_CXX_STANDARD=17`.
 
 #### Compiling on Windows with Visual Studio using he Visual Studio projects
 Simply open the VS project from the runtime folder (VS 2019+) and build it.

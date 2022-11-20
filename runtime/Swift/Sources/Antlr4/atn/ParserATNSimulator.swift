@@ -237,7 +237,7 @@ import Foundation
 
 open class ParserATNSimulator: ATNSimulator {
     public let debug = false
-    public let debug_list_atn_decisions = false
+    public let trace_atn_sim = false
     public let dfa_debug = false
     public let retry_debug = false
 
@@ -310,7 +310,7 @@ open class ParserATNSimulator: ATNSimulator {
     open func adaptivePredict(_ input: TokenStream, _ decision: Int,
         _ outerContext: ParserRuleContext?) throws -> Int {
         var outerContext = outerContext
-        if debug || debug_list_atn_decisions {
+        if debug || trace_atn_sim {
             var debugInfo = "adaptivePredict decision \(decision) "
             debugInfo += "exec LA(1)==\(try getLookaheadName(input)) "
             debugInfo += "line \(try input.LT(1)!.getLine()):"
@@ -347,7 +347,7 @@ open class ParserATNSimulator: ATNSimulator {
                 if outerContext == nil {
                     outerContext = ParserRuleContext.EMPTY
                 }
-                if debug || debug_list_atn_decisions {
+                if debug || trace_atn_sim {
                     var debugInfo = "predictATN decision \(dfa.decision) "
                     debugInfo += "exec LA(1)==\(try getLookaheadName(input)), "
                     debugInfo += "outerContext=\(outerContext!.toString(parser))"
@@ -423,7 +423,7 @@ open class ParserATNSimulator: ATNSimulator {
     final func execATN(_ dfa: DFA, _ s0: DFAState,
         _ input: TokenStream, _ startIndex: Int,
         _ outerContext: ParserRuleContext) throws -> Int {
-            if debug || debug_list_atn_decisions {
+            if debug || trace_atn_sim {
                 try print("execATN decision \(dfa.decision) exec LA(1)==\(getLookaheadName(input)) line \(input.LT(1)!.getLine()):\(input.LT(1)!.getCharPositionInLine())")
             }
 
@@ -637,7 +637,7 @@ open class ParserATNSimulator: ATNSimulator {
         _ s0: ATNConfigSet,
         _ input: TokenStream, _ startIndex: Int,
         _ outerContext: ParserRuleContext) throws -> Int {
-        if debug || debug_list_atn_decisions {
+        if debug || trace_atn_sim {
             print("execATNWithFullContext \(s0)")
         }
         let fullCtx = true

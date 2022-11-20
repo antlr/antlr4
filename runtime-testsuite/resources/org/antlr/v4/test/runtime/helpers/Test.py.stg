@@ -27,12 +27,16 @@ class TreeShapeListener(ParseTreeListener):
 <endif>
 
 def main(argv):
+<if(traceATN)>
+    ParserATNSimulator.trace_atn_sim = True
+    PredictionContext._trace_atn_sim = True
+<endif>
     input = FileStream(argv[1], encoding='utf-8', errors='replace')
     lexer = <lexerName>(input)
     stream = CommonTokenStream(lexer)
 <if(parserName)>
     parser = <parserName>(stream)
-<if(debug)>
+<if(showDiagnosticErrors)>
     parser.addErrorListener(DiagnosticErrorListener())
 <endif>
     parser.buildParseTrees = True

@@ -198,7 +198,7 @@ type AND struct {
 
 func NewAND(a, b SemanticContext) *AND {
 
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](&ObjEqComparator[SemanticContext]{})
+	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.Put(o)
@@ -349,7 +349,7 @@ type OR struct {
 
 func NewOR(a, b SemanticContext) *OR {
 
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](&ObjEqComparator[SemanticContext]{})
+	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.Put(o)

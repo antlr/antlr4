@@ -45,3 +45,26 @@ $ mvn compile
 ```
 
 That should proceed with success. See [Building ANTLR](building-antlr.md) for more details.
+
+## Comparing your target's parsing decisionmaking with Java's
+
+ANTLR's power comes from it's dynamic parsing strategy, but that means each target
+must implement that complicated algorithm. You should compare your target's debug
+output for ParserATNSimulator with Java's.
+
+Run this so we get right jars before trying this script:
+
+```
+cd ANTLR-ROOT-DIR
+mvn install -DskipTests=true
+cd runtime-tests 
+mvn install -DskipTests=true # yes do it again
+```
+
+Run the script from `runtime-tests` dir with
+
+```
+../scripts/traceatn.sh /tmp/JSON.g4 json -target Go /tmp/foo.json
+```
+
+or whatever your test grammar, start rule, target, test input are.

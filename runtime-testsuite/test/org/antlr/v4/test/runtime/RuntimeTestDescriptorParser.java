@@ -103,6 +103,7 @@ public class RuntimeTestDescriptorParser {
 		String errors = "";
 		boolean showDFA = false;
 		boolean showDiagnosticErrors = false;
+		boolean traceATN = false;
 		String[] skipTargets = new String[0];
 		for (Pair<String,String> p : pairs) {
 			String section = p.a;
@@ -152,6 +153,9 @@ public class RuntimeTestDescriptorParser {
 							case "showDiagnosticErrors":
 								showDiagnosticErrors = true;
 								break;
+							case "traceATN":
+								traceATN = true;
+								break;
 						}
 					}
 					break;
@@ -163,7 +167,7 @@ public class RuntimeTestDescriptorParser {
 			}
 		}
 		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets, uri);
+				slaveGrammars, showDiagnosticErrors, traceATN, showDFA, skipTargets, uri);
 	}
 
 	/** Get A, B, or C from:

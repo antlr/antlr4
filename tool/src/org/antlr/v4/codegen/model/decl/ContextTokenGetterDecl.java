@@ -13,7 +13,16 @@ public class ContextTokenGetterDecl extends ContextGetterDecl {
 	public boolean optional;
 
 	public ContextTokenGetterDecl(OutputModelFactory factory, String name, boolean optional) {
-		super(factory, name);
+		this(factory, name, optional, false);
+	}
+
+	public ContextTokenGetterDecl(OutputModelFactory factory, String name, boolean optional, boolean signature) {
+		super(factory, name, signature);
 		this.optional = optional;
+	}
+
+	@Override
+	public ContextGetterDecl getSignatureDecl() {
+		return new ContextTokenGetterDecl(factory, name, optional, true);
 	}
 }

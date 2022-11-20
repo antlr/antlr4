@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	ParserATNSimulatorDebug            = false
-	ParserATNSimulatorListATNDecisions = false
-	ParserATNSimulatorDFADebug         = false
-	ParserATNSimulatorRetryDebug       = false
-	TurnOffLRLoopEntryBranchOpt        = false
+	ParserATNSimulatorDebug       = false
+	ParserATNSimulatorTraceATNSim = false
+	ParserATNSimulatorDFADebug    = false
+	ParserATNSimulatorRetryDebug  = false
+	TurnOffLRLoopEntryBranchOpt   = false
 )
 
 type ParserATNSimulator struct {
@@ -70,8 +70,8 @@ func (p *ParserATNSimulator) reset() {
 }
 
 func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, outerContext ParserRuleContext) int {
-	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
-		fmt.Println("AdaptivePredict decision " + strconv.Itoa(decision) +
+	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
+		fmt.Println("adaptivePredict decision " + strconv.Itoa(decision) +
 			" exec LA(1)==" + p.getLookaheadName(input) +
 			" line " + strconv.Itoa(input.LT(1).GetLine()) + ":" +
 			strconv.Itoa(input.LT(1).GetColumn()))
@@ -113,7 +113,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 		if outerContext == nil {
 			outerContext = ParserRuleContextEmpty
 		}
-		if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
+		if ParserATNSimulatorDebug {
 			fmt.Println("predictATN decision " + strconv.Itoa(dfa.decision) +
 				" exec LA(1)==" + p.getLookaheadName(input) +
 				", outerContext=" + outerContext.String(p.parser.GetRuleNames(), nil))
@@ -182,9 +182,10 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 //	conflict + preds
 func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, startIndex int, outerContext ParserRuleContext) int {
 
-	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
+	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
 		fmt.Println("execATN decision " + strconv.Itoa(dfa.decision) +
-			" exec LA(1)==" + p.getLookaheadName(input) +
+			", DFA state " + s0.String() +
+			", LA(1)==" + p.getLookaheadName(input) +
 			" line " + strconv.Itoa(input.LT(1).GetLine()) + ":" + strconv.Itoa(input.LT(1).GetColumn()))
 	}
 
@@ -382,7 +383,7 @@ func (p *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionState
 // comes back with reach.uniqueAlt set to a valid alt
 func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 ATNConfigSet, input TokenStream, startIndex int, outerContext ParserRuleContext) int {
 
-	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
+	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
 		fmt.Println("execATNWithFullContext " + s0.String())
 	}
 
@@ -490,9 +491,6 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 }
 
 func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCtx bool) ATNConfigSet {
-	if ParserATNSimulatorDebug {
-		fmt.Println("in computeReachSet, starting closure: " + closure.String())
-	}
 	if p.mergeCache == nil {
 		p.mergeCache = NewDoubleDict()
 	}
@@ -608,6 +606,11 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 			reach.Add(skippedStopStates[l], p.mergeCache)
 		}
 	}
+
+	if ParserATNSimulatorTraceATNSim {
+		fmt.Println("computeReachSet " + closure.String() + " -> " + reach.String())
+	}
+
 	if len(reach.GetItems()) == 0 {
 		return nil
 	}
@@ -658,6 +661,11 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	// always at least the implicit call to start rule
 	initialContext := predictionContextFromRuleContext(p.atn, ctx)
 	configs := NewBaseATNConfigSet(fullCtx)
+	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
+		fmt.Println("computeStartState from ATN state " + a.String() +
+			" initialContext=" + initialContext.String())
+	}
+
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
 		c := NewBaseATNConfig6(target, i+1, initialContext)
@@ -971,9 +979,9 @@ func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, clo
 }
 
 func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
-	if ParserATNSimulatorDebug {
+	if ParserATNSimulatorTraceATNSim {
 		fmt.Println("closure(" + config.String() + ")")
-		fmt.Println("configs(" + configs.String() + ")")
+		//fmt.Println("configs(" + configs.String() + ")")
 		if config.GetReachesIntoOuterContext() > 50 {
 			panic("problem")
 		}
@@ -1361,13 +1369,12 @@ func (p *ParserATNSimulator) GetTokenName(t int) string {
 		return "EOF"
 	}
 
-	if p.parser != nil && p.parser.GetLiteralNames() != nil {
-		if t >= len(p.parser.GetLiteralNames()) {
-			fmt.Println(strconv.Itoa(t) + " ttype out of range: " + strings.Join(p.parser.GetLiteralNames(), ","))
-			//			fmt.Println(p.parser.GetInputStream().(TokenStream).GetAllText()) // p seems incorrect
-		} else {
-			return p.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
-		}
+	if p.parser != nil && p.parser.GetLiteralNames() != nil && t < len(p.parser.GetLiteralNames()) {
+		return p.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
+	}
+
+	if p.parser != nil && p.parser.GetLiteralNames() != nil && t < len(p.parser.GetSymbolicNames()) {
+		return p.parser.GetSymbolicNames()[t] + "<" + strconv.Itoa(t) + ">"
 	}
 
 	return strconv.Itoa(t)
@@ -1495,6 +1502,9 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 	}
 	existing, present := dfa.states.Get(d)
 	if present {
+		if ParserATNSimulatorTraceATNSim {
+			fmt.Print("addDFAState " + d.String() + " exists")
+		}
 		return existing
 	}
 
@@ -1506,8 +1516,8 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 		d.configs.SetReadOnly(true)
 	}
 	dfa.states.Put(d)
-	if ParserATNSimulatorDebug {
-		fmt.Println("adding NewDFA state: " + d.String())
+	if ParserATNSimulatorTraceATNSim {
+		fmt.Println("addDFAState new " + d.String())
 	}
 
 	return d

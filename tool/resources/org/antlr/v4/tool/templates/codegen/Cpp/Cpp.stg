@@ -575,7 +575,7 @@ public:
 
 >>
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, signatures) ::= <<
 //----------------- <struct.escapedName> ------------------------------------------------------------------
 
 <if (ctorAttrs)>
@@ -802,8 +802,8 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <<
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
-  ((1ULL \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
+  ((1ULL \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0)
 >>
 
 isZero ::= [

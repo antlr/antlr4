@@ -150,6 +150,13 @@ class PrecedencePredicate(SemanticContext):
         else:
             return self.precedence == other.precedence
 
+    def __str__(self):
+        return unicode(self)
+
+    def __unicode__(self):
+        return u"{" + unicode(self.precedence) + u">=prec}?"
+
+
 # A semantic context which is true whenever none of the contained contexts
 # is false.
 #

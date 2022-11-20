@@ -63,7 +63,7 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		runCommand(new String[] {getCompilerPath(), "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
 	}
 

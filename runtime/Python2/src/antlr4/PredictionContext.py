@@ -3,9 +3,12 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
-from io import StringIO
 from antlr4.RuleContext import RuleContext
 from antlr4.error.Errors import IllegalStateException
+from io import StringIO
+
+# dup ParserATNSimulator class var here to avoid circular import; no idea why this can't be in PredictionContext
+_trace_atn_sim = False
 
 class PredictionContext(object):
 
@@ -219,7 +222,7 @@ class ArrayPredictionContext(PredictionContext):
                 if self.returnStates[i]==PredictionContext.EMPTY_RETURN_STATE:
                     buf.write(u"$")
                     continue
-                buf.write(self.returnStates[i])
+                buf.write(unicode(self.returnStates[i]))
                 if self.parents[i] is not None:
                     buf.write(u' ')
                     buf.write(unicode(self.parents[i]))
@@ -444,9 +447,11 @@ def mergeArrays(a, b, rootIsWildcard, mergeCache):
     if mergeCache is not None:
         previous = mergeCache.get((a,b), None)
         if previous is not None:
+            if _trace_atn_sim: print("mergeArrays a="+str(a)+",b="+str(b)+" -> previous")
             return previous
         previous = mergeCache.get((b,a), None)
         if previous is not None:
+            if _trace_atn_sim: print("mergeArrays a="+str(a)+",b="+str(b)+" -> previous")
             return previous
 
     # merge sorted payloads a + b => M
@@ -515,15 +520,20 @@ def mergeArrays(a, b, rootIsWildcard, mergeCache):
     if merged==a:
         if mergeCache is not None:
             mergeCache[(a,b)] = a
+        if _trace_atn_sim: print("mergeArrays a="+str(a)+",b="+str(b)+" -> a")
         return a
     if merged==b:
         if mergeCache is not None:
             mergeCache[(a,b)] = b
+        if _trace_atn_sim: print("mergeArrays a="+str(a)+",b="+str(b)+" -> b")
         return b
     combineCommonParents(mergedParents)
 
     if mergeCache is not None:
         mergeCache[(a,b)] = merged
+
+    if _trace_atn_sim: print("mergeArrays a="+str(a)+",b="+str(b)+" -> "+str(M))
+
     return merged
 
 

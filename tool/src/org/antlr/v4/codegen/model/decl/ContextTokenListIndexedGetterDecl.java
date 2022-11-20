@@ -10,11 +10,20 @@ import org.antlr.v4.codegen.OutputModelFactory;
 
 public class ContextTokenListIndexedGetterDecl extends ContextTokenListGetterDecl {
 	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name) {
-		super(factory, name);
+		this(factory, name, false);
+	}
+
+	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name, boolean signature) {
+		super(factory, name, signature);
 	}
 
 	@Override
 	public String getArgType() {
 		return "int";
+	}
+
+	@Override
+	public ContextGetterDecl getSignatureDecl() {
+		return new ContextTokenListIndexedGetterDecl(factory, name, true);
 	}
 }

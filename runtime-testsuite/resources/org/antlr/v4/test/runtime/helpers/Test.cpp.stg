@@ -33,7 +33,7 @@ int main(int argc, const char* argv[]) {
   CommonTokenStream tokens(&lexer);
 <if(parserName)>
   <parserName> parser(&tokens);
-<if(debug)>
+<if(showDiagnosticErrors)>
   DiagnosticErrorListener errorListener;
   parser.addErrorListener(&errorListener);
 <endif>

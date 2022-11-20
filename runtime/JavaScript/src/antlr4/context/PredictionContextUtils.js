@@ -132,10 +132,12 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     if (mergeCache !== null) {
         let previous = mergeCache.get(a, b);
         if (previous !== null) {
+            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
             return previous;
         }
         previous = mergeCache.get(b, a);
         if (previous !== null) {
+            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
             return previous;
         }
     }
@@ -215,12 +217,14 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, a);
         }
+        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> a");
         return a;
     }
     if (M === b) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, b);
         }
+        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> b");
         return b;
     }
     combineCommonParents(mergedParents);
@@ -228,6 +232,9 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     if (mergeCache !== null) {
         mergeCache.set(a, b, M);
     }
+
+    if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> "+M);
+
     return M;
 }
 

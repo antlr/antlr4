@@ -224,7 +224,7 @@ import Antlr4
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -268,7 +268,7 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
                     accessLevelNotOpen(parser))>
 
 	override <accessLevelOpenOK(parser)>
-	func getGrammarFileName() -> String { return "<parser.grammarFileName; format="java-escape">" }
+	func getGrammarFileName() -> String { return "<parser.grammarFileName>" }
 
 	override <accessLevelOpenOK(parser)>
 	func getRuleNames() -> [String] { return <parser.name>.ruleNames }
@@ -618,7 +618,7 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <<
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((Int64(1) \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((Int64(1) \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0)
 >>
 
 isZero ::= [
@@ -812,7 +812,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = try _input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures,
            superClass={ParserRuleContext}) ::= <<
 
 <accessLevelNotOpen(parser)> class <struct.escapedName>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {

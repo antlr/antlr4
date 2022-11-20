@@ -103,7 +103,7 @@ export default class <file.grammarName>Visitor extends antlr4.tree.ParseTreeVisi
 
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 // jshint ignore: start
 >>
 
@@ -122,7 +122,7 @@ const sharedContextCache = new antlr4.PredictionContextCache();
 
 export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 
-    static grammarFileName = "<parser.grammarFileName; format="java-escape">";
+    static grammarFileName = "<parser.grammarFileName>";
     static literalNames = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
     static symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
     static ruleNames = [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
@@ -657,7 +657,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
 
     constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.escapedName>}>) {

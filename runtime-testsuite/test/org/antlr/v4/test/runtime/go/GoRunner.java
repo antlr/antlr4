@@ -76,7 +76,7 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		String cachePath = getCachePath();
 		mkdir(cachePath);
 		Path runtimeFilesPath = Paths.get(getRuntimePath("Go"), "antlr");

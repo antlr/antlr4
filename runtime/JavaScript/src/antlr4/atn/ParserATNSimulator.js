@@ -24,7 +24,7 @@ import RuleTransition from '../transition/RuleTransition.js';
 import ActionTransition from '../transition/ActionTransition.js';
 import NoViableAltException from '../error/NoViableAltException.js';
 import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
-import { predictionContextFromRuleContext } from '../context/PredictionContextUtils.js';
+import {predictionContextFromRuleContext} from '../context/PredictionContextUtils.js';
 import AtomTransition from "../transition/AtomTransition.js";
 import arrayToString from "../utils/arrayToString.js";
 import BitSet from "../misc/BitSet.js";
@@ -283,7 +283,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         this.debug = false;
         this.debug_closure = false;
         this.debug_add = false;
-        this.debug_list_atn_decisions = false;
+        this.trace_atn_sim = false;
         this.dfa_debug = false;
         this.retry_debug = false;
     }
@@ -291,7 +291,7 @@ export default class ParserATNSimulator extends ATNSimulator {
     reset() {}
 
     adaptivePredict(input, decision, outerContext) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("adaptivePredict decision " + decision +
                                    " exec LA(1)==" + this.getLookaheadName(input) +
                                    " line " + input.LT(1).line + ":" +
@@ -322,7 +322,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                 if (outerContext===null) {
                     outerContext = RuleContext.EMPTY;
                 }
-                if (this.debug || this.debug_list_atn_decisions) {
+                if (this.debug ) {
                     console.log("predictATN decision " + dfa.decision +
                                        " exec LA(1)==" + this.getLookaheadName(input) +
                                        ", outerContext=" + outerContext.toString(this.parser.ruleNames));
@@ -393,10 +393,11 @@ export default class ParserATNSimulator extends ATNSimulator {
      *
      */
     execATN(dfa, s0, input, startIndex, outerContext ) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("execATN decision " + dfa.decision +
-                    " exec LA(1)==" + this.getLookaheadName(input) +
-                    " line " + input.LT(1).line + ":" + input.LT(1).column);
+                        ", DFA state " + s0 +
+                        ", LA(1)==" + this.getLookaheadName(input) +
+                        " line " + input.LT(1).line + ":" + input.LT(1).column);
         }
         let alt;
         let previousD = s0;
@@ -590,7 +591,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                          input,
                                          startIndex,
                                          outerContext) {
-        if (this.debug || this.debug_list_atn_decisions) {
+        if (this.debug || this.trace_atn_sim) {
             console.log("execATNWithFullContext "+s0);
         }
         const fullCtx = true;
@@ -814,6 +815,11 @@ export default class ParserATNSimulator extends ATNSimulator {
                 reach.add(skippedStopStates[l], this.mergeCache);
             }
         }
+
+        if ( this.trace_atn_sim ) {
+            console.log("computeReachSet "+closure+" -> "+reach);
+        }
+
         if (reach.items.length===0) {
             return null;
         } else {
@@ -867,6 +873,11 @@ export default class ParserATNSimulator extends ATNSimulator {
         // always at least the implicit call to start rule
         const initialContext = predictionContextFromRuleContext(this.atn, ctx);
         const configs = new ATNConfigSet(fullCtx);
+
+        if ( this.trace_atn_sim ) {
+            console.log("computeStartState from ATN state " + p + " initialContext=" + initialContext.toString(this.parser));
+        }
+
         for(let i=0;i<p.transitions.length;i++) {
             const target = p.transitions[i].target;
             const c = new ATNConfig({ state:target, alt:i+1, context:initialContext }, null);
@@ -1198,12 +1209,8 @@ export default class ParserATNSimulator extends ATNSimulator {
     }
 
     closureCheckingStopState(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
-        if (this.debug || this.debug_closure) {
+        if (this.trace_atn_sim || this.debug_closure) {
             console.log("closure(" + config.toString(this.parser,true) + ")");
-            // console.log("configs(" + configs.toString() + ")");
-            if(config.reachesIntoOuterContext>50) {
-                throw "problem";
-            }
         }
         if (config.state instanceof RuleStopState) {
             // We hit rule end. If we have context info, use it
@@ -1670,6 +1677,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         }
         const existing = dfa.states.get(D);
         if(existing!==null) {
+            if ( this.trace_atn_sim ) console.log("addDFAState " + D + " exists");
             return existing;
         }
         D.stateNumber = dfa.states.length;
@@ -1677,6 +1685,9 @@ export default class ParserATNSimulator extends ATNSimulator {
             D.configs.optimizeConfigs(this);
             D.configs.setReadonly(true);
         }
+
+        if ( this.trace_atn_sim ) console.log("addDFAState new " + D);
+
         dfa.states.add(D);
         if (this.debug) {
             console.log("adding new DFA state: " + D);
