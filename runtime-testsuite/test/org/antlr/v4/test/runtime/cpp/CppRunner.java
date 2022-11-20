@@ -96,7 +96,7 @@ public class CppRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		String runtimePath = getRuntimePath();
 
 		if (isWindows()) {
@@ -107,7 +107,9 @@ public class CppRunner extends RuntimeRunner {
 			runCommand(command, runtimePath + "\\runtime","build c++ ANTLR runtime using MSBuild");
 		}
 		else {
-			String[] command = {"cmake", ".", "-DCMAKE_BUILD_TYPE=Release"};
+			// cmake ignores default of OFF and must explicitly say yes or no on tracing arg. grrr...
+			String trace = "-DTRACE_ATN="+(runOptions.traceATN?"ON":"OFF");
+			String[] command = {"cmake", ".", trace, "-DCMAKE_BUILD_TYPE=Release"};
 			runCommand(command, runtimePath, "run cmake on antlr c++ runtime");
 
 			command = new String[] {"make", "-j", Integer.toString(Runtime.getRuntime().availableProcessors())};

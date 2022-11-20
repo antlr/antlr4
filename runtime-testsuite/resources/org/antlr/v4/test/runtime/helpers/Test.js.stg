@@ -28,7 +28,7 @@ function main(argv) {
     var stream = new antlr4.CommonTokenStream(lexer);
 <if(parserName)>
     var parser = new <parserName>(stream);
-<if(debug)>
+<if(showDiagnosticErrors)>
     parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
 <endif>
     parser.buildParseTrees = true;
@@ -38,6 +38,10 @@ function main(argv) {
         return this;
     };
     parser.printer = new printer();
+<if(traceATN)>
+	parser._interp.trace_atn_sim = true;
+	antlr4.context.PredictionContext.trace_atn_sim = true;
+<endif>
     var tree = parser.<parserStartRuleName>();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
 <else>

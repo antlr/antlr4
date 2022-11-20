@@ -42,11 +42,6 @@
 			<version>1.0.3</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>1.1.4</version>
-		</dependency>
-		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
 			<version>71.1</version>

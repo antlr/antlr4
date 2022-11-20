@@ -4,7 +4,9 @@
 
 package antlr
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ATNConfigSet interface {
 	Hash() int
@@ -103,7 +105,7 @@ func (b *BaseATNConfigSet) Alts() *BitSet {
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
 		cachedHash:   -1,
-		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](&ATNConfigComparator[ATNConfig]{}),
+		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst),
 		fullCtx:      fullCtx,
 	}
 }
@@ -159,7 +161,7 @@ func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 
 	// states uses the standard comparator provided by the ATNState instance
 	//
-	states := NewJStore[ATNState, Comparator[ATNState]](&ObjEqComparator[ATNState]{})
+	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst)
 
 	for i := 0; i < len(b.configs); i++ {
 		states.Put(b.configs[i].GetState())
@@ -314,7 +316,7 @@ func (b *BaseATNConfigSet) Clear() {
 
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](&BaseATNConfigComparator[ATNConfig]{})
+	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](atnConfCompInst)
 }
 
 func (b *BaseATNConfigSet) FullContext() bool {
@@ -397,7 +399,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	b := NewBaseATNConfigSet(false)
 
 	// This set uses the standard Hash() and Equals() from ATNConfig
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](&ObjEqComparator[ATNConfig]{})
+	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
 
 	return &OrderedATNConfigSet{BaseATNConfigSet: b}
 }

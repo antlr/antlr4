@@ -32,7 +32,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{}),
+		states:        NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst),
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
@@ -95,7 +95,7 @@ func (d *DFA) getPrecedenceDfa() bool {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
-		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{})
+		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst)
 		d.numstates = 0
 
 		if precedenceDfa {

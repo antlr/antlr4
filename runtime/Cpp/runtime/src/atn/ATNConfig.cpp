@@ -95,7 +95,7 @@ std::string ATNConfig::toString(bool showAlt) const {
     ss << ",[" << context->toString() << "]";
   }
   if (semanticContext != nullptr && semanticContext != SemanticContext::Empty::Instance) {
-    ss << ",[" << semanticContext->toString() << "]";
+    ss << "," << semanticContext->toString();
   }
   if (getOuterContextDepth() > 0) {
     ss << ",up=" << getOuterContextDepth();

@@ -21,6 +21,16 @@ package antlr
 // allows us to use it in any collection instance that does nto require a special hash or equals implementation.
 type ObjEqComparator[T Collectable[T]] struct{}
 
+var (
+	aStateEqInst    = &ObjEqComparator[ATNState]{}
+	aConfEqInst     = &ObjEqComparator[ATNConfig]{}
+	aConfCompInst   = &ATNConfigComparator[ATNConfig]{}
+	atnConfCompInst = &BaseATNConfigComparator[ATNConfig]{}
+	dfaStateEqInst  = &ObjEqComparator[*DFAState]{}
+	semctxEqInst    = &ObjEqComparator[SemanticContext]{}
+	atnAltCfgEqInst = &ATNAltConfigComparator[ATNConfig]{}
+)
+
 // Equals2 delegates to the Equals() method of type T
 func (c *ObjEqComparator[T]) Equals2(o1, o2 T) bool {
 	return o1.Equals(o2)
