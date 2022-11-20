@@ -6,7 +6,8 @@
 
 package org.antlr.v4.test.runtime.swift;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTextFromResource;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
@@ -45,7 +46,7 @@ public class SwiftRunner extends RuntimeRunner {
 	static {
 		swiftRuntimePath = getRuntimePath("Swift");
 		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
-		includePath = Paths.get(swiftRuntimePath, ".build", buildSuffix, "release").toString();
+		includePath = Paths.get(swiftRuntimePath, "../..", ".build", buildSuffix, "release").normalize().toString();
 		environment = new HashMap<>();
 		if (isWindows()) {
 			libraryPath = Paths.get(includePath, "Antlr4.lib").toString();
