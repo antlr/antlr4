@@ -9,10 +9,12 @@
 ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique and highly valuable feature.
 To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
 As such, ANTLR versioning does not strictly follow semver semantics:
-- a component may be released with the latest version number even though nothing has changed within that component since the previous release
-- major version is bumped only when new grammar features are released (such as ANTLR3 -> ANTLR4)
-- minor version updates may include minor breaking changes, the policy is to regenerate parsers with every release
-- backwards compatibility is only guaranteed for patch version bumps 
+
+* a component may be released with the latest version number even though nothing has changed within that component since the previous release
+* major version is bumped only when ANTLR is rewritten for a totally new "generation", such as ANTLR3 -> ANTLR4 (LL(\*) -> ALL(\*) parsing)
+* minor version updates may include minor breaking changes, the policy is to regenerate parsers with every release (4.11 -> 4.12)
+* backwards compatibility is only guaranteed for patch version bumps (4.11.1 -> 4.11.2)
+
 If you use a semver verifier in your CI, you probably want to apply special rules for ANTLR, such as treating minor change as a major change.
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
