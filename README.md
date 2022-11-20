@@ -16,7 +16,7 @@
 
 ## Versioning
 
-ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique and highly useful feature.
+ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique and highly valuable feature.
 To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
 As such, ANTLR versioning does not strictly follow semver semantics:
 - a component may be released with the latest version number even though nothing has changed within that component since the previous release
