@@ -23,11 +23,11 @@ let package = Package(
             dependencies: ["Antlr4"],
             path: "./runtime/Swift/Tests/Antlr4Tests",
             exclude: [
-                "./runtime/Swift/Tests/VisitorBasic.g4",
-                "./runtime/Swift/Tests/VisitorCalc.g4",
-                "./runtime/Swift/Tests/LexerA.g4",
-                "./runtime/Swift/Tests/LexerB.g4",
-                "./runtime/Swift/Tests/Threading.g4"
+                "./VisitorBasic.g4",
+                "./VisitorCalc.g4",
+                "./LexerA.g4",
+                "./LexerB.g4",
+                "./Threading.g4"
             ]
         )
     ]
