@@ -17,11 +17,11 @@ let package = Package(
         .target(
             name: "Antlr4",
             dependencies: [],
-            path: "./Sources/Antlr4"),
+            path: "./runtime/Swift/Sources/Antlr4"),
         .testTarget(
             name: "Antlr4Tests",
             dependencies: ["Antlr4"],
-            path: "./Tests/Antlr4Tests",
+            path: "./runtime/Swift/Tests/Antlr4Tests",
             exclude: [
                 "./VisitorBasic.g4",
                 "./VisitorCalc.g4",
