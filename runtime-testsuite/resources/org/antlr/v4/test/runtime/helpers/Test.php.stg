@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
+use Antlr\Antlr4\Runtime\Atn\ParserATNSimulator;
 use Antlr\Antlr4\Runtime\CommonTokenStream;
 use Antlr\Antlr4\Runtime\Error\Listeners\ConsoleErrorListener;
+use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
 use Antlr\Antlr4\Runtime\InputStream;
 use Antlr\Antlr4\Runtime\Lexer;
-use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
 use Antlr\Antlr4\Runtime\ParserRuleContext;
 use Antlr\Antlr4\Runtime\Tree\ErrorNode;
 use Antlr\Antlr4\Runtime\Tree\ParseTreeListener;
@@ -52,6 +53,9 @@ $parser = new <parserName>($tokens);
 $parser->addErrorListener(new DiagnosticErrorListener());
 <endif>
 $parser->addErrorListener(new ConsoleErrorListener());
+<if(traceATN)>
+ParserATNSimulator::$traceAtnSimulation = true;
+<endif>
 $parser->setBuildParseTree(true);
 $tree = $parser-><parserStartRuleName>();
 
