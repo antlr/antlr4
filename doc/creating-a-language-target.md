@@ -68,3 +68,14 @@ Run the script from `runtime-tests` dir with
 ```
 
 or whatever your test grammar, start rule, target, test input are.
+
+### Debugging the PHP target
+
+Because the PHP target is hosted in a separate repository, you will need to clone the [antlr/php-antlr-runtime](https://github.com/antlr/antlr-php-runtime)
+repository into the `runtime/PHP` and install the dependencies with `composer install` before you can run the tests.
+
+```
+git clone -b dev https://github.com/antlr/antlr-php-runtime.git runtime/PHP
+cd runtime/PHP
+composer install
+```
