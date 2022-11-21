@@ -17,8 +17,10 @@ use Antlr\Antlr4\Runtime\Tree\TerminalNode;
 
 $runtime = \getenv('RUNTIME');
 
+require_once $runtime . '/vendor/autoload.php';
+
 \spl_autoload_register(function (string $class) use ($runtime) : void {
-    $file = \str_replace('\\\', \DIRECTORY_SEPARATOR, \str_replace('Antlr\Antlr4\Runtime\\\', $runtime . '\\\src\\\', $class)) . '.php';
+    $file = \str_replace('\\\', \DIRECTORY_SEPARATOR, $class) . '.php';
 
     if (\file_exists($file)) {
         require_once $file;
