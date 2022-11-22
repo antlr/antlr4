@@ -109,10 +109,10 @@ jobs:
           echo 'CC=clang' >> $GITHUB_ENV
           echo 'CXX=clang++' >> $GITHUB_ENV
         else
-          export CC=gcc-9
-          export CXX=g++-9
-          echo 'CC=gcc-9' >> $GITHUB_ENV
-          echo 'CXX=g++-9' >> $GITHUB_ENV
+          export CC=gcc
+          export CXX=g++
+          echo 'CC=gcc' >> $GITHUB_ENV
+          echo 'CXX=g++' >> $GITHUB_ENV
         fi
 
         env
