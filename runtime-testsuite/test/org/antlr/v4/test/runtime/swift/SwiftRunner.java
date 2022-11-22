@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime.swift;
 
+import org.antlr.v4.test.runtime.ProcessorResult;
 import org.antlr.v4.test.runtime.RunOptions;
 import org.antlr.v4.test.runtime.RuntimeRunner;
 import org.antlr.v4.test.runtime.states.CompiledState;
@@ -99,10 +100,23 @@ public class SwiftRunner extends RuntimeRunner {
 
 	@Override
 	public String getExecFileName() {
-		return Paths.get(getTempDirPath(),
-				".build",
-				buildSuffix,
-				"release",
-				"Test" + (isWindows() ? ".exe" : "")).toString();
+		try {
+			String tempDirPath = getTempDirPath();
+			String[] binaryPathCommand = new String[]{
+				getCompilerPath(), 
+				"build", 
+				"-c", 
+				"release", 
+				"--show-bin-path"
+			};
+			
+			ProcessorResult result = runCommand(binaryPathCommand, tempDirPath);
+			String binaryPath = result.output.trim();
+
+			return Paths.get(binaryPath,
+					"Test" + (isWindows() ? ".exe" : "")).toString();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
