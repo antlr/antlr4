@@ -4,8 +4,19 @@ import PackageDescription
 
 let package = Package(
     name: "Test",
+    products: [
+        .executable(name: "Test", targets: ["Test"]),
+    ],
+    dependencies: [
+        .package(path: "<projectPath>"),
+    ],
     targets: [
-        .executableTarget(name: "Test", path: ".",
-             exclude:[ <excludedFiles: {f | "<f>"}; separator = ", ", wrap> ]),
+        .executableTarget(
+            name: "Test", 
+            dependencies: [
+                .product(name: "Antlr4", package: "antlr4"),
+            ],
+            path: ".",
+            exclude:[ <excludedFiles: {f | "<f>"}; separator = ", ", wrap> ]),
     ]
 )

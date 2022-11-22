@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 """
 Find all .g4 files and generate parsers in the same directory.
 the antlr used should be the one located at user's mvn directory
@@ -12,15 +14,16 @@ the java version is used according to environment variable $JAVA_HOME.
 
 from __future__ import print_function
 
+import glob
+import shutil
 import argparse
 import fnmatch
-import glob
 import os.path
-import shutil
 import subprocess
 import sys
 import time
 from subprocess import check_call
+
 
 # ANTLR Version, here we only care about major version.
 MAJOR_VERSION = "4"
