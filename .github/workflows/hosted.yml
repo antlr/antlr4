@@ -190,6 +190,7 @@ jobs:
     - name: Install dependencies
       env:
         COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
+      if: matrix.target == 'php'
       run: |-
         cd runtime/PHP
         composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
