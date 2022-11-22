@@ -51,7 +51,6 @@ between X1 and X2 or between X3 and X4
 ;
 
 [skip]
-Cpp
 Python2
 Python3
 JavaScript
