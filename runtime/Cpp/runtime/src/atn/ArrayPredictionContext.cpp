@@ -79,18 +79,37 @@ bool ArrayPredictionContext::equals(const PredictionContext &other) const {
   if (getContextType() != other.getContextType()) {
     return false;
   }
+/*
+   const auto &array = downCast<const ArrayPredictionContext&>(other);
+  return returnStates.size() == array.returnStates.size() &&
+         parents.size() == array.parents.size() &&
+         cachedHashCodeEqual(cachedHashCode(), array.cachedHashCode()) &&
+         std::memcmp(returnStates.data(), array.returnStates.data(), returnStates.size() * sizeof(decltype(returnStates)::value_type)) == 0 &&
+ */
   const auto &array = downCast<const ArrayPredictionContext&>(other);
   const bool sameSize = returnStates.size() == array.returnStates.size() &&
                         parents.size() == array.parents.size();
+  if ( !sameSize ) {
+      return false;
+  }
+
   const bool sameHash = cachedHashCodeEqual(cachedHashCode(), array.cachedHashCode());
+  if ( !sameHash ) {
+      return false;
+  }
+
   const size_t stateSizeBytes = sizeof(decltype(returnStates)::value_type);
   const bool returnStateArraysEqual =
           std::memcmp(returnStates.data(), array.returnStates.data(),
                       returnStates.size() * stateSizeBytes) == 0;
+  if ( !returnStateArraysEqual ) {
+      return false;
+  }
+
   // stack of contexts is the same
   const bool parentCtxEqual =
           std::equal(parents.begin(), parents.end(), array.parents.begin(), predictionContextEqual);
-  return sameSize && sameHash && returnStateArraysEqual && parentCtxEqual;
+  return parentCtxEqual;
 }
 
 std::string ArrayPredictionContext::toString() const {
