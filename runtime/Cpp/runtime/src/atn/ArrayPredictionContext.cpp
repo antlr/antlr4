@@ -79,13 +79,6 @@ bool ArrayPredictionContext::equals(const PredictionContext &other) const {
   if (getContextType() != other.getContextType()) {
     return false;
   }
-/*
-   const auto &array = downCast<const ArrayPredictionContext&>(other);
-  return returnStates.size() == array.returnStates.size() &&
-         parents.size() == array.parents.size() &&
-         cachedHashCodeEqual(cachedHashCode(), array.cachedHashCode()) &&
-         std::memcmp(returnStates.data(), array.returnStates.data(), returnStates.size() * sizeof(decltype(returnStates)::value_type)) == 0 &&
- */
   const auto &array = downCast<const ArrayPredictionContext&>(other);
   const bool sameSize = returnStates.size() == array.returnStates.size() &&
                         parents.size() == array.parents.size();
