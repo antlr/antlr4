@@ -187,6 +187,12 @@ jobs:
         repository: antlr/antlr-php-runtime
         path: runtime/PHP
 
+    - name: Install dependencies
+      env:
+        COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
+      run: |-
+        composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'ubuntu')
       run: |
