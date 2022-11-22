@@ -191,6 +191,7 @@ jobs:
       env:
         COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
       run: |-
+        cd runtime/PHP
         composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
     - name: Install dependencies (Ubuntu)
