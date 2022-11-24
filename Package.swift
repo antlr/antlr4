@@ -8,10 +8,6 @@ let package = Package(
         .library(
             name: "Antlr4",
             targets: ["Antlr4"]),
-        .library(
-            name: "Antlr4Static",
-            type: .static,
-            targets: ["Antlr4"]),
     ],
     targets: [
         .target(
@@ -45,6 +41,6 @@ let package = Package(
                 "LexerB.g4",
                 "Threading.g4"
             ]
-        )
+        ),
     ]
 )

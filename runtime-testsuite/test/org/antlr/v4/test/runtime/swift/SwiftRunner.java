@@ -51,15 +51,13 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime(RunOptions runOptions) throws Exception {}
-
-	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		Exception exception = null;
 		try {
 			String projectPath = Paths.get(swiftRuntimePath, "../..").normalize().toString();
 			String tempDirPath = getTempDirPath();
 			File tempDirFile = new File(tempDirPath);
+			String mainPackageBinaryPath = getSwiftPackageBinaryPath(projectPath);
 
 			File[] ignoredFiles = tempDirFile.listFiles(NoSwiftFileFilter.Instance);
 			assert ignoredFiles != null;
@@ -68,14 +66,13 @@ public class SwiftRunner extends RuntimeRunner {
 			String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/Package.swift.stg");
 			ST outputFileST = new ST(text);
 			outputFileST.add("excludedFiles", excludedFiles);
-			outputFileST.add("projectPath", projectPath);
+			outputFileST.add("libraryPath", projectPath);
 			writeFile(tempDirPath, "Package.swift", outputFileST.render());
 
 			String[] buildProjectArgs = new String[]{
 					getCompilerPath(),
 					"build",
-					"-c",
-					"release"
+					"-c", "release"
 			};
 			runCommand(buildProjectArgs, tempDirPath);
 		} catch (Exception e) {
@@ -102,21 +99,24 @@ public class SwiftRunner extends RuntimeRunner {
 	public String getExecFileName() {
 		try {
 			String tempDirPath = getTempDirPath();
-			String[] binaryPathCommand = new String[]{
-				getCompilerPath(), 
-				"build", 
-				"-c", 
-				"release", 
-				"--show-bin-path"
-			};
-			
-			ProcessorResult result = runCommand(binaryPathCommand, tempDirPath);
-			String binaryPath = result.output.trim();
+			String binaryPath = getSwiftPackageBinaryPath(tempDirPath);
 
 			return Paths.get(binaryPath,
 					"Test" + (isWindows() ? ".exe" : "")).toString();
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	protected String getSwiftPackageBinaryPath(String packageDirectory) throws Exception {
+		String[] binaryPathCommand = new String[]{
+			getCompilerPath(), 
+			"build", 
+			"-c", "release", 
+			"--show-bin-path"
+		};
+		
+		ProcessorResult result = runCommand(binaryPathCommand, packageDirectory);
+		return result.output.trim();
 	}
 }
