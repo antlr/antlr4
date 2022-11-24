@@ -7,16 +7,21 @@ let package = Package(
     products: [
         .executable(name: "Test", targets: ["Test"]),
     ],
-    dependencies: [
-        .package(path: "<projectPath>"),
-    ],
     targets: [
+        .target(
+            name: "Antlr4",
+            path: "<libraryPath>"
+        ),
+
         .executableTarget(
             name: "Test", 
             dependencies: [
-                .product(name: "Antlr4", package: "antlr4"),
+                .target(name: "Antlr4")
             ],
             path: ".",
-            exclude:[ <excludedFiles: {f | "<f>"}; separator = ", ", wrap> ]),
+            exclude: [ 
+                <excludedFiles: {f | "<f>"}; separator = ", ", wrap> 
+            ]
+        ),
     ]
 )
