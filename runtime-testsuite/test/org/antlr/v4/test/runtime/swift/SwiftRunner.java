@@ -51,16 +51,8 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime(RunOptions runOptions) throws Exception {
-		String tempDirPath = getTempDirPath();
-		String scratchPath = Paths.get(tempDirPath, "../build").normalize().toString();
-		
-		runCommand(new String[] {
-			getCompilerPath(), 
-			"build", 
-			"-c", "release", 
-			"--scratch-path",  scratchPath },
-			swiftRuntimePath, "build Swift runtime");
+	protected void initRuntime(RunOptions runOptions) throws Exception {		
+		runCommand(new String[] { getCompilerPath(), "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
 	}
 
 	@Override
@@ -70,7 +62,6 @@ public class SwiftRunner extends RuntimeRunner {
 			String projectPath = Paths.get(swiftRuntimePath, "../..").normalize().toString();
 			String tempDirPath = getTempDirPath();
 			File tempDirFile = new File(tempDirPath);
-			String scratchPath = Paths.get(tempDirPath, "../build").normalize().toString();
 			String mainPackageBinaryPath = getSwiftPackageBinaryPath(projectPath);
 
 			File[] ignoredFiles = tempDirFile.listFiles(NoSwiftFileFilter.Instance);
@@ -86,8 +77,7 @@ public class SwiftRunner extends RuntimeRunner {
 			String[] buildProjectArgs = new String[]{
 					getCompilerPath(),
 					"build",
-					"-c", "release",
-					"--scratch-path",  scratchPath
+					"-c", "release"
 			};
 			runCommand(buildProjectArgs, tempDirPath);
 		} catch (Exception e) {
@@ -124,14 +114,10 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	protected String getSwiftPackageBinaryPath(String packageDirectory) throws Exception {
-		String tempDirPath = getTempDirPath();
-		String scratchPath = Paths.get(tempDirPath, "../build").normalize().toString();
-
 		String[] binaryPathCommand = new String[]{
 			getCompilerPath(), 
 			"build", 
 			"-c", "release", 
-			"--scratch-path",  scratchPath,
 			"--show-bin-path"
 		};
 		
