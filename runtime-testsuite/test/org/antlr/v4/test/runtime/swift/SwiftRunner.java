@@ -66,7 +66,7 @@ public class SwiftRunner extends RuntimeRunner {
 			String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/Package.swift.stg");
 			ST outputFileST = new ST(text);
 			outputFileST.add("excludedFiles", excludedFiles);
-			outputFileST.add("libraryPath", mainPackageBinaryPath);
+			outputFileST.add("libraryPath", projectPath);
 			writeFile(tempDirPath, "Package.swift", outputFileST.render());
 
 			String[] buildProjectArgs = new String[]{

@@ -7,16 +7,14 @@ let package = Package(
     products: [
         .executable(name: "Test", targets: ["Test"]),
     ],
+    dependencies: [
+        .package(name: "Anltr4", path: "<libraryPath>"),
+    ],
     targets: [
-        .target(
-            name: "Antlr4",
-            path: "<libraryPath>"
-        ),
-
         .executableTarget(
             name: "Test", 
             dependencies: [
-                .target(name: "Antlr4")
+                .product(name: "Antlr4", package: "Anltr4"),
             ],
             path: ".",
             exclude: [ 
