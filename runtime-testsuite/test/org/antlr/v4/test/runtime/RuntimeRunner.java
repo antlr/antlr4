@@ -18,17 +18,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.*;
 
 public abstract class RuntimeRunner implements AutoCloseable {
-	/** Turn this on to see output like:
-	 *  RUNNING cmake . -DCMAKE_BUILD_TYPE=Release in /Users/parrt/antlr/code/antlr4/runtime/Cpp
-	 *  RUNNING make -j 20 in /Users/parrt/antlr/code/antlr4/runtime/Cpp
-	 *  RUNNING ln -s /Users/parrt/antlr/code/antlr4/runtime/Cpp/dist/libantlr4-runtime.dylib in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
-	 *  RUNNING clang++ -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src -L. -lantlr4-runtime -pthread -o Test.out Test.cpp TLexer.cpp TParser.cpp TListener.cpp TBaseListener.cpp TVisitor.cpp TBaseVisitor.cpp in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
-	 */
-	public static final boolean WATCH_COMMANDS_EXEC = false;
 
 	public abstract String getLanguage();
 
@@ -320,9 +314,6 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	protected ProcessorResult runCommand(String[] command, String workPath, String description) throws Exception {
 		String cmd = String.join(" ", command);
-		if ( WATCH_COMMANDS_EXEC ) {
-			System.out.println("RUNNING "+cmd+" in "+workPath);
-		}
 		try {
 			return Processor.run(command, workPath);
 		}
