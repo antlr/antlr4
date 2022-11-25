@@ -161,6 +161,10 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return runtimePath.toString() + FileSeparator + language;
 	}
 
+	public State run(RunOptions runOptions) {
+		return run(null, runOptions);
+	}
+
 	public State run(RuntimeTestDescriptor descriptor, RunOptions runOptions) {
 		List<String> options = new ArrayList<>();
 		if (runOptions.useVisitor) {
@@ -305,8 +309,9 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			}
 			args.add(getExecFileName());
 			args.add("input");
+			String description = compiledState.descriptor!=null ? compiledState.descriptor.name : "";
 			ProcessorResult result =
-					Processor.run(compiledState.descriptor.name,
+					Processor.run(description,
 					              args.toArray(new String[0]),
 							      getTempDirPath(),
 							      getExecEnvironment());

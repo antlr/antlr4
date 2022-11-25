@@ -133,7 +133,8 @@ public class GoRunner extends RuntimeRunner {
 
 		Exception ex = null;
 		try {
-			Processor.run(generatedState.descriptor.name, new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
+			String description = generatedState.descriptor!=null ? generatedState.descriptor.name : "";
+			Processor.run(description, new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
 		} catch (InterruptedException | IOException e) {
 			ex = e;
 		}
