@@ -6,7 +6,9 @@
 
 package org.antlr.v4.test.runtime.swift;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.ProcessorResult;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
@@ -15,12 +17,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTextFromResource;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
@@ -37,24 +37,10 @@ public class SwiftRunner extends RuntimeRunner {
 
 	private static final String swiftRuntimePath;
 	private static final String buildSuffix;
-	private static final Map<String, String> environment;
-
-	private static final String includePath;
-	private static final String libraryPath;
 
 	static {
 		swiftRuntimePath = getRuntimePath("Swift");
 		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
-		includePath = Paths.get(swiftRuntimePath, ".build", buildSuffix, "release").toString();
-		environment = new HashMap<>();
-		if (isWindows()) {
-			libraryPath = Paths.get(includePath, "Antlr4.lib").toString();
-			String path = System.getenv("PATH");
-			environment.put("PATH", path == null ? includePath : path + ";" + includePath);
-		}
-		else {
-			libraryPath = includePath;
-		}
 	}
 
 	@Override
@@ -63,17 +49,12 @@ public class SwiftRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime(RunOptions runOptions) throws Exception {
-		runCommand(new String[] {getCompilerPath(), "build", "-c", "release"}, swiftRuntimePath, "build Swift runtime");
-	}
-
-	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		Exception exception = null;
 		try {
+			String projectPath = Paths.get(swiftRuntimePath, "../..").normalize().toString();
 			String tempDirPath = getTempDirPath();
 			File tempDirFile = new File(tempDirPath);
-
 			File[] ignoredFiles = tempDirFile.listFiles(NoSwiftFileFilter.Instance);
 			assert ignoredFiles != null;
 			List<String> excludedFiles = Arrays.stream(ignoredFiles).map(File::getName).collect(Collectors.toList());
@@ -81,23 +62,13 @@ public class SwiftRunner extends RuntimeRunner {
 			String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/Package.swift.stg");
 			ST outputFileST = new ST(text);
 			outputFileST.add("excludedFiles", excludedFiles);
+			outputFileST.add("libraryPath", projectPath);
 			writeFile(tempDirPath, "Package.swift", outputFileST.render());
 
 			String[] buildProjectArgs = new String[]{
 					getCompilerPath(),
 					"build",
-					"-c",
-					"release",
-					"-Xswiftc",
-					"-I" + includePath,
-					"-Xlinker",
-					"-L" + includePath,
-					"-Xlinker",
-					"-lAntlr4",
-					"-Xlinker",
-					"-rpath",
-					"-Xlinker",
-					libraryPath
+					"-c", "release"
 			};
 			runCommand(buildProjectArgs, tempDirPath);
 		} catch (Exception e) {
@@ -122,15 +93,26 @@ public class SwiftRunner extends RuntimeRunner {
 
 	@Override
 	public String getExecFileName() {
-		return Paths.get(getTempDirPath(),
-				".build",
-				buildSuffix,
-				"release",
-				"Test" + (isWindows() ? ".exe" : "")).toString();
+		try {
+			String tempDirPath = getTempDirPath();
+			String binaryPath = getSwiftPackageBinaryPath(tempDirPath);
+
+			return Paths.get(binaryPath,
+					"Test" + (isWindows() ? ".exe" : "")).toString();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
-	@Override
-	public Map<String, String> getExecEnvironment() {
-		return environment;
+	protected String getSwiftPackageBinaryPath(String packageDirectory) throws Exception {
+		String[] binaryPathCommand = new String[]{
+			getCompilerPath(),
+			"build",
+			"-c", "release",
+			"--show-bin-path"
+		};
+
+		ProcessorResult result = runCommand(binaryPathCommand, packageDirectory);
+		return result.output.trim();
 	}
 }

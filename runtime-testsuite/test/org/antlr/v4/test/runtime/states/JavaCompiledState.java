@@ -23,8 +23,8 @@ public class JavaCompiledState extends CompiledState {
 							 ClassLoader loader,
 							 Class<? extends Lexer> lexer,
 							 Class<? extends Parser> parser,
-							 Exception exception
-	) {
+							 Exception exception)
+	{
 		super(previousState, exception);
 		this.loader = loader;
 		this.lexer = lexer;

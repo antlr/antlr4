@@ -19,7 +19,7 @@ public class ExecutedState extends State {
 	public final String errors;
 
 	public ExecutedState(CompiledState previousState, String output, String errors, Exception exception) {
-		super(previousState, exception);
+		super(previousState.descriptor, previousState, exception);
 		this.output = output != null ? output : "";
 		this.errors = errors != null ? errors : "";
 	}

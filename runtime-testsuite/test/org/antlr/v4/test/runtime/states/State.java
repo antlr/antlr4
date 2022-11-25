@@ -6,9 +6,12 @@
 
 package org.antlr.v4.test.runtime.states;
 
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.Stage;
 
 public abstract class State {
+	public final RuntimeTestDescriptor descriptor;
+
 	public final State previousState;
 
 	public final Exception exception;
@@ -31,7 +34,8 @@ public abstract class State {
 		return result;
 	}
 
-	public State(State previousState, Exception exception) {
+	public State(RuntimeTestDescriptor descriptor, State previousState, Exception exception) {
+		this.descriptor = descriptor;
 		this.previousState = previousState;
 		this.exception = exception;
 	}

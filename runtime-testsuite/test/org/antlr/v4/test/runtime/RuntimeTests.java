@@ -15,7 +15,10 @@ import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.stringtemplate.v4.*;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,7 +173,7 @@ public abstract class RuntimeTests {
 				superClass
 		);
 
-		State result = runner.run(runOptions);
+		State result = runner.run(descriptor, runOptions);
 
 		return assertCorrectOutput(descriptor, targetName, result);
 	}

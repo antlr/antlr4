@@ -5,7 +5,10 @@
  */
 package org.antlr.v4.test.runtime.cpp;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.OSType;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
@@ -104,16 +107,16 @@ public class CppRunner extends RuntimeRunner {
 				getCompilerPath(), "antlr4cpp-vs2022.vcxproj", "/p:configuration=Release DLL", "/p:platform=x64"
 			};
 
-			runCommand(command, runtimePath + "\\runtime","build c++ ANTLR runtime using MSBuild");
+			runCommand("build c++ ANTLR runtime using MSBuild", command, runtimePath + "\\runtime");
 		}
 		else {
 			// cmake ignores default of OFF and must explicitly say yes or no on tracing arg. grrr...
 			String trace = "-DTRACE_ATN="+(runOptions.traceATN?"ON":"OFF");
 			String[] command = {"cmake", ".", trace, "-DCMAKE_BUILD_TYPE=Release"};
-			runCommand(command, runtimePath, "run cmake on antlr c++ runtime");
+			runCommand("run cmake on antlr c++ runtime", command, runtimePath);
 
 			command = new String[] {"make", "-j", Integer.toString(Runtime.getRuntime().availableProcessors())};
-			runCommand(command, runtimePath, "run make on antlr c++ runtime");
+			runCommand("run make on antlr c++ runtime", command, runtimePath);
 		}
 	}
 
@@ -128,7 +131,7 @@ public class CppRunner extends RuntimeRunner {
 		try {
 			if (!isWindows()) {
 				String[] linkCommand = new String[]{"ln", "-s", runtimeLibraryFileName};
-				runCommand(linkCommand, getTempDirPath(), "sym link C++ runtime");
+				runCommand("sym link C++ runtime", linkCommand, getTempDirPath());
 			}
 
 			List<String> buildCommand = new ArrayList<>();
@@ -151,7 +154,7 @@ public class CppRunner extends RuntimeRunner {
 				buildCommand.addAll(generatedState.generatedFiles.stream().map(file -> file.name).collect(Collectors.toList()));
 			}
 
-			runCommand(buildCommand.toArray(new String[0]), getTempDirPath(), "build test c++ binary");
+			runCommand("build test c++ binary", buildCommand.toArray(new String[0]), getTempDirPath());
 		}
 		catch (Exception ex) {
 			exception = ex;

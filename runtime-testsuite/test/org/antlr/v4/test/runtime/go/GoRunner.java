@@ -5,15 +5,21 @@
  */
 package org.antlr.v4.test.runtime.go;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.GeneratedFile;
+import org.antlr.v4.test.runtime.Processor;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.antlr.v4.test.runtime.FileUtils.*;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
@@ -85,8 +91,8 @@ public class GoRunner extends RuntimeRunner {
 		if (goModFile.exists())
 			if (!goModFile.delete())
 				throw new IOException("Can't delete " + goModFile);
-		Processor.run(new String[] {runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
-		Processor.run(new String[] {runtimeToolPath, "mod", "edit",
+		Processor.run("initRuntime: Go", new String[] {runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
+		Processor.run("initRuntime: Go", new String[] {runtimeToolPath, "mod", "edit",
 				"-replace=" + GoRuntimeImportPath + "=" + runtimeFilesPath}, cachePath, environment);
 		cachedGoMod = readFile(cachePath + FileSeparator, "go.mod");
 	}
@@ -124,9 +130,11 @@ public class GoRunner extends RuntimeRunner {
 		}
 
 		writeFile(tempDirPath, "go.mod", cachedGoMod);
+
 		Exception ex = null;
 		try {
-			Processor.run(new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
+			String description = generatedState.descriptor!=null ? generatedState.descriptor.name : "";
+			Processor.run(description, new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
 		} catch (InterruptedException | IOException e) {
 			ex = e;
 		}

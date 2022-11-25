@@ -15,6 +15,6 @@ public class CompiledState extends State {
 	}
 
 	public CompiledState(GeneratedState previousState, Exception exception) {
-		super(previousState, exception);
+		super(previousState.descriptor, previousState, exception);
 	}
 }

@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 """
 Find all .g4 files and generate parsers in the same directory.

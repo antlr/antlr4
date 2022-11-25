@@ -14,23 +14,33 @@ import java.util.Map;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.joinLines;
 
 public class Processor {
+	/** Turn this on to see output like:
+	 *  RUNNING cmake . -DCMAKE_BUILD_TYPE=Release in /Users/parrt/antlr/code/antlr4/runtime/Cpp
+	 *  RUNNING make -j 20 in /Users/parrt/antlr/code/antlr4/runtime/Cpp
+	 *  RUNNING ln -s /Users/parrt/antlr/code/antlr4/runtime/Cpp/dist/libantlr4-runtime.dylib in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
+	 *  RUNNING clang++ -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src -L. -lantlr4-runtime -pthread -o Test.out Test.cpp TLexer.cpp TParser.cpp TListener.cpp TBaseListener.cpp TVisitor.cpp TBaseVisitor.cpp in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
+	 */
+	public static final boolean WATCH_COMMANDS_EXEC = true;
+	public final String description;
 	public final String[] arguments;
 	public final String workingDirectory;
 	public final Map<String, String> environmentVariables;
 	public final boolean throwOnNonZeroErrorCode;
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables)
+	public static ProcessorResult run(String description, String[] arguments, String workingDirectory, Map<String, String> environmentVariables)
 			throws InterruptedException, IOException
 	{
-		return new Processor(arguments, workingDirectory, environmentVariables, true).start();
+		return new Processor(description, arguments, workingDirectory, environmentVariables, true).start();
 	}
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory) throws InterruptedException, IOException {
-		return new Processor(arguments, workingDirectory, new HashMap<>(), true).start();
+	public static ProcessorResult run(String description, String[] arguments, String workingDirectory) throws InterruptedException, IOException {
+		return new Processor(description, arguments, workingDirectory, new HashMap<>(), true).start();
 	}
 
-	public Processor(String[] arguments, String workingDirectory, Map<String, String> environmentVariables,
-					 boolean throwOnNonZeroErrorCode) {
+	public Processor(String description, String[] arguments, String workingDirectory, Map<String, String> environmentVariables,
+					 boolean throwOnNonZeroErrorCode)
+	{
+		this.description = description;
 		this.arguments = arguments;
 		this.workingDirectory = workingDirectory;
 		this.environmentVariables = environmentVariables;
@@ -38,6 +48,13 @@ public class Processor {
 	}
 
 	public ProcessorResult start() throws InterruptedException, IOException {
+		if ( WATCH_COMMANDS_EXEC ) {
+			String d = "";
+			if ( description==null ) {
+				d = description+": ";
+			}
+			System.out.println("RUNNING "+d+ String.join(" ", arguments)+" in "+workingDirectory);
+		}
 		ProcessBuilder builder = new ProcessBuilder(arguments);
 		if (workingDirectory != null) {
 			builder.directory(new File(workingDirectory));
@@ -61,7 +78,11 @@ public class Processor {
 		String output = stdoutReader.toString();
 		String errors = stderrReader.toString();
 		if (throwOnNonZeroErrorCode && process.exitValue() != 0) {
-			throw new InterruptedException("Exit code "+process.exitValue()+" with output:\n"+joinLines(output, errors));
+			;
+			String msg = "Process " + description + ": " + String.join(" ", arguments) +
+					" exited with code " + process.exitValue() +
+					" and output:\n" + joinLines(output, errors);
+			throw new InterruptedException(msg);
 		}
 		return new ProcessorResult(process.exitValue(), output, errors);
 	}
