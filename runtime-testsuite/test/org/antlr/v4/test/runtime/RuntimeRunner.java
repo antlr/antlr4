@@ -18,7 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.*;
 
 public abstract class RuntimeRunner implements AutoCloseable {
@@ -160,7 +161,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return runtimePath.toString() + FileSeparator + language;
 	}
 
-	public State run(RunOptions runOptions) {
+	public State run(RuntimeTestDescriptor descriptor, RunOptions runOptions) {
 		List<String> options = new ArrayList<>();
 		if (runOptions.useVisitor) {
 			options.add("-visitor");
@@ -172,7 +173,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 				runOptions.grammarFileName, runOptions.grammarStr, false, options.toArray(new String[0]));
 
 		List<GeneratedFile> generatedFiles = getGeneratedFiles(runOptions);
-		GeneratedState generatedState = new GeneratedState(errorQueue, generatedFiles, null);
+		GeneratedState generatedState = new GeneratedState(descriptor, errorQueue, generatedFiles, null);
 
 		if (generatedState.containsErrors() || runOptions.endStage == Stage.Generate) {
 			return generatedState;
@@ -304,7 +305,11 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			}
 			args.add(getExecFileName());
 			args.add("input");
-			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
+			ProcessorResult result =
+					Processor.run(compiledState.descriptor.name,
+					              args.toArray(new String[0]),
+							      getTempDirPath(),
+							      getExecEnvironment());
 			output = result.output;
 			errors = result.errors;
 		}
@@ -315,16 +320,16 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	}
 
 	protected ProcessorResult runCommand(String[] command, String workPath) throws Exception {
-		return runCommand(command, workPath, null);
+		return runCommand(null, command, workPath);
 	}
 
-	protected ProcessorResult runCommand(String[] command, String workPath, String description) throws Exception {
+	protected ProcessorResult runCommand(String description, String[] command, String workPath) throws Exception {
 		String cmd = String.join(" ", command);
 		if ( WATCH_COMMANDS_EXEC ) {
 			System.out.println("RUNNING "+cmd+" in "+workPath);
 		}
 		try {
-			return Processor.run(command, workPath);
+			return Processor.run(description, command, workPath);
 		}
 		catch (InterruptedException | IOException e) {
 			String msg = "command \""+cmd+"\"\n  in "+workPath+" failed";

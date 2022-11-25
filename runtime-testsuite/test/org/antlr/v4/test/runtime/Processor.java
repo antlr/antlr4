@@ -14,23 +14,26 @@ import java.util.Map;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.joinLines;
 
 public class Processor {
+	public final String description;
 	public final String[] arguments;
 	public final String workingDirectory;
 	public final Map<String, String> environmentVariables;
 	public final boolean throwOnNonZeroErrorCode;
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory, Map<String, String> environmentVariables)
+	public static ProcessorResult run(String description, String[] arguments, String workingDirectory, Map<String, String> environmentVariables)
 			throws InterruptedException, IOException
 	{
-		return new Processor(arguments, workingDirectory, environmentVariables, true).start();
+		return new Processor(description, arguments, workingDirectory, environmentVariables, true).start();
 	}
 
-	public static ProcessorResult run(String[] arguments, String workingDirectory) throws InterruptedException, IOException {
-		return new Processor(arguments, workingDirectory, new HashMap<>(), true).start();
+	public static ProcessorResult run(String description, String[] arguments, String workingDirectory) throws InterruptedException, IOException {
+		return new Processor(description, arguments, workingDirectory, new HashMap<>(), true).start();
 	}
 
-	public Processor(String[] arguments, String workingDirectory, Map<String, String> environmentVariables,
-					 boolean throwOnNonZeroErrorCode) {
+	public Processor(String description, String[] arguments, String workingDirectory, Map<String, String> environmentVariables,
+					 boolean throwOnNonZeroErrorCode)
+	{
+		this.description = description;
 		this.arguments = arguments;
 		this.workingDirectory = workingDirectory;
 		this.environmentVariables = environmentVariables;
@@ -61,7 +64,11 @@ public class Processor {
 		String output = stdoutReader.toString();
 		String errors = stderrReader.toString();
 		if (throwOnNonZeroErrorCode && process.exitValue() != 0) {
-			throw new InterruptedException("Exit code "+process.exitValue()+" with output:\n"+joinLines(output, errors));
+			;
+			String msg = "Process " + description + ": " + String.join(" ", arguments) +
+					" exited with code " + process.exitValue() +
+					" and output:\n" + joinLines(output, errors);
+			throw new InterruptedException(msg);
 		}
 		return new ProcessorResult(process.exitValue(), output, errors);
 	}

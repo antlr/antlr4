@@ -5,7 +5,9 @@
  */
 package org.antlr.v4.test.runtime.csharp;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
@@ -49,7 +51,7 @@ public class CSharpRunner extends RuntimeRunner {
 		mkdir(cachePath);
 		String projectPath = Paths.get(getRuntimePath(), "src", "Antlr4.csproj").toString();
 		String[] args = new String[]{getRuntimeToolPath(), "build", projectPath, "-c", "Release", "-o", cachePath};
-		runCommand(args, cachePath, "build " + getTitleName() + " ANTLR runtime");
+		runCommand("build " + getTitleName() + " ANTLR runtime", args, cachePath);
 	}
 
 	@Override
@@ -57,8 +59,8 @@ public class CSharpRunner extends RuntimeRunner {
 		Exception exception = null;
 		try {
 			writeFile(getTempDirPath(), testProjectFileName, cSharpTestProjectContent);
-			runCommand(new String[]{getRuntimeToolPath(), "build", testProjectFileName, "-c", "Release"}, getTempDirPath(),
-					"build C# test binary");
+			runCommand("build C# test binary", new String[]{getRuntimeToolPath(), "build", testProjectFileName, "-c", "Release"}, getTempDirPath()
+            );
 		} catch (Exception e) {
 			exception = e;
 		}

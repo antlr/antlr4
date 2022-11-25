@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime.states;
 
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.GeneratedFile;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.Stage;
 
 import java.util.List;
@@ -38,8 +39,12 @@ public class GeneratedState extends State {
 		return result;
 	}
 
-	public GeneratedState(ErrorQueue errorQueue, List<GeneratedFile>  generatedFiles, Exception exception) {
-		super(null, exception);
+	public GeneratedState(RuntimeTestDescriptor descriptor,
+						  ErrorQueue errorQueue,
+						  List<GeneratedFile>  generatedFiles,
+						  Exception exception)
+	{
+		super(descriptor, null, exception);
 		this.errorQueue = errorQueue;
 		this.generatedFiles = generatedFiles;
 	}

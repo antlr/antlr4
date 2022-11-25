@@ -17,9 +17,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
@@ -57,8 +55,6 @@ public class SwiftRunner extends RuntimeRunner {
 			String projectPath = Paths.get(swiftRuntimePath, "../..").normalize().toString();
 			String tempDirPath = getTempDirPath();
 			File tempDirFile = new File(tempDirPath);
-			String mainPackageBinaryPath = getSwiftPackageBinaryPath(projectPath);
-
 			File[] ignoredFiles = tempDirFile.listFiles(NoSwiftFileFilter.Instance);
 			assert ignoredFiles != null;
 			List<String> excludedFiles = Arrays.stream(ignoredFiles).map(File::getName).collect(Collectors.toList());
@@ -88,7 +84,7 @@ public class SwiftRunner extends RuntimeRunner {
 		public boolean accept(File dir, String name) {
 			return !name.endsWith(".swift");
 		}
-	}	
+	}
 
 	@Override
 	public String getRuntimeToolName() {
@@ -110,12 +106,12 @@ public class SwiftRunner extends RuntimeRunner {
 
 	protected String getSwiftPackageBinaryPath(String packageDirectory) throws Exception {
 		String[] binaryPathCommand = new String[]{
-			getCompilerPath(), 
-			"build", 
-			"-c", "release", 
+			getCompilerPath(),
+			"build",
+			"-c", "release",
 			"--show-bin-path"
 		};
-		
+
 		ProcessorResult result = runCommand(binaryPathCommand, packageDirectory);
 		return result.output.trim();
 	}
