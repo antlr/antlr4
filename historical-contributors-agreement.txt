@@ -328,4 +328,3 @@ YYYY/MM/DD, github id, Full name, email
 2021/12/31, Biswa96, Biswapriyo Nath, nathbappai@gmail.com
 2022/03/07, chenquan, chenquan, chenquan.dev@gmail.com
 2022/03/15, hzeller, Henner Zeller, h.zeller@acm.org
-2022/11/25, incident-recipient, Nelson Boyer, nboyer@google.com
