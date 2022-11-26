@@ -104,40 +104,6 @@ void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context c
  * @param ctx the parse tree
  */
 default void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx){\}}; separator="\n">
-}
->>
-
-SimpleListenerFile(file, header, namedActions) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-package <file.genPackage>;
-<endif>
-<header>
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-
-/**
- * This interface defines a complete listener for a parse tree produced by
- * {@link <file.parserName>}.
- * 
- * All of the exit rules have an empty, default implementation as well as the methods defined in
- * ParseTreeListener. This allows a middleground between the AbstractParseTreeListener which
- * has empty implementations for everything and the interface which has no implementations.
- * 
- * It can be used when additional type safety is wanted without having to pollute the
- * implementing class with empty stubs for methods that might be unlikely to be needed.
- */
-public interface <file.grammarName>SimpleListener extends ParseTreeListener {
-	<file.listenerNames:{lname |
-	/**
-	<if(file.listenerLabelRuleNames.(lname))>
-	* Exit a parse tree produced by the {@code <lname>\}
-	* labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
-	<else>
-	* Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
-	<endif>
-	* @param ctx the parse tree
-	*/
-	default void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx){};}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
@@ -157,12 +123,6 @@ public interface <file.grammarName>SimpleListener extends ParseTreeListener {
 	 * \<p>The default implementation does nothing.\</p>
 	 */
 	@Override default void visitTerminal(TerminalNode node) { }
-	/**
-	 * {@inheritDoc\}
-	 *
-	 * \<p>The default implementation does nothing.\</p>
-	 */
-	@Override default void visitErrorNode(ErrorNode node) { }
 }
 >>
 
