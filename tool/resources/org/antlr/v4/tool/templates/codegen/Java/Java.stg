@@ -81,7 +81,7 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 	 */
 	@Override default void visitErrorNode(ErrorNode node) { 
 		throw new IllegalStateException("An error node was encountered! There may be an error with the grammar!");
-	}
+	\}
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
