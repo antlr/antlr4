@@ -110,19 +110,19 @@ default void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Co
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override default void enterEveryRule(ParserRuleContext ctx) { }
+	@Override default void enterEveryRule(ParserRuleContext ctx) { \}
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override default void exitEveryRule(ParserRuleContext ctx) { }
+	@Override default void exitEveryRule(ParserRuleContext ctx) { \}
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override default void visitTerminal(TerminalNode node) { }
+	@Override default void visitTerminal(TerminalNode node) { \}
 }
 >>
 
