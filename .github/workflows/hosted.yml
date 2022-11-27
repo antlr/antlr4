@@ -1,5 +1,9 @@
 name: antlr4
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ master, dev, hostedci ]
@@ -14,16 +18,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-latest,
-          ubuntu-latest,
-          windows-latest
+          macos-11,
+          ubuntu-20.04,
+          windows-2022
         ]
         compiler: [ clang, gcc ]
         exclude:
-          - os: windows-latest
+          - os: windows-2022
             compiler: gcc
         include:
-          - os: windows-latest
+          - os: windows-2022
             compiler: cl
 
     steps:
@@ -46,11 +50,11 @@ jobs:
         cygwin: 0
 
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Use ccache
       if: startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')
-      uses: hendrikmuhs/ccache-action@v1
+      uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: ${{ matrix.os }}-${{ matrix.compiler }}
 
@@ -138,7 +142,7 @@ jobs:
 
     - name: Archive artifacts
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.compiler }}
         path: antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz
@@ -151,9 +155,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-latest,
-          ubuntu-latest,
-          windows-latest
+          macos-11,
+          ubuntu-20.04,
+          windows-2022
         ]
         target: [
           tool,
@@ -169,7 +173,7 @@ jobs:
           swift,
         ]
         exclude:
-          - os: windows-latest
+          - os: windows-2022
             target: swift
 
     steps:
@@ -178,11 +182,11 @@ jobs:
       # dependencies, for instance, the setup-java actually parses
       # **/pom.xml files to decide what to cache.
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: antlr/antlr-php-runtime
         path: runtime/PHP
@@ -215,7 +219,7 @@ jobs:
 
     - name: Set up Maven
       if: steps.setup-java.outputs.cache-hit != 'true'
-      uses: stCarolas/setup-maven@v4.4
+      uses: stCarolas/setup-maven@v4.5
       with:
         maven-version: 3.8.5
 
@@ -239,13 +243,13 @@ jobs:
 
     - name: Set up Node 14
       if: matrix.target == 'javascript'
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v3.5.1
       with:
         node-version: '14'
 
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.x'
 
@@ -257,13 +261,13 @@ jobs:
 
     - name: Setup Go 1.19
       if: matrix.target == 'go'
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v3.3.1
       with:
         go-version: '^1.19'
 
     - name: Setup PHP 8.2
       if: matrix.target == 'php'
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@2.22.0
       with:
         php-version: '8.2'
         extensions: mbstring
@@ -271,13 +275,13 @@ jobs:
 
     - name: Setup Swift
       if: matrix.target == 'swift'
-      uses: swift-actions/setup-swift@v1
+      uses: swift-actions/setup-swift@v1.19.0
       with:
         swift-version: '5.2'
 
     - name: Use ccache
       if: (startswith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu')) && (matrix.target == 'cpp')
-      uses: hendrikmuhs/ccache-action@v1
+      uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: ${{ matrix.os }}-${{ matrix.target }}
 
@@ -336,7 +340,7 @@ jobs:
 
     - name: Archive artifacts
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.target }}
         path: antlr_${{ matrix.os }}_${{ matrix.target }}.tgz
