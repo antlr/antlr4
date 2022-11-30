@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine AS builder
+FROM eclipse-temurin:11 AS builder
 
 WORKDIR /opt/antlr4
 
@@ -6,7 +6,7 @@ ARG ANTLR_VERSION="4.12.0"
 ARG MAVEN_OPTS="-Xmx1G"
 
 
-RUN apk add --no-cache maven git \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install maven git -y \
     && git clone https://github.com/antlr/antlr4.git \
     && cd antlr4 \
     && git checkout $ANTLR_VERSION \
@@ -14,7 +14,7 @@ RUN apk add --no-cache maven git \
     && mvn -DskipTests install --projects tool --also-make \
     && mv ./tool/target/antlr4-*-complete.jar antlr4-tool.jar
 
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM eclipse-temurin:11-jre
 
 ARG user=appuser
 ARG group=appuser
