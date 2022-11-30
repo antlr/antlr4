@@ -4,8 +4,8 @@ This Docker image wraps current version of **ANTLR4** inclusive **Java runtime e
 
 ## Docker Image
 
-The image uses the official [adoptopenjdk/openjdk11:alpine](https://hub.docker.com/r/adoptopenjdk/openjdk11/tags?page=1&name=alpine&ordering=-name) image
-for building a distribution of ANTLR4 and [adoptopenjdk/openjdk11:alpine-jre](https://hub.docker.com/r/adoptopenjdk/openjdk11/tags?page=1&name=alpine-jre&ordering=-name) for runtime.
+The image uses the official [eclipse-temurin:11](https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=11&ordering=-name) image
+for building a distribution of ANTLR4 and [eclipse-temurin:11-jre](https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=11-jre&ordering=-name) for runtime.
 
 ## Build
 
