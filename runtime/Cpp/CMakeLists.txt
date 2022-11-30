@@ -3,6 +3,8 @@ cmake_minimum_required (VERSION 3.15)
 # 3.14 needed because of FetchContent
 # 3.15 needed to avid spew of warnings related to overriding cl command line flags
 
+set(CMAKE_MACOSX_RPATH OFF)
+
 enable_testing()
 
 # Detect build type, fallback to release and throw a warning if use didn't specify any
@@ -35,13 +37,6 @@ else()
 endif(WITH_STATIC_CRT)
 
 project(LIBANTLR4)
-
-CMAKE_POLICY(SET CMP0054 OLD)
-CMAKE_POLICY(SET CMP0045 OLD)
-CMAKE_POLICY(SET CMP0042 OLD)
-
-CMAKE_POLICY(SET CMP0059 OLD)
-CMAKE_POLICY(SET CMP0054 OLD)
 
 if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation)
