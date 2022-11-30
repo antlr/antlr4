@@ -7,17 +7,10 @@
 
 #include "support/Casts.h"
 #include "misc/MurmurHash.h"
+#include "atn/HashUtils.h"
 
 using namespace antlr4::atn;
 using namespace antlrcpp;
-
-namespace {
-
-  bool cachedHashCodeEqual(size_t lhs, size_t rhs) {
-    return lhs == rhs || lhs == 0 || rhs == 0;
-  }
-
-}
 
 SingletonPredictionContext::SingletonPredictionContext(Ref<const PredictionContext> parent, size_t returnState)
     : PredictionContext(PredictionContextType::SINGLETON), parent(std::move(parent)), returnState(returnState) {
