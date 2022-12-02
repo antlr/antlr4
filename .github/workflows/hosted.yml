@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master, dev ]
 
+permissions:
+  contents: read
+
 jobs:
   cpp-builds:
     runs-on: ${{ matrix.os }}
