@@ -56,7 +56,11 @@ class ParseTreeVisitor(object):
         return None
 
     def aggregateResult(self, aggregate, nextResult):
-        return nextResult
+        if aggregate is None:
+            return nextResult
+        elif nextResult is None:
+            return aggregate
+        return aggregate + nextResult
 
     def shouldVisitNextChild(self, node, currentResult):
         return True
