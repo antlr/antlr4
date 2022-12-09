@@ -170,7 +170,7 @@ jobs:
           php,
           python2,
           python3,
-          swift,
+          # swift,
         ]
         exclude:
           - os: windows-2022
@@ -327,7 +327,6 @@ jobs:
         case ${{ matrix.target }} in
           python2) mvn -X '-Dantlr-python2-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python2.**' test ;;
           python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
-          swift) mvn -X -e '-Dtest=python3.**' test ;;
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
 
