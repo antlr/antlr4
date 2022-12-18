@@ -54,5 +54,6 @@ between X1 and X2 or between X3 and X4
 Python2
 Python3
 JavaScript
+TypeScript
 PHP
 

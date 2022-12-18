@@ -32,8 +32,6 @@ public class StructDecl extends Decl {
 	@ModelElement public List<? super DispatchMethod> dispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
-	// Used to generate method signatures in Go target interfaces
-	@ModelElement public OrderedHashSet<Decl> signatures = new OrderedHashSet<Decl>();
 
 	// Track these separately; Go target needs to generate getters/setters
 	// Do not make them templates; we only need the Decl object not the ST
@@ -73,11 +71,10 @@ public class StructDecl extends Decl {
 	public void addDecl(Decl d) {
 		d.ctx = this;
 
-		if ( d instanceof ContextGetterDecl ) {
+		if ( d instanceof ContextGetterDecl )
 			getters.add(d);
-			signatures.add(((ContextGetterDecl) d).getSignatureDecl());
-		}
-		else attrs.add(d);
+		else
+			attrs.add(d);
 
 		// add to specific "lists"
 		if ( d instanceof TokenTypeDecl ) {

@@ -59,3 +59,6 @@ if (!String.prototype.codePointAt) {
 		}
 	}());
 }
+
+const CodePointAt = String.prototype.codePointAt;
+export default CodePointAt;

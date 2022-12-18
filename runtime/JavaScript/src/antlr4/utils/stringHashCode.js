@@ -3,9 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-String.prototype.seed = String.prototype.seed || Math.round(Math.random() * Math.pow(2, 32));
+export const StringSeedHashCode = Math.round(Math.random() * Math.pow(2, 32));
 
-String.prototype.hashCode = function () {
+String.prototype.seed = StringSeedHashCode;
+
+export default function StringHashCode () {
     const key = this.toString();
     let h1b, k1;
 
@@ -60,4 +62,6 @@ String.prototype.hashCode = function () {
     h1 ^= h1 >>> 16;
 
     return h1 >>> 0;
-};
+}
+
+String.prototype.hashCode = StringHashCode;

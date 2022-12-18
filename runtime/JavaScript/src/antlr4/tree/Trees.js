@@ -49,7 +49,7 @@ const Trees = {
         }
         if(ruleNames!==null) {
             if (t instanceof RuleNode) {
-                const context = t.getRuleContext()
+                const context = t.ruleContext;
                 const altNumber = context.getAltNumber();
                 // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
                 if ( altNumber != 0 ) {

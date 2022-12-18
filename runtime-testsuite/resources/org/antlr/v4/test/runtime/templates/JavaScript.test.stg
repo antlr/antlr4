@@ -1,5 +1,5 @@
-writeln(s) ::= <<console.log(<s>);>>
-write(s) ::= <<process.stdout.write(<s>);>>
+writeln(s) ::= <<console.log(<s> || '');>>
+write(s) ::= <<process.stdout.write(<s> || '');>>
 writeList(s) ::= <<console.log(<s; separator="+">);>>
 
 False() ::= "false"
@@ -298,5 +298,8 @@ Declare_pred() ::= <<this.pred = function(v) {
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>_list()"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, member) ::= "<ctx>.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

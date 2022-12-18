@@ -339,11 +339,11 @@ export default class BufferedTokenStream extends TokenStream {
 		return this.tokenSource.getSourceName();
 	}
 
-// Get the text of all tokens in this buffer.///
+	// Get the text of all tokens in this buffer.///
 	getText(interval) {
 		this.lazyInit();
 		this.fill();
-		if (interval === undefined || interval === null) {
+		if (!interval) {
 			interval = new Interval(0, this.tokens.length - 1);
 		}
 		let start = interval.start;
@@ -371,11 +371,16 @@ export default class BufferedTokenStream extends TokenStream {
 		return s;
 	}
 
-// Get all tokens from lexer until EOF///
+	// Get all tokens from lexer until EOF///
 	fill() {
 		this.lazyInit();
-		while (this.fetch(1000) === 1000) {
-			continue;
-		}
+		// noinspection StatementWithEmptyBodyJS
+		while (this.fetch(1000) === 1000);
 	}
 }
+
+Object.defineProperty(BufferedTokenStream, "size", {
+	get: function() {
+		return this.tokens.length;
+	}
+})
