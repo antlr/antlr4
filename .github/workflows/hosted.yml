@@ -244,7 +244,7 @@ jobs:
 
     - name: Set up Node 14
       if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v3.5.1
       with:
         node-version: '14'
 
