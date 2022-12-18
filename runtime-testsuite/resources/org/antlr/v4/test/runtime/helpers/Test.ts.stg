@@ -38,7 +38,7 @@ function main(argv: string[]): void {
     const stream = new CommonTokenStream(lexer);
 <if(parserName)>
     const parser = new <parserName>(stream);
-<if(debug)>
+<if(showDiagnosticErrors)>
     parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
     parser.buildParseTrees = true;
