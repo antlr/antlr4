@@ -29,7 +29,7 @@ public class TsNodeRunner extends RuntimeRunner {
 
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		npmInstallTsNodeAndWebpack();
 		npmLinkRuntime();
 	}
