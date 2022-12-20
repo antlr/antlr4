@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurrences(of: \"\\\"\", with: \"\")"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>

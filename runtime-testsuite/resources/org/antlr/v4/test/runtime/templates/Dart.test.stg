@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.expectedTokens.toString(vocabulary: this.vocabulary)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "ruleInvocationStack"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<interpreter!.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>

@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>

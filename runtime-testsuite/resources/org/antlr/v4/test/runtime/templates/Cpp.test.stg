@@ -49,6 +49,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "getExpectedTokens().toString(getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>

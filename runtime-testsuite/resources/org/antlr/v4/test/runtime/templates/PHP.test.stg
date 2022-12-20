@@ -52,6 +52,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "\$this->getExpectedTokens()->toStringVocabulary(\$this->getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "'[' . \implode(', ', \$this->getRuleInvocationStack()) . ']'"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<\$this->interp->setPredictionMode(Antlr\\Antlr4\\Runtime\\Atn\\PredictionMode::LL_EXACT_AMBIG_DETECTION);>>

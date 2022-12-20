@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
