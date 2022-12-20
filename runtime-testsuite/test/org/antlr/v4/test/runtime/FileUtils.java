@@ -8,9 +8,15 @@ package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.misc.Utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributes;
 
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
 
@@ -55,7 +61,7 @@ public class FileUtils {
 	}
 
 	public static void deleteDirectory(File f) throws IOException {
-		if (f.isDirectory()) {
+		if (f.isDirectory() && !isLink(f.toPath())) {
 			File[] files = f.listFiles();
 			if (files != null) {
 				for (File c : files)
@@ -64,5 +70,14 @@ public class FileUtils {
 		}
 		if (!f.delete())
 			throw new IOException("Failed to delete file: " + f);
+	}
+
+	public static boolean isLink(Path path) throws IOException {
+		try {
+			BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+			return attrs.isSymbolicLink() || (attrs instanceof DosFileAttributes && attrs.isOther());
+		} catch (IOException ignored) {
+			return false;
+		}
 	}
 }
