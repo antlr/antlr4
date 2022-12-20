@@ -1364,5 +1364,4 @@ public class Grammar implements AttributeResolver {
 
 		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserializedATN, tokenStream);
 	}
-
 }
