@@ -87,6 +87,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "antlr.PrintArrayJavaStyle(p.GetRuleInvocationStack(nil))"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);>>
@@ -340,5 +342,8 @@ func pred(v bool) bool {
 
 Invoke_pred(v) ::= <<pred(<v>)>>
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 StringType() ::= "string"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"
+ContextMember(ctx, member) ::= "<ctx>.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local; format={cap}>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"

@@ -9,8 +9,8 @@ grammar T;
 
 s
 @after {
-<ContextRuleFunction("$ctx", "r"):ToStringTree():writeln()>
-<ContextRuleFunction("$ctx", "r"):WalkListener()>
+<ContextMember("$ctx", "r"):ToStringTree():writeln()>
+<ContextMember("$ctx", "r"):WalkListener()>
 }
    : r=e ;
 e : e op='*' e
