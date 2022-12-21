@@ -118,7 +118,7 @@ const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
 
-const sharedContextCache = new antlr4.PredictionContextCache();
+const sharedContextCache = new antlr4.atn.PredictionContextCache();
 
 export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 
@@ -134,10 +134,6 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
         this.literalNames = <parser.name>.literalNames;
         this.symbolicNames = <parser.name>.symbolicNames;
         <namedActions.members>
-    }
-
-    get atn() {
-        return atn;
     }
 
     <if(sempredFuncs)>
@@ -454,7 +450,7 @@ TestSetInline(s) ::= <<
 
 // Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & ~0x1f) == 0
+((<shiftAmount>) & ~0x1f) === 0
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <%
@@ -535,13 +531,13 @@ catch (<catchArg>) {
 
 // lexer actions are not associated with model objects
 
-LexerSkipCommand()  ::= "this.skip()"
-LexerMoreCommand()  ::= "this.more()"
-LexerPopModeCommand() ::= "this.popMode()"
-LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>"
-LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>"
-LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>"
-LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>)"
+LexerSkipCommand()  ::= "this.skip();"
+LexerMoreCommand()  ::= "this.more();"
+LexerPopModeCommand() ::= "this.popMode();"
+LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>;"
+LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -558,17 +554,17 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.escapedName> = <rhsChunks>"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>===null ? null : <ctx(t)>.<t.label>.text)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.label>.type)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.label>.line)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.label>.column)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.label>.channel)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.label>.tokenIndex)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : parseInt(<ctx(t)>.<t.label>.text))"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label> == null ? null : <ctx(t)>.<t.label>.text)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.type)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.line)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.column)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.channel)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.tokenIndex)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : parseInt(<ctx(t)>.<t.label>.text))"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.start)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label> == null ? null : <ctx(r)>.<r.label>.start)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label> == null ? null : <ctx(r)>.<r.label>.stop)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label> == null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
@@ -583,11 +579,11 @@ SetNonLocalAttr(s, rhsChunks)  ::= "this.getInvokingContext(<s.ruleIndex>).<s.es
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.push(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "this.<t.escapedName> = null; // <TokenLabelType()>"
-TokenTypeDecl(t) ::= "var <t.escapedName> = 0; // <TokenLabelType()> type"
-TokenListDecl(t) ::= "this.<t.escapedName> = []; // of <TokenLabelType()>s"
-RuleContextDecl(r) ::= "this.<r.escapedName> = null; // <r.ctxName>"
-RuleContextListDecl(rdecl) ::= "this.<rdecl.escapedName> = []; // of <rdecl.ctxName>s"
+TokenDecl(t) ::= "this.<t.escapedName> = null;"
+TokenTypeDecl(t) ::= "var <t.escapedName> = 0;"
+TokenListDecl(t) ::= "this.<t.escapedName> = [];"
+RuleContextDecl(r) ::= "this.<r.escapedName> = null;"
+RuleContextListDecl(rdecl) ::= "this.<rdecl.escapedName> = [];"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.escapedName>() {
@@ -597,7 +593,7 @@ ContextTokenGetterDecl(t)      ::= <<
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
-<t.name>_list() {
+<t.escapedName>_list() {
     return this.getTokens(<parser.name>.<t.name>);
 }
 >>
@@ -624,7 +620,7 @@ ContextRuleGetterDecl(r)       ::= <<
 
 // should never be called
 ContextRuleListGetterDecl(r)   ::= <<
-<r.name>_list() {
+<r.escapedName>_list() {
     return this.getTypedRuleContexts(<parser.name>.<r.ctxName>);
 }
 >>
@@ -793,8 +789,8 @@ import antlr4 from 'antlr4';
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
 import <superClass> from './<superClass>.js';
-<endif>
 
+<endif>
 <atn>
 
 const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
@@ -812,12 +808,8 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 
     constructor(input) {
         super(input)
-        this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
+        this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.atn.PredictionContextCache());
         <namedActions.members>
-    }
-
-    get atn() {
-        return atn;
     }
 }
 

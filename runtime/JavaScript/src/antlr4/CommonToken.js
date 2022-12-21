@@ -39,6 +39,16 @@ export default class CommonToken extends Token {
         return t;
     }
 
+    cloneWithType(type) {
+        const t = new CommonToken(this.source, type, this.channel, this.start, this.stop);
+        t.tokenIndex = this.tokenIndex;
+        t.line = this.line;
+        t.column = this.column;
+        if (type === Token.EOF)
+            t.text = "";
+        return t;
+    }
+
     toString() {
         let txt = this.text;
         if (txt !== null) {

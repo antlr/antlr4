@@ -76,9 +76,9 @@ public class StructDecl extends Decl {
 		if ( d instanceof ContextGetterDecl ) {
 			getters.add(d);
 			signatures.add(((ContextGetterDecl) d).getSignatureDecl());
+		} else {
+			attrs.add(d);
 		}
-		else attrs.add(d);
-
 		// add to specific "lists"
 		if ( d instanceof TokenTypeDecl ) {
 			tokenTypeDecls.add(d);

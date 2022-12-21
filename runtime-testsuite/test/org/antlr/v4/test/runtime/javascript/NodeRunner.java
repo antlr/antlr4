@@ -3,7 +3,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-package org.antlr.v4.test.runtime.node;
+package org.antlr.v4.test.runtime.javascript;
 
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.CompiledState;
@@ -52,7 +52,7 @@ public class NodeRunner extends RuntimeRunner {
 		}
 
 		writeFile(getTempDirPath(), "package.json",
-				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package.json"));
+				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
 		return new CompiledState(generatedState, null);
 	}
 

@@ -6,7 +6,7 @@ import ParseTree from "./ParseTree.js";
 
 export default class RuleNode extends ParseTree {
 
-    getRuleContext(){
+    get ruleContext() {
         throw new Error("missing interface implementation")
     }
 }
