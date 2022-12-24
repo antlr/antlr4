@@ -322,7 +322,7 @@ func action(_ _localctx: RuleContext?,  _ ruleIndex: Int, _ actionIndex: Int) th
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
-	<f.name>_action((_localctx as <f.ctxType>?), actionIndex)
+	try <f.name>_action((_localctx as <f.ctxType>?), actionIndex)
 	 }; separator="\n">
 	default: break
 	}
@@ -364,7 +364,7 @@ init(_ input:TokenStream) throws {
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-private func <r.name>_action(_ _localctx: <r.ctxType>?,  _ actionIndex: Int) {
+private func <r.name>_action(_ _localctx: <r.ctxType>?,  _ actionIndex: Int) throws {
 	switch (actionIndex) {
 	<actions:{index|
 case <index>:
