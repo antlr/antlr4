@@ -28,12 +28,8 @@ import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
@@ -325,14 +321,15 @@ public class GrammarTransformPipeline {
 			// Rules copied in the mode copy phase are not copied again.
 			List<GrammarAST> rules = imp.ast.getNodesWithType(ANTLRParser.RULE);
 			if ( rules!=null ) {
-				for (GrammarAST r : rules) {
+				List<GrammarAST> rulesToInsert = rules.stream()
+						.filter(r -> !rootRuleNames.contains(r.getChild(0).getText()))
+						.collect(Collectors.toList());
+				// insert in reverse order to preserve precedence
+				Collections.reverse(rulesToInsert);
+				for (GrammarAST r : rulesToInsert) {
 					rootGrammar.tool.log("grammar", "imported rule: "+r.toStringTree());
-					String name = r.getChild(0).getText();
-					boolean rootAlreadyHasRule = rootRuleNames.contains(name);
-					if ( !rootAlreadyHasRule ) {
-						RULES.addChild(r); // merge in if not overridden
-						rootRuleNames.add(name);
-					}
+					RULES.insertChild(0, r); // merge in if not overridden
+					rootRuleNames.add(r.getChild(0).getText());
 				}
 			}
 

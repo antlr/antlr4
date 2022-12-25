@@ -11,10 +11,7 @@ import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.JavaCompiledState;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.antlr.v4.tool.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -561,6 +558,52 @@ public class TestCompositeGrammars {
 					 realElements(g.typeToTokenList).toString());
 
 		assertEquals(0, equeue.errors.size(), "unexpected errors: "+equeue);
+	}
+
+	@Test public void testLexerRulePrecedence(@TempDir Path tempDir) throws RecognitionException {
+		String tempDirPath = tempDir.toString();
+		FileUtils.mkdir(tempDirPath);
+		String g1str =
+				"lexer grammar G1Lexer;\n" +
+					"G1: 'g1';\n";
+		writeFile(tempDirPath, "G1Lexer.g4", g1str);
+		ErrorQueue equeue = Generator.antlrOnString(tempDirPath, "Java", "G1Lexer.g4", false);
+		g1str =
+				"parser grammar G1Parser;\n" +
+						"options { tokenVocab = G1Lexer; }\n" +
+						"g1: G1;\n";
+		writeFile(tempDirPath, "G1Parser.g4", g1str);
+		equeue = Generator.antlrOnString(tempDirPath, "Java", "G1Parser.g4", false);
+		String g2str =
+				"lexer grammar G2Lexer;\n" +
+					"import G1Lexer;\n" +
+					"G2: 'g2';\n";
+		writeFile(tempDirPath, "G2Lexer.g4", g2str);
+		equeue = Generator.antlrOnString(tempDirPath, "Java", "G2Lexer.g4", false);
+		g2str =
+				"parser grammar G2Parser;\n" +
+					"import G1Parser;\n" +
+					"options { tokenVocab = G2Lexer; }\n" +
+					"g2: G2;\n";
+		writeFile(tempDirPath, "G2Parser.g4", g2str);
+		String g3str =
+				"lexer grammar G3Lexer;\n" +
+						"import G2Lexer;\n" +
+						"G3: 'g3';\n";
+		writeFile(tempDirPath, "G3Lexer.g4", g3str);
+		equeue = Generator.antlrOnString(tempDirPath, "Java", "G3Lexer.g4", false);
+		g3str =
+				"parser grammar G3Parser;\n" +
+						"import G2Parser;\n" +
+						"options { tokenVocab = G3Lexer; }\n" +
+						"g3: G1 G2 G3;\n";
+		writeFile(tempDirPath, "G3Parser.g4", g3str);
+
+		Grammar g = new Grammar(tempDirPath+"/G3Parser.g4", g3str, equeue);
+		int g1_type = g.getTokenType("G1");
+		int g2_type = g.getTokenType("G2");
+		int g3_type = g.getTokenType("G3");
+		assertTrue(g3_type > g2_type && g2_type > g1_type);
 	}
 
 	@Test public void testNestedComposite(@TempDir Path tempDir) throws RecognitionException {
