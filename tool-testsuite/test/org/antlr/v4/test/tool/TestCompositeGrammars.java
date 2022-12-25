@@ -611,14 +611,6 @@ public class TestCompositeGrammars {
 		// Wasn't compiling. http://www.antlr.org/jira/browse/ANTLR-438
 		ErrorQueue equeue = new ErrorQueue();
 		String gstr =
-			"lexer grammar L;\n" +
-			"T1: '1';\n" +
-			"T2: '2';\n" +
-			"T3: '3';\n" +
-			"T4: '4';\n" ;
-		FileUtils.mkdir(tempDirPath);
-		writeFile(tempDirPath, "L.g4", gstr);
-		gstr =
 			"parser grammar G1;\n" +
 			"s: a | b;\n" +
 			"a: T1;\n" +
