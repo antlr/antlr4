@@ -5,12 +5,12 @@ CompositeParser
 grammar M;
 import S;
 a : A {<Append("\"M.a: \"","$A"):writeln()>};
-A : 'abc' {<writeln("\"M.A\"")>};
+ID : 'a'..'z'+;
 WS : (' '|'\n') -> skip ;
 
 [slaveGrammar]
 lexer grammar S;
-ID : 'a'..'z'+;
+A : 'abc' {<writeln("\"M.A\"")>};
 
 [start]
 a
