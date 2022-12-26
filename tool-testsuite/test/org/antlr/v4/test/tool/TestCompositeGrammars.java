@@ -547,9 +547,9 @@ public class TestCompositeGrammars {
 		writeFile(tempDirPath, "M.g4", master);
 		Grammar g = new Grammar(tempDirPath+"/M.g4", master, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, M=1, T=2}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, T=1, M=2}";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[M, T]";
+		String expectedTypeToTokenList = "[T, M]";
 
 		assertEquals(expectedTokenIDToTypeMap,
 					 g.tokenNameToTypeMap.toString());
@@ -633,9 +633,9 @@ public class TestCompositeGrammars {
 
 		Grammar g = new Grammar(tempDirPath+"/G3.g4", G3str, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, T4=1, T3=2}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, T3=1, T4=2}";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[T4, T3]";
+		String expectedTypeToTokenList = "[T3, T4]";
 
 		assertEquals(expectedTokenIDToTypeMap,
 					 g.tokenNameToTypeMap.toString());
