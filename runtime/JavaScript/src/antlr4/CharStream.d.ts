@@ -1,11 +1,17 @@
 export declare class CharStream {
 
     index: number; // defined as property
+    size: number;// defined as property
 
     constructor(data: string);
     constructor(data: string, decodeToUnicodeCodePoints: boolean);
-    seek(index: number): void;
+    reset(): void;
     consume(): void;
-    getText(start: number, stop: number): string;
     LA(offset: number): number;
+    LT(offset: number): number;
+    mark(): number;
+    release(marker: number): void;
+    seek(index: number): void;
+    getText(start: number, stop: number): string;
+    toString(): string;
 }
