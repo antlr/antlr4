@@ -6,7 +6,7 @@
     "sourceMap": true,
     "esModuleInterop":true,
     "lib": [
-      "ES2020"
+      "ES2020", "dom"
     ],
     "noImplicitAny": true,
     "strictNullChecks": true,
