@@ -1,6 +1,9 @@
-import {ATNState, RuleStopState} from "./index";
+import ATNState from "./ATNState";
+import RuleStopState from "./RuleStopState";
 
-export declare class RuleStartState extends ATNState {
+declare class RuleStartState extends ATNState {
     stopState: RuleStopState;
     isLeftRecursiveRule: boolean;
 }
+
+export default RuleStartState;

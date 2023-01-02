@@ -1,3 +1,5 @@
-export declare class PredictionContextCache {
+declare class PredictionContextCache {
 
 }
+
+export default PredictionContextCache;

@@ -1,4 +1,4 @@
-export declare class CharStream {
+declare class CharStream {
 
     index: number; // defined as property
     size: number;// defined as property
@@ -15,3 +15,5 @@ export declare class CharStream {
     getText(start: number, stop: number): string;
     toString(): string;
 }
+
+export default CharStream;

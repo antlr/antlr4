@@ -1,13 +1,13 @@
-import {TokenStream} from "./TokenStream";
-import {Recognizer} from "./Recognizer";
-import {ErrorStrategy} from "./error";
-import {IntervalSet} from "./misc";
-import {ParserATNSimulator} from "./atn";
-import {Token} from "./Token";
-import {ParserRuleContext} from "./context";
-import {Printer} from "./utils";
+import TokenStream from "./TokenStream";
+import Recognizer from "./Recognizer";
+import ErrorStrategy from "./error/ErrorStrategy";
+import IntervalSet from "./misc/IntervalSet";
+import ParserATNSimulator from "./atn/ParserATNSimulator";
+import Token from "./Token";
+import ParserRuleContext from "./context/ParserRuleContext";
+import Printer from "./utils/Printer";
 
-export declare class Parser extends Recognizer<Token> {
+declare class Parser extends Recognizer<Token> {
 
     static EOF: number;
 
@@ -37,3 +37,5 @@ export declare class Parser extends Recognizer<Token> {
     getExpectedTokens(): IntervalSet;
     getTokenStream(): TokenStream;
 }
+
+export default Parser;

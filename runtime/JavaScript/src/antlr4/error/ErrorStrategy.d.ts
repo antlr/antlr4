@@ -1,8 +1,8 @@
-import {RecognitionException} from "./RecognitionException";
-import {Parser} from "../Parser";
-import {Token} from "../Token";
+import RecognitionException from "./RecognitionException";
+import Parser from "../Parser";
+import Token from "../Token";
 
-export declare class ErrorStrategy {
+declare class ErrorStrategy {
     reset(recognizer: Parser): void;
     sync(recognizer: Parser): void;
     recover(recognizer: Parser, e: RecognitionException): void;
@@ -10,3 +10,5 @@ export declare class ErrorStrategy {
     reportMatch(recognizer: Parser): void;
     reportError(recognizer: Parser, e: RecognitionException): void;
 }
+
+export default ErrorStrategy;

@@ -1,5 +1,7 @@
-import {ATNState} from "./index";
+import ATNState from "./ATNState";
 
-export declare class RuleStopState extends ATNState {
+declare class RuleStopState extends ATNState {
 
 }
+
+export default RuleStopState;

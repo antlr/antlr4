@@ -1,6 +1,6 @@
-import {Token} from "../Token";
+import Token from "../Token";
 
-export declare class Interval {
+declare class Interval {
 
     start: number;
     stop: number;
@@ -8,3 +8,5 @@ export declare class Interval {
     constructor(start: number, stop: number);
     constructor(start: Token, stop: Token | undefined);
 }
+
+export default Interval;

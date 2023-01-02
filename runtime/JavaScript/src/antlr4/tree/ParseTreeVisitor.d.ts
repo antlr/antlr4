@@ -1,9 +1,9 @@
-import {RuleNode} from "./RuleNode";
-import {ErrorNode} from "./ErrorNode";
-import {TerminalNode} from "./TerminalNode";
-import {ParseTree} from "./ParseTree";
+import RuleNode from "./RuleNode";
+import ErrorNode from "./ErrorNode";
+import TerminalNode from "./TerminalNode";
+import ParseTree from "./ParseTree";
 
-export declare class ParseTreeVisitor<Result> {
+declare class ParseTreeVisitor<Result> {
 
     visit(tree: ParseTree): Result;
 
@@ -14,3 +14,5 @@ export declare class ParseTreeVisitor<Result> {
     visitErrorNode(node: ErrorNode): Result;
 
 }
+
+export default ParseTreeVisitor;

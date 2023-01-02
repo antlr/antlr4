@@ -1,8 +1,11 @@
-import {IntervalSet} from "../misc";
-import {RuleContext} from "../context";
-import {ATNState, DecisionState, RuleStartState, RuleStopState} from "../state";
+import IntervalSet from "../misc/IntervalSet";
+import RuleContext from "../context/RuleContext";
+import ATNState from "../state/ATNState";
+import DecisionState from "../state/DecisionState";
+import RuleStartState from "../state/RuleStartState";
+import RuleStopState from "../state/RuleStopState";
 
-export declare class ATN {
+declare class ATN {
 
     static INVALID_ALT_NUMBER: number;
 
@@ -15,3 +18,5 @@ export declare class ATN {
     nextTokens(atnState: ATNState, ctx?: RuleContext): IntervalSet;
 
 }
+
+export default ATN;

@@ -14,7 +14,7 @@ import { default as Utils } from './utils/index.js';
 import Token from './Token.js';
 import CommonToken from './CommonToken.js';
 import InputStream from './InputStream.js';
-import CharStream from './InputStream.js';
+import CharStream from './CharStream.js';
 import FileStream from './FileStream.js';
 import CommonTokenStream from './CommonTokenStream.js';
 import Lexer from './Lexer.js';
@@ -59,6 +59,9 @@ export {
 
 /* eslint no-unused-vars: [ "off"] */
 // need to import unused to force loading
+// noinspection ES6UnusedImports
 import StringHashCode from './utils/stringHashCode.js';
+// noinspection ES6UnusedImports
 import CodePointAt from './polyfills/codepointat.js';
+// noinspection ES6UnusedImports
 import FromCodePoint from './polyfills/fromcodepoint.js';

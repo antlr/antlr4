@@ -1,6 +1,6 @@
-import {Interval} from "./Interval";
+import Interval from "./Interval";
 
-export declare class IntervalSet {
+declare class IntervalSet {
 
     isNil: boolean;
     size: number;
@@ -11,3 +11,5 @@ export declare class IntervalSet {
     contains(i: number): boolean;
     toString(literalNames?: (string | null)[], symbolicNames?: string[], elemsAreChar?: boolean): string;
 }
+
+export default IntervalSet;
