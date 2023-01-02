@@ -1,5 +1,7 @@
-import {TerminalNode} from "./TerminalNode";
+import TerminalNode from "./TerminalNode";
 
-export declare class ErrorNode extends TerminalNode {
+declare class ErrorNode extends TerminalNode {
 
 }
+
+export default ErrorNode;

@@ -1,3 +1,5 @@
-export declare class TokenSource {
+declare class TokenSource {
 
 }
+
+export default TokenSource;

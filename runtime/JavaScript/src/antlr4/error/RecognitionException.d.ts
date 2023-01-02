@@ -1,7 +1,8 @@
-import {ParserRuleContext, RuleContext} from "../context";
-import {TokenStream} from "../TokenStream";
-import {Recognizer} from "../Recognizer";
-import {CharStream} from "../CharStream";
+import ParserRuleContext from "../context/ParserRuleContext";
+import RuleContext from "../context/RuleContext";
+import TokenStream from "../TokenStream";
+import Recognizer from "../Recognizer";
+import CharStream from "../CharStream";
 
 export interface ExceptionParams {
     message: string;
@@ -11,8 +12,10 @@ export interface ExceptionParams {
 
 }
 
-export declare class RecognitionException extends Error {
+declare class RecognitionException extends Error {
     ctx: RuleContext;
 
     constructor(params: ExceptionParams);
 }
+
+export default RecognitionException;

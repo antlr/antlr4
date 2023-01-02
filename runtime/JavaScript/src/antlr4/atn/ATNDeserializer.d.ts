@@ -1,7 +1,9 @@
-import {ATNDeserializationOptions} from "./ATNDeserializationOptions";
-import {ATN} from "./ATN";
+import ATNDeserializationOptions from "./ATNDeserializationOptions";
+import ATN from "./ATN";
 
-export declare class ATNDeserializer {
+declare class ATNDeserializer {
     constructor(options?: ATNDeserializationOptions);
     deserialize(data:  number[]) : ATN;
 }
+
+export default ATNDeserializer;

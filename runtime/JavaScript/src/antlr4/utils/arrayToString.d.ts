@@ -1,1 +1,3 @@
-export declare function arrayToString(value: any[]) : string;
+declare function arrayToString(value: any[]) : string;
+
+export default arrayToString;

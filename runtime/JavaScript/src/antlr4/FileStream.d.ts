@@ -1,6 +1,6 @@
-import {CharStream} from "./CharStream";
+import CharStream from "./CharStream";
 
-export declare class FileStream extends CharStream {
+declare class FileStream extends CharStream {
 
     fileName: string;
 
@@ -8,3 +8,5 @@ export declare class FileStream extends CharStream {
     constructor(fileName: string, decodeToUnicodeCodePoints: boolean);
 
 }
+
+export default FileStream;

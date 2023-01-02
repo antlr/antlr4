@@ -1,3 +1,5 @@
-export declare class ATNSimulator {
+declare class ATNSimulator {
 
 }
+
+export default ATNSimulator;
