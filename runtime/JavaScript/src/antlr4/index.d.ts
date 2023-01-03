@@ -4,7 +4,7 @@ import { default as context } from './context';
 import { default as misc } from './misc';
 import { default as tree } from './tree';
 import { default as error } from './error';
-import { default as state } from './state';
+import type { default as state } from './state';
 import { default as Utils } from './utils';
 
 import Token from './Token';
