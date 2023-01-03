@@ -4,6 +4,7 @@ import { default as context } from './context';
 import { default as misc } from './misc';
 import { default as tree } from './tree';
 import { default as error } from './error';
+import { default as state } from './state';
 import { default as Utils } from './utils';
 
 import Token from './Token';
@@ -40,8 +41,18 @@ import RuleNode from "./tree/RuleNode"
 import TerminalNode from "./tree/TerminalNode"
 import arrayToString from "./utils/arrayToString"
 
+export * from './atn/index';
+export * from './dfa/index';
+export * from './context/index';
+export * from './misc/index';
+export * from './tree/index';
+export * from './error/index';
+export * from './state/index';
+export * from './CharStreams';
+export * from './utils/index';
+
 export {
-  atn, dfa, context, misc, tree, error, Token, CommonToken,
+  atn, dfa, context, misc, tree, error, state, Token, CommonToken,
   CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
   ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils,
   RuleNode, TerminalNode, ParseTreeWalker, RuleContext,
