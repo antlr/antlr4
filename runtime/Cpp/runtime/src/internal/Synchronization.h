@@ -27,12 +27,13 @@
 
 #include "antlr4-common.h"
 
+#include <atomic>
+#include <functional>
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
 
 #if ANTLR4CPP_USING_ABSEIL
-#include "absl/base/call_once.h"
 #include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 #define ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS ABSL_NO_THREAD_SAFETY_ANALYSIS
@@ -121,7 +122,10 @@ namespace antlr4::internal {
   // Must be compatible with std::once_flag.
   class ANTLR4CPP_PUBLIC OnceFlag final {
   public:
-    constexpr OnceFlag() = default;
+    // Note: Not constexpr, because the std::atomic constructor is not constexpr
+    // on older versions of MSVC:
+    // https://developercommunity.visualstudio.com/t/stdatomic-value-constructor-is-not-actually-conste/545566#TPIN-N577715
+    OnceFlag() = default;
 
     // No copying or moving, we are as strict as possible to support other implementations.
     OnceFlag(const OnceFlag&) = delete;
@@ -135,20 +139,32 @@ namespace antlr4::internal {
     template <typename Callable, typename... Args>
     friend void call_once(OnceFlag &onceFlag, Callable &&callable, Args&&... args);
 
-#if ANTLR4CPP_USING_ABSEIL
-    absl::once_flag _impl;
-#else
-    std::once_flag _impl;
-#endif
+    std::mutex _mutex;
+    std::atomic<bool> _returned = false;
   };
 
   template <typename Callable, typename... Args>
-  void call_once(OnceFlag &onceFlag, Callable &&callable, Args&&... args) {
-#if ANTLR4CPP_USING_ABSEIL
-    absl::call_once(onceFlag._impl, std::forward<Callable>(callable), std::forward<Args>(args)...);
-#else
-    std::call_once(onceFlag._impl, std::forward<Callable>(callable), std::forward<Args>(args)...);
-#endif
+  void call_once(OnceFlag &onceFlag, Callable &&callable, Args &&...args) {
+    // Fast path: If the callable has already been called and returned, we can
+    // just return immediately without using a lock.
+    if (onceFlag._returned.load(std::memory_order_acquire)) {
+      return;
+    }
+
+    // Slow path: One thread is executing the callable, while the other threads
+    // are waiting for it to finish.
+    const std::lock_guard<std::mutex> lock(onceFlag._mutex);
+
+    // When two threads call call_once at the same time, the second thread
+    // already waited for the callable to finish. It must not call the callable
+    // again.
+    if (onceFlag._returned.load(std::memory_order_acquire)) {
+      return;
+    }
+
+    std::invoke(std::forward<Callable>(callable), std::forward<Args>(args)...);
+
+    onceFlag._returned.store(true, std::memory_order_release);
   }
 
 }  // namespace antlr4::internal
