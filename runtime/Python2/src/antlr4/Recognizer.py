@@ -45,6 +45,12 @@ class Recognizer(object):
     def removeErrorListeners(self):
         self._listeners = []
 
+    def getTokenNames(self):
+        return tuple(self.literalNames + self.symbolicNames[len(self.literalNames):])
+
+    def getRuleNames(self):
+        return tuple(self.ruleNames)
+
     def getTokenTypeMap(self):
         tokenNames = self.getTokenNames()
         if tokenNames is None:
@@ -52,7 +58,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of token names.")
         result = self.tokenTypeMapCache.get(tokenNames, None)
         if result is None:
-            result = zip( tokenNames, range(0, len(tokenNames)))
+            result = dict(zip(tokenNames, range(0, len(tokenNames))))
             result["EOF"] = Token.EOF
             self.tokenTypeMapCache[tokenNames] = result
         return result
@@ -68,7 +74,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of rule names.")
         result = self.ruleIndexMapCache.get(ruleNames, None)
         if result is None:
-            result = zip( ruleNames, range(0, len(ruleNames)))
+            result = dict(zip(ruleNames, range(0, len(ruleNames))))
             self.ruleIndexMapCache[ruleNames] = result
         return result
 
