@@ -20,7 +20,7 @@ module.exports = {
             fs: false
         }
     },
-    target: "node16",
+    target: "web",
     module: {
         rules: [{
             test: /\.js$/,
