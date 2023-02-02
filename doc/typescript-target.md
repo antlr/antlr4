@@ -89,7 +89,7 @@ class CustomVisitor extends MyGrammarVisitor {
   }
 }
 
-tree.accept(new Visitor());
+tree.accept(new CustomVisitor());
 ````
 
 ## How do I create and run a custom listener?
