@@ -32,10 +32,10 @@ The runtime is webpacked and sits in the dist folder. A .map file is also provid
 
 Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "MyStartRule". The tool will have generated for you the following files:
 
-*   MyGrammarLexer.js
-*   MyGrammarParser.js
-*   MyGrammarListener.js (if you have not activated the -no-listener option)
-*   MyGrammarVisitor.js (if you have activated the -visitor option)
+*   MyGrammarLexer.ts
+*   MyGrammarParser.ts
+*   MyGrammarListener.ts (if you have not activated the -no-listener option)
+*   MyGrammarVisitor.ts (if you have activated the -visitor option)
    
 There is no listener or visitor interface generated, instead the generated listener and visitor class methods are implemented using lambdas.
 
@@ -89,7 +89,7 @@ class CustomVisitor extends MyGrammarVisitor {
   }
 }
 
-tree.accept(new Visitor());
+tree.accept(new CustomVisitor());
 ````
 
 ## How do I create and run a custom listener?
