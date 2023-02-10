@@ -37,7 +37,7 @@ IntervalSet& IntervalSet::operator=(const IntervalSet& other) {
 }
 
 IntervalSet& IntervalSet::operator=(IntervalSet&& other) {
-  _intervals = move(other._intervals);
+  _intervals = std::move(other._intervals);
   return *this;
 }
 

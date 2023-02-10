@@ -82,7 +82,7 @@ export default class Parser extends Recognizer {
      *
      * <p>If the symbol type does not match,
      * {@link ANTLRErrorStrategy//recoverInline} is called on the current error
-     * strategy to attempt recovery. If {@link //getBuildParseTree} is
+     * strategy to attempt recovery. If {@link //buildParseTree} is
      * {@code true} and the token index of the symbol returned by
      * {@link ANTLRErrorStrategy//recoverInline} is -1, the symbol is added to
      * the parse tree by calling {@link ParserRuleContext//addErrorNode}.</p>
@@ -117,7 +117,7 @@ export default class Parser extends Recognizer {
      *
      * <p>If the symbol type does not match,
      * {@link ANTLRErrorStrategy//recoverInline} is called on the current error
-     * strategy to attempt recovery. If {@link //getBuildParseTree} is
+     * strategy to attempt recovery. If {@link //buildParseTree} is
      * {@code true} and the token index of the symbol returned by
      * {@link ANTLRErrorStrategy//recoverInline} is -1, the symbol is added to
      * the parse tree by calling {@link ParserRuleContext//addErrorNode}.</p>
@@ -134,7 +134,7 @@ export default class Parser extends Recognizer {
             this.consume();
         } else {
             t = this._errHandler.recoverInline(this);
-            if (this._buildParseTrees && t.tokenIndex === -1) {
+            if (this.buildParseTrees && t.tokenIndex === -1) {
                 // we must have conjured up a new token during single token
                 // insertion
                 // if it's not the current symbol
