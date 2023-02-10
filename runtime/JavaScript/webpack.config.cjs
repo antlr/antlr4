@@ -15,12 +15,10 @@ module.exports = {
     resolve: {
         extensions: [ '.js'],
         fallback: {
-            module: false,
-            net: false,
             fs: false
         }
     },
-    target: "node16",
+    target: "web",
     module: {
         rules: [{
             test: /\.js$/,

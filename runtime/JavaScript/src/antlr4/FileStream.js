@@ -4,7 +4,8 @@
  */
 
 import InputStream from './InputStream.js';
-import fs from "fs";
+import { isNode } from "browser-or-node";
+const fs = isNode ? await eval("import('fs')") : null;
 
 /**
  * This is an InputStream that is loaded from a file all at once
@@ -12,6 +13,8 @@ import fs from "fs";
  */
 export default class FileStream extends InputStream {
 	constructor(fileName, decodeToUnicodeCodePoints) {
+		if(!isNode)
+			throw new Error("FileStream is only available when running in Node!");
 		const data = fs.readFileSync(fileName, "utf8");
 		super(data, decodeToUnicodeCodePoints);
 		this.fileName = fileName;

@@ -20,9 +20,9 @@
   "homepage": "https://github.com/antlr/antlr4",
   "devDependencies": {
     "@babel/core": "^7.19.1",
+    "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-env": "^7.19.4",
     "@types/node": "^18.7.23",
-    "@babel/eslint-parser": "^7.19.1",
     "babel-loader": "^8.2.5",
     "compression-webpack-plugin": "^10.0.0",
     "eslint": "^8.23.1",
@@ -45,8 +45,9 @@
     "node": ">=16"
   },
   "browser": {
-    "fs": false,
-    "net": false,
-    "module": false
+    "fs": false
+  },
+  "dependencies": {
+    "browser-or-node": "^2.1.1"
   }
 }
