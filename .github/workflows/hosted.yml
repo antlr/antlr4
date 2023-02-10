@@ -242,11 +242,11 @@ jobs:
         python-version: '3.x'
         architecture: 'x64'
 
-    - name: Set up Node 14
+    - name: Set up Node 16
       if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
-      uses: actions/setup-node@v3.5.1
+      uses: actions/setup-node@v3.6.0
       with:
-        node-version: '14'
+        node-version: '16'
 
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
