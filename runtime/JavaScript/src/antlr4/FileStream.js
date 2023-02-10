@@ -4,7 +4,11 @@
  */
 
 import InputStream from './InputStream.js';
-import { isNode } from "browser-or-node";
+const isNode =
+	typeof process !== "undefined" &&
+	process.versions != null &&
+	process.versions.node != null;
+// use eval to fool webpack and mocha
 const fs = isNode ? await eval("import('fs')") : null;
 
 /**

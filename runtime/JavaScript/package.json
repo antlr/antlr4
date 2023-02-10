@@ -46,8 +46,5 @@
   },
   "browser": {
     "fs": false
-  },
-  "dependencies": {
-    "browser-or-node": "^2.1.1"
   }
 }
