@@ -148,7 +148,7 @@ install(TARGETS antlr4_static
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
-        DESTINATION "include/antlr4-runtime"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/antlr4-runtime"
         COMPONENT dev
         FILES_MATCHING PATTERN "*.h"
         )
