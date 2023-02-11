@@ -138,10 +138,11 @@ if(WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
 
+include(GNUInstallDirs)
+
 # Generate CMake Package Files only if install is active
 if (ANTLR4_INSTALL)
 
-  include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
 
   if(NOT ANTLR4_CMAKE_DIR)
