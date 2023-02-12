@@ -5,6 +5,7 @@ export * from "./CharStreams";
 export * from "./TokenStream";
 export * from "./BufferedTokenStream";
 export * from "./CommonTokenStream";
+export * from "./Recognizer";
 export * from "./Lexer";
 export * from "./Parser";
 export * from './Token';
