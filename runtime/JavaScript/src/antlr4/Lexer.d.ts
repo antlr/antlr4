@@ -18,6 +18,7 @@ export declare class Lexer extends Recognizer<number> {
     _type: number;
 
     constructor(input: CharStream);
-    nextToken() : Token;
-    emit() : Token;
+    nextToken(): Token;
+    emit(): Token;
+    reset(): void;
 }
