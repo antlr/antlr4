@@ -14,6 +14,7 @@ export declare class ParserATNSimulator extends ATNSimulator {
     decisionToDFA: DFA[];
     atn: ATN;
     debug?: boolean;
+    trace_atn_sim?: boolean;
 
     constructor(recog: Recognizer<Token>, atn: ATN, decisionToDFA: DFA[], sharedContextCache: PredictionContextCache);
     adaptivePredict(input: TokenStream, decision: number, outerContext: ParserRuleContext) : number;

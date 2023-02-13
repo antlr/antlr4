@@ -4,22 +4,36 @@
  */
 
 import InputStream from './InputStream.js';
+import CharStream from './CharStream.js';
 const isNode =
 	typeof process !== "undefined" &&
 	process.versions != null &&
 	process.versions.node != null;
-// use eval to fool webpack and mocha
-const fs = isNode ? await eval("import('fs')") : null;
+import fs from 'fs';
 
 /**
  * This is an InputStream that is loaded from a file all at once
  * when you construct the object.
  */
 export default class FileStream extends InputStream {
-	constructor(fileName, decodeToUnicodeCodePoints) {
+
+	static fromPath(path, encoding, callback) {
 		if(!isNode)
 			throw new Error("FileStream is only available when running in Node!");
-		const data = fs.readFileSync(fileName, "utf8");
+		fs.readFile(path, encoding, function(err, data) {
+			let is = null;
+			if (data !== null) {
+				is = new CharStream(data, true);
+			}
+			callback(err, is);
+		});
+
+	}
+
+	constructor(fileName, encoding, decodeToUnicodeCodePoints) {
+		if(!isNode)
+			throw new Error("FileStream is only available when running in Node!");
+		const data = fs.readFileSync(fileName, encoding || "utf-8" );
 		super(data, decodeToUnicodeCodePoints);
 		this.fileName = fileName;
 	}

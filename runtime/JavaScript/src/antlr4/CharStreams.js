@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import InputStream from './InputStream.js';
-import fs from "fs";
+import CharStream from "./CharStream.js";
+import FileStream from "./FileStream.js";
 
 /**
  * Utility functions to create InputStreams from various sources.
@@ -16,7 +16,7 @@ import fs from "fs";
 export default {
   // Creates an InputStream from a string.
   fromString: function(str) {
-    return new InputStream(str, true);
+    return new CharStream(str, true);
   },
 
   /**
@@ -30,7 +30,7 @@ export default {
   fromBlob: function(blob, encoding, onLoad, onError) {
     const reader = new window.FileReader();
     reader.onload = function(e) {
-      const is = new InputStream(e.target.result, true);
+      const is = new CharStream(e.target.result, true);
       onLoad(is);
     };
     reader.onerror = onError;
@@ -43,7 +43,7 @@ export default {
    * encoding is null).
    */
   fromBuffer: function(buffer, encoding) {
-    return new InputStream(buffer.toString(encoding), true);
+    return new CharStream(buffer.toString(encoding), true);
   },
 
   /** Asynchronously creates an InputStream from a file on disk given
@@ -53,13 +53,7 @@ export default {
    * Invokes callback(error, result) on completion.
    */
   fromPath: function(path, encoding, callback) {
-    fs.readFile(path, encoding, function(err, data) {
-      let is = null;
-      if (data !== null) {
-        is = new InputStream(data, true);
-      }
-      callback(err, is);
-    });
+    FileStream.fromPath(path, encoding, callback);
   },
 
   /**
@@ -68,7 +62,6 @@ export default {
    * 'utf8' if encoding is null).
    */
   fromPathSync: function(path, encoding) {
-    const data = fs.readFileSync(path, encoding);
-    return new InputStream(data, true);
+    return new FileStream(path, encoding);
   }
 };

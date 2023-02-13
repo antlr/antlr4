@@ -33,7 +33,7 @@ class TreeShapeListener extends ParseTreeListener {
 <endif>
 
 function main(argv: string[]): void {
-    const input = new FileStream(argv[2], true);
+    const input = new FileStream(argv[2], "utf-8", true);
     const lexer = new <lexerName>(input);
     const stream = new CommonTokenStream(lexer);
 <if(parserName)>

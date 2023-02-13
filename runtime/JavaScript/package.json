@@ -1,9 +1,10 @@
 {
   "name": "antlr4",
-  "version": "4.12.0-beta.5",
+  "version": "4.12.0-beta.10",
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
-  "main": "dist/antlr4.js",
+  "browser": "dist/antlr4.web.js",
+  "main": "dist/antlr4.node.js",
   "types": "src/antlr4/index.d.ts",
   "repository": "antlr/antlr4.git",
   "keywords": [
@@ -43,8 +44,5 @@
   },
   "engines": {
     "node": ">=16"
-  },
-  "browser": {
-    "fs": false
   }
 }
