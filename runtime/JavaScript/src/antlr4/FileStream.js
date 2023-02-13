@@ -9,8 +9,7 @@ const isNode =
 	typeof process !== "undefined" &&
 	process.versions != null &&
 	process.versions.node != null;
-// use eval to fool webpack and mocha
-const fs = isNode ? await eval("import('fs')") : null;
+import fs from 'fs';
 
 /**
  * This is an InputStream that is loaded from a file all at once
