@@ -1,4 +1,4 @@
-import antlr4 from 'file://<runtimePath>/src/antlr4/index.js'
+import antlr4 from 'file://<runtimePath>/src/antlr4/index.node.js'
 import <lexerName> from './<lexerName>.js';
 <if(parserName)>
 import <parserName> from './<parserName>.js';
@@ -23,7 +23,7 @@ class TreeShapeListener extends antlr4.tree.ParseTreeListener {
 <endif>
 
 function main(argv) {
-    var input = new antlr4.FileStream(argv[2], true);
+    var input = new antlr4.FileStream(argv[2], "utf-8", true);
     var lexer = new <lexerName>(input);
     var stream = new antlr4.CommonTokenStream(lexer);
 <if(parserName)>
