@@ -311,11 +311,7 @@ nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://ww
 
 ### Python
 
-The Python targets get deployed with `setup.py` (Python 2), or `build` and `twine` (Python 3).
-Install them by
-```sh
-pip3 install build twine
-```
+The Python targets get deployed with `twine` for Python 2 and 3.
 
 First, set up `~/.pypirc` with tight privileges:
 
@@ -339,19 +335,20 @@ username: parrt
 password: xxx
 ```
 
-Then run the usual python set up stuff:
+Then run the python build and upload:
 
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python2
 # assume you have ~/.pypirc set up
-python setup.py sdist upload
+pip install build twine
+twine upload dist/antlr4-python2-runtime-4.12.0.tar.gz
 ```
 
 For Python 3 target, do
 
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python3
-python3 -m build
+python -m build
 # assume you have ~/.pypirc set up
 twine upload dist/antlr4-python3-runtime-<version>.tar.gz dist/antlr4_python3_runtime-<version>-py3-none-any.whl
 ```
