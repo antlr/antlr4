@@ -27,13 +27,12 @@
 
 #include "antlr4-common.h"
 
-#include <atomic>
-#include <functional>
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
 
 #if ANTLR4CPP_USING_ABSEIL
+#include "absl/base/call_once.h"
 #include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 #define ANTLR4CPP_NO_THREAD_SAFTEY_ANALYSIS ABSL_NO_THREAD_SAFETY_ANALYSIS
@@ -136,15 +135,20 @@ namespace antlr4::internal {
     template <typename Callable, typename... Args>
     friend void call_once(OnceFlag &onceFlag, Callable &&callable, Args&&... args);
 
-    std::atomic_flag _flag = ATOMIC_FLAG_INIT;
+#if ANTLR4CPP_USING_ABSEIL
+    absl::once_flag _impl;
+#else
+    std::once_flag _impl;
+#endif
   };
 
   template <typename Callable, typename... Args>
-  void call_once(OnceFlag &onceFlag, Callable &&callable, Args &&...args) {
-    if (onceFlag._flag.test_and_set()) {
-      return;
-    }
-    std::invoke(std::forward<Callable>(callable), std::forward<Args>(args)...);
+  void call_once(OnceFlag &onceFlag, Callable &&callable, Args&&... args) {
+#if ANTLR4CPP_USING_ABSEIL
+    absl::call_once(onceFlag._impl, std::forward<Callable>(callable), std::forward<Args>(args)...);
+#else
+    std::call_once(onceFlag._impl, std::forward<Callable>(callable), std::forward<Args>(args)...);
+#endif
   }
 
 }  // namespace antlr4::internal
