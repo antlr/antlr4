@@ -90,6 +90,6 @@ public class Python3Target extends Target {
 
 	@Override
 	public String translateThisAccessor(String code) {
-		return code.replaceAll("this.", "self.");
+		return code.replaceAll("this\\.", "self.");
 	}
 }

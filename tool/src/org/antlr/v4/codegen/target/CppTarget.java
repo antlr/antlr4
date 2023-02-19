@@ -46,7 +46,7 @@ public class CppTarget extends Target {
 		"switch", "template", "this", "thread_local", "throw", "true",
 		"try", "typedef", "typeid", "typename", "union", "unsigned",
 		"using", "virtual", "void", "volatile", "wchar_t", "while",
-		"xor", "xor_eq", 
+		"xor", "xor_eq",
 
 		"rule", "parserRule"
 	));
@@ -120,6 +120,6 @@ public class CppTarget extends Target {
 
 	@Override
 	public String translateThisAccessor(String code) {
-		return code.replaceAll("this.", "this->");
+		return code.replaceAll("this\\.", "this->");
 	}
 }

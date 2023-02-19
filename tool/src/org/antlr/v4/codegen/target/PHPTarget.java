@@ -96,6 +96,6 @@ public class PHPTarget extends Target {
 
 	@Override
 	public String translateThisAccessor(String code) {
-		return code.replaceAll("this.", "$this->");
+		return code.replaceAll("this\\.", "$this->");
 	}
 }
