@@ -59,7 +59,7 @@ public class JavaRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime() {
+	protected void initRuntime(RunOptions runOptions) {
 		compiler = ToolProvider.getSystemJavaCompiler();
 	}
 

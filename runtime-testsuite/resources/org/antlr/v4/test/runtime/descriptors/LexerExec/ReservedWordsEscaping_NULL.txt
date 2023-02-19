@@ -1,0 +1,17 @@
+[notes]
+https://github.com/antlr/antlr4/pull/3889
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+
+NULL : ('N' | 'n')('U' | 'u')('L' | 'l')('L' | 'l') ;
+
+[input]
+NULL
+
+[output]
+[@0,0:3='NULL',<1>,1:0]
+[@1,4:3='<EOF>',<-1>,1:4]

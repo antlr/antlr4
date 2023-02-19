@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurrences(of: \"\\\"\", with: \"\")"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
@@ -299,9 +301,9 @@ func pred(_ v: Bool) -> Bool {
 >>
 
 StringType() ::= "String"
-
 Invoke_pred(v) ::= <<self.pred(<v>)>>
-
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
-
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
+ContextMember(ctx, member) ::= "<ctx>!.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>!.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>"

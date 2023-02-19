@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.11.2-SNAPSHOT</version>
+		<version>4.12.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4</artifactId>
 	<name>ANTLR 4 Tool</name>
@@ -40,11 +40,6 @@
 			<groupId>org.abego.treelayout</groupId>
 			<artifactId>org.abego.treelayout.core</artifactId>
 			<version>1.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>1.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
@@ -160,6 +155,38 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin><!-- workaround for https://github.com/antlr/antlr3/pull/209 -->
+              <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <id>fix-antlr3-RB</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <basedir>${project.build.directory}/generated-sources/antlr3/org/antlr/v4</basedir>
+                    <includes>
+                        <include>parse/*.java</include>
+                        <include>codegen/*.java</include>
+                    </includes>
+                    <replacements>
+                        <replacement>
+                            <token>(// .ANTLR .+) ....-..-.. ..:..:..</token>
+                            <value>$1</value>
+                        </replacement>
+                        <replacement>
+                            <token>(// elements: ).*</token>
+                            <value>$1</value>
+                        </replacement>
+                    </replacements>
+                    <regex>true</regex>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>com.webguys</groupId>
 				<artifactId>string-template-maven-plugin</artifactId>

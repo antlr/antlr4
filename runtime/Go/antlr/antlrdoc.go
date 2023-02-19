@@ -27,7 +27,7 @@ Here is a general template for an ANTLR based recognizer in Go:
 	├── myproject
 	├── parser
 	│     ├── mygrammar.g4
-	│     ├── antlr-4.11.1-complete.jar
+	│     ├── antlr-4.12.0-complete.jar
 	│     ├── error_listeners.go
 	│     ├── generate.go
 	│     ├── generate.sh
@@ -47,8 +47,8 @@ And the generate.sh file will look similar to this:
 
 	#!/bin/sh
 
-	alias antlr4='java -Xmx500M -cp "./antlr4-4.11.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-	antlr4 -Dlanguage=Go -no-visitor -package tgram *.g4
+	alias antlr4='java -Xmx500M -cp "./antlr4-4.12.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+	antlr4 -Dlanguage=Go -no-visitor -package parser *.g4
 
 depending on whether you want visitors or listeners or any other ANTLR options.
 

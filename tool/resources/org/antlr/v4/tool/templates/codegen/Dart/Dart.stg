@@ -519,7 +519,7 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <%
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>) != 0)
 %>
 
 isZero ::= [
@@ -681,7 +681,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = tokenStream.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = tokenStream.LA(1)!;"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures)
   ::= <<
 class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
   <attrs:{a | <a>;}; separator="\n">

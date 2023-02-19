@@ -67,3 +67,4 @@ PredictionContext.EMPTY_RETURN_STATE = 0x7FFFFFFF;
 
 PredictionContext.globalNodeCount = 1;
 PredictionContext.id = PredictionContext.globalNodeCount;
+PredictionContext.trace_atn_sim = false;

@@ -12,6 +12,7 @@
  */
 
 export default class RecognitionException extends Error {
+
     constructor(params) {
         super(params.message);
         if (Error.captureStackTrace)

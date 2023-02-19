@@ -23,7 +23,7 @@ let lex = <lexerName>(input)
 let tokens = CommonTokenStream(lex)
 <if(parserName)>
 let parser = try <parserName>(tokens)
-<if(debug)>
+<if(showDiagnosticErrors)>
 parser.addErrorListener(DiagnosticErrorListener())
 <endif>
 parser.setBuildParseTree(true)

@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Misc;
@@ -222,19 +223,23 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		public static PredictionContext MergeArrays(
-	ArrayPredictionContext a,
-	ArrayPredictionContext b,
-	bool rootIsWildcard,
-	MergeCache mergeCache)
+            ArrayPredictionContext a,
+            ArrayPredictionContext b,
+            bool rootIsWildcard,
+            MergeCache mergeCache)
 		{
 			if (mergeCache != null)
 			{
 				PredictionContext previous = mergeCache.Get(a, b);
-				if (previous != null)
+				if (previous != null) {
+    				if ( ParserATNSimulator.trace_atn_sim ) Console.WriteLine("mergeArrays a="+a+",b="+b+" -> previous");
 					return previous;
+				}
 				previous = mergeCache.Get(b, a);
-				if (previous != null)
+				if (previous != null) {
+    				if ( ParserATNSimulator.trace_atn_sim ) Console.WriteLine("mergeArrays a="+a+",b="+b+" -> previous");
 					return previous;
+				}
 			}
 
 			// merge sorted payloads a + b => M
@@ -327,16 +332,20 @@ namespace Antlr4.Runtime.Atn
 			{
 				if (mergeCache != null)
 					mergeCache.Put(a, b, a);
+   				if ( ParserATNSimulator.trace_atn_sim ) Console.WriteLine("mergeArrays a="+a+",b="+b+" -> a");
 				return a;
 			}
 			if (M.Equals(b))
 			{
 				if (mergeCache != null)
 					mergeCache.Put(a, b, b);
+   				if ( ParserATNSimulator.trace_atn_sim ) Console.WriteLine("mergeArrays a="+a+",b="+b+" -> b");
 				return b;
 			}
 
 			CombineCommonParents(mergedParents);
+
+			if ( ParserATNSimulator.trace_atn_sim ) Console.WriteLine("mergeArrays a="+a+",b="+b+" -> "+M);
 
 			if (mergeCache != null)
 				mergeCache.Put(a, b, M);

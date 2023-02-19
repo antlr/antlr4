@@ -67,3 +67,6 @@ if (!String.fromCodePoint) {
 		}
 	}());
 }
+
+const FromCodePoint = String.prototype.fromCodePoint;
+export default FromCodePoint;

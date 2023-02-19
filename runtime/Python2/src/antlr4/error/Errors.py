@@ -79,6 +79,7 @@ class LexerNoViableAltException(RecognitionException):
         super(LexerNoViableAltException, self).__init__(message=None, recognizer=lexer, input=input, ctx=None)
         self.startIndex = startIndex
         self.deadEndConfigs = deadEndConfigs
+        self.message = ""
 
     def __unicode__(self):
         symbol = ""

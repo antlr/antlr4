@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.expectedTokens.toString(vocabulary: this.vocabulary)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "ruleInvocationStack"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<interpreter!.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
@@ -314,5 +316,8 @@ Invoke_pred(v) ::= <<this.pred(<v>)>>
 
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>!"
+ContextMember(ctx, member) ::= "<ctx>.<member>!"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>!.<local>!"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>!"

@@ -29,8 +29,11 @@ public class Test {
 		parser.setOutStream(outStream);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errorListener);
-<if(debug)>
+<if(showDiagnosticErrors)>
 		parser.addErrorListener(new DiagnosticErrorListener());
+<endif>
+<if(traceATN)>
+		ParserATNSimulator.trace_atn_sim = true;
 <endif>
 		parser.setBuildParseTree(true);
 <if(profile)>

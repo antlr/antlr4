@@ -217,7 +217,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -250,7 +250,7 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
 	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -614,7 +614,7 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <%
-<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>L) != 0
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & <bits.calculated>L) != 0)
 %>
 
 isZero ::= [
@@ -782,7 +782,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures)
 	::= <<
 @SuppressWarnings("CheckReturnValue")
 public static class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {

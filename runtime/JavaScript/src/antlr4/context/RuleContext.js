@@ -63,7 +63,7 @@ export default class RuleContext extends RuleNode {
         return Interval.INVALID_INTERVAL;
     }
 
-    getRuleContext() {
+    get ruleContext() {
         return this;
     }
 
