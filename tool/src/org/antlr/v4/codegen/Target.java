@@ -192,6 +192,10 @@ public abstract class Target {
 		return buf.toString();
 	}
 
+	public String translateThisAccessor(String code) {
+		return code;
+	}
+
 	private void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
 		if (escape) {
 			sb.append("\\");

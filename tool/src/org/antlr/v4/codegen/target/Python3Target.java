@@ -87,4 +87,9 @@ public class Python3Target extends Target {
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
+
+	@Override
+	public String translateThisAccessor(String code) {
+		return code.replaceAll("this.", "self.");
+	}
 }
