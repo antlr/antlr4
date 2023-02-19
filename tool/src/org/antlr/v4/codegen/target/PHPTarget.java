@@ -93,4 +93,9 @@ public class PHPTarget extends Target {
 	protected String escapeChar(int v) {
 		return String.format("\\u{%X}", v);
 	}
+
+	@Override
+	public String translateThisAccessor(String code) {
+		return code.replaceAll("this.", "$this->");
+	}
 }

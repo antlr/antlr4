@@ -120,7 +120,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			int firstCurly = action.indexOf('{');
 			int lastCurly = action.lastIndexOf('}');
 			if ( firstCurly>=0 && lastCurly>=0 ) {
-				action = action.substring(firstCurly+1, lastCurly); // trim {...}
+				action = factory.getGenerator().getTarget().translateThisAccessor(action.substring(firstCurly+1, lastCurly)); // trim {...}
 			}
 		}
 		return translateActionChunk(factory, rf, action, node);

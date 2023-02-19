@@ -117,4 +117,9 @@ public class CppTarget extends Target {
 		String listenerName = gen.g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
+
+	@Override
+	public String translateThisAccessor(String code) {
+		return code.replaceAll("this.", "this->");
+	}
 }
