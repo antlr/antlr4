@@ -42,7 +42,7 @@ golang.org/x/exp
 ```
 
 A complete list of releases can be found on [the release page](https://github.com/antlr/antlr4/releases). The Go 
-runtime will be tagged using standard Go tags, so release 4.11.0 will be tagged with `v4.11.0` and go get will pick
+runtime will be tagged using standard Go tags, so release 4.12.0 will be tagged with `v4.12.0` and go get will pick
 that up from the ANTLR repo.
 
 #### 3. Configuring `go generate` in your project
@@ -59,7 +59,7 @@ place the ANTLR grammar files in their own package in your project structure. He
 	├── myproject
 	├── parser
 	│     ├── mygrammar.g4
-	│     ├── antlr-4.11.0-complete.jar
+	│     ├── antlr-4.12.0-complete.jar
 	│     ├── error_listeners.go
 	│     ├── generate.go
 	│     ├── generate.sh
@@ -84,7 +84,7 @@ And the `generate.sh` file will look similar to this:
 
 	#!/bin/sh
 
-	alias antlr4='java -Xmx500M -cp "./antlr-4.11.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+	alias antlr4='java -Xmx500M -cp "./antlr-4.12.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
 	antlr4 -Dlanguage=Go -no-visitor -package parser *.g4
 ```
 

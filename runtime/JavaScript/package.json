@@ -1,6 +1,6 @@
 {
   "name": "antlr4",
-  "version": "4.12.0-beta.10",
+  "version": "4.12.0",
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "browser": "dist/antlr4.web.js",
@@ -35,7 +35,7 @@
     "source-map-support": "^0.5.21",
     "terser-webpack-plugin": "^5.3.6",
     "typescript": "^4.8.3",
-    "webpack": "^5.66.0",
+    "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0"
   },
   "scripts": {
