@@ -503,6 +503,8 @@ git push origin dev
 git push upstream dev
 ```
 
-## Update Intellij plug-in
+## Other updates 
 
-Rebuild antlr plugin with new antlr jar.
+* Rebuild antlr Intellij plug-in with new antlr jar.
+* Cut release notes in github
+* Update lab.antlr.org
