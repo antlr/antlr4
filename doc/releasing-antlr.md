@@ -306,6 +306,7 @@ As a registered NuGet user, you can then manually upload the package here: [http
 Alternately, you can publish from the cmd line. You need to get your NuGet key from [https://www.nuget.org/account#](https://www.nuget.org/account#) and then from the cmd line, you can then type:
 
 ```cmd
+cd bin/Release
 nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
 
