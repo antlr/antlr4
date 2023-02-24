@@ -18,4 +18,15 @@ target_compile_definitions(runtime
         ANTLR4CPP_STATIC
 )
 
-target_include_directories(runtime PUBLIC ${PROJECT_SOURCE_DIR}/runtime/src)
+target_include_directories(runtime
+    PUBLIC
+        ${PROJECT_SOURCE_DIR}/runtime/src
+        ${PROJECT_SOURCE_DIR}/runtime/src/atn
+        ${PROJECT_SOURCE_DIR}/runtime/src/dfa
+        ${PROJECT_SOURCE_DIR}/runtime/src/internal
+        ${PROJECT_SOURCE_DIR}/runtime/src/misc
+        ${PROJECT_SOURCE_DIR}/runtime/src/support
+        ${PROJECT_SOURCE_DIR}/runtime/src/tree
+        ${PROJECT_SOURCE_DIR}/runtime/src/tree/pattern
+        ${PROJECT_SOURCE_DIR}/runtime/src/tree/xpath
+)
