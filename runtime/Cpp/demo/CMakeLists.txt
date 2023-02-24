@@ -1,4 +1,3 @@
-# -*- mode:cmake -*-
 if(NOT UNIX)
   message(WARNING "Unsupported operating system")
 endif()
