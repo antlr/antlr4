@@ -4,6 +4,8 @@
 
 In order for CMake to find ANTLR, it must be installed on your system. This can be accomplished in one of several ways. The simplest is to [use CPM](#cpm). If you prefer not to use CPM, you can [install ANTLR manually](#installing-antlr-locally).
 
+TODO: Add section on installing the Antlr generator and getting CMake to recognize it
+
 ## CPM
 
 To start building with ANTLR 4 using CPM, create a new source directory structured like this:
