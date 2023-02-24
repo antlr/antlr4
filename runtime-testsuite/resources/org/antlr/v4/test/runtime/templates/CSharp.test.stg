@@ -78,6 +78,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
@@ -323,5 +325,8 @@ Declare_pred() ::= <<bool pred(bool v) {
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, member) ::= "<ctx>.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

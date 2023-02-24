@@ -28,8 +28,8 @@
 #include "antlr4-common.h"
 
 #define ANTLRCPP_VERSION_MAJOR 4
-#define ANTLRCPP_VERSION_MINOR 11
-#define ANTLRCPP_VERSION_PATCH 1
+#define ANTLRCPP_VERSION_MINOR 12
+#define ANTLRCPP_VERSION_PATCH 0
 
 #define ANTLRCPP_MAKE_VERSION(major, minor, patch) ((major) * 100000 + (minor) * 1000 + (patch))
 

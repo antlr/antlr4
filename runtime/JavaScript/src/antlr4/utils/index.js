@@ -2,6 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import arrayToString from "../utils/arrayToString.js";
+import arrayToString from "./arrayToString.js";
+import stringToCharArray from "./stringToCharArray.js";
 
-export default { arrayToString };
+export default { arrayToString, stringToCharArray };

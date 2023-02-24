@@ -1,0 +1,312 @@
+writeln(s) ::= <<console.log(<s> || '');>>
+write(s) ::= <<process.stdout.write(<s> || '');>>
+writeList(s) ::= <<console.log(<s; separator="+">);>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= <<console.assert(<s>);>>
+
+Cast(t,v) ::= "(<v> as <t>)"
+
+Append(a,b) ::= "<a> + <b>"
+
+AppendStr(a,b) ::= <%<Append(a,b)>%>
+
+Concat(a,b) ::= "<a><b>"
+
+AssertIsList(v) ::= <%if ( !(<v> instanceof Array) ) {throw "value is not an array";}%>
+
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= <%<n> : number = <v>;%>
+
+InitBooleanMember(n,v) ::= <%<n> : boolean = <v>;%>
+
+InitIntVar(n,v) ::= <%let <n> : number = <v>;%>
+
+IntArg(n) ::= "<n>: number"
+
+VarRef(n) ::= "<n>"
+
+GetMember(n) ::= <%this.<n>%>
+
+SetMember(n,v) ::= <%this.<n> = <v>;%>
+
+AddMember(n,v) ::= <%this.<n> += <v>;%>
+
+MemberEquals(n,v) ::= <%this.<n> === <v>%>
+
+ModMemberEquals(n,m,v) ::= <%this.<n> % <m> === <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+
+DumpDFA() ::= "this.dumpDFA();"
+
+Pass() ::= ""
+
+StringList() ::= "string[]"
+
+BuildParseTrees() ::= "this.buildParseTrees = true;"
+
+BailErrorStrategy() ::= <%this._errHandler = new BailErrorStrategy();%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(null, this)%>
+
+Column() ::= "this.column"
+
+Text() ::= "this.text"
+
+ValEquals(a,b) ::= <%<a>===<b>%>
+
+TextEquals(a) ::= <%this.text==="<a>"%>
+
+PlusText(a) ::= <%"<a>" + this.text%>
+
+InputText() ::= "this._input.getText()"
+
+LTEquals(i, v) ::= <%this._input.LT(<i>).text===<v>%>
+
+LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
+
+ImportRuleInvocationStack() ::= <<
+@parser::header {
+	import { arrayToString } from 'antlr4';
+}>>
+
+RuleInvocationStack() ::= "arrayToString(this.getRuleInvocationStack())"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+public Property() {
+    return true;
+}
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexerDef() ::= ""
+
+PositionAdjustingLexer() ::= <<
+
+resetAcceptPosition (index: number, line: number, column: number) : void {
+	this._input.seek(index);
+	this.line = line;
+	this.column = column;
+	this._interp.consume(this._input);
+}
+
+emit () : any /* should be Token */ {
+	switch(this._type) {
+	case PositionAdjustingLexer.TOKENS:
+		this.handleAcceptPositionForKeyword("tokens");
+		break;
+	case PositionAdjustingLexer.LABEL:
+		this.handleAcceptPositionForIdentifier();
+		break;
+	}
+	return super.emit();
+}
+
+handleAcceptPositionForIdentifier () : boolean {
+	var tokenText = this.text;
+	var identifierLength = 0;
+	while (identifierLength \< tokenText.length && PositionAdjustingLexer.isIdentifierChar(tokenText[identifierLength])
+	) {
+		identifierLength += 1;
+	}
+	if (this._input.index > this._tokenStartCharIndex + identifierLength) {
+		var offset = identifierLength - 1;
+		this.resetAcceptPosition(this._tokenStartCharIndex + offset,
+				this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+handleAcceptPositionForKeyword (keyword: string) : boolean {
+	if (this._input.index > this._tokenStartCharIndex + keyword.length) {
+		var offset = keyword.length - 1;
+		this.resetAcceptPosition(this._tokenStartCharIndex + offset,
+			this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+static isIdentifierChar (c: string) {
+	return c.match(/^[0-9a-zA-Z_]+$/);
+}
+
+>>
+
+BasicListener(X) ::= <<
+@parser::header {
+import { ParseTreeWalker } from 'antlr4';
+
+class LeafListener extends <X>Listener {
+	visitTerminal(node: TerminalNode) {
+		console.log(node.symbol.text);
+	}
+}
+
+}
+>>
+
+WalkListener(s) ::= <<
+var walker = new ParseTreeWalker();
+walker.walk(new LeafListener(), <s>);
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::header {
+class MyRuleNode extends ParserRuleContext {
+
+    altNum: number;
+
+    constructor(parent?: ParserRuleContext, invokingState?: number) {
+        super(parent, invokingState);
+        this.altNum = 0;
+    }
+
+    getAltNumber(): number {
+        return this.altNum;
+    }
+
+    setAltNumber(altNumber: number){
+        this.altNum = altNumber;
+    }
+};
+
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::header {
+import { arrayToString, ParseTreeWalker } from 'antlr4';
+
+class LeafListener extends <X>Listener {
+
+	exitA? = (ctx: AContext) => {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + arrayToString(ctx.INT_list());
+        } else {
+            str = ctx.ID()!.symbol.toString();
+        }
+    	console.log(str);
+    };
+
+}
+
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::header {
+import { ParseTreeWalker } from 'antlr4';
+
+class LeafListener extends <X>Listener {
+	exitA? = (ctx: AContext) => {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b_list()[0].start.text;
+        } else {
+            str = ctx.b(0).start.text;
+        }
+    	console.log(str);
+    };
+}
+
+}
+>>
+
+LRListener(X) ::= <<
+@parser::header {
+import { ParseTreeWalker } from 'antlr4';
+
+class LeafListener extends <X>Listener {
+
+	exitE? = (ctx: EContext) => {
+    	var str;
+        if(ctx.getChildCount()===3) {
+            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e_list()[0].start.text;
+        } else {
+            str = ctx.INT()!.symbol.text;
+        }
+    	console.log(str);
+    };
+}
+
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::header {
+import { ParseTreeWalker } from 'antlr4';
+
+class LeafListener extends <X>Listener {
+
+    exitCall? = (ctx: CallContext) => {
+    	var str = ctx.e().start.text + ' ' + ctx.eList();
+    	console.log(str);
+    };
+
+    exitInt? = (ctx: IntContext) => {
+        var str = ctx.INT().symbol.text;
+        console.log(str);
+    }
+
+}
+
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+	foo() {
+		var s = new SContext();
+	    var a = s.a_list();
+	    var b = s.b_list();
+    };
+>>
+
+Declare_foo() ::= "foo() {console.log('foo');}"
+
+Invoke_foo() ::= "this.foo();"
+
+Declare_pred() ::= <<
+
+	pred(v: any) {
+		console.log("eval=" + v.toString());
+		return v;
+	}
+>>
+
+Invoke_pred(v) ::= <<this.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>_list()"
+StringType() ::= "string | undefined"
+ContextMember(ctx, member) ::= "<ctx>._<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>._<member>"

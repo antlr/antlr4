@@ -12,14 +12,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class PredictionContext {
@@ -357,9 +350,15 @@ public abstract class PredictionContext {
 	{
 		if ( mergeCache!=null ) {
 			PredictionContext previous = mergeCache.get(a,b);
-			if ( previous!=null ) return previous;
+			if ( previous!=null ) {
+				if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> previous");
+				return previous;
+			}
 			previous = mergeCache.get(b,a);
-			if ( previous!=null ) return previous;
+			if ( previous!=null ) {
+				if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> previous");
+				return previous;
+			}
 		}
 
 		// merge sorted payloads a + b => M
@@ -445,16 +444,23 @@ public abstract class PredictionContext {
 		// TODO: track whether this is possible above during merge sort for speed
 		if ( M.equals(a) ) {
 			if ( mergeCache!=null ) mergeCache.put(a,b,a);
+			if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> a");
 			return a;
 		}
 		if ( M.equals(b) ) {
 			if ( mergeCache!=null ) mergeCache.put(a,b,b);
+			if ( ParserATNSimulator.trace_atn_sim ) System.out.println("mergeArrays a="+a+",b="+b+" -> b");
 			return b;
 		}
 
 		combineCommonParents(mergedParents);
 
 		if ( mergeCache!=null ) mergeCache.put(a,b,M);
+
+		if ( ParserATNSimulator.trace_atn_sim ) {
+			System.out.println("mergeArrays a="+a+",b="+b+" -> "+M);
+		}
+
 		return M;
 	}
 

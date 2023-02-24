@@ -18,10 +18,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.*;
 
 public abstract class RuntimeRunner implements AutoCloseable {
+
 	public abstract String getLanguage();
 
 	protected String getExtension() { return getLanguage().toLowerCase(); }
@@ -170,7 +172,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			return generatedState;
 		}
 
-		if (!initAntlrRuntimeIfRequired()) {
+		if (!initAntlrRuntimeIfRequired(runOptions)) {
 			// Do not repeat ANTLR runtime initialization error
 			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized"));
 		}
@@ -223,7 +225,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		outputFileST.add("lexerName", runOptions.lexerName);
 		outputFileST.add("parserName", runOptions.parserName);
 		outputFileST.add("parserStartRuleName", grammarParseRuleToRecognizerName(runOptions.startRuleName));
-		outputFileST.add("debug", runOptions.showDiagnosticErrors);
+		outputFileST.add("showDiagnosticErrors", runOptions.showDiagnosticErrors);
+		outputFileST.add("traceATN", runOptions.traceATN);
 		outputFileST.add("profile", runOptions.profile);
 		outputFileST.add("showDFA", runOptions.showDFA);
 		outputFileST.add("useListener", runOptions.useListener);
@@ -238,7 +241,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	protected void addExtraRecognizerParameters(ST template) {}
 
-	private boolean initAntlrRuntimeIfRequired() {
+	private boolean initAntlrRuntimeIfRequired(RunOptions runOptions) {
 		String language = getLanguage();
 		InitializationStatus status;
 
@@ -260,7 +263,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			if (status.isInitialized == null) {
 				Exception exception = null;
 				try {
-					initRuntime();
+					initRuntime(runOptions);
 				} catch (Exception e) {
 					exception = e;
 					e.printStackTrace();
@@ -272,7 +275,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return status.isInitialized;
 	}
 
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 	}
 
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
@@ -298,7 +301,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
 			output = result.output;
 			errors = result.errors;
-		} catch (InterruptedException | IOException e) {
+		}
+		catch (InterruptedException | IOException e) {
 			exception = e;
 		}
 		return new ExecutedState(compiledState, output, errors, exception);
@@ -309,10 +313,16 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	}
 
 	protected ProcessorResult runCommand(String[] command, String workPath, String description) throws Exception {
+		String cmd = String.join(" ", command);
 		try {
 			return Processor.run(command, workPath);
-		} catch (InterruptedException | IOException e) {
-			throw description != null ? new Exception("can't " + description, e) : e;
+		}
+		catch (InterruptedException | IOException e) {
+			String msg = "command \""+cmd+"\"\n  in "+workPath+" failed";
+			if ( description != null ) {
+				msg += ":\n  can't "+description;
+			}
+			throw new Exception(msg, e);
 		}
 	}
 
@@ -322,7 +332,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			if (dirFile.exists()) {
 				try {
 					deleteDirectory(dirFile);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			}

@@ -39,6 +39,7 @@ CSharp
 Dart
 Go
 JavaScript
+TypeScript
 PHP
 Python2
 Python3

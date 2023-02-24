@@ -17,12 +17,14 @@ runtime/Python2/src/antlr4/Recognizer.py
 runtime/Dart/pubspec.yaml
 runtime/Dart/lib/src/runtime_meta_data.dart
 runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
+runtime/Cpp/CPackConfig.cmake
 runtime/Cpp/demo/generate.cmd
 runtime/Cpp/cmake/Antlr4Package.md
 runtime/Cpp/cmake/README.md
 runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
 runtime/Cpp/cmake/FindANTLR.cmake
 runtime/Cpp/runtime/src/Version.h
+runtime/Cpp/runtime/cmake_install.cmake
 runtime/Cpp/VERSION
 runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
 runtime/CSharp/src/README.md
@@ -31,6 +33,7 @@ runtime/CSharp/src/Antlr4.csproj
 runtime/JavaScript/package-lock.json
 runtime/JavaScript/package.json
 runtime/JavaScript/src/antlr4/Recognizer.js
+runtime-testsuite/resources/org/antlr/v4/test/runtime/helpers/package_ts.json
 
 # Allow doc files to have multiple values updated
 * doc/swift-target.md

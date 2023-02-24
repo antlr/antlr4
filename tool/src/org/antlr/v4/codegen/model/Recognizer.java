@@ -59,7 +59,7 @@ public abstract class Recognizer extends OutputModelObject {
 		for (Map.Entry<String, Integer> entry : g.tokenNameToTypeMap.entrySet()) {
 			Integer ttype = entry.getValue();
 			if ( ttype>0 ) {
-				tokens.put(entry.getKey(), ttype);
+			    tokens.put(gen.getTarget().escapeIfNeeded(entry.getKey()), ttype);
 			}
 		}
 

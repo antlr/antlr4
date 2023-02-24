@@ -125,7 +125,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             self.reportFailedPredicate(recognizer, e)
         else:
             print("unknown recognition error type: " + type(e).__name__)
-            recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
+            recognizer.notifyErrorListeners(e.message, e.getOffendingToken(), e)
 
     #
     # {@inheritDoc}

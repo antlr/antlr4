@@ -34,7 +34,7 @@ class Recognizer(object):
         return major, minor
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.11.1"
+        runtimeVersion = "4.12.0"
         rvmajor, rvminor = self.extractVersion(runtimeVersion)
         tvmajor, tvminor = self.extractVersion(toolVersion)
         if rvmajor!=tvmajor or rvminor!=tvminor:

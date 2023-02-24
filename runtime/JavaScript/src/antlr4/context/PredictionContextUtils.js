@@ -88,7 +88,7 @@ export function merge(a, b, rootIsWildcard, mergeCache) {
         return mergeSingletons(a, b, rootIsWildcard, mergeCache);
     }
     // At least one of a or b is array
-    // If one is $ and rootIsWildcard, return $ as// wildcard
+    // If one is $ and rootIsWildcard, return $ as * wildcard
     if (rootIsWildcard) {
         if (a instanceof EmptyPredictionContext) {
             return a;
@@ -132,10 +132,12 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     if (mergeCache !== null) {
         let previous = mergeCache.get(a, b);
         if (previous !== null) {
+            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
             return previous;
         }
         previous = mergeCache.get(b, a);
         if (previous !== null) {
+            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
             return previous;
         }
     }
@@ -144,8 +146,8 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     let j = 0; // walks b
     let k = 0; // walks target M array
 
-    let mergedReturnStates = [];
-    let mergedParents = [];
+    let mergedReturnStates = new Array(a.returnStates.length + b.returnStates.length).fill(0);
+    let mergedParents = new Array(a.returnStates.length + b.returnStates.length).fill(null);
     // walk and merge to yield mergedParents, mergedReturnStates
     while (i < a.returnStates.length && j < b.returnStates.length) {
         const a_parent = a.parents[i];
@@ -211,16 +213,18 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 
     // if we created same array as a or b, return that instead
     // TODO: track whether this is possible above during merge sort for speed
-    if (M === a) {
+    if (M.equals(a)) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, a);
         }
+        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> a");
         return a;
     }
-    if (M === b) {
+    if (M.equals(b)) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, b);
         }
+        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> b");
         return b;
     }
     combineCommonParents(mergedParents);
@@ -228,6 +232,9 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     if (mergeCache !== null) {
         mergeCache.set(a, b, M);
     }
+
+    if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> "+M);
+
     return M;
 }
 

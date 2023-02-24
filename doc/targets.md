@@ -6,6 +6,7 @@ This page lists the available and upcoming ANTLR runtimes. Please note that you 
 * [C#](csharp-target.md)
 * [Python](python-target.md) (2 and 3)
 * [JavaScript](javascript-target.md)
+* [TypeScript](typescript-target.md)
 * [Go](go-target.md)
 * [C++](cpp-target.md)
 * [Swift](swift-target.md)

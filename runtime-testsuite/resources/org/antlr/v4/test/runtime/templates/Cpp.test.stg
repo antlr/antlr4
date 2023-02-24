@@ -49,6 +49,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "getExpectedTokens().toString(getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
@@ -274,5 +276,8 @@ bool pred(bool v) {
 Invoke_pred(v) ::= <<pred(<v>)>>
 
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>-><rule>()"
 StringType() ::= "std::string"
-ContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
+ContextMember(ctx, member) ::= "<ctx>-><member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>-><subctx>-><local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
