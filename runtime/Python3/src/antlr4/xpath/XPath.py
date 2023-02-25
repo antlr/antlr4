@@ -137,8 +137,8 @@ class XPath(object):
 
             ttype = Token.INVALID_TYPE
             if wordToken.type == XPathLexer.TOKEN_REF:
-                if word in tsource.ruleNames:
-                    ttype = tsource.ruleNames.index(word) + 1
+                if word in tsource.symbolicNames:
+                    ttype = tsource.symbolicNames.index(word)
             else:
                 if word in tsource.literalNames:
                     ttype = tsource.literalNames.index(word)
