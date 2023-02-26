@@ -18,3 +18,4 @@ export * from './tree';
 export * from './state';
 export * from './error';
 export * from './utils';
+export * from './TokenStreamRewriter';

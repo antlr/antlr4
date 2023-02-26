@@ -83,6 +83,10 @@ export default class BufferedTokenStream extends TokenStream {
 		this.index = this.adjustSeekIndex(index);
 	}
 
+	get size() {
+		return this.tokens.length;
+	}
+
 	get(index) {
 		this.lazyInit();
 		return this.tokens[index];
@@ -148,7 +152,7 @@ export default class BufferedTokenStream extends TokenStream {
 		return n;
 	}
 
-// Get all tokens from start..stop inclusively///
+	// Get all tokens from start..stop inclusively///
 	getTokens(start, stop, types) {
 		if (types === undefined) {
 			types = null;
@@ -230,7 +234,7 @@ export default class BufferedTokenStream extends TokenStream {
 		this.index = this.adjustSeekIndex(0);
 	}
 
-// Reset this token stream by setting its token source.///
+	// Reset this token stream by setting its token source.///
 	setTokenSource(tokenSource) {
 		this.tokenSource = tokenSource;
 		this.tokens = [];
@@ -278,7 +282,7 @@ export default class BufferedTokenStream extends TokenStream {
 	 * EOF. If channel is -1, find any non default channel token.
 	 */
 	getHiddenTokensToRight(tokenIndex,
-			channel) {
+		channel) {
 		if (channel === undefined) {
 			channel = -1;
 		}
@@ -299,7 +303,7 @@ export default class BufferedTokenStream extends TokenStream {
 	 * If channel is -1, find any non default channel token.
 	 */
 	getHiddenTokensToLeft(tokenIndex,
-			channel) {
+		channel) {
 		if (channel === undefined) {
 			channel = -1;
 		}

@@ -1,0 +1,10 @@
+{
+    "all": true,
+    "include": [
+        "src/antlr4/**/*.js"
+    ],
+    "reporter": [
+        "text",
+        "lcov"
+    ]
+}
