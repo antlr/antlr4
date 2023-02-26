@@ -14,7 +14,8 @@ parser: "@babel/eslint-parser"
 parserOptions:
   sourceType: module
   project: ['./tsconfig.json']
+  ecmaVersion: 2022
 rules:
-  no-unused-vars: ["error", {vars: "all", args: "none"}]
-  no-prototype-builtins: [ "off" ]
+  no-unused-vars: ["error", { vars: "all", args: "none" }]
+  no-prototype-builtins: ["off"]
   no-fallthrough: ["error", { "commentPattern": "no-break" }]
