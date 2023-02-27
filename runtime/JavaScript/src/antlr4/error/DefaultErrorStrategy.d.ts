@@ -16,4 +16,11 @@ export declare class DefaultErrorStrategy implements ErrorStrategy {
 
     sync(recognizer: Parser): void;
 
+    constructor();
+
+    inErrorRecoveryMode(recognizer: Parser): void;
+
+    beginErrorCondition(recognizer: Parser): void;
+
+    getMissingSymbol(recognizer: Parser): Token;
 }

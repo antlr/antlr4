@@ -1,6 +1,6 @@
 import {TokenStream} from "./TokenStream";
 import {Recognizer} from "./Recognizer";
-import {ErrorStrategy} from "./error";
+import {ErrorStrategy, RecognitionException} from "./error";
 import {IntervalSet} from "./misc";
 import {ParserATNSimulator} from "./atn";
 import {Token} from "./Token";
@@ -10,6 +10,9 @@ import {Printer} from "./utils";
 export declare class Parser extends Recognizer<Token> {
 
     static EOF: number;
+    static literalNames: (string | null)[];
+    static symbolicNames: (string | null)[];
+    static ruleNames: string[];
 
     _input: TokenStream;
     _ctx: ParserRuleContext;
@@ -36,4 +39,8 @@ export declare class Parser extends Recognizer<Token> {
     dumpDFA(): void;
     getExpectedTokens(): IntervalSet;
     getTokenStream(): TokenStream;
+    reset(): void;
+    setTokenStream(input: TokenStream): void;
+    notifyErrorListeners(msg: string, offendingToken: Token, err: RecognitionException | undefined): void;
+    getCurrentToken(): Token;
 }

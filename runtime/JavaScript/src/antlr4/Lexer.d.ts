@@ -6,6 +6,9 @@ import {Token} from "./Token";
 export declare class Lexer extends Recognizer<number> {
 
     static DEFAULT_MODE: number;
+    static literalNames: (string | null)[];
+    static symbolicNames: (string | null)[];
+    static ruleNames: string[];
 
     _input: CharStream;
     _interp: LexerATNSimulator;
@@ -28,4 +31,5 @@ export declare class Lexer extends Recognizer<number> {
     emitToken(token: Token): void;
     emit(): Token;
     emitEOF(): Token;
+    getAllTokens(): Token[];
 }

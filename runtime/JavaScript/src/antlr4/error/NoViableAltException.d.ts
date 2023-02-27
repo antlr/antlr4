@@ -1,5 +1,6 @@
 import {ATNConfigSet} from "../atn";
 import {Recognizer} from "../Recognizer";
+import { Token } from "../Token";
 import {RecognitionException} from "./RecognitionException";
 
 export declare class NoViableAltException extends RecognitionException {
@@ -8,4 +9,5 @@ export declare class NoViableAltException extends RecognitionException {
 
     constructor(recognizer: Recognizer<any>);
 
+    startToken: Token;
 }
