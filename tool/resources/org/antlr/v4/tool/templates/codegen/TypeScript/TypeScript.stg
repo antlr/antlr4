@@ -873,8 +873,8 @@ export default class <lexer.name> extends <superClass; null="Lexer"> {
 	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
 
 	public static readonly channelNames: string[] = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];
-	public static readonly literalNames: string[] = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-	public static readonly symbolicNames: string[] = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+	public static readonly literalNames: (string | null)[] = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+	public static readonly symbolicNames: (string | null)[] = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 	public static readonly modeNames: string[] = [ <lexer.modes:{m| "<m>",}; separator=" ", wrap, anchor> ];
 
 	public static readonly ruleNames: string[] = [
