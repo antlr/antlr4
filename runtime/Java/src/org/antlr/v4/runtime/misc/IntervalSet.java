@@ -662,16 +662,19 @@ public class IntervalSet implements IntSet {
 				right = middle - 1;
 			} else if (interval.b < el) {
 				left = middle + 1;
-			} else if (interval.length() == 1) { // el in [a..b]
-				intervals.remove(middle);
-			} else if (el == interval.a) {
-				interval.a += 1;
-			} else if (el == interval.b) {
-				interval.b -= 1;
-			} else {
-				int oldB = interval.b;
-				interval.b = el - 1;
-				add(el + 1, oldB);
+			} else { // el in [a..b]
+				if (interval.length() == 1) {
+					intervals.remove(middle);
+				} else if (el == interval.a) {
+					interval.a += 1;
+				} else if (el == interval.b) {
+					interval.b -= 1;
+				} else {
+					int oldB = interval.b;
+					interval.b = el - 1;
+					add(el + 1, oldB);
+				}
+				return;
 			}
 		}
     }
