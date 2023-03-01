@@ -14,6 +14,6 @@ export interface ExceptionParams {
 
 export declare class RecognitionException extends Error {
     ctx: RuleContext;
-    offendingToken: Token;
+    offendingToken: Token | null;
     constructor(params: ExceptionParams);
 }

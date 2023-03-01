@@ -11,7 +11,6 @@ export declare class ParserRuleContext extends RuleContext {
     parentCtx: ParserRuleContext | undefined;
     exception?: RecognitionException;
     parser?: Parser;
-    ruleIndex: number;
 
     constructor(parent?: ParserRuleContext, invokingStateNumber?: number);
     copyFrom(ctx: ParserRuleContext): void;

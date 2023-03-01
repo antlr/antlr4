@@ -10,9 +10,6 @@ import {Printer} from "./utils";
 export declare class Parser extends Recognizer<Token> {
 
     static EOF: number;
-    static literalNames: (string | null)[];
-    static symbolicNames: (string | null)[];
-    static ruleNames: string[];
 
     _input: TokenStream;
     _ctx: ParserRuleContext;
