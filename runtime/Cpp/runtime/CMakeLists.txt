@@ -39,16 +39,18 @@ if (ANTLR_BUILD_STATIC)
   add_library(antlr4_static STATIC ${libantlrcpp_SRC})
 endif()
 
-# Make sure to link against threads (pthreads) library in order to be able to
-# make use of std::call_once in the code without producing runtime errors
-# (see also https://github.com/antlr/antlr4/issues/3708 and/or https://stackoverflow.com/q/51584960).
-find_package(Threads REQUIRED)
+if (CMAKE_HOST_UNIX)
+  # Make sure to link against threads (pthreads) library in order to be able to
+  # make use of std::call_once in the code without producing runtime errors
+  # (see also https://github.com/antlr/antlr4/issues/3708 and/or https://stackoverflow.com/q/51584960).
+  find_package(Threads REQUIRED)
 
-if (TARGET antlr4_shared)
-  target_link_libraries(antlr4_shared Threads::Threads)
-endif()
-if (TARGET antlr4_static)
-  target_link_libraries(antlr4_static Threads::Threads)
+  if (TARGET antlr4_shared)
+    target_link_libraries(antlr4_shared Threads::Threads)
+  endif()
+  if (TARGET antlr4_static)
+    target_link_libraries(antlr4_static Threads::Threads)
+  endif()
 endif()
 
 IF(TRACE_ATN)
