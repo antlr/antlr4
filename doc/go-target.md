@@ -1,5 +1,18 @@
 # ANTLR4 Language Target, Runtime for Go
 
+### Removal of non v4 module
+
+Prior to the  release of the v4 tagged runtime, the source code for the Go runtime module existed at the root of 
+`runtime/Go/antlr`, which is the pre-v4 version of the code, and under `runtime/Go/antlr/v4`. If your project
+was not using modules, you could merely sync to the latest hash in the master branch and use the code,
+
+As of now, you can still use the code without modules, but you must use the code under the `/v4` directory and
+not the code at the runtime root. This is for historic reasons as the code was originally written before modules were a
+thing and the go runtime source was (and still is) part of the monorepo that is `antlr/antlr4`.
+
+We strongly advise you to use modules, and to use the /v4 version of the source code, though it is not required. See
+below for more information.
+
 ### First steps
 
 #### 1. Install ANTLR4
