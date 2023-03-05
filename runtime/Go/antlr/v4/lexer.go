@@ -118,7 +118,7 @@ const (
 	LexerMaxCharValue        = 0x10FFFF
 )
 
-func (b *BaseLexer) reset() {
+func (b *BaseLexer) Reset() {
 	// wack Lexer state variables
 	if b.input != nil {
 		b.input.Seek(0) // rewind the input
@@ -280,7 +280,7 @@ func (b *BaseLexer) inputStream() CharStream {
 func (b *BaseLexer) SetInputStream(input CharStream) {
 	b.input = nil
 	b.tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b.input}
-	b.reset()
+	b.Reset()
 	b.input = input
 	b.tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b.input}
 }

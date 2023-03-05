@@ -250,4 +250,62 @@ func (p *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
 	listener.ExitEveryRule(ctx)
 }
 
+//goland:noinspection GoUnusedGlobalVariable
 var ParseTreeWalkerDefault = NewParseTreeWalker()
+
+type IterativeParseTreeWalker struct {
+	*ParseTreeWalker
+}
+
+func NewIterativeParseTreeWalker() *IterativeParseTreeWalker {
+	return new(IterativeParseTreeWalker)
+}
+
+func (i *IterativeParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
+	var stack []Tree
+	var indexStack []int
+	currentNode := t
+	currentIndex := 0
+
+	for currentNode != nil {
+		// pre-order visit
+		switch tt := currentNode.(type) {
+		case ErrorNode:
+			listener.VisitErrorNode(tt)
+		case TerminalNode:
+			listener.VisitTerminal(tt)
+		default:
+			i.EnterRule(listener, currentNode.(RuleNode))
+		}
+		// Move down to first child, if exists
+		if currentNode.GetChildCount() > 0 {
+			stack = append(stack, currentNode)
+			indexStack = append(indexStack, currentIndex)
+			currentIndex = 0
+			currentNode = currentNode.GetChild(0)
+			continue
+		}
+
+		for {
+			// post-order visit
+			if ruleNode, ok := currentNode.(RuleNode); ok {
+				i.ExitRule(listener, ruleNode)
+			}
+			// No parent, so no siblings
+			if len(stack) == 0 {
+				currentNode = nil
+				currentIndex = 0
+				break
+			}
+			// Move to next sibling if possible
+			currentIndex++
+			if stack[len(stack)-1].GetChildCount() > currentIndex {
+				currentNode = stack[len(stack)-1].GetChild(currentIndex)
+				break
+			}
+			// No next, sibling, so move up
+			currentNode, stack = stack[len(stack)-1], stack[:len(stack)-1]
+			currentIndex, indexStack = indexStack[len(indexStack)-1], indexStack[:len(indexStack)-1]
+		}
+	}
+}
