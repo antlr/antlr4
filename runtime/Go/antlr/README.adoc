@@ -1,0 +1,4 @@
+= Migration to v4 from non tagged code
+
+Please note that the source code that was previously located here is now located in the `/v4` subdirectory to accommodate
+go modules. If you are not using modules, then use the code in the `/v4` subdirectory from here on out.
