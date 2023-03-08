@@ -48,19 +48,14 @@ func NewConsoleErrorListener() *ConsoleErrorListener {
 	return new(ConsoleErrorListener)
 }
 
-// Provides a default instance of {@link ConsoleErrorListener}.
+// ConsoleErrorListenerINSTANCE provides a default instance of {@link ConsoleErrorListener}.
 var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 
-// {@inheritDoc}
+// SyntaxError prints messages to System.err containing the
+// values of line, charPositionInLine, and msg using
+// the following format:
 //
-// <p>
-// This implementation prints messages to {@link System//err} containing the
-// values of {@code line}, {@code charPositionInLine}, and {@code msg} using
-// the following format.</p>
-//
-// <pre>
-// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
-// </pre>
+//	line line:charPositionInLine msg
 func (c *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
 	fmt.Fprintln(os.Stderr, "line "+strconv.Itoa(line)+":"+strconv.Itoa(column)+" "+msg)
 }

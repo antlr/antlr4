@@ -44,6 +44,8 @@ type CommonTokenStream struct {
 	tokens []Token
 }
 
+// NewCommonTokenStream creates a new CommonTokenStream instance using the supplied lexer to produce
+// tokens and will pull tokens from the given lexer channel.
 func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	return &CommonTokenStream{
 		channel:     channel,
@@ -53,6 +55,7 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	}
 }
 
+// GetAllTokens returns all tokens currently pulled from the token source.
 func (c *CommonTokenStream) GetAllTokens() []Token {
 	return c.tokens
 }
