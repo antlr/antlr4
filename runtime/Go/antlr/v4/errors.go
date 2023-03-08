@@ -43,15 +43,17 @@ func NewBaseRecognitionException(message string, recognizer Recognizer, input In
 	t.recognizer = recognizer
 	t.input = input
 	t.ctx = ctx
-	// The current {@link Token} when an error occurred. Since not all streams
+
+	// The current Token when an error occurred. Since not all streams
 	// support accessing symbols by index, we have to track the {@link Token}
 	// instance itself.
+	//
 	t.offendingToken = nil
+
 	// Get the ATN state number the parser was in at the time the error
-	// occurred. For {@link NoViableAltException} and
-	// {@link LexerNoViableAltException} exceptions, this is the
-	// {@link DecisionState} number. For others, it is the state whose outgoing
-	// edge we couldn't Match.
+	// occurred. For NoViableAltException and LexerNoViableAltException exceptions, this is the
+	// DecisionState number. For others, it is the state whose outgoing edge we couldn't Match.
+	//
 	t.offendingState = -1
 	if t.recognizer != nil {
 		t.offendingState = t.recognizer.GetState()
@@ -131,10 +133,12 @@ type NoViableAltException struct {
 	deadEndConfigs ATNConfigSet
 }
 
-// Indicates that the parser could not decide which of two or more paths
+// NewNoViableAltException creates an exception indicating that the parser could not decide which of two or more paths
 // to take based upon the remaining input. It tracks the starting token
 // of the offending input and also knows where the parser was
-// in the various paths when the error. Reported by ReportNoViableAlternative()
+// in the various paths when the error.
+//
+// Reported by [ReportNoViableAlternative]
 func NewNoViableAltException(recognizer Parser, input TokenStream, startToken Token, offendingToken Token, deadEndConfigs ATNConfigSet, ctx ParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
@@ -173,7 +177,7 @@ type InputMisMatchException struct {
 	*BaseRecognitionException
 }
 
-// This signifies any kind of mismatched input exceptions such as
+// NewInputMisMatchException creates an exception that signifies any kind of mismatched input exceptions such as
 // when the current input does not Match the expected token.
 func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 
@@ -186,11 +190,10 @@ func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 
 }
 
-// A semantic predicate failed during validation. Validation of predicates
+// FailedPredicateException indicates that a semantic predicate failed during validation. Validation of predicates
 // occurs when normally parsing the alternative just like Matching a token.
 // Disambiguating predicate evaluation occurs when we test a predicate during
 // prediction.
-
 type FailedPredicateException struct {
 	*BaseRecognitionException
 
@@ -199,6 +202,7 @@ type FailedPredicateException struct {
 	predicate      string
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewFailedPredicateException(recognizer Parser, predicate string, message string) *FailedPredicateException {
 
 	f := new(FailedPredicateException)

@@ -8,7 +8,7 @@ func testBitSet(t *testing.T, bs *BitSet, str string, length int, contains []int
 		t.Errorf("%+v.String() = %q, want %q", bs, got, want)
 	}
 	if got, want := bs.length(), length; got != want {
-		t.Errorf("%+v.length() = %q, want %q", bs, got, want)
+		t.Errorf("%+v.Length() = %q, want %q", bs, got, want)
 	}
 	for i := 0; i < len(bs.data)*bitsPerWord; i++ {
 		var want bool

@@ -59,10 +59,10 @@ func (b *BaseLexerAction) Equals(other LexerAction) bool {
 	return b == other
 }
 
-// Implements the {@code Skip} lexer action by calling {@link Lexer//Skip}.
+// LexerSkipAction implements the [BaseLexerAction.Skip] lexer action by calling [Lexer.Skip].
 //
-// <p>The {@code Skip} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// The Skip command does not have any parameters, so this action is
+// implemented as a singleton instance exposed by the [LexerSkipActionINSTANCE].
 type LexerSkipAction struct {
 	*BaseLexerAction
 }
@@ -73,13 +73,14 @@ func NewLexerSkipAction() *LexerSkipAction {
 	return la
 }
 
-// Provides a singleton instance of l parameterless lexer action.
+// LexerSkipActionINSTANCE provides a singleton instance of this parameterless lexer action.
 var LexerSkipActionINSTANCE = NewLexerSkipAction()
 
 func (l *LexerSkipAction) execute(lexer Lexer) {
 	lexer.Skip()
 }
 
+// String returns a string representation of the current [LexerSkipAction].
 func (l *LexerSkipAction) String() string {
 	return "skip"
 }
@@ -125,11 +126,10 @@ func (l *LexerTypeAction) String() string {
 	return "actionType(" + strconv.Itoa(l.thetype) + ")"
 }
 
-// Implements the {@code pushMode} lexer action by calling
-// {@link Lexer//pushMode} with the assigned mode.
+// LexerPushModeAction implements the pushMode lexer action by calling
+// [Lexer.pushMode] with the assigned mode.
 type LexerPushModeAction struct {
 	*BaseLexerAction
-
 	mode int
 }
 
@@ -169,10 +169,10 @@ func (l *LexerPushModeAction) String() string {
 	return "pushMode(" + strconv.Itoa(l.mode) + ")"
 }
 
-// Implements the {@code popMode} lexer action by calling {@link Lexer//popMode}.
+// LexerPopModeAction implements the popMode lexer action by calling [Lexer.popMode].
 //
-// <p>The {@code popMode} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// The popMode command does not have any parameters, so this action is
+// implemented as a singleton instance exposed by [LexerPopModeActionINSTANCE]
 type LexerPopModeAction struct {
 	*BaseLexerAction
 }
@@ -224,11 +224,10 @@ func (l *LexerMoreAction) String() string {
 	return "more"
 }
 
-// Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
+// LexerModeAction implements the mode lexer action by calling [Lexer.mode] with
 // the assigned mode.
 type LexerModeAction struct {
 	*BaseLexerAction
-
 	mode int
 }
 
@@ -322,16 +321,19 @@ func (l *LexerCustomAction) Equals(other LexerAction) bool {
 	}
 }
 
-// Implements the {@code channel} lexer action by calling
-// {@link Lexer//setChannel} with the assigned channel.
-// Constructs a New{@code channel} action with the specified channel value.
-// @param channel The channel value to pass to {@link Lexer//setChannel}.
+// LexerChannelAction implements the channel lexer action by calling
+// [Lexer.setChannel] with the assigned channel.
+//
+// Constructs a new channel action with the specified channel value.
 type LexerChannelAction struct {
 	*BaseLexerAction
-
 	channel int
 }
 
+// NewLexerChannelAction creates a channel lexer action by calling
+// [Lexer.setChannel] with the assigned channel.
+//
+// Constructs a new channel action with the specified channel value.
 func NewLexerChannelAction(channel int) *LexerChannelAction {
 	l := new(LexerChannelAction)
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeChannel)
@@ -375,25 +377,22 @@ func (l *LexerChannelAction) String() string {
 // lexer actions, see {@link LexerActionExecutor//append} and
 // {@link LexerActionExecutor//fixOffsetBeforeMatch}.</p>
 
-// Constructs a Newindexed custom action by associating a character offset
-// with a {@link LexerAction}.
-//
-// <p>Note: This class is only required for lexer actions for which
-// {@link LexerAction//isPositionDependent} returns {@code true}.</p>
-//
-// @param offset The offset into the input {@link CharStream}, relative to
-// the token start index, at which the specified lexer action should be
-// executed.
-// @param action The lexer action to execute at a particular offset in the
-// input {@link CharStream}.
 type LexerIndexedCustomAction struct {
 	*BaseLexerAction
-
 	offset              int
 	lexerAction         LexerAction
 	isPositionDependent bool
 }
 
+// NewLexerIndexedCustomAction constructs a new indexed custom action by associating a character offset
+// with a [LexerAction].
+//
+// Note: This class is only required for lexer actions for which
+// [LexerAction.isPositionDependent] returns true}
+//
+// The offset points into the input [CharStream], relative to
+// the token start index, at which the specified lexerAction should be
+// executed.
 func NewLexerIndexedCustomAction(offset int, lexerAction LexerAction) *LexerIndexedCustomAction {
 
 	l := new(LexerIndexedCustomAction)

@@ -1546,7 +1546,10 @@ func (p *ParserATNSimulator) ReportContextSensitivity(dfa *DFA, prediction int, 
 	}
 }
 
-// If context sensitive parsing, we know it's ambiguity not conflict//
+// ReportAmbiguity reports and ambiguity in the parse, which shows that the parser will explore a different route.
+//
+// If context-sensitive parsing, we know it's an ambiguity not a conflict or error, but we can report it to the developer
+// so that they can see that this is happening and can take action if they want to.
 func (p *ParserATNSimulator) ReportAmbiguity(dfa *DFA, D *DFAState, startIndex, stopIndex int,
 	exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
 	if ParserATNSimulatorDebug || ParserATNSimulatorRetryDebug {

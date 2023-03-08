@@ -14,7 +14,7 @@ type Interval struct {
 	Stop  int
 }
 
-/* stop is not included! */
+// NewInterval creates a new interval with the given start and stop values.
 func NewInterval(start, stop int) *Interval {
 	i := new(Interval)
 
@@ -23,10 +23,12 @@ func NewInterval(start, stop int) *Interval {
 	return i
 }
 
+// Contains returns true if the given item is contained within the interval.
 func (i *Interval) Contains(item int) bool {
 	return item >= i.Start && item < i.Stop
 }
 
+// String generates a string representation of the interval.
 func (i *Interval) String() string {
 	if i.Start == i.Stop-1 {
 		return strconv.Itoa(i.Start)
@@ -35,15 +37,18 @@ func (i *Interval) String() string {
 	return strconv.Itoa(i.Start) + ".." + strconv.Itoa(i.Stop-1)
 }
 
-func (i *Interval) length() int {
+// Length returns the length of the interval.
+func (i *Interval) Length() int {
 	return i.Stop - i.Start
 }
 
+// IntervalSet represents a collection of [Intervals], which may be read-only.
 type IntervalSet struct {
 	intervals []*Interval
 	readOnly  bool
 }
 
+// NewIntervalSet creates a new empty, writable, interval set.
 func NewIntervalSet() *IntervalSet {
 
 	i := new(IntervalSet)
@@ -142,7 +147,7 @@ func (i *IntervalSet) length() int {
 	len := 0
 
 	for _, v := range i.intervals {
-		len += v.length()
+		len += v.Length()
 	}
 
 	return len

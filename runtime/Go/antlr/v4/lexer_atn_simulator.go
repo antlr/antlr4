@@ -138,7 +138,7 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		fmt.Println("start state closure=" + ds0.configs.String())
 	}
 	if ds0.isAcceptState {
-		// allow zero-length tokens
+		// allow zero-Length tokens
 		l.captureSimState(l.prevAccept, input, ds0)
 	}
 	t := input.LA(1)
@@ -620,7 +620,7 @@ func (l *LexerATNSimulator) getDFA(mode int) *DFA {
 	return l.decisionToDFA[mode]
 }
 
-// Get the text Matched so far for the current token.
+// GetText returns the text [Match]ed so far for the current token.
 func (l *LexerATNSimulator) GetText(input CharStream) string {
 	// index is first lookahead char, don't include.
 	return input.GetTextFromInterval(NewInterval(l.startIndex, input.Index()-1))

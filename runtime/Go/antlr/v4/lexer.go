@@ -69,7 +69,7 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 	// create a single token. NextToken will return l object after
 	// Matching lexer rule(s). If you subclass to allow multiple token
 	// emissions, then set l to the last token to be Matched or
-	// something nonnil so that the auto token emit mechanism will not
+	// something non nil so that the auto token emit mechanism will not
 	// emit another token.
 	lexer.token = nil
 
@@ -176,7 +176,7 @@ func (b *BaseLexer) safeMatch() (ret int) {
 	return b.Interpreter.Match(b.input, b.mode)
 }
 
-// Return a token from l source i.e., Match a token on the char stream.
+// NextToken returns a token from the lexer input source i.e., Match a token on the source char stream.
 func (b *BaseLexer) NextToken() Token {
 	if b.input == nil {
 		panic("NextToken requires a non-nil input stream.")
@@ -234,12 +234,11 @@ func (b *BaseLexer) NextToken() Token {
 	}
 }
 
-// Instruct the lexer to Skip creating a token for current lexer rule
-// and look for another token. NextToken() knows to keep looking when
-// a lexer rule finishes with token set to SKIPTOKEN. Recall that
+// Skip instructs the lexer to Skip creating a token for current lexer rule
+// and look for another token. [NextToken] knows to keep looking when
+// a lexer rule finishes with token set to [SKIPTOKEN]. Recall that
 // if token==nil at end of any token rule, it creates one for you
 // and emits it.
-// /
 func (b *BaseLexer) Skip() {
 	b.thetype = LexerSkip
 }
@@ -248,10 +247,14 @@ func (b *BaseLexer) More() {
 	b.thetype = LexerMore
 }
 
+// SetMode changes the lexer to a new mode. The lexer will use this mode from hereon in and the rules for that mode
+// will be in force.
 func (b *BaseLexer) SetMode(m int) {
 	b.mode = m
 }
 
+// PushMode saves the current lexer mode so that it can be restored later. See [PopMode], then sets the
+// current lexer mode to the supplied mode m.
 func (b *BaseLexer) PushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
@@ -260,6 +263,8 @@ func (b *BaseLexer) PushMode(m int) {
 	b.mode = m
 }
 
+// PopMode restores the lexer mode saved by a call to [PushMode]. It is a panic error if there is no saved mode to
+// return to.
 func (b *BaseLexer) PopMode() int {
 	if len(b.modeStack) == 0 {
 		panic("Empty Stack")
@@ -289,20 +294,19 @@ func (b *BaseLexer) GetTokenSourceCharStreamPair() *TokenSourceCharStreamPair {
 	return b.tokenFactorySourcePair
 }
 
-// By default does not support multiple emits per NextToken invocation
-// for efficiency reasons. Subclass and override l method, NextToken,
-// and GetToken (to push tokens into a list and pull from that list
-// rather than a single variable as l implementation does).
-// /
+// EmitToken by default does not support multiple emits per [NextToken] invocation
+// for efficiency reasons. Subclass and override this func, [NextToken],
+// and [GetToken] (to push tokens into a list and pull from that list
+// rather than a single variable as this implementation does).
 func (b *BaseLexer) EmitToken(token Token) {
 	b.token = token
 }
 
-// The standard method called to automatically emit a token at the
+// Emit is the standard method called to automatically emit a token at the
 // outermost lexical rule. The token object should point into the
 // char buffer start..stop. If there is a text override in 'text',
-// use that to set the token's text. Override l method to emit
-// custom Token objects or provide a Newfactory.
+// use that to set the token's text. Override this method to emit
+// custom [Token] objects or provide a new factory.
 // /
 func (b *BaseLexer) Emit() Token {
 	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
@@ -310,6 +314,7 @@ func (b *BaseLexer) Emit() Token {
 	return t
 }
 
+// EmitEOF emits an EOF token. By default, this is the last token emitted
 func (b *BaseLexer) EmitEOF() Token {
 	cpos := b.GetCharPositionInLine()
 	lpos := b.GetLine()
@@ -318,6 +323,7 @@ func (b *BaseLexer) EmitEOF() Token {
 	return eof
 }
 
+// GetCharPositionInLine returns the current position in the current line as far as the lexer is concerned.
 func (b *BaseLexer) GetCharPositionInLine() int {
 	return b.Interpreter.GetCharPositionInLine()
 }
@@ -334,13 +340,12 @@ func (b *BaseLexer) SetType(t int) {
 	b.thetype = t
 }
 
-// What is the index of the current character of lookahead?///
+// GetCharIndex returns the index of the current character of lookahead
 func (b *BaseLexer) GetCharIndex() int {
 	return b.input.Index()
 }
 
-// Return the text Matched so far for the current token or any text override.
-// Set the complete text of l token it wipes any previous changes to the text.
+// GetText returns the text Matched so far for the current token or any text override.
 func (b *BaseLexer) GetText() string {
 	if b.text != "" {
 		return b.text
@@ -349,17 +354,20 @@ func (b *BaseLexer) GetText() string {
 	return b.Interpreter.GetText(b.input)
 }
 
+// SetText sets the complete text of this token; it wipes any previous changes to the text.
 func (b *BaseLexer) SetText(text string) {
 	b.text = text
 }
 
+// GetATN returns the ATN used by the lexer.
 func (b *BaseLexer) GetATN() *ATN {
 	return b.Interpreter.ATN()
 }
 
-// Return a list of all Token objects in input char stream.
-// Forces load of all tokens. Does not include EOF token.
-// /
+// GetAllTokens returns a list of all [Token] objects in input char stream.
+// Forces a load of all tokens that can be made from the input char stream.
+//
+// Does not include EOF token.
 func (b *BaseLexer) GetAllTokens() []Token {
 	vl := b.Virt
 	tokens := make([]Token, 0)
@@ -398,11 +406,13 @@ func (b *BaseLexer) getCharErrorDisplay(c rune) string {
 	return "'" + b.getErrorDisplayForChar(c) + "'"
 }
 
-// Lexers can normally Match any char in it's vocabulary after Matching
-// a token, so do the easy thing and just kill a character and hope
+// Recover can normally Match any char in its vocabulary after Matching
+// a token, so here we do the easy thing and just kill a character and hope
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
-// /
+//
+// In general, lexers should not need to recover and should have rules that cover any eventuality, such as
+// a character that makes no sense to the recognizer.
 func (b *BaseLexer) Recover(re RecognitionException) {
 	if b.input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
