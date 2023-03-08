@@ -14,25 +14,40 @@ import (
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
+
+	// Equals compares this ATNConfig to another for equality
 	Equals(o Collectable[ATNConfig]) bool
+
+	// Hash returns the hash code for this ATNConfig for use in maps and comparisons
 	Hash() int
 
+	// GetState returns the ATN state associated with this configuration
 	GetState() ATNState
+	// GetAlt returns the alternative associated with this configuration
 	GetAlt() int
+	// GetSemanticContext returns the semantic context associated with this configuration
 	GetSemanticContext() SemanticContext
 
+	// GetContext returns the rule invocation stack associated with this configuration
 	GetContext() PredictionContext
+	// SetContext sets the rule invocation stack associated with this configuration
 	SetContext(PredictionContext)
 
+	// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
 	GetReachesIntoOuterContext() int
+	// SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
 	SetReachesIntoOuterContext(int)
 
+	// String returns a string representation of the configuration
 	String() string
 
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 }
 
+// BaseATNConfig is a base implementation of ATNConfig. Thi si s done to emulate Java's ability to have multiple
+// constructors for a single class. This is not idiomatic Go, but it works for now.
+// TODO: this isn't the way to do this I think, but it will take time to rework - JI Also, getters and setters are not Go. Might be better to just access the fields, though the compiler will probably eliminate the calls
 type BaseATNConfig struct {
 	precedenceFilterSuppressed bool
 	state                      ATNState
@@ -42,7 +57,7 @@ type BaseATNConfig struct {
 	reachesIntoOuterContext    int
 }
 
-func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup
+func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup - maybe delete this
 	return &BaseATNConfig{
 		state:                   old.state,
 		alt:                     old.alt,
@@ -52,10 +67,12 @@ func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup
 	}
 }
 
+// NewBaseATNConfig6 creates a new BaseATNConfig instanc given a state, alt and context only
 func NewBaseATNConfig6(state ATNState, alt int, context PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 }
 
+// NewBaseATNConfig5 creates a new BaseATNConfig instance given a state, alt, context and semantic context
 func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
@@ -64,22 +81,28 @@ func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, seman
 	return &BaseATNConfig{state: state, alt: alt, context: context, semanticContext: semanticContext}
 }
 
+// NewBaseATNConfig4 creates a new BaseATNConfig instance given an existing config, and a state only
 func NewBaseATNConfig4(c ATNConfig, state ATNState) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
+// NewBaseATNConfig3 creates a new BaseATNConfig instance given an existing config, a state and a semantic context
 func NewBaseATNConfig3(c ATNConfig, state ATNState, semanticContext SemanticContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
+// NewBaseATNConfig2 creates a new BaseATNConfig instance given an existing config, and a context only
 func NewBaseATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
 }
 
+// NewBaseATNConfig1 creates a new BaseATNConfig instance given an existing config, a state, and a context only
 func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 }
 
+// NewBaseATNConfig creates a new BaseATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors
+// are just wrappers around this one.
 func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil")
@@ -103,29 +126,37 @@ func (b *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
 	b.precedenceFilterSuppressed = v
 }
 
+// GetState returns the ATN state associated with this configuration
 func (b *BaseATNConfig) GetState() ATNState {
 	return b.state
 }
 
+// GetAlt returns the alternative associated with this configuration
 func (b *BaseATNConfig) GetAlt() int {
 	return b.alt
 }
 
+// SetContext sets the rule invocation stack associated with this configuration
 func (b *BaseATNConfig) SetContext(v PredictionContext) {
 	b.context = v
 }
+
+// GetContext returns the rule invocation stack associated with this configuration
 func (b *BaseATNConfig) GetContext() PredictionContext {
 	return b.context
 }
 
+// GetSemanticContext returns the semantic context associated with this configuration
 func (b *BaseATNConfig) GetSemanticContext() SemanticContext {
 	return b.semanticContext
 }
 
+// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
 func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
 	return b.reachesIntoOuterContext
 }
 
+// SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
 func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 	b.reachesIntoOuterContext = v
 }
@@ -182,6 +213,7 @@ func (b *BaseATNConfig) Hash() int {
 	return murmurFinish(h, 4)
 }
 
+// String returns a string representation of the BaseATNConfig, usually used for debugging purposes
 func (b *BaseATNConfig) String() string {
 	var s1, s2, s3 string
 
@@ -200,6 +232,9 @@ func (b *BaseATNConfig) String() string {
 	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
 }
 
+// LexerATNConfig represents a lexer ATN configuration which tracks the lexer action, and which "inherits" from the
+// BaseATNConfig struct.
+// TODO: Stop using a pointer and embed the struct instead as this saves allocations. Same for the LexerATNConfig "constructors"
 type LexerATNConfig struct {
 	*BaseATNConfig
 	lexerActionExecutor            *LexerActionExecutor

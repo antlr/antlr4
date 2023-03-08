@@ -30,6 +30,7 @@ type ParserATNSimulator struct {
 	outerContext   ParserRuleContext
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *ParserATNSimulator {
 
 	p := new(ParserATNSimulator)
@@ -47,7 +48,7 @@ func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, shared
 	p.dfa = nil
 	// Each prediction operation uses a cache for merge of prediction contexts.
 	//  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
-	//  isn't Synchronized but we're ok since two threads shouldn't reuse same
+	//  isn't Synchronized, but we're ok since two threads shouldn't reuse same
 	//  parser/atnsim object because it can only handle one input at a time.
 	//  This maps graphs a and b to merged result c. (a,b)&rarrc. We can avoid
 	//  the merge if we ever see a and b again.  Note that (b,a)&rarrc should

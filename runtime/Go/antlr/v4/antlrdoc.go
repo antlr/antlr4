@@ -8,6 +8,19 @@ or translating structured text or binary files. It's widely used to build langua
 From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface
 (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
+# Go Runtime
+
+At version 4.11.x and prior, the Go runtime was not properly versioned for go modules. After this point, the runtime
+source code is held in the `runtime/Go/antlr/v4` directory, and the go.mod file is updated to reflect the version of
+ANTLR4 that it is compatible with (I.E. uses the /v4 path). The runtime is now available as a go module, and can be
+imported as `github.com/antlr/antlr4/runtime/Go/antlr/v4` (the go get command should also be used with this path). See
+the main documentation for the ANTLR4 project for more information.
+
+This means that if you are using the source code without modules, you should also use the source code in /v4. Though
+we highly recommend that you use go modules, as they are now idiomatic Go.
+
+I am aware that this change will prove Hyrum's Law, but am prepared to live with it for teh common good. JI
+
 # Code Generation
 
 ANTLR supports the generation of code in a number of [target languages], and the generated code is supported by a

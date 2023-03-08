@@ -94,6 +94,8 @@ type BitSet struct {
 	data []uint64
 }
 
+// NewBitSet creates a new bitwise set
+// TODO: See if we can replace with the standard library's BitSet
 func NewBitSet() *BitSet {
 	return &BitSet{}
 }

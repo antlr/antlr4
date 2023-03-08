@@ -51,6 +51,8 @@ type ATNConfigSet interface {
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
 type BaseATNConfigSet struct {
+
+	// TODO: Is this actually valid? JI
 	cachedHash int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
@@ -94,6 +96,7 @@ type BaseATNConfigSet struct {
 	uniqueAlt int
 }
 
+// Alts returns the combined set of alts for all the configurations in this set.
 func (b *BaseATNConfigSet) Alts() *BitSet {
 	alts := NewBitSet()
 	for _, it := range b.configs {
@@ -102,6 +105,7 @@ func (b *BaseATNConfigSet) Alts() *BitSet {
 	return alts
 }
 
+// NewBaseATNConfigSet creates a new BaseATNConfigSet instance.
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
 		cachedHash:   -1,
@@ -110,10 +114,13 @@ func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	}
 }
 
-// Add merges contexts with existing configs for (s, i, pi, _), where s is the
-// ATNConfig.state, i is the ATNConfig.alt, and pi is the
-// ATNConfig.semanticContext. We use (s,i,pi) as the key. Updates
-// dipsIntoOuterContext and hasSemanticContext when necessary.
+// Add merges contexts with existing configs for (s, i, pi, _),
+// where s is the ATNConfig.state,
+// i is the ATNConfig.alt, and
+// pi is the ATNConfig.semanticContext.
+//
+// We use (s,i,pi) as the key.
+// Updates dipsIntoOuterContext and hasSemanticContext when necessary.
 func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	if b.readOnly {
 		panic("set is read-only")
@@ -157,9 +164,10 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	return true
 }
 
+// GetStates returns the set of states represented by all configurations in this config set
 func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 
-	// states uses the standard comparator provided by the ATNState instance
+	// states uses the standard comparator and Hash() provided by the ATNState instance
 	//
 	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst)
 
@@ -170,10 +178,12 @@ func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 	return states
 }
 
+// HasSemanticContext returns true if this set contains a semantic context.
 func (b *BaseATNConfigSet) HasSemanticContext() bool {
 	return b.hasSemanticContext
 }
 
+// SetHasSemanticContext sets whether this set contains a semantic context.
 func (b *BaseATNConfigSet) SetHasSemanticContext(v bool) {
 	b.hasSemanticContext = v
 }
@@ -402,40 +412,4 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
 
 	return &OrderedATNConfigSet{BaseATNConfigSet: b}
-}
-
-func hashATNConfig(i interface{}) int {
-	o := i.(ATNConfig)
-	hash := 7
-	hash = 31*hash + o.GetState().GetStateNumber()
-	hash = 31*hash + o.GetAlt()
-	hash = 31*hash + o.GetSemanticContext().Hash()
-	return hash
-}
-
-func equalATNConfigs(a, b interface{}) bool {
-	if a == nil || b == nil {
-		return false
-	}
-
-	if a == b {
-		return true
-	}
-
-	var ai, ok = a.(ATNConfig)
-	var bi, ok1 = b.(ATNConfig)
-
-	if !ok || !ok1 {
-		return false
-	}
-
-	if ai.GetState().GetStateNumber() != bi.GetState().GetStateNumber() {
-		return false
-	}
-
-	if ai.GetAlt() != bi.GetAlt() {
-		return false
-	}
-
-	return ai.GetSemanticContext().Equals(bi.GetSemanticContext())
 }

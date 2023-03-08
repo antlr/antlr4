@@ -20,10 +20,11 @@ var ATNInvalidAltNumber int
 // [ALL(*)]: https://www.antlr.org/papers/allstar-techreport.pdf
 // [Recursive Transition Network]: https://en.wikipedia.org/wiki/Recursive_transition_network
 type ATN struct {
-	// DecisionToState is the decision points for all rules, subrules, optional
-	// blocks, ()+, ()*, etc. Each subrule/rule is a decision point, and we must track them so we
+
+	// DecisionToState is the decision points for all rules, sub-rules, optional
+	// blocks, ()+, ()*, etc. Each sub-rule/rule is a decision point, and we must track them, so we
 	// can go back later and build DFA predictors for them.  This includes
-	// all the rules, subrules, optional blocks, ()+, ()* etc...
+	// all the rules, sub-rules, optional blocks, ()+, ()* etc...
 	DecisionToState []DecisionState
 
 	// grammarType is the ATN type and is used for deserializing ATNs from strings.
@@ -51,6 +52,8 @@ type ATN struct {
 	// specified, and otherwise is nil.
 	ruleToTokenType []int
 
+	// ATNStates is a list of all states in the ATN, ordered by state number.
+	//
 	states []ATNState
 
 	mu      sync.Mutex
