@@ -64,7 +64,7 @@ func (c *CommonTokenStream) Mark() int {
 	return 0
 }
 
-func (c *CommonTokenStream) Release(marker int) {}
+func (c *CommonTokenStream) Release(_ int) {}
 
 func (c *CommonTokenStream) reset() {
 	c.Seek(0)
@@ -201,7 +201,7 @@ func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 // NextTokenOnChannel returns the index of the next token on channel given a
 // starting index. Returns i if tokens[i] is on channel. Returns -1 if there are
 // no tokens on channel between i and EOF.
-func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
+func (c *CommonTokenStream) NextTokenOnChannel(i, _ int) int {
 	c.Sync(i)
 
 	if i >= len(c.tokens) {

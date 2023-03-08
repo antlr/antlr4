@@ -31,7 +31,7 @@ func intMax(a, b int) int {
 
 type IntStack []int
 
-var ErrEmptyStack = errors.New("Stack is empty")
+var ErrEmptyStack = errors.New("stack is empty")
 
 func (s *IntStack) Pop() (int, error) {
 	l := len(*s) - 1
@@ -45,10 +45,6 @@ func (s *IntStack) Pop() (int, error) {
 
 func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
-}
-
-type comparable interface {
-	Equals(other Collectable[any]) bool
 }
 
 func standardEqualsFunction(a Collectable[any], b Collectable[any]) bool {
@@ -74,6 +70,7 @@ func indexForBit(bit int) int {
 	return bit / bitsPerWord
 }
 
+//goland:noinspection GoUnusedExportedFunction,GoUnusedFunction
 func wordForBit(data []uint64, bit int) uint64 {
 	idx := indexForBit(bit)
 	if idx >= len(data) {
@@ -290,6 +287,7 @@ func EscapeWhitespace(s string, escapeSpaces bool) string {
 	return s
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	st := make([]string, len(sa))
 
@@ -300,6 +298,7 @@ func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	return st
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func PrintArrayJavaStyle(sa []string) string {
 	var buffer bytes.Buffer
 

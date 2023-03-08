@@ -10,10 +10,8 @@ import (
 	"strconv"
 )
 
-// Represents {@code $} in local context prediction, which means wildcard.
-// {@code//+x =//}.
-// /
 const (
+	// BasePredictionContextEmptyReturnState represents '$' in local context prediction, which means wildcard.
 	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
 )
 
@@ -22,6 +20,7 @@ const (
 // {@code $} = {@link //EmptyReturnState}.
 // /
 
+//goland:noinspection GoUnusedGlobalVariable
 var (
 	BasePredictionContextglobalNodeCount = 1
 	BasePredictionContextid              = BasePredictionContextglobalNodeCount
@@ -149,11 +148,11 @@ func (b *BaseSingletonPredictionContext) length() int {
 	return 1
 }
 
-func (b *BaseSingletonPredictionContext) GetParent(index int) PredictionContext {
+func (b *BaseSingletonPredictionContext) GetParent(_ int) PredictionContext {
 	return b.parentCtx
 }
 
-func (b *BaseSingletonPredictionContext) getReturnState(index int) int {
+func (b *BaseSingletonPredictionContext) getReturnState(_ int) int {
 	return b.returnState
 }
 
@@ -224,11 +223,11 @@ func (e *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (e *EmptyPredictionContext) GetParent(index int) PredictionContext {
+func (e *EmptyPredictionContext) GetParent(_ int) PredictionContext {
 	return nil
 }
 
-func (e *EmptyPredictionContext) getReturnState(index int) int {
+func (e *EmptyPredictionContext) getReturnState(_ int) int {
 	return e.returnState
 }
 
@@ -620,7 +619,8 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 // <p>Equal tops, merge parents and reduce top to
 // {@link SingletonBasePredictionContext}.<br>
 // <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
-// /
+//
+//goland:noinspection GoBoolExpressions
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
 		previous := mergeCache.Get(a.Hash(), b.Hash())
@@ -708,8 +708,8 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	M := NewArrayPredictionContext(mergedParents, mergedReturnStates)
 
 	// if we created same array as a or b, return that instead
-	// TODO: track whether this is possible above during merge sort for speed
-	// TODO: In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
+	// TODO: JI track whether this is possible above during merge sort for speed
+	// TODO: JI In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
 	if M == a {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)

@@ -126,6 +126,7 @@ func NewLexerB(input CharStream) *LexerB {
 }
 
 // LexerB tokens.
+//goland:noinspection GoUnusedConst
 const (
 	LexerBID     = 1
 	LexerBINT    = 2

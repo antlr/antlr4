@@ -57,6 +57,7 @@ type BaseATNConfig struct {
 	reachesIntoOuterContext    int
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup - maybe delete this
 	return &BaseATNConfig{
 		state:                   old.state,
@@ -276,6 +277,7 @@ func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionCon
 	}
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }

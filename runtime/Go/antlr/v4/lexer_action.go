@@ -39,7 +39,7 @@ func NewBaseLexerAction(action int) *BaseLexerAction {
 	return la
 }
 
-func (b *BaseLexerAction) execute(lexer Lexer) {
+func (b *BaseLexerAction) execute(_ Lexer) {
 	panic("Not implemented")
 }
 

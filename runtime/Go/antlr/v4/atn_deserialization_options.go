@@ -20,7 +20,7 @@ func (opts *ATNDeserializationOptions) ReadOnly() bool {
 
 func (opts *ATNDeserializationOptions) SetReadOnly(readOnly bool) {
 	if opts.readOnly {
-		panic(errors.New("Cannot mutate read only ATNDeserializationOptions"))
+		panic(errors.New("cannot mutate read only ATNDeserializationOptions"))
 	}
 	opts.readOnly = readOnly
 }
@@ -31,7 +31,7 @@ func (opts *ATNDeserializationOptions) VerifyATN() bool {
 
 func (opts *ATNDeserializationOptions) SetVerifyATN(verifyATN bool) {
 	if opts.readOnly {
-		panic(errors.New("Cannot mutate read only ATNDeserializationOptions"))
+		panic(errors.New("cannot mutate read only ATNDeserializationOptions"))
 	}
 	opts.verifyATN = verifyATN
 }
@@ -42,11 +42,12 @@ func (opts *ATNDeserializationOptions) GenerateRuleBypassTransitions() bool {
 
 func (opts *ATNDeserializationOptions) SetGenerateRuleBypassTransitions(generateRuleBypassTransitions bool) {
 	if opts.readOnly {
-		panic(errors.New("Cannot mutate read only ATNDeserializationOptions"))
+		panic(errors.New("cannot mutate read only ATNDeserializationOptions"))
 	}
 	opts.generateRuleBypassTransitions = generateRuleBypassTransitions
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func DefaultATNDeserializationOptions() *ATNDeserializationOptions {
 	return NewATNDeserializationOptions(&defaultATNDeserializationOptions)
 }

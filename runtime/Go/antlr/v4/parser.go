@@ -94,11 +94,12 @@ func NewBaseParser(input TokenStream) *BaseParser {
 	return p
 }
 
-// p.field maps from the serialized ATN string to the deserialized {@link
-// ATN} with
+// This field maps from the serialized ATN string to the deserialized [ATN] with
 // bypass alternatives.
 //
-// @see ATNDeserializationOptions//isGenerateRuleBypassTransitions()
+// [ATNDeserializationOptions.isGenerateRuleBypassTransitions]
+//
+//goland:noinspection GoUnusedGlobalVariable
 var bypassAltsAtnCache = make(map[string]int)
 
 // reset the parser's state//
@@ -350,6 +351,7 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 // String id = m.Get("ID")
 // </pre>
 
+//goland:noinspection GoUnusedParameter
 func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Lexer) {
 
 	panic("NewParseTreePatternMatcher not implemented!")
@@ -444,7 +446,7 @@ func (p *BaseParser) addContextToParseTree() {
 	}
 }
 
-func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, _ int) {
 	p.SetState(state)
 	p.ctx = localctx
 	p.ctx.SetStart(p.input.LT(1))
@@ -496,7 +498,7 @@ func (p *BaseParser) GetPrecedence() int {
 	return p.precedenceStack[len(p.precedenceStack)-1]
 }
 
-func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleIndex, precedence int) {
+func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, _, precedence int) {
 	p.SetState(state)
 	p.precedenceStack.Push(precedence)
 	p.ctx = localctx
@@ -510,7 +512,7 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 //
 // Like {@link //EnterRule} but for recursive rules.
 
-func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, _ int) {
 	previous := p.ctx
 	previous.SetParent(localctx)
 	previous.SetInvokingState(state)
@@ -528,7 +530,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 }
 
 func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
-	p.precedenceStack.Pop()
+	_, _ = p.precedenceStack.Pop()
 	p.ctx.SetStop(p.input.LT(-1))
 	retCtx := p.ctx // save current ctx (return value)
 	// unroll so ctx is as it was before call to recursive method
@@ -559,29 +561,22 @@ func (p *BaseParser) GetInvokingContext(ruleIndex int) ParserRuleContext {
 	return nil
 }
 
-func (p *BaseParser) Precpred(localctx RuleContext, precedence int) bool {
+func (p *BaseParser) Precpred(_ RuleContext, precedence int) bool {
 	return precedence >= p.precedenceStack[len(p.precedenceStack)-1]
 }
 
+//goland:noinspection GoUnusedParameter
 func (p *BaseParser) inContext(context ParserRuleContext) bool {
 	// TODO: useful in parser?
 	return false
 }
 
-//
-// Checks whether or not {@code symbol} can follow the current state in the
-// ATN. The behavior of p.method is equivalent to the following, but is
+// IsExpectedToken checks whether symbol can follow the current state in the
+// {ATN}. The behavior of p.method is equivalent to the following, but is
 // implemented such that the complete context-sensitive follow set does not
 // need to be explicitly constructed.
 //
-// <pre>
-// return getExpectedTokens().contains(symbol)
-// </pre>
-//
-// @param symbol the symbol type to check
-// @return {@code true} if {@code symbol} can follow the current state in
-// the ATN, otherwise {@code false}.
-
+//	return getExpectedTokens().contains(symbol)
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	atn := p.Interpreter.atn
 	ctx := p.ctx

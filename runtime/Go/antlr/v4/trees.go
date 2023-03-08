@@ -32,7 +32,7 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 	}
 	for i := 1; i < c; i++ {
 		s = TreesStringTree(tree.GetChild(i), ruleNames, nil)
-		res += (" " + s)
+		res += " " + s
 	}
 	res += ")"
 	return res
@@ -71,7 +71,8 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 	return fmt.Sprint(t.GetPayload())
 }
 
-// Return ordered list of all children of this node
+// TreesGetChildren returns am ordered list of all children of this node
+//goland:noinspection GoUnusedExportedFunction
 func TreesGetChildren(t Tree) []Tree {
 	list := make([]Tree, 0)
 	for i := 0; i < t.GetChildCount(); i++ {
@@ -80,9 +81,9 @@ func TreesGetChildren(t Tree) []Tree {
 	return list
 }
 
-// Return a list of all ancestors of this node.  The first node of
-//
-//	list is the root and the last is the parent of this node.
+// TreesgetAncestors returns a list of all ancestors of this node.  The first node of list is the root
+// and the last node is the parent of this node.
+//goland:noinspection GoUnusedExportedFunction
 func TreesgetAncestors(t Tree) []Tree {
 	ancestors := make([]Tree, 0)
 	t = t.GetParent()
@@ -94,10 +95,12 @@ func TreesgetAncestors(t Tree) []Tree {
 	return ancestors
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TreesFindAllTokenNodes(t ParseTree, ttype int) []ParseTree {
 	return TreesfindAllNodes(t, ttype, true)
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TreesfindAllRuleNodes(t ParseTree, ruleIndex int) []ParseTree {
 	return TreesfindAllNodes(t, ruleIndex, false)
 }
@@ -129,6 +132,7 @@ func treesFindAllNodes(t ParseTree, index int, findTokens bool, nodes *[]ParseTr
 	}
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TreesDescendants(t ParseTree) []ParseTree {
 	nodes := []ParseTree{t}
 	for i := 0; i < t.GetChildCount(); i++ {

@@ -64,10 +64,10 @@ type BaseParseTreeVisitor struct{}
 
 var _ ParseTreeVisitor = &BaseParseTreeVisitor{}
 
-func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}            { return tree.Accept(v) }
-func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { return nil }
-func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
-func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
+func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}         { return tree.Accept(v) }
+func (v *BaseParseTreeVisitor) VisitChildren(_ RuleNode) interface{}     { return nil }
+func (v *BaseParseTreeVisitor) VisitTerminal(_ TerminalNode) interface{} { return nil }
+func (v *BaseParseTreeVisitor) VisitErrorNode(_ ErrorNode) interface{}   { return nil }
 
 // TODO
 //func (this ParseTreeVisitor) Visit(ctx) {
@@ -101,10 +101,10 @@ type BaseParseTreeListener struct{}
 
 var _ ParseTreeListener = &BaseParseTreeListener{}
 
-func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode)      {}
-func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode)        {}
-func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext) {}
-func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext)  {}
+func (l *BaseParseTreeListener) VisitTerminal(_ TerminalNode)       {}
+func (l *BaseParseTreeListener) VisitErrorNode(_ ErrorNode)         {}
+func (l *BaseParseTreeListener) EnterEveryRule(_ ParserRuleContext) {}
+func (l *BaseParseTreeListener) ExitEveryRule(_ ParserRuleContext)  {}
 
 type TerminalNodeImpl struct {
 	parentCtx RuleContext
@@ -123,7 +123,7 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	return tn
 }
 
-func (t *TerminalNodeImpl) GetChild(i int) Tree {
+func (t *TerminalNodeImpl) GetChild(_ int) Tree {
 	return nil
 }
 
@@ -131,7 +131,7 @@ func (t *TerminalNodeImpl) GetChildren() []Tree {
 	return nil
 }
 
-func (t *TerminalNodeImpl) SetChildren(tree []Tree) {
+func (t *TerminalNodeImpl) SetChildren(_ []Tree) {
 	panic("Cannot set children on terminal node")
 }
 
@@ -179,7 +179,7 @@ func (t *TerminalNodeImpl) String() string {
 	return t.symbol.GetText()
 }
 
-func (t *TerminalNodeImpl) ToStringTree(s []string, r Recognizer) string {
+func (t *TerminalNodeImpl) ToStringTree(_ []string, _ Recognizer) string {
 	return t.String()
 }
 
@@ -257,6 +257,7 @@ type IterativeParseTreeWalker struct {
 	*ParseTreeWalker
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewIterativeParseTreeWalker() *IterativeParseTreeWalker {
 	return new(IterativeParseTreeWalker)
 }

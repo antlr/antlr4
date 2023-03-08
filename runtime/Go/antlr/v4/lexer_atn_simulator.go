@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+//goland:noinspection GoUnusedGlobalVariable
 var (
 	LexerATNSimulatorDebug    = false
 	LexerATNSimulatorDFADebug = false
@@ -114,7 +115,8 @@ func (l *LexerATNSimulator) reset() {
 func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	startState := l.atn.modeToStartState[l.mode]
 
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("MatchATN mode " + strconv.Itoa(l.mode) + " start: " + startState.String())
 	}
 	oldMode := l.mode
@@ -126,7 +128,8 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 
 	predict := l.execATN(input, next)
 
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("DFA after MatchATN: " + l.decisionToDFA[oldMode].ToLexerString())
 	}
 	return predict
@@ -134,7 +137,8 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 
 func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("start state closure=" + ds0.configs.String())
 	}
 	if ds0.isAcceptState {
@@ -145,7 +149,8 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 	s := ds0 // s is current/from DFA state
 
 	for { // while more work
-		if LexerATNSimulatorDebug {
+		if //goland:noinspection GoBoolExpressions
+		LexerATNSimulatorDebug {
 			fmt.Println("execATN loop starting closure: " + s.configs.String())
 		}
 
@@ -214,7 +219,8 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 		return nil
 	}
 	target := s.getIthEdge(t - LexerATNSimulatorMinDFAEdge)
-	if LexerATNSimulatorDebug && target != nil {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug && target != nil {
 		fmt.Println("reuse state " + strconv.Itoa(s.stateNumber) + " edge to " + strconv.Itoa(target.stateNumber))
 	}
 	return target
@@ -274,12 +280,13 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 	SkipAlt := ATNInvalidAltNumber
 
 	for _, cfg := range closure.GetItems() {
-		currentAltReachedAcceptState := (cfg.GetAlt() == SkipAlt)
+		currentAltReachedAcceptState := cfg.GetAlt() == SkipAlt
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
 
-		if LexerATNSimulatorDebug {
+		if //goland:noinspection GoBoolExpressions
+		LexerATNSimulatorDebug {
 
 			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String()) // l.recog, true))
 		}
@@ -291,7 +298,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 				if lexerActionExecutor != nil {
 					lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.Index() - l.startIndex)
 				}
-				treatEOFAsEpsilon := (t == TokenEOF)
+				treatEOFAsEpsilon := t == TokenEOF
 				config := NewLexerATNConfig3(cfg.(*LexerATNConfig), target, lexerActionExecutor)
 				if l.closure(input, config, reach,
 					currentAltReachedAcceptState, true, treatEOFAsEpsilon) {
@@ -305,7 +312,8 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 }
 
 func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerActionExecutor, startIndex, index, line, charPos int) {
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Printf("ACTION %v\n", lexerActionExecutor)
 	}
 	// seek to after last char in token
@@ -347,14 +355,16 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")") // config.String(l.recog, true) + ")")
 	}
 
 	_, ok := config.state.(*RuleStopState)
 	if ok {
 
-		if LexerATNSimulatorDebug {
+		if //goland:noinspection GoBoolExpressions
+		LexerATNSimulatorDebug {
 			if l.recog != nil {
 				fmt.Printf("closure at %s rule stop %s\n", l.recog.GetRuleNames()[config.state.GetRuleIndex()], config)
 			} else {
@@ -435,7 +445,8 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 
 		pt := trans.(*PredicateTransition)
 
-		if LexerATNSimulatorDebug {
+		if //goland:noinspection GoBoolExpressions
+		LexerATNSimulatorDebug {
 			fmt.Println("EVAL rule " + strconv.Itoa(trans.(*PredicateTransition).ruleIndex) + ":" + strconv.Itoa(pt.predIndex))
 		}
 		configs.SetHasSemanticContext(true)
@@ -554,7 +565,8 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// Only track edges within the DFA bounds
 		return to
 	}
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
 	}
 	l.atn.edgeMu.Lock()

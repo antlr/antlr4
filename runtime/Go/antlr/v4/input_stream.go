@@ -76,7 +76,7 @@ func (is *InputStream) Mark() int {
 }
 
 // Release does nothing here as we have entire buffer
-func (is *InputStream) Release(marker int) {
+func (is *InputStream) Release(_ int) {
 }
 
 // Seek the input point to the provided index offset

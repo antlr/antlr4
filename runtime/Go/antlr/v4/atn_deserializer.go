@@ -35,6 +35,7 @@ func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
 	return &ATNDeserializer{options: options}
 }
 
+//goland:noinspection GoUnusedFunction
 func stringInSlice(a string, list []string) int {
 	for i, b := range list {
 		if b == a {
@@ -193,7 +194,7 @@ func (a *ATNDeserializer) readModes(atn *ATN) {
 	}
 }
 
-func (a *ATNDeserializer) readSets(atn *ATN, sets []*IntervalSet) []*IntervalSet {
+func (a *ATNDeserializer) readSets(_ *ATN, sets []*IntervalSet) []*IntervalSet {
 	m := a.readInt()
 
 	// Preallocate the needed capacity.
@@ -553,7 +554,7 @@ func (a *ATNDeserializer) readInt() int {
 	return int(v) // data is 32 bits but int is at least that big
 }
 
-func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {
+func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, _, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {
 	target := atn.states[trg]
 
 	switch typeIndex {

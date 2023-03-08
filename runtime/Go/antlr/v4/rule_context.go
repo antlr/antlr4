@@ -93,7 +93,7 @@ func (b *BaseRuleContext) GetAltNumber() int {
 	return ATNInvalidAltNumber
 }
 
-func (b *BaseRuleContext) SetAltNumber(altNumber int) {}
+func (b *BaseRuleContext) SetAltNumber(_ int) {}
 
 // A context is empty if there is no invoking state meaning nobody call
 // current context.

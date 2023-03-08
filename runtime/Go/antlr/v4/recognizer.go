@@ -45,7 +45,10 @@ func NewBaseRecognizer() *BaseRecognizer {
 	return rec
 }
 
+//goland:noinspection GoUnusedGlobalVariable
 var tokenTypeMapCache = make(map[string]int)
+
+//goland:noinspection GoUnusedGlobalVariable
 var ruleIndexMapCache = make(map[string]int)
 
 func (b *BaseRecognizer) checkVersion(toolVersion string) {
@@ -55,7 +58,7 @@ func (b *BaseRecognizer) checkVersion(toolVersion string) {
 	}
 }
 
-func (b *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {
+func (b *BaseRecognizer) Action(_ RuleContext, _, _ int) {
 	panic("action not implemented on Recognizer!")
 }
 
@@ -124,7 +127,7 @@ func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 	//    return result
 }
 
-func (b *BaseRecognizer) GetTokenType(tokenName string) int {
+func (b *BaseRecognizer) GetTokenType(_ string) int {
 	panic("Method not defined!")
 	//    var ttype = b.GetTokenTypeMap()[tokenName]
 	//    if (ttype !=nil) {
@@ -207,10 +210,10 @@ func (b *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (b *BaseRecognizer) Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool {
+func (b *BaseRecognizer) Sempred(_ RuleContext, _ int, _ int) bool {
 	return true
 }
 
-func (b *BaseRecognizer) Precpred(localctx RuleContext, precedence int) bool {
+func (b *BaseRecognizer) Precpred(_ RuleContext, _ int) bool {
 	return true
 }

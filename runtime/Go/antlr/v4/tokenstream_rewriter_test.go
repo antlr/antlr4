@@ -33,7 +33,7 @@ func TestInsertBeforeIndex0(t *testing.T) {
 	}
 }
 
-func prepare_rewriter(str string) *TokenStreamRewriter {
+func prepareRewriter(str string) *TokenStreamRewriter {
 	input := NewInputStream(str)
 	lexer := NewLexerA(input)
 	stream := NewCommonTokenStream(lexer, 0)
@@ -42,31 +42,31 @@ func prepare_rewriter(str string) *TokenStreamRewriter {
 }
 
 type LexerTest struct {
-	input              string
-	expected           string
-	description        string
-	expected_exception []string
-	ops                func(*TokenStreamRewriter)
+	input             string
+	expected          string
+	description       string
+	expectedException []string
+	ops               func(*TokenStreamRewriter)
 }
 
 func NewLexerTest(input, expected, desc string, ops func(*TokenStreamRewriter)) LexerTest {
 	return LexerTest{input: input, expected: expected, description: desc, ops: ops}
 }
 
-func NewLexerExceptionTest(input string, expected_err []string, desc string, ops func(*TokenStreamRewriter)) LexerTest {
-	return LexerTest{input: input, expected_exception: expected_err, description: desc, ops: ops}
+func NewLexerExceptionTest(input string, expectedErr []string, desc string, ops func(*TokenStreamRewriter)) LexerTest {
+	return LexerTest{input: input, expectedException: expectedErr, description: desc, ops: ops}
 }
 
-func panic_tester(t *testing.T, expected_msg []string, r *TokenStreamRewriter) {
+func panicTester(t *testing.T, expectedMsg []string, r *TokenStreamRewriter) {
 	defer func() {
 		r := recover()
 		if r == nil {
 			t.Errorf("Panic is expected, but finished normally")
 		} else {
-			s_e := r.(string)
-			for _, e := range expected_msg {
-				if !strings.Contains(s_e, e) {
-					t.Errorf("Element [%s] is not in error message: [%s]", e, s_e)
+			sE := r.(string)
+			for _, e := range expectedMsg {
+				if !strings.Contains(sE, e) {
+					t.Errorf("Element [%s] is not in error message: [%s]", e, sE)
 				}
 			}
 		}
@@ -307,10 +307,10 @@ func TestLexerA(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.description, func(t *testing.T) {
-			rewriter := prepare_rewriter(c.input)
+			rewriter := prepareRewriter(c.input)
 			c.ops(rewriter)
-			if len(c.expected_exception) > 0 {
-				panic_tester(t, c.expected_exception, rewriter)
+			if len(c.expectedException) > 0 {
+				panicTester(t, c.expectedException, rewriter)
 			} else {
 				result := rewriter.GetTextDefault()
 				if result != c.expected {
@@ -410,6 +410,7 @@ func NewLexerA(input CharStream) *LexerA {
 }
 
 // LexerA tokens.
+//goland:noinspection GoUnusedConst
 const (
 	LexerAA = 1
 	LexerAB = 2

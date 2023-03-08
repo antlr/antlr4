@@ -19,6 +19,7 @@ type FileStream struct {
 	filename string
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewFileStream(fileName string) (*FileStream, error) {
 
 	buf := bytes.NewBuffer(nil)
@@ -27,7 +28,11 @@ func NewFileStream(fileName string) (*FileStream, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		errF := f.Close()
+		if errF != nil {
+		}
+	}(f)
 	_, err = io.Copy(buf, f)
 	if err != nil {
 		return nil, err

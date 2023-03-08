@@ -227,6 +227,7 @@ func newArray2DHashSetWithCap(
 	return ret
 }
 
+//goland:noinspection GoUnusedExportedFunction,GoUnusedFunction
 func newArray2DHashSet(
 	hashcodeFunction func(interface{}) int,
 	equalsFunction func(Collectable[any], Collectable[any]) bool,

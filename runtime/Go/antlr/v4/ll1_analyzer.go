@@ -71,12 +71,11 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 // specified ctx.
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
-	seeThruPreds := true // ignore preds get all lookahead
 	var lookContext PredictionContext
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	la.look1(s, stopState, lookContext, r, NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst), NewBitSet(), true, true)
 	return r
 }
 
@@ -110,7 +109,7 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
+func (la *LL1Analyzer) look2(_, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)

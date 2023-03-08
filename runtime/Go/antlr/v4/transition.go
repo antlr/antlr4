@@ -72,7 +72,7 @@ func (t *BaseTransition) getSerializationType() int {
 	return t.serializationType
 }
 
-func (t *BaseTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *BaseTransition) Matches(_, _, _ int) bool {
 	panic("Not implemented")
 }
 
@@ -89,6 +89,7 @@ const (
 	TransitionPRECEDENCE = 10
 )
 
+//goland:noinspection GoUnusedGlobalVariable
 var TransitionserializationNames = []string{
 	"INVALID",
 	"EPSILON",
@@ -150,7 +151,7 @@ func (t *AtomTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *AtomTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *AtomTransition) Matches(symbol, _, _ int) bool {
 	return t.label == symbol
 }
 
@@ -179,7 +180,7 @@ func NewRuleTransition(ruleStart ATNState, ruleIndex, precedence int, followStat
 	return t
 }
 
-func (t *RuleTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RuleTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -200,7 +201,7 @@ func NewEpsilonTransition(target ATNState, outermostPrecedenceReturn int) *Epsil
 	return t
 }
 
-func (t *EpsilonTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *EpsilonTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -232,7 +233,7 @@ func (t *RangeTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *RangeTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RangeTransition) Matches(symbol, _, _ int) bool {
 	return symbol >= t.start && symbol <= t.stop
 }
 
@@ -285,7 +286,7 @@ func NewPredicateTransition(target ATNState, ruleIndex, predIndex int, isCtxDepe
 	return t
 }
 
-func (t *PredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PredicateTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -317,7 +318,7 @@ func NewActionTransition(target ATNState, ruleIndex, actionIndex int, isCtxDepen
 	return t
 }
 
-func (t *ActionTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *ActionTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -345,7 +346,7 @@ func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 	return t
 }
 
-func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *SetTransition) Matches(symbol, _, _ int) bool {
 	return t.intervalSet.contains(symbol)
 }
 
@@ -415,7 +416,7 @@ func NewPrecedencePredicateTransition(target ATNState, precedence int) *Preceden
 	return t
 }
 
-func (t *PrecedencePredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PrecedencePredicateTransition) Matches(_, _, _ int) bool {
 	return false
 }
 

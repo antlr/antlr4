@@ -24,20 +24,21 @@ type ErrorListener interface {
 type DefaultErrorListener struct {
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewDefaultErrorListener() *DefaultErrorListener {
 	return new(DefaultErrorListener)
 }
 
-func (d *DefaultErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
+func (d *DefaultErrorListener) SyntaxError(_ Recognizer, _ interface{}, _, _ int, _ string, _ RecognitionException) {
 }
 
-func (d *DefaultErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAmbiguity(_ Parser, _ *DFA, _, _ int, _ bool, _ *BitSet, _ ATNConfigSet) {
 }
 
-func (d *DefaultErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAttemptingFullContext(_ Parser, _ *DFA, _, _ int, _ *BitSet, _ ATNConfigSet) {
 }
 
-func (d *DefaultErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (d *DefaultErrorListener) ReportContextSensitivity(_ Parser, _ *DFA, _, _, _ int, _ ATNConfigSet) {
 }
 
 type ConsoleErrorListener struct {
@@ -56,8 +57,8 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // the following format:
 //
 //	line line:charPositionInLine msg
-func (c *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
-	fmt.Fprintln(os.Stderr, "line "+strconv.Itoa(line)+":"+strconv.Itoa(column)+" "+msg)
+func (c *ConsoleErrorListener) SyntaxError(_ Recognizer, _ interface{}, line, column int, msg string, _ RecognitionException) {
+	_, _ = fmt.Fprintln(os.Stderr, "line "+strconv.Itoa(line)+":"+strconv.Itoa(column)+" "+msg)
 }
 
 type ProxyErrorListener struct {

@@ -111,6 +111,7 @@ const (
 	LexerSkip        = -3
 )
 
+//goland:noinspection GoUnusedConst
 const (
 	LexerDefaultTokenChannel = TokenDefaultChannel
 	LexerHidden              = TokenHiddenChannel
@@ -256,7 +257,8 @@ func (b *BaseLexer) SetMode(m int) {
 // PushMode saves the current lexer mode so that it can be restored later. See [PopMode], then sets the
 // current lexer mode to the supplied mode m.
 func (b *BaseLexer) PushMode(m int) {
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
 	b.modeStack.Push(b.mode)
@@ -269,7 +271,8 @@ func (b *BaseLexer) PopMode() int {
 	if len(b.modeStack) == 0 {
 		panic("Empty Stack")
 	}
-	if LexerATNSimulatorDebug {
+	if //goland:noinspection GoBoolExpressions
+	LexerATNSimulatorDebug {
 		fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
 	}
 	i, _ := b.modeStack.Pop()

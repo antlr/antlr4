@@ -144,13 +144,13 @@ func (i *IntervalSet) contains(item int) bool {
 }
 
 func (i *IntervalSet) length() int {
-	len := 0
+	iLen := 0
 
 	for _, v := range i.intervals {
-		len += v.Length()
+		iLen += v.Length()
 	}
 
-	return len
+	return iLen
 }
 
 func (i *IntervalSet) removeRange(v *Interval) {

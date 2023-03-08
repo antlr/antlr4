@@ -30,6 +30,7 @@ func testBitSet(t *testing.T, bs *BitSet, str string, length int, contains []int
 	}
 }
 
+//goland:noinspection GoBoolExpressions
 func TestBitSet(t *testing.T) {
 	bs1 := NewBitSet()
 	testBitSet(t, bs1, "{}", 0, []int{}, 2147483647, 0)
