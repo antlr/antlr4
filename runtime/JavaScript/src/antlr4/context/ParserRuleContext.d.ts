@@ -18,6 +18,6 @@ export declare class ParserRuleContext extends RuleContext {
     getChild(i: number) : ParseTree;
     getToken(ttype: number, i: number): TerminalNode;
     getTokens(ttype: number): TerminalNode[];
-    getTypedRuleContext<T extends ParserRuleContext>(ctxType: { new (parser?: Parser, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}, i: number): T;
-    getTypedRuleContexts<T extends ParserRuleContext>(ctxType: { new (parser?: Parser, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}): T[];
+    getTypedRuleContext<T extends ParserRuleContext, P extends Parser>(ctxType: { new (parser?: P, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}, i: number): T;
+    getTypedRuleContexts<T extends ParserRuleContext, P extends Parser>(ctxType: { new (parser?: P, parent?: ParserRuleContext, invokingState?: number, ...args: any[]) : T}): T[];
 }
