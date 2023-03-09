@@ -79,7 +79,7 @@ public class GoRunner extends RuntimeRunner {
 	protected void initRuntime(RunOptions runOptions) throws Exception {
 		String cachePath = getCachePath();
 		mkdir(cachePath);
-		Path runtimeFilesPath = Paths.get(getRuntimePath("Go"), "antlr");
+		Path runtimeFilesPath = Paths.get(getRuntimePath("Go"), "antlr", "v4");
 		String runtimeToolPath = getRuntimeToolPath();
 		File goModFile = new File(cachePath, "go.mod");
 		if (goModFile.exists())
