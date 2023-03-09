@@ -27,16 +27,16 @@ package antlr
 
 type RuleContext interface {
 	RuleNode
-
+	
 	GetInvokingState() int
 	SetInvokingState(int)
-
+	
 	GetRuleIndex() int
 	IsEmpty() bool
-
+	
 	GetAltNumber() int
 	SetAltNumber(altNumber int)
-
+	
 	String([]string, RuleContext) string
 }
 
@@ -47,12 +47,12 @@ type BaseRuleContext struct {
 }
 
 func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext {
-
+	
 	rn := new(BaseRuleContext)
-
+	
 	// What context invoked b rule?
 	rn.parentCtx = parent
-
+	
 	// What state invoked the rule associated with b context?
 	// The "return address" is the followState of invokingState
 	// If parent is nil, b should be -1.
@@ -61,7 +61,7 @@ func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext 
 	} else {
 		rn.invokingState = invokingState
 	}
-
+	
 	return rn
 }
 
@@ -95,20 +95,21 @@ func (b *BaseRuleContext) GetAltNumber() int {
 
 func (b *BaseRuleContext) SetAltNumber(_ int) {}
 
-// A context is empty if there is no invoking state meaning nobody call
+// IsEmpty returns true if the context of b is empty.
+//
+// A context is empty if there is no invoking state, meaning nobody calls
 // current context.
 func (b *BaseRuleContext) IsEmpty() bool {
 	return b.invokingState == -1
 }
 
-// Return the combined text of all child nodes. This method only considers
+// GetParent returns the combined text of all child nodes. This method only considers
 // tokens which have been added to the parse tree.
-// <p>
+//
 // Since tokens on hidden channels (e.g. whitespace or comments) are not
-// added to the parse trees, they will not appear in the output of b
+// added to the parse trees, they will not appear in the output of this
 // method.
 //
-
 func (b *BaseRuleContext) GetParent() Tree {
 	return b.parentCtx
 }

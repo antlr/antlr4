@@ -108,9 +108,11 @@ func (b *BaseRecognizer) SetState(v int) {
 //    return result
 //}
 
-// Get a map from rule names to rule indexes.
+// GetRuleIndexMap Get a map from rule names to rule indexes.
 //
-// <p>Used for XPath and tree pattern compilation.</p>
+// Used for XPath and tree pattern compilation.
+//
+// TODO: JI This is not yet implemented in the Go runtime. Maybe not needed.
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 
 	panic("Method not defined!")
@@ -127,6 +129,7 @@ func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 	//    return result
 }
 
+// GetTokenType get the type of a token based upon it's name
 func (b *BaseRecognizer) GetTokenType(_ string) int {
 	panic("Method not defined!")
 	//    var ttype = b.GetTokenTypeMap()[tokenName]
@@ -165,26 +168,27 @@ func (b *BaseRecognizer) GetTokenType(_ string) int {
 //    }
 //}
 
-// What is the error header, normally line/character position information?//
+// GetErrorHeader returns the error header, normally line/character position information.
+//
+// Can be overridden in sub structs embedding BaseRecognizer.
 func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 	line := e.GetOffendingToken().GetLine()
 	column := e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 
-// How should a token be displayed in an error message? The default
+// GetTokenErrorDisplay shows how a token should be displayed in an error message.
 //
-//	is to display just the text, but during development you might
-//	want to have a lot of information spit out.  Override in that case
-//	to use t.String() (which, for CommonToken, dumps everything about
-//	the token). This is better than forcing you to override a method in
-//	your token objects because you don't have to go modify your lexer
-//	so that it creates a NewJava type.
+// The default is to display just the text, but during development you might
+// want to have a lot of information spit out.  Override in that case
+// to use t.String() (which, for CommonToken, dumps everything about
+// the token). This is better than forcing you to override a method in
+// your token objects because you don't have to go modify your lexer
+// so that it creates a NewJava type.
 //
-// @deprecated This method is not called by the ANTLR 4 Runtime. Specific
-// implementations of {@link ANTLRErrorStrategy} may provide a similar
-// feature when necessary. For example, see
-// {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
+// Deprecated: This method is not called by the ANTLR 4 Runtime. Specific
+// implementations of [ANTLRErrorStrategy] may provide a similar
+// feature when necessary. For example, see [DefaultErrorStrategy].GetTokenErrorDisplay()
 func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
@@ -208,12 +212,14 @@ func (b *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
 	return NewProxyErrorListener(b.listeners)
 }
 
-// subclass needs to override these if there are sempreds or actions
-// that the ATN interp needs to execute
+// Sempred embedding structs need to override this if there are sempreds or actions
+// that the ATN interpreter needs to execute
 func (b *BaseRecognizer) Sempred(_ RuleContext, _ int, _ int) bool {
 	return true
 }
 
+// Precpred embedding structs need to override this if there are preceding predicates
+// that the ATN interpreter needs to execute
 func (b *BaseRecognizer) Precpred(_ RuleContext, _ int) bool {
 	return true
 }

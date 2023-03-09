@@ -8,10 +8,8 @@ import "fmt"
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 
-// Print out a whole tree in LISP form. {@link //getNodeText} is used on the
-//
-//	node payloads to get the text for the nodes.  Detect
-//	parse trees and extract data appropriately.
+// TreesStringTree prints out a whole tree in LISP form. [getNodeText] is used on the
+// node payloads to get the text for the nodes. Detects parse trees and extracts data appropriately.
 func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 
 	if recog != nil {
@@ -72,6 +70,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 }
 
 // TreesGetChildren returns am ordered list of all children of this node
+//
 //goland:noinspection GoUnusedExportedFunction
 func TreesGetChildren(t Tree) []Tree {
 	list := make([]Tree, 0)
@@ -83,6 +82,7 @@ func TreesGetChildren(t Tree) []Tree {
 
 // TreesgetAncestors returns a list of all ancestors of this node.  The first node of list is the root
 // and the last node is the parent of this node.
+//
 //goland:noinspection GoUnusedExportedFunction
 func TreesgetAncestors(t Tree) []Tree {
 	ancestors := make([]Tree, 0)

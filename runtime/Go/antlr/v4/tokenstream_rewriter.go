@@ -230,7 +230,7 @@ func (op *InsertAfterOp) String() string {
 	return op.BaseRewriteOperation.String()
 }
 
-// I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
+// ReplaceOp tries to replace range from x..y with (y-x)+1 ReplaceOp
 // instructions.
 type ReplaceOp struct {
 	BaseRewriteOperation
@@ -303,7 +303,7 @@ func (tsr *TokenStreamRewriter) RollbackDefault(instructionIndex int) {
 	tsr.Rollback(DefaultProgramName, instructionIndex)
 }
 
-// Reset the program so that no instructions exist
+// DeleteProgram reset the program so that no instructions exist
 func (tsr *TokenStreamRewriter) DeleteProgram(programName string) {
 	tsr.Rollback(programName, MinTokenIndex) //TODO: double test on that cause lower bound is not included
 }
@@ -430,7 +430,7 @@ func (tsr *TokenStreamRewriter) GetProgram(name string) []RewriteOperation {
 	return is
 }
 
-// Return the text from the original tokens altered per the
+// GetTextDefault returns the text from the original tokens altered per the
 // instructions given to this rewriter.
 func (tsr *TokenStreamRewriter) GetTextDefault() string {
 	return tsr.GetText(
@@ -438,7 +438,7 @@ func (tsr *TokenStreamRewriter) GetTextDefault() string {
 		NewInterval(0, tsr.tokens.Size()-1))
 }
 
-// Return the text from the original tokens altered per the
+// GetText returns the text from the original tokens altered per the
 // instructions given to this rewriter.
 func (tsr *TokenStreamRewriter) GetText(programName string, interval *Interval) string {
 	rewrites := tsr.programs[programName]
