@@ -202,20 +202,21 @@ func (op *InsertBeforeOp) String() string {
 	return op.BaseRewriteOperation.String()
 }
 
-// Distinguish between insert after/before to do the "insert afters"
-//  first and then the "insert befores" at same index. Implementation
-//  of "insert after" is "insert before index+1".
-
+// InsertAfterOp distinguishes between insert after/before to do the "insert after" instructions
+// first and then the "insert before" instructions at same index. Implementation
+// of "insert after" is "insert before index+1".
 type InsertAfterOp struct {
 	BaseRewriteOperation
 }
 
 func NewInsertAfterOp(index int, text string, stream TokenStream) *InsertAfterOp {
-	return &InsertAfterOp{BaseRewriteOperation: BaseRewriteOperation{
-		index:  index + 1,
-		text:   text,
-		tokens: stream,
-	}}
+	return &InsertAfterOp{
+		BaseRewriteOperation: BaseRewriteOperation{
+			index:  index + 1,
+			text:   text,
+			tokens: stream,
+		},
+	}
 }
 
 func (op *InsertAfterOp) Execute(buffer *bytes.Buffer) int {
@@ -483,11 +484,13 @@ func (tsr *TokenStreamRewriter) GetText(programName string, interval *Interval) 
 	return buf.String()
 }
 
-//	 We need to combine operations and report invalid operations (like
-//	 overlapping replaces that are not completed nested). Inserts to
-//	 same index need to be combined etc...  Here are the cases:
+// reduceToSingleOperationPerIndex combines operations and report invalid operations (like
+// overlapping replaces that are not completed nested). Inserts to
+// same index need to be combined etc...
 //
-//	 I.i.u I.j.v								leave alone, nonoverlapping
+// Here are the cases:
+//
+//	 I.i.u I.j.v								leave alone, non-overlapping
 //	 I.i.u I.i.v								combine: Iivu
 //
 //	 R.i-j.u R.x-y.v	| i-j in x-y			delete first R
@@ -499,38 +502,38 @@ func (tsr *TokenStreamRewriter) GetText(programName string, interval *Interval) 
 //	 D.i-j.u D.x-y.v	| boundaries overlap	combine to max(min)..max(right)
 //
 //	 I.i.u R.x-y.v | i in (x+1)-y			delete I (since insert before
-//												we're not deleting i)
-//	 I.i.u R.x-y.v | i not in (x+1)-y		leave alone, nonoverlapping
+//													we're not deleting i)
+//	 I.i.u R.x-y.v | i not in (x+1)-y		leave alone, non-overlapping
 //	 R.x-y.v I.i.u | i in x-y				ERROR
 //	 R.x-y.v I.x.u 							R.x-y.uv (combine, delete I)
-//	 R.x-y.v I.i.u | i not in x-y			leave alone, nonoverlapping
+//	 R.x-y.v I.i.u | i not in x-y			leave alone, non-overlapping
 //
 //	 I.i.u = insert u before op @ index i
 //	 R.x-y.u = replace x-y indexed tokens with u
 //
-//	 First we need to examine replaces. For any replace op:
+// First we need to examine replaces. For any replace op:
 //
-//			1. wipe out any insertions before op within that range.
-//			2. Drop any replace op before that is contained completely within
-//		 	that range.
-//			3. Throw exception upon boundary overlap with any previous replace.
+//  1. wipe out any insertions before op within that range.
+//  2. Drop any replace op before that is contained completely within
+//     that range.
+//  3. Throw exception upon boundary overlap with any previous replace.
 //
-//	 	Then we can deal with inserts:
+// Then we can deal with inserts:
 //
-//			1. for any inserts to same index, combine even if not adjacent.
-//			2. for any prior replace with same left boundary, combine this
-//		 	insert with replace and delete this replace.
-//			3. throw exception if index in same range as previous replace
+//  1. for any inserts to same index, combine even if not adjacent.
+//  2. for any prior replace with same left boundary, combine this
+//     insert with replace and delete this 'replace'.
+//  3. throw exception if index in same range as previous replace
 //
-//	 Don't actually delete; make op null in list. Easier to walk list.
-//	 Later we can throw as we add to index &rarr; op map.
+// Don't actually delete; make op null in list. Easier to walk list.
+// Later we can throw as we add to index &rarr; op map.
 //
-//	 Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
-//	 inserted stuff would be before the replace range. But, if you
-//	 add tokens in front of a method body '{' and then delete the method
-//	 body, I think the stuff before the '{' you added should disappear too.
+// Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
+// inserted stuff would be before the 'replace' range. But, if you
+// add tokens in front of a method body '{' and then delete the method
+// body, I think the stuff before the '{' you added should disappear too.
 //
-//	 Return a map from token index to operation.
+// The func returns a map from token index to operation.
 func reduceToSingleOperationPerIndex(rewrites []RewriteOperation) map[int]RewriteOperation {
 	// WALK REPLACES
 	for i := 0; i < len(rewrites); i++ {

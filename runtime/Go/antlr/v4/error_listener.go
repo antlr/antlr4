@@ -56,7 +56,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // values of line, charPositionInLine, and msg using
 // the following format:
 //
-//	line line:charPositionInLine msg
+//	line <line>:<charPositionInLine> <msg>
 func (c *ConsoleErrorListener) SyntaxError(_ Recognizer, _ interface{}, line, column int, msg string, _ RecognitionException) {
 	_, _ = fmt.Fprintln(os.Stderr, "line "+strconv.Itoa(line)+":"+strconv.Itoa(column)+" "+msg)
 }

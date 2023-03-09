@@ -60,7 +60,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 		}
 	}
 
-	// no recog for rule names
+	// no recognition for rule names
 	payload := t.GetPayload()
 	if p2, ok := payload.(Token); ok {
 		return p2.GetText()

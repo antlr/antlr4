@@ -362,7 +362,7 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 
 	b.stateType = ATNStateStarLoopEntry
 
-	// False precedenceRuleDecision indicates whether s state can benefit from a precedence DFA during SLL decision making.
+	// False precedenceRuleDecision indicates whether this state can benefit from a precedence [DFA] during SLL decision-making.
 	return &StarLoopEntryState{BaseDecisionState: b}
 }
 

@@ -71,7 +71,7 @@ From the command line at the root of your package “myproject” you can then s
 
 # Copyright Notice
 
-Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+Copyright (c) 2012-2023 The ANTLR Project. All rights reserved.
 
 Use of this file is governed by the BSD 3-clause license, which can be found in the [LICENSE.txt] file in the project root.
 

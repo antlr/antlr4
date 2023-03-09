@@ -605,7 +605,7 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 // during parsing. Later, the runtime Sync was improved for loops/sub-rules see [Sync] docs
 //
 // [A note on error recovery in recursive descent parsers]: http://portal.acm.org/citation.cfm?id=947902.947905
-// [Algorithms + Data Structures = Programs]: https:t.ly/5QzgE
+// [Algorithms + Data Structures = Programs]: https://t.ly/5QzgE
 // [Efficient and Comfortable Error Recovery in Recursive Descent Parsers]: ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
 func (d *DefaultErrorStrategy) GetErrorRecoverySet(recognizer Parser) *IntervalSet {
 	atn := recognizer.GetInterpreter().atn

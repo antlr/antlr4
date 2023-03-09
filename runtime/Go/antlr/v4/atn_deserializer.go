@@ -451,7 +451,7 @@ func (a *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
 			continue
 		}
 
-		// We analyze the ATN to determine if a ATN decision state is the
+		// We analyze the [ATN] to determine if an ATN decision state is the
 		// decision for the closure block that determines whether a
 		// precedence rule should continue or complete.
 		if atn.ruleToStartState[state.GetRuleIndex()].isPrecedenceRule {

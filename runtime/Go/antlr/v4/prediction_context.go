@@ -85,7 +85,7 @@ func NewPredictionContextCache() *PredictionContextCache {
 }
 
 // Add a context to the cache and return it. If the context already exists,
-// return that one instead and do not add a Newcontext to the cache.
+// return that one instead and do not add a new context to the cache.
 // Protect shared cache from unsafe thread access.
 func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	if ctx == BasePredictionContextEMPTY {
@@ -432,14 +432,14 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 	return mergeArrays(arp, arb, rootIsWildcard, mergeCache)
 }
 
-// Merge two {@link SingletonBasePredictionContext} instances.
+// mergeSingletons merges two [SingletonBasePredictionContext] instances.
 //
-// <p>Stack tops equal, parents merge is same return left graph.<br>
+// Stack tops equal, parents merge is same return left graph.
 // <embed src="images/SingletonMerge_SameRootSamePar.svg"
 // type="image/svg+xml"/></p>
 //
 // <p>Same stack top, parents differ merge parents giving array node, then
-// remainders of those graphs. A Newroot node is created to point to the
+// remainders of those graphs. A new root node is created to point to the
 // merged parents.<br>
 // <embed src="images/SingletonMerge_SameRootDiffPar.svg"
 // type="image/svg+xml"/></p>
@@ -493,8 +493,8 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		}
 		// else: ax + ay = a'[x,y]
 		// merge parents x and y, giving array node with x,y then remainders
-		// of those graphs. dup a, a' points at merged array
-		// Newjoined parent so create Newsingleton pointing to it, a'
+		// of those graphs. dup a, a' points at merged array.
+		// New joined parent so create a new singleton pointing to it, a'
 		spc := SingletonBasePredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), spc)

@@ -74,6 +74,7 @@ func panicTester(t *testing.T, expectedMsg []string, r *TokenStreamRewriter) {
 	r.GetTextDefault()
 }
 
+//goland:noinspection ALL
 func TestLexerA(t *testing.T) {
 	tests := []LexerTest{
 		NewLexerTest("abc", "0abc", "InsertBeforeIndex0",
@@ -382,7 +383,7 @@ func lexeraLexerInit() {
 	}
 }
 
-// LexerAInit initializes any static state used to implement LexerA. By default the
+// LexerAInit initializes any static state used to implement LexerA. By default, the
 // static state used to implement the lexer is lazily initialized during the first call to
 // NewLexerA(). You can call this function if you wish to initialize the static state ahead
 // of time.
@@ -410,6 +411,7 @@ func NewLexerA(input CharStream) *LexerA {
 }
 
 // LexerA tokens.
+//
 //goland:noinspection GoUnusedConst
 const (
 	LexerAA = 1

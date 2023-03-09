@@ -129,7 +129,7 @@ func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 	//    return result
 }
 
-// GetTokenType get the type of a token based upon it's name
+// GetTokenType get the token type based upon its name
 func (b *BaseRecognizer) GetTokenType(_ string) int {
 	panic("Method not defined!")
 	//    var ttype = b.GetTokenTypeMap()[tokenName]

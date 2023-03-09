@@ -10,7 +10,7 @@ import (
 
 // ATNConfig is a tuple: (ATN state, predicted alt, syntactic, semantic
 // context). The syntactic context is a graph-structured stack node whose
-// path(s) to the root is the rule invocation(s) chain used to arrive at the
+// path(s) to the root is the rule invocation(s) chain used to arrive in the
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
@@ -68,7 +68,7 @@ func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup - maybe dele
 	}
 }
 
-// NewBaseATNConfig6 creates a new BaseATNConfig instanc given a state, alt and context only
+// NewBaseATNConfig6 creates a new BaseATNConfig instance given a state, alt and context only
 func NewBaseATNConfig6(state ATNState, alt int, context PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 }
@@ -102,7 +102,7 @@ func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *
 	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 }
 
-// NewBaseATNConfig creates a new BaseATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors
+// NewBaseATNConfig creates a new BaseATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors'
 // are just wrappers around this one.
 func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
@@ -308,29 +308,29 @@ func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
 	if l == other {
 		return true
 	}
-	var othert, ok = other.(*LexerATNConfig)
+	var otherT, ok = other.(*LexerATNConfig)
 
 	if l == other {
 		return true
 	} else if !ok {
 		return false
-	} else if l.passedThroughNonGreedyDecision != othert.passedThroughNonGreedyDecision {
+	} else if l.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
 		return false
 	}
 
 	var b bool
 
 	if l.lexerActionExecutor != nil {
-		b = !l.lexerActionExecutor.Equals(othert.lexerActionExecutor)
+		b = !l.lexerActionExecutor.Equals(otherT.lexerActionExecutor)
 	} else {
-		b = othert.lexerActionExecutor != nil
+		b = otherT.lexerActionExecutor != nil
 	}
 
 	if b {
 		return false
 	}
 
-	return l.BaseATNConfig.Equals(othert.BaseATNConfig)
+	return l.BaseATNConfig.Equals(otherT.BaseATNConfig)
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {

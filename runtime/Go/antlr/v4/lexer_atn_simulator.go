@@ -193,7 +193,7 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 			}
 		}
 		t = input.LA(1)
-		s = target // flip current DFA target becomes Newsrc/from state
+		s = target // flip current DFA target becomes new src/from state
 	}
 
 	return l.failOrAccept(l.prevAccept, input, s.configs, t)
@@ -226,16 +226,12 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 	return target
 }
 
-// Compute a target state for an edge in the DFA, and attempt to add the
-// computed state and corresponding edge to the DFA.
+// computeTargetState computes a target state for an edge in the [DFA], and attempt to add the
+// computed state and corresponding edge to the [DFA].
 //
-// @param input The input stream
-// @param s The current DFA state
-// @param t The next input symbol
-//
-// @return The computed target DFA state for the given input symbol
-// {@code t}. If {@code t} does not lead to a valid DFA state, l method
-// returns {@link //ERROR}.
+// The func returns the computed target [DFA] state for the given input symbol t.
+// If this does not lead to a valid [DFA] state, this method
+// returns ATNSimulatorError.
 func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
 	reach := NewOrderedATNConfigSet()
 
@@ -246,7 +242,7 @@ func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t 
 	if len(reach.configs) == 0 { // we got nowhere on t from s
 		if !reach.hasSemanticContext {
 			// we got nowhere on t, don't panic out l knowledge it'd
-			// cause a failover from DFA later.
+			// cause a fail-over from DFA later.
 			l.addDFAEdge(s, t, ATNSimulatorError, nil)
 		}
 		// stop when we can't Match any more char
@@ -271,9 +267,10 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 	panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, reach))
 }
 
-// Given a starting configuration set, figure out all ATN configurations
-// we can reach upon input {@code t}. Parameter {@code reach} is a return
-// parameter.
+// getReachableConfigSet when given a starting configuration set, figures out all [ATN] configurations
+// we can reach upon input t.
+//
+// Parameter reach is a return parameter.
 func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
 	// l is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
@@ -288,7 +285,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 		if //goland:noinspection GoBoolExpressions
 		LexerATNSimulatorDebug {
 
-			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String()) // l.recog, true))
+			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String())
 		}
 
 		for _, trans := range cfg.GetState().GetTransitions() {
@@ -344,20 +341,19 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 	return configs
 }
 
-// Since the alternatives within any lexer decision are ordered by
-// preference, l method stops pursuing the closure as soon as an accept
+// closure since the alternatives within any lexer decision are ordered by
+// preference, this method stops pursuing the closure as soon as an accept
 // state is reached. After the first accept state is reached by depth-first
-// search from {@code config}, all other (potentially reachable) states for
-// l rule would have a lower priority.
+// search from config, all other (potentially reachable) states for
+// this rule would have a lower priority.
 //
-// @return {@code true} if an accept state is reached, otherwise
-// {@code false}.
+// The func returns true if an accept state is reached.
 func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 
 	if //goland:noinspection GoBoolExpressions
 	LexerATNSimulatorDebug {
-		fmt.Println("closure(" + config.String() + ")") // config.String(l.recog, true) + ")")
+		fmt.Println("closure(" + config.String() + ")")
 	}
 
 	_, ok := config.state.(*RuleStopState)
@@ -487,26 +483,18 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 	return cfg
 }
 
-// Evaluate a predicate specified in the lexer.
+// evaluatePredicate eEvaluates a predicate specified in the lexer.
 //
-// <p>If {@code speculative} is {@code true}, l method was called before
-// {@link //consume} for the Matched character. This method should call
-// {@link //consume} before evaluating the predicate to ensure position
-// sensitive values, including {@link Lexer//GetText}, {@link Lexer//GetLine},
-// and {@link Lexer//getcolumn}, properly reflect the current
-// lexer state. This method should restore {@code input} and the simulator
-// to the original state before returning (i.e. undo the actions made by the
-// call to {@link //consume}.</p>
+// If speculative is true, this method was called before
+// [consume] for the Matched character. This method should call
+// [consume] before evaluating the predicate to ensure position
+// sensitive values, including [GetText], [GetLine],
+// and [GetColumn], properly reflect the current
+// lexer state. This method should restore input and the simulator
+// to the original state before returning, i.e. undo the actions made by the
+// call to [Consume].
 //
-// @param input The input stream.
-// @param ruleIndex The rule containing the predicate.
-// @param predIndex The index of the predicate within the rule.
-// @param speculative {@code true} if the current index in {@code input} is
-// one character before the predicate's location.
-//
-// @return {@code true} if the specified predicate evaluates to
-// {@code true}.
-// /
+// The func returns true if the specified predicate evaluates to true.
 func (l *LexerATNSimulator) evaluatePredicate(input CharStream, ruleIndex, predIndex int, speculative bool) bool {
 	// assume true if no recognizer was provided
 	if l.recog == nil {

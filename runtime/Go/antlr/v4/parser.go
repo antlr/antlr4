@@ -153,9 +153,9 @@ func (p *BaseParser) Match(ttype int) Token {
 	} else {
 		t = p.errHandler.RecoverInline(p)
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
-			// we must have conjured up a Newtoken during single token
-			// insertion
-			// if it's not the current symbol
+
+			// we must have conjured up a new token during single token
+			// insertion if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
 	}
@@ -187,9 +187,8 @@ func (p *BaseParser) MatchWildcard() Token {
 	} else {
 		t = p.errHandler.RecoverInline(p)
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
-			// we must have conjured up a Newtoken during single token
-			// insertion
-			// if it's not the current symbol
+			// we must have conjured up a new token during single token
+			// insertion if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
 	}
@@ -314,7 +313,7 @@ func (p *BaseParser) GetTokenFactory() TokenFactory {
 	return p.input.GetTokenSource().GetTokenFactory()
 }
 
-// Tell our token source and error strategy about a Newway to create tokens.//
+// setTokenFactory is used to tell our token source and error strategy about a new way to create tokens.
 func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 	p.input.GetTokenSource().setTokenFactory(factory)
 }
@@ -323,7 +322,7 @@ func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 // lazily.
 func (p *BaseParser) GetATNWithBypassAlts() {
 
-	// TODO
+	// TODO - Implement this?
 	panic("Not implemented!")
 
 	//	serializedAtn := p.getSerializedATN()
@@ -474,7 +473,7 @@ func (p *BaseParser) ExitRule() {
 
 func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 	localctx.SetAltNumber(altNum)
-	// if we have Newlocalctx, make sure we replace existing ctx
+	// if we have a new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if p.BuildParseTrees && p.ctx != localctx {
 		if p.ctx.GetParent() != nil {

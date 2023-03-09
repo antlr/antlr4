@@ -76,15 +76,14 @@ func (b *BaseRecognitionException) GetInputStream() IntStream {
 
 // <p>If the state number is not known, b method returns -1.</p>
 
-// Gets the set of input symbols which could potentially follow the
-// previously Matched symbol at the time b exception was panicn.
+// getExpectedTokens gets the set of input symbols which could potentially follow the
+// previously Matched symbol at the time this exception was raised.
 //
-// <p>If the set of expected tokens is not known and could not be computed,
-// b method returns {@code nil}.</p>
+// If the set of expected tokens is not known and could not be computed,
+// this method returns nil.
 //
-// @return The set of token types that could potentially follow the current
-// state in the ATN, or {@code nil} if the information is not available.
-// /
+// The func returns the set of token types that could potentially follow the current
+// state in the {ATN}, or nil if the information is not available.
 func (b *BaseRecognitionException) getExpectedTokens() *IntervalSet {
 	if b.recognizer != nil {
 		return b.recognizer.GetATN().getExpectedTokens(b.offendingState, b.ctx)
@@ -161,12 +160,14 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken To
 	n.BaseRecognitionException = NewBaseRecognitionException("", recognizer, input, ctx)
 
 	// Which configurations did we try at input.Index() that couldn't Match
-	// input.LT(1)?//
+	// input.LT(1)
 	n.deadEndConfigs = deadEndConfigs
+
 	// The token object at the start index the input stream might
-	// not be buffering tokens so get a reference to it. (At the
-	// time the error occurred, of course the stream needs to keep a
-	// buffer all of the tokens but later we might not have access to those.)
+	// not be buffering tokens so get a reference to it.
+	//
+	// At the time the error occurred, of course the stream needs to keep a
+	// buffer of all the tokens, but later we might not have access to those.
 	n.startToken = startToken
 	n.offendingToken = offendingToken
 

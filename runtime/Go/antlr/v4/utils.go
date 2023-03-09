@@ -57,7 +57,7 @@ func standardHashFunction(a interface{}) int {
 		return h.Hash()
 	}
 
-	panic("Not Hasher")
+	panic("Not 'Hasher'")
 }
 
 type hasher interface {
@@ -122,7 +122,7 @@ func (b *BitSet) or(set *BitSet) {
 	setLen := set.minLen()
 	maxLen := intMax(bLen, setLen)
 	if maxLen > len(b.data) {
-		// Increase the size of len(b.data) to repesent the bits in both sets.
+		// Increase the size of len(b.data) to represent the bits in both sets.
 		data := make([]uint64, maxLen)
 		copy(data, b.data)
 		b.data = data

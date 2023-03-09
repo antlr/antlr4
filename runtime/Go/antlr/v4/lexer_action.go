@@ -7,14 +7,29 @@ package antlr
 import "strconv"
 
 const (
-	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
-	LexerActionTypeCustom   = 1 //The type of a {@link LexerCustomAction} action.
-	LexerActionTypeMode     = 2 //The type of a {@link LexerModeAction} action.
-	LexerActionTypeMore     = 3 //The type of a {@link LexerMoreAction} action.
-	LexerActionTypePopMode  = 4 //The type of a {@link LexerPopModeAction} action.
-	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
-	LexerActionTypeSkip     = 6 //The type of a {@link LexerSkipAction} action.
-	LexerActionTypeType     = 7 //The type of a {@link LexerTypeAction} action.
+	// LexerActionTypeChannel represents a [LexerChannelAction] action.
+	LexerActionTypeChannel = 0
+
+	// LexerActionTypeCustom represents a [LexerCustomAction] action.
+	LexerActionTypeCustom = 1
+
+	// LexerActionTypeMode represents a [LexerModeAction] action.
+	LexerActionTypeMode = 2
+
+	// LexerActionTypeMore represents a [LexerMoreAction] action.
+	LexerActionTypeMore = 3
+
+	// LexerActionTypePopMode represents a [LexerPopModeAction] action.
+	LexerActionTypePopMode = 4
+
+	// LexerActionTypePushMode represents a [LexerPushModeAction] action.
+	LexerActionTypePushMode = 5
+
+	// LexerActionTypeSkip represents a [LexerSkipAction] action.
+	LexerActionTypeSkip = 6
+
+	// LexerActionTypeType represents a [LexerTypeAction] action.
+	LexerActionTypeType = 7
 )
 
 type LexerAction interface {
@@ -388,7 +403,7 @@ type LexerIndexedCustomAction struct {
 // with a [LexerAction].
 //
 // Note: This class is only required for lexer actions for which
-// [LexerAction.isPositionDependent] returns true}
+// [LexerAction.isPositionDependent] returns true.
 //
 // The offset points into the input [CharStream], relative to
 // the token start index, at which the specified lexerAction should be
