@@ -85,8 +85,8 @@ public class GoRunner extends RuntimeRunner {
 		if (goModFile.exists())
 			if (!goModFile.delete())
 				throw new IOException("Can't delete " + goModFile);
-		Processor.run(new String[] {runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
-		Processor.run(new String[] {runtimeToolPath, "mod", "edit",
+		Processor.run(new String[]{runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
+		Processor.run(new String[]{runtimeToolPath, "mod", "edit",
 				"-replace=" + GoRuntimeImportPath + "=" + runtimeFilesPath}, cachePath, environment);
 		cachedGoMod = readFile(cachePath + FileSeparator, "go.mod");
 	}
@@ -97,7 +97,18 @@ public class GoRunner extends RuntimeRunner {
 			return null;
 		}
 
-		return startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
+		// The rule name start is now translated to Start_ at runtime to avoid clashes with labels.
+		// Some tests use start as the first rule name, and we must cater for that
+		//
+		String rn = startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
+		switch (rn) {
+			case "Start":
+			case "End":
+			case "Exception":
+				rn += "_";
+			default:
+		}
+		return rn;
 	}
 
 	@Override
@@ -126,7 +137,7 @@ public class GoRunner extends RuntimeRunner {
 		writeFile(tempDirPath, "go.mod", cachedGoMod);
 		Exception ex = null;
 		try {
-			Processor.run(new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
+			Processor.run(new String[]{getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
 		} catch (InterruptedException | IOException e) {
 			ex = e;
 		}
