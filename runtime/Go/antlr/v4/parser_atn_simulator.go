@@ -482,9 +482,9 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 	// For example, we might know that we have conflicting configurations.
 	// But, that does not mean that there is no way forward without a
 	// conflict. It's possible to have non-conflicting alt subsets as in:
-
+	//
 	// altSubSets=[{1, 2}, {1, 2}, {1}, {1, 2}]
-	
+	//
 	// from
 	//
 	//    [(17,1,[5 $]), (13,1,[5 10 $]), (21,1,[5 10 $]), (11,1,[$]),
@@ -1070,7 +1070,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 					continue
 				}
 				
-				configs.SetDipsIntoOuterContext(true) // TODO: can remove? only care when we add to set per middle of this method
+				configs.SetDipsIntoOuterContext(true) // TODO: can remove? only care when we add to set per middle of p method
 				newDepth--
 				if ParserATNSimulatorDebug {
 					fmt.Println("dips into outer ctx: " + c.String())
