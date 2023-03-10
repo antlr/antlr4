@@ -173,7 +173,7 @@ func (op *BaseRewriteOperation) String() string {
 		op.tokens.Get(op.GetIndex()),
 		op.text,
 	)
-
+	
 }
 
 type InsertBeforeOp struct {
@@ -304,7 +304,7 @@ func (tsr *TokenStreamRewriter) RollbackDefault(instruction_index int) {
 
 // Reset the program so that no instructions exist
 func (tsr *TokenStreamRewriter) DeleteProgram(program_name string) {
-	tsr.Rollback(program_name, Min_Token_Index) //TODO: double test on that cause lower bound is not included
+	tsr.Rollback(program_name, Min_Token_Index) // TODO: double test on that cause lower bound is not included
 }
 
 func (tsr *TokenStreamRewriter) DeleteProgramDefault() {
@@ -575,7 +575,6 @@ func reduceToSingleOperationPerIndex(rewrites []RewriteOperation) map[int]Rewrit
 					rewrites[prevop.instruction_index] = nil
 					rop.index = min(prevop.index, rop.index)
 					rop.LastIndex = max(prevop.LastIndex, rop.LastIndex)
-					println("new rop" + rop.String()) //TODO: remove console write, taken from Java version
 				} else if !disjoint {
 					panic("replace op boundaries of " + rop.String() + " overlap with previous " + prevop.String())
 				}

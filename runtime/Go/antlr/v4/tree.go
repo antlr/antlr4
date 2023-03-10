@@ -21,35 +21,35 @@ type Tree interface {
 
 type SyntaxTree interface {
 	Tree
-
+	
 	GetSourceInterval() *Interval
 }
 
 type ParseTree interface {
 	SyntaxTree
-
+	
 	Accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
-
+	
 	ToStringTree([]string, Recognizer) string
 }
 
 type RuleNode interface {
 	ParseTree
-
+	
 	GetRuleContext() RuleContext
 	GetBaseRuleContext() *BaseRuleContext
 }
 
 type TerminalNode interface {
 	ParseTree
-
+	
 	GetSymbol() Token
 }
 
 type ErrorNode interface {
 	TerminalNode
-
+	
 	errorNode()
 }
 
@@ -69,7 +69,7 @@ func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { re
 func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
 func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
 
-// TODO
+// TODO: Implement this?
 //func (this ParseTreeVisitor) Visit(ctx) {
 //	if (Utils.isArray(ctx)) {
 //		self := this
@@ -108,7 +108,7 @@ func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext)  {}
 
 type TerminalNodeImpl struct {
 	parentCtx RuleContext
-
+	
 	symbol Token
 }
 
@@ -116,10 +116,10 @@ var _ TerminalNode = &TerminalNodeImpl{}
 
 func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
-
+	
 	tn.parentCtx = nil
 	tn.symbol = symbol
-
+	
 	return tn
 }
 
@@ -175,7 +175,7 @@ func (t *TerminalNodeImpl) String() string {
 	if t.symbol.GetTokenType() == TokenEOF {
 		return "<EOF>"
 	}
-
+	
 	return t.symbol.GetText()
 }
 
@@ -266,7 +266,7 @@ func (i *IterativeParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 	var indexStack []int
 	currentNode := t
 	currentIndex := 0
-
+	
 	for currentNode != nil {
 		// pre-order visit
 		switch tt := currentNode.(type) {
@@ -285,7 +285,7 @@ func (i *IterativeParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 			currentNode = currentNode.GetChild(0)
 			continue
 		}
-
+		
 		for {
 			// post-order visit
 			if ruleNode, ok := currentNode.(RuleNode); ok {

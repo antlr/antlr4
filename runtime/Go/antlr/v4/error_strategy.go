@@ -32,9 +32,9 @@ type DefaultErrorStrategy struct {
 var _ ErrorStrategy = &DefaultErrorStrategy{}
 
 func NewDefaultErrorStrategy() *DefaultErrorStrategy {
-
+	
 	d := new(DefaultErrorStrategy)
-
+	
 	// Indicates whether the error strategy is currently "recovering from an
 	// error". This is used to suppress Reporting multiple error messages while
 	// attempting to recover from a detected syntax error.
@@ -42,7 +42,7 @@ func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 	// @see //InErrorRecoveryMode
 	//
 	d.errorRecoveryMode = false
-
+	
 	// The index into the input stream where the last error occurred.
 	// This is used to prevent infinite loops where an error is found
 	// but no token is consumed during recovery...another error is found,
@@ -113,7 +113,7 @@ func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionExcep
 		return // don't Report spurious errors
 	}
 	d.beginErrorCondition(recognizer)
-
+	
 	switch t := e.(type) {
 	default:
 		fmt.Println("unknown recognition error type: " + reflect.TypeOf(e).Name())
@@ -134,7 +134,7 @@ func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionExcep
 // until we find one in the reSynchronization set--loosely the set of tokens
 // that can follow the current rule.</p>
 func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
-
+	
 	if d.lastErrorIndex == recognizer.GetInputStream().Index() &&
 		d.lastErrorStates != nil && d.lastErrorStates.contains(recognizer.GetState()) {
 		// uh oh, another error at same token index and previously-Visited
@@ -201,16 +201,16 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 	if d.InErrorRecoveryMode(recognizer) {
 		return
 	}
-
+	
 	s := recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	la := recognizer.GetTokenStream().LA(1)
-
+	
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
 	nextTokens := recognizer.GetATN().NextTokens(s, nil)
 	if nextTokens.contains(TokenEpsilon) || nextTokens.contains(la) {
 		return
 	}
-
+	
 	switch s.GetStateType() {
 	case ATNStateBlockStart, ATNStateStarBlockStart, ATNStatePlusBlockStart, ATNStateStarLoopEntry:
 		// Report error and recover if possible
@@ -427,7 +427,7 @@ func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 		d.ReportMissingToken(recognizer)
 		return true
 	}
-
+	
 	return false
 }
 
@@ -463,7 +463,7 @@ func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 		d.ReportMatch(recognizer) // we know current token is correct
 		return MatchedSymbol
 	}
-
+	
 	return nil
 }
 
@@ -490,7 +490,7 @@ func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 	expecting := d.GetExpectedTokens(recognizer)
 	expectedTokenType := expecting.first()
 	var tokenText string
-
+	
 	if expectedTokenType == TokenEOF {
 		tokenText = "<missing EOF>"
 	} else {
@@ -498,7 +498,7 @@ func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 		if expectedTokenType > 0 && expectedTokenType < len(ln) {
 			tokenText = "<missing " + recognizer.GetLiteralNames()[expectedTokenType] + ">"
 		} else {
-			tokenText = "<missing undefined>" // TODO matches the JS impl
+			tokenText = "<missing undefined>" // TODO: matches the JS impl
 		}
 	}
 	current := currentSymbol
@@ -506,9 +506,9 @@ func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 	if current.GetTokenType() == TokenEOF && lookback != nil {
 		current = lookback
 	}
-
+	
 	tf := recognizer.GetTokenFactory()
-
+	
 	return tf.Create(current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 
@@ -695,11 +695,11 @@ type BailErrorStrategy struct {
 var _ ErrorStrategy = &BailErrorStrategy{}
 
 func NewBailErrorStrategy() *BailErrorStrategy {
-
+	
 	b := new(BailErrorStrategy)
-
+	
 	b.DefaultErrorStrategy = NewDefaultErrorStrategy()
-
+	
 	return b
 }
 
@@ -717,14 +717,14 @@ func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 			context = nil
 		}
 	}
-	panic(NewParseCancellationException()) // TODO we don't emit e properly
+	panic(NewParseCancellationException()) // TODO: we don't emit e properly
 }
 
 // Make sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't panic an exception.
 func (b *BailErrorStrategy) RecoverInline(recognizer Parser) Token {
 	b.Recover(recognizer, NewInputMisMatchException(recognizer))
-
+	
 	return nil
 }
 

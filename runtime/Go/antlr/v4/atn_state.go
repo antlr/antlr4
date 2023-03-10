@@ -151,6 +151,7 @@ func (as *BaseATNState) AddTransition(trans Transition, index int) {
 		as.epsilonOnlyTransitions = false
 	}
 	
+	// TODO: Check code for already present compared to the Java equivalent
 	if index == -1 {
 		as.transitions = append(as.transitions, trans)
 	} else {

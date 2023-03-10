@@ -457,7 +457,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 			// TODO: if the entry rule is invoked recursively, some
 			// actions may be executed during the recursive call. The
 			// problem can appear when hasEmptyPath() is true but
-			// isEmpty() is false. In l case, the config needs to be
+			// isEmpty() is false. In this case, the config needs to be
 			// split into two contexts - one with just the empty path
 			// and another with everything but the empty path.
 			// Unfortunately, the current algorithm does not allow
@@ -486,7 +486,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 
 // Evaluate a predicate specified in the lexer.
 //
-// <p>If {@code speculative} is {@code true}, l method was called before
+// <p>If {@code speculative} is {@code true}, this method was called before
 // {@link //consume} for the Matched character. This method should call
 // {@link //consume} before evaluating the predicate to ensure position
 // sensitive values, including {@link Lexer//GetText}, {@link Lexer//GetLine},

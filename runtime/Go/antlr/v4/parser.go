@@ -326,7 +326,7 @@ func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 // implement the {@link //getSerializedATN()} method.
 func (p *BaseParser) GetATNWithBypassAlts() {
 
-	// TODO
+	// TODO: implement
 	panic("Not implemented!")
 
 	//	serializedAtn := p.getSerializedATN()

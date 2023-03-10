@@ -38,13 +38,13 @@ func (c *ObjEqComparator[T]) Equals2(o1, o2 T) bool {
 
 // Hash1 delegates to the Hash() method of type T
 func (c *ObjEqComparator[T]) Hash1(o T) int {
-
+	
 	return o.Hash()
 }
 
 type SemCComparator[T Collectable[T]] struct{}
 
-// ATNConfigComparator is used as the compartor for the configLookup field of an ATNConfigSet
+// ATNConfigComparator is used as the comparator for the configLookup field of an ATNConfigSet
 // and has a custom Equals() and Hash() implementation, because equality is not based on the
 // standard Hash() and Equals() methods of the ATNConfig type.
 type ATNConfigComparator[T Collectable[T]] struct {
@@ -52,20 +52,20 @@ type ATNConfigComparator[T Collectable[T]] struct {
 
 // Equals2 is a custom comparator for ATNConfigs specifically for configLookup
 func (c *ATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
-
+	
 	// Same pointer, must be equal, even if both nil
 	//
 	if o1 == o2 {
 		return true
-
+		
 	}
-
+	
 	// If either are nil, but not both, then the result is false
 	//
 	if o1 == nil || o2 == nil {
 		return false
 	}
-
+	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetAlt() == o2.GetAlt() &&
 		o1.GetSemanticContext().Equals(o2.GetSemanticContext())
@@ -86,20 +86,20 @@ type ATNAltConfigComparator[T Collectable[T]] struct {
 
 // Equals2 is a custom comparator for ATNConfigs specifically for configLookup
 func (c *ATNAltConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
-
+	
 	// Same pointer, must be equal, even if both nil
 	//
 	if o1 == o2 {
 		return true
-
+		
 	}
-
+	
 	// If either are nil, but not both, then the result is false
 	//
 	if o1 == nil || o2 == nil {
 		return false
 	}
-
+	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetContext().Equals(o2.GetContext())
 }
@@ -120,20 +120,20 @@ type BaseATNConfigComparator[T Collectable[T]] struct {
 
 // Equals2 is a custom comparator for ATNConfigs specifically for baseATNConfigSet
 func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
-
+	
 	// Same pointer, must be equal, even if both nil
 	//
 	if o1 == o2 {
 		return true
-
+		
 	}
-
+	
 	// If either are nil, but not both, then the result is false
 	//
 	if o1 == nil || o2 == nil {
 		return false
 	}
-
+	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetAlt() == o2.GetAlt() &&
 		o1.GetSemanticContext().Equals(o2.GetSemanticContext())
@@ -142,6 +142,6 @@ func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup, but in fact just
 // delegates to the standard Hash() method of the ATNConfig type.
 func (c *BaseATNConfigComparator[T]) Hash1(o ATNConfig) int {
-
+	
 	return o.Hash()
 }

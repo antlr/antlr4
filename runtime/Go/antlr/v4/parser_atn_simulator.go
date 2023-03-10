@@ -1075,7 +1075,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 					continue
 				}
 				
-				configs.SetDipsIntoOuterContext(true) // TODO: can remove? only care when we add to set per middle of p method
+				configs.SetDipsIntoOuterContext(true) // TODO: can remove? only care when we add to set per middle of this method
 				newDepth--
 				if ParserATNSimulatorDebug {
 					fmt.Println("dips into outer ctx: " + c.String())

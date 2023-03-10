@@ -7,22 +7,21 @@ package antlr
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState
-
+	
 	decision int
-
+	
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there. Go maps implement key hash collisions and so on and are very
-	// good, but the DFAState is an object and can't be used directly as the key as it can in say JAva
+	// good, but the DFAState is an object and can't be used directly as the key as it can in say Java
 	// amd C#, whereby if the hashcode is the same for two objects, then Equals() is called against them
-	// to see if they really are the same object.
-	//
+	// to see if they really are the same object. Hence, we have our own map storage.
 	//
 	states *JStore[*DFAState, *ObjEqComparator[*DFAState]]
-
+	
 	numstates int
-
+	
 	s0 *DFAState
-
+	
 	// precedenceDfa is the backing field for isPrecedenceDfa and setPrecedenceDfa.
 	// True if the DFA is for a precedence decision and false otherwise.
 	precedenceDfa bool
@@ -51,12 +50,12 @@ func (d *DFA) getPrecedenceStartState(precedence int) *DFAState {
 	if !d.getPrecedenceDfa() {
 		panic("only precedence DFAs may contain a precedence start state")
 	}
-
+	
 	// s0.edges is never nil for a precedence DFA
 	if precedence < 0 || precedence >= len(d.getS0().getEdges()) {
 		return nil
 	}
-
+	
 	return d.getS0().getIthEdge(precedence)
 }
 
@@ -66,11 +65,11 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 	if !d.getPrecedenceDfa() {
 		panic("only precedence DFAs may contain a precedence start state")
 	}
-
+	
 	if precedence < 0 {
 		return
 	}
-
+	
 	// Synchronization on s0 here is ok. When the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again. s0.edges
 	// is never nil for a precedence DFA.
@@ -80,7 +79,7 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 		s0.setEdges(edges)
 		d.setS0(s0)
 	}
-
+	
 	s0.setIthEdge(precedence, startState)
 }
 
@@ -97,10 +96,10 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
 		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst)
 		d.numstates = 0
-
+		
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
-
+			
 			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -108,7 +107,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		} else {
 			d.setS0(nil)
 		}
-
+		
 		d.precedenceDfa = precedenceDfa
 	}
 }
@@ -123,11 +122,11 @@ func (d *DFA) setS0(s *DFAState) {
 
 // sortedStates returns the states in d sorted by their state number.
 func (d *DFA) sortedStates() []*DFAState {
-
+	
 	vs := d.states.SortedSlice(func(i, j *DFAState) bool {
 		return i.stateNumber < j.stateNumber
 	})
-
+	
 	return vs
 }
 
@@ -135,7 +134,7 @@ func (d *DFA) String(literalNames []string, symbolicNames []string) string {
 	if d.getS0() == nil {
 		return ""
 	}
-
+	
 	return NewDFASerializer(d, literalNames, symbolicNames).String()
 }
 
@@ -143,6 +142,6 @@ func (d *DFA) ToLexerString() string {
 	if d.getS0() == nil {
 		return ""
 	}
-
+	
 	return NewLexerDFASerializer(d).String()
 }
