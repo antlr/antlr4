@@ -14,11 +14,11 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 	return la
 }
 
-//   - Special value added to the lookahead sets to indicate that we hit
-//     a predicate during analysis if {@code seeThruPreds==false}.
-//
-// /
 const (
+	// LL1AnalyzerHitPred is a special value added to the lookahead sets to indicate that we hit
+	// a predicate during analysis if
+	//
+	//   seeThruPreds==false
 	LL1AnalyzerHitPred = TokenInvalidType
 )
 
@@ -38,11 +38,12 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	count := len(s.GetTransitions())
 	look := make([]*IntervalSet, count)
 	for alt := 0; alt < count; alt++ {
+
 		look[alt] = NewIntervalSet()
 		lookBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
-		seeThruPreds := false // fail to get lookahead upon pred
-		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
-		// Wipe out lookahead for la alternative if we found nothing
+		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), false, false)
+
+		// Wipe out lookahead for la alternative if we found nothing,
 		// or we had a predicate when we !seeThruPreds
 		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHitPred) {
 			look[alt] = nil
@@ -51,32 +52,30 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	return look
 }
 
-// *
-// Compute set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// Look computes the set of tokens that can follow s in the [ATN] in the
+// specified ctx.
 //
-// <p>If {@code ctx} is {@code nil} and the end of the rule containing
-// {@code s} is reached, {@link Token//EPSILON} is added to the result set.
-// If {@code ctx} is not {@code nil} and the end of the outermost rule is
-// reached, {@link Token//EOF} is added to the result set.</p>
+// If ctx is nil and the end of the rule containing
+// s is reached, [EPSILON] is added to the result set.
 //
-// @param s the ATN state
-// @param stopState the ATN state to stop at. This can be a
-// {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx the complete parser context, or {@code nil} if the context
+// If ctx is not nil and the end of the outermost rule is
+// reached, [EOF] is added to the result set.
+//
+// Parameter s the ATN state, and stopState is the ATN state to stop at. This can be a
+// [BlockEndState] to detect epsilon paths through a closure.
+//
+// Parameter ctx is the complete parser context, or nil if the context
 // should be ignored
 //
-// @return The set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
-// /
+// The func returns the set of tokens that can follow s in the [ATN] in the
+// specified ctx.
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
-	seeThruPreds := true // ignore preds get all lookahead
 	var lookContext PredictionContext
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	la.look1(s, stopState, lookContext, r, NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst), NewBitSet(), true, true)
 	return r
 }
 
@@ -110,7 +109,7 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
+func (la *LL1Analyzer) look2(_, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *JStore[ATNConfig, Comparator[ATNConfig]], calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)

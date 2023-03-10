@@ -90,14 +90,15 @@ func (prc *BaseParserRuleContext) GetText() string {
 	return s
 }
 
-// Double dispatch methods for listeners
-func (prc *BaseParserRuleContext) EnterRule(listener ParseTreeListener) {
+// EnterRule is called when any rule is entered.
+func (prc *BaseParserRuleContext) EnterRule(_ ParseTreeListener) {
 }
 
-func (prc *BaseParserRuleContext) ExitRule(listener ParseTreeListener) {
+// ExitRule is called when any rule is exited.
+func (prc *BaseParserRuleContext) ExitRule(_ ParseTreeListener) {
 }
 
-// * Does not set parent link other add methods do that///
+// * Does not set parent link other add methods do that
 func (prc *BaseParserRuleContext) addTerminalNodeChild(child TerminalNode) TerminalNode {
 	if prc.children == nil {
 		prc.children = make([]Tree, 0)
@@ -120,10 +121,9 @@ func (prc *BaseParserRuleContext) AddChild(child RuleContext) RuleContext {
 	return child
 }
 
-// * Used by EnterOuterAlt to toss out a RuleContext previously added as
-// we entered a rule. If we have // label, we will need to remove
-// generic ruleContext object.
-// /
+// RemoveLastChild is used by [EnterOuterAlt] to toss out a [RuleContext] previously added as
+// we entered a rule. If we have a label, we will need to remove
+// the generic ruleContext object.
 func (prc *BaseParserRuleContext) RemoveLastChild() {
 	if prc.children != nil && len(prc.children) > 0 {
 		prc.children = prc.children[0 : len(prc.children)-1]
@@ -350,6 +350,7 @@ type BaseInterpreterRuleContext struct {
 	*BaseParserRuleContext
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewBaseInterpreterRuleContext(parent BaseInterpreterRuleContext, invokingStateNumber, ruleIndex int) *BaseInterpreterRuleContext {
 
 	prc := new(BaseInterpreterRuleContext)

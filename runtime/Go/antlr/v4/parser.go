@@ -48,8 +48,10 @@ type BaseParser struct {
 	_SyntaxErrors  int
 }
 
-// p.is all the parsing support code essentially most of it is error
-// recovery stuff.//
+// NewBaseParser contains all the parsing support code to embed in parsers. Essentially most of it is error
+// recovery stuff.
+//
+//goland:noinspection GoUnusedExportedFunction
 func NewBaseParser(input TokenStream) *BaseParser {
 
 	p := new(BaseParser)
@@ -58,39 +60,46 @@ func NewBaseParser(input TokenStream) *BaseParser {
 
 	// The input stream.
 	p.input = nil
+
 	// The error handling strategy for the parser. The default value is a new
 	// instance of {@link DefaultErrorStrategy}.
 	p.errHandler = NewDefaultErrorStrategy()
 	p.precedenceStack = make([]int, 0)
 	p.precedenceStack.Push(0)
-	// The {@link ParserRuleContext} object for the currently executing rule.
+
+	// The ParserRuleContext object for the currently executing rule.
 	// p.is always non-nil during the parsing process.
 	p.ctx = nil
-	// Specifies whether or not the parser should construct a parse tree during
+
+	// Specifies whether the parser should construct a parse tree during
 	// the parsing process. The default value is {@code true}.
 	p.BuildParseTrees = true
-	// When {@link //setTrace}{@code (true)} is called, a reference to the
-	// {@link TraceListener} is stored here so it can be easily removed in a
-	// later call to {@link //setTrace}{@code (false)}. The listener itself is
+
+	// When setTrace(true) is called, a reference to the
+	// TraceListener is stored here, so it can be easily removed in a
+	// later call to setTrace(false). The listener itself is
 	// implemented as a parser listener so p.field is not directly used by
 	// other parser methods.
 	p.tracer = nil
-	// The list of {@link ParseTreeListener} listeners registered to receive
+
+	// The list of ParseTreeListener listeners registered to receive
 	// events during the parse.
 	p.parseListeners = nil
+
 	// The number of syntax errors Reported during parsing. p.value is
-	// incremented each time {@link //NotifyErrorListeners} is called.
+	// incremented each time NotifyErrorListeners is called.
 	p._SyntaxErrors = 0
 	p.SetInputStream(input)
 
 	return p
 }
 
-// p.field maps from the serialized ATN string to the deserialized {@link
-// ATN} with
+// This field maps from the serialized ATN string to the deserialized [ATN] with
 // bypass alternatives.
 //
-// @see ATNDeserializationOptions//isGenerateRuleBypassTransitions()
+// [ATNDeserializationOptions.isGenerateRuleBypassTransitions]
+//
+//goland:noinspection GoUnusedGlobalVariable
 var bypassAltsAtnCache = make(map[string]int)
 
 // reset the parser's state//
@@ -144,9 +153,9 @@ func (p *BaseParser) Match(ttype int) Token {
 	} else {
 		t = p.errHandler.RecoverInline(p)
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
-			// we must have conjured up a Newtoken during single token
-			// insertion
-			// if it's not the current symbol
+
+			// we must have conjured up a new token during single token
+			// insertion if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
 	}
@@ -178,9 +187,8 @@ func (p *BaseParser) MatchWildcard() Token {
 	} else {
 		t = p.errHandler.RecoverInline(p)
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
-			// we must have conjured up a Newtoken during single token
-			// insertion
-			// if it's not the current symbol
+			// we must have conjured up a new token during single token
+			// insertion if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
 	}
@@ -202,33 +210,27 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 	return p.parseListeners
 }
 
-// Registers {@code listener} to receive events during the parsing process.
+// AddParseListener registers listener to receive events during the parsing process.
 //
-// <p>To support output-preserving grammar transformations (including but not
+// To support output-preserving grammar transformations (including but not
 // limited to left-recursion removal, automated left-factoring, and
 // optimized code generation), calls to listener methods during the parse
 // may differ substantially from calls made by
-// {@link ParseTreeWalker//DEFAULT} used after the parse is complete. In
+// [ParseTreeWalker.DEFAULT] used after the parse is complete. In
 // particular, rule entry and exit events may occur in a different order
 // during the parse than after the parser. In addition, calls to certain
-// rule entry methods may be omitted.</p>
+// rule entry methods may be omitted.
 //
-// <p>With the following specific exceptions, calls to listener events are
-// <em>deterministic</em>, i.e. for identical input the calls to listener
-// methods will be the same.</p>
+// With the following specific exceptions, calls to listener events are
+// deterministic, i.e. for identical input the calls to listener
+// methods will be the same.
 //
-// <ul>
-// <li>Alterations to the grammar used to generate code may change the
-// behavior of the listener calls.</li>
-// <li>Alterations to the command line options passed to ANTLR 4 when
-// generating the parser may change the behavior of the listener calls.</li>
-// <li>Changing the version of the ANTLR Tool used to generate the parser
-// may change the behavior of the listener calls.</li>
-// </ul>
-//
-// @param listener the listener to add
-//
-// @panics nilPointerException if {@code} listener is {@code nil}
+//   - Alterations to the grammar used to generate code may change the
+//     behavior of the listener calls.
+//   - Alterations to the command line options passed to ANTLR 4 when
+//     generating the parser may change the behavior of the listener calls.
+//   - Changing the version of the ANTLR Tool used to generate the parser
+//     may change the behavior of the listener calls.
 func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 	if listener == nil {
 		panic("listener")
@@ -239,11 +241,10 @@ func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 	p.parseListeners = append(p.parseListeners, listener)
 }
 
-// Remove {@code listener} from the list of parse listeners.
+// RemoveParseListener removes listener from the list of parse listeners.
 //
-// <p>If {@code listener} is {@code nil} or has not been added as a parse
-// listener, p.method does nothing.</p>
-// @param listener the listener to remove
+// If listener is nil or has not been added as a parse
+// listener, this func does nothing.
 func (p *BaseParser) RemoveParseListener(listener ParseTreeListener) {
 
 	if p.parseListeners != nil {
@@ -274,7 +275,7 @@ func (p *BaseParser) removeParseListeners() {
 	p.parseListeners = nil
 }
 
-// Notify any parse listeners of an enter rule event.
+// TriggerEnterRuleEvent notifies all parse listeners of an enter rule event.
 func (p *BaseParser) TriggerEnterRuleEvent() {
 	if p.parseListeners != nil {
 		ctx := p.ctx
@@ -285,9 +286,7 @@ func (p *BaseParser) TriggerEnterRuleEvent() {
 	}
 }
 
-// Notify any parse listeners of an exit rule event.
-//
-// @see //addParseListener
+// TriggerExitRuleEvent notifies any parse listeners of an exit rule event.
 func (p *BaseParser) TriggerExitRuleEvent() {
 	if p.parseListeners != nil {
 		// reverse order walk of listeners
@@ -314,19 +313,16 @@ func (p *BaseParser) GetTokenFactory() TokenFactory {
 	return p.input.GetTokenSource().GetTokenFactory()
 }
 
-// Tell our token source and error strategy about a Newway to create tokens.//
+// setTokenFactory is used to tell our token source and error strategy about a new way to create tokens.
 func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 	p.input.GetTokenSource().setTokenFactory(factory)
 }
 
-// The ATN with bypass alternatives is expensive to create so we create it
+// GetATNWithBypassAlts - the ATN with bypass alternatives is expensive to create, so we create it
 // lazily.
-//
-// @panics UnsupportedOperationException if the current parser does not
-// implement the {@link //getSerializedATN()} method.
 func (p *BaseParser) GetATNWithBypassAlts() {
 
-	// TODO
+	// TODO - Implement this?
 	panic("Not implemented!")
 
 	//	serializedAtn := p.getSerializedATN()
@@ -354,6 +350,7 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 // String id = m.Get("ID")
 // </pre>
 
+//goland:noinspection GoUnusedParameter
 func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Lexer) {
 
 	panic("NewParseTreePatternMatcher not implemented!")
@@ -386,14 +383,16 @@ func (p *BaseParser) GetTokenStream() TokenStream {
 	return p.input
 }
 
-// Set the token stream and reset the parser.//
+// SetTokenStream installs input as the token stream and resets the parser.
 func (p *BaseParser) SetTokenStream(input TokenStream) {
 	p.input = nil
 	p.reset()
 	p.input = input
 }
 
-// Match needs to return the current input symbol, which gets put
+// GetCurrentToken returns the current token at LT(1).
+//
+// [Match] needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
 func (p *BaseParser) GetCurrentToken() Token {
 	return p.input.LT(1)
@@ -446,7 +445,7 @@ func (p *BaseParser) addContextToParseTree() {
 	}
 }
 
-func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, _ int) {
 	p.SetState(state)
 	p.ctx = localctx
 	p.ctx.SetStart(p.input.LT(1))
@@ -474,7 +473,7 @@ func (p *BaseParser) ExitRule() {
 
 func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 	localctx.SetAltNumber(altNum)
-	// if we have Newlocalctx, make sure we replace existing ctx
+	// if we have a new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if p.BuildParseTrees && p.ctx != localctx {
 		if p.ctx.GetParent() != nil {
@@ -498,7 +497,7 @@ func (p *BaseParser) GetPrecedence() int {
 	return p.precedenceStack[len(p.precedenceStack)-1]
 }
 
-func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleIndex, precedence int) {
+func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, _, precedence int) {
 	p.SetState(state)
 	p.precedenceStack.Push(precedence)
 	p.ctx = localctx
@@ -512,7 +511,7 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 //
 // Like {@link //EnterRule} but for recursive rules.
 
-func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, _ int) {
 	previous := p.ctx
 	previous.SetParent(localctx)
 	previous.SetInvokingState(state)
@@ -530,7 +529,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 }
 
 func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
-	p.precedenceStack.Pop()
+	_, _ = p.precedenceStack.Pop()
 	p.ctx.SetStop(p.input.LT(-1))
 	retCtx := p.ctx // save current ctx (return value)
 	// unroll so ctx is as it was before call to recursive method
@@ -561,29 +560,22 @@ func (p *BaseParser) GetInvokingContext(ruleIndex int) ParserRuleContext {
 	return nil
 }
 
-func (p *BaseParser) Precpred(localctx RuleContext, precedence int) bool {
+func (p *BaseParser) Precpred(_ RuleContext, precedence int) bool {
 	return precedence >= p.precedenceStack[len(p.precedenceStack)-1]
 }
 
+//goland:noinspection GoUnusedParameter
 func (p *BaseParser) inContext(context ParserRuleContext) bool {
 	// TODO: useful in parser?
 	return false
 }
 
-//
-// Checks whether or not {@code symbol} can follow the current state in the
-// ATN. The behavior of p.method is equivalent to the following, but is
+// IsExpectedToken checks whether symbol can follow the current state in the
+// {ATN}. The behavior of p.method is equivalent to the following, but is
 // implemented such that the complete context-sensitive follow set does not
 // need to be explicitly constructed.
 //
-// <pre>
-// return getExpectedTokens().contains(symbol)
-// </pre>
-//
-// @param symbol the symbol type to check
-// @return {@code true} if {@code symbol} can follow the current state in
-// the ATN, otherwise {@code false}.
-
+//	return getExpectedTokens().contains(symbol)
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	atn := p.Interpreter.atn
 	ctx := p.ctx
@@ -611,11 +603,9 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	return false
 }
 
-// Computes the set of input symbols which could follow the current parser
-// state and context, as given by {@link //GetState} and {@link //GetContext},
+// GetExpectedTokens and returns the set of input symbols which could follow the current parser
+// state and context, as given by [GetState] and [GetContext],
 // respectively.
-//
-// @see ATN//getExpectedTokens(int, RuleContext)
 func (p *BaseParser) GetExpectedTokens() *IntervalSet {
 	return p.Interpreter.atn.getExpectedTokens(p.state, p.ctx)
 }
@@ -626,7 +616,7 @@ func (p *BaseParser) GetExpectedTokensWithinCurrentRule() *IntervalSet {
 	return atn.NextTokens(s, nil)
 }
 
-// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
+// GetRuleIndex get a rule's index (i.e., RULE_ruleName field) or -1 if not found.
 func (p *BaseParser) GetRuleIndex(ruleName string) int {
 	var ruleIndex, ok = p.GetRuleIndexMap()[ruleName]
 	if ok {
@@ -636,13 +626,10 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 	return -1
 }
 
-// Return List&ltString&gt of the rule names in your parser instance
+// GetRuleInvocationStack returns a list of the rule names in your parser instance
 // leading up to a call to the current rule. You could override if
 // you want more details such as the file/line info of where
 // in the ATN a rule is invoked.
-//
-// this very useful for error messages.
-
 func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 	if c == nil {
 		c = p.ctx
@@ -668,12 +655,12 @@ func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 	return stack
 }
 
-// For debugging and other purposes.//
+// GetDFAStrings returns a list of all DFA states used for debugging purposes
 func (p *BaseParser) GetDFAStrings() string {
 	return fmt.Sprint(p.Interpreter.decisionToDFA)
 }
 
-// For debugging and other purposes.//
+// DumpDFA prints the whole of the DFA for debugging
 func (p *BaseParser) DumpDFA() {
 	seenOne := false
 	for _, dfa := range p.Interpreter.decisionToDFA {
@@ -692,8 +679,10 @@ func (p *BaseParser) GetSourceName() string {
 	return p.GrammarFileName
 }
 
-// During a parse is sometimes useful to listen in on the rule entry and exit
-// events as well as token Matches. p.is for quick and dirty debugging.
+// SetTrace installs a trace listener for the parse.
+//
+// During a parse it is sometimes useful to listen in on the rule entry and exit
+// events as well as token Matches. This is for quick and dirty debugging.
 func (p *BaseParser) SetTrace(trace *TraceListener) {
 	if trace == nil {
 		p.RemoveParseListener(p.tracer)

@@ -4,27 +4,26 @@
 
 package antlr
 
-//  A rule context is a record of a single rule invocation. It knows
-//  which context invoked it, if any. If there is no parent context, then
-//  naturally the invoking state is not valid.  The parent link
-//  provides a chain upwards from the current rule invocation to the root
-//  of the invocation tree, forming a stack. We actually carry no
-//  information about the rule associated with b context (except
-//  when parsing). We keep only the state number of the invoking state from
-//  the ATN submachine that invoked b. Contrast b with the s
-//  pointer inside ParserRuleContext that tracks the current state
-//  being "executed" for the current rule.
+// RuleContext is a record of a single rule invocation. It knows
+// which context invoked it, if any. If there is no parent context, then
+// naturally the invoking state is not valid.  The parent link
+// provides a chain upwards from the current rule invocation to the root
+// of the invocation tree, forming a stack.
 //
-//  The parent contexts are useful for computing lookahead sets and
-//  getting error information.
+// We actually carry no information about the rule associated with this context (except
+// when parsing). We keep only the state number of the invoking state from
+// the [ATN] submachine that invoked this. Contrast this with the s
+// pointer inside [ParserRuleContext] that tracks the current state
+// being "executed" for the current rule.
 //
-//  These objects are used during parsing and prediction.
-//  For the special case of parsers, we use the subclass
-//  ParserRuleContext.
+// The parent contexts are useful for computing lookahead sets and
+// getting error information.
 //
-//  @see ParserRuleContext
+// These objects are used during parsing and prediction.
+// For the special case of parsers, we use the struct
+// [ParserRuleContext], which embeds a RuleContext.
 //
-
+// @see ParserRuleContext
 type RuleContext interface {
 	RuleNode
 
@@ -93,22 +92,22 @@ func (b *BaseRuleContext) GetAltNumber() int {
 	return ATNInvalidAltNumber
 }
 
-func (b *BaseRuleContext) SetAltNumber(altNumber int) {}
+func (b *BaseRuleContext) SetAltNumber(_ int) {}
 
-// A context is empty if there is no invoking state meaning nobody call
+// IsEmpty returns true if the context of b is empty.
+//
+// A context is empty if there is no invoking state, meaning nobody calls
 // current context.
 func (b *BaseRuleContext) IsEmpty() bool {
 	return b.invokingState == -1
 }
 
-// Return the combined text of all child nodes. This method only considers
+// GetParent returns the combined text of all child nodes. This method only considers
 // tokens which have been added to the parse tree.
-// <p>
-// Since tokens on hidden channels (e.g. whitespace or comments) are not
-// added to the parse trees, they will not appear in the output of b
-// method.
 //
-
+// Since tokens on hidden channels (e.g. whitespace or comments) are not
+// added to the parse trees, they will not appear in the output of this
+// method.
 func (b *BaseRuleContext) GetParent() Tree {
 	return b.parentCtx
 }
