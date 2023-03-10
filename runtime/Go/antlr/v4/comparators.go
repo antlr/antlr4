@@ -44,7 +44,7 @@ func (c *ObjEqComparator[T]) Hash1(o T) int {
 
 type SemCComparator[T Collectable[T]] struct{}
 
-// ATNConfigComparator is used as the compartor for the configLookup field of an ATNConfigSet
+// ATNConfigComparator is used as the comparator for the configLookup field of an ATNConfigSet
 // and has a custom Equals() and Hash() implementation, because equality is not based on the
 // standard Hash() and Equals() methods of the ATNConfig type.
 type ATNConfigComparator[T Collectable[T]] struct {

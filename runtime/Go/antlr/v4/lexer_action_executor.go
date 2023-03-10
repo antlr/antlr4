@@ -38,19 +38,9 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	return l
 }
 
-// Creates a {@link LexerActionExecutor} which executes the actions for
-// the input {@code lexerActionExecutor} followed by a specified
-// {@code lexerAction}.
-//
-// @param lexerActionExecutor The executor for actions already traversed by
-// the lexer while Matching a token within a particular
-// {@link LexerATNConfig}. If this is {@code nil}, the method behaves as
-// though it were an empty executor.
-// @param lexerAction The lexer action to execute after the actions
-// specified in {@code lexerActionExecutor}.
-//
-// @return A {@link LexerActionExecutor} for executing the combine actions
-// of {@code lexerActionExecutor} and {@code lexerAction}.
+// LexerActionExecutorappend creates a [LexerActionExecutor] which executes the actions for
+// the input [LexerActionExecutor] followed by a specified
+// [LexerAction].
 func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction LexerAction) *LexerActionExecutor {
 	if lexerActionExecutor == nil {
 		return NewLexerActionExecutor([]LexerAction{lexerAction})
@@ -59,34 +49,34 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 	return NewLexerActionExecutor(append(lexerActionExecutor.lexerActions, lexerAction))
 }
 
-// Creates a {@link LexerActionExecutor} which encodes the current offset
+// fixOffsetBeforeMatch creates a [LexerActionExecutor] which encodes the current offset
 // for position-dependent lexer actions.
 //
-// <p>Normally, when the executor encounters lexer actions where
-// {@link LexerAction//isPositionDependent} returns {@code true}, it calls
-// {@link IntStream//seek} on the input {@link CharStream} to set the input
-// position to the <em>end</em> of the current token. This behavior provides
-// for efficient DFA representation of lexer actions which appear at the end
+// Normally, when the executor encounters lexer actions where
+// [LexerAction.isPositionDependent] returns true, it calls
+// [IntStream.Seek] on the input [CharStream] to set the input
+// position to the end of the current token. This behavior provides
+// for efficient [DFA] representation of lexer actions which appear at the end
 // of a lexer rule, even when the lexer rule Matches a variable number of
-// characters.</p>
+// characters.
 //
-// <p>Prior to traversing a Match transition in the ATN, the current offset
+// Prior to traversing a Match transition in the [ATN], the current offset
 // from the token start index is assigned to all position-dependent lexer
 // actions which have not already been assigned a fixed offset. By storing
-// the offsets relative to the token start index, the DFA representation of
+// the offsets relative to the token start index, the [DFA] representation of
 // lexer actions which appear in the middle of tokens remains efficient due
-// to sharing among tokens of the same length, regardless of their absolute
-// position in the input stream.</p>
+// to sharing among tokens of the same Length, regardless of their absolute
+// position in the input stream.
 //
-// <p>If the current executor already has offsets assigned to all
-// position-dependent lexer actions, the method returns {@code this}.</p>
+// If the current executor already has offsets assigned to all
+// position-dependent lexer actions, the method returns this instance.
 //
-// @param offset The current offset to assign to all position-dependent
+// The offset is assigned to all position-dependent
 // lexer actions which do not already have offsets assigned.
 //
-// @return A {@link LexerActionExecutor} which stores input stream offsets
+// The func returns a [LexerActionExecutor] that stores input stream offsets
 // for all position-dependent lexer actions.
-// /
+//
 func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
 	var updatedLexerActions []LexerAction
 	for i := 0; i < len(l.lexerActions); i++ {

@@ -4,13 +4,17 @@ import (
 	"testing"
 )
 
-// Test for Issue # 3319
-// To run, "cd antlr4/runtime/Go/antlr/", then "go test".
+// Test for Issue #3319
+// To run:
+//
+//   cd antlr4/runtime/Go/antlr/v4
+//   go test
+//
 // In the old runtime code, the test would crash because it would try
 // to compare a *LexerActionExecutor with nil, causing a nil pointer dereference.
 // It only happens if there were different states that had equal stateNumber mod 16,
-// and you created that ATNConfig with a nil LexerActionExecutor. (That's why this
-// code has a hardwired constant of 16.
+// and you created that ATNConfig with a nil LexerActionExecutor. That's why this
+// test code has a hardwired constant of 16.
 
 func TestCompare(t *testing.T) {
 	var set = NewOrderedATNConfigSet()

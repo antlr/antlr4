@@ -9,14 +9,13 @@ import (
 	"strconv"
 )
 
-// A tree structure used to record the semantic context in which
-//  an ATN configuration is valid.  It's either a single predicate,
-//  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
+// SemanticContext is a tree structure used to record the semantic context in which
 //
-//  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
-//  {@link SemanticContext} within the scope of this outer class.</p>
+//	an ATN configuration is valid.  It's either a single predicate,
+//	a conjunction p1 && p2, or a sum of products p1 || p2.
 //
-
+//	I have scoped the AND, OR, and Predicate subclasses of
+//	[SemanticContext] within the scope of this outer ``class''
 type SemanticContext interface {
 	Equals(other Collectable[SemanticContext]) bool
 	Hash() int
@@ -80,7 +79,7 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 
 var SemanticContextNone = NewPredicate(-1, -1, false)
 
-func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+func (p *Predicate) evalPrecedence(_ Recognizer, _ RuleContext) SemanticContext {
 	return p
 }
 
@@ -316,12 +315,12 @@ func (a *AND) Hash() int {
 	return murmurFinish(h, len(a.opnds))
 }
 
-func (a *OR) Hash() int {
-	h := murmurInit(41) // Init with a value different from AND
-	for _, op := range a.opnds {
+func (o *OR) Hash() int {
+	h := murmurInit(41) // Init with o value different from AND
+	for _, op := range o.opnds {
 		h = murmurUpdate(h, op.Hash())
 	}
-	return murmurFinish(h, len(a.opnds))
+	return murmurFinish(h, len(o.opnds))
 }
 
 func (a *AND) String() string {

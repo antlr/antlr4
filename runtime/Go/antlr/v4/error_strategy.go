@@ -21,8 +21,8 @@ type ErrorStrategy interface {
 	ReportMatch(Parser)
 }
 
-// This is the default implementation of {@link ANTLRErrorStrategy} used for
-// error Reporting and recovery in ANTLR parsers.
+// DefaultErrorStrategy is the default implementation of ANTLRErrorStrategy used for
+// error reporting and recovery in ANTLR parsers.
 type DefaultErrorStrategy struct {
 	errorRecoveryMode bool
 	lastErrorIndex    int
@@ -46,7 +46,7 @@ func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 	// The index into the input stream where the last error occurred.
 	// This is used to prevent infinite loops where an error is found
 	// but no token is consumed during recovery...another error is found,
-	// ad nauseum. This is a failsafe mechanism to guarantee that at least
+	// ad nauseam. This is a failsafe mechanism to guarantee that at least
 	// one token/tree node is consumed for two errors.
 	//
 	d.lastErrorIndex = -1
@@ -62,50 +62,37 @@ func (d *DefaultErrorStrategy) reset(recognizer Parser) {
 
 // This method is called to enter error recovery mode when a recognition
 // exception is Reported.
-//
-// @param recognizer the parser instance
-func (d *DefaultErrorStrategy) beginErrorCondition(recognizer Parser) {
+func (d *DefaultErrorStrategy) beginErrorCondition(_ Parser) {
 	d.errorRecoveryMode = true
 }
 
-func (d *DefaultErrorStrategy) InErrorRecoveryMode(recognizer Parser) bool {
+func (d *DefaultErrorStrategy) InErrorRecoveryMode(_ Parser) bool {
 	return d.errorRecoveryMode
 }
 
 // This method is called to leave error recovery mode after recovering from
 // a recognition exception.
-//
-// @param recognizer
-func (d *DefaultErrorStrategy) endErrorCondition(recognizer Parser) {
+func (d *DefaultErrorStrategy) endErrorCondition(_ Parser) {
 	d.errorRecoveryMode = false
 	d.lastErrorStates = nil
 	d.lastErrorIndex = -1
 }
 
-// {@inheritDoc}
-//
-// <p>The default implementation simply calls {@link //endErrorCondition}.</p>
+// ReportMatch is the default implementation of error matching and simply calls endErrorCondition.
 func (d *DefaultErrorStrategy) ReportMatch(recognizer Parser) {
 	d.endErrorCondition(recognizer)
 }
 
-// {@inheritDoc}
+// ReportError is the default implementation of error reporting.
+// It returns immediately if the handler is already
+// in error recovery mode. Otherwise, it calls [beginErrorCondition]
+// and dispatches the Reporting task based on the runtime type of e
+// according to the following table.
 //
-// <p>The default implementation returns immediately if the handler is already
-// in error recovery mode. Otherwise, it calls {@link //beginErrorCondition}
-// and dispatches the Reporting task based on the runtime type of {@code e}
-// according to the following table.</p>
-//
-// <ul>
-// <li>{@link NoViableAltException}: Dispatches the call to
-// {@link //ReportNoViableAlternative}</li>
-// <li>{@link InputMisMatchException}: Dispatches the call to
-// {@link //ReportInputMisMatch}</li>
-// <li>{@link FailedPredicateException}: Dispatches the call to
-// {@link //ReportFailedPredicate}</li>
-// <li>All other types: calls {@link Parser//NotifyErrorListeners} to Report
-// the exception</li>
-// </ul>
+//		 [NoViableAltException]     : Dispatches the call to [ReportNoViableAlternative]
+//		 [InputMisMatchException]   : Dispatches the call to [ReportInputMisMatch]
+//	  [FailedPredicateException] : Dispatches the call to [ReportFailedPredicate]
+//	  All other types            : Calls [NotifyErrorListeners] to Report the exception
 func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionException) {
 	// if we've already Reported an error and have not Matched a token
 	// yet successfully, don't Report any errors.
@@ -128,12 +115,10 @@ func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionExcep
 	}
 }
 
-// {@inheritDoc}
-//
-// <p>The default implementation reSynchronizes the parser by consuming tokens
-// until we find one in the reSynchronization set--loosely the set of tokens
-// that can follow the current rule.</p>
-func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
+// Recover is the default recovery implementation.
+// It reSynchronizes the parser by consuming tokens until we find one in the reSynchronization set -
+// loosely the set of tokens that can follow the current rule.
+func (d *DefaultErrorStrategy) Recover(recognizer Parser, _ RecognitionException) {
 
 	if d.lastErrorIndex == recognizer.GetInputStream().Index() &&
 		d.lastErrorStates != nil && d.lastErrorStates.contains(recognizer.GetState()) {
@@ -148,54 +133,58 @@ func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException
 		d.lastErrorStates = NewIntervalSet()
 	}
 	d.lastErrorStates.addOne(recognizer.GetState())
-	followSet := d.getErrorRecoverySet(recognizer)
+	followSet := d.GetErrorRecoverySet(recognizer)
 	d.consumeUntil(recognizer, followSet)
 }
 
-// The default implementation of {@link ANTLRErrorStrategy//Sync} makes sure
-// that the current lookahead symbol is consistent with what were expecting
-// at d point in the ATN. You can call d anytime but ANTLR only
-// generates code to check before subrules/loops and each iteration.
+// Sync is the default implementation of error strategy synchronization.
 //
-// <p>Implements Jim Idle's magic Sync mechanism in closures and optional
-// subrules. E.g.,</p>
+// This Sync makes sure that the current lookahead symbol is consistent with what were expecting
+// at this point in the [ATN]. You can call this anytime but ANTLR only
+// generates code to check before sub-rules/loops and each iteration.
 //
-// <pre>
-// a : Sync ( stuff Sync )*
-// Sync : {consume to what can follow Sync}
-// </pre>
+// Implements [Jim Idle]'s magic Sync mechanism in closures and optional
+// sub-rules. E.g.:
 //
-// At the start of a sub rule upon error, {@link //Sync} performs single
+//	a    : Sync ( stuff Sync )*
+//	Sync : {consume to what can follow Sync}
+//
+// At the start of a sub-rule upon error, Sync performs single
 // token deletion, if possible. If it can't do that, it bails on the current
 // rule and uses the default error recovery, which consumes until the
 // reSynchronization set of the current rule.
 //
-// <p>If the sub rule is optional ({@code (...)?}, {@code (...)*}, or block
-// with an empty alternative), then the expected set includes what follows
-// the subrule.</p>
+// If the sub-rule is optional
 //
-// <p>During loop iteration, it consumes until it sees a token that can start a
-// sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
-// stay in the loop as long as possible.</p>
+//	({@code (...)?}, {@code (...)*},
 //
-// <p><strong>ORIGINS</strong></p>
+// or a block with an empty alternative), then the expected set includes what follows
+// the sub-rule.
 //
-// <p>Previous versions of ANTLR did a poor job of their recovery within loops.
+// During loop iteration, it consumes until it sees a token that can start a
+// sub-rule or what follows loop. Yes, that is pretty aggressive. We opt to
+// stay in the loop as long as possible.
+//
+// # Origins
+//
+// Previous versions of ANTLR did a poor job of their recovery within loops.
 // A single mismatch token or missing token would force the parser to bail
-// out of the entire rules surrounding the loop. So, for rule</p>
+// out of the entire rules surrounding the loop. So, for rule:
 //
-// <pre>
-// classfunc : 'class' ID '{' member* '}'
-// </pre>
+//	classfunc : 'class' ID '{' member* '}'
 //
 // input with an extra token between members would force the parser to
 // consume until it found the next class definition rather than the next
 // member definition of the current class.
 //
-// <p>This functionality cost a little bit of effort because the parser has to
-// compare token set at the start of the loop and at each iteration. If for
-// some reason speed is suffering for you, you can turn off d
-// functionality by simply overriding d method as a blank { }.</p>
+// This functionality cost a bit of effort because the parser has to
+// compare the token set at the start of the loop and at each iteration. If for
+// some reason speed is suffering for you, you can turn off this
+// functionality by simply overriding this method as empty:
+//
+//	{ }
+//
+// [Jim Idle]: https://github.com/jimidle
 func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 	// If already recovering, don't try to Sync
 	if d.InErrorRecoveryMode(recognizer) {
@@ -222,20 +211,16 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 		d.ReportUnwantedToken(recognizer)
 		expecting := NewIntervalSet()
 		expecting.addSet(recognizer.GetExpectedTokens())
-		whatFollowsLoopIterationOrRule := expecting.addSet(d.getErrorRecoverySet(recognizer))
+		whatFollowsLoopIterationOrRule := expecting.addSet(d.GetErrorRecoverySet(recognizer))
 		d.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
 	default:
 		// do nothing if we can't identify the exact kind of ATN state
 	}
 }
 
-// This is called by {@link //ReportError} when the exception is a
-// {@link NoViableAltException}.
+// ReportNoViableAlternative is called by [ReportError] when the exception is a [NoViableAltException].
 //
-// @see //ReportError
-//
-// @param recognizer the parser instance
-// @param e the recognition exception
+// See also [ReportError]
 func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *NoViableAltException) {
 	tokens := recognizer.GetTokenStream()
 	var input string
@@ -252,48 +237,38 @@ func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *N
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
-// This is called by {@link //ReportError} when the exception is an
-// {@link InputMisMatchException}.
+// ReportInputMisMatch is called by [ReportError] when the exception is an [InputMisMatchException]
 //
-// @see //ReportError
-//
-// @param recognizer the parser instance
-// @param e the recognition exception
-func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *InputMisMatchException) {
-	msg := "mismatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
+// See also: [ReportError]
+func (d *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *InputMisMatchException) {
+	msg := "mismatched input " + d.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
-// This is called by {@link //ReportError} when the exception is a
-// {@link FailedPredicateException}.
+// ReportFailedPredicate is called by [ReportError] when the exception is a [FailedPredicateException].
 //
-// @see //ReportError
-//
-// @param recognizer the parser instance
-// @param e the recognition exception
+// See also: [ReportError]
 func (d *DefaultErrorStrategy) ReportFailedPredicate(recognizer Parser, e *FailedPredicateException) {
 	ruleName := recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
 	msg := "rule " + ruleName + " " + e.message
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
-// This method is called to Report a syntax error which requires the removal
+// ReportUnwantedToken is called to report a syntax error that requires the removal
 // of a token from the input stream. At the time d method is called, the
-// erroneous symbol is current {@code LT(1)} symbol and has not yet been
-// removed from the input stream. When d method returns,
-// {@code recognizer} is in error recovery mode.
+// erroneous symbol is the current LT(1) symbol and has not yet been
+// removed from the input stream. When this method returns,
+// recognizer is in error recovery mode.
 //
-// <p>This method is called when {@link //singleTokenDeletion} identifies
+// This method is called when singleTokenDeletion identifies
 // single-token deletion as a viable recovery strategy for a mismatched
-// input error.</p>
+// input error.
 //
-// <p>The default implementation simply returns if the handler is already in
-// error recovery mode. Otherwise, it calls {@link //beginErrorCondition} to
+// The default implementation simply returns if the handler is already in
+// error recovery mode. Otherwise, it calls beginErrorCondition to
 // enter error recovery mode, followed by calling
-// {@link Parser//NotifyErrorListeners}.</p>
-//
-// @param recognizer the parser instance
+// [NotifyErrorListeners]
 func (d *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 	if d.InErrorRecoveryMode(recognizer) {
 		return
@@ -307,21 +282,18 @@ func (d *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
-// This method is called to Report a syntax error which requires the
-// insertion of a missing token into the input stream. At the time d
-// method is called, the missing token has not yet been inserted. When d
-// method returns, {@code recognizer} is in error recovery mode.
+// ReportMissingToken is called to report a syntax error which requires the
+// insertion of a missing token into the input stream. At the time this
+// method is called, the missing token has not yet been inserted. When this
+// method returns, recognizer is in error recovery mode.
 //
-// <p>This method is called when {@link //singleTokenInsertion} identifies
+// This method is called when singleTokenInsertion identifies
 // single-token insertion as a viable recovery strategy for a mismatched
-// input error.</p>
+// input error.
 //
-// <p>The default implementation simply returns if the handler is already in
-// error recovery mode. Otherwise, it calls {@link //beginErrorCondition} to
-// enter error recovery mode, followed by calling
-// {@link Parser//NotifyErrorListeners}.</p>
-//
-// @param recognizer the parser instance
+// The default implementation simply returns if the handler is already in
+// error recovery mode. Otherwise, it calls beginErrorCondition to
+// enter error recovery mode, followed by calling [NotifyErrorListeners]
 func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 	if d.InErrorRecoveryMode(recognizer) {
 		return
@@ -334,54 +306,48 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
-// <p>The default implementation attempts to recover from the mismatched input
+// The RecoverInline default implementation attempts to recover from the mismatched input
 // by using single token insertion and deletion as described below. If the
-// recovery attempt fails, d method panics an
-// {@link InputMisMatchException}.</p>
+// recovery attempt fails, this method panics with [InputMisMatchException}.
+// TODO: Not sure that panic() is the right thing to do here - JI
 //
-// <p><strong>EXTRA TOKEN</strong> (single token deletion)</p>
+// # EXTRA TOKEN (single token deletion)
 //
-// <p>{@code LA(1)} is not what we are looking for. If {@code LA(2)} has the
-// right token, however, then assume {@code LA(1)} is some extra spurious
+// LA(1) is not what we are looking for. If LA(2) has the
+// right token, however, then assume LA(1) is some extra spurious
 // token and delete it. Then consume and return the next token (which was
-// the {@code LA(2)} token) as the successful result of the Match operation.</p>
+// the LA(2) token) as the successful result of the Match operation.
 //
-// <p>This recovery strategy is implemented by {@link
-// //singleTokenDeletion}.</p>
+// # This recovery strategy is implemented by singleTokenDeletion
 //
-// <p><strong>MISSING TOKEN</strong> (single token insertion)</p>
+// # MISSING TOKEN (single token insertion)
 //
-// <p>If current token (at {@code LA(1)}) is consistent with what could come
-// after the expected {@code LA(1)} token, then assume the token is missing
-// and use the parser's {@link TokenFactory} to create it on the fly. The
-// "insertion" is performed by returning the created token as the successful
-// result of the Match operation.</p>
+// If current token  -at LA(1) - is consistent with what could come
+// after the expected LA(1) token, then assume the token is missing
+// and use the parser's [TokenFactory] to create it on the fly. The
+// “insertion” is performed by returning the created token as the successful
+// result of the Match operation.
 //
-// <p>This recovery strategy is implemented by {@link
-// //singleTokenInsertion}.</p>
+// This recovery strategy is implemented by [SingleTokenInsertion].
 //
-// <p><strong>EXAMPLE</strong></p>
+// # Example
 //
-// <p>For example, Input {@code i=(3} is clearly missing the {@code ')'}. When
-// the parser returns from the nested call to {@code expr}, it will have
-// call chain:</p>
+// For example, Input i=(3 is clearly missing the ')'. When
+// the parser returns from the nested call to expr, it will have
+// call the chain:
 //
-// <pre>
-// stat &rarr expr &rarr atom
-// </pre>
+//	stat → expr → atom
 //
-// and it will be trying to Match the {@code ')'} at d point in the
+// and it will be trying to Match the ')' at this point in the
 // derivation:
 //
-// <pre>
-// =&gt ID '=' '(' INT ')' ('+' atom)* ”
-// ^
-// </pre>
+//	  : ID '=' '(' INT ')' ('+' atom)* ';'
+//		                ^
 //
-// The attempt to Match {@code ')'} will fail when it sees {@code ”} and
-// call {@link //recoverInline}. To recover, it sees that {@code LA(1)==”}
-// is in the set of tokens that can follow the {@code ')'} token reference
-// in rule {@code atom}. It can assume that you forgot the {@code ')'}.
+// The attempt to [Match] ')' will fail when it sees ';' and
+// call [RecoverInline]. To recover, it sees that LA(1)==';'
+// is in the set of tokens that can follow the ')' token reference
+// in rule atom. It can assume that you forgot the ')'.
 func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	// SINGLE TOKEN DELETION
 	MatchedSymbol := d.SingleTokenDeletion(recognizer)
@@ -399,21 +365,20 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	panic(NewInputMisMatchException(recognizer))
 }
 
-// This method implements the single-token insertion inline error recovery
-// strategy. It is called by {@link //recoverInline} if the single-token
+// SingleTokenInsertion implements the single-token insertion inline error recovery
+// strategy. It is called by [RecoverInline] if the single-token
 // deletion strategy fails to recover from the mismatched input. If this
 // method returns {@code true}, {@code recognizer} will be in error recovery
 // mode.
 //
-// <p>This method determines whether or not single-token insertion is viable by
-// checking if the {@code LA(1)} input symbol could be successfully Matched
-// if it were instead the {@code LA(2)} symbol. If d method returns
+// This method determines whether single-token insertion is viable by
+// checking if the LA(1) input symbol could be successfully Matched
+// if it were instead the LA(2) symbol. If this method returns
 // {@code true}, the caller is responsible for creating and inserting a
-// token with the correct type to produce d behavior.</p>
+// token with the correct type to produce this behavior.</p>
 //
-// @param recognizer the parser instance
-// @return {@code true} if single-token insertion is a viable recovery
-// strategy for the current mismatched input, otherwise {@code false}
+// This func returns true if single-token insertion is a viable recovery
+// strategy for the current mismatched input.
 func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 	currentSymbolType := recognizer.GetTokenStream().LA(1)
 	// if current token is consistent with what could come after current
@@ -431,23 +396,21 @@ func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 	return false
 }
 
-// This method implements the single-token deletion inline error recovery
-// strategy. It is called by {@link //recoverInline} to attempt to recover
+// SingleTokenDeletion implements the single-token deletion inline error recovery
+// strategy. It is called by [RecoverInline] to attempt to recover
 // from mismatched input. If this method returns nil, the parser and error
 // handler state will not have changed. If this method returns non-nil,
-// {@code recognizer} will <em>not</em> be in error recovery mode since the
+// recognizer will not be in error recovery mode since the
 // returned token was a successful Match.
 //
-// <p>If the single-token deletion is successful, d method calls
-// {@link //ReportUnwantedToken} to Report the error, followed by
-// {@link Parser//consume} to actually "delete" the extraneous token. Then,
-// before returning {@link //ReportMatch} is called to signal a successful
-// Match.</p>
+// If the single-token deletion is successful, this method calls
+// [ReportUnwantedToken] to Report the error, followed by
+// [Consume] to actually “delete” the extraneous token. Then,
+// before returning, [ReportMatch] is called to signal a successful
+// Match.
 //
-// @param recognizer the parser instance
-// @return the successfully Matched {@link Token} instance if single-token
-// deletion successfully recovers from the mismatched input, otherwise
-// {@code nil}
+// The func returns the successfully Matched [Token] instance if single-token
+// deletion successfully recovers from the mismatched input, otherwise nil.
 func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 	NextTokenType := recognizer.GetTokenStream().LA(2)
 	expecting := d.GetExpectedTokens(recognizer)
@@ -467,24 +430,28 @@ func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 	return nil
 }
 
-// Conjure up a missing token during error recovery.
+// GetMissingSymbol conjures up a missing token during error recovery.
 //
 // The recognizer attempts to recover from single missing
 // symbols. But, actions might refer to that missing symbol.
-// For example, x=ID {f($x)}. The action clearly assumes
+// For example:
+//
+//	x=ID {f($x)}.
+//
+// The action clearly assumes
 // that there has been an identifier Matched previously and that
 // $x points at that token. If that token is missing, but
 // the next token in the stream is what we want we assume that
-// d token is missing and we keep going. Because we
+// this token is missing, and we keep going. Because we
 // have to return some token to replace the missing token,
 // we have to conjure one up. This method gives the user control
 // over the tokens returned for missing tokens. Mostly,
 // you will want to create something special for identifier
 // tokens. For literals such as '{' and ',', the default
 // action in the parser or tree parser works. It simply creates
-// a CommonToken of the appropriate type. The text will be the token.
-// If you change what tokens must be created by the lexer,
-// override d method to create the appropriate tokens.
+// a [CommonToken] of the appropriate type. The text will be the token name.
+// If you need to change which tokens must be created by the lexer,
+// override this method to create the appropriate tokens.
 func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 	currentSymbol := recognizer.GetCurrentToken()
 	expecting := d.GetExpectedTokens(recognizer)
@@ -516,13 +483,13 @@ func (d *DefaultErrorStrategy) GetExpectedTokens(recognizer Parser) *IntervalSet
 	return recognizer.GetExpectedTokens()
 }
 
-// How should a token be displayed in an error message? The default
-// is to display just the text, but during development you might
-// want to have a lot of information spit out. Override in that case
-// to use t.String() (which, for CommonToken, dumps everything about
+// GetTokenErrorDisplay determines how  a token should be displayed in an error message.
+// The default is to display just the text, but during development you might
+// want to have a lot of information spit out. Override this func in that case
+// to use t.String() (which, for [CommonToken], dumps everything about
 // the token). This is better than forcing you to override a method in
 // your token objects because you don't have to go modify your lexer
-// so that it creates a NewJava type.
+// so that it creates a new type.
 func (d *DefaultErrorStrategy) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
@@ -545,52 +512,57 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 	return "'" + s + "'"
 }
 
-// Compute the error recovery set for the current rule. During
+// GetErrorRecoverySet computes the error recovery set for the current rule. During
 // rule invocation, the parser pushes the set of tokens that can
-// follow that rule reference on the stack d amounts to
+// follow that rule reference on the stack. This amounts to
 // computing FIRST of what follows the rule reference in the
 // enclosing rule. See LinearApproximator.FIRST().
+//
 // This local follow set only includes tokens
 // from within the rule i.e., the FIRST computation done by
 // ANTLR stops at the end of a rule.
 //
-// # EXAMPLE
+// # Example
 //
 // When you find a "no viable alt exception", the input is not
 // consistent with any of the alternatives for rule r. The best
 // thing to do is to consume tokens until you see something that
-// can legally follow a call to r//or* any rule that called r.
+// can legally follow a call to r or any rule that called r.
 // You don't want the exact set of viable next tokens because the
 // input might just be missing a token--you might consume the
 // rest of the input looking for one of the missing tokens.
 //
-// Consider grammar:
+// Consider the grammar:
 //
-// a : '[' b ']'
-// | '(' b ')'
+//		a : '[' b ']'
+//		  | '(' b ')'
+//		  ;
 //
-// b : c '^' INT
-// c : ID
-// | INT
+//		b : c '^' INT
+//	      ;
+//
+//		c : ID
+//		  | INT
+//		  ;
 //
 // At each rule invocation, the set of tokens that could follow
 // that rule is pushed on a stack. Here are the various
 // context-sensitive follow sets:
 //
-// FOLLOW(b1_in_a) = FIRST(']') = ']'
-// FOLLOW(b2_in_a) = FIRST(')') = ')'
-// FOLLOW(c_in_b) = FIRST('^') = '^'
+//	FOLLOW(b1_in_a) = FIRST(']') = ']'
+//	FOLLOW(b2_in_a) = FIRST(')') = ')'
+//	FOLLOW(c_in_b)  = FIRST('^') = '^'
 //
-// Upon erroneous input "[]", the call chain is
+// Upon erroneous input “[]”, the call chain is
 //
-// a -> b -> c
+//	a → b → c
 //
 // and, hence, the follow context stack is:
 //
-// depth follow set start of rule execution
-// 0 <EOF> a (from main())
-// 1 ']' b
-// 2 '^' c
+//	Depth Follow set   Start of rule execution
+//	  0   <EOF>        a (from main())
+//	  1   ']'          b
+//	  2   '^'          c
 //
 // Notice that ')' is not included, because b would have to have
 // been called from a different context in rule a for ')' to be
@@ -598,11 +570,14 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 //
 // For error recovery, we cannot consider FOLLOW(c)
 // (context-sensitive or otherwise). We need the combined set of
-// all context-sensitive FOLLOW sets--the set of all tokens that
+// all context-sensitive FOLLOW sets - the set of all tokens that
 // could follow any reference in the call chain. We need to
 // reSync to one of those tokens. Note that FOLLOW(c)='^' and if
 // we reSync'd to that token, we'd consume until EOF. We need to
-// Sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
+// Sync to context-sensitive FOLLOWs for a, b, and c:
+//
+//	{']','^'}
+//
 // In this case, for input "[]", LA(1) is ']' and in the set, so we would
 // not consume anything. After printing an error, rule c would
 // return normally. Rule b would not find the required '^' though.
@@ -620,22 +595,19 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 //
 // ANTLR's error recovery mechanism is based upon original ideas:
 //
-// "Algorithms + Data Structures = Programs" by Niklaus Wirth
+// [Algorithms + Data Structures = Programs] by Niklaus Wirth and
+// [A note on error recovery in recursive descent parsers].
 //
-// and
+// Later, Josef Grosch had some good ideas in [Efficient and Comfortable Error Recovery in Recursive Descent
+// Parsers]
 //
-// "A note on error recovery in recursive descent parsers":
-// http://portal.acm.org/citation.cfm?id=947902.947905
+// Like Grosch I implement context-sensitive FOLLOW sets that are combined  at run-time upon error to avoid overhead
+// during parsing. Later, the runtime Sync was improved for loops/sub-rules see [Sync] docs
 //
-// Later, Josef Grosch had some good ideas:
-//
-// "Efficient and Comfortable Error Recovery in Recursive Descent
-// Parsers":
-// ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
-//
-// Like Grosch I implement context-sensitive FOLLOW sets that are combined
-// at run-time upon error to avoid overhead during parsing.
-func (d *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *IntervalSet {
+// [A note on error recovery in recursive descent parsers]: http://portal.acm.org/citation.cfm?id=947902.947905
+// [Algorithms + Data Structures = Programs]: https://t.ly/5QzgE
+// [Efficient and Comfortable Error Recovery in Recursive Descent Parsers]: ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
+func (d *DefaultErrorStrategy) GetErrorRecoverySet(recognizer Parser) *IntervalSet {
 	atn := recognizer.GetInterpreter().atn
 	ctx := recognizer.GetParserRuleContext()
 	recoverSet := NewIntervalSet()
@@ -660,40 +632,36 @@ func (d *DefaultErrorStrategy) consumeUntil(recognizer Parser, set *IntervalSet)
 	}
 }
 
-//
-// This implementation of {@link ANTLRErrorStrategy} responds to syntax errors
+// The BailErrorStrategy implementation of ANTLRErrorStrategy responds to syntax errors
 // by immediately canceling the parse operation with a
-// {@link ParseCancellationException}. The implementation ensures that the
-// {@link ParserRuleContext//exception} field is set for all parse tree nodes
+// [ParseCancellationException]. The implementation ensures that the
+// [ParserRuleContext//exception] field is set for all parse tree nodes
 // that were not completed prior to encountering the error.
 //
-// <p>
-// This error strategy is useful in the following scenarios.</p>
+// This error strategy is useful in the following scenarios.
 //
-// <ul>
-// <li><strong>Two-stage parsing:</strong> This error strategy allows the first
-// stage of two-stage parsing to immediately terminate if an error is
-// encountered, and immediately fall back to the second stage. In addition to
-// avoiding wasted work by attempting to recover from errors here, the empty
-// implementation of {@link BailErrorStrategy//Sync} improves the performance of
-// the first stage.</li>
-// <li><strong>Silent validation:</strong> When syntax errors are not being
-// Reported or logged, and the parse result is simply ignored if errors occur,
-// the {@link BailErrorStrategy} avoids wasting work on recovering from errors
-// when the result will be ignored either way.</li>
-// </ul>
+//   - Two-stage parsing: This error strategy allows the first
+//     stage of two-stage parsing to immediately terminate if an error is
+//     encountered, and immediately fall back to the second stage. In addition to
+//     avoiding wasted work by attempting to recover from errors here, the empty
+//     implementation of [BailErrorStrategy.Sync] improves the performance of
+//     the first stage.
 //
-// <p>
-// {@code myparser.setErrorHandler(NewBailErrorStrategy())}</p>
+//   - Silent validation: When syntax errors are not being
+//     Reported or logged, and the parse result is simply ignored if errors occur,
+//     the [BailErrorStrategy] avoids wasting work on recovering from errors
+//     when the result will be ignored either way.
 //
-// @see Parser//setErrorHandler(ANTLRErrorStrategy)
-
+//     myparser.SetErrorHandler(NewBailErrorStrategy())
+//
+// See also: [Parser.SetErrorHandler(ANTLRErrorStrategy)]
 type BailErrorStrategy struct {
 	*DefaultErrorStrategy
 }
 
 var _ ErrorStrategy = &BailErrorStrategy{}
 
+//goland:noinspection GoUnusedExportedFunction
 func NewBailErrorStrategy() *BailErrorStrategy {
 
 	b := new(BailErrorStrategy)
@@ -703,10 +671,10 @@ func NewBailErrorStrategy() *BailErrorStrategy {
 	return b
 }
 
-// Instead of recovering from exception {@code e}, re-panic it wrapped
-// in a {@link ParseCancellationException} so it is not caught by the
-// rule func catches. Use {@link Exception//getCause()} to get the
-// original {@link RecognitionException}.
+// Recover Instead of recovering from exception e, re-panic it wrapped
+// in a [ParseCancellationException] so it is not caught by the
+// rule func catches. Use Exception.GetCause() to get the
+// original [RecognitionException].
 func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 	context := recognizer.GetParserRuleContext()
 	for context != nil {
@@ -720,7 +688,7 @@ func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 	panic(NewParseCancellationException()) // TODO we don't emit e properly
 }
 
-// Make sure we don't attempt to recover inline if the parser
+// RecoverInline makes sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't panic an exception.
 func (b *BailErrorStrategy) RecoverInline(recognizer Parser) Token {
 	b.Recover(recognizer, NewInputMisMatchException(recognizer))
@@ -728,7 +696,6 @@ func (b *BailErrorStrategy) RecoverInline(recognizer Parser) Token {
 	return nil
 }
 
-// Make sure we don't attempt to recover from problems in subrules.//
-func (b *BailErrorStrategy) Sync(recognizer Parser) {
-	// pass
+// Sync makes sure we don't attempt to recover from problems in sub-rules.
+func (b *BailErrorStrategy) Sync(_ Parser) {
 }

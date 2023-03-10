@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// newTestCommonToken create common token with tokentype, text and channel
+// newTestCommonToken create common token with tokenType, text and channel
 // notice: test purpose only
 func newTestCommonToken(tokenType int, text string, channel int) *CommonToken {
 	t := new(CommonToken)
@@ -18,7 +18,7 @@ func newTestCommonToken(tokenType int, text string, channel int) *CommonToken {
 	return t
 }
 
-// tokensToString returnes []Tokens string
+// tokensToString returns []Tokens string
 // notice: test purpose only
 func tokensToString(tokens []Token) string {
 	buf := make([]string, len(tokens))

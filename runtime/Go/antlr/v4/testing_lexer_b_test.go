@@ -7,7 +7,7 @@ package antlr
 /*
 LexerB is a lexer for testing purpose.
 
-This file is generated from this grammer.
+This file is generated from this grammar.
 
 lexer grammar LexerB;
 
@@ -97,7 +97,7 @@ func lexerbLexerInit() {
 	}
 }
 
-// LexerBInit initializes any static state used to implement LexerB. By default the
+// LexerBInit initializes any static state used to implement LexerB. By default, the
 // static state used to implement the lexer is lazily initialized during the first call to
 // NewLexerB(). You can call this function if you wish to initialize the static state ahead
 // of time.
@@ -126,6 +126,8 @@ func NewLexerB(input CharStream) *LexerB {
 }
 
 // LexerB tokens.
+//
+//goland:noinspection GoUnusedConst
 const (
 	LexerBID     = 1
 	LexerBINT    = 2
