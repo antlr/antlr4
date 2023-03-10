@@ -61,7 +61,7 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T]) *JStore[T, C] {
 // # If the given value is already present in the store, then the existing value is returned as v and exists is set to true
 //
 // If the given value is not present in the store, then the value is added to the store and returned as v and exists is set to false.
-func (s *JStore[T, C]) Put(value T) (v T, exists bool) { //nolint:ireturn
+func (s *JStore[T, C]) Put(value T) (v T, exists bool) {
 
 	kh := s.comparator.Hash1(value)
 
@@ -78,7 +78,7 @@ func (s *JStore[T, C]) Put(value T) (v T, exists bool) { //nolint:ireturn
 // Get will return the value associated with the key - the type of the key is the same type as the value
 // which would not generally be useful, but this is a specific thing for ANTLR where the key is
 // generated using the object we are going to store.
-func (s *JStore[T, C]) Get(key T) (T, bool) { //nolint:ireturn
+func (s *JStore[T, C]) Get(key T) (T, bool) {
 
 	kh := s.comparator.Hash1(key)
 
@@ -91,7 +91,7 @@ func (s *JStore[T, C]) Get(key T) (T, bool) { //nolint:ireturn
 }
 
 // Contains returns true if the given key is present in the store
-func (s *JStore[T, C]) Contains(key T) bool { //nolint:ireturn
+func (s *JStore[T, C]) Contains(key T) bool {
 
 	_, present := s.Get(key)
 	return present

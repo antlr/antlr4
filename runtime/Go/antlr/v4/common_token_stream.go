@@ -28,22 +28,24 @@ type CommonTokenStream struct {
 	// trivial with bt field.
 	fetchedEOF bool
 
-	// index indexs into tokens of the current token (next token to consume).
+	// index into [tokens] of the current token (next token to consume).
 	// tokens[p] should be LT(1). It is set to -1 when the stream is first
 	// constructed or when SetTokenSource is called, indicating that the first token
 	// has not yet been fetched from the token source. For additional information,
-	// see the documentation of IntStream for a description of initializing methods.
+	// see the documentation of [IntStream] for a description of initializing methods.
 	index int
 
-	// tokenSource is the TokenSource from which tokens for the bt stream are
+	// tokenSource is the [TokenSource] from which tokens for the bt stream are
 	// fetched.
 	tokenSource TokenSource
 
-	// tokens is all tokens fetched from the token source. The list is considered a
+	// tokens contains all tokens fetched from the token source. The list is considered a
 	// complete view of the input once fetchedEOF is set to true.
 	tokens []Token
 }
 
+// NewCommonTokenStream creates a new CommonTokenStream instance using the supplied lexer to produce
+// tokens and will pull tokens from the given lexer channel.
 func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	return &CommonTokenStream{
 		channel:     channel,
@@ -53,6 +55,7 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	}
 }
 
+// GetAllTokens returns all tokens currently pulled from the token source.
 func (c *CommonTokenStream) GetAllTokens() []Token {
 	return c.tokens
 }
@@ -61,7 +64,7 @@ func (c *CommonTokenStream) Mark() int {
 	return 0
 }
 
-func (c *CommonTokenStream) Release(marker int) {}
+func (c *CommonTokenStream) Release(_ int) {}
 
 func (c *CommonTokenStream) reset() {
 	c.Seek(0)
@@ -197,8 +200,8 @@ func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 
 // NextTokenOnChannel returns the index of the next token on channel given a
 // starting index. Returns i if tokens[i] is on channel. Returns -1 if there are
-// no tokens on channel between i and EOF.
-func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
+// no tokens on channel between 'i' and [TokenEOF].
+func (c *CommonTokenStream) NextTokenOnChannel(i, _ int) int {
 	c.Sync(i)
 
 	if i >= len(c.tokens) {
@@ -244,7 +247,7 @@ func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []To
 	nextOnChannel := c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	from := tokenIndex + 1
 
-	// If no onchannel to the right, then nextOnChannel == -1, so set to to last token
+	// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
 	var to int
 
 	if nextOnChannel == -1 {

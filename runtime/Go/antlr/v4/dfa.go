@@ -4,6 +4,8 @@
 
 package antlr
 
+// DFA represents the Deterministic Finite Automaton used by the recognizer, including all the states it can
+// reach and the transitions between them.
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState

@@ -33,6 +33,7 @@ type DiagnosticErrorListener struct {
 	exactOnly bool
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 
 	n := new(DiagnosticErrorListener)
@@ -55,7 +56,7 @@ func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, s
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, _ *BitSet, _ ATNConfigSet) {
 
 	msg := "reportAttemptingFullContext d=" +
 		d.getDecisionDescription(recognizer, dfa) +
@@ -64,7 +65,7 @@ func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser,
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, _ int, _ ATNConfigSet) {
 	msg := "reportContextSensitivity d=" +
 		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +

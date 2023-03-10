@@ -31,7 +31,7 @@ func intMax(a, b int) int {
 
 type IntStack []int
 
-var ErrEmptyStack = errors.New("Stack is empty")
+var ErrEmptyStack = errors.New("stack is empty")
 
 func (s *IntStack) Pop() (int, error) {
 	l := len(*s) - 1
@@ -47,10 +47,6 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-type comparable interface {
-	Equals(other Collectable[any]) bool
-}
-
 func standardEqualsFunction(a Collectable[any], b Collectable[any]) bool {
 
 	return a.Equals(b)
@@ -61,7 +57,7 @@ func standardHashFunction(a interface{}) int {
 		return h.Hash()
 	}
 
-	panic("Not Hasher")
+	panic("Not 'Hasher'")
 }
 
 type hasher interface {
@@ -74,6 +70,7 @@ func indexForBit(bit int) int {
 	return bit / bitsPerWord
 }
 
+//goland:noinspection GoUnusedExportedFunction,GoUnusedFunction
 func wordForBit(data []uint64, bit int) uint64 {
 	idx := indexForBit(bit)
 	if idx >= len(data) {
@@ -94,6 +91,8 @@ type BitSet struct {
 	data []uint64
 }
 
+// NewBitSet creates a new bitwise set
+// TODO: See if we can replace with the standard library's BitSet
 func NewBitSet() *BitSet {
 	return &BitSet{}
 }
@@ -123,7 +122,7 @@ func (b *BitSet) or(set *BitSet) {
 	setLen := set.minLen()
 	maxLen := intMax(bLen, setLen)
 	if maxLen > len(b.data) {
-		// Increase the size of len(b.data) to repesent the bits in both sets.
+		// Increase the size of len(b.data) to represent the bits in both sets.
 		data := make([]uint64, maxLen)
 		copy(data, b.data)
 		b.data = data
@@ -288,6 +287,7 @@ func EscapeWhitespace(s string, escapeSpaces bool) string {
 	return s
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	st := make([]string, len(sa))
 
@@ -298,6 +298,7 @@ func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	return st
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func PrintArrayJavaStyle(sa []string) string {
 	var buffer bytes.Buffer
 

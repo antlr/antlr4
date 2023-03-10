@@ -25,6 +25,7 @@ const (
 	ATNStateInvalidStateNumber = -1
 )
 
+//goland:noinspection GoUnusedGlobalVariable
 var ATNStateInitialNumTransitions = 4
 
 type ATNState interface {
