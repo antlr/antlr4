@@ -259,13 +259,13 @@ void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, size_t actio
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(<r.ctxType> *_localctx, size_t predicateIndex);
+bool <r.name>Sempred([[maybe_unused]] <r.ctxType> *_localctx, size_t predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
 <! Called for both lexer and parser. But only one of them is actually available. Testing for the parser directly
    generates a warning, however. So do the check via the factory instead. !>
-bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(<r.ctxType> *_localctx, size_t predicateIndex) {
+bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred([[maybe_unused]] <r.ctxType> *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
 
