@@ -16,19 +16,19 @@ import (
 type ATNConfig interface {
 	Equals(o Collectable[ATNConfig]) bool
 	Hash() int
-	
+
 	GetState() ATNState
 	GetAlt() int
 	GetSemanticContext() SemanticContext
-	
+
 	GetContext() PredictionContext
 	SetContext(PredictionContext)
-	
+
 	GetReachesIntoOuterContext() int
 	SetReachesIntoOuterContext(int)
-	
+
 	String() string
-	
+
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 }
@@ -60,7 +60,7 @@ func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, seman
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
-	
+
 	return &BaseATNConfig{state: state, alt: alt, context: context, semanticContext: semanticContext}
 }
 
@@ -84,15 +84,15 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
-	
+
 	b := &BaseATNConfig{}
 	b.InitBaseATNConfig(c, state, c.GetAlt(), context, semanticContext)
-	
+
 	return b
 }
 
 func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) {
-	
+
 	b.state = state
 	b.alt = alt
 	b.context = context
@@ -147,28 +147,28 @@ func (b *BaseATNConfig) Equals(o Collectable[ATNConfig]) bool {
 	} else if o == nil {
 		return false
 	}
-	
+
 	var other, ok = o.(*BaseATNConfig)
-	
+
 	if !ok {
 		return false
 	}
-	
+
 	var equal bool
-	
+
 	if b.context == nil {
 		equal = other.context == nil
 	} else {
 		equal = b.context.Equals(other.context)
 	}
-	
+
 	var (
 		nums = b.state.GetStateNumber() == other.state.GetStateNumber()
 		alts = b.alt == other.alt
 		cons = b.semanticContext.Equals(other.semanticContext)
 		sups = b.precedenceFilterSuppressed == other.precedenceFilterSuppressed
 	)
-	
+
 	return nums && alts && cons && sups && equal
 }
 
@@ -179,7 +179,7 @@ func (b *BaseATNConfig) Hash() int {
 	if b.context != nil {
 		c = b.context.Hash()
 	}
-	
+
 	h := murmurInit(7)
 	h = murmurUpdate(h, b.state.GetStateNumber())
 	h = murmurUpdate(h, b.alt)
@@ -190,19 +190,19 @@ func (b *BaseATNConfig) Hash() int {
 
 func (b *BaseATNConfig) String() string {
 	var s1, s2, s3 string
-	
+
 	if b.context != nil {
 		s1 = ",[" + fmt.Sprint(b.context) + "]"
 	}
-	
+
 	if b.semanticContext != SemanticContextNone {
 		s2 = "," + fmt.Sprint(b.semanticContext)
 	}
-	
+
 	if b.reachesIntoOuterContext > 0 {
 		s3 = ",up=" + fmt.Sprint(b.reachesIntoOuterContext)
 	}
-	
+
 	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
 }
 
@@ -213,7 +213,7 @@ type LexerATNConfig struct {
 }
 
 func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
-	
+
 	return &LexerATNConfig{
 		BaseATNConfig: BaseATNConfig{
 			state:           state,
@@ -238,7 +238,7 @@ func NewLexerATNConfig5(state ATNState, alt int, context PredictionContext, lexe
 
 func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
 	lac := &LexerATNConfig{
-		
+
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
@@ -303,7 +303,7 @@ func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
 		return true
 	}
 	var othert, ok = other.(*LexerATNConfig)
-	
+
 	if l == other {
 		return true
 	} else if !ok {
@@ -311,24 +311,24 @@ func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
 	} else if l.passedThroughNonGreedyDecision != othert.passedThroughNonGreedyDecision {
 		return false
 	}
-	
+
 	var b bool
-	
+
 	if l.lexerActionExecutor != nil {
 		b = !l.lexerActionExecutor.Equals(othert.lexerActionExecutor)
 	} else {
 		b = othert.lexerActionExecutor != nil
 	}
-	
+
 	if b {
 		return false
 	}
-	
+
 	return l.BaseATNConfig.Equals(&othert.BaseATNConfig)
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)
-	
+
 	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())
 }
