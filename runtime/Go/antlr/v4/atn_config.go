@@ -82,17 +82,23 @@ func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *
 
 func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
-		panic("semanticContext cannot be nil")
+		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
 
-	return &BaseATNConfig{
-		state:                      state,
-		alt:                        c.GetAlt(),
-		context:                    context,
-		semanticContext:            semanticContext,
-		reachesIntoOuterContext:    c.GetReachesIntoOuterContext(),
-		precedenceFilterSuppressed: c.getPrecedenceFilterSuppressed(),
-	}
+	b := &BaseATNConfig{}
+	b.InitBaseATNConfig(c, state, c.GetAlt(), context, semanticContext)
+
+	return b
+}
+
+func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) {
+
+	b.state = state
+	b.alt = alt
+	b.context = context
+	b.semanticContext = semanticContext
+	b.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
+	b.precedenceFilterSuppressed = c.getPrecedenceFilterSuppressed()
 }
 
 func (b *BaseATNConfig) getPrecedenceFilterSuppressed() bool {
