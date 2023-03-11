@@ -4,7 +4,11 @@
 
 package antlr
 
-import "strconv"
+import (
+	"fmt"
+	"os"
+	"strconv"
+)
 
 // Constants for serialization.
 const (
@@ -149,16 +153,33 @@ func (as *BaseATNState) AddTransition(trans Transition, index int) {
 	if len(as.transitions) == 0 {
 		as.epsilonOnlyTransitions = trans.getIsEpsilon()
 	} else if as.epsilonOnlyTransitions != trans.getIsEpsilon() {
+		_, _ = fmt.Fprintf(os.Stdin, "ATN state %d has both epsilon and non-epsilon transitions.\n", as.stateNumber)
 		as.epsilonOnlyTransitions = false
 	}
 	
 	// TODO: Check code for already present compared to the Java equivalent
+	//alreadyPresent := false
+	//for _, t := range as.transitions {
+	//	if t.getTarget().GetStateNumber() == trans.getTarget().GetStateNumber() {
+	//		if t.getLabel() != nil && trans.getLabel() != nil && trans.getLabel().Equals(t.getLabel()) {
+	//			alreadyPresent = true
+	//			break
+	//		}
+	//	} else if t.getIsEpsilon() && trans.getIsEpsilon() {
+	//		alreadyPresent = true
+	//		break
+	//	}
+	//}
+	//if !alreadyPresent {
 	if index == -1 {
 		as.transitions = append(as.transitions, trans)
 	} else {
 		as.transitions = append(as.transitions[:index], append([]Transition{trans}, as.transitions[index:]...)...)
 		// TODO: as.transitions.splice(index, 1, trans)
 	}
+	//} else {
+	//	_, _ = fmt.Fprintf(os.Stderr, "Transition already present in state %d\n", as.stateNumber)
+	//}
 }
 
 type BasicState struct {
