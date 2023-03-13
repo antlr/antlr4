@@ -174,7 +174,7 @@ func (op *BaseRewriteOperation) String() string {
 		op.tokens.Get(op.GetIndex()),
 		op.text,
 	)
-
+	
 }
 
 type InsertBeforeOp struct {
@@ -579,7 +579,6 @@ func reduceToSingleOperationPerIndex(rewrites []RewriteOperation) map[int]Rewrit
 					rewrites[prevop.instructionIndex] = nil
 					rop.index = min(prevop.index, rop.index)
 					rop.LastIndex = max(prevop.LastIndex, rop.LastIndex)
-					println("new rop" + rop.String()) //TODO: remove console write, taken from Java version
 				} else if !disjoint {
 					panic("replace op boundaries of " + rop.String() + " overlap with previous " + prevop.String())
 				}
