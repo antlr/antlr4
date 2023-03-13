@@ -26,16 +26,16 @@ type Token interface {
 	GetStop() int
 	GetLine() int
 	GetColumn() int
-
+	
 	GetText() string
 	SetText(s string)
-
+	
 	GetTokenIndex() int
 	SetTokenIndex(v int)
-
+	
 	GetTokenSource() TokenSource
 	GetInputStream() CharStream
-
+	
 	String() string
 }
 
@@ -54,22 +54,22 @@ type BaseToken struct {
 
 const (
 	TokenInvalidType = 0
-
+	
 	// TokenEpsilon  - during lookahead operations, this "token" signifies we hit the rule end [ATN] state
 	// and did not follow it despite needing to.
 	TokenEpsilon = -2
-
+	
 	TokenMinUserTokenType = 1
-
+	
 	TokenEOF = -1
-
+	
 	// TokenDefaultChannel is the default channel upon which tokens are sent to the parser.
 	//
 	// All tokens go to the parser (unless [Skip] is called in the lexer rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
 	TokenDefaultChannel = 0
-
+	
 	// TokenHiddenChannel defines the normal hidden channel - the parser wil not see tokens that are not on [TokenDefaultChannel].
 	//
 	// Anything on a different channel than TokenDefaultChannel is not parsed by parser.
@@ -121,21 +121,22 @@ func (b *BaseToken) GetInputStream() CharStream {
 }
 
 type CommonToken struct {
-	*BaseToken
+	BaseToken
 }
 
 func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start, stop int) *CommonToken {
-
-	t := new(CommonToken)
-
-	t.BaseToken = new(BaseToken)
-
-	t.source = source
-	t.tokenType = tokenType
-	t.channel = channel
-	t.start = start
-	t.stop = stop
-	t.tokenIndex = -1
+	
+	t := &CommonToken{
+		BaseToken: BaseToken{
+			source:     source,
+			tokenType:  tokenType,
+			channel:    channel,
+			start:      start,
+			stop:       stop,
+			tokenIndex: -1,
+		},
+	}
+	
 	if t.source.tokenSource != nil {
 		t.line = source.tokenSource.GetLine()
 		t.column = source.tokenSource.GetCharPositionInLine()
@@ -198,14 +199,14 @@ func (c *CommonToken) String() string {
 	} else {
 		txt = "<no text>"
 	}
-
+	
 	var ch string
 	if c.channel > 0 {
 		ch = ",channel=" + strconv.Itoa(c.channel)
 	} else {
 		ch = ""
 	}
-
+	
 	return "[@" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
 		txt + "',<" + strconv.Itoa(c.tokenType) + ">" +
 		ch + "," + strconv.Itoa(c.line) + ":" + strconv.Itoa(c.column) + "]"
