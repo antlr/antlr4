@@ -144,6 +144,7 @@ func NewAtomTransition(target ATNState, intervalSet int) *AtomTransition {
 		},
 	}
 	t.intervalSet = t.makeLabel()
+
 	return t
 }
 
@@ -337,7 +338,8 @@ func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 			serializationType: TransitionSET,
 		},
 	}
-	if set != nil {
+
+  if set != nil {
 		t.intervalSet = set
 	} else {
 		t.intervalSet = NewIntervalSet()

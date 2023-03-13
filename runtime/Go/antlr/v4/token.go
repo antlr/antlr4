@@ -54,22 +54,22 @@ type BaseToken struct {
 
 const (
 	TokenInvalidType = 0
-	
-	// TokenEpsilon  - during lookahead operations, this "token" signifies we hit the rule end [ATN] state
+
+  // TokenEpsilon  - during lookahead operations, this "token" signifies we hit the rule end [ATN] state
 	// and did not follow it despite needing to.
 	TokenEpsilon = -2
-	
+  
 	TokenMinUserTokenType = 1
-	
+
 	TokenEOF = -1
-	
-	// TokenDefaultChannel is the default channel upon which tokens are sent to the parser.
+
+  // TokenDefaultChannel is the default channel upon which tokens are sent to the parser.
 	//
 	// All tokens go to the parser (unless [Skip] is called in the lexer rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
 	TokenDefaultChannel = 0
-	
+
 	// TokenHiddenChannel defines the normal hidden channel - the parser wil not see tokens that are not on [TokenDefaultChannel].
 	//
 	// Anything on a different channel than TokenDefaultChannel is not parsed by parser.

@@ -1401,7 +1401,7 @@ func (p *ParserATNSimulator) getLookaheadName(input TokenStream) string {
 //	it out for clarity now that alg. works well. We can leave p
 //	"dead" code for a bit.
 func (p *ParserATNSimulator) dumpDeadEndConfigs(_ *NoViableAltException) {
-	
+
 	panic("Not implemented")
 	
 	//    fmt.Println("dead end configs: ")

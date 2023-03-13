@@ -53,6 +53,7 @@ func calculateHash(parent PredictionContext, returnState int) int {
 	return murmurFinish(h, 2)
 }
 
+
 // Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
