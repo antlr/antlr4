@@ -95,12 +95,11 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 	}
 	// At least one of a or b is array
 	// If one is $ and rootIsWildcard, return $ as wildcard
-	// TODO: JI Use isEmpty() instead of type assertion where we can
 	if rootIsWildcard {
-		if _, ok := a.(*EmptyPredictionContext); ok {
+		if a.isEmpty() {
 			return a
 		}
-		if _, ok := b.(*EmptyPredictionContext); ok {
+		if b.isEmpty() {
 			return b
 		}
 	}
