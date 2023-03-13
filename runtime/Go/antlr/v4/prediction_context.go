@@ -44,7 +44,6 @@ const (
 	PredictionContextEmpty = iota
 	PredictionContextSingleton
 	PredictionContextArray
-	PredictionContextFull
 )
 
 func calculateHash(parent PredictionContext, returnState int) int {
@@ -88,7 +87,6 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 	// In go, EmptyPredictionContext does not equate to SingletonPredictionContext and so that conversion
 	// will fail. We need to test for both Empty and Singleton and create an ArrayPredictionContext from
 	// either of them.
-	
 	ac, ok1 := a.(*BaseSingletonPredictionContext)
 	bc, ok2 := b.(*BaseSingletonPredictionContext)
 	
@@ -96,7 +94,8 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 		return mergeSingletons(ac, bc, rootIsWildcard, mergeCache)
 	}
 	// At least one of a or b is array
-	// If one is $ and rootIsWildcard, return $ as// wildcard
+	// If one is $ and rootIsWildcard, return $ as wildcard
+	// TODO: JI Use isEmpty() instead of type assertion where we can
 	if rootIsWildcard {
 		if _, ok := a.(*EmptyPredictionContext); ok {
 			return a
@@ -280,13 +279,13 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 			return BasePredictionContextEMPTY // a +// =//
 		}
 	} else {
-		if a == BasePredictionContextEMPTY && b == BasePredictionContextEMPTY {
+		if a.isEmpty() && b.isEmpty() {
 			return BasePredictionContextEMPTY // $ + $ = $
-		} else if a == BasePredictionContextEMPTY { // $ + x = [$,x]
+		} else if a.isEmpty() { // $ + x = [$,x]
 			payloads := []int{b.getReturnState(-1), BasePredictionContextEmptyReturnState}
 			parents := []PredictionContext{b.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
-		} else if b == BasePredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
+		} else if b.isEmpty() { // x + $ = [$,x] ($ is always first if present)
 			payloads := []int{a.getReturnState(-1), BasePredictionContextEmptyReturnState}
 			parents := []PredictionContext{a.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
@@ -403,7 +402,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	
 	// if we created same array as a or b, return that instead
 	// TODO: JI track whether this is possible above during merge sort for speed
-	// TODO: JI In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
+	// TODO: JI VERY IMPORTANT - In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
 	if M == a {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)

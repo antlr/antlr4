@@ -20,9 +20,10 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 		BaseSingletonPredictionContext: BaseSingletonPredictionContext{
 			BasePredictionContext: BasePredictionContext{
 				cachedHash: calculateEmptyHash(),
+				pcType:     PredictionContextEmpty,
 			},
 			parentCtx:   nil,
-			returnState: 0,
+			returnState: BasePredictionContextEmptyReturnState,
 		},
 	}
 }
