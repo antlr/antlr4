@@ -6,26 +6,9 @@ package antlr
 
 import (
 	"fmt"
-	"golang.org/x/exp/slices"
-	"strconv"
 )
 
-const (
-	// BasePredictionContextEmptyReturnState represents '$' in local context prediction, which means wildcard.
-	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
-)
-
-// Represents {@code $} in an array in full context mode, when {@code $}
-// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-// {@code $} = {@link //EmptyReturnState}.
-// /
-
-//goland:noinspection GoUnusedGlobalVariable
-var (
-	BasePredictionContextglobalNodeCount = 1
-	BasePredictionContextid              = BasePredictionContextglobalNodeCount
-)
-
+// PredictionContext defines the interface that must be implemented by any flavor of prediction context.
 type PredictionContext interface {
 	Hash() int
 	Equals(interface{}) bool
@@ -35,324 +18,40 @@ type PredictionContext interface {
 	isEmpty() bool
 	hasEmptyPath() bool
 	String() string
+	Type() int
 }
 
-type BasePredictionContext struct {
-	cachedHash int
-}
+const (
+	// BasePredictionContextEmptyReturnState represents {@code $} in an array in full context mode, $
+	// doesn't mean wildcard:
+	//
+	//   $ + x = [$,x]
+	//
+	// Here,
+	//
+	//   $ = EmptyReturnState
+	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
+)
 
-func NewBasePredictionContext(cachedHash int) *BasePredictionContext {
-	pc := new(BasePredictionContext)
-	pc.cachedHash = cachedHash
-	
-	return pc
-}
+// TODO: JI These are meant to be atomics - this does not seem to match the Java runtime here
+//goland:noinspection GoUnusedGlobalVariable
+var (
+	BasePredictionContextglobalNodeCount = 1
+	BasePredictionContextid              = BasePredictionContextglobalNodeCount
+)
 
-func (b *BasePredictionContext) isEmpty() bool {
-	return false
-}
+const (
+	PredictionContextEmpty = iota
+	PredictionContextSingleton
+	PredictionContextArray
+	PredictionContextFull
+)
 
 func calculateHash(parent PredictionContext, returnState int) int {
 	h := murmurInit(1)
 	h = murmurUpdate(h, parent.Hash())
 	h = murmurUpdate(h, returnState)
 	return murmurFinish(h, 2)
-}
-
-var _emptyPredictionContextHash int
-
-func init() {
-	_emptyPredictionContextHash = murmurInit(1)
-	_emptyPredictionContextHash = murmurFinish(_emptyPredictionContextHash, 0)
-}
-
-func calculateEmptyHash() int {
-	return _emptyPredictionContextHash
-}
-
-// Used to cache {@link BasePredictionContext} objects. Its used for the shared
-// context cash associated with contexts in DFA states. This cache
-// can be used for both lexers and parsers.
-
-type PredictionContextCache struct {
-	cache map[PredictionContext]PredictionContext
-}
-
-func NewPredictionContextCache() *PredictionContextCache {
-	t := new(PredictionContextCache)
-	t.cache = make(map[PredictionContext]PredictionContext)
-	return t
-}
-
-// Add a context to the cache and return it. If the context already exists,
-// return that one instead and do not add a new context to the cache.
-// Protect shared cache from unsafe thread access.
-func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
-	if ctx == BasePredictionContextEMPTY {
-		return BasePredictionContextEMPTY
-	}
-	existing := p.cache[ctx]
-	if existing != nil {
-		return existing
-	}
-	p.cache[ctx] = ctx
-	return ctx
-}
-
-func (p *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
-	return p.cache[ctx]
-}
-
-func (p *PredictionContextCache) length() int {
-	return len(p.cache)
-}
-
-type SingletonPredictionContext interface {
-	PredictionContext
-}
-
-type BaseSingletonPredictionContext struct {
-	*BasePredictionContext
-	
-	parentCtx   PredictionContext
-	returnState int
-}
-
-func NewBaseSingletonPredictionContext(parent PredictionContext, returnState int) *BaseSingletonPredictionContext {
-	var cachedHash int
-	if parent != nil {
-		cachedHash = calculateHash(parent, returnState)
-	} else {
-		cachedHash = calculateEmptyHash()
-	}
-	
-	s := new(BaseSingletonPredictionContext)
-	s.BasePredictionContext = NewBasePredictionContext(cachedHash)
-	
-	s.parentCtx = parent
-	s.returnState = returnState
-	
-	return s
-}
-
-func SingletonBasePredictionContextCreate(parent PredictionContext, returnState int) PredictionContext {
-	if returnState == BasePredictionContextEmptyReturnState && parent == nil {
-		// someone can pass in the bits of an array ctx that mean $
-		return BasePredictionContextEMPTY
-	}
-	
-	return NewBaseSingletonPredictionContext(parent, returnState)
-}
-
-func (b *BaseSingletonPredictionContext) length() int {
-	return 1
-}
-
-func (b *BaseSingletonPredictionContext) GetParent(_ int) PredictionContext {
-	return b.parentCtx
-}
-
-func (b *BaseSingletonPredictionContext) getReturnState(_ int) int {
-	return b.returnState
-}
-
-func (b *BaseSingletonPredictionContext) hasEmptyPath() bool {
-	return b.returnState == BasePredictionContextEmptyReturnState
-}
-
-func (b *BaseSingletonPredictionContext) Hash() int {
-	return b.cachedHash
-}
-
-func (b *BaseSingletonPredictionContext) Equals(other interface{}) bool {
-	if b == other {
-		return true
-	}
-	if _, ok := other.(*BaseSingletonPredictionContext); !ok {
-		return false
-	}
-	
-	otherP := other.(*BaseSingletonPredictionContext)
-	
-	if b.returnState != otherP.getReturnState(0) {
-		return false
-	}
-	if b.parentCtx == nil {
-		return otherP.parentCtx == nil
-	}
-	
-	return b.parentCtx.Equals(otherP.parentCtx)
-}
-
-func (b *BaseSingletonPredictionContext) String() string {
-	var up string
-	
-	if b.parentCtx == nil {
-		up = ""
-	} else {
-		up = b.parentCtx.String()
-	}
-	
-	if len(up) == 0 {
-		if b.returnState == BasePredictionContextEmptyReturnState {
-			return "$"
-		}
-		
-		return strconv.Itoa(b.returnState)
-	}
-	
-	return strconv.Itoa(b.returnState) + " " + up
-}
-
-var BasePredictionContextEMPTY = NewEmptyPredictionContext()
-
-type EmptyPredictionContext struct {
-	*BaseSingletonPredictionContext
-}
-
-func NewEmptyPredictionContext() *EmptyPredictionContext {
-	
-	p := new(EmptyPredictionContext)
-	
-	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEmptyReturnState)
-	p.cachedHash = calculateEmptyHash()
-	return p
-}
-
-func (e *EmptyPredictionContext) isEmpty() bool {
-	return true
-}
-
-func (e *EmptyPredictionContext) GetParent(_ int) PredictionContext {
-	return nil
-}
-
-func (e *EmptyPredictionContext) getReturnState(_ int) int {
-	return e.returnState
-}
-
-func (e *EmptyPredictionContext) Hash() int {
-	return e.cachedHash
-}
-
-func (e *EmptyPredictionContext) Equals(other interface{}) bool {
-	return e == other
-}
-
-func (e *EmptyPredictionContext) String() string {
-	return "$"
-}
-
-type ArrayPredictionContext struct {
-	*BasePredictionContext
-	
-	parents      []PredictionContext
-	returnStates []int
-}
-
-func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) *ArrayPredictionContext {
-	// Parent can be nil only if full ctx mode and we make an array
-	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
-	// nil parent and
-	// returnState == {@link //EmptyReturnState}.
-	hash := murmurInit(1)
-	
-	for _, parent := range parents {
-		hash = murmurUpdate(hash, parent.Hash())
-	}
-	
-	for _, returnState := range returnStates {
-		hash = murmurUpdate(hash, returnState)
-	}
-	
-	hash = murmurFinish(hash, len(parents)<<1)
-	
-	c := new(ArrayPredictionContext)
-	c.BasePredictionContext = NewBasePredictionContext(hash)
-	
-	c.parents = parents
-	c.returnStates = returnStates
-	
-	return c
-}
-
-func (a *ArrayPredictionContext) GetReturnStates() []int {
-	return a.returnStates
-}
-
-func (a *ArrayPredictionContext) hasEmptyPath() bool {
-	return a.getReturnState(a.length()-1) == BasePredictionContextEmptyReturnState
-}
-
-func (a *ArrayPredictionContext) isEmpty() bool {
-	// since EmptyReturnState can only appear in the last position, we
-	// don't need to verify that size==1
-	return a.returnStates[0] == BasePredictionContextEmptyReturnState
-}
-
-func (a *ArrayPredictionContext) length() int {
-	return len(a.returnStates)
-}
-
-func (a *ArrayPredictionContext) GetParent(index int) PredictionContext {
-	return a.parents[index]
-}
-
-func (a *ArrayPredictionContext) getReturnState(index int) int {
-	return a.returnStates[index]
-}
-
-// Equals is the default comparison function for ArrayPredictionContext when no specialized
-// implementation is needed for a collection
-func (a *ArrayPredictionContext) Equals(o interface{}) bool {
-	if a == o {
-		return true
-	}
-	other, ok := o.(*ArrayPredictionContext)
-	if !ok {
-		return false
-	}
-	if a.cachedHash != other.Hash() {
-		return false // can't be same if hash is different
-	}
-	
-	// Must compare the actual array elements and not just the array address
-	//
-	return slices.Equal(a.returnStates, other.returnStates) &&
-		slices.EqualFunc(a.parents, other.parents, func(x, y PredictionContext) bool {
-			return x.Equals(y)
-		})
-}
-
-// Hash is the default hash function for ArrayPredictionContext when no specialized
-// implementation is needed for a collection
-func (a *ArrayPredictionContext) Hash() int {
-	return a.BasePredictionContext.cachedHash
-}
-
-func (a *ArrayPredictionContext) String() string {
-	if a.isEmpty() {
-		return "[]"
-	}
-	
-	s := "["
-	for i := 0; i < len(a.returnStates); i++ {
-		if i > 0 {
-			s = s + ", "
-		}
-		if a.returnStates[i] == BasePredictionContextEmptyReturnState {
-			s = s + "$"
-			continue
-		}
-		s = s + strconv.Itoa(a.returnStates[i])
-		if a.parents[i] != nil {
-			s = s + " " + a.parents[i].String()
-		} else {
-			s = s + "nil"
-		}
-	}
-	
-	return s + "]"
 }
 
 // Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
@@ -407,29 +106,24 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 		}
 	}
 	
-	// Convert Singleton or Empty so both are arrays to normalize - We should not use the existing parameters
-	// here.
-	//
-	// TODO: IMPORTANT JIM - I think that maybe the Prediction Context structs should be redone as there is a chance we will see this mess again - maybe redo the logic here
+	// Convert either Singleton or Empty to arrays, so that we can merge them
+	var ara, arb *ArrayPredictionContext
 	
-	var arp, arb *ArrayPredictionContext
-	var ok bool
-	if arp, ok = a.(*ArrayPredictionContext); ok {
-	} else if _, ok = a.(*BaseSingletonPredictionContext); ok {
-		arp = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
-	} else if _, ok = a.(*EmptyPredictionContext); ok {
-		arp = NewArrayPredictionContext([]PredictionContext{}, []int{})
+	ara = convertToArray(a)
+	arb = convertToArray(b)
+	return mergeArrays(ara, arb, rootIsWildcard, mergeCache)
+}
+
+func convertToArray(pc PredictionContext) *ArrayPredictionContext {
+	switch pc.Type() {
+	case PredictionContextEmpty:
+		return NewArrayPredictionContext([]PredictionContext{}, []int{})
+	case PredictionContextSingleton:
+		return NewArrayPredictionContext([]PredictionContext{pc.GetParent(0)}, []int{pc.getReturnState(0)})
+	default:
+		// Already an array
 	}
-	
-	if arb, ok = b.(*ArrayPredictionContext); ok {
-	} else if _, ok = b.(*BaseSingletonPredictionContext); ok {
-		arb = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
-	} else if _, ok = b.(*EmptyPredictionContext); ok {
-		arb = NewArrayPredictionContext([]PredictionContext{}, []int{})
-	}
-	
-	// Both arp and arb
-	return mergeArrays(arp, arb, rootIsWildcard, mergeCache)
+	return pc.(*ArrayPredictionContext)
 }
 
 // mergeSingletons merges two [SingletonBasePredictionContext] instances.
@@ -579,10 +273,10 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 // /
 func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionContext {
 	if rootIsWildcard {
-		if a == BasePredictionContextEMPTY {
+		if a.isEmpty() {
 			return BasePredictionContextEMPTY // // + b =//
 		}
-		if b == BasePredictionContextEMPTY {
+		if b.isEmpty() {
 			return BasePredictionContextEMPTY // a +// =//
 		}
 	} else {

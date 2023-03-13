@@ -977,10 +977,6 @@ func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, clo
 func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	if ParserATNSimulatorTraceATNSim {
 		fmt.Println("closure(" + config.String() + ")")
-		//fmt.Println("configs(" + configs.String() + ")")
-		if config.GetReachesIntoOuterContext() > 50 {
-			panic("problem")
-		}
 	}
 	
 	if _, ok := config.GetState().(*RuleStopState); ok {
@@ -1054,7 +1050,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 				// We can't get here if incoming config was rule stop and we had context
 				// track how far we dip into outer context.  Might
 				// come in handy and we avoid evaluating context dependent
-				// preds if p is > 0.
+				// preds if this is > 0.
 				
 				if p.dfa != nil && p.dfa.getPrecedenceDfa() {
 					if t.(*EpsilonTransition).outermostPrecedenceReturn == p.dfa.atnStartState.GetRuleIndex() {
@@ -1405,7 +1401,7 @@ func (p *ParserATNSimulator) getLookaheadName(input TokenStream) string {
 //	it out for clarity now that alg. works well. We can leave p
 //	"dead" code for a bit.
 func (p *ParserATNSimulator) dumpDeadEndConfigs(_ *NoViableAltException) {
-
+	
 	panic("Not implemented")
 	
 	//    fmt.Println("dead end configs: ")
