@@ -17,7 +17,7 @@ type Interval struct {
 // NewInterval creates a new interval with the given start and stop values.
 func NewInterval(start, stop int) *Interval {
 	i := new(Interval)
-
+	
 	i.Start = start
 	i.Stop = stop
 	return i
@@ -33,7 +33,7 @@ func (i *Interval) String() string {
 	if i.Start == i.Stop-1 {
 		return strconv.Itoa(i.Start)
 	}
-
+	
 	return strconv.Itoa(i.Start) + ".." + strconv.Itoa(i.Stop-1)
 }
 
@@ -50,20 +50,34 @@ type IntervalSet struct {
 
 // NewIntervalSet creates a new empty, writable, interval set.
 func NewIntervalSet() *IntervalSet {
-
+	
 	i := new(IntervalSet)
-
+	
 	i.intervals = nil
 	i.readOnly = false
-
+	
 	return i
+}
+
+func (i *IntervalSet) Equals(other *IntervalSet) bool {
+	if len(i.intervals) != len(other.intervals) {
+		return false
+	}
+	
+	for k, v := range i.intervals {
+		if v.Start != other.intervals[k].Start || v.Stop != other.intervals[k].Stop {
+			return false
+		}
+	}
+	
+	return true
 }
 
 func (i *IntervalSet) first() int {
 	if len(i.intervals) == 0 {
 		return TokenInvalidType
 	}
-
+	
 	return i.intervals[0].Start
 }
 
@@ -91,7 +105,7 @@ func (i *IntervalSet) addInterval(v *Interval) {
 				return
 			} else if v.Start <= interval.Stop {
 				i.intervals[k] = NewInterval(intMin(interval.Start, v.Start), intMax(interval.Stop, v.Stop))
-
+				
 				// if not applying to end, merge potential overlaps
 				if k < len(i.intervals)-1 {
 					l := i.intervals[k]
@@ -216,7 +230,7 @@ func (i *IntervalSet) String() string {
 }
 
 func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
-
+	
 	if i.intervals == nil {
 		return "{}"
 	} else if literalNames != nil || symbolicNames != nil {
@@ -224,7 +238,7 @@ func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []strin
 	} else if elemsAreChar {
 		return i.toCharString()
 	}
-
+	
 	return i.toIndexString()
 }
 
@@ -234,9 +248,9 @@ func (i *IntervalSet) GetIntervals() []*Interval {
 
 func (i *IntervalSet) toCharString() string {
 	names := make([]string, len(i.intervals))
-
+	
 	var sb strings.Builder
-
+	
 	for j := 0; j < len(i.intervals); j++ {
 		v := i.intervals[j]
 		if v.Stop == v.Start+1 {
@@ -262,12 +276,12 @@ func (i *IntervalSet) toCharString() string {
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
 	}
-
+	
 	return names[0]
 }
 
 func (i *IntervalSet) toIndexString() string {
-
+	
 	names := make([]string, 0)
 	for j := 0; j < len(i.intervals); j++ {
 		v := i.intervals[j]
@@ -284,7 +298,7 @@ func (i *IntervalSet) toIndexString() string {
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
 	}
-
+	
 	return names[0]
 }
 
@@ -298,7 +312,7 @@ func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []strin
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
 	}
-
+	
 	return names[0]
 }
 
@@ -311,7 +325,7 @@ func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string,
 		if a < len(literalNames) && literalNames[a] != "" {
 			return literalNames[a]
 		}
-
+		
 		return symbolicNames[a]
 	}
 }

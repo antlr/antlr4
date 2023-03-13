@@ -16,7 +16,7 @@ import (
 // Token.HIDDEN_CHANNEL, use a filtering token stream such a CommonTokenStream.
 type CommonTokenStream struct {
 	channel int
-
+	
 	// fetchedEOF indicates whether the Token.EOF token has been fetched from
 	// tokenSource and added to tokens. This field improves performance for the
 	// following cases:
@@ -38,7 +38,7 @@ type CommonTokenStream struct {
 	// tokenSource is the [TokenSource] from which tokens for the bt stream are
 	// fetched.
 	tokenSource TokenSource
-
+	
 	// tokens contains all tokens fetched from the token source. The list is considered a
 	// complete view of the input once fetchedEOF is set to true.
 	tokens []Token
@@ -77,13 +77,13 @@ func (c *CommonTokenStream) Seek(index int) {
 
 func (c *CommonTokenStream) Get(index int) Token {
 	c.lazyInit()
-
+	
 	return c.tokens[index]
 }
 
 func (c *CommonTokenStream) Consume() {
 	SkipEOFCheck := false
-
+	
 	if c.index >= 0 {
 		if c.fetchedEOF {
 			// The last token in tokens is EOF. Skip the check if p indexes any fetched.
@@ -97,11 +97,11 @@ func (c *CommonTokenStream) Consume() {
 		// Not yet initialized
 		SkipEOFCheck = false
 	}
-
+	
 	if !SkipEOFCheck && c.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
-
+	
 	if c.Sync(c.index + 1) {
 		c.index = c.adjustSeekIndex(c.index + 1)
 	}
@@ -110,13 +110,13 @@ func (c *CommonTokenStream) Consume() {
 // Sync makes sure index i in tokens has a token and returns true if a token is
 // located at index i and otherwise false.
 func (c *CommonTokenStream) Sync(i int) bool {
-	n := i - len(c.tokens) + 1 // TODO: How many more elements do we need?
-
+	n := i - len(c.tokens) + 1 // How many more elements do we need?
+	
 	if n > 0 {
 		fetched := c.fetch(n)
 		return fetched >= n
 	}
-
+	
 	return true
 }
 
@@ -126,20 +126,20 @@ func (c *CommonTokenStream) fetch(n int) int {
 	if c.fetchedEOF {
 		return 0
 	}
-
+	
 	for i := 0; i < n; i++ {
 		t := c.tokenSource.NextToken()
-
+		
 		t.SetTokenIndex(len(c.tokens))
 		c.tokens = append(c.tokens, t)
-
+		
 		if t.GetTokenType() == TokenEOF {
 			c.fetchedEOF = true
-
+			
 			return i + 1
 		}
 	}
-
+	
 	return n
 }
 
@@ -148,27 +148,27 @@ func (c *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) [
 	if start < 0 || stop < 0 {
 		return nil
 	}
-
+	
 	c.lazyInit()
-
+	
 	subset := make([]Token, 0)
-
+	
 	if stop >= len(c.tokens) {
 		stop = len(c.tokens) - 1
 	}
-
+	
 	for i := start; i < stop; i++ {
 		t := c.tokens[i]
-
+		
 		if t.GetTokenType() == TokenEOF {
 			break
 		}
-
+		
 		if types == nil || types.contains(t.GetTokenType()) {
 			subset = append(subset, t)
 		}
 	}
-
+	
 	return subset
 }
 
@@ -203,23 +203,23 @@ func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 // no tokens on channel between 'i' and [TokenEOF].
 func (c *CommonTokenStream) NextTokenOnChannel(i, _ int) int {
 	c.Sync(i)
-
+	
 	if i >= len(c.tokens) {
 		return -1
 	}
-
+	
 	token := c.tokens[i]
-
+	
 	for token.GetChannel() != c.channel {
 		if token.GetTokenType() == TokenEOF {
 			return -1
 		}
-
+		
 		i++
 		c.Sync(i)
 		token = c.tokens[i]
 	}
-
+	
 	return i
 }
 
@@ -230,7 +230,7 @@ func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 	for i >= 0 && c.tokens[i].GetChannel() != channel {
 		i--
 	}
-
+	
 	return i
 }
 
@@ -239,23 +239,23 @@ func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 // or EOF. If channel is -1, it finds any non-default channel token.
 func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []Token {
 	c.lazyInit()
-
+	
 	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
-
+	
 	nextOnChannel := c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	from := tokenIndex + 1
 
-	// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
+// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
 	var to int
-
+	
 	if nextOnChannel == -1 {
 		to = len(c.tokens) - 1
 	} else {
 		to = nextOnChannel
 	}
-
+	
 	return c.filterForChannel(from, to, channel)
 }
 
@@ -264,30 +264,30 @@ func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []To
 // -1, it finds any non default channel token.
 func (c *CommonTokenStream) GetHiddenTokensToLeft(tokenIndex, channel int) []Token {
 	c.lazyInit()
-
+	
 	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
-
+	
 	prevOnChannel := c.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
-
+	
 	if prevOnChannel == tokenIndex-1 {
 		return nil
 	}
-
+	
 	// If there are none on channel to the left and prevOnChannel == -1 then from = 0
 	from := prevOnChannel + 1
 	to := tokenIndex - 1
-
+	
 	return c.filterForChannel(from, to, channel)
 }
 
 func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
 	hidden := make([]Token, 0)
-
+	
 	for i := left; i < right+1; i++ {
 		t := c.tokens[i]
-
+		
 		if channel == -1 {
 			if t.GetChannel() != LexerDefaultTokenChannel {
 				hidden = append(hidden, t)
@@ -296,11 +296,11 @@ func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
 			hidden = append(hidden, t)
 		}
 	}
-
+	
 	if len(hidden) == 0 {
 		return nil
 	}
-
+	
 	return hidden
 }
 
@@ -324,7 +324,7 @@ func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
 	if start == nil || end == nil {
 		return ""
 	}
-
+	
 	return c.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
@@ -334,44 +334,44 @@ func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string 
 
 func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 	c.lazyInit()
-
+	
 	if interval == nil {
 		c.Fill()
 		interval = NewInterval(0, len(c.tokens)-1)
 	} else {
 		c.Sync(interval.Stop)
 	}
-
+	
 	start := interval.Start
 	stop := interval.Stop
-
+	
 	if start < 0 || stop < 0 {
 		return ""
 	}
-
+	
 	if stop >= len(c.tokens) {
 		stop = len(c.tokens) - 1
 	}
-
+	
 	s := ""
-
+	
 	for i := start; i < stop+1; i++ {
 		t := c.tokens[i]
-
+		
 		if t.GetTokenType() == TokenEOF {
 			break
 		}
-
+		
 		s += t.GetText()
 	}
-
+	
 	return s
 }
 
 // Fill gets all tokens from the lexer until EOF.
 func (c *CommonTokenStream) Fill() {
 	c.lazyInit()
-
+	
 	for c.fetch(1000) == 1000 {
 		continue
 	}
@@ -385,68 +385,68 @@ func (c *CommonTokenStream) LB(k int) Token {
 	if k == 0 || c.index-k < 0 {
 		return nil
 	}
-
+	
 	i := c.index
 	n := 1
-
+	
 	// Find k good tokens looking backward
 	for n <= k {
 		// Skip off-channel tokens
 		i = c.previousTokenOnChannel(i-1, c.channel)
 		n++
 	}
-
+	
 	if i < 0 {
 		return nil
 	}
-
+	
 	return c.tokens[i]
 }
 
 func (c *CommonTokenStream) LT(k int) Token {
 	c.lazyInit()
-
+	
 	if k == 0 {
 		return nil
 	}
-
+	
 	if k < 0 {
 		return c.LB(-k)
 	}
-
+	
 	i := c.index
 	n := 1 // We know tokens[n] is valid
-
+	
 	// Find k good tokens
 	for n < k {
 		// Skip off-channel tokens, but make sure to not look past EOF
 		if c.Sync(i + 1) {
 			i = c.NextTokenOnChannel(i+1, c.channel)
 		}
-
+		
 		n++
 	}
-
+	
 	return c.tokens[i]
 }
 
 // getNumberOfOnChannelTokens counts EOF once.
 func (c *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	var n int
-
+	
 	c.Fill()
-
+	
 	for i := 0; i < len(c.tokens); i++ {
 		t := c.tokens[i]
-
+		
 		if t.GetChannel() == c.channel {
 			n++
 		}
-
+		
 		if t.GetTokenType() == TokenEOF {
 			break
 		}
 	}
-
+	
 	return n
 }

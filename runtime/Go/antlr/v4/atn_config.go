@@ -106,17 +106,23 @@ func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *
 // are just wrappers around this one.
 func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
-		panic("semanticContext cannot be nil")
+		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
 
-	return &BaseATNConfig{
-		state:                      state,
-		alt:                        c.GetAlt(),
-		context:                    context,
-		semanticContext:            semanticContext,
-		reachesIntoOuterContext:    c.GetReachesIntoOuterContext(),
-		precedenceFilterSuppressed: c.getPrecedenceFilterSuppressed(),
-	}
+	b := &BaseATNConfig{}
+	b.InitBaseATNConfig(c, state, c.GetAlt(), context, semanticContext)
+
+	return b
+}
+
+func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) {
+
+	b.state = state
+	b.alt = alt
+	b.context = context
+	b.semanticContext = semanticContext
+	b.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
+	b.precedenceFilterSuppressed = c.getPrecedenceFilterSuppressed()
 }
 
 func (b *BaseATNConfig) getPrecedenceFilterSuppressed() bool {
@@ -237,49 +243,74 @@ func (b *BaseATNConfig) String() string {
 // BaseATNConfig struct.
 // TODO: Stop using a pointer and embed the struct instead as this saves allocations. Same for the LexerATNConfig "constructors"
 type LexerATNConfig struct {
-	*BaseATNConfig
+	BaseATNConfig
 	lexerActionExecutor            *LexerActionExecutor
 	passedThroughNonGreedyDecision bool
 }
 
 func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
-	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
+
+	return &LexerATNConfig{
+		BaseATNConfig: BaseATNConfig{
+			state:           state,
+			alt:             alt,
+			context:         context,
+			semanticContext: SemanticContextNone,
+		},
+	}
 }
 
 func NewLexerATNConfig5(state ATNState, alt int, context PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 	return &LexerATNConfig{
-		BaseATNConfig:       NewBaseATNConfig5(state, alt, context, SemanticContextNone),
+		BaseATNConfig: BaseATNConfig{
+			state:           state,
+			alt:             alt,
+			context:         context,
+			semanticContext: SemanticContextNone,
+		},
 		lexerActionExecutor: lexerActionExecutor,
 	}
 }
 
 func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
-	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext()),
+	lac := &LexerATNConfig{
+
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
+	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	return lac
 }
 
 func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
-	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext()),
+	lac := &LexerATNConfig{
 		lexerActionExecutor:            lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
+	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	return lac
 }
 
 func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionContext) *LexerATNConfig {
-	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, context, c.GetSemanticContext()),
+	lac := &LexerATNConfig{
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
+	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
+	return lac
 }
 
 //goland:noinspection GoUnusedExportedFunction
 func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
-	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
+	lac := &LexerATNConfig{
+		BaseATNConfig: BaseATNConfig{
+			state:           state,
+			alt:             alt,
+			context:         context,
+			semanticContext: SemanticContextNone,
+		},
+	}
+	return lac
 }
 
 // Hash is the default hash function for LexerATNConfig objects, it can be used directly or via
@@ -330,7 +361,7 @@ func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
 		return false
 	}
 
-	return l.BaseATNConfig.Equals(otherT.BaseATNConfig)
+	return l.BaseATNConfig.Equals(&otherT.BaseATNConfig)
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
