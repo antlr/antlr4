@@ -12,7 +12,7 @@ func (b *BasePredictionContext) Hash() int {
 	return b.cachedHash
 }
 
-func (b *BasePredictionContext) Equals(i interface{}) bool {
+func (b *BasePredictionContext) Equals(_ Collectable[PredictionContext]) bool {
 	return false
 }
 

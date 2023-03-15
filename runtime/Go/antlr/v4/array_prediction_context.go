@@ -63,7 +63,7 @@ func (a *ArrayPredictionContext) getReturnState(index int) int {
 
 // Equals is the default comparison function for ArrayPredictionContext when no specialized
 // implementation is needed for a collection
-func (a *ArrayPredictionContext) Equals(o interface{}) bool {
+func (a *ArrayPredictionContext) Equals(o Collectable[PredictionContext]) bool {
 	if a == o {
 		return true
 	}

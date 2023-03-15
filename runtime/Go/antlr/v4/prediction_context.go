@@ -11,7 +11,7 @@ import (
 // PredictionContext defines the interface that must be implemented by any flavor of prediction context.
 type PredictionContext interface {
 	Hash() int
-	Equals(interface{}) bool
+	Equals(collectable Collectable[PredictionContext]) bool
 	GetParent(int) PredictionContext
 	getReturnState(int) int
 	length() int
