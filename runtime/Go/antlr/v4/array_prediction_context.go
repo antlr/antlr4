@@ -76,7 +76,7 @@ func (a *ArrayPredictionContext) Equals(o Collectable[PredictionContext]) bool {
 	}
 	
 	// Must compare the actual array elements and not just the array address
-	//
+	// TODO: The hash hashes in all the return states anyway, to we maybe don't need to compare them here?
 	return slices.Equal(a.returnStates, other.returnStates) &&
 		slices.EqualFunc(a.parents, other.parents, func(x, y PredictionContext) bool {
 			return x.Equals(y)

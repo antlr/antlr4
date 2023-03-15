@@ -23,7 +23,7 @@ func (b *BaseATNSimulator) getCachedContext(context PredictionContext) Predictio
 		return context
 	}
 	
-	visited := make(map[PredictionContext]PredictionContext)
+	visited := NewJStore[PredictionContext, Comparator[PredictionContext]](pContextEqInst)
 	
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }

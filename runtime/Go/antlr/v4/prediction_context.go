@@ -448,25 +448,25 @@ func combineCommonParents(parents []PredictionContext) {
 	}
 }
 
-func getCachedBasePredictionContext(context PredictionContext, contextCache *PredictionContextCache, visited map[PredictionContext]PredictionContext) PredictionContext {
+func getCachedBasePredictionContext(context PredictionContext, contextCache *PredictionContextCache, visited *JStore[PredictionContext, Comparator[PredictionContext]]) PredictionContext {
 	
 	if context.isEmpty() {
 		return context
 	}
-	existing := visited[context]
-	if existing != nil {
+	existing, present := visited.Get(context)
+	if present {
 		return existing
 	}
-	existing = contextCache.Get(context)
-	if existing != nil {
-		visited[context] = existing
+	existing, present = contextCache.Get(context)
+	if present {
+		_, _ = visited.Put(existing)
 		return existing
 	}
 	changed := false
 	parents := make([]PredictionContext, context.length())
 	for i := 0; i < len(parents); i++ {
 		parent := getCachedBasePredictionContext(context.GetParent(i), contextCache, visited)
-		if changed || parent != context.GetParent(i) {
+		if changed || !parent.Equals(context.GetParent(i)) {
 			if !changed {
 				parents = make([]PredictionContext, context.length())
 				for j := 0; j < context.length(); j++ {
@@ -479,7 +479,7 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 	}
 	if !changed {
 		contextCache.add(context)
-		visited[context] = context
+		_, _ = visited.Put(context)
 		return context
 	}
 	var updated PredictionContext
@@ -491,8 +491,8 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 		updated = NewArrayPredictionContext(parents, context.(*ArrayPredictionContext).GetReturnStates())
 	}
 	contextCache.add(updated)
-	visited[updated] = updated
-	visited[context] = updated
+	visited.Put(updated)
+	visited.Put(context)
 	
 	return updated
 }
