@@ -400,8 +400,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	M := NewArrayPredictionContext(mergedParents, mergedReturnStates)
 	
 	// if we created same array as a or b, return that instead
-	// TODO: JI track whether this is possible above during merge sort for speed
-	// TODO: JI VERY IMPORTANT - In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
+	// TODO: JI track whether this is possible above during merge sort for speed and possibly avoid an allocation
 	if M.Equals(a) {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)
