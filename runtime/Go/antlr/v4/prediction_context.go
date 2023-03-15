@@ -53,7 +53,6 @@ func calculateHash(parent PredictionContext, returnState int) int {
 	return murmurFinish(h, 2)
 }
 
-
 // Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
@@ -403,7 +402,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// if we created same array as a or b, return that instead
 	// TODO: JI track whether this is possible above during merge sort for speed
 	// TODO: JI VERY IMPORTANT - In go, I do not think we can just do M == xx as M is a brand new allocation. This could be causing allocation problems
-	if M == a {
+	if M.Equals(a) {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), a)
 		}
