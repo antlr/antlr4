@@ -9,7 +9,8 @@ export declare class TokenStream {
     LA(i: number): number;
     LT(k: number): Token;
     getText(interval?: Interval): string;
-    getHiddenTokensToLeft(tokenIndex: number, channelName?: string): Token[];
-    getHiddenTokensToRight(tokenIndex: number, channelName?: string): Token[];
+    // channelIndex can be retrieved using: lexer.channelNames().findIndex(channelName)
+    getHiddenTokensToLeft(tokenIndex: number, channelIndex?: number): Token[];
+    getHiddenTokensToRight(tokenIndex: number, channelIndex?: number): Token[];
     get(idx: number): Token;
 }
