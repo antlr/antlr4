@@ -57,7 +57,7 @@ func (b *BaseSingletonPredictionContext) Hash() int {
 	return b.cachedHash
 }
 
-func (b *BaseSingletonPredictionContext) Equals(other interface{}) bool {
+func (b *BaseSingletonPredictionContext) Equals(other Collectable[PredictionContext]) bool {
 	if b == other {
 		return true
 	}

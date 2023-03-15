@@ -11,7 +11,7 @@ import (
 // PredictionContext defines the interface that must be implemented by any flavor of prediction context.
 type PredictionContext interface {
 	Hash() int
-	Equals(interface{}) bool
+	Equals(collectable Collectable[PredictionContext]) bool
 	GetParent(int) PredictionContext
 	getReturnState(int) int
 	length() int
@@ -52,7 +52,6 @@ func calculateHash(parent PredictionContext, returnState int) int {
 	h = murmurUpdate(h, returnState)
 	return murmurFinish(h, 2)
 }
-
 
 // Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.

@@ -47,7 +47,7 @@ func (e *EmptyPredictionContext) Hash() int {
 	return e.cachedHash
 }
 
-func (e *EmptyPredictionContext) Equals(other interface{}) bool {
+func (e *EmptyPredictionContext) Equals(other Collectable[PredictionContext]) bool {
 	return e == other
 }
 

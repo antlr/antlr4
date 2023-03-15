@@ -29,6 +29,7 @@ var (
 	dfaStateEqInst  = &ObjEqComparator[*DFAState]{}
 	semctxEqInst    = &ObjEqComparator[SemanticContext]{}
 	atnAltCfgEqInst = &ATNAltConfigComparator[ATNConfig]{}
+	pContextEqInst  = &ObjEqComparator[PredictionContext]{}
 )
 
 // Equals2 delegates to the Equals() method of type T
