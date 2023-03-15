@@ -31,9 +31,9 @@ func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	return pc
 }
 
-func (p *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
-	pc, _ := p.cache.Get(ctx)
-	return pc
+func (p *PredictionContextCache) Get(ctx PredictionContext) (PredictionContext, bool) {
+	pc, exists := p.cache.Get(ctx)
+	return pc, exists
 }
 
 func (p *PredictionContextCache) length() int {
