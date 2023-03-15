@@ -1,0 +1,3 @@
+# Test rig for go
+
+This test rig will build and run the grammar file test.g4 with the `input` file and turn on all tracing options.

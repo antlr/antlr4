@@ -132,3 +132,7 @@ runtime/Cpp/runtime/cmake_install.cmake
 runtime/Cpp/runtime/libantlr4-runtime.4.10.1.dylib
 runtime/Cpp/runtime/libantlr4-runtime.a
 runtime/Cpp/runtime/libantlr4-runtime.dylib
+/runtime/Cpp/runtime/libantlr4-runtime.4.12.0.dylib
+
+# Go test and performance trace files
+**/*.pprof
