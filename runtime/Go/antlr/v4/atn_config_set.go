@@ -245,20 +245,7 @@ func (b *BaseATNConfigSet) Compare(bs *BaseATNConfigSet) bool {
 			return false
 		}
 	}
-	//for _, c := range b.configs {
-	//	found := false
-	//	for _, c2 := range bs.configs {
-	//		if c.Equals(c2) {
-	//			found = true
-	//			break
-	//		}
-	//	}
-	//
-	//	if !found {
-	//		return false
-	//	}
-	//
-	//}
+	
 	return true
 }
 
