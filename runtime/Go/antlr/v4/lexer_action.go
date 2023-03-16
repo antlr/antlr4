@@ -9,25 +9,25 @@ import "strconv"
 const (
 	// LexerActionTypeChannel represents a [LexerChannelAction] action.
 	LexerActionTypeChannel = 0
-
+	
 	// LexerActionTypeCustom represents a [LexerCustomAction] action.
 	LexerActionTypeCustom = 1
-
+	
 	// LexerActionTypeMode represents a [LexerModeAction] action.
 	LexerActionTypeMode = 2
-
+	
 	// LexerActionTypeMore represents a [LexerMoreAction] action.
 	LexerActionTypeMore = 3
-
+	
 	// LexerActionTypePopMode represents a [LexerPopModeAction] action.
 	LexerActionTypePopMode = 4
-
+	
 	// LexerActionTypePushMode represents a [LexerPushModeAction] action.
 	LexerActionTypePushMode = 5
-
+	
 	// LexerActionTypeSkip represents a [LexerSkipAction] action.
 	LexerActionTypeSkip = 6
-
+	
 	// LexerActionTypeType represents a [LexerTypeAction] action.
 	LexerActionTypeType = 7
 )
@@ -47,10 +47,10 @@ type BaseLexerAction struct {
 
 func NewBaseLexerAction(action int) *BaseLexerAction {
 	la := new(BaseLexerAction)
-
+	
 	la.actionType = action
 	la.isPositionDependent = false
-
+	
 	return la
 }
 
@@ -67,11 +67,13 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 }
 
 func (b *BaseLexerAction) Hash() int {
-	return b.actionType
+	h := murmurInit(0)
+	h = murmurUpdate(h, b.actionType)
+	return murmurFinish(h, 1)
 }
 
 func (b *BaseLexerAction) Equals(other LexerAction) bool {
-	return b == other
+	return b.actionType == other.getActionType()
 }
 
 // LexerSkipAction implements the [BaseLexerAction.Skip] lexer action by calling [Lexer.Skip].
@@ -100,12 +102,16 @@ func (l *LexerSkipAction) String() string {
 	return "skip"
 }
 
+func (b *LexerSkipAction) Equals(other LexerAction) bool {
+	return other.getActionType() == LexerActionTypeSkip
+}
+
 //	Implements the {@code type} lexer action by calling {@link Lexer//setType}
 //
 // with the assigned type.
 type LexerTypeAction struct {
 	*BaseLexerAction
-
+	
 	thetype int
 }
 
@@ -149,10 +155,10 @@ type LexerPushModeAction struct {
 }
 
 func NewLexerPushModeAction(mode int) *LexerPushModeAction {
-
+	
 	l := new(LexerPushModeAction)
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypePushMode)
-
+	
 	l.mode = mode
 	return l
 }
@@ -193,11 +199,11 @@ type LexerPopModeAction struct {
 }
 
 func NewLexerPopModeAction() *LexerPopModeAction {
-
+	
 	l := new(LexerPopModeAction)
-
+	
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypePopMode)
-
+	
 	return l
 }
 
@@ -224,7 +230,7 @@ type LexerMoreAction struct {
 func NewLexerMoreAction() *LexerMoreAction {
 	l := new(LexerMoreAction)
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMore)
-
+	
 	return l
 }
 
@@ -409,14 +415,14 @@ type LexerIndexedCustomAction struct {
 // the token start index, at which the specified lexerAction should be
 // executed.
 func NewLexerIndexedCustomAction(offset int, lexerAction LexerAction) *LexerIndexedCustomAction {
-
+	
 	l := new(LexerIndexedCustomAction)
 	l.BaseLexerAction = NewBaseLexerAction(lexerAction.getActionType())
-
+	
 	l.offset = offset
 	l.lexerAction = lexerAction
 	l.isPositionDependent = true
-
+	
 	return l
 }
 

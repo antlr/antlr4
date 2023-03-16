@@ -69,15 +69,21 @@ func (c *ATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetAlt() == o2.GetAlt() &&
-		o1.GetSemanticContext().Equals(o2.GetSemanticContext())
+		o1.GetContext().Equals(o2.GetContext()) &&
+		o1.GetSemanticContext().Equals(o2.GetSemanticContext()) &&
+		o1.getPrecedenceFilterSuppressed() == o2.getPrecedenceFilterSuppressed()
 }
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup
 func (c *ATNConfigComparator[T]) Hash1(o ATNConfig) int {
-	hash := 7
-	hash = 31*hash + o.GetState().GetStateNumber()
-	hash = 31*hash + o.GetAlt()
-	hash = 31*hash + o.GetSemanticContext().Hash()
+	
+	hash := murmurInit(7)
+	hash = murmurUpdate(hash, o.GetState().GetStateNumber())
+	hash = murmurUpdate(hash, o.GetAlt())
+	hash = murmurUpdate(hash, o.GetContext().Hash())
+	hash = murmurUpdate(hash, o.GetSemanticContext().Hash())
+	hash = murmurFinish(hash, 4)
+	
 	return hash
 }
 
