@@ -26,25 +26,45 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 	public abstract String getLanguage();
 
-	protected String getExtension() { return getLanguage().toLowerCase(); }
+	protected String getExtension() {
+		return getLanguage().toLowerCase();
+	}
 
-	protected String getTitleName() { return getLanguage(); }
+	protected String getTitleName() {
+		return getLanguage();
+	}
 
-	protected String getTestFileName() { return "Test"; }
+	protected String getTestFileName() {
+		return "Test";
+	}
 
-	protected String getLexerSuffix() { return "Lexer"; }
+	protected String getLexerSuffix() {
+		return "Lexer";
+	}
 
-	protected String getParserSuffix() { return "Parser"; }
+	protected String getParserSuffix() {
+		return "Parser";
+	}
 
-	protected String getBaseListenerSuffix() { return "BaseListener"; }
+	protected String getBaseListenerSuffix() {
+		return "BaseListener";
+	}
 
-	protected String getListenerSuffix() { return "Listener"; }
+	protected String getListenerSuffix() {
+		return "Listener";
+	}
 
-	protected String getBaseVisitorSuffix() { return "BaseVisitor"; }
+	protected String getBaseVisitorSuffix() {
+		return "BaseVisitor";
+	}
 
-	protected String getVisitorSuffix() { return "Visitor"; }
+	protected String getVisitorSuffix() {
+		return "Visitor";
+	}
 
-	protected String grammarNameToFileName(String grammarName) { return grammarName; }
+	protected String grammarNameToFileName(String grammarName) {
+		return grammarName;
+	}
 
 	private static String runtimeToolPath;
 	private static String compilerPath;
@@ -77,17 +97,29 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return runtimeToolPath;
 	}
 
-	protected String getCompilerName() { return null; }
+	protected String getCompilerName() {
+		return null;
+	}
 
-	protected String getRuntimeToolName() { return getLanguage().toLowerCase(); }
+	protected String getRuntimeToolName() {
+		return getLanguage().toLowerCase();
+	}
 
-	protected String getTestFileWithExt() { return getTestFileName() + "." + getExtension(); }
+	protected String getTestFileWithExt() {
+		return getTestFileName() + "." + getExtension();
+	}
 
-	protected String getExecFileName() { return getTestFileWithExt(); }
+	protected String getExecFileName() {
+		return getTestFileWithExt();
+	}
 
-	protected String[] getExtraRunArgs() { return null; }
+	protected String[] getExtraRunArgs() {
+		return null;
+	}
 
-	protected Map<String, String> getExecEnvironment() { return null; }
+	protected Map<String, String> getExecEnvironment() {
+		return null;
+	}
 
 	protected String getPropertyPrefix() {
 		return "antlr-" + getLanguage().toLowerCase();
@@ -157,7 +189,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	// Allows any target to add additional options for the antlr tool such as the location of the output files
 	// which is useful for the Go target for instance to avoid having to move them before running the test
 	//
-	protected List<String> getTargetToolOptions() {
+	protected List<String> getTargetToolOptions(RunOptions ro) {
 		return null;
 	}
 
@@ -170,9 +202,9 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			options.add("-DsuperClass=" + runOptions.superClass);
 		}
 
-		// See if the target wants to add tool options
+		// See if the target wants to add tool options.
 		//
-		List<String>targetOpts = getTargetToolOptions();
+		List<String> targetOpts = getTargetToolOptions(runOptions);
 		if (targetOpts != null) {
 			options.addAll(targetOpts);
 		}
@@ -254,7 +286,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return startRuleName;
 	}
 
-	protected void addExtraRecognizerParameters(ST template) {}
+	protected void addExtraRecognizerParameters(ST template) {
+	}
 
 	private boolean initAntlrRuntimeIfRequired(RunOptions runOptions) {
 		String language = getLanguage();
@@ -316,8 +349,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
 			output = result.output;
 			errors = result.errors;
-		}
-		catch (InterruptedException | IOException e) {
+		} catch (InterruptedException | IOException e) {
 			exception = e;
 		}
 		return new ExecutedState(compiledState, output, errors, exception);
@@ -331,11 +363,10 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		String cmd = String.join(" ", command);
 		try {
 			return Processor.run(command, workPath);
-		}
-		catch (InterruptedException | IOException e) {
-			String msg = "command \""+cmd+"\"\n  in "+workPath+" failed";
-			if ( description != null ) {
-				msg += ":\n  can't "+description;
+		} catch (InterruptedException | IOException e) {
+			String msg = "command \"" + cmd + "\"\n  in " + workPath + " failed";
+			if (description != null) {
+				msg += ":\n  can't " + description;
 			}
 			throw new Exception(msg, e);
 		}
@@ -347,8 +378,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			if (dirFile.exists()) {
 				try {
 					deleteDirectory(dirFile);
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
