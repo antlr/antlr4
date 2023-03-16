@@ -70,6 +70,7 @@ public class GoRunner extends RuntimeRunner {
 
 	private static String cachedGoMod;
 	private static String cachedGoSum;
+	private static ArrayList<String> options = new ArrayList<>();
 
 	static {
 		environment = new HashMap<>();
@@ -115,8 +116,13 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected  List<String> getTargetToolOptions() {
-		ArrayList<String> options = new ArrayList<String>();
+	protected List<String> getTargetToolOptions(RunOptions ro) {
+		// Unfortunately this cannot be cached because all the synchronization is out of whack, and
+		// we end up return the options before they are populated. I prefer to make this small change
+		// at the expense of an object rather than try to change teh synchronized initialization, which is
+		// very fragile.
+		// Also, the options may need to change in the future according to the test options. This is safe
+		ArrayList<String> options = new ArrayList<>();
 		options.add("-o");
 		options.add(tempTestDir.resolve("parser").toString());
 		return options;
@@ -124,27 +130,6 @@ public class GoRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-//		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-//		String tempDirPath = getTempDirPath();
-//		File generatedParserDir = new File(tempDirPath, "parser");
-//		if (!generatedParserDir.mkdir()) {
-//			return new CompiledState(generatedState, new Exception("can't make dir " + generatedParserDir));
-//		}
-//
-//		// The generated files seem to need to be in the parser subdirectory.
-//		// We have no need to change the import of the runtime because of go mod replace so, we could just generate them
-//		// directly in to the parser subdir. But in case down the line, there is some reason to want to replace things in
-//		// the generated code, then I will leave this here, and we can use replaceInFile()
-//		//
-//		for (GeneratedFile generatedFile : generatedFiles) {
-//			try {
-//				Path originalFile = Paths.get(tempDirPath, generatedFile.name);
-//				Files.move(originalFile, Paths.get(tempDirPath, "parser", generatedFile.name));
-//			} catch (IOException e) {
-//				return new CompiledState(generatedState, e);
-//			}
-//		}
-
 		// We have already created a suitable go.mod file, though it may need to have go mod tidy run on it one time
 		//
 		writeFile(getTempDirPath(), "go.mod", cachedGoMod);
