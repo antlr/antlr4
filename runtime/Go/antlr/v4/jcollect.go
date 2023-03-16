@@ -5,7 +5,6 @@ package antlr
 // can be found in the LICENSE.txt file in the project root.
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -83,9 +82,6 @@ func (s *JStore[T, C]) Get(key T) (T, bool) {
 	
 	kh := s.comparator.Hash1(key)
 	
-	if len(s.store[kh]) > 10 {
-		fmt.Println("hash collision", kh, len(s.store[kh]))
-	}
 	for _, v := range s.store[kh] {
 		if s.comparator.Equals2(key, v) {
 			return v, true
