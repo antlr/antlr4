@@ -5,6 +5,7 @@ package antlr
 // can be found in the LICENSE.txt file in the project root.
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -38,11 +39,11 @@ type JStore[T any, C Comparator[T]] struct {
 }
 
 func NewJStore[T any, C Comparator[T]](comparator Comparator[T]) *JStore[T, C] {
-
+	
 	if comparator == nil {
 		panic("comparator cannot be nil")
 	}
-
+	
 	s := &JStore[T, C]{
 		store:      make(map[int][]T, 1),
 		comparator: comparator,
@@ -62,9 +63,9 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T]) *JStore[T, C] {
 //
 // If the given value is not present in the store, then the value is added to the store and returned as v and exists is set to false.
 func (s *JStore[T, C]) Put(value T) (v T, exists bool) {
-
+	
 	kh := s.comparator.Hash1(value)
-
+	
 	for _, v1 := range s.store[kh] {
 		if s.comparator.Equals2(value, v1) {
 			return v1, true
@@ -79,9 +80,12 @@ func (s *JStore[T, C]) Put(value T) (v T, exists bool) {
 // which would not generally be useful, but this is a specific thing for ANTLR where the key is
 // generated using the object we are going to store.
 func (s *JStore[T, C]) Get(key T) (T, bool) {
-
+	
 	kh := s.comparator.Hash1(key)
-
+	
+	if len(s.store[kh]) > 10 {
+		fmt.Println("hash collision", kh, len(s.store[kh]))
+	}
 	for _, v := range s.store[kh] {
 		if s.comparator.Equals2(key, v) {
 			return v, true
@@ -92,7 +96,7 @@ func (s *JStore[T, C]) Get(key T) (T, bool) {
 
 // Contains returns true if the given key is present in the store
 func (s *JStore[T, C]) Contains(key T) bool {
-
+	
 	_, present := s.Get(key)
 	return present
 }
@@ -105,7 +109,7 @@ func (s *JStore[T, C]) SortedSlice(less func(i, j T) bool) []T {
 	sort.Slice(vs, func(i, j int) bool {
 		return less(vs[i], vs[j])
 	})
-
+	
 	return vs
 }
 
@@ -151,7 +155,7 @@ func NewJMap[K, V any, C Comparator[K]](comparator Comparator[K]) *JMap[K, V, C]
 
 func (m *JMap[K, V, C]) Put(key K, val V) {
 	kh := m.comparator.Hash1(key)
-
+	
 	m.store[kh] = append(m.store[kh], &entry[K, V]{key, val})
 	m.len++
 }
@@ -167,7 +171,7 @@ func (m *JMap[K, V, C]) Values() []V {
 }
 
 func (m *JMap[K, V, C]) Get(key K) (V, bool) {
-
+	
 	var none V
 	kh := m.comparator.Hash1(key)
 	for _, e := range m.store[kh] {
