@@ -119,7 +119,7 @@ func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionExcep
 // It reSynchronizes the parser by consuming tokens until we find one in the reSynchronization set -
 // loosely the set of tokens that can follow the current rule.
 func (d *DefaultErrorStrategy) Recover(recognizer Parser, _ RecognitionException) {
-
+	
 	if d.lastErrorIndex == recognizer.GetInputStream().Index() &&
 		d.lastErrorStates != nil && d.lastErrorStates.contains(recognizer.GetState()) {
 		// uh oh, another error at same token index and previously-Visited
@@ -206,7 +206,7 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 		if d.SingleTokenDeletion(recognizer) != nil {
 			return
 		}
-		panic(NewInputMisMatchException(recognizer))
+		recognizer.SetError(NewInputMisMatchException(recognizer))
 	case ATNStatePlusLoopBack, ATNStateStarLoopBack:
 		d.ReportUnwantedToken(recognizer)
 		expecting := NewIntervalSet()
@@ -362,7 +362,8 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 		return d.GetMissingSymbol(recognizer)
 	}
 	// even that didn't work must panic the exception
-	panic(NewInputMisMatchException(recognizer))
+	recognizer.SetError(NewInputMisMatchException(recognizer))
+	return nil
 }
 
 // SingleTokenInsertion implements the single-token insertion inline error recovery
@@ -685,7 +686,7 @@ func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 			context = nil
 		}
 	}
-	panic(NewParseCancellationException()) // TODO: we don't emit e properly
+	recognizer.SetError(NewParseCancellationException()) // TODO: we don't emit e properly
 }
 
 // RecoverInline makes sure we don't attempt to recover inline if the parser

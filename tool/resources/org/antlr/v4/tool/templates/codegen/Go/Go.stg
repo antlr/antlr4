@@ -393,49 +393,41 @@ func (p *<parser.name>) <currentRule.escapedName; format="cap">(<currentRule.arg
 	<locals:{l | var <l>}; separator="\n">
 	<endif>
 
-
 	defer func() {
+	    if p.HasError() {
+	    	v := p.GetError()
+			localctx.SetException(v)
+			p.GetErrorHandler().ReportError(p, v)
+			p.GetErrorHandler().Recover(p, v)
+			p.SetError(nil)
+		}
 		<if(finallyAction)>
 		<finallyAction>
 		<endif>
 		p.ExitRule()
 	}()
 
-	defer func() {
-		if err := recover(); err != nil {
-			<if(exceptions)>
-			<exceptions; separator="\n">
-			<else>
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-			<endif>
-		}
-	}()
+	if !p.HassError() {
+		<if(currentRule.hasLookaheadBlock)>
+		var _alt int
+		<endif>
 
-	<if(currentRule.hasLookaheadBlock)>
-	var _alt int
-	<endif>
-
-	<if(code)>
-	<code>
+		<if(code)>
+		<code>
 
 
-	<endif>
-	<if(postamble)>
-	<postamble; separator="\n">
+		<endif>
+		<if(postamble)>
+		<postamble; separator="\n">
 
 
-	<endif>
-	<if(namedActions.after)>
-	<namedActions.after>
+		<endif>
+		<if(namedActions.after)>
+		<namedActions.after>
 
 
-	<endif>
+		<endif>
+	}
 	return localctx
 }
 >>
@@ -474,45 +466,40 @@ func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedN
 	<locals:{l | var <l>}; separator="\n">
 	<endif>
 
-
 	defer func() {
+	    if p.HasError() {
+	    	v := p.GetError()
+			localctx.SetException(v)
+			p.GetErrorHandler().ReportError(p, v)
+			p.GetErrorHandler().Recover(p, v)
+			p.SetError(nil)
+		}
 		<if(finallyAction)>
 		<finallyAction>
 		<endif>
 		p.UnrollRecursionContexts(_parentctx)
 	}()
+	if !p.HasError() {
+		<if(currentRule.hasLookaheadBlock)>
+		var _alt int
+		<endif>
 
-	defer func() {
-		if err := recover(); err != nil {
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-		}
-	}()
-
-	<if(currentRule.hasLookaheadBlock)>
-	var _alt int
-	<endif>
-
-	<if(code)>
-	<code>
+		<if(code)>
+		<code>
 
 
-	<endif>
-	<if(postamble)>
-	<postamble; separator="\n">
+		<endif>
+		<if(postamble)>
+		<postamble; separator="\n">
 
 
-	<endif>
-	<if(namedActions.after)>
-	<namedActions.after>
+		<endif>
+		<if(namedActions.after)>
+		<namedActions.after>
 
 
-	<endif>
+		<endif>
+	}
 	return localctx
 }
 >>
