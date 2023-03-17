@@ -43,13 +43,13 @@ func NewBaseRecognitionException(message string, recognizer Recognizer, input In
 	t.recognizer = recognizer
 	t.input = input
 	t.ctx = ctx
-
+	
 	// The current Token when an error occurred. Since not all streams
 	// support accessing symbols by index, we have to track the {@link Token}
 	// instance itself.
 	//
 	t.offendingToken = nil
-
+	
 	// Get the ATN state number the parser was in at the time the error
 	// occurred. For NoViableAltException and LexerNoViableAltException exceptions, this is the
 	// DecisionState number. For others, it is the state whose outgoing edge we couldn't Match.
@@ -162,7 +162,7 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken To
 	// Which configurations did we try at input.Index() that couldn't Match
 	// input.LT(1)
 	n.deadEndConfigs = deadEndConfigs
-
+	
 	// The token object at the start index the input stream might
 	// not be buffering tokens so get a reference to it.
 	//
@@ -234,6 +234,21 @@ func (f *FailedPredicateException) formatMessage(predicate, message string) stri
 }
 
 type ParseCancellationException struct {
+}
+
+func (p ParseCancellationException) GetOffendingToken() Token {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p ParseCancellationException) GetMessage() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p ParseCancellationException) GetInputStream() IntStream {
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewParseCancellationException() *ParseCancellationException {

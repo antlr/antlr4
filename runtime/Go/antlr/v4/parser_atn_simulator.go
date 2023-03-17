@@ -225,8 +225,9 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			if alt != ATNInvalidAltNumber {
 				return alt
 			}
-			
-			panic(e)
+			p.parser.SetError(e)
+			// TODO: JI - was panicing here.. how to drop out now?
+			return ATNInvalidAltNumber
 		}
 		if D.requiresFullContext && p.predictionMode != PredictionModeSLL {
 			// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
@@ -1401,7 +1402,7 @@ func (p *ParserATNSimulator) getLookaheadName(input TokenStream) string {
 //	it out for clarity now that alg. works well. We can leave p
 //	"dead" code for a bit.
 func (p *ParserATNSimulator) dumpDeadEndConfigs(_ *NoViableAltException) {
-
+	
 	panic("Not implemented")
 	
 	//    fmt.Println("dead end configs: ")
