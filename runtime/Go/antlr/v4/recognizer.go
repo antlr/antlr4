@@ -7,7 +7,7 @@ package antlr
 import (
 	"fmt"
 	"strings"
-
+	
 	"strconv"
 )
 
@@ -15,10 +15,10 @@ type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
-
+	
 	Sempred(RuleContext, int, int) bool
 	Precpred(RuleContext, int) bool
-
+	
 	GetState() int
 	SetState(int)
 	Action(RuleContext, int, int)
@@ -26,16 +26,20 @@ type Recognizer interface {
 	RemoveErrorListeners()
 	GetATN() *ATN
 	GetErrorListenerDispatch() ErrorListener
+	HasError() bool
+	GetError() RecognitionException
+	SetError(RecognitionException)
 }
 
 type BaseRecognizer struct {
 	listeners []ErrorListener
 	state     int
-
+	
 	RuleNames       []string
 	LiteralNames    []string
 	SymbolicNames   []string
 	GrammarFileName string
+	SynErr          RecognitionException
 }
 
 func NewBaseRecognizer() *BaseRecognizer {
@@ -56,6 +60,18 @@ func (b *BaseRecognizer) checkVersion(toolVersion string) {
 	if runtimeVersion != toolVersion {
 		fmt.Println("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 	}
+}
+
+func (b *BaseRecognizer) SetError(err RecognitionException) {
+	b.SynErr = err
+}
+
+func (b *BaseRecognizer) HasError() bool {
+	return b.SynErr != nil
+}
+
+func (b *BaseRecognizer) GetError() RecognitionException {
+	return b.SynErr
 }
 
 func (b *BaseRecognizer) Action(_ RuleContext, _, _ int) {
@@ -114,7 +130,7 @@ func (b *BaseRecognizer) SetState(v int) {
 //
 // TODO: JI This is not yet implemented in the Go runtime. Maybe not needed.
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
-
+	
 	panic("Method not defined!")
 	//    var ruleNames = b.GetRuleNames()
 	//    if (ruleNames==nil) {
@@ -204,7 +220,7 @@ func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	s = strings.Replace(s, "\t", "\\t", -1)
 	s = strings.Replace(s, "\n", "\\n", -1)
 	s = strings.Replace(s, "\r", "\\r", -1)
-
+	
 	return "'" + s + "'"
 }
 
