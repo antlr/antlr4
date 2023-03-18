@@ -35,7 +35,7 @@ public class TsNodeRunner extends RuntimeRunner {
 	}
 
 	private void npmInstallTsNodeAndWebpack() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "webpack-cli"}, null);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "babel-loader", "webpack-cli"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
