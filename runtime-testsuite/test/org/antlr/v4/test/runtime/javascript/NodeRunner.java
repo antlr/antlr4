@@ -36,7 +36,7 @@ public class NodeRunner extends RuntimeRunner {
 
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
 	private final static String newImportAntlrString =
-			"import antlr4 from 'file://" + normalizedRuntimePath + "/src/antlr4/index.node.js'";
+			"import antlr4 from 'file://" + normalizedRuntimePath + "/lib/index.node.js'";
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
