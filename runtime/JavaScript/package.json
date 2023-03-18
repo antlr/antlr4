@@ -8,8 +8,8 @@
   "exports": {
     ".": {
       "node": "./lib/index.node.js",
-      "import": "./es/index.js",
-      "require": "./lib/index.js"
+      "import": "./es/index.web.js",
+      "require": "./lib/index.web.js"
     },
     "./src/antlr4/index.d.ts": {
       "node": "./src/antlr4/index.node.d.ts",
