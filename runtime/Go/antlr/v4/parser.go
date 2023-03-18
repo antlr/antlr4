@@ -152,6 +152,9 @@ func (p *BaseParser) Match(ttype int) Token {
 		p.Consume()
 	} else {
 		t = p.errHandler.RecoverInline(p)
+		if p.HasError() {
+			return nil
+		}
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
 
 			// we must have conjured up a new token during single token

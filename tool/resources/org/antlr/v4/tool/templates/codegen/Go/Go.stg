@@ -333,14 +333,10 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
  */
 RuleActionFunction(r, actions) ::= <<
 func (l *<lexer.name>) <r.escapedName; format="cap">_Action(localctx <if(r.factory.grammar.lexer)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
-	this := l
-	_ = this
-
 	switch actionIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
 		<actions.(index)>}; separator="\n\n">
-
 
 	<endif>
 	default:
@@ -354,9 +350,6 @@ func (l *<lexer.name>) <r.escapedName; format="cap">_Action(localctx <if(r.facto
  */
 RuleSempredFunction(r, actions) ::= <<
 func (p *<r.factory.grammar.recognizerName>) <r.escapedName; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
-	this := p
-	_ = this
-
 	switch predIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -381,9 +374,6 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 
 <endif>
 func (p *<parser.name>) <currentRule.escapedName; format="cap">(<currentRule.args:{a | <a.escapedName> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
-	this := p
-	_ = this
-
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.escapedName>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
 	<if(namedActions.init)>
@@ -393,42 +383,39 @@ func (p *<parser.name>) <currentRule.escapedName; format="cap">(<currentRule.arg
 	<locals:{l | var <l>}; separator="\n">
 	<endif>
 
-	defer func() {
-	    if p.HasError() {
-	    	v := p.GetError()
-			localctx.SetException(v)
-			p.GetErrorHandler().ReportError(p, v)
-			p.GetErrorHandler().Recover(p, v)
-			p.SetError(nil)
-		}
-		<if(finallyAction)>
-		<finallyAction>
-		<endif>
-		p.ExitRule()
-	}()
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
-	if !p.HassError() {
-		<if(currentRule.hasLookaheadBlock)>
-		var _alt int
-		<endif>
-
-		<if(code)>
-		<code>
+	<if(code)>
+	<code>
 
 
-		<endif>
-		<if(postamble)>
-		<postamble; separator="\n">
+	<endif>
+	<if(postamble)>
+	<postamble; separator="\n">
 
 
-		<endif>
-		<if(namedActions.after)>
-		<namedActions.after>
+	<endif>
+	<if(namedActions.after)>
+	<namedActions.after>
 
 
-		<endif>
+	<endif>
+errorExit:
+	if p.HasError() {
+		v := p.GetError()
+		localctx.SetException(v)
+		p.GetErrorHandler().ReportError(p, v)
+		p.GetErrorHandler().Recover(p, v)
+		p.SetError(nil)
 	}
+	<if(finallyAction)>
+	<finallyAction>
+	<endif>
+	p.ExitRule()
 	return localctx
+	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 >>
 
@@ -449,10 +436,8 @@ func (p *<parser.name>) <currentRule.escapedName; format="cap">(<args:{a | <a.es
 }
 
 func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedName> <a.type>}>) (localctx I<currentRule.ctxType>) {
-	this := p
-	_ = this
-
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
+
 	_parentState := p.GetState()
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.escapedName>}>)
 	var _prevctx I<currentRule.ctxType> = localctx
@@ -466,41 +451,39 @@ func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedN
 	<locals:{l | var <l>}; separator="\n">
 	<endif>
 
-	defer func() {
-	    if p.HasError() {
-	    	v := p.GetError()
-			localctx.SetException(v)
-			p.GetErrorHandler().ReportError(p, v)
-			p.GetErrorHandler().Recover(p, v)
-			p.SetError(nil)
-		}
-		<if(finallyAction)>
-		<finallyAction>
-		<endif>
-		p.UnrollRecursionContexts(_parentctx)
-	}()
-	if !p.HasError() {
-		<if(currentRule.hasLookaheadBlock)>
-		var _alt int
-		<endif>
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
-		<if(code)>
-		<code>
+	<if(code)>
+	<code>
 
 
-		<endif>
-		<if(postamble)>
-		<postamble; separator="\n">
+	<endif>
+	<if(postamble)>
+	<postamble; separator="\n">
 
 
-		<endif>
-		<if(namedActions.after)>
-		<namedActions.after>
+	<endif>
+	<if(namedActions.after)>
+	<namedActions.after>
 
 
-		<endif>
+	<endif>
+	errorExit:
+	if p.HasError() {
+		v := p.GetError()
+		localctx.SetException(v)
+		p.GetErrorHandler().ReportError(p, v)
+		p.GetErrorHandler().Recover(p, v)
+		p.SetError(nil)
 	}
+	<if(finallyAction)>
+	<finallyAction>
+	<endif>
+	p.UnrollRecursionContexts(_parentctx)
 	return localctx
+	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 >>
 
@@ -529,6 +512,9 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
 <if(choice.label)>
 <labelref(choice.label)> = p.GetTokenStream().LT(1)
 <endif>
@@ -555,7 +541,9 @@ default:
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-
+if p.HasError() {
+	goto errorExit
+}
 switch p.GetTokenStream().LA(1) {
 <if(choice.altLook && alts)>
 <choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l.name>}; separator=", ">:
@@ -574,6 +562,9 @@ p.SetState(<choice.stateNumber>)
  But, see TestLeftRecursion.testJavaExpressions_10, 11 which fails with sync()
  !>
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
 <if(preamble)>
 <preamble; separator="\n">
 
@@ -591,6 +582,9 @@ if <expr> {
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
 <if(preamble)>
 <preamble; separator="\n">
 
@@ -602,6 +596,9 @@ for <loopExpr> {
 	<endif>
 	p.SetState(<choice.loopBackStateNumber>)
 	p.GetErrorHandler().Sync(p)
+	if p.HasError() {
+    	goto errorExit
+    }
 	<if(iteration)>
 	<iteration>
 	<endif>
@@ -611,6 +608,9 @@ for <loopExpr> {
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
 <if(preamble)>
 <preamble; separator="\n">
 
@@ -622,6 +622,9 @@ for ok := true; ok; ok = <loopExpr> {
 	<endif>
 	p.SetState(<choice.stateNumber>)<! loopback/exit decision !>
 	p.GetErrorHandler().Sync(p)
+	if p.HasError() {
+    	goto errorExit
+    }
 	<if(iteration)>
 	<iteration>
 	<endif>
@@ -633,6 +636,10 @@ for ok := true; ok; ok = <loopExpr> {
 AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
+
 <if(choice.label)>
 <labelref(choice.label)> = _input.LT(1)
 
@@ -642,11 +649,13 @@ p.GetErrorHandler().Sync(p)
 
 <endif>
 
-switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) {
+switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) {
 <if(alts)>
 <alts:{alt | case <i>:
 	<alt>}; separator="\n\n">
 <endif>
+case antlr.ATNInvalidAltNumber:
+	goto errorExit
 }
 >>
 
@@ -656,9 +665,10 @@ p.GetErrorHandler().Sync(p)
 
 <if(alts)>
 
-<alts:{alt | if p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) == <i><if(!choice.ast.greedy)>+1<endif> {
+<alts:{alt | if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) == <i><if(!choice.ast.greedy)>+1<endif> {
 	<alt>
-}; separator="} else ">
+	\} else if p.HasError() { // JIM
+		goto errorExit}; separator="} else ">
 <endif>
 }
 >>
@@ -666,8 +676,13 @@ p.GetErrorHandler().Sync(p)
 StarBlock(choice, alts, Sync, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
-
+if p.HasError() {
+	goto errorExit
+}
+_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+if p.HasError() {
+	goto errorExit
+}
 for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	if _alt == 1<if(!choice.ast.greedy)>+1<endif> {
 		<if(iteration)>
@@ -679,13 +694,22 @@ for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	}
 	p.SetState(<choice.loopBackStateNumber>)
 	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+	if p.HasError() {
+    	goto errorExit
+    }
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+	if p.HasError() {
+		goto errorExit
+	}
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
 p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
+if p.HasError() {
+	goto errorExit
+}
 _alt = 1<if(!choice.ast.greedy)>+1<endif>
 for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	switch _alt {
@@ -703,13 +727,19 @@ for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAlt
 
 	p.SetState(<choice.loopBackStateNumber>)<! loopback/exit decision !>
 	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+	if p.HasError() {
+		goto errorExit
+	}
 }
 >>
 
 Sync(s) ::= "Sync(<s.expecting.name>)"
 
-ThrowNoViableAlt(t) ::= "panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))"
+ThrowNoViableAlt(t) ::= <<
+p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+goto errorExit
+>>
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
@@ -775,6 +805,10 @@ MatchToken(m) ::= <<
 	<else>
 	p.Match(<parser.name><m.escapedName>)
 	<endif>
+	if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+	}
 }
 >>
 
@@ -833,7 +867,8 @@ SemPred(p, chunks, failChunks) ::= <<
 p.SetState(<p.stateNumber>)
 
 if !(<chunks>) {
-	panic(antlr.NewFailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><else>, ""<endif>))
+	p.SetError(antlr.NewFailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><else>, ""<endif>))
+	goto errorExit
 }
 >>
 
