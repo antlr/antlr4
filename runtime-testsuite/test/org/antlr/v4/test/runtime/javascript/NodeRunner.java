@@ -36,7 +36,7 @@ public class NodeRunner extends RuntimeRunner {
 
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
 	private final static String newImportAntlrString =
-			"import antlr4 from 'file://" + normalizedRuntimePath + "/lib/index.node.js'";
+			"import antlr4 from 'file://" + normalizedRuntimePath + "/src/antlr4/index.node.js'";
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
@@ -51,8 +51,10 @@ public class NodeRunner extends RuntimeRunner {
 			}
 		}
 
-		writeFile(getTempDirPath(), "package.json",
+		writeFile(normalizedRuntimePath + "/src/antlr4", "package.json",
 				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
+		writeFile(getTempDirPath(), "package.json",
+		 		RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
 		return new CompiledState(generatedState, null);
 	}
 
