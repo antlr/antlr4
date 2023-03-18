@@ -3,7 +3,6 @@
   "version": "4.12.0",
   "description": "JavaScript runtime for ANTLR4",
   "types": "src/antlr4/index.d.ts",
-  "browser": "./umd/antlr4.js",
   "main": "lib/index.web.js",
   "module": "es/index.web.js",
   "exports": {
