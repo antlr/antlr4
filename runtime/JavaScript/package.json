@@ -17,6 +17,13 @@
     }
   },
   "repository": "antlr/antlr4.git",
+  "files": [
+    "src/antlr4/*.d.ts",
+    "es/",
+    "lib/",
+    "umd/",
+    "README.md"
+  ],
   "keywords": [
     "lexer",
     "parser",
