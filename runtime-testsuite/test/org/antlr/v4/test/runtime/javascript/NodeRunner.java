@@ -51,8 +51,6 @@ public class NodeRunner extends RuntimeRunner {
 			}
 		}
 
-		writeFile(normalizedRuntimePath + "/src/antlr4", "package.json",
-				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
 		writeFile(getTempDirPath(), "package.json",
 		 		RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
 		return new CompiledState(generatedState, null);
