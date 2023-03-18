@@ -1,2 +1,4 @@
-/dist/
+/umd
+/lib
+/es
 /node_modules

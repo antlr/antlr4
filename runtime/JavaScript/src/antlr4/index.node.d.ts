@@ -1,4 +1,5 @@
 export * from "./InputStream";
+export * from "./FileStream";
 export * from "./CharStream";
 export * from "./CharStreams";
 export * from "./TokenStream";
