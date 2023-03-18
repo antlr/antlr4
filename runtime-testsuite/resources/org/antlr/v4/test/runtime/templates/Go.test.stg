@@ -19,13 +19,9 @@ AppendStr(a,b) ::= "<a> + <b>"
 Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= <<
-// A noddy range over the list will not compile if it is not getting a slice
-// however, Go will not compile the generated code if the slice vs single value is wrong.
-// Makes the Java based tests suite work though.
-j1__ := make([]interface{}, len(<v>))
-j2__ := <v>
-for j3__ := range j2__ {
-   j1__[j3__] = j2__[j3__]
+// Go will not compile this generated code if the slice vs single value is wrong.
+for i := range localctx.(*ExpressionContext).GetArgs() {
+    _ = localctx.(*ExpressionContext).GetArgs()[i]
 }
 >>
 

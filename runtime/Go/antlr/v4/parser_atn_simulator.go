@@ -74,7 +74,7 @@ func (p *ParserATNSimulator) reset() {
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, outerContext ParserRuleContext) int {
+func (p *ParserATNSimulator) AdaptivePredict(parser *BaseParser, input TokenStream, decision int, outerContext ParserRuleContext) int {
 	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
 		fmt.Println("adaptivePredict decision " + strconv.Itoa(decision) +
 			" exec LA(1)==" + p.getLookaheadName(input) +
@@ -147,7 +147,8 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 		p.atn.stateMu.Unlock()
 	}
 	
-	alt := p.execATN(dfa, s0, input, index, outerContext)
+	alt, re := p.execATN(dfa, s0, input, index, outerContext)
+	parser.SetError(re)
 	if ParserATNSimulatorDebug {
 		fmt.Println("DFA after predictATN: " + dfa.String(p.parser.GetLiteralNames(), nil))
 	}
@@ -189,7 +190,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 //   - conflict + predicates
 //
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, startIndex int, outerContext ParserRuleContext) int {
+func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, startIndex int, outerContext ParserRuleContext) (int, RecognitionException) {
 	
 	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
 		fmt.Println("execATN decision " + strconv.Itoa(dfa.decision) +
@@ -223,11 +224,10 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			input.Seek(startIndex)
 			alt := p.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext)
 			if alt != ATNInvalidAltNumber {
-				return alt
+				return alt, nil
 			}
 			p.parser.SetError(e)
-			// TODO: JI - was panicing here.. how to drop out now?
-			return ATNInvalidAltNumber
+			return ATNInvalidAltNumber, e
 		}
 		if D.requiresFullContext && p.predictionMode != PredictionModeSLL {
 			// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
@@ -245,7 +245,7 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 					if ParserATNSimulatorDebug {
 						fmt.Println("Full LL avoided")
 					}
-					return conflictingAlts.minValue()
+					return conflictingAlts.minValue(), nil
 				}
 				if conflictIndex != startIndex {
 					// restore the index so Reporting the fallback to full
@@ -259,12 +259,12 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			fullCtx := true
 			s0Closure := p.computeStartState(dfa.atnStartState, outerContext, fullCtx)
 			p.ReportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.Index())
-			alt := p.execATNWithFullContext(dfa, D, s0Closure, input, startIndex, outerContext)
-			return alt
+			alt, re := p.execATNWithFullContext(dfa, D, s0Closure, input, startIndex, outerContext)
+			return alt, re
 		}
 		if D.isAcceptState {
 			if D.predicates == nil {
-				return D.prediction
+				return D.prediction, nil
 			}
 			stopIndex := input.Index()
 			input.Seek(startIndex)
@@ -272,13 +272,13 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			
 			switch alts.length() {
 			case 0:
-				panic(p.noViableAlt(input, outerContext, D.configs, startIndex))
+				return ATNInvalidAltNumber, p.noViableAlt(input, outerContext, D.configs, startIndex)
 			case 1:
-				return alts.minValue()
+				return alts.minValue(), nil
 			default:
 				// Report ambiguity after predicate evaluation to make sure the correct set of ambig alts is Reported.
 				p.ReportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs)
-				return alts.minValue()
+				return alts.minValue(), nil
 			}
 		}
 		previousD = D
@@ -394,7 +394,7 @@ func (p *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionState
 // comes back with reach.uniqueAlt set to a valid alt
 //
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 ATNConfigSet, input TokenStream, startIndex int, outerContext ParserRuleContext) int {
+func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 ATNConfigSet, input TokenStream, startIndex int, outerContext ParserRuleContext) (int, RecognitionException) {
 	
 	if ParserATNSimulatorDebug || ParserATNSimulatorTraceATNSim {
 		fmt.Println("execATNWithFullContext " + s0.String())
@@ -420,14 +420,12 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 			// ATN states in SLL implies LL will also get nowhere.
 			// If conflict in states that dip out, choose min since we
 			// will get error no matter what.
-			e := p.noViableAlt(input, outerContext, previous, startIndex)
 			input.Seek(startIndex)
 			alt := p.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext)
 			if alt != ATNInvalidAltNumber {
-				return alt
+				return alt, nil
 			}
-			
-			panic(e)
+			return alt, p.noViableAlt(input, outerContext, previous, startIndex)
 		}
 		altSubSets := PredictionModegetConflictingAltSubsets(reach)
 		if ParserATNSimulatorDebug {
@@ -469,7 +467,7 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 	// not SLL.
 	if reach.GetUniqueAlt() != ATNInvalidAltNumber {
 		p.ReportContextSensitivity(dfa, predictedAlt, reach, startIndex, input.Index())
-		return predictedAlt
+		return predictedAlt, nil
 	}
 	// We do not check predicates here because we have checked them
 	// on-the-fly when doing full context prediction.
@@ -500,7 +498,7 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 	
 	p.ReportAmbiguity(dfa, D, startIndex, input.Index(), foundExactAmbig, reach.Alts(), reach)
 	
-	return predictedAlt
+	return predictedAlt, nil
 }
 
 //goland:noinspection GoBoolExpressions
