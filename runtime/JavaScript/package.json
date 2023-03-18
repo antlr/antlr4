@@ -51,8 +51,8 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "build-commonjs": "babel --config-file ./babel.commonjs.config.js --extensions \".js\" --out-dir lib ./src",
-    "build-es": "babel --extensions \".js\" --out-dir es ./src",
+    "build-commonjs": "babel --config-file ./babel.commonjs.config.js --extensions \".js\" --out-dir lib ./src/antlr4",
+    "build-es": "babel --extensions \".js\" --out-dir es ./src/antlr4",
     "build-umd": "rollup --config",
     "build": "npm run clean && npm run build-commonjs && npm run build-es && npm run build-umd",
     "clean-commonjs": "rimraf -g lib/*",
