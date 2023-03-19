@@ -10,16 +10,26 @@ import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
-
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
 public class NodeRunner extends RuntimeRunner {
+	private final static String NPM_EXEC = "npm" + (isWindows() ? ".cmd" : "");
+
 	@Override
 	public String getLanguage() {
 		return "JavaScript";
+	}
+
+	@Override
+	protected void initRuntime(RunOptions runOptions) throws Exception {
+		npmLinkRuntime();
+	}
+
+	private void npmLinkRuntime() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, normalizedRuntimePath);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "run", "build"}, normalizedRuntimePath);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "link"}, normalizedRuntimePath);
 	}
 
 	@Override
@@ -35,25 +45,24 @@ public class NodeRunner extends RuntimeRunner {
 	public String getRuntimeToolName() { return "node"; }
 
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
-	private final static String newImportAntlrString =
-			"import antlr4 from 'file://" + normalizedRuntimePath + "/src/antlr4/index.node.js'";
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		for (GeneratedFile generatedFile : generatedFiles) {
-			try {
-				FileUtils.replaceInFile(Paths.get(getTempDirPath(), generatedFile.name),
-						"import antlr4 from 'antlr4';",
-						newImportAntlrString);
-			} catch (IOException e) {
-				return new CompiledState(generatedState, e);
-			}
-		}
+		try {
+			writeFile(getTempDirPath(), "package.json",
+					RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
 
-		writeFile(getTempDirPath(), "package.json",
-				RuntimeTestUtils.getTextFromResource("org/antlr/v4/test/runtime/helpers/package_js.json"));
-		return new CompiledState(generatedState, null);
+			npmLinkAntlr4();
+
+			return new CompiledState(generatedState, null);
+
+		} catch (Exception e) {
+			return new CompiledState(generatedState, e);
+		}
+	}
+
+	private void npmLinkAntlr4() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "link", "antlr4"}, getTempDirPath());
 	}
 
 	@Override
