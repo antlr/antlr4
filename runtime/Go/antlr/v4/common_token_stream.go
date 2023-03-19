@@ -27,14 +27,14 @@ type CommonTokenStream struct {
 	// fetch: The check to prevent adding multiple EOF symbols into tokens is
 	// trivial with bt field.
 	fetchedEOF bool
-
+	
 	// index into [tokens] of the current token (next token to consume).
 	// tokens[p] should be LT(1). It is set to -1 when the stream is first
 	// constructed or when SetTokenSource is called, indicating that the first token
 	// has not yet been fetched from the token source. For additional information,
 	// see the documentation of [IntStream] for a description of initializing methods.
 	index int
-
+	
 	// tokenSource is the [TokenSource] from which tokens for the bt stream are
 	// fetched.
 	tokenSource TokenSource
@@ -246,8 +246,8 @@ func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []To
 	
 	nextOnChannel := c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	from := tokenIndex + 1
-
-// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
+	
+	// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
 	var to int
 	
 	if nextOnChannel == -1 {
@@ -317,7 +317,8 @@ func (c *CommonTokenStream) Index() int {
 }
 
 func (c *CommonTokenStream) GetAllText() string {
-	return c.GetTextFromInterval(nil)
+	c.Fill()
+	return c.GetTextFromInterval(NewInterval(0, len(c.tokens)-1))
 }
 
 func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
@@ -332,15 +333,9 @@ func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string 
 	return c.GetTextFromInterval(interval.GetSourceInterval())
 }
 
-func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
+func (c *CommonTokenStream) GetTextFromInterval(interval Interval) string {
 	c.lazyInit()
-	
-	if interval == nil {
-		c.Fill()
-		interval = NewInterval(0, len(c.tokens)-1)
-	} else {
-		c.Sync(interval.Stop)
-	}
+	c.Sync(interval.Stop)
 	
 	start := interval.Start
 	stop := interval.Stop

@@ -21,16 +21,13 @@ type Tree interface {
 
 type SyntaxTree interface {
 	Tree
-	
-	GetSourceInterval() *Interval
+	GetSourceInterval() Interval
 }
 
 type ParseTree interface {
 	SyntaxTree
-	
 	Accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
-	
 	ToStringTree([]string, Recognizer) string
 }
 
@@ -43,7 +40,6 @@ type RuleNode interface {
 
 type TerminalNode interface {
 	ParseTree
-	
 	GetSymbol() Token
 }
 
@@ -108,8 +104,7 @@ func (l *BaseParseTreeListener) ExitEveryRule(_ ParserRuleContext)  {}
 
 type TerminalNodeImpl struct {
 	parentCtx RuleContext
-	
-	symbol Token
+	symbol    Token
 }
 
 var _ TerminalNode = &TerminalNodeImpl{}
@@ -151,7 +146,7 @@ func (t *TerminalNodeImpl) GetPayload() interface{} {
 	return t.symbol
 }
 
-func (t *TerminalNodeImpl) GetSourceInterval() *Interval {
+func (t *TerminalNodeImpl) GetSourceInterval() Interval {
 	if t.symbol == nil {
 		return TreeInvalidInterval
 	}

@@ -111,7 +111,7 @@ func (is *InputStream) GetTextFromTokens(start, stop Token) string {
 	return ""
 }
 
-func (is *InputStream) GetTextFromInterval(i *Interval) string {
+func (is *InputStream) GetTextFromInterval(i Interval) string {
 	return is.GetText(i.Start, i.Stop)
 }
 
