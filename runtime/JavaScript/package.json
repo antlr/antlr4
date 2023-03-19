@@ -2,18 +2,15 @@
   "name": "antlr4",
   "version": "4.12.0",
   "description": "JavaScript runtime for ANTLR4",
-  "types": "src/antlr4/index.d.ts",
+  "types": "src/antlr4/index.node.d.ts",
   "main": "lib/index.web.js",
   "module": "es/index.web.js",
   "exports": {
     ".": {
+      "types": "./src/antlr4/index.node.d.ts",
       "node": "./lib/index.node.js",
       "import": "./es/index.web.js",
       "require": "./lib/index.web.js"
-    },
-    "./src/antlr4/index.d.ts": {
-      "node": "./src/antlr4/index.node.d.ts",
-      "default": "./src/antlr4/index.d.ts"
     }
   },
   "repository": "antlr/antlr4.git",
