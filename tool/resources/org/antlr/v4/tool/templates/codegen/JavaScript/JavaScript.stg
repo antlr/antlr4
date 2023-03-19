@@ -48,7 +48,7 @@ javascriptTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 <if(file.genListener)>
 import <file.grammarName>Listener from './<file.grammarName>Listener.js';
 <endif>
@@ -62,7 +62,7 @@ import <file.grammarName>Visitor from './<file.grammarName>Visitor.js';
 
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
@@ -84,7 +84,7 @@ export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeLis
 
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
@@ -778,7 +778,7 @@ _prevctx = localctx;
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-import antlr4 from 'antlr4';
+import { default as antlr4 } from 'antlr4';
 
 <namedActions.header>
 
