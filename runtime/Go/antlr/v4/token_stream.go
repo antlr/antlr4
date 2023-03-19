@@ -14,7 +14,7 @@ type TokenStream interface {
 	SetTokenSource(TokenSource)
 
 	GetAllText() string
-	GetTextFromInterval(*Interval) string
+	GetTextFromInterval(Interval) string
 	GetTextFromRuleContext(RuleContext) string
 	GetTextFromTokens(Token, Token) string
 }

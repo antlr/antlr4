@@ -94,7 +94,7 @@ const (
 // Define the rewrite operation hierarchy
 
 type RewriteOperation interface {
-
+	
 	// Execute the rewrite operation by possibly adding to the buffer.
 	// Return the index of the next token to operate on.
 	Execute(buffer *bytes.Buffer) int
@@ -441,7 +441,7 @@ func (tsr *TokenStreamRewriter) GetTextDefault() string {
 
 // GetText returns the text from the original tokens altered per the
 // instructions given to this rewriter.
-func (tsr *TokenStreamRewriter) GetText(programName string, interval *Interval) string {
+func (tsr *TokenStreamRewriter) GetText(programName string, interval Interval) string {
 	rewrites := tsr.programs[programName]
 	start := interval.Start
 	stop := interval.Stop
