@@ -29,11 +29,11 @@ public class TsNodeRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime(RunOptions runOptions) throws Exception {
-		npmInstallTsNodeAndWebpack();
+		npmInstallTsNode();
 		npmLinkRuntime();
 	}
 
-	private void npmInstallTsNodeAndWebpack() throws Exception {
+	private void npmInstallTsNode() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node"}, null);
 	}
 
