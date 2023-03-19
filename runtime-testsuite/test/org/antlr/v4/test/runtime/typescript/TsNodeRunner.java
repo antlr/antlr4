@@ -39,7 +39,7 @@ public class TsNodeRunner extends RuntimeRunner {
 
 	private void npmLinkRuntime() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
-		Processor.run(new String[] {NPM_EXEC, "--silent", "run build"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "run", "build"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 		Processor.run(new String[] {NPM_EXEC, "--silent", "link"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
