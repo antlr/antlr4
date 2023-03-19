@@ -48,7 +48,7 @@ javascriptTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import { default as antlr4 } from 'antlr4';
+import antlr4 from 'antlr4';
 <if(file.genListener)>
 import <file.grammarName>Listener from './<file.grammarName>Listener.js';
 <endif>
@@ -62,10 +62,10 @@ import <file.grammarName>Visitor from './<file.grammarName>Visitor.js';
 
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import { default as antlr4 } from 'antlr4';
+import antlr4 from 'antlr4';
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
-export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
+export default class <file.grammarName>Listener extends antlr4.default.tree.ParseTreeListener {
 
 <file.listenerNames:{lname |
 	// Enter a parse tree produced by <file.parserName>#<lname>.
@@ -84,11 +84,11 @@ export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeLis
 
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import { default as antlr4 } from 'antlr4';
+import antlr4 from 'antlr4';
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
-export default class <file.grammarName>Visitor extends antlr4.tree.ParseTreeVisitor {
+export default class <file.grammarName>Visitor extends antlr4.default.tree.ParseTreeVisitor {
 
 <file.visitorNames:{lname |
 	// Visit a parse tree produced by <file.parserName>#<lname>.
@@ -114,13 +114,13 @@ import <superClass> from './<superClass>.js';
 
 <atn>
 
-const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
+const atn = new antlr4.default.atn.ATNDeserializer().deserialize(serializedATN);
 
-const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
+const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.default.dfa.DFA(ds, index) );
 
-const sharedContextCache = new antlr4.atn.PredictionContextCache();
+const sharedContextCache = new antlr4.default.atn.PredictionContextCache();
 
-export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
+export default class <parser.name> extends <superClass; null="antlr4.default.Parser"> {
 
     static grammarFileName = "<parser.grammarFileName>";
     static literalNames = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
@@ -129,7 +129,7 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 
     constructor(input) {
         super(input);
-        this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
+        this._interp = new antlr4.default.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
         this.ruleNames = <parser.name>.ruleNames;
         this.literalNames = <parser.name>.literalNames;
         this.symbolicNames = <parser.name>.symbolicNames;
@@ -153,7 +153,7 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 
 }
 
-<parser.name>.EOF = antlr4.Token.EOF;
+<parser.name>.EOF = antlr4.default.Token.EOF;
 <if(parser.tokens)>
 <parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
@@ -252,7 +252,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
     }<if(exceptions)>
     <exceptions; separator="\n">
     <else> catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
+    	if(re instanceof antlr4.default.error.RecognitionException) {
 	        localctx.exception = re;
 	        this._errHandler.reportError(this, re);
 	        this._errHandler.recover(this, re);
@@ -289,7 +289,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
         <postamble; separator="\n">
         <namedActions.after>
     } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
+        if(error instanceof antlr4.default.error.RecognitionException) {
 	        localctx.exception = error;
 	        this._errHandler.reportError(this, error);
 	        this._errHandler.recover(this, error);
@@ -409,7 +409,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 var _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
-while(_alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+while(_alt!=<choice.exitAlt> && _alt!=antlr4.default.atn.ATN.INVALID_ALT_NUMBER) {
     if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
         <alts> <! should only be one !>
@@ -437,12 +437,12 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	this.state = <choice.loopBackStateNumber>; <! loopback/exit decision !>
 	this._errHandler.sync(this);
 	_alt = this._interp.adaptivePredict(this._input,<choice.decision>, this._ctx);
-} while ( _alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER );
+} while ( _alt!=<choice.exitAlt> && _alt!=antlr4.default.atn.ATN.INVALID_ALT_NUMBER );
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>)"
 
-ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException(this);"
+ThrowNoViableAlt(t) ::= "throw new antlr4.default.error.NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
@@ -519,7 +519,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 this.state = <p.stateNumber>;
 if (!( <chunks>)) {
-    throw new antlr4.error.FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
+    throw new antlr4.default.error.FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
 }
 >>
 
@@ -564,13 +564,13 @@ TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : parseInt(<ctx(t)>
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label> == null ? null : <ctx(r)>.<r.label>.start)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label> == null ? null : <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label> == null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label> == null ? null : this._input.getText(new antlr4.default.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.Interval(localctx.start, this._input.LT(-1)))"
+ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.default.Interval(localctx.start, this._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
@@ -654,7 +654,7 @@ CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
-class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
+class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.default.ParserRuleContext<endif> {
 
     constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.escapedName>}>) {
         if(parent===undefined) {
@@ -778,7 +778,7 @@ _prevctx = localctx;
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-import { default as antlr4 } from 'antlr4';
+import antlr4 from 'antlr4';
 
 <namedActions.header>
 
@@ -793,11 +793,11 @@ import <superClass> from './<superClass>.js';
 <endif>
 <atn>
 
-const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
+const atn = new antlr4.default.atn.ATNDeserializer().deserialize(serializedATN);
 
-const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
+const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.default.dfa.DFA(ds, index) );
 
-export default class <lexer.name> extends <if(superClass)><superClass><else>antlr4.Lexer<endif> {
+export default class <lexer.name> extends <if(superClass)><superClass><else>antlr4.default.Lexer<endif> {
 
     static grammarFileName = "<lexer.grammarFileName>";
     static channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];
@@ -808,12 +808,12 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 
     constructor(input) {
         super(input)
-        this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.atn.PredictionContextCache());
+        this._interp = new antlr4.default.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.default.atn.PredictionContextCache());
         <namedActions.members>
     }
 }
 
-<lexer.name>.EOF = antlr4.Token.EOF;
+<lexer.name>.EOF = antlr4.default.Token.EOF;
 <if(lexer.tokens)>
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
