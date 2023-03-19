@@ -52,7 +52,7 @@ StringList() ::= "list"
 
 BuildParseTrees() ::= "this.buildParseTrees = true;"
 
-BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
+BailErrorStrategy() ::= <%this._errHandler = new antlr4.default.error.BailErrorStrategy();%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(null, this)%>
 
@@ -80,9 +80,9 @@ GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames
 
 ImportRuleInvocationStack() ::= ""
 
-RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"
+RuleInvocationStack() ::= "antlr4.default.Utils.arrayToString(this.getRuleInvocationStack())"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.default.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
@@ -116,7 +116,7 @@ PositionAdjustingLexer.prototype.nextToken = function() {
 		var lexer = this;
 		this._interp.resetAcceptPosition = function(index, line, column) { lexer.resetAcceptPosition(index, line, column); };
 	}
-	return antlr4.Lexer.prototype.nextToken.call(this);
+	return antlr4.default.Lexer.prototype.nextToken.call(this);
 };
 
 PositionAdjustingLexer.prototype.emit = function() {
@@ -128,7 +128,7 @@ PositionAdjustingLexer.prototype.emit = function() {
 		this.handleAcceptPositionForIdentifier();
 		break;
 	}
-	return antlr4.Lexer.prototype.emit.call(this);
+	return antlr4.default.Lexer.prototype.emit.call(this);
 };
 
 PositionAdjustingLexer.prototype.handleAcceptPositionForIdentifier = function() {
@@ -180,13 +180,13 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 >>
 
 WalkListener(s) ::= <<
-var walker = new antlr4.tree.ParseTreeWalker();
+var walker = new antlr4.default.tree.ParseTreeWalker();
 walker.walk(new this.LeafListener(), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::header {
-class MyRuleNode extends antlr4.ParserRuleContext {
+class MyRuleNode extends antlr4.default.ParserRuleContext {
     constructor(parent, invokingState) {
         super(parent, invokingState);
         this.altNum = 0;
@@ -210,7 +210,7 @@ this.LeafListener = function() {
     this.exitA = function(ctx) {
     	var str;
         if(ctx.getChildCount()===2) {
-            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.default.Utils.arrayToString(ctx.INT());
         } else {
             str = ctx.ID().symbol.toString();
         }
