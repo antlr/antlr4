@@ -10,6 +10,17 @@ import (
 	"strconv"
 )
 
+var _emptyPredictionContextHash int
+
+func init() {
+	_emptyPredictionContextHash = murmurInit(1)
+	_emptyPredictionContextHash = murmurFinish(_emptyPredictionContextHash, 0)
+}
+
+func calculateEmptyHash() int {
+	return _emptyPredictionContextHash
+}
+
 const (
 	// BasePredictionContextEmptyReturnState represents {@code $} in an array in full context mode, $
 	// doesn't mean wildcard:
