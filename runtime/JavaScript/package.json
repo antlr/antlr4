@@ -2,7 +2,7 @@
   "name": "antlr4",
   "version": "4.12.0",
   "description": "JavaScript runtime for ANTLR4",
-  "types": "src/antlr4/index.node.d.ts",
+  "types": "src/antlr4/index.web.d.ts",
   "main": "lib/index.web.js",
   "module": "es/index.web.js",
   "exports": {
@@ -43,7 +43,7 @@
     "eslint": "^8.36.0",
     "jasmine": "^4.6.0",
     "jasmine-spec-reporter": "^7.0.0",
-    "rimraf": "^4.4.0",
+    "del-cli": "^5.0.0",
     "rollup": "^3.19.1",
     "typescript": "^4.9.5"
   },
@@ -52,9 +52,9 @@
     "build-es": "babel --extensions \".js\" --out-dir es ./src/antlr4",
     "build-umd": "rollup --config",
     "build": "npm run clean && npm run build-commonjs && npm run build-es && npm run build-umd",
-    "clean-commonjs": "rimraf -g lib/*",
-    "clean-es": "rimraf -g es/*",
-    "clean-umd": "rimraf -g umd/*",
+    "clean-commonjs": "del \"lib/*\"",
+    "clean-es": "del \"es/*\" \"!es/package.json\"",
+    "clean-umd": "del \"umd/*\"",
     "clean": "npm run clean-commonjs && npm run clean-es && npm run clean-umd",
     "test": "jasmine",
     "lint": "eslint src/antlr4/**.js"

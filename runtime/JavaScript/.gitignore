@@ -1,4 +1,5 @@
-/umd
-/lib
-/es
+/umd/*
+/lib/*
+/es/*
+!/es/package.json
 /node_modules
