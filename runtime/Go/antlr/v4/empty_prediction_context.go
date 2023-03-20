@@ -15,18 +15,7 @@ type EmptyPredictionContext struct {
 	BaseSingletonPredictionContext
 }
 
-func NewEmptyPredictionContext() *EmptyPredictionContext {
-	return &EmptyPredictionContext{
-		BaseSingletonPredictionContext: BaseSingletonPredictionContext{
-			BasePredictionContext: BasePredictionContext{
-				cachedHash: calculateEmptyHash(),
-				pcType:     PredictionContextEmpty,
-			},
-			parentCtx:   nil,
-			returnState: BasePredictionContextEmptyReturnState,
-		},
-	}
-}
+
 func (e *EmptyPredictionContext) length() int {
 	return 1
 }
@@ -35,9 +24,9 @@ func (e *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (e *EmptyPredictionContext) GetParent(_ int) PredictionContext {
-	return nil
-}
+//func (e *EmptyPredictionContext) GetParent(_ int) PredictionContext {
+//	return nil
+//}
 
 func (e *EmptyPredictionContext) getReturnState(_ int) int {
 	return e.returnState

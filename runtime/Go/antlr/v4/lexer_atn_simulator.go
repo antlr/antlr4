@@ -122,7 +122,7 @@ func (l *LexerATNSimulator) reset() {
 
 func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	startState := l.atn.modeToStartState[l.mode]
-
+	
 	if //goland:noinspection GoBoolExpressions
 	LexerATNSimulatorDebug {
 		fmt.Println("MatchATN mode " + strconv.Itoa(l.mode) + " start: " + startState.String())
@@ -135,7 +135,7 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	next := l.addDFAState(s0Closure, suppressEdge)
 	
 	predict := l.execATN(input, next)
-
+	
 	if //goland:noinspection GoBoolExpressions
 	LexerATNSimulatorDebug {
 		fmt.Println("DFA after MatchATN: " + l.decisionToDFA[oldMode].ToLexerString())
@@ -144,7 +144,7 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 }
 
 func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
-
+	
 	if //goland:noinspection GoBoolExpressions
 	LexerATNSimulatorDebug {
 		fmt.Println("start state closure=" + ds0.configs.String())
@@ -289,10 +289,10 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
-
+		
 		if //goland:noinspection GoBoolExpressions
 		LexerATNSimulatorDebug {
-
+			
 			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String())
 		}
 		
@@ -358,7 +358,7 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 // The func returns true if an accept state is reached.
 func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
-
+	
 	if //goland:noinspection GoBoolExpressions
 	LexerATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")")
@@ -366,7 +366,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 	
 	_, ok := config.state.(*RuleStopState)
 	if ok {
-
+		
 		if //goland:noinspection GoBoolExpressions
 		LexerATNSimulatorDebug {
 			if l.recog != nil {
@@ -448,7 +448,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 		// test them, we cannot cash the DFA state target of ID.
 		
 		pt := trans.(*PredicateTransition)
-
+		
 		if //goland:noinspection GoBoolExpressions
 		LexerATNSimulatorDebug {
 			fmt.Println("EVAL rule " + strconv.Itoa(trans.(*PredicateTransition).ruleIndex) + ":" + strconv.Itoa(pt.predIndex))

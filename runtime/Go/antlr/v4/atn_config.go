@@ -29,9 +29,9 @@ type ATNConfig interface {
 	GetSemanticContext() SemanticContext
 	
 	// GetContext returns the rule invocation stack associated with this configuration
-	GetContext() PredictionContext
+	GetContext() *PredictionContext
 	// SetContext sets the rule invocation stack associated with this configuration
-	SetContext(PredictionContext)
+	SetContext(*PredictionContext)
 	
 	// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
 	GetReachesIntoOuterContext() int
@@ -52,7 +52,7 @@ type BaseATNConfig struct {
 	precedenceFilterSuppressed bool
 	state                      ATNState
 	alt                        int
-	context                    PredictionContext
+	context                    *PredictionContext
 	semanticContext            SemanticContext
 	reachesIntoOuterContext    int
 }
@@ -69,12 +69,12 @@ func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup - maybe dele
 }
 
 // NewBaseATNConfig6 creates a new BaseATNConfig instance given a state, alt and context only
-func NewBaseATNConfig6(state ATNState, alt int, context PredictionContext) *BaseATNConfig {
+func NewBaseATNConfig6(state ATNState, alt int, context *PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 }
 
 // NewBaseATNConfig5 creates a new BaseATNConfig instance given a state, alt, context and semantic context
-func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig5(state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
@@ -98,13 +98,13 @@ func NewBaseATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNCon
 }
 
 // NewBaseATNConfig1 creates a new BaseATNConfig instance given an existing config, a state, and a context only
-func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *BaseATNConfig {
+func NewBaseATNConfig1(c ATNConfig, state ATNState, context *PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 }
 
 // NewBaseATNConfig creates a new BaseATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors'
 // are just wrappers around this one.
-func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig(c ATNConfig, state ATNState, context *PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
@@ -115,7 +115,7 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 	return b
 }
 
-func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) {
+func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) {
 	
 	b.state = state
 	b.alt = alt
@@ -144,12 +144,12 @@ func (b *BaseATNConfig) GetAlt() int {
 }
 
 // SetContext sets the rule invocation stack associated with this configuration
-func (b *BaseATNConfig) SetContext(v PredictionContext) {
+func (b *BaseATNConfig) SetContext(v *PredictionContext) {
 	b.context = v
 }
 
 // GetContext returns the rule invocation stack associated with this configuration
-func (b *BaseATNConfig) GetContext() PredictionContext {
+func (b *BaseATNConfig) GetContext() *PredictionContext {
 	return b.context
 }
 
@@ -248,7 +248,7 @@ type LexerATNConfig struct {
 	passedThroughNonGreedyDecision bool
 }
 
-func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
+func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *LexerATNConfig {
 	
 	return &LexerATNConfig{
 		BaseATNConfig: BaseATNConfig{
@@ -260,7 +260,7 @@ func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *Lex
 	}
 }
 
-func NewLexerATNConfig5(state ATNState, alt int, context PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
+func NewLexerATNConfig5(state ATNState, alt int, context *PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 	return &LexerATNConfig{
 		BaseATNConfig: BaseATNConfig{
 			state:           state,
@@ -291,7 +291,7 @@ func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *
 	return lac
 }
 
-func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionContext) *LexerATNConfig {
+func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context *PredictionContext) *LexerATNConfig {
 	lac := &LexerATNConfig{
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
@@ -301,7 +301,7 @@ func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionCon
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
+func NewLexerATNConfig1(state ATNState, alt int, context *PredictionContext) *LexerATNConfig {
 	lac := &LexerATNConfig{
 		BaseATNConfig: BaseATNConfig{
 			state:           state,
