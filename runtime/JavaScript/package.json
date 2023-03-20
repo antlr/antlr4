@@ -51,13 +51,14 @@
     "build-commonjs": "babel --config-file ./babel.commonjs.config.js --extensions \".js\" --out-dir lib ./src/antlr4",
     "build-es": "babel --extensions \".js\" --out-dir es ./src/antlr4",
     "build-umd": "rollup --config",
-    "build": "npm run clean && npm run build-commonjs && npm run build-es && npm run build-umd",
+    "build": "npm run build-commonjs && npm run build-es && npm run build-umd",
     "clean-commonjs": "del lib/*",
     "clean-es": "del es/* !es/package.json",
     "clean-umd": "del umd/*",
     "clean": "npm run clean-commonjs && npm run clean-es && npm run clean-umd",
     "test": "jasmine",
-    "lint": "eslint src/antlr4/**.js"
+    "lint": "eslint src/antlr4/**.js",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "engines": {
     "node": ">=16"
