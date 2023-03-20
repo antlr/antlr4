@@ -732,7 +732,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // calling [Parser].getPrecedence).
 func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConfigSet {
 	
-	statesFromAlt1 := make(map[int]PredictionContext)
+	statesFromAlt1 := make(map[int]*PredictionContext)
 	configSet := NewBaseATNConfigSet(configs.FullContext())
 	
 	for _, config := range configs.GetItems() {
