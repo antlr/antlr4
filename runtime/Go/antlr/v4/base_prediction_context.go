@@ -16,9 +16,9 @@ func (b *BasePredictionContext) Equals(_ Collectable[PredictionContext]) bool {
 	return false
 }
 
-func (b *BasePredictionContext) GetParent(i int) PredictionContext {
-	return nil
-}
+//func (b *BasePredictionContext) GetParent(i int) PredictionContext {
+//	return nil
+//}
 
 func (b *BasePredictionContext) getReturnState(i int) int {
 	return 0

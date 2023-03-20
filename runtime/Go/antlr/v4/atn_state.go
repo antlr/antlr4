@@ -78,9 +78,9 @@ type BaseATNState struct {
 	transitions []Transition
 }
 
-//func NewBaseATNState() *BaseATNState {
-//	return &BaseATNState{stateNumber: ATNStateInvalidStateNumber, stateType: ATNStateInvalidType}
-//}
+func NewBaseATNState() *BaseATNState {
+	return &BaseATNState{stateNumber: ATNStateInvalidStateNumber, stateType: ATNStateInvalidType}
+}
 
 func (as *BaseATNState) GetRuleIndex() int {
 	return as.ruleIndex

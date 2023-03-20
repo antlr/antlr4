@@ -18,12 +18,13 @@ type BaseATNSimulator struct {
 	decisionToDFA      []*DFA
 }
 
-func (b *BaseATNSimulator) getCachedContext(context PredictionContext) PredictionContext {
+func (b *BaseATNSimulator) getCachedContext(context *PredictionContext) *PredictionContext {
 	if b.sharedContextCache == nil {
 		return context
 	}
 	
-	visited := NewJStore[PredictionContext, Comparator[PredictionContext]](pContextEqInst)
+	// TODO: Should this be guarded by a mutex?
+	visited := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
 	
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }
