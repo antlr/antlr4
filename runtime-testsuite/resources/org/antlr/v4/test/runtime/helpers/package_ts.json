@@ -1,9 +1,6 @@
 {
   "type": "module",
-   "devDependencies": {
+  "devDependencies": {
     "@types/node": "^18.0.5"
-   },
-  "dependencies": {
-    "antlr4": "^4.12.0"
   }
 }

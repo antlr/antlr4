@@ -20,7 +20,6 @@ public class TsNodeRunner extends RuntimeRunner {
 	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String NORMALIZED_JAVASCRIPT_RUNTIME_PATH = getRuntimePath("JavaScript").replace('\\', '/');
 	private final static String NPM_EXEC = "npm" + (isWindows() ? ".cmd" : "");
-	private final static String WEBPACK_EXEC = "webpack" + (isWindows() ? ".cmd" : "");
 
 	@Override
 	public String getLanguage() {
@@ -30,17 +29,17 @@ public class TsNodeRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime(RunOptions runOptions) throws Exception {
-		npmInstallTsNodeAndWebpack();
+		npmInstallTsNode();
 		npmLinkRuntime();
 	}
 
-	private void npmInstallTsNodeAndWebpack() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "webpack-cli"}, null);
+	private void npmInstallTsNode() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
 		Processor.run(new String[] {NPM_EXEC, "--silent", "install"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
-		Processor.run(new String[] {WEBPACK_EXEC, "--no-stats"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "run", "build"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 		Processor.run(new String[] {NPM_EXEC, "--silent", "link"}, NORMALIZED_JAVASCRIPT_RUNTIME_PATH);
 	}
 
