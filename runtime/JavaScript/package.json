@@ -8,7 +8,7 @@
   "exports": {
     ".": {
       "types": "./src/antlr4/index.node.d.ts",
-      "node": "./lib/index.node.js",
+      "node": "./es/index.node.js",
       "import": "./es/index.web.js",
       "require": "./lib/index.web.js"
     }
