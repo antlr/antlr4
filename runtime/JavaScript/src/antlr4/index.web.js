@@ -49,7 +49,6 @@ export default {
 }
 
 export {
-    atn, dfa, context, misc, tree, error, Utils,
     Token, CommonToken, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
