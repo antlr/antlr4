@@ -779,7 +779,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 
-		public void Consume(ICharStream input)
+		public virtual void Consume(ICharStream input)
 		{
 			int curChar = input.LA(1);
 			if (curChar == '\n')
