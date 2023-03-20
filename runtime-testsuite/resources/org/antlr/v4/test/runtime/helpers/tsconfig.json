@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "ES2020",
-    "moduleResolution": "node",
-    "target": "ES6",
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "target": "ESNext",
     "noImplicitAny": true,
   },
   "ts-node": {

@@ -2,7 +2,7 @@
   "name": "antlr4",
   "version": "4.12.0",
   "description": "JavaScript runtime for ANTLR4",
-  "types": "src/antlr4/index.node.d.ts",
+  "types": "src/antlr4/index.web.d.ts",
   "main": "lib/index.web.js",
   "module": "es/index.web.js",
   "exports": {
