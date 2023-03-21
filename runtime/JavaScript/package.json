@@ -3,21 +3,21 @@
   "version": "4.12.0",
   "description": "JavaScript runtime for ANTLR4",
   "types": "src/antlr4/index.node.d.ts",
-  "main": "lib/index.web.js",
-  "module": "es/index.web.js",
+  "main": "cjs/index.web.js",
+  "module": "esm/index.web.js",
   "exports": {
     ".": {
       "types": "./src/antlr4/index.node.d.ts",
-      "node": "./es/index.node.js",
-      "import": "./es/index.web.js",
-      "require": "./lib/index.web.js"
+      "node": "./esm/index.node.js",
+      "import": "./esm/index.web.js",
+      "require": "./cjs/index.web.js"
     }
   },
   "repository": "antlr/antlr4.git",
   "files": [
     "src/antlr4/*.d.ts",
-    "es/",
-    "lib/",
+    "esm/",
+    "cjs/",
     "umd/",
     "README.md"
   ],
@@ -49,14 +49,14 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "build-commonjs": "babel --config-file ./babel.commonjs.config.js --extensions \".js\" --out-dir lib ./src/antlr4",
-    "build-es": "babel --extensions \".js\" --out-dir es ./src/antlr4",
+    "build-cjs": "babel --config-file ./babel.commonjs.config.js --extensions \".js\" --out-dir cjs ./src/antlr4",
+    "build-esm": "babel --extensions \".js\" --out-dir esm ./src/antlr4",
     "build-umd": "rollup --config",
-    "build": "npm run clean && npm run build-commonjs && npm run build-es && npm run build-umd",
-    "clean-commonjs": "del-cli lib/*",
-    "clean-es": "del-cli es/* !es/package.json",
+    "build": "npm run clean && npm run build-cjs && npm run build-esm && npm run build-umd",
+    "clean-cjs": "del-cli cjs/*",
+    "clean-esm": "del-cli esm/* !esm/package.json",
     "clean-umd": "del-cli umd/*",
-    "clean": "npm run clean-commonjs && npm run clean-es && npm run clean-umd",
+    "clean": "npm run clean-cjs && npm run clean-esm && npm run clean-umd",
     "test": "jasmine",
     "coverage": "c8 jasmine",
     "lint": "eslint src/antlr4/"

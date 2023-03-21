@@ -1,5 +1,5 @@
 /umd/*
-/lib/*
-/es/*
-!/es/package.json
+/cjs/*
+/esm/*
+!/esm/package.json
 /node_modules
