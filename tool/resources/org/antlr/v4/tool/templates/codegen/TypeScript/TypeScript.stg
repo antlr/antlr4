@@ -89,7 +89,7 @@ import {ParseTreeVisitor} from 'antlr4';
 
 <header>
 
-<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>.js";}; separator="\n">
 
 <namedActions.beforeVisitor>
 
