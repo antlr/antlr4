@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  cpp-builds:
+  cpp-lib-build:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -141,11 +141,12 @@ jobs:
       if: always()
       run: |
         cd ${{ github.workspace }}/..
-        tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz antlr4
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz ${{ github.workspace }}/.
 
     - name: Archive artifacts
       if: always()
+      continue-on-error: true
       uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.compiler }}
@@ -339,11 +340,12 @@ jobs:
       if: always()
       run: |
         cd ${{ github.workspace }}/..
-        tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz antlr4
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.target }}.tgz ${{ github.workspace }}/.
 
     - name: Archive artifacts
       if: always()
+      continue-on-error: true
       uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.target }}
