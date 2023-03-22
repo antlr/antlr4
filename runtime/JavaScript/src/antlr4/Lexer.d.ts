@@ -28,4 +28,5 @@ export declare class Lexer extends Recognizer<number> {
     emitToken(token: Token): void;
     emit(): Token;
     emitEOF(): Token;
+    getAllTokens(): Token[];
 }
