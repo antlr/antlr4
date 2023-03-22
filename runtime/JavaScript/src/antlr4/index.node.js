@@ -8,7 +8,7 @@ import { default as context } from './context/index.js';
 import { default as misc } from './misc/index.js';
 import { default as tree } from './tree/index.js';
 import { default as error } from './error/index.js';
-import { default as CharStreams } from './CharStreams.js';
+import { default as CharStreams } from './CharStreams.node.js';
 import { default as Utils } from './utils/index.js';
 
 import Token from './Token.js';

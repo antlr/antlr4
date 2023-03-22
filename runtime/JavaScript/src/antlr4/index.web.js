@@ -8,6 +8,7 @@ import { default as context } from './context/index.js';
 import { default as misc } from './misc/index.js';
 import { default as tree } from './tree/index.js';
 import { default as error } from './error/index.js';
+import { default as CharStreams } from './CharStreams.web.js';
 import { default as Utils } from './utils/index.js';
 
 import Token from './Token.js';
@@ -45,12 +46,12 @@ import arrayToString from "./utils/arrayToString.js"
 import TokenStreamRewriter from './TokenStreamRewriter.js';
 
 export default {
-    atn, dfa, context, misc, tree, error, Token, CommonToken, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
+    atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
     ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils, TokenStreamRewriter
 }
 
 export {
-    Token, CommonToken, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
+    Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
