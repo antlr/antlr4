@@ -4,8 +4,6 @@
  */
 
 import Token from './Token.js';
-import './polyfills/codepointat.js';
-import './polyfills/fromcodepoint.js';
 
 /**
  * If decodeToUnicodeCodePoints is true, the input is treated
