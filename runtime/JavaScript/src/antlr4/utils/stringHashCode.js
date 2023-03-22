@@ -5,15 +5,20 @@
 
 export const StringSeedHashCode = Math.round(Math.random() * Math.pow(2, 32));
 
-String.prototype.seed = StringSeedHashCode;
-
-export default function StringHashCode () {
-    const key = this.toString();
+export function stringHashCode (value) {
+    if (!value) {
+        return 0;
+    }
+    const type = typeof value;
+    const key = type === 'string' ? value : type === 'object' && value.toString ? value.toString() : false;
+    if (!key) {
+        return 0;
+    }
     let h1b, k1;
 
     const remainder = key.length & 3; // key.length % 4
     const bytes = key.length - remainder;
-    let h1 = String.prototype.seed;
+    let h1 = StringSeedHashCode;
     const c1 = 0xcc9e2d51;
     const c2 = 0x1b873593;
     let i = 0;
@@ -63,5 +68,3 @@ export default function StringHashCode () {
 
     return h1 >>> 0;
 }
-
-String.prototype.hashCode = StringHashCode;

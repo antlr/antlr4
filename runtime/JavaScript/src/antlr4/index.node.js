@@ -58,9 +58,3 @@ export {
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
     arrayToString
 }
-
-/* eslint no-unused-vars: [ "off"] */
-// need to import unused to force loading
-import StringHashCode from './utils/stringHashCode.js';
-import CodePointAt from './polyfills/codepointat.js';
-import FromCodePoint from './polyfills/fromcodepoint.js';
