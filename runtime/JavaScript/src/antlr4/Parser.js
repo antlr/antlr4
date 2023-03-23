@@ -269,6 +269,10 @@ export default class Parser extends Recognizer {
         return result;
     }
 
+    setErrorHandler(handler) {
+      this._errHandler = handler;
+    }
+
     getInputStream() {
         return this.getTokenStream();
     }
