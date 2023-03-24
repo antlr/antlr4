@@ -81,7 +81,7 @@ func NewBaseSingletonPredictionContext(parent *PredictionContext, returnState in
 }
 
 func SingletonBasePredictionContextCreate(parent *PredictionContext, returnState int) *PredictionContext {
-	if returnState == BasePredictionContextEmptyReturnState && parent.isEmpty() {
+	if returnState == BasePredictionContextEmptyReturnState && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
 		return BasePredictionContextEMPTY
 	}
