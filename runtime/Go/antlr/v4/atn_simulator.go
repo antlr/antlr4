@@ -24,7 +24,7 @@ func (b *BaseATNSimulator) getCachedContext(context *PredictionContext) *Predict
 	}
 	
 	// TODO: Should this be guarded by a mutex?
-	visited := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
+	visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
 	
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }

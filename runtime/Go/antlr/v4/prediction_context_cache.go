@@ -6,12 +6,12 @@ var BasePredictionContextEMPTY = NewEmptyPredictionContext()
 // context cash associated with contexts in DFA states. This cache
 // can be used for both lexers and parsers.
 type PredictionContextCache struct {
-	cache *JStore[*PredictionContext, Comparator[*PredictionContext]]
+	cache *JMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]]
 }
 
 func NewPredictionContextCache() *PredictionContextCache {
 	return &PredictionContextCache{
-		cache: NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst),
+		cache: NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst),
 	}
 }
 
@@ -26,8 +26,12 @@ func (p *PredictionContextCache) add(ctx *PredictionContext) *PredictionContext 
 	// Put will return the existing entry if it is present (note this is done via Equals, not whether it is
 	// the same pointer), otherwise it will add the new entry and return that.
 	//
-	pc, _ := p.cache.Put(ctx)
-	return pc
+	existing, present := p.cache.Get(ctx)
+	if present {
+		return existing
+	}
+	p.cache.Put(ctx, ctx)
+	return ctx
 }
 
 func (p *PredictionContextCache) Get(ctx *PredictionContext) (*PredictionContext, bool) {
