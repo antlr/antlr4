@@ -26,7 +26,7 @@ type ParserATNSimulator struct {
 	input          TokenStream
 	startIndex     int
 	dfa            *DFA
-	mergeCache     *DoubleDict
+	mergeCache     *JPCMap
 	outerContext   ParserRuleContext
 }
 
@@ -81,7 +81,6 @@ func (p *ParserATNSimulator) AdaptivePredict(parser *BaseParser, input TokenStre
 			" line " + strconv.Itoa(input.LT(1).GetLine()) + ":" +
 			strconv.Itoa(input.LT(1).GetColumn()))
 	}
-	
 	p.input = input
 	p.startIndex = input.Index()
 	p.outerContext = outerContext
@@ -504,7 +503,7 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 //goland:noinspection GoBoolExpressions
 func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCtx bool) ATNConfigSet {
 	if p.mergeCache == nil {
-		p.mergeCache = NewDoubleDict()
+		p.mergeCache = NewJPCMap()
 	}
 	intermediate := NewBaseATNConfigSet(fullCtx)
 	
@@ -603,7 +602,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 		// already guaranteed to meet this condition whether it's
 		// required.
 		//
-		reach = p.removeAllConfigsNotInRuleStopState(reach, reach == intermediate)
+		reach = p.removeAllConfigsNotInRuleStopState(reach, reach.Equals(intermediate))
 	}
 	// If SkippedStopStates!=nil, then it contains at least one
 	// configuration. For full-context reach operations, these
@@ -615,6 +614,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	//
 	if skippedStopStates != nil && ((!fullCtx) || (!PredictionModehasConfigInRuleStopState(reach))) {
 		for l := 0; l < len(skippedStopStates); l++ {
+			fmt.Println("Adding skipped(" + skippedStopStates[l].String() + ")")
 			reach.Add(skippedStopStates[l], p.mergeCache)
 		}
 	}
@@ -985,7 +985,8 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 			for i := 0; i < config.GetContext().length(); i++ {
 				if config.GetContext().getReturnState(i) == BasePredictionContextEmptyReturnState {
 					if fullCtx {
-						configs.Add(NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY), p.mergeCache)
+						nb := NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY)
+						configs.Add(nb, p.mergeCache)
 						continue
 					} else {
 						// we have no context info, just chase follow links (if greedy)
@@ -1396,9 +1397,8 @@ func (p *ParserATNSimulator) getLookaheadName(input TokenStream) string {
 }
 
 // Used for debugging in [AdaptivePredict] around [execATN], but I cut
-//
-//	it out for clarity now that alg. works well. We can leave p
-//	"dead" code for a bit.
+// it out for clarity now that alg. works well. We can leave this
+// "dead" code for a bit.
 func (p *ParserATNSimulator) dumpDeadEndConfigs(_ *NoViableAltException) {
 	
 	panic("Not implemented")

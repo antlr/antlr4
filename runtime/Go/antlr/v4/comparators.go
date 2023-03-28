@@ -22,8 +22,10 @@ package antlr
 type ObjEqComparator[T Collectable[T]] struct{}
 
 var (
-	aStateEqInst    = &ObjEqComparator[ATNState]{}
-	aConfEqInst     = &ObjEqComparator[ATNConfig]{}
+	aStateEqInst = &ObjEqComparator[ATNState]{}
+	aConfEqInst  = &ObjEqComparator[ATNConfig]{}
+	
+	// aConfCompInst is the comparator used for the ATNConfigSet for the configLookup cache
 	aConfCompInst   = &ATNConfigComparator[ATNConfig]{}
 	atnConfCompInst = &BaseATNConfigComparator[ATNConfig]{}
 	dfaStateEqInst  = &ObjEqComparator[*DFAState]{}
@@ -69,21 +71,16 @@ func (c *ATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetAlt() == o2.GetAlt() &&
-		o1.GetContext().Equals(o2.GetContext()) &&
-		o1.GetSemanticContext().Equals(o2.GetSemanticContext()) &&
-		o1.getPrecedenceFilterSuppressed() == o2.getPrecedenceFilterSuppressed()
+		o1.GetSemanticContext().Equals(o2.GetSemanticContext())
 }
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup
 func (c *ATNConfigComparator[T]) Hash1(o ATNConfig) int {
 	
-	hash := murmurInit(7)
-	hash = murmurUpdate(hash, o.GetState().GetStateNumber())
-	hash = murmurUpdate(hash, o.GetAlt())
-	hash = murmurUpdate(hash, o.GetContext().Hash())
-	hash = murmurUpdate(hash, o.GetSemanticContext().Hash())
-	hash = murmurFinish(hash, 4)
-	
+	hash := 7
+	hash = 31*hash + o.GetState().GetStateNumber()
+	hash = 31*hash + o.GetAlt()
+	hash = 31*hash + o.GetSemanticContext().Hash()
 	return hash
 }
 

@@ -11,7 +11,7 @@ import (
 type ATNConfigSet interface {
 	Hash() int
 	Equals(o Collectable[ATNConfig]) bool
-	Add(ATNConfig, *DoubleDict) bool
+	Add(ATNConfig, *JPCMap) bool
 	AddAll([]ATNConfig) bool
 	
 	GetStates() *JStore[ATNState, Comparator[ATNState]]
@@ -120,7 +120,7 @@ func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 //
 // We use (s,i,pi) as the key.
 // Updates dipsIntoOuterContext and hasSemanticContext when necessary.
-func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
+func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *JPCMap) bool {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -324,7 +324,7 @@ func (b *BaseATNConfigSet) Clear() {
 	
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](atnConfCompInst)
+	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst)
 }
 
 func (b *BaseATNConfigSet) FullContext() bool {
