@@ -186,8 +186,8 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 			dup := NewATNConfigSet(false)
 			for _, c := range configs.configs {
 				
-				//				NewBaseATNConfig({semanticContext:}, c)
-				c = NewBaseATNConfig2(c, SemanticContextNone)
+				//				NewATNConfig({semanticContext:}, c)
+				c = NewATNConfig2(c, SemanticContextNone)
 				dup.Add(c, nil)
 			}
 			configs = dup
@@ -473,7 +473,7 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 //	for each configuration c in configs:
 //	   map[c] U= c.ATNConfig.alt // map hash/equals uses s and x, not alt and not pred
 func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
-	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](atnAltCfgEqInst)
+	configToAlts := NewJMap[*ATNConfig, *BitSet, *ATNAltConfigComparator[*ATNConfig]](atnAltCfgEqInst)
 	
 	for _, c := range configs.configs {
 		

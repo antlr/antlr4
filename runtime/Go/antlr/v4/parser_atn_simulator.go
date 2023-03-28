@@ -517,7 +517,7 @@ func (p *ParserATNSimulator) computeReachSet(closure *ATNConfigSet, t int, fullC
 	// ensure that the alternative Matching the longest overall sequence is
 	// chosen when multiple such configurations can Match the input.
 	
-	var skippedStopStates []*BaseATNConfig
+	var skippedStopStates []*ATNConfig
 	
 	// First figure out where we can reach on input t
 	for _, c := range closure.configs {
@@ -527,7 +527,7 @@ func (p *ParserATNSimulator) computeReachSet(closure *ATNConfigSet, t int, fullC
 		
 		if _, ok := c.GetState().(*RuleStopState); ok {
 			if fullCtx || t == TokenEOF {
-				skippedStopStates = append(skippedStopStates, c.(*BaseATNConfig))
+				skippedStopStates = append(skippedStopStates, c)
 				if ParserATNSimulatorDebug {
 					fmt.Println("added " + c.String() + " to SkippedStopStates")
 				}
@@ -538,7 +538,7 @@ func (p *ParserATNSimulator) computeReachSet(closure *ATNConfigSet, t int, fullC
 		for _, trans := range c.GetState().GetTransitions() {
 			target := p.getReachableTarget(trans, t)
 			if target != nil {
-				cfg := NewBaseATNConfig4(c, target)
+				cfg := NewATNConfig4(c, target)
 				intermediate.Add(cfg, p.mergeCache)
 				if ParserATNSimulatorDebug {
 					fmt.Println("added " + cfg.String() + " to intermediate")
@@ -577,7 +577,7 @@ func (p *ParserATNSimulator) computeReachSet(closure *ATNConfigSet, t int, fullC
 	//
 	if reach == nil {
 		reach = NewATNConfigSet(fullCtx)
-		closureBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
+		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst)
 		treatEOFAsEpsilon := t == TokenEOF
 		amount := len(intermediate.configs)
 		for k := 0; k < amount; k++ {
@@ -660,7 +660,7 @@ func (p *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs *ATNConf
 			NextTokens := p.atn.NextTokens(config.GetState(), nil)
 			if NextTokens.contains(TokenEpsilon) {
 				endOfRuleState := p.atn.ruleToStopState[config.GetState().GetRuleIndex()]
-				result.Add(NewBaseATNConfig4(config, endOfRuleState), p.mergeCache)
+				result.Add(NewATNConfig4(config, endOfRuleState), p.mergeCache)
 			}
 		}
 	}
@@ -679,8 +679,8 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
-		c := NewBaseATNConfig6(target, i+1, initialContext)
-		closureBusy := NewJStore[ATNConfig, Comparator[ATNConfig]](atnConfCompInst)
+		c := NewATNConfig6(target, i+1, initialContext)
+		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](atnConfCompInst)
 		p.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
 	return configs
@@ -746,7 +746,7 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs *ATNConfigSet) *ATNCo
 		}
 		statesFromAlt1[config.GetState().GetStateNumber()] = config.GetContext()
 		if updatedContext != config.GetSemanticContext() {
-			configSet.Add(NewBaseATNConfig2(config, updatedContext), p.mergeCache)
+			configSet.Add(NewATNConfig2(config, updatedContext), p.mergeCache)
 		} else {
 			configSet.Add(config, p.mergeCache)
 		}
@@ -965,14 +965,14 @@ func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredicti
 	return predictions
 }
 
-func (p *ParserATNSimulator) closure(config ATNConfig, configs *ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closure(config *ATNConfig, configs *ATNConfigSet, closureBusy *JStore[*ATNConfig, Comparator[*ATNConfig]], collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
 	initialDepth := 0
 	p.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 		fullCtx, initialDepth, treatEOFAsEpsilon)
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs *ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureCheckingStopState(config *ATNConfig, configs *ATNConfigSet, closureBusy *JStore[*ATNConfig, Comparator[*ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	if ParserATNSimulatorTraceATNSim {
 		fmt.Println("closure(" + config.String() + ")")
 	}
@@ -984,7 +984,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 			for i := 0; i < config.GetContext().length(); i++ {
 				if config.GetContext().getReturnState(i) == BasePredictionContextEmptyReturnState {
 					if fullCtx {
-						nb := NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY)
+						nb := NewATNConfig1(config, config.GetState(), BasePredictionContextEMPTY)
 						configs.Add(nb, p.mergeCache)
 						continue
 					} else {
@@ -999,7 +999,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 				returnState := p.atn.states[config.GetContext().getReturnState(i)]
 				newContext := config.GetContext().GetParent(i) // "pop" return state
 				
-				c := NewBaseATNConfig5(returnState, config.GetAlt(), newContext, config.GetSemanticContext())
+				c := NewATNConfig5(returnState, config.GetAlt(), newContext, config.GetSemanticContext())
 				// While we have context to pop back from, we may have
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
@@ -1024,7 +1024,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 // Do the actual work of walking epsilon edges
 //
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) closureWork(config ATNConfig, configs *ATNConfigSet, closureBusy *JStore[ATNConfig, Comparator[ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureWork(config *ATNConfig, configs *ATNConfigSet, closureBusy *JStore[*ATNConfig, Comparator[*ATNConfig]], collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	state := config.GetState()
 	// optimization
 	if !state.GetEpsilonOnlyTransitions() {
@@ -1041,7 +1041,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs *ATNConfigSet
 		_, ok := t.(*ActionTransition)
 		continueCollecting := collectPredicates && !ok
 		c := p.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEOFAsEpsilon)
-		if ci, ok := c.(*BaseATNConfig); ok && ci != nil {
+		if c != nil {
 			newDepth := depth
 			
 			if _, ok := config.GetState().(*RuleStopState); ok {
@@ -1092,7 +1092,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs *ATNConfigSet
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) canDropLoopEntryEdgeInLeftRecursiveRule(config ATNConfig) bool {
+func (p *ParserATNSimulator) canDropLoopEntryEdgeInLeftRecursiveRule(config *ATNConfig) bool {
 	if TurnOffLRLoopEntryBranchOpt {
 		return false
 	}
@@ -1190,7 +1190,7 @@ func (p *ParserATNSimulator) getRuleName(index int) string {
 	return sb.String()
 }
 
-func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEOFAsEpsilon bool) ATNConfig {
+func (p *ParserATNSimulator) getEpsilonTarget(config *ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEOFAsEpsilon bool) *ATNConfig {
 	
 	switch t.getSerializationType() {
 	case TransitionRULE:
@@ -1202,13 +1202,13 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 	case TransitionACTION:
 		return p.actionTransition(config, t.(*ActionTransition))
 	case TransitionEPSILON:
-		return NewBaseATNConfig4(config, t.getTarget())
+		return NewATNConfig4(config, t.getTarget())
 	case TransitionATOM, TransitionRANGE, TransitionSET:
 		// EOF transitions act like epsilon transitions after the first EOF
 		// transition is traversed
 		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
-				return NewBaseATNConfig4(config, t.getTarget())
+				return NewATNConfig4(config, t.getTarget())
 			}
 		}
 		return nil
@@ -1218,16 +1218,16 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) actionTransition(config ATNConfig, t *ActionTransition) *BaseATNConfig {
+func (p *ParserATNSimulator) actionTransition(config *ATNConfig, t *ActionTransition) *ATNConfig {
 	if ParserATNSimulatorDebug {
 		fmt.Println("ACTION edge " + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.actionIndex))
 	}
-	return NewBaseATNConfig4(config, t.getTarget())
+	return NewATNConfig4(config, t.getTarget())
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
-	pt *PrecedencePredicateTransition, collectPredicates, inContext, fullCtx bool) *BaseATNConfig {
+func (p *ParserATNSimulator) precedenceTransition(config *ATNConfig,
+	pt *PrecedencePredicateTransition, collectPredicates, inContext, fullCtx bool) *ATNConfig {
 	
 	if ParserATNSimulatorDebug {
 		fmt.Println("PRED (collectPredicates=" + fmt.Sprint(collectPredicates) + ") " +
@@ -1236,7 +1236,7 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 			fmt.Println("context surrounding pred is " + fmt.Sprint(p.parser.GetRuleInvocationStack(nil)))
 		}
 	}
-	var c *BaseATNConfig
+	var c *ATNConfig
 	if collectPredicates && inContext {
 		if fullCtx {
 			// In full context mode, we can evaluate predicates on-the-fly
@@ -1248,14 +1248,14 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 			predSucceeds := pt.getPredicate().evaluate(p.parser, p.outerContext)
 			p.input.Seek(currentPosition)
 			if predSucceeds {
-				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
+				c = NewATNConfig4(config, pt.getTarget()) // no pred context
 			}
 		} else {
 			newSemCtx := SemanticContextandContext(config.GetSemanticContext(), pt.getPredicate())
-			c = NewBaseATNConfig3(config, pt.getTarget(), newSemCtx)
+			c = NewATNConfig3(config, pt.getTarget(), newSemCtx)
 		}
 	} else {
-		c = NewBaseATNConfig4(config, pt.getTarget())
+		c = NewATNConfig4(config, pt.getTarget())
 	}
 	if ParserATNSimulatorDebug {
 		fmt.Println("config from pred transition=" + c.String())
@@ -1264,7 +1264,7 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTransition, collectPredicates, inContext, fullCtx bool) *BaseATNConfig {
+func (p *ParserATNSimulator) predTransition(config *ATNConfig, pt *PredicateTransition, collectPredicates, inContext, fullCtx bool) *ATNConfig {
 	
 	if ParserATNSimulatorDebug {
 		fmt.Println("PRED (collectPredicates=" + fmt.Sprint(collectPredicates) + ") " + strconv.Itoa(pt.ruleIndex) +
@@ -1273,7 +1273,7 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 			fmt.Println("context surrounding pred is " + fmt.Sprint(p.parser.GetRuleInvocationStack(nil)))
 		}
 	}
-	var c *BaseATNConfig
+	var c *ATNConfig
 	if collectPredicates && (!pt.isCtxDependent || inContext) {
 		if fullCtx {
 			// In full context mode, we can evaluate predicates on-the-fly
@@ -1285,14 +1285,14 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 			predSucceeds := pt.getPredicate().evaluate(p.parser, p.outerContext)
 			p.input.Seek(currentPosition)
 			if predSucceeds {
-				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
+				c = NewATNConfig4(config, pt.getTarget()) // no pred context
 			}
 		} else {
 			newSemCtx := SemanticContextandContext(config.GetSemanticContext(), pt.getPredicate())
-			c = NewBaseATNConfig3(config, pt.getTarget(), newSemCtx)
+			c = NewATNConfig3(config, pt.getTarget(), newSemCtx)
 		}
 	} else {
-		c = NewBaseATNConfig4(config, pt.getTarget())
+		c = NewATNConfig4(config, pt.getTarget())
 	}
 	if ParserATNSimulatorDebug {
 		fmt.Println("config from pred transition=" + c.String())
@@ -1301,13 +1301,13 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 }
 
 //goland:noinspection GoBoolExpressions
-func (p *ParserATNSimulator) ruleTransition(config ATNConfig, t *RuleTransition) *BaseATNConfig {
+func (p *ParserATNSimulator) ruleTransition(config *ATNConfig, t *RuleTransition) *ATNConfig {
 	if ParserATNSimulatorDebug {
 		fmt.Println("CALL rule " + p.getRuleName(t.getTarget().GetRuleIndex()) + ", ctx=" + config.GetContext().String())
 	}
 	returnState := t.followState
 	newContext := SingletonBasePredictionContextCreate(config.GetContext(), returnState.GetStateNumber())
-	return NewBaseATNConfig1(config, t.getTarget(), newContext)
+	return NewATNConfig1(config, t.getTarget(), newContext)
 }
 
 func (p *ParserATNSimulator) getConflictingAlts(configs *ATNConfigSet) *BitSet {

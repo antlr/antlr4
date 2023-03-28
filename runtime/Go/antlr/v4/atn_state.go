@@ -78,7 +78,7 @@ type BaseATNState struct {
 	transitions []Transition
 }
 
-func NewBaseATNState() *BaseATNState {
+func NewATNState() *BaseATNState {
 	return &BaseATNState{stateNumber: ATNStateInvalidStateNumber, stateType: ATNStateInvalidType}
 }
 

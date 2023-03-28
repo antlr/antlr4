@@ -13,159 +13,179 @@ import (
 // path(s) to the root is the rule invocation(s) chain used to arrive in the
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
-type ATNConfig interface {
-	
-	// Equals compares this ATNConfig to another for equality
-	Equals(o Collectable[ATNConfig]) bool
-	
-	// Hash returns the hash code for this ATNConfig for use in maps and comparisons
-	Hash() int
-	
-	// GetState returns the ATN state associated with this configuration
-	GetState() ATNState
-	// GetAlt returns the alternative associated with this configuration
-	GetAlt() int
-	// GetSemanticContext returns the semantic context associated with this configuration
-	GetSemanticContext() SemanticContext
-	
-	// GetContext returns the rule invocation stack associated with this configuration
-	GetContext() *PredictionContext
-	// SetContext sets the rule invocation stack associated with this configuration
-	SetContext(*PredictionContext)
-	
-	// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
-	GetReachesIntoOuterContext() int
-	// SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
-	SetReachesIntoOuterContext(int)
-	
-	// String returns a string representation of the configuration
-	String() string
-	
-	getPrecedenceFilterSuppressed() bool
-	setPrecedenceFilterSuppressed(bool)
-}
+//type ATNConfig interface {
+//	
+//	// Equals compares this ATNConfig to another for equality
+//	Equals(o Collectable[ATNConfig]) bool
+//	
+//	// Hash returns the hash code for this ATNConfig for use in maps and comparisons
+//	Hash() int
+//	
+//	// GetState returns the ATN state associated with this configuration
+//	GetState() ATNState
+//	// GetAlt returns the alternative associated with this configuration
+//	GetAlt() int
+//	// GetSemanticContext returns the semantic context associated with this configuration
+//	GetSemanticContext() SemanticContext
+//	
+//	// GetContext returns the rule invocation stack associated with this configuration
+//	GetContext() *PredictionContext
+//	// SetContext sets the rule invocation stack associated with this configuration
+//	SetContext(*PredictionContext)
+//	
+//	// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
+//	GetReachesIntoOuterContext() int
+//	// SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
+//	SetReachesIntoOuterContext(int)
+//	
+//	// String returns a string representation of the configuration
+//	String() string
+//	
+//	getPrecedenceFilterSuppressed() bool
+//	setPrecedenceFilterSuppressed(bool)
+//}
 
-// BaseATNConfig is a base implementation of ATNConfig. Thi si s done to emulate Java's ability to have multiple
-// constructors for a single class. This is not idiomatic Go, but it works for now.
-// TODO: this isn't the way to do this I think, but it will take time to rework - JI Also, getters and setters are not Go. Might be better to just access the fields, though the compiler will probably eliminate the calls
-type BaseATNConfig struct {
-	precedenceFilterSuppressed bool
-	state                      ATNState
-	alt                        int
-	context                    *PredictionContext
-	semanticContext            SemanticContext
-	reachesIntoOuterContext    int
+const (
+	lexerConfig  = iota // Indicates that this ATNConfig is for a lexer
+	parserConfig        // Indicates that this ATNConfig is for a parser
+)
+
+// ATNConfig is a tuple: (ATN state, predicted alt, syntactic, semantic
+// context). The syntactic context is a graph-structured stack node whose
+// path(s) to the root is the rule invocation(s) chain used to arrive in the
+// state. The semantic context is the tree of semantic predicates encountered
+// before reaching an ATN state.
+//
+type ATNConfig struct {
+	precedenceFilterSuppressed     bool
+	state                          ATNState
+	alt                            int
+	context                        *PredictionContext
+	semanticContext                SemanticContext
+	reachesIntoOuterContext        int
+	cType                          int // lexerConfig or parserConfig
+	lexerActionExecutor            *LexerActionExecutor
+	passedThroughNonGreedyDecision bool
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func NewBaseATNConfig7(old *BaseATNConfig) ATNConfig { // TODO: Dup - maybe delete this
-	return &BaseATNConfig{
+func NewATNConfig7(old *ATNConfig) *ATNConfig { // TODO: Dup - maybe delete this
+	return &ATNConfig{
 		state:                   old.state,
 		alt:                     old.alt,
 		context:                 old.context,
 		semanticContext:         old.semanticContext,
 		reachesIntoOuterContext: old.reachesIntoOuterContext,
+		cType:                   old.cType,
 	}
 }
 
-// NewBaseATNConfig6 creates a new BaseATNConfig instance given a state, alt and context only
-func NewBaseATNConfig6(state ATNState, alt int, context *PredictionContext) *BaseATNConfig {
-	return NewBaseATNConfig5(state, alt, context, SemanticContextNone)
+// NewATNConfig6 creates a new ATNConfig instance given a state, alt and context only
+func NewATNConfig6(state ATNState, alt int, context *PredictionContext) *ATNConfig {
+	return NewATNConfig5(state, alt, context, SemanticContextNone)
 }
 
-// NewBaseATNConfig5 creates a new BaseATNConfig instance given a state, alt, context and semantic context
-func NewBaseATNConfig5(state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+// NewATNConfig5 creates a new ATNConfig instance given a state, alt, context and semantic context
+func NewATNConfig5(state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) *ATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
 	
-	return &BaseATNConfig{state: state, alt: alt, context: context, semanticContext: semanticContext}
+	return &ATNConfig{
+		state:           state,
+		alt:             alt,
+		context:         context,
+		semanticContext: semanticContext,
+		cType:           parserConfig,
+	}
 }
 
-// NewBaseATNConfig4 creates a new BaseATNConfig instance given an existing config, and a state only
-func NewBaseATNConfig4(c ATNConfig, state ATNState) *BaseATNConfig {
-	return NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+// NewATNConfig4 creates a new ATNConfig instance given an existing config, and a state only
+func NewATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
+	return NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
-// NewBaseATNConfig3 creates a new BaseATNConfig instance given an existing config, a state and a semantic context
-func NewBaseATNConfig3(c ATNConfig, state ATNState, semanticContext SemanticContext) *BaseATNConfig {
-	return NewBaseATNConfig(c, state, c.GetContext(), semanticContext)
+// NewATNConfig3 creates a new ATNConfig instance given an existing config, a state and a semantic context
+func NewATNConfig3(c *ATNConfig, state ATNState, semanticContext SemanticContext) *ATNConfig {
+	return NewATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
-// NewBaseATNConfig2 creates a new BaseATNConfig instance given an existing config, and a context only
-func NewBaseATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNConfig {
-	return NewBaseATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
+// NewATNConfig2 creates a new ATNConfig instance given an existing config, and a context only
+func NewATNConfig2(c *ATNConfig, semanticContext SemanticContext) *ATNConfig {
+	return NewATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
 }
 
-// NewBaseATNConfig1 creates a new BaseATNConfig instance given an existing config, a state, and a context only
-func NewBaseATNConfig1(c ATNConfig, state ATNState, context *PredictionContext) *BaseATNConfig {
-	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
+// NewATNConfig1 creates a new ATNConfig instance given an existing config, a state, and a context only
+func NewATNConfig1(c *ATNConfig, state ATNState, context *PredictionContext) *ATNConfig {
+	return NewATNConfig(c, state, context, c.GetSemanticContext())
 }
 
-// NewBaseATNConfig creates a new BaseATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors'
+// NewATNConfig creates a new ATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors'
 // are just wrappers around this one.
-func NewBaseATNConfig(c ATNConfig, state ATNState, context *PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewATNConfig(c *ATNConfig, state ATNState, context *PredictionContext, semanticContext SemanticContext) *ATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
 	
-	b := &BaseATNConfig{}
-	b.InitBaseATNConfig(c, state, c.GetAlt(), context, semanticContext)
+	b := &ATNConfig{
+		cType: parserConfig,
+	}
+	b.InitATNConfig(c, state, c.GetAlt(), context, semanticContext)
 	
 	return b
 }
 
-func (b *BaseATNConfig) InitBaseATNConfig(c ATNConfig, state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) {
+func (a *ATNConfig) InitATNConfig(c *ATNConfig, state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) {
 	
-	b.state = state
-	b.alt = alt
-	b.context = context
-	b.semanticContext = semanticContext
-	b.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
-	b.precedenceFilterSuppressed = c.getPrecedenceFilterSuppressed()
+	a.state = state
+	a.alt = alt
+	a.context = context
+	a.semanticContext = semanticContext
+	a.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
+	a.precedenceFilterSuppressed = c.getPrecedenceFilterSuppressed()
 }
 
-func (b *BaseATNConfig) getPrecedenceFilterSuppressed() bool {
-	return b.precedenceFilterSuppressed
+func (a *ATNConfig) getPrecedenceFilterSuppressed() bool {
+	return a.precedenceFilterSuppressed
 }
 
-func (b *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
-	b.precedenceFilterSuppressed = v
+func (a *ATNConfig) setPrecedenceFilterSuppressed(v bool) {
+	a.precedenceFilterSuppressed = v
 }
 
 // GetState returns the ATN state associated with this configuration
-func (b *BaseATNConfig) GetState() ATNState {
-	return b.state
+func (a *ATNConfig) GetState() ATNState {
+	return a.state
 }
 
 // GetAlt returns the alternative associated with this configuration
-func (b *BaseATNConfig) GetAlt() int {
-	return b.alt
+func (a *ATNConfig) GetAlt() int {
+	return a.alt
 }
 
 // SetContext sets the rule invocation stack associated with this configuration
-func (b *BaseATNConfig) SetContext(v *PredictionContext) {
-	b.context = v
+func (a *ATNConfig) SetContext(v *PredictionContext) {
+	a.context = v
 }
 
 // GetContext returns the rule invocation stack associated with this configuration
-func (b *BaseATNConfig) GetContext() *PredictionContext {
-	return b.context
+func (a *ATNConfig) GetContext() *PredictionContext {
+	return a.context
 }
 
 // GetSemanticContext returns the semantic context associated with this configuration
-func (b *BaseATNConfig) GetSemanticContext() SemanticContext {
-	return b.semanticContext
+func (a *ATNConfig) GetSemanticContext() SemanticContext {
+	return a.semanticContext
 }
 
 // GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
-func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
-	return b.reachesIntoOuterContext
+func (a *ATNConfig) GetReachesIntoOuterContext() int {
+	return a.reachesIntoOuterContext
 }
 
 // SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
-func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
-	b.reachesIntoOuterContext = v
+func (a *ATNConfig) SetReachesIntoOuterContext(v int) {
+	a.reachesIntoOuterContext = v
 }
 
 // Equals is the default comparison function for an ATNConfig when no specialist implementation is required
@@ -173,149 +193,166 @@ func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 //
 // An ATN configuration is equal to another if both have the same state, they
 // predict the same alternative, and syntactic/semantic contexts are the same.
-func (b *BaseATNConfig) Equals(o Collectable[ATNConfig]) bool {
-	if b == o {
-		return true
-	} else if o == nil {
-		return false
+func (a *ATNConfig) Equals(o Collectable[*ATNConfig]) bool {
+	switch a.cType {
+	case lexerConfig:
+		return a.LEquals(o)
+	case parserConfig:
+		return a.PEquals(o)
+	default:
+		panic("Invalid ATNConfig type")
 	}
-	
-	var other, ok = o.(*BaseATNConfig)
+}
+
+// PEquals is the default comparison function for a Parser ATNConfig when no specialist implementation is required
+// for a collection.
+//
+// An ATN configuration is equal to another if both have the same state, they
+// predict the same alternative, and syntactic/semantic contexts are the same.
+func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
+	var other, ok = o.(*ATNConfig)
 	
 	if !ok {
 		return false
 	}
 	
+	if a == other {
+		return true
+	} else if other == nil {
+		return false
+	}
+	
 	var equal bool
 	
-	if b.context == nil {
+	if a.context == nil {
 		equal = other.context == nil
 	} else {
-		equal = b.context.Equals(other.context)
+		equal = a.context.Equals(other.context)
 	}
 	
 	var (
-		nums = b.state.GetStateNumber() == other.state.GetStateNumber()
-		alts = b.alt == other.alt
-		cons = b.semanticContext.Equals(other.semanticContext)
-		sups = b.precedenceFilterSuppressed == other.precedenceFilterSuppressed
+		nums = a.state.GetStateNumber() == other.state.GetStateNumber()
+		alts = a.alt == other.alt
+		cons = a.semanticContext.Equals(other.semanticContext)
+		sups = a.precedenceFilterSuppressed == other.precedenceFilterSuppressed
 	)
 	
 	return nums && alts && cons && sups && equal
 }
 
-// Hash is the default hash function for BaseATNConfig, when no specialist hash function
+// Hash is the default hash function for a parser ATNConfig, when no specialist hash function
 // is required for a collection
-func (b *BaseATNConfig) Hash() int {
+func (a *ATNConfig) Hash() int {
+	switch a.cType {
+	case lexerConfig:
+		return a.LHash()
+	case parserConfig:
+		return a.PHash()
+	default:
+		panic("Invalid ATNConfig type")
+	}
+}
+
+// PHash is the default hash function for a parser ATNConfig, when no specialist hash function
+// is required for a collection
+func (a *ATNConfig) PHash() int {
 	var c int
-	if b.context != nil {
-		c = b.context.Hash()
+	if a.context != nil {
+		c = a.context.Hash()
 	}
 	
 	h := murmurInit(7)
-	h = murmurUpdate(h, b.state.GetStateNumber())
-	h = murmurUpdate(h, b.alt)
+	h = murmurUpdate(h, a.state.GetStateNumber())
+	h = murmurUpdate(h, a.alt)
 	h = murmurUpdate(h, c)
-	h = murmurUpdate(h, b.semanticContext.Hash())
+	h = murmurUpdate(h, a.semanticContext.Hash())
 	return murmurFinish(h, 4)
 }
 
-// String returns a string representation of the BaseATNConfig, usually used for debugging purposes
-func (b *BaseATNConfig) String() string {
+// String returns a string representation of the ATNConfig, usually used for debugging purposes
+func (a *ATNConfig) String() string {
 	var s1, s2, s3 string
 	
-	if b.context != nil {
-		s1 = ",[" + fmt.Sprint(b.context) + "]"
+	if a.context != nil {
+		s1 = ",[" + fmt.Sprint(a.context) + "]"
 	}
 	
-	if b.semanticContext != SemanticContextNone {
-		s2 = "," + fmt.Sprint(b.semanticContext)
+	if a.semanticContext != SemanticContextNone {
+		s2 = "," + fmt.Sprint(a.semanticContext)
 	}
 	
-	if b.reachesIntoOuterContext > 0 {
-		s3 = ",up=" + fmt.Sprint(b.reachesIntoOuterContext)
+	if a.reachesIntoOuterContext > 0 {
+		s3 = ",up=" + fmt.Sprint(a.reachesIntoOuterContext)
 	}
 	
-	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
+	return fmt.Sprintf("(%v,%v%v%v%v)", a.state, a.alt, s1, s2, s3)
 }
 
-// LexerATNConfig represents a lexer ATN configuration which tracks the lexer action, and which "inherits" from the
-// BaseATNConfig struct.
-// TODO: Stop using a pointer and embed the struct instead as this saves allocations. Same for the LexerATNConfig "constructors"
-type LexerATNConfig struct {
-	BaseATNConfig
-	lexerActionExecutor            *LexerActionExecutor
-	passedThroughNonGreedyDecision bool
-}
-
-func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *LexerATNConfig {
-	
-	return &LexerATNConfig{
-		BaseATNConfig: BaseATNConfig{
-			state:           state,
-			alt:             alt,
-			context:         context,
-			semanticContext: SemanticContextNone,
-		},
+func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *ATNConfig {
+	return &ATNConfig{
+		state:           state,
+		alt:             alt,
+		context:         context,
+		semanticContext: SemanticContextNone,
+		cType:           lexerConfig,
 	}
 }
 
-func NewLexerATNConfig5(state ATNState, alt int, context *PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
-	return &LexerATNConfig{
-		BaseATNConfig: BaseATNConfig{
-			state:           state,
-			alt:             alt,
-			context:         context,
-			semanticContext: SemanticContextNone,
-		},
+func NewLexerATNConfig5(state ATNState, alt int, context *PredictionContext, lexerActionExecutor *LexerActionExecutor) *ATNConfig {
+	return &ATNConfig{
+		state:               state,
+		alt:                 alt,
+		context:             context,
+		semanticContext:     SemanticContextNone,
 		lexerActionExecutor: lexerActionExecutor,
+		cType:               lexerConfig,
 	}
 }
 
-func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
-	lac := &LexerATNConfig{
-		
+func NewLexerATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
+	lac := &ATNConfig{
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
-	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	lac.cType = lexerConfig
 	return lac
 }
 
-func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
-	lac := &LexerATNConfig{
+func NewLexerATNConfig3(c *ATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *ATNConfig {
+	lac := &ATNConfig{
 		lexerActionExecutor:            lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
-	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
+	lac.cType = lexerConfig
 	return lac
 }
 
-func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context *PredictionContext) *LexerATNConfig {
-	lac := &LexerATNConfig{
+func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext) *ATNConfig {
+	lac := &ATNConfig{
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
-	lac.BaseATNConfig.InitBaseATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
+	lac.InitATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
 	return lac
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func NewLexerATNConfig1(state ATNState, alt int, context *PredictionContext) *LexerATNConfig {
-	lac := &LexerATNConfig{
-		BaseATNConfig: BaseATNConfig{
-			state:           state,
-			alt:             alt,
-			context:         context,
-			semanticContext: SemanticContextNone,
-		},
+func NewLexerATNConfig1(state ATNState, alt int, context *PredictionContext) *ATNConfig {
+	lac := &ATNConfig{
+		state:           state,
+		alt:             alt,
+		context:         context,
+		semanticContext: SemanticContextNone,
+		cType:           lexerConfig,
 	}
 	return lac
 }
 
-// Hash is the default hash function for LexerATNConfig objects, it can be used directly or via
+// LHash is the default hash function for Lexer ATNConfig objects, it can be used directly or via
 // the default comparator [ObjEqComparator].
-func (l *LexerATNConfig) Hash() int {
+func (l *ATNConfig) LHash() int {
 	var f int
 	if l.passedThroughNonGreedyDecision {
 		f = 1
@@ -333,13 +370,10 @@ func (l *LexerATNConfig) Hash() int {
 	return h
 }
 
-// Equals is the default comparison function for LexerATNConfig objects, it can be used directly or via
+// LEquals is the default comparison function for Lexer ATNConfig objects, it can be used directly or via
 // the default comparator [ObjEqComparator].
-func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
-	if l == other {
-		return true
-	}
-	var otherT, ok = other.(*LexerATNConfig)
+func (l *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
+	var otherT, ok = other.(*ATNConfig)
 	if !ok {
 		return false
 	} else if l.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
@@ -356,10 +390,10 @@ func (l *LexerATNConfig) Equals(other Collectable[ATNConfig]) bool {
 		return false // One but not both, are nil
 	}
 	
-	return l.BaseATNConfig.Equals(&otherT.BaseATNConfig)
+	return l.PEquals(otherT)
 }
 
-func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
+func checkNonGreedyDecision(source *ATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)
 	
 	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())

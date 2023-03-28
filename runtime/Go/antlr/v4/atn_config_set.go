@@ -19,10 +19,10 @@ type ATNConfigSet struct {
 	// effectively doubles the number of objects associated with ATNConfigs. All
 	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
 	// read-only because a set becomes a DFA state.
-	configLookup *JStore[ATNConfig, Comparator[ATNConfig]]
+	configLookup *JStore[*ATNConfig, Comparator[*ATNConfig]]
 	
 	// configs is the added elements.
-	configs []ATNConfig
+	configs []*ATNConfig
 	
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves re-computation. Can we track conflicts as they
@@ -68,7 +68,7 @@ func (b *ATNConfigSet) Alts() *BitSet {
 func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash:   -1,
-		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst),
+		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst),
 		fullCtx:      fullCtx,
 	}
 }
@@ -79,7 +79,7 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 //
 // We use (s,i,pi) as the key.
 // Updates dipsIntoOuterContext and hasSemanticContext when necessary.
-func (b *ATNConfigSet) Add(config ATNConfig, mergeCache *JPCMap) bool {
+func (b *ATNConfigSet) Add(config *ATNConfig, mergeCache *JPCMap) bool {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -166,7 +166,7 @@ func (b *ATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	}
 }
 
-func (b *ATNConfigSet) AddAll(coll []ATNConfig) bool {
+func (b *ATNConfigSet) AddAll(coll []*ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
 		b.Add(coll[i], nil)
 	}
@@ -238,7 +238,7 @@ func (b *ATNConfigSet) hashCodeConfigs() int {
 	return h
 }
 
-func (b *ATNConfigSet) Contains(item ATNConfig) bool {
+func (b *ATNConfigSet) Contains(item *ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
 	}
@@ -246,7 +246,7 @@ func (b *ATNConfigSet) Contains(item ATNConfig) bool {
 	return b.configLookup.Contains(item)
 }
 
-func (b *ATNConfigSet) ContainsFast(item ATNConfig) bool {
+func (b *ATNConfigSet) ContainsFast(item *ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
 	}
@@ -259,9 +259,9 @@ func (b *ATNConfigSet) Clear() {
 		panic("set is read-only")
 	}
 	
-	b.configs = make([]ATNConfig, 0)
+	b.configs = make([]*ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst)
+	b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst)
 }
 
 func (b *ATNConfigSet) String() string {
@@ -302,7 +302,7 @@ func NewOrderedATNConfigSet() *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash: -1,
 		// This set uses the standard Hash() and Equals() from ATNConfig
-		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst),
+		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst),
 		fullCtx:      false,
 	}
 }
