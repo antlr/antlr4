@@ -614,7 +614,6 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	//
 	if skippedStopStates != nil && ((!fullCtx) || (!PredictionModehasConfigInRuleStopState(reach))) {
 		for l := 0; l < len(skippedStopStates); l++ {
-			fmt.Println("Adding skipped(" + skippedStopStates[l].String() + ")")
 			reach.Add(skippedStopStates[l], p.mergeCache)
 		}
 	}

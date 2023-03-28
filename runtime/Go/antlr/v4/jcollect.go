@@ -198,15 +198,16 @@ func (m *JMap[K, V, C]) Clear() {
 }
 
 type JPCMap struct {
-	store *JMap[PredictionContext, *JMap[PredictionContext, PredictionContext, *ObjEqComparator[PredictionContext]], *ObjEqComparator[PredictionContext]]
+	store *JMap[*PredictionContext, *JMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]], *ObjEqComparator[*PredictionContext]]
 }
+
 func NewJPCMap() *JPCMap {
-	return &JPCMap {
-		store: NewJMap[PredictionContext, *JMap[PredictionContext, PredictionContext, *ObjEqComparator[PredictionContext]], *ObjEqComparator[PredictionContext]](pContextEqInst),
+	return &JPCMap{
+		store: NewJMap[*PredictionContext, *JMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]], *ObjEqComparator[*PredictionContext]](pContextEqInst),
 	}
 }
 
-func (pcm *JPCMap) Get(k1, k2 PredictionContext) (PredictionContext, bool) {
+func (pcm *JPCMap) Get(k1, k2 *PredictionContext) (*PredictionContext, bool) {
 	
 	// Do we have a map stored by k1?
 	//
@@ -219,7 +220,7 @@ func (pcm *JPCMap) Get(k1, k2 PredictionContext) (PredictionContext, bool) {
 	return nil, false
 }
 
-func (pcm *JPCMap) Put(k1, k2, v PredictionContext) {
+func (pcm *JPCMap) Put(k1, k2, v *PredictionContext) {
 	
 	// First does a map already exist for k1?
 	//
@@ -228,9 +229,8 @@ func (pcm *JPCMap) Put(k1, k2, v PredictionContext) {
 	} else {
 		// No map found for k1, so we create it, add in our value, then store is
 		//
-		m2 = NewJMap[PredictionContext, PredictionContext, *ObjEqComparator[PredictionContext]](pContextEqInst)
+		m2 = NewJMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]](pContextEqInst)
 		m2.Put(k2, v)
 		pcm.store.Put(k1, m2)
 	}
 }
-

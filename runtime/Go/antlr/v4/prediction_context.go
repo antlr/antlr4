@@ -117,7 +117,8 @@ func (p *PredictionContext) Hash() int {
 func (p *PredictionContext) Equals(other Collectable[*PredictionContext]) bool {
 	switch p.pcType {
 	case PredictionContextEmpty:
-		return other == nil || other.(*PredictionContext).isEmpty()
+		otherP := other.(*PredictionContext)
+		return other == nil || otherP == nil || otherP.isEmpty()
 	case PredictionContextSingleton:
 		return p.SingletonEquals(other)
 	case PredictionContextArray:
@@ -131,7 +132,7 @@ func (p *PredictionContext) ArrayEquals(o Collectable[*PredictionContext]) bool 
 		return false
 	}
 	other := o.(*PredictionContext)
-	if other.pcType != PredictionContextArray {
+	if other == nil || other.pcType != PredictionContextArray {
 		return false
 	}
 	if p.cachedHash != other.Hash() {
@@ -151,6 +152,9 @@ func (p *PredictionContext) SingletonEquals(other Collectable[*PredictionContext
 		return false
 	}
 	otherP := other.(*PredictionContext)
+	if otherP == nil {
+		return false
+	}
 	
 	if p.cachedHash != otherP.Hash() {
 		return false // Can't be same if hash is different
@@ -384,11 +388,11 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *J
 	if mergeCache != nil {
 		previous, present := mergeCache.Get(a, b)
 		if present {
-			return previous.(*PredictionContext)
+			return previous
 		}
 		previous, present = mergeCache.Get(b, a)
 		if previous != nil {
-			return previous.(*PredictionContext)
+			return previous
 		}
 	}
 	
@@ -546,14 +550,14 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 			if ParserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
-			return previous.(*PredictionContext)
+			return previous
 		}
 		previous, present = mergeCache.Get(b, a)
 		if present {
 			if ParserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
-			return previous.(*PredictionContext)
+			return previous
 		}
 	}
 	// merge sorted payloads a + b => M
