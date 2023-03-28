@@ -283,7 +283,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *ATN
 	// l is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	SkipAlt := ATNInvalidAltNumber
-	
+
 	for _, cfg := range closure.configs {
 		currentAltReachedAcceptState := cfg.GetAlt() == SkipAlt
 		if currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision {
@@ -546,10 +546,9 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// TJP notes: next time through the DFA, we see a pred again and eval.
 		// If that gets us to a previously created (but dangling) DFA
 		// state, we can continue in pure DFA mode from there.
-		// /
+		//
 		suppressEdge := cfgs.hasSemanticContext
 		cfgs.hasSemanticContext = false
-		
 		to = l.addDFAState(cfgs, true)
 		
 		if suppressEdge {
@@ -586,7 +585,6 @@ func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool
 	var firstConfigWithRuleStopState *ATNConfig
 	
 	for _, cfg := range configs.configs {
-		
 		_, ok := cfg.GetState().(*RuleStopState)
 		
 		if ok {

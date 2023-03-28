@@ -56,7 +56,6 @@ func standardHashFunction(a interface{}) int {
 	if h, ok := a.(hasher); ok {
 		return h.Hash()
 	}
-	
 	panic("Not 'Hasher'")
 }
 

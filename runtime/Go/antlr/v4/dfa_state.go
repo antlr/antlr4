@@ -53,7 +53,7 @@ type DFAState struct {
 	edges []*DFAState
 	
 	isAcceptState bool
-	
+
 	// prediction is the 'ttype' we match or alt we predict if the state is 'accept'.
 	// Set to ATN.INVALID_ALT_NUMBER when predicates != nil or
 	// requiresFullContext.

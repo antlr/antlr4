@@ -71,7 +71,9 @@ func (c *ATNConfigComparator[T]) Equals2(o1, o2 *ATNConfig) bool {
 	
 	return o1.GetState().GetStateNumber() == o2.GetState().GetStateNumber() &&
 		o1.GetAlt() == o2.GetAlt() &&
-		o1.GetSemanticContext().Equals(o2.GetSemanticContext())
+		o1.GetContext().Equals(o2.GetContext()) &&
+		o1.GetSemanticContext().Equals(o2.GetSemanticContext()) &&
+		o1.getPrecedenceFilterSuppressed() == o2.getPrecedenceFilterSuppressed()
 }
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup
@@ -146,6 +148,5 @@ func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 *ATNConfig) bool {
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup, but in fact just
 // delegates to the standard Hash() method of the ATNConfig type.
 func (c *BaseATNConfigComparator[T]) Hash1(o *ATNConfig) int {
-	
 	return o.Hash()
 }

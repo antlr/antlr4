@@ -8,43 +8,6 @@ import (
 	"fmt"
 )
 
-// ATNConfig is a tuple: (ATN state, predicted alt, syntactic, semantic
-// context). The syntactic context is a graph-structured stack node whose
-// path(s) to the root is the rule invocation(s) chain used to arrive in the
-// state. The semantic context is the tree of semantic predicates encountered
-// before reaching an ATN state.
-//type ATNConfig interface {
-//	
-//	// Equals compares this ATNConfig to another for equality
-//	Equals(o Collectable[ATNConfig]) bool
-//	
-//	// Hash returns the hash code for this ATNConfig for use in maps and comparisons
-//	Hash() int
-//	
-//	// GetState returns the ATN state associated with this configuration
-//	GetState() ATNState
-//	// GetAlt returns the alternative associated with this configuration
-//	GetAlt() int
-//	// GetSemanticContext returns the semantic context associated with this configuration
-//	GetSemanticContext() SemanticContext
-//	
-//	// GetContext returns the rule invocation stack associated with this configuration
-//	GetContext() *PredictionContext
-//	// SetContext sets the rule invocation stack associated with this configuration
-//	SetContext(*PredictionContext)
-//	
-//	// GetReachesIntoOuterContext returns the count of references to an outer context from this configuration
-//	GetReachesIntoOuterContext() int
-//	// SetReachesIntoOuterContext sets the count of references to an outer context from this configuration
-//	SetReachesIntoOuterContext(int)
-//	
-//	// String returns a string representation of the configuration
-//	String() string
-//	
-//	getPrecedenceFilterSuppressed() bool
-//	setPrecedenceFilterSuppressed(bool)
-//}
-
 const (
 	lexerConfig  = iota // Indicates that this ATNConfig is for a lexer
 	parserConfig        // Indicates that this ATNConfig is for a parser
@@ -126,7 +89,6 @@ func NewATNConfig(c *ATNConfig, state ATNState, context *PredictionContext, sema
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
-	
 	b := &ATNConfig{
 		cType: parserConfig,
 	}
@@ -215,7 +177,6 @@ func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
 	if !ok {
 		return false
 	}
-	
 	if a == other {
 		return true
 	} else if other == nil {

@@ -180,7 +180,6 @@ func (b *ATNConfigSet) AddAll(coll []*ATNConfig) bool {
 // only equal if they are in the same order too as Java uses ArrayList.equals(), which requires
 // the same order.
 //
-// TODO: JI - Look to change the way config set is implemented. Improve data structure if possible
 func (b *ATNConfigSet) Compare(bs *ATNConfigSet) bool {
 	if len(b.configs) != len(bs.configs) {
 		return false
@@ -258,13 +257,13 @@ func (b *ATNConfigSet) Clear() {
 	if b.readOnly {
 		panic("set is read-only")
 	}
-	
 	b.configs = make([]*ATNConfig, 0)
 	b.cachedHash = -1
 	b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst)
 }
 
 func (b *ATNConfigSet) String() string {
+
 	s := "["
 	
 	for i, c := range b.configs {

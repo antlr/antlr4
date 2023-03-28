@@ -100,8 +100,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		d.numstates = 0
 		
 		if precedenceDfa {
-			precedenceState := NewDFAState(-1, NewATNConfigSet(false))
-			
+			precedenceState := NewDFAState(-1, NewATNConfigSet(false))	
 			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
