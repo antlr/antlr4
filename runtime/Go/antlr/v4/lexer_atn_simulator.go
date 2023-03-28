@@ -245,7 +245,7 @@ func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t 
 	
 	// if we don't find an existing DFA state
 	// Fill reach starting from closure, following t transitions
-	l.getReachableConfigSet(input, s.configs, reach.BaseATNConfigSet, t)
+	l.getReachableConfigSet(input, s.configs, reach, t)
 	
 	if len(reach.configs) == 0 { // we got nowhere on t from s
 		if !reach.hasSemanticContext {
@@ -257,10 +257,10 @@ func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t 
 		return ATNSimulatorError
 	}
 	// Add an edge from s to target DFA found/created for reach
-	return l.addDFAEdge(s, t, nil, reach.BaseATNConfigSet)
+	return l.addDFAEdge(s, t, nil, reach)
 }
 
-func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream, reach ATNConfigSet, t int) int {
+func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream, reach *ATNConfigSet, t int) int {
 	if l.prevAccept.dfaState != nil {
 		lexerActionExecutor := prevAccept.dfaState.lexerActionExecutor
 		l.accept(input, lexerActionExecutor, l.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
@@ -279,7 +279,7 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 // we can reach upon input t.
 //
 // Parameter reach is a return parameter.
-func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
+func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *ATNConfigSet, reach *ATNConfigSet, t int) {
 	// l is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	SkipAlt := ATNInvalidAltNumber
@@ -338,7 +338,7 @@ func (l *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNState
 	return nil
 }
 
-func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *OrderedATNConfigSet {
+func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *ATNConfigSet {
 	configs := NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
 		target := p.GetTransitions()[i].getTarget()
@@ -356,7 +356,7 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 // this rule would have a lower priority.
 //
 // The func returns true if an accept state is reached.
-func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
+func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs *ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 	
 	if //goland:noinspection GoBoolExpressions
@@ -416,7 +416,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 
 // side-effect: can alter configs.hasSemanticContext
 func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNConfig, trans Transition,
-	configs ATNConfigSet, speculative, treatEOFAsEpsilon bool) *LexerATNConfig {
+	configs *ATNConfigSet, speculative, treatEOFAsEpsilon bool) *LexerATNConfig {
 	
 	var cfg *LexerATNConfig
 	
@@ -534,7 +534,7 @@ func (l *LexerATNSimulator) captureSimState(settings *SimState, input CharStream
 	settings.dfaState = dfaState
 }
 
-func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfgs ATNConfigSet) *DFAState {
+func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfgs *ATNConfigSet) *DFAState {
 	if to == nil && cfgs != nil {
 		// leading to l call, ATNConfigSet.hasSemanticContext is used as a
 		// marker indicating dynamic predicate evaluation makes l edge
@@ -580,7 +580,7 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 // configurations already. This method also detects the first
 // configuration containing an ATN rule stop state. Later, when
 // traversing the DFA, we will know which rule to accept.
-func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool) *DFAState {
+func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool) *DFAState {
 	
 	proposed := NewDFAState(-1, configs)
 	var firstConfigWithRuleStopState ATNConfig

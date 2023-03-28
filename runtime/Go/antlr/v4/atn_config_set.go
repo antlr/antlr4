@@ -8,54 +8,53 @@ import (
 	"fmt"
 )
 
-type ATNConfigSet interface {
-	Hash() int
-	Equals(o Collectable[ATNConfig]) bool
-	Add(ATNConfig, *JPCMap) bool
-	AddAll([]ATNConfig) bool
-	
-	GetStates() *JStore[ATNState, Comparator[ATNState]]
-	GetPredicates() []SemanticContext
-	GetItems() []ATNConfig
-	
-	OptimizeConfigs(interpreter *BaseATNSimulator)
-	
-	Length() int
-	IsEmpty() bool
-	Contains(ATNConfig) bool
-	ContainsFast(ATNConfig) bool
-	Clear()
-	String() string
-	
-	HasSemanticContext() bool
-	SetHasSemanticContext(v bool)
-	
-	ReadOnly() bool
-	SetReadOnly(bool)
-	
-	GetConflictingAlts() *BitSet
-	SetConflictingAlts(*BitSet)
-	
-	Alts() *BitSet
-	
-	FullContext() bool
-	
-	GetUniqueAlt() int
-	SetUniqueAlt(int)
-	
-	GetDipsIntoOuterContext() bool
-	SetDipsIntoOuterContext(bool)
-}
+//
+//type ATNConfigSet interface {
+//	Hash() int
+//	Equals(o Collectable[ATNConfig]) bool
+//	Add(ATNConfig, *JPCMap) bool
+//	AddAll([]ATNConfig) bool
+//
+//	GetStates() *JStore[ATNState, Comparator[ATNState]]
+//	GetPredicates() []SemanticContext
+//	GetItems() []ATNConfig
+//
+//	OptimizeConfigs(interpreter *BaseATNSimulator)
+//
+//	Length() int
+//	IsEmpty() bool
+//	Contains(ATNConfig) bool
+//	ContainsFast(ATNConfig) bool
+//	Clear()
+//	String() string
+//
+//	HasSemanticContext() bool
+//	SetHasSemanticContext(v bool)
+//
+//	ReadOnly() bool
+//	SetReadOnly(bool)
+//
+//	GetConflictingAlts() *BitSet
+//	SetConflictingAlts(*BitSet)
+//
+//	Alts() *BitSet
+//
+//	FullContext() bool
+//
+//	GetUniqueAlt() int
+//	SetUniqueAlt(int)
+//
+//	GetDipsIntoOuterContext() bool
+//	SetDipsIntoOuterContext(bool)
+//}
 
-// BaseATNConfigSet is a specialized set of ATNConfig that tracks information
+// ATNConfigSet is a specialized set of ATNConfig that tracks information
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
-type BaseATNConfigSet struct {
-	
-	// TODO: Is this actually valid? JI
+type ATNConfigSet struct {
 	cachedHash int
 	
-	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
+	// configLookup is used to determine whether two ATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
 	// effectively doubles the number of objects associated with ATNConfigs. All
 	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
@@ -72,7 +71,7 @@ type BaseATNConfigSet struct {
 	
 	// dipsIntoOuterContext is used by parsers and lexers. In a lexer, it indicates
 	// we hit a pred while computing a closure operation. Do not make a DFA state
-	// from the BaseATNConfigSet in this case. TODO: How is this used by parsers?
+	// from the ATNConfigSet in this case. TODO: How is this used by parsers?
 	dipsIntoOuterContext bool
 	
 	// fullCtx is whether it is part of a full context LL prediction. Used to
@@ -97,7 +96,7 @@ type BaseATNConfigSet struct {
 }
 
 // Alts returns the combined set of alts for all the configurations in this set.
-func (b *BaseATNConfigSet) Alts() *BitSet {
+func (b *ATNConfigSet) Alts() *BitSet {
 	alts := NewBitSet()
 	for _, it := range b.configs {
 		alts.add(it.GetAlt())
@@ -105,9 +104,9 @@ func (b *BaseATNConfigSet) Alts() *BitSet {
 	return alts
 }
 
-// NewBaseATNConfigSet creates a new BaseATNConfigSet instance.
-func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
-	return &BaseATNConfigSet{
+// NewATNConfigSet creates a new ATNConfigSet instance.
+func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
+	return &ATNConfigSet{
 		cachedHash:   -1,
 		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst),
 		fullCtx:      fullCtx,
@@ -120,7 +119,7 @@ func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 //
 // We use (s,i,pi) as the key.
 // Updates dipsIntoOuterContext and hasSemanticContext when necessary.
-func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *JPCMap) bool {
+func (b *ATNConfigSet) Add(config ATNConfig, mergeCache *JPCMap) bool {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -164,7 +163,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *JPCMap) bool {
 }
 
 // GetStates returns the set of states represented by all configurations in this config set
-func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
+func (b *ATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 	
 	// states uses the standard comparator and Hash() provided by the ATNState instance
 	//
@@ -178,16 +177,16 @@ func (b *BaseATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 }
 
 // HasSemanticContext returns true if this set contains a semantic context.
-func (b *BaseATNConfigSet) HasSemanticContext() bool {
+func (b *ATNConfigSet) HasSemanticContext() bool {
 	return b.hasSemanticContext
 }
 
 // SetHasSemanticContext sets whether this set contains a semantic context.
-func (b *BaseATNConfigSet) SetHasSemanticContext(v bool) {
+func (b *ATNConfigSet) SetHasSemanticContext(v bool) {
 	b.hasSemanticContext = v
 }
 
-func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
+func (b *ATNConfigSet) GetPredicates() []SemanticContext {
 	predicates := make([]SemanticContext, 0)
 	
 	for i := 0; i < len(b.configs); i++ {
@@ -201,11 +200,11 @@ func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
 	return predicates
 }
 
-func (b *BaseATNConfigSet) GetItems() []ATNConfig {
+func (b *ATNConfigSet) GetItems() []ATNConfig {
 	return b.configs
 }
 
-func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
+func (b *ATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -221,7 +220,7 @@ func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	}
 }
 
-func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
+func (b *ATNConfigSet) AddAll(coll []ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
 		b.Add(coll[i], nil)
 	}
@@ -236,7 +235,7 @@ func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
 // the same order.
 //
 // TODO: JI - Look to change the way config set is implemented. Improve data structure if possible
-func (b *BaseATNConfigSet) Compare(bs *BaseATNConfigSet) bool {
+func (b *ATNConfigSet) Compare(bs *ATNConfigSet) bool {
 	if len(b.configs) != len(bs.configs) {
 		return false
 	}
@@ -249,14 +248,14 @@ func (b *BaseATNConfigSet) Compare(bs *BaseATNConfigSet) bool {
 	return true
 }
 
-func (b *BaseATNConfigSet) Equals(other Collectable[ATNConfig]) bool {
+func (b *ATNConfigSet) Equals(other Collectable[ATNConfig]) bool {
 	if b == other {
 		return true
-	} else if _, ok := other.(*BaseATNConfigSet); !ok {
+	} else if _, ok := other.(*ATNConfigSet); !ok {
 		return false
 	}
 	
-	other2 := other.(*BaseATNConfigSet)
+	other2 := other.(*ATNConfigSet)
 	var eca bool
 	switch {
 	case b.conflictingAlts == nil && other2.conflictingAlts == nil:
@@ -273,7 +272,7 @@ func (b *BaseATNConfigSet) Equals(other Collectable[ATNConfig]) bool {
 		b.Compare(other2)
 }
 
-func (b *BaseATNConfigSet) Hash() int {
+func (b *ATNConfigSet) Hash() int {
 	if b.readOnly {
 		if b.cachedHash == -1 {
 			b.cachedHash = b.hashCodeConfigs()
@@ -285,7 +284,7 @@ func (b *BaseATNConfigSet) Hash() int {
 	return b.hashCodeConfigs()
 }
 
-func (b *BaseATNConfigSet) hashCodeConfigs() int {
+func (b *ATNConfigSet) hashCodeConfigs() int {
 	h := 1
 	for _, config := range b.configs {
 		h = 31*h + config.Hash()
@@ -293,15 +292,15 @@ func (b *BaseATNConfigSet) hashCodeConfigs() int {
 	return h
 }
 
-func (b *BaseATNConfigSet) Length() int {
+func (b *ATNConfigSet) Length() int {
 	return len(b.configs)
 }
 
-func (b *BaseATNConfigSet) IsEmpty() bool {
+func (b *ATNConfigSet) IsEmpty() bool {
 	return len(b.configs) == 0
 }
 
-func (b *BaseATNConfigSet) Contains(item ATNConfig) bool {
+func (b *ATNConfigSet) Contains(item ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
 	}
@@ -309,7 +308,7 @@ func (b *BaseATNConfigSet) Contains(item ATNConfig) bool {
 	return b.configLookup.Contains(item)
 }
 
-func (b *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
+func (b *ATNConfigSet) ContainsFast(item ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
 	}
@@ -317,7 +316,7 @@ func (b *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
 	return b.configLookup.Contains(item) // TODO: containsFast is not implemented for Set
 }
 
-func (b *BaseATNConfigSet) Clear() {
+func (b *ATNConfigSet) Clear() {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -327,39 +326,39 @@ func (b *BaseATNConfigSet) Clear() {
 	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst)
 }
 
-func (b *BaseATNConfigSet) FullContext() bool {
+func (b *ATNConfigSet) FullContext() bool {
 	return b.fullCtx
 }
 
-func (b *BaseATNConfigSet) GetDipsIntoOuterContext() bool {
+func (b *ATNConfigSet) GetDipsIntoOuterContext() bool {
 	return b.dipsIntoOuterContext
 }
 
-func (b *BaseATNConfigSet) SetDipsIntoOuterContext(v bool) {
+func (b *ATNConfigSet) SetDipsIntoOuterContext(v bool) {
 	b.dipsIntoOuterContext = v
 }
 
-func (b *BaseATNConfigSet) GetUniqueAlt() int {
+func (b *ATNConfigSet) GetUniqueAlt() int {
 	return b.uniqueAlt
 }
 
-func (b *BaseATNConfigSet) SetUniqueAlt(v int) {
+func (b *ATNConfigSet) SetUniqueAlt(v int) {
 	b.uniqueAlt = v
 }
 
-func (b *BaseATNConfigSet) GetConflictingAlts() *BitSet {
+func (b *ATNConfigSet) GetConflictingAlts() *BitSet {
 	return b.conflictingAlts
 }
 
-func (b *BaseATNConfigSet) SetConflictingAlts(v *BitSet) {
+func (b *ATNConfigSet) SetConflictingAlts(v *BitSet) {
 	b.conflictingAlts = v
 }
 
-func (b *BaseATNConfigSet) ReadOnly() bool {
+func (b *ATNConfigSet) ReadOnly() bool {
 	return b.readOnly
 }
 
-func (b *BaseATNConfigSet) SetReadOnly(readOnly bool) {
+func (b *ATNConfigSet) SetReadOnly(readOnly bool) {
 	b.readOnly = readOnly
 	
 	if readOnly {
@@ -367,7 +366,7 @@ func (b *BaseATNConfigSet) SetReadOnly(readOnly bool) {
 	}
 }
 
-func (b *BaseATNConfigSet) String() string {
+func (b *ATNConfigSet) String() string {
 	s := "["
 	
 	for i, c := range b.configs {
@@ -399,15 +398,13 @@ func (b *BaseATNConfigSet) String() string {
 	return s
 }
 
-type OrderedATNConfigSet struct {
-	*BaseATNConfigSet
-}
-
-func NewOrderedATNConfigSet() *OrderedATNConfigSet {
-	b := NewBaseATNConfigSet(false)
-	
-	// This set uses the standard Hash() and Equals() from ATNConfig
-	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst)
-	
-	return &OrderedATNConfigSet{BaseATNConfigSet: b}
+// NewOrderedATNConfigSet creates a config set with a slightly different Hash/Equal pair
+// for use in lexers.
+func NewOrderedATNConfigSet() *ATNConfigSet {
+	return &ATNConfigSet{
+		cachedHash: -1,
+		// This set uses the standard Hash() and Equals() from ATNConfig
+		configLookup: NewJStore[ATNConfig, Comparator[ATNConfig]](aConfEqInst),
+		fullCtx:      false,
+	}
 }

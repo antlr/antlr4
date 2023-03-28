@@ -16,9 +16,9 @@ import (
 
 type ErrorListener interface {
 	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException)
-	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet)
-	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet)
-	ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet)
+	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet)
+	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet)
+	ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet)
 }
 
 type DefaultErrorListener struct {
@@ -32,13 +32,13 @@ func NewDefaultErrorListener() *DefaultErrorListener {
 func (d *DefaultErrorListener) SyntaxError(_ Recognizer, _ interface{}, _, _ int, _ string, _ RecognitionException) {
 }
 
-func (d *DefaultErrorListener) ReportAmbiguity(_ Parser, _ *DFA, _, _ int, _ bool, _ *BitSet, _ ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAmbiguity(_ Parser, _ *DFA, _, _ int, _ bool, _ *BitSet, _ *ATNConfigSet) {
 }
 
-func (d *DefaultErrorListener) ReportAttemptingFullContext(_ Parser, _ *DFA, _, _ int, _ *BitSet, _ ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAttemptingFullContext(_ Parser, _ *DFA, _, _ int, _ *BitSet, _ *ATNConfigSet) {
 }
 
-func (d *DefaultErrorListener) ReportContextSensitivity(_ Parser, _ *DFA, _, _, _ int, _ ATNConfigSet) {
+func (d *DefaultErrorListener) ReportContextSensitivity(_ Parser, _ *DFA, _, _, _ int, _ *ATNConfigSet) {
 }
 
 type ConsoleErrorListener struct {
@@ -81,19 +81,19 @@ func (p *ProxyErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol 
 	}
 }
 
-func (p *ProxyErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (p *ProxyErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	for _, d := range p.delegates {
 		d.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 	}
 }
 
-func (p *ProxyErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (p *ProxyErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 	for _, d := range p.delegates {
 		d.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
 	}
 }
 
-func (p *ProxyErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (p *ProxyErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 	for _, d := range p.delegates {
 		d.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
 	}

@@ -37,7 +37,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
-		dfa.s0 = NewDFAState(-1, NewBaseATNConfigSet(false))
+		dfa.s0 = NewDFAState(-1, NewATNConfigSet(false))
 		dfa.s0.isAcceptState = false
 		dfa.s0.requiresFullContext = false
 	}
@@ -100,7 +100,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		d.numstates = 0
 		
 		if precedenceDfa {
-			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
+			precedenceState := NewDFAState(-1, NewATNConfigSet(false))
 			
 			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false

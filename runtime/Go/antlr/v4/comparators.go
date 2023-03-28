@@ -116,7 +116,7 @@ func (c *ATNAltConfigComparator[T]) Hash1(o ATNConfig) int {
 	return murmurFinish(h, 2)
 }
 
-// BaseATNConfigComparator is used as the comparator for the configLookup field of a BaseATNConfigSet
+// BaseATNConfigComparator is used as the comparator for the configLookup field of a ATNConfigSet
 // and has a custom Equals() and Hash() implementation, because equality is not based on the
 // standard Hash() and Equals() methods of the ATNConfig type.
 type BaseATNConfigComparator[T Collectable[T]] struct {

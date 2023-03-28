@@ -29,7 +29,7 @@ const (
 	// behavior for syntactically-incorrect inputs.
 	//
 	PredictionModeSLL = 0
-
+	
 	// PredictionModeLL represents the LL(*) prediction mode.
 	// This prediction mode allows the current parser
 	// context to be used for resolving SLL conflicts that occur during
@@ -47,7 +47,7 @@ const (
 	// behavior for syntactically-incorrect inputs.
 	//
 	PredictionModeLL = 1
-
+	
 	// PredictionModeLLExactAmbigDetection represents the LL(*) prediction mode
 	// with exact ambiguity detection.
 	//
@@ -165,8 +165,8 @@ const (
 // [ATNConfigSet.hasSemanticContext]), this algorithm makes a copy of
 // the configurations to strip out all the predicates so that a standard
 // [ATNConfigSet] will merge everything ignoring predicates.
-func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConfigSet) bool {
-
+func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNConfigSet) bool {
+	
 	// Configs in rule stop states indicate reaching the end of the decision
 	// rule (local context) or end of start rule (full context). If all
 	// configs meet this condition, then none of the configurations is able
@@ -175,7 +175,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 	if PredictionModeallConfigsInRuleStopStates(configs) {
 		return true
 	}
-
+	
 	// pure SLL mode parsing
 	if mode == PredictionModeSLL {
 		// Don't bother with combining configs from different semantic
@@ -183,9 +183,9 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 		// since we'll often fail over anyway.
 		if configs.HasSemanticContext() {
 			// dup configs, tossing out semantic predicates
-			dup := NewBaseATNConfigSet(false)
+			dup := NewATNConfigSet(false)
 			for _, c := range configs.GetItems() {
-
+				
 				//				NewBaseATNConfig({semanticContext:}, c)
 				c = NewBaseATNConfig2(c, SemanticContextNone)
 				dup.Add(c, nil)
@@ -205,7 +205,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 // context).
 //
 // The func returns true if any configuration in the supplied configs is in a [RuleStopState]
-func PredictionModehasConfigInRuleStopState(configs ATNConfigSet) bool {
+func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
 	for _, c := range configs.GetItems() {
 		if _, ok := c.GetState().(*RuleStopState); ok {
 			return true
@@ -221,8 +221,8 @@ func PredictionModehasConfigInRuleStopState(configs ATNConfigSet) bool {
 //
 // the func returns true if all configurations in configs are in a
 // [RuleStopState]
-func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
-
+func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
+	
 	for _, c := range configs.GetItems() {
 		if _, ok := c.GetState().(*RuleStopState); !ok {
 			return false
@@ -430,7 +430,7 @@ func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 // The func returns true if every member of altsets is equal to the others.
 func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 	var first *BitSet
-
+	
 	for i := 0; i < len(altsets); i++ {
 		alts := altsets[i]
 		if first == nil {
@@ -439,7 +439,7 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 			return false
 		}
 	}
-
+	
 	return true
 }
 
@@ -453,7 +453,7 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 	if all.length() == 1 {
 		return all.minValue()
 	}
-
+	
 	return ATNInvalidAltNumber
 }
 
@@ -472,11 +472,11 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 //
 //	for each configuration c in configs:
 //	   map[c] U= c.ATNConfig.alt // map hash/equals uses s and x, not alt and not pred
-func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
+func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](atnAltCfgEqInst)
-
+	
 	for _, c := range configs.GetItems() {
-
+		
 		alts, ok := configToAlts.Get(c)
 		if !ok {
 			alts = NewBitSet()
@@ -484,7 +484,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 		}
 		alts.add(c.GetAlt())
 	}
-
+	
 	return configToAlts.Values()
 }
 
@@ -492,9 +492,9 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 //
 //	for each configuration c in configs:
 //	   map[c.ATNConfig.state] U= c.ATNConfig.alt}
-func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
+func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	m := NewAltDict()
-
+	
 	for _, c := range configs.GetItems() {
 		alts := m.Get(c.GetState().String())
 		if alts == nil {
@@ -506,7 +506,7 @@ func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
 	return m
 }
 
-func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
+func PredictionModehasStateAssociatedWithOneAlt(configs *ATNConfigSet) bool {
 	values := PredictionModeGetStateToAltMap(configs).values()
 	for i := 0; i < len(values); i++ {
 		if values[i].(*BitSet).length() == 1 {
@@ -522,7 +522,7 @@ func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
 // TODO: JI - Review this code - it does not seem to do the same thing as the Java code - maybe because [BitSet] is not like the Java utils BitSet
 func PredictionModegetSingleViableAlt(altsets []*BitSet) int {
 	result := ATNInvalidAltNumber
-
+	
 	for i := 0; i < len(altsets); i++ {
 		alts := altsets[i]
 		minAlt := alts.minValue()

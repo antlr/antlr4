@@ -4,7 +4,7 @@
 
 package antlr
 
-var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
+var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))
 
 type IATNSimulator interface {
 	SharedContextCache() *PredictionContextCache

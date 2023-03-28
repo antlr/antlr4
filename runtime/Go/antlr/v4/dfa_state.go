@@ -46,27 +46,27 @@ func (p *PredPrediction) String() string {
 // reached via a different set of rule invocations.
 type DFAState struct {
 	stateNumber int
-	configs     ATNConfigSet
-
+	configs     *ATNConfigSet
+	
 	// edges elements point to the target of the symbol. Shift up by 1 so (-1)
 	// Token.EOF maps to the first element.
 	edges []*DFAState
-
+	
 	isAcceptState bool
-
+	
 	// prediction is the 'ttype' we match or alt we predict if the state is 'accept'.
 	// Set to ATN.INVALID_ALT_NUMBER when predicates != nil or
 	// requiresFullContext.
 	prediction int
-
+	
 	lexerActionExecutor *LexerActionExecutor
-
+	
 	// requiresFullContext indicates it was created during an SLL prediction that
 	// discovered a conflict between the configurations in the state. Future
 	// ParserATNSimulator.execATN invocations immediately jump doing
 	// full context prediction if true.
 	requiresFullContext bool
-
+	
 	// predicates is the predicates associated with the ATN configurations of the
 	// DFA state during SLL parsing. When we have predicates, requiresFullContext
 	// is false, since full context prediction evaluates predicates on-the-fly. If
@@ -82,28 +82,28 @@ type DFAState struct {
 	predicates []*PredPrediction
 }
 
-func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
+func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 	if configs == nil {
-		configs = NewBaseATNConfigSet(false)
+		configs = NewATNConfigSet(false)
 	}
-
+	
 	return &DFAState{configs: configs, stateNumber: stateNumber}
 }
 
 // GetAltSet gets the set of all alts mentioned by all ATN configurations in d.
 func (d *DFAState) GetAltSet() []int {
 	var alts []int
-
+	
 	if d.configs != nil {
 		for _, c := range d.configs.GetItems() {
 			alts = append(alts, c.GetAlt())
 		}
 	}
-
+	
 	if len(alts) == 0 {
 		return nil
 	}
-
+	
 	return alts
 }
 
@@ -140,7 +140,7 @@ func (d *DFAState) String() string {
 			s = "=>" + fmt.Sprint(d.prediction)
 		}
 	}
-
+	
 	return fmt.Sprintf("%d:%s%s", d.stateNumber, fmt.Sprint(d.configs), s)
 }
 
@@ -165,6 +165,6 @@ func (d *DFAState) Equals(o Collectable[*DFAState]) bool {
 	if d == o {
 		return true
 	}
-
+	
 	return d.configs.Equals(o.(*DFAState).configs)
 }

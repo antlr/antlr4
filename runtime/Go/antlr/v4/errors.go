@@ -100,10 +100,10 @@ type LexerNoViableAltException struct {
 	*BaseRecognitionException
 	
 	startIndex     int
-	deadEndConfigs ATNConfigSet
+	deadEndConfigs *ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
+func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
 	
 	l := new(LexerNoViableAltException)
 	
@@ -129,7 +129,7 @@ type NoViableAltException struct {
 	startToken     Token
 	offendingToken Token
 	ctx            ParserRuleContext
-	deadEndConfigs ATNConfigSet
+	deadEndConfigs *ATNConfigSet
 }
 
 // NewNoViableAltException creates an exception indicating that the parser could not decide which of two or more paths
@@ -138,7 +138,7 @@ type NoViableAltException struct {
 // in the various paths when the error.
 //
 // Reported by [ReportNoViableAlternative]
-func NewNoViableAltException(recognizer Parser, input TokenStream, startToken Token, offendingToken Token, deadEndConfigs ATNConfigSet, ctx ParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer Parser, input TokenStream, startToken Token, offendingToken Token, deadEndConfigs *ATNConfigSet, ctx ParserRuleContext) *NoViableAltException {
 	
 	if ctx == nil {
 		ctx = recognizer.GetParserRuleContext()
