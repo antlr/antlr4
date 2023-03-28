@@ -296,6 +296,7 @@ func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
 	lac.InitATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
+	lac.cType = lexerConfig
 	return lac
 }
 
@@ -337,12 +338,15 @@ func (l *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	var otherT, ok = other.(*ATNConfig)
 	if !ok {
 		return false
+	} else if l == otherT {
+		return true
 	} else if l.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
 		return false
 	}
 	
 	switch {
 	case l.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
+		return true
 	case l.lexerActionExecutor != nil && otherT.lexerActionExecutor != nil:
 		if !l.lexerActionExecutor.Equals(otherT.lexerActionExecutor) {
 			return false
