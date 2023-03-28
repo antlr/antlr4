@@ -95,7 +95,7 @@ func (d *DFAState) GetAltSet() []int {
 	var alts []int
 	
 	if d.configs != nil {
-		for _, c := range d.configs.GetItems() {
+		for _, c := range d.configs.configs {
 			alts = append(alts, c.GetAlt())
 		}
 	}

@@ -181,10 +181,10 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 		// Don't bother with combining configs from different semantic
 		// contexts if we can fail over to full LL costs more time
 		// since we'll often fail over anyway.
-		if configs.HasSemanticContext() {
+		if configs.hasSemanticContext {
 			// dup configs, tossing out semantic predicates
 			dup := NewATNConfigSet(false)
-			for _, c := range configs.GetItems() {
+			for _, c := range configs.configs {
 				
 				//				NewBaseATNConfig({semanticContext:}, c)
 				c = NewBaseATNConfig2(c, SemanticContextNone)
@@ -206,7 +206,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 //
 // The func returns true if any configuration in the supplied configs is in a [RuleStopState]
 func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
-	for _, c := range configs.GetItems() {
+	for _, c := range configs.configs {
 		if _, ok := c.GetState().(*RuleStopState); ok {
 			return true
 		}
@@ -223,7 +223,7 @@ func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
 // [RuleStopState]
 func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
 	
-	for _, c := range configs.GetItems() {
+	for _, c := range configs.configs {
 		if _, ok := c.GetState().(*RuleStopState); !ok {
 			return false
 		}
@@ -475,7 +475,7 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 	configToAlts := NewJMap[ATNConfig, *BitSet, *ATNAltConfigComparator[ATNConfig]](atnAltCfgEqInst)
 	
-	for _, c := range configs.GetItems() {
+	for _, c := range configs.configs {
 		
 		alts, ok := configToAlts.Get(c)
 		if !ok {
@@ -495,7 +495,7 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	m := NewAltDict()
 	
-	for _, c := range configs.GetItems() {
+	for _, c := range configs.configs {
 		alts := m.Get(c.GetState().String())
 		if alts == nil {
 			alts = NewBitSet()

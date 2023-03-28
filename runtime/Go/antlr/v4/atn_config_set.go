@@ -8,46 +8,6 @@ import (
 	"fmt"
 )
 
-//
-//type ATNConfigSet interface {
-//	Hash() int
-//	Equals(o Collectable[ATNConfig]) bool
-//	Add(ATNConfig, *JPCMap) bool
-//	AddAll([]ATNConfig) bool
-//
-//	GetStates() *JStore[ATNState, Comparator[ATNState]]
-//	GetPredicates() []SemanticContext
-//	GetItems() []ATNConfig
-//
-//	OptimizeConfigs(interpreter *BaseATNSimulator)
-//
-//	Length() int
-//	IsEmpty() bool
-//	Contains(ATNConfig) bool
-//	ContainsFast(ATNConfig) bool
-//	Clear()
-//	String() string
-//
-//	HasSemanticContext() bool
-//	SetHasSemanticContext(v bool)
-//
-//	ReadOnly() bool
-//	SetReadOnly(bool)
-//
-//	GetConflictingAlts() *BitSet
-//	SetConflictingAlts(*BitSet)
-//
-//	Alts() *BitSet
-//
-//	FullContext() bool
-//
-//	GetUniqueAlt() int
-//	SetUniqueAlt(int)
-//
-//	GetDipsIntoOuterContext() bool
-//	SetDipsIntoOuterContext(bool)
-//}
-
 // ATNConfigSet is a specialized set of ATNConfig that tracks information
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
@@ -176,16 +136,6 @@ func (b *ATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 	return states
 }
 
-// HasSemanticContext returns true if this set contains a semantic context.
-func (b *ATNConfigSet) HasSemanticContext() bool {
-	return b.hasSemanticContext
-}
-
-// SetHasSemanticContext sets whether this set contains a semantic context.
-func (b *ATNConfigSet) SetHasSemanticContext(v bool) {
-	b.hasSemanticContext = v
-}
-
 func (b *ATNConfigSet) GetPredicates() []SemanticContext {
 	predicates := make([]SemanticContext, 0)
 	
@@ -198,10 +148,6 @@ func (b *ATNConfigSet) GetPredicates() []SemanticContext {
 	}
 	
 	return predicates
-}
-
-func (b *ATNConfigSet) GetItems() []ATNConfig {
-	return b.configs
 }
 
 func (b *ATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
@@ -292,14 +238,6 @@ func (b *ATNConfigSet) hashCodeConfigs() int {
 	return h
 }
 
-func (b *ATNConfigSet) Length() int {
-	return len(b.configs)
-}
-
-func (b *ATNConfigSet) IsEmpty() bool {
-	return len(b.configs) == 0
-}
-
 func (b *ATNConfigSet) Contains(item ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
@@ -324,46 +262,6 @@ func (b *ATNConfigSet) Clear() {
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHash = -1
 	b.configLookup = NewJStore[ATNConfig, Comparator[ATNConfig]](aConfCompInst)
-}
-
-func (b *ATNConfigSet) FullContext() bool {
-	return b.fullCtx
-}
-
-func (b *ATNConfigSet) GetDipsIntoOuterContext() bool {
-	return b.dipsIntoOuterContext
-}
-
-func (b *ATNConfigSet) SetDipsIntoOuterContext(v bool) {
-	b.dipsIntoOuterContext = v
-}
-
-func (b *ATNConfigSet) GetUniqueAlt() int {
-	return b.uniqueAlt
-}
-
-func (b *ATNConfigSet) SetUniqueAlt(v int) {
-	b.uniqueAlt = v
-}
-
-func (b *ATNConfigSet) GetConflictingAlts() *BitSet {
-	return b.conflictingAlts
-}
-
-func (b *ATNConfigSet) SetConflictingAlts(v *BitSet) {
-	b.conflictingAlts = v
-}
-
-func (b *ATNConfigSet) ReadOnly() bool {
-	return b.readOnly
-}
-
-func (b *ATNConfigSet) SetReadOnly(readOnly bool) {
-	b.readOnly = readOnly
-	
-	if readOnly {
-		b.configLookup = nil // Read only, so no need for the lookup cache
-	}
 }
 
 func (b *ATNConfigSet) String() string {

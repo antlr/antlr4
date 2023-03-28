@@ -284,7 +284,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *ATN
 	// than a config that already reached an accept state for the same rule
 	SkipAlt := ATNInvalidAltNumber
 	
-	for _, cfg := range closure.GetItems() {
+	for _, cfg := range closure.configs {
 		currentAltReachedAcceptState := cfg.GetAlt() == SkipAlt
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
@@ -453,7 +453,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 		LexerATNSimulatorDebug {
 			fmt.Println("EVAL rule " + strconv.Itoa(trans.(*PredicateTransition).ruleIndex) + ":" + strconv.Itoa(pt.predIndex))
 		}
-		configs.SetHasSemanticContext(true)
+		configs.hasSemanticContext = true
 		if l.evaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative) {
 			cfg = NewLexerATNConfig4(config, trans.getTarget())
 		}
@@ -547,8 +547,8 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// If that gets us to a previously created (but dangling) DFA
 		// state, we can continue in pure DFA mode from there.
 		// /
-		suppressEdge := cfgs.HasSemanticContext()
-		cfgs.SetHasSemanticContext(false)
+		suppressEdge := cfgs.hasSemanticContext
+		cfgs.hasSemanticContext = false
 		
 		to = l.addDFAState(cfgs, true)
 		
@@ -585,7 +585,7 @@ func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool
 	proposed := NewDFAState(-1, configs)
 	var firstConfigWithRuleStopState ATNConfig
 	
-	for _, cfg := range configs.GetItems() {
+	for _, cfg := range configs.configs {
 		
 		_, ok := cfg.GetState().(*RuleStopState)
 		
@@ -614,7 +614,8 @@ func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool
 		// We need to add the new state
 		//
 		proposed.stateNumber = dfa.states.Len()
-		configs.SetReadOnly(true)
+		configs.readOnly = true
+		configs.configLookup = nil // Not needed now
 		proposed.configs = configs
 		dfa.states.Put(proposed)
 	}
