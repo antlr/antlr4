@@ -47,22 +47,6 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-func standardEqualsFunction(a Collectable[any], b Collectable[any]) bool {
-	
-	return a.Equals(b)
-}
-
-func standardHashFunction(a interface{}) int {
-	if h, ok := a.(hasher); ok {
-		return h.Hash()
-	}
-	panic("Not 'Hasher'")
-}
-
-type hasher interface {
-	Hash() int
-}
-
 const bitsPerWord = 64
 
 func indexForBit(bit int) int {

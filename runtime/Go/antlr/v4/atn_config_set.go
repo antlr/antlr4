@@ -68,7 +68,7 @@ func (b *ATNConfigSet) Alts() *BitSet {
 func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash:   -1,
-		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst),
+		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst, "NewATNConfigSet()"),
 		fullCtx:      fullCtx,
 	}
 }
@@ -127,7 +127,7 @@ func (b *ATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
 	
 	// states uses the standard comparator and Hash() provided by the ATNState instance
 	//
-	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst)
+	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst, "ATNConfigSet.GetStates()")
 	
 	for i := 0; i < len(b.configs); i++ {
 		states.Put(b.configs[i].GetState())
@@ -259,11 +259,11 @@ func (b *ATNConfigSet) Clear() {
 	}
 	b.configs = make([]*ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst)
+	b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst, "ATNConfigSet.Clear()")
 }
 
 func (b *ATNConfigSet) String() string {
-
+	
 	s := "["
 	
 	for i, c := range b.configs {
@@ -301,7 +301,7 @@ func NewOrderedATNConfigSet() *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash: -1,
 		// This set uses the standard Hash() and Equals() from ATNConfig
-		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst),
+		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst, "ATNConfigSet.NewOrderedATNConfigSet()"),
 		fullCtx:      false,
 	}
 }

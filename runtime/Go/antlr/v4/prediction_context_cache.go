@@ -1,5 +1,7 @@
 package antlr
 
+import "fmt"
+
 var BasePredictionContextEMPTY = NewEmptyPredictionContext()
 
 // PredictionContextCache is Used to cache [PredictionContext] objects. It is used for the shared
@@ -31,6 +33,9 @@ func (p *PredictionContextCache) add(ctx *PredictionContext) *PredictionContext 
 		return existing
 	}
 	p.cache.Put(ctx, ctx)
+	if p.cache.Len()%100000 == 0 {
+		fmt.Printf("Cache(%p) size  : %d\n", p, p.cache.Len())
+	}
 	return ctx
 }
 

@@ -448,7 +448,7 @@ func (tsr *TokenStreamRewriter) GetText(programName string, interval Interval) s
 	// ensure start/end are in range
 	stop = min(stop, tsr.tokens.Size()-1)
 	start = max(start, 0)
-	if rewrites == nil || len(rewrites) == 0 {
+	if len(rewrites) == 0 {
 		return tsr.tokens.GetTextFromInterval(interval) // no instructions to execute
 	}
 	buf := bytes.Buffer{}

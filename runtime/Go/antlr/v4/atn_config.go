@@ -31,18 +31,6 @@ type ATNConfig struct {
 	passedThroughNonGreedyDecision bool
 }
 
-//goland:noinspection GoUnusedExportedFunction
-func NewATNConfig7(old *ATNConfig) *ATNConfig { // TODO: Dup - maybe delete this
-	return &ATNConfig{
-		state:                   old.state,
-		alt:                     old.alt,
-		context:                 old.context,
-		semanticContext:         old.semanticContext,
-		reachesIntoOuterContext: old.reachesIntoOuterContext,
-		cType:                   old.cType,
-	}
-}
-
 // NewATNConfig6 creates a new ATNConfig instance given a state, alt and context only
 func NewATNConfig6(state ATNState, alt int, context *PredictionContext) *ATNConfig {
 	return NewATNConfig5(state, alt, context, SemanticContextNone)
@@ -54,13 +42,13 @@ func NewATNConfig5(state ATNState, alt int, context *PredictionContext, semantic
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
 	
-	return &ATNConfig{
-		state:           state,
-		alt:             alt,
-		context:         context,
-		semanticContext: semanticContext,
-		cType:           parserConfig,
-	}
+	pac := ATNCPool.Get()
+	pac.state = state
+	pac.alt = alt
+	pac.context = context
+	pac.semanticContext = semanticContext
+	pac.cType = parserConfig
+	return pac
 }
 
 // NewATNConfig4 creates a new ATNConfig instance given an existing config, and a state only
@@ -89,11 +77,9 @@ func NewATNConfig(c *ATNConfig, state ATNState, context *PredictionContext, sema
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
-	b := &ATNConfig{
-		cType: parserConfig,
-	}
+	b := ATNCPool.Get()
 	b.InitATNConfig(c, state, c.GetAlt(), context, semanticContext)
-	
+	b.cType = parserConfig
 	return b
 }
 
@@ -250,51 +236,37 @@ func (a *ATNConfig) String() string {
 }
 
 func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *ATNConfig {
-	return &ATNConfig{
-		state:           state,
-		alt:             alt,
-		context:         context,
-		semanticContext: SemanticContextNone,
-		cType:           lexerConfig,
-	}
-}
-
-func NewLexerATNConfig5(state ATNState, alt int, context *PredictionContext, lexerActionExecutor *LexerActionExecutor) *ATNConfig {
-	return &ATNConfig{
-		state:               state,
-		alt:                 alt,
-		context:             context,
-		semanticContext:     SemanticContextNone,
-		lexerActionExecutor: lexerActionExecutor,
-		cType:               lexerConfig,
-	}
+	lac := ATNCPool.Get()
+	lac.state = state
+	lac.alt = alt
+	lac.context = context
+	lac.semanticContext = SemanticContextNone
+	lac.cType = lexerConfig
+	return lac
 }
 
 func NewLexerATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
-	lac := &ATNConfig{
-		lexerActionExecutor:            c.lexerActionExecutor,
-		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
-	}
+	lac := ATNCPool.Get()
+	lac.lexerActionExecutor = c.lexerActionExecutor
+	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
 	lac.cType = lexerConfig
 	return lac
 }
 
 func NewLexerATNConfig3(c *ATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *ATNConfig {
-	lac := &ATNConfig{
-		lexerActionExecutor:            lexerActionExecutor,
-		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
-	}
+	lac := ATNCPool.Get()
+	lac.lexerActionExecutor = lexerActionExecutor
+	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
 	lac.cType = lexerConfig
 	return lac
 }
 
 func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext) *ATNConfig {
-	lac := &ATNConfig{
-		lexerActionExecutor:            c.lexerActionExecutor,
-		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
-	}
+	lac := ATNCPool.Get()
+	lac.lexerActionExecutor = c.lexerActionExecutor
+	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
 	lac.cType = lexerConfig
 	return lac
@@ -302,60 +274,59 @@ func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext
 
 //goland:noinspection GoUnusedExportedFunction
 func NewLexerATNConfig1(state ATNState, alt int, context *PredictionContext) *ATNConfig {
-	lac := &ATNConfig{
-		state:           state,
-		alt:             alt,
-		context:         context,
-		semanticContext: SemanticContextNone,
-		cType:           lexerConfig,
-	}
+	lac := ATNCPool.Get()
+	lac.state = state
+	lac.alt = alt
+	lac.context = context
+	lac.semanticContext = SemanticContextNone
+	lac.cType = lexerConfig
 	return lac
 }
 
 // LHash is the default hash function for Lexer ATNConfig objects, it can be used directly or via
 // the default comparator [ObjEqComparator].
-func (l *ATNConfig) LHash() int {
+func (a *ATNConfig) LHash() int {
 	var f int
-	if l.passedThroughNonGreedyDecision {
+	if a.passedThroughNonGreedyDecision {
 		f = 1
 	} else {
 		f = 0
 	}
 	h := murmurInit(7)
-	h = murmurUpdate(h, l.state.GetStateNumber())
-	h = murmurUpdate(h, l.alt)
-	h = murmurUpdate(h, l.context.Hash())
-	h = murmurUpdate(h, l.semanticContext.Hash())
+	h = murmurUpdate(h, a.state.GetStateNumber())
+	h = murmurUpdate(h, a.alt)
+	h = murmurUpdate(h, a.context.Hash())
+	h = murmurUpdate(h, a.semanticContext.Hash())
 	h = murmurUpdate(h, f)
-	h = murmurUpdate(h, l.lexerActionExecutor.Hash())
+	h = murmurUpdate(h, a.lexerActionExecutor.Hash())
 	h = murmurFinish(h, 6)
 	return h
 }
 
 // LEquals is the default comparison function for Lexer ATNConfig objects, it can be used directly or via
 // the default comparator [ObjEqComparator].
-func (l *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
+func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	var otherT, ok = other.(*ATNConfig)
 	if !ok {
 		return false
-	} else if l == otherT {
+	} else if a == otherT {
 		return true
-	} else if l.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
+	} else if a.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
 		return false
 	}
 	
 	switch {
-	case l.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
+	case a.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
 		return true
-	case l.lexerActionExecutor != nil && otherT.lexerActionExecutor != nil:
-		if !l.lexerActionExecutor.Equals(otherT.lexerActionExecutor) {
+	case a.lexerActionExecutor != nil && otherT.lexerActionExecutor != nil:
+		if !a.lexerActionExecutor.Equals(otherT.lexerActionExecutor) {
 			return false
 		}
 	default:
 		return false // One but not both, are nil
 	}
 	
-	return l.PEquals(otherT)
+	return a.PEquals(otherT)
 }
 
 func checkNonGreedyDecision(source *ATNConfig, target ATNState) bool {

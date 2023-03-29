@@ -59,19 +59,18 @@ type PredictionContext struct {
 }
 
 func NewEmptyPredictionContext() *PredictionContext {
-	return &PredictionContext{
-		cachedHash:  calculateEmptyHash(),
-		pcType:      PredictionContextEmpty,
-		returnState: BasePredictionContextEmptyReturnState,
-	}
+	nep := PCPool.Get()
+	nep.cachedHash = calculateEmptyHash()
+	nep.pcType = PredictionContextEmpty
+	nep.returnState = BasePredictionContextEmptyReturnState
+	return nep
 }
 
 func NewBaseSingletonPredictionContext(parent *PredictionContext, returnState int) *PredictionContext {
-	pc := &PredictionContext{
-		pcType:      PredictionContextSingleton,
-		returnState: returnState,
-		parentCtx:   parent,
-	}
+	pc := PCPool.Get()
+	pc.pcType = PredictionContextSingleton
+	pc.returnState = returnState
+	pc.parentCtx = parent
 	if parent != nil {
 		pc.cachedHash = calculateHash(parent, returnState)
 	} else {
@@ -102,12 +101,12 @@ func NewArrayPredictionContext(parents []*PredictionContext, returnStates []int)
 	}
 	hash = murmurFinish(hash, len(parents)<<1)
 	
-	return &PredictionContext{
-		cachedHash:   hash,
-		pcType:       PredictionContextArray,
-		parents:      parents,
-		returnStates: returnStates,
-	}
+	nec := PCPool.Get()
+	nec.cachedHash = hash
+	nec.pcType = PredictionContextArray
+	nec.parents = parents
+	nec.returnStates = returnStates
+	return nec
 }
 
 func (p *PredictionContext) Hash() int {
@@ -391,7 +390,7 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *J
 			return previous
 		}
 		previous, present = mergeCache.Get(b, a)
-		if previous != nil {
+		if present {
 			return previous
 		}
 	}
@@ -649,7 +648,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 		}
 		return b
 	}
-	combineCommonParents(mergedParents)
+	combineCommonParents(&mergedParents)
 	
 	if mergeCache != nil {
 		mergeCache.Put(a, b, M)
@@ -661,19 +660,18 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 }
 
 // Make pass over all M parents and merge any Equals() ones.
-// Note: This is not used in Go as we are not using pointers in the slice anyway, but I have kept it for reference
-// and if we ever need to use pointers in the slice.
+// Note that we pass a pointer to the slice as we want to modify it in place.
 //goland:noinspection GoUnusedFunction
-func combineCommonParents(parents []*PredictionContext) {
-	uniqueParents := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
+func combineCommonParents(parents *[]*PredictionContext) {
+	uniqueParents := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst, "combineCommonParents for PredictionContext")
 	
-	for p := 0; p < len(parents); p++ {
-		parent := parents[p]
+	for p := 0; p < len(*parents); p++ {
+		parent := (*parents)[p]
 		_, _ = uniqueParents.Put(parent)
 	}
-	for q := 0; q < len(parents); q++ {
-		pc, _ := uniqueParents.Get(parents[q])
-		parents[q] = pc
+	for q := 0; q < len(*parents); q++ {
+		pc, _ := uniqueParents.Get((*parents)[q])
+		(*parents)[q] = pc
 	}
 }
 

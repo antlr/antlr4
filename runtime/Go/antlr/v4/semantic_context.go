@@ -19,10 +19,10 @@ import (
 type SemanticContext interface {
 	Equals(other Collectable[SemanticContext]) bool
 	Hash() int
-
+	
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
-
+	
 	String() string
 }
 
@@ -37,7 +37,7 @@ func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
 	}
-
+	
 	return result
 }
 
@@ -55,7 +55,7 @@ func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
 	}
-
+	
 	return result
 }
 
@@ -67,7 +67,7 @@ type Predicate struct {
 
 func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 	p := new(Predicate)
-
+	
 	p.ruleIndex = ruleIndex
 	p.predIndex = predIndex
 	p.isCtxDependent = isCtxDependent // e.g., $i ref in pred
@@ -84,13 +84,13 @@ func (p *Predicate) evalPrecedence(_ Recognizer, _ RuleContext) SemanticContext 
 }
 
 func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
-
+	
 	var localctx RuleContext
-
+	
 	if p.isCtxDependent {
 		localctx = outerContext
 	}
-
+	
 	return parser.Sempred(localctx, p.ruleIndex, p.predIndex)
 }
 
@@ -127,10 +127,10 @@ type PrecedencePredicate struct {
 }
 
 func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
-
+	
 	p := new(PrecedencePredicate)
 	p.precedence = precedence
-
+	
 	return p
 }
 
@@ -142,7 +142,7 @@ func (p *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext Rul
 	if parser.Precpred(outerContext, p.precedence) {
 		return SemanticContextNone
 	}
-
+	
 	return nil
 }
 
@@ -151,17 +151,17 @@ func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 }
 
 func (p *PrecedencePredicate) Equals(other Collectable[SemanticContext]) bool {
-
+	
 	var op *PrecedencePredicate
 	var ok bool
 	if op, ok = other.(*PrecedencePredicate); !ok {
 		return false
 	}
-
+	
 	if p == op {
 		return true
 	}
-
+	
 	return p.precedence == other.(*PrecedencePredicate).precedence
 }
 
@@ -177,14 +177,14 @@ func (p *PrecedencePredicate) String() string {
 
 func PrecedencePredicatefilterPrecedencePredicates(set *JStore[SemanticContext, Comparator[SemanticContext]]) []*PrecedencePredicate {
 	result := make([]*PrecedencePredicate, 0)
-
+	
 	set.Each(func(v SemanticContext) bool {
 		if c2, ok := v.(*PrecedencePredicate); ok {
 			result = append(result, c2)
 		}
 		return true
 	})
-
+	
 	return result
 }
 
@@ -196,8 +196,8 @@ type AND struct {
 }
 
 func NewAND(a, b SemanticContext) *AND {
-
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst)
+	
+	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst, "NewAND() operands")
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.Put(o)
@@ -205,7 +205,7 @@ func NewAND(a, b SemanticContext) *AND {
 	} else {
 		operands.Put(a)
 	}
-
+	
 	if ba, ok := b.(*AND); ok {
 		for _, o := range ba.opnds {
 			operands.Put(o)
@@ -217,25 +217,23 @@ func NewAND(a, b SemanticContext) *AND {
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
 		var reduced *PrecedencePredicate
-
+		
 		for _, p := range precedencePredicates {
 			if reduced == nil || p.precedence < reduced.precedence {
 				reduced = p
 			}
 		}
-
+		
 		operands.Put(reduced)
 	}
-
+	
 	vs := operands.Values()
 	opnds := make([]SemanticContext, len(vs))
-	for i, v := range vs {
-		opnds[i] = v.(SemanticContext)
-	}
-
+	copy(opnds, vs)
+	
 	and := new(AND)
 	and.opnds = opnds
-
+	
 	return and
 }
 
@@ -272,7 +270,7 @@ func (a *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
 func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	differs := false
 	operands := make([]SemanticContext, 0)
-
+	
 	for i := 0; i < len(a.opnds); i++ {
 		context := a.opnds[i]
 		evaluated := context.evalPrecedence(parser, outerContext)
@@ -288,14 +286,14 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 	if !differs {
 		return a
 	}
-
+	
 	if len(operands) == 0 {
 		// all elements were true, so the AND context is true
 		return SemanticContextNone
 	}
-
+	
 	var result SemanticContext
-
+	
 	for _, o := range operands {
 		if result == nil {
 			result = o
@@ -303,7 +301,7 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 			result = SemanticContextandContext(result, o)
 		}
 	}
-
+	
 	return result
 }
 
@@ -325,15 +323,15 @@ func (o *OR) Hash() int {
 
 func (a *AND) String() string {
 	s := ""
-
+	
 	for _, o := range a.opnds {
 		s += "&& " + fmt.Sprint(o)
 	}
-
+	
 	if len(s) > 3 {
 		return s[0:3]
 	}
-
+	
 	return s
 }
 
@@ -347,8 +345,8 @@ type OR struct {
 }
 
 func NewOR(a, b SemanticContext) *OR {
-
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst)
+	
+	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst, "NewOR() operands")
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.Put(o)
@@ -356,7 +354,7 @@ func NewOR(a, b SemanticContext) *OR {
 	} else {
 		operands.Put(a)
 	}
-
+	
 	if ba, ok := b.(*OR); ok {
 		for _, o := range ba.opnds {
 			operands.Put(o)
@@ -368,26 +366,24 @@ func NewOR(a, b SemanticContext) *OR {
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
 		var reduced *PrecedencePredicate
-
+		
 		for _, p := range precedencePredicates {
 			if reduced == nil || p.precedence > reduced.precedence {
 				reduced = p
 			}
 		}
-
+		
 		operands.Put(reduced)
 	}
-
+	
 	vs := operands.Values()
-
+	
 	opnds := make([]SemanticContext, len(vs))
-	for i, v := range vs {
-		opnds[i] = v.(SemanticContext)
-	}
-
+	copy(opnds, vs)
+	
 	o := new(OR)
 	o.opnds = opnds
-
+	
 	return o
 }
 
@@ -441,7 +437,7 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 		return nil
 	}
 	var result SemanticContext
-
+	
 	for _, o := range operands {
 		if result == nil {
 			result = o
@@ -449,20 +445,20 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 			result = SemanticContextorContext(result, o)
 		}
 	}
-
+	
 	return result
 }
 
 func (o *OR) String() string {
 	s := ""
-
+	
 	for _, o := range o.opnds {
 		s += "|| " + fmt.Sprint(o)
 	}
-
+	
 	if len(s) > 3 {
 		return s[0:3]
 	}
-
+	
 	return s
 }
