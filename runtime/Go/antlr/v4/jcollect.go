@@ -196,3 +196,41 @@ func (m *JMap[K, V, C]) Delete(key K) {
 func (m *JMap[K, V, C]) Clear() {
 	m.store = make(map[int][]*entry[K, V])
 }
+
+type JPCMap struct {
+	store *JMap[*PredictionContext, *JMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]], *ObjEqComparator[*PredictionContext]]
+}
+
+func NewJPCMap() *JPCMap {
+	return &JPCMap{
+		store: NewJMap[*PredictionContext, *JMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]], *ObjEqComparator[*PredictionContext]](pContextEqInst),
+	}
+}
+
+func (pcm *JPCMap) Get(k1, k2 *PredictionContext) (*PredictionContext, bool) {
+	
+	// Do we have a map stored by k1?
+	//
+	m2, present := pcm.store.Get(k1)
+	if present {
+		// We found a map of values corresponding to k1, so now we need to look up k2 in that map
+		//
+		return m2.Get(k2)
+	}
+	return nil, false
+}
+
+func (pcm *JPCMap) Put(k1, k2, v *PredictionContext) {
+	
+	// First does a map already exist for k1?
+	//
+	if m2, present := pcm.store.Get(k1); present {
+		m2.Put(k2, v)
+	} else {
+		// No map found for k1, so we create it, add in our value, then store is
+		//
+		m2 = NewJMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]](pContextEqInst)
+		m2.Put(k2, v)
+		pcm.store.Put(k1, m2)
+	}
+}

@@ -117,7 +117,8 @@ func (p *PredictionContext) Hash() int {
 func (p *PredictionContext) Equals(other Collectable[*PredictionContext]) bool {
 	switch p.pcType {
 	case PredictionContextEmpty:
-		return other == nil || other.(*PredictionContext).isEmpty()
+		otherP := other.(*PredictionContext)
+		return other == nil || otherP == nil || otherP.isEmpty()
 	case PredictionContextSingleton:
 		return p.SingletonEquals(other)
 	case PredictionContextArray:
@@ -131,7 +132,7 @@ func (p *PredictionContext) ArrayEquals(o Collectable[*PredictionContext]) bool 
 		return false
 	}
 	other := o.(*PredictionContext)
-	if other.pcType != PredictionContextArray {
+	if other == nil || other.pcType != PredictionContextArray {
 		return false
 	}
 	if p.cachedHash != other.Hash() {
@@ -151,6 +152,9 @@ func (p *PredictionContext) SingletonEquals(other Collectable[*PredictionContext
 		return false
 	}
 	otherP := other.(*PredictionContext)
+	if otherP == nil {
+		return false
+	}
 	
 	if p.cachedHash != otherP.Hash() {
 		return false // Can't be same if hash is different
@@ -309,7 +313,7 @@ func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) *Predict
 	return SingletonBasePredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
-func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
+func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
 	
 	// Share same graph if both same
 	//
@@ -380,22 +384,22 @@ func convertToArray(pc *PredictionContext) *PredictionContext {
 // otherwise false to indicate a full-context merge
 // @param mergeCache
 // /
-func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
+func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
 	if mergeCache != nil {
-		previous := mergeCache.Get(a.Hash(), b.Hash())
-		if previous != nil {
-			return previous.(*PredictionContext)
+		previous, present := mergeCache.Get(a, b)
+		if present {
+			return previous
 		}
-		previous = mergeCache.Get(b.Hash(), a.Hash())
+		previous, present = mergeCache.Get(b, a)
 		if previous != nil {
-			return previous.(*PredictionContext)
+			return previous
 		}
 	}
 	
 	rootMerge := mergeRoot(a, b, rootIsWildcard)
 	if rootMerge != nil {
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), rootMerge)
+			mergeCache.Put(a, b, rootMerge)
 		}
 		return rootMerge
 	}
@@ -415,7 +419,7 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *D
 		// New joined parent so create a new singleton pointing to it, a'
 		spc := SingletonBasePredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), spc)
+			mergeCache.Put(a, b, spc)
 		}
 		return spc
 	}
@@ -437,7 +441,7 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *D
 		parents := []*PredictionContext{singleParent, singleParent}
 		apc := NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), apc)
+			mergeCache.Put(a, b, apc)
 		}
 		return apc
 	}
@@ -453,7 +457,7 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *D
 	}
 	apc := NewArrayPredictionContext(parents, payloads)
 	if mergeCache != nil {
-		mergeCache.set(a.Hash(), b.Hash(), apc)
+		mergeCache.Put(a, b, apc)
 	}
 	return apc
 }
@@ -539,21 +543,21 @@ func mergeRoot(a, b *PredictionContext, rootIsWildcard bool) *PredictionContext 
 // <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 //
 //goland:noinspection GoBoolExpressions
-func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
+func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
 	if mergeCache != nil {
-		previous := mergeCache.Get(a.Hash(), b.Hash())
-		if previous != nil {
+		previous, present := mergeCache.Get(a, b)
+		if present {
 			if ParserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
-			return previous.(*PredictionContext)
+			return previous
 		}
-		previous = mergeCache.Get(b.Hash(), a.Hash())
-		if previous != nil {
+		previous, present = mergeCache.Get(b, a)
+		if present {
 			if ParserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
-			return previous.(*PredictionContext)
+			return previous
 		}
 	}
 	// merge sorted payloads a + b => M
@@ -615,7 +619,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *Doubl
 		if k == 1 { // for just one merged element, return singleton top
 			pc := SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
-				mergeCache.set(a.Hash(), b.Hash(), pc)
+				mergeCache.Put(a, b, pc)
 			}
 			return pc
 		}
@@ -629,7 +633,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *Doubl
 	// TODO: JI track whether this is possible above during merge sort for speed and possibly avoid an allocation
 	if M.Equals(a) {
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), a)
+			mergeCache.Put(a, b, a)
 		}
 		if ParserATNSimulatorTraceATNSim {
 			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> a")
@@ -638,7 +642,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *Doubl
 	}
 	if M.Equals(b) {
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), b)
+			mergeCache.Put(a, b, b)
 		}
 		if ParserATNSimulatorTraceATNSim {
 			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> b")
@@ -648,7 +652,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *Doubl
 	combineCommonParents(mergedParents)
 	
 	if mergeCache != nil {
-		mergeCache.set(a.Hash(), b.Hash(), M)
+		mergeCache.Put(a, b, M)
 	}
 	if ParserATNSimulatorTraceATNSim {
 		fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> " + M.String())
@@ -673,8 +677,7 @@ func combineCommonParents(parents []*PredictionContext) {
 	}
 }
 
-func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *JStore[*PredictionContext, Comparator[*PredictionContext]]) *PredictionContext {
-	
+func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *JMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]]) *PredictionContext {
 	if context.isEmpty() {
 		return context
 	}
@@ -684,7 +687,7 @@ func getCachedBasePredictionContext(context *PredictionContext, contextCache *Pr
 	}
 	existing, present = contextCache.Get(context)
 	if present {
-		_, _ = visited.Put(existing)
+		visited.Put(context, existing)
 		return existing
 	}
 	changed := false
@@ -704,7 +707,7 @@ func getCachedBasePredictionContext(context *PredictionContext, contextCache *Pr
 	}
 	if !changed {
 		contextCache.add(context)
-		_, _ = visited.Put(context)
+		visited.Put(context, context)
 		return context
 	}
 	var updated *PredictionContext
@@ -716,8 +719,8 @@ func getCachedBasePredictionContext(context *PredictionContext, contextCache *Pr
 		updated = NewArrayPredictionContext(parents, context.GetReturnStates())
 	}
 	contextCache.add(updated)
-	visited.Put(updated)
-	visited.Put(context)
+	visited.Put(updated, updated)
+	visited.Put(context, updated)
 	
 	return updated
 }

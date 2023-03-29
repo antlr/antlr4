@@ -4,7 +4,7 @@
 
 package antlr
 
-var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
+var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))
 
 type IATNSimulator interface {
 	SharedContextCache() *PredictionContextCache
@@ -24,7 +24,7 @@ func (b *BaseATNSimulator) getCachedContext(context *PredictionContext) *Predict
 	}
 	
 	// TODO: Should this be guarded by a mutex?
-	visited := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
+	visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
 	
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }

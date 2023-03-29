@@ -171,8 +171,7 @@ func TestCommonTokenStreamGetTextFromInterval(t *testing.T) {
 		},
 	}
 	tokens := NewCommonTokenStream(lexEngine, TokenDefaultChannel)
-	assert.Equal("x", tokens.GetTextFromInterval(&Interval{Start: 1, Stop: 1}))
+	assert.Equal("x", tokens.GetTextFromInterval(Interval{Start: 1, Stop: 1}))
 	assert.Equal(len(tokens.tokens), 2)
-	assert.Equal(" x =34  ; \n", tokens.GetTextFromInterval(nil))
 	assert.Equal(len(tokens.tokens), 11)
 }

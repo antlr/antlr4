@@ -9,7 +9,6 @@ import (
 // notice: test purpose only
 func newTestCommonToken(tokenType int, text string, channel int) *CommonToken {
 	t := new(CommonToken)
-	t.BaseToken = new(BaseToken)
 	t.tokenType = tokenType
 	t.channel = channel
 	t.text = text
@@ -25,6 +24,6 @@ func tokensToString(tokens []Token) string {
 	for i, token := range tokens {
 		buf[i] = fmt.Sprintf("%v", token)
 	}
-
+	
 	return "[" + strings.Join(buf, ", ") + "]"
 }
