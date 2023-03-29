@@ -283,7 +283,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *ATN
 	// l is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	SkipAlt := ATNInvalidAltNumber
-
+	
 	for _, cfg := range closure.configs {
 		currentAltReachedAcceptState := cfg.GetAlt() == SkipAlt
 		if currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision {
@@ -601,7 +601,7 @@ func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool
 	
 	l.atn.stateMu.Lock()
 	defer l.atn.stateMu.Unlock()
-	existing, present := dfa.states.Get(proposed)
+	existing, present := dfa.Get(proposed)
 	if present {
 		
 		// This state was already present, so just return it.
@@ -611,11 +611,11 @@ func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool
 		
 		// We need to add the new state
 		//
-		proposed.stateNumber = dfa.states.Len()
+		proposed.stateNumber = dfa.Len()
 		configs.readOnly = true
 		configs.configLookup = nil // Not needed now
 		proposed.configs = configs
-		dfa.states.Put(proposed)
+		dfa.Put(proposed)
 	}
 	if !suppressEdge {
 		dfa.setS0(proposed)

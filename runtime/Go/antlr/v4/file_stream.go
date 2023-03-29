@@ -15,15 +15,15 @@ import (
 
 type FileStream struct {
 	*InputStream
-
+	
 	filename string
 }
 
 //goland:noinspection GoUnusedExportedFunction
 func NewFileStream(fileName string) (*FileStream, error) {
-
+	
 	buf := bytes.NewBuffer(nil)
-
+	
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -37,16 +37,15 @@ func NewFileStream(fileName string) (*FileStream, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
 	fs := new(FileStream)
-
+	
 	fs.filename = fileName
-	s := string(buf.Bytes())
-
+	s := buf.String()
 	fs.InputStream = NewInputStream(s)
-
+	
 	return fs, nil
-
+	
 }
 
 func (f *FileStream) GetSourceName() string {

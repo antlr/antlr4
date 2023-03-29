@@ -577,7 +577,7 @@ func (p *ParserATNSimulator) computeReachSet(closure *ATNConfigSet, t int, fullC
 	//
 	if reach == nil {
 		reach = NewATNConfigSet(fullCtx)
-		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst)
+		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst, "ParserATNSimulator.computeReachSet() make a closureBusy")
 		treatEOFAsEpsilon := t == TokenEOF
 		amount := len(intermediate.configs)
 		for k := 0; k < amount; k++ {
@@ -680,7 +680,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
 		c := NewATNConfig6(target, i+1, initialContext)
-		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](atnConfCompInst)
+		closureBusy := NewJStore[*ATNConfig, Comparator[*ATNConfig]](atnConfCompInst, "ParserATNSimulator.computeStartState() make a closureBusy")
 		p.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
 	return configs
@@ -1508,7 +1508,8 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 	if d == ATNSimulatorError {
 		return d
 	}
-	existing, present := dfa.states.Get(d)
+	
+	existing, present := dfa.Get(d)
 	if present {
 		if ParserATNSimulatorTraceATNSim {
 			fmt.Print("addDFAState " + d.String() + " exists")
@@ -1516,15 +1517,17 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 		return existing
 	}
 	
-	// The state was not present, so update it with configs
+	// The state will be added if not already there or we will be given back the existing state struct
+	// if it is present.
 	//
-	d.stateNumber = dfa.states.Len()
+	d.stateNumber = dfa.Len()
 	if !d.configs.readOnly {
 		d.configs.OptimizeConfigs(&p.BaseATNSimulator)
 		d.configs.readOnly = true
 		d.configs.configLookup = nil
 	}
-	dfa.states.Put(d)
+	dfa.Put(d)
+	
 	if ParserATNSimulatorTraceATNSim {
 		fmt.Println("addDFAState new " + d.String())
 	}

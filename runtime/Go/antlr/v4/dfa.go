@@ -33,7 +33,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst),
+		states:        nil, // Lazy initialize
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
@@ -96,11 +96,11 @@ func (d *DFA) getPrecedenceDfa() bool {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
-		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst)
+		d.states = nil // Lazy initialize
 		d.numstates = 0
 		
 		if precedenceDfa {
-			precedenceState := NewDFAState(-1, NewATNConfigSet(false))	
+			precedenceState := NewDFAState(-1, NewATNConfigSet(false))
 			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -113,6 +113,31 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
+// Len returns the number of states in d. We use this instead of accessing states directly so that we can implement lazy
+// instantiation of the states JMap.
+func (d *DFA) Len() int {
+	if d.states == nil {
+		return 0
+	}
+	return d.states.Len()
+}
+
+// Get returns a state that matches s if it is present in the DFA state set. We defer to this
+// function instead of accessing states directly so that we can implement lazy instantiation of the states JMap.
+func (d *DFA) Get(s *DFAState) (*DFAState, bool) {
+	if d.states == nil {
+		return nil, false
+	}
+	return d.states.Get(s)
+}
+
+func (d *DFA) Put(s *DFAState) (*DFAState, bool) {
+	if d.states == nil {
+		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst, "DFA via DFA.Put")
+	}
+	return d.states.Put(s)
+}
+
 func (d *DFA) getS0() *DFAState {
 	return d.s0
 }
@@ -121,9 +146,11 @@ func (d *DFA) setS0(s *DFAState) {
 	d.s0 = s
 }
 
-// sortedStates returns the states in d sorted by their state number.
+// sortedStates returns the states in d sorted by their state number, or an empty set if d.states is nil.
 func (d *DFA) sortedStates() []*DFAState {
-	
+	if d.states == nil {
+		return []*DFAState{}
+	}
 	vs := d.states.SortedSlice(func(i, j *DFAState) bool {
 		return i.stateNumber < j.stateNumber
 	})

@@ -85,13 +85,9 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 		_, ok := l.lexerActions[i].(*LexerIndexedCustomAction)
 		if l.lexerActions[i].getIsPositionDependent() && !ok {
 			if updatedLexerActions == nil {
-				updatedLexerActions = make([]LexerAction, 0)
-				
-				for _, a := range l.lexerActions {
-					updatedLexerActions = append(updatedLexerActions, a)
-				}
+				updatedLexerActions = make([]LexerAction, 0, len(l.lexerActions))
+				updatedLexerActions = append(updatedLexerActions, l.lexerActions...)
 			}
-			
 			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset, l.lexerActions[i])
 		}
 	}
