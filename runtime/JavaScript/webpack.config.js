@@ -10,7 +10,7 @@ const nodeConfig = {
     entry: './src/antlr4/index.node.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'antlr4.node.js',
+        filename: 'antlr4.node.mjs',
         chunkFormat: "module",
         library: {
             type: "module"
@@ -30,6 +30,35 @@ const nodeConfig = {
     plugins: [ new ESLintPlugin() ],
         experiments: {
             outputModule: true
+    },
+    devtool: "source-map"
+};
+
+const nodeConfigCommonJs = {
+    mode: "production",
+    entry: './src/antlr4/index.node.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'antlr4.node.cjs',
+        chunkFormat: "commonjs",
+        library: {
+            type: "commonjs"
+        }
+    },
+    resolve: {
+        extensions: [ '.js']
+    },
+    target: "node",
+    module: {
+        rules: [{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [ 'babel-loader' ]
+        }]
+    },
+    plugins: [ new ESLintPlugin() ],
+    experiments: {
+        outputModule: false
     },
     devtool: "source-map"
 };
@@ -69,4 +98,4 @@ const webConfig = {
     devtool: "source-map"
 };
 
-export default [ nodeConfig, webConfig ];
+export default [ nodeConfig, nodeConfigCommonJs, webConfig ];

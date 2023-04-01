@@ -4,7 +4,7 @@
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "browser": "dist/antlr4.web.js",
-  "main": "dist/antlr4.node.js",
+  "main": "dist/antlr4.node.mjs",
   "types": "src/antlr4/index.d.ts",
   "repository": "antlr/antlr4.git",
   "keywords": [
@@ -47,5 +47,9 @@
   },
   "engines": {
     "node": ">=16"
+  },
+  "exports": {
+    "import": "./dist/antlr4.node.mjs",
+    "require": "./dist/antlr4.node.cjs"
   }
 }
