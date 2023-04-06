@@ -43,10 +43,10 @@ type BaseLexer struct {
 	tokenFactorySourcePair *TokenSourceCharStreamPair
 	token                  Token
 	hitEOF                 bool
-	channel                int
+	Channel                int
 	thetype                int
 	modeStack              IntStack
-	mode                   int
+	Mode                   int
 	text                   string
 }
 
@@ -88,14 +88,14 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 	// If you have DONE : EOF  then you see DONE EOF.
 	lexer.hitEOF = false
 
-	// The channel number for the current token///
-	lexer.channel = TokenDefaultChannel
+	// The Channel number for the current token///
+	lexer.Channel = TokenDefaultChannel
 
 	// The token type for the current token///
 	lexer.thetype = TokenInvalidType
 
 	lexer.modeStack = make([]int, 0)
-	lexer.mode = LexerDefaultMode
+	lexer.Mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
@@ -125,14 +125,14 @@ func (b *BaseLexer) reset() {
 	}
 	b.token = nil
 	b.thetype = TokenInvalidType
-	b.channel = TokenDefaultChannel
+	b.Channel = TokenDefaultChannel
 	b.TokenStartCharIndex = -1
 	b.TokenStartColumn = -1
 	b.TokenStartLine = -1
 	b.text = ""
 
 	b.hitEOF = false
-	b.mode = LexerDefaultMode
+	b.Mode = LexerDefaultMode
 	b.modeStack = make([]int, 0)
 
 	b.Interpreter.reset()
@@ -151,7 +151,7 @@ func (b *BaseLexer) GetSourceName() string {
 }
 
 func (b *BaseLexer) SetChannel(v int) {
-	b.channel = v
+	b.Channel = v
 }
 
 func (b *BaseLexer) GetTokenFactory() TokenFactory {
@@ -173,7 +173,7 @@ func (b *BaseLexer) safeMatch() (ret int) {
 		}
 	}()
 
-	return b.Interpreter.Match(b.input, b.mode)
+	return b.Interpreter.Match(b.input, b.Mode)
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
@@ -197,7 +197,7 @@ func (b *BaseLexer) NextToken() Token {
 			return b.token
 		}
 		b.token = nil
-		b.channel = TokenDefaultChannel
+		b.Channel = TokenDefaultChannel
 		b.TokenStartCharIndex = b.input.Index()
 		b.TokenStartColumn = b.Interpreter.GetCharPositionInLine()
 		b.TokenStartLine = b.Interpreter.GetLine()
@@ -249,15 +249,15 @@ func (b *BaseLexer) More() {
 }
 
 func (b *BaseLexer) SetMode(m int) {
-	b.mode = m
+	b.Mode = m
 }
 
 func (b *BaseLexer) PushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
-	b.modeStack.Push(b.mode)
-	b.mode = m
+	b.modeStack.Push(b.Mode)
+	b.Mode = m
 }
 
 func (b *BaseLexer) PopMode() int {
@@ -268,8 +268,8 @@ func (b *BaseLexer) PopMode() int {
 		fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
 	}
 	i, _ := b.modeStack.Pop()
-	b.mode = i
-	return b.mode
+	b.Mode = i
+	return b.Mode
 }
 
 func (b *BaseLexer) inputStream() CharStream {
@@ -305,7 +305,7 @@ func (b *BaseLexer) EmitToken(token Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (b *BaseLexer) Emit() Token {
-	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
+	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.Channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
 	b.EmitToken(t)
 	return t
 }
