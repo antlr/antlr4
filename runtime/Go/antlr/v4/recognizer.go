@@ -7,7 +7,7 @@ package antlr
 import (
 	"fmt"
 	"strings"
-	
+
 	"strconv"
 )
 
@@ -15,10 +15,10 @@ type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
-	
+
 	Sempred(RuleContext, int, int) bool
 	Precpred(RuleContext, int) bool
-	
+
 	GetState() int
 	SetState(int)
 	Action(RuleContext, int, int)
@@ -34,7 +34,7 @@ type Recognizer interface {
 type BaseRecognizer struct {
 	listeners []ErrorListener
 	state     int
-	
+
 	RuleNames       []string
 	LiteralNames    []string
 	SymbolicNames   []string
@@ -130,7 +130,7 @@ func (b *BaseRecognizer) SetState(v int) {
 //
 // TODO: JI This is not yet implemented in the Go runtime. Maybe not needed.
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
-	
+
 	panic("Method not defined!")
 	//    var ruleNames = b.GetRuleNames()
 	//    if (ruleNames==nil) {
@@ -220,7 +220,7 @@ func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	s = strings.Replace(s, "\t", "\\t", -1)
 	s = strings.Replace(s, "\n", "\\n", -1)
 	s = strings.Replace(s, "\r", "\\r", -1)
-	
+
 	return "'" + s + "'"
 }
 

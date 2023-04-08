@@ -13,42 +13,42 @@ import (
 // graph-structured stack.
 type ATNConfigSet struct {
 	cachedHash int
-	
+
 	// configLookup is used to determine whether two ATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
 	// effectively doubles the number of objects associated with ATNConfigs. All
 	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
 	// read-only because a set becomes a DFA state.
 	configLookup *JStore[*ATNConfig, Comparator[*ATNConfig]]
-	
-	// configs is the added elements.
+
+	// configs is the added elements that did not match an existing key in configLookup
 	configs []*ATNConfig
-	
+
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves re-computation. Can we track conflicts as they
 	// are added to save scanning configs later?
 	conflictingAlts *BitSet
-	
+
 	// dipsIntoOuterContext is used by parsers and lexers. In a lexer, it indicates
 	// we hit a pred while computing a closure operation. Do not make a DFA state
 	// from the ATNConfigSet in this case. TODO: How is this used by parsers?
 	dipsIntoOuterContext bool
-	
+
 	// fullCtx is whether it is part of a full context LL prediction. Used to
 	// determine how to merge $. It is a wildcard with SLL, but not for an LL
 	// context merge.
 	fullCtx bool
-	
+
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation. Don't make a DFA state from this set.
 	hasSemanticContext bool
-	
+
 	// readOnly is whether it is read-only. Do not
 	// allow any code to manipulate the set if true because DFA states will point at
 	// sets and those must not change. It not, protect other fields; conflictingAlts
 	// in particular, which is assigned after readOnly.
 	readOnly bool
-	
+
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves re-computation. Can we track conflicts as they
 	// are added to save scanning configs later?
@@ -68,7 +68,7 @@ func (b *ATNConfigSet) Alts() *BitSet {
 func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash:   -1,
-		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst, "NewATNConfigSet()"),
+		configLookup: nil, // Lazy init
 		fullCtx:      fullCtx,
 	}
 }
@@ -79,74 +79,78 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 //
 // We use (s,i,pi) as the key.
 // Updates dipsIntoOuterContext and hasSemanticContext when necessary.
-func (b *ATNConfigSet) Add(config *ATNConfig, mergeCache *JPCMap) bool {
+func (b *ATNConfigSet) Add(config *ATNConfig, mergeCache *JPCMap2) bool {
 	if b.readOnly {
 		panic("set is read-only")
 	}
-	
+
 	if config.GetSemanticContext() != SemanticContextNone {
 		b.hasSemanticContext = true
 	}
-	
+
 	if config.GetReachesIntoOuterContext() > 0 {
 		b.dipsIntoOuterContext = true
 	}
-	
+
+	// Lazy init
+	if b.configLookup == nil {
+		b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst, ATNConfigLookupCollection, "Via ATNConfigSet.Add()")
+	}
 	existing, present := b.configLookup.Put(config)
-	
-	// The config was not already in the set
+
+	// The runtimeConfig was not already in the set
 	//
 	if !present {
 		b.cachedHash = -1
 		b.configs = append(b.configs, config) // Track order here
 		return true
 	}
-	
+
 	// Merge a previous (s, i, pi, _) with it and save the result
 	rootIsWildcard := !b.fullCtx
 	merged := merge(existing.GetContext(), config.GetContext(), rootIsWildcard, mergeCache)
-	
-	// No need to check for existing.context because config.context is in the cache,
+
+	// No need to check for existing.context because runtimeConfig.context is in the cache,
 	// since the only way to create new graphs is the "call rule" and here. We cache
 	// at both places.
 	existing.SetReachesIntoOuterContext(intMax(existing.GetReachesIntoOuterContext(), config.GetReachesIntoOuterContext()))
-	
+
 	// Preserve the precedence filter suppression during the merge
 	if config.getPrecedenceFilterSuppressed() {
 		existing.setPrecedenceFilterSuppressed(true)
 	}
-	
+
 	// Replace the context because there is no need to do alt mapping
 	existing.SetContext(merged)
-	
+
 	return true
 }
 
-// GetStates returns the set of states represented by all configurations in this config set
+// GetStates returns the set of states represented by all configurations in this runtimeConfig set
 func (b *ATNConfigSet) GetStates() *JStore[ATNState, Comparator[ATNState]] {
-	
+
 	// states uses the standard comparator and Hash() provided by the ATNState instance
 	//
-	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst, "ATNConfigSet.GetStates()")
-	
+	states := NewJStore[ATNState, Comparator[ATNState]](aStateEqInst, ATNStateCollection, "ATNConfigSet.GetStates()")
+
 	for i := 0; i < len(b.configs); i++ {
 		states.Put(b.configs[i].GetState())
 	}
-	
+
 	return states
 }
 
 func (b *ATNConfigSet) GetPredicates() []SemanticContext {
 	predicates := make([]SemanticContext, 0)
-	
+
 	for i := 0; i < len(b.configs); i++ {
 		c := b.configs[i].GetSemanticContext()
-		
+
 		if c != SemanticContextNone {
 			predicates = append(predicates, c)
 		}
 	}
-	
+
 	return predicates
 }
 
@@ -154,14 +158,14 @@ func (b *ATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	if b.readOnly {
 		panic("set is read-only")
 	}
-	
-	if b.configLookup.Len() == 0 {
+
+	// Lazy init and empty indicate no optimization is possible
+	if b.configLookup == nil || b.configLookup.Len() == 0 {
 		return
 	}
-	
+
 	for i := 0; i < len(b.configs); i++ {
 		config := b.configs[i]
-		
 		config.SetContext(interpreter.getCachedContext(config.GetContext()))
 	}
 }
@@ -170,16 +174,12 @@ func (b *ATNConfigSet) AddAll(coll []*ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
 		b.Add(coll[i], nil)
 	}
-	
+
 	return false
 }
 
-// Compare is a hack function  - O(n squared) at worst - just to verify that adding [DFA] states to the known
-// set works, so long as comparison of [ATNConfigSet] works. For that to work, we
-// need to make sure that the set of ATNConfigs in two sets are equivalent. The configs are
-// only equal if they are in the same order too as Java uses ArrayList.equals(), which requires
-// the same order.
-//
+// Compare The configs are only equal if they are in the same order and their Equals function returns true.
+// Java uses ArrayList.equals(), which requires the same order.
 func (b *ATNConfigSet) Compare(bs *ATNConfigSet) bool {
 	if len(b.configs) != len(bs.configs) {
 		return false
@@ -189,7 +189,7 @@ func (b *ATNConfigSet) Compare(bs *ATNConfigSet) bool {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
@@ -199,7 +199,7 @@ func (b *ATNConfigSet) Equals(other Collectable[ATNConfig]) bool {
 	} else if _, ok := other.(*ATNConfigSet); !ok {
 		return false
 	}
-	
+
 	other2 := other.(*ATNConfigSet)
 	var eca bool
 	switch {
@@ -222,10 +222,10 @@ func (b *ATNConfigSet) Hash() int {
 		if b.cachedHash == -1 {
 			b.cachedHash = b.hashCodeConfigs()
 		}
-		
+
 		return b.cachedHash
 	}
-	
+
 	return b.hashCodeConfigs()
 }
 
@@ -238,19 +238,17 @@ func (b *ATNConfigSet) hashCodeConfigs() int {
 }
 
 func (b *ATNConfigSet) Contains(item *ATNConfig) bool {
-	if b.configLookup == nil {
+	if b.readOnly {
 		panic("not implemented for read-only sets")
 	}
-	
+	if b.configLookup == nil {
+		return false
+	}
 	return b.configLookup.Contains(item)
 }
 
 func (b *ATNConfigSet) ContainsFast(item *ATNConfig) bool {
-	if b.configLookup == nil {
-		panic("not implemented for read-only sets")
-	}
-	
-	return b.configLookup.Contains(item) // TODO: containsFast is not implemented for Set
+	return b.Contains(item)
 }
 
 func (b *ATNConfigSet) Clear() {
@@ -259,49 +257,49 @@ func (b *ATNConfigSet) Clear() {
 	}
 	b.configs = make([]*ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfCompInst, "ATNConfigSet.Clear()")
+	b.configLookup = nil // Lazy initialization
 }
 
 func (b *ATNConfigSet) String() string {
-	
+
 	s := "["
-	
+
 	for i, c := range b.configs {
 		s += c.String()
-		
+
 		if i != len(b.configs)-1 {
 			s += ", "
 		}
 	}
-	
+
 	s += "]"
-	
+
 	if b.hasSemanticContext {
 		s += ",hasSemanticContext=" + fmt.Sprint(b.hasSemanticContext)
 	}
-	
+
 	if b.uniqueAlt != ATNInvalidAltNumber {
 		s += ",uniqueAlt=" + fmt.Sprint(b.uniqueAlt)
 	}
-	
+
 	if b.conflictingAlts != nil {
 		s += ",conflictingAlts=" + b.conflictingAlts.String()
 	}
-	
+
 	if b.dipsIntoOuterContext {
 		s += ",dipsIntoOuterContext"
 	}
-	
+
 	return s
 }
 
-// NewOrderedATNConfigSet creates a config set with a slightly different Hash/Equal pair
+// NewOrderedATNConfigSet creates a runtimeConfig set with a slightly different Hash/Equal pair
 // for use in lexers.
 func NewOrderedATNConfigSet() *ATNConfigSet {
 	return &ATNConfigSet{
 		cachedHash: -1,
 		// This set uses the standard Hash() and Equals() from ATNConfig
-		configLookup: NewJStore[*ATNConfig, Comparator[*ATNConfig]](aConfEqInst, "ATNConfigSet.NewOrderedATNConfigSet()"),
+		configLookup: nil, // Lazy init
 		fullCtx:      false,
 	}
 }

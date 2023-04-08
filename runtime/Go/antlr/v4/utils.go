@@ -9,8 +9,10 @@ import (
 	"errors"
 	"fmt"
 	"math/bits"
+	"os"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 func intMin(a, b int) int {
@@ -143,27 +145,27 @@ func (b *BitSet) equals(other interface{}) bool {
 	if !ok {
 		return false
 	}
-	
+
 	if b == otherBitSet {
 		return true
 	}
-	
+
 	// We only compare set bits, so we cannot rely on the two slices having the same size. Its
 	// possible for two BitSets to have different slice lengths but the same set bits. So we only
 	// compare the relevant words and ignore the trailing zeros.
 	bLen := b.minLen()
 	otherLen := otherBitSet.minLen()
-	
+
 	if bLen != otherLen {
 		return false
 	}
-	
+
 	for i := 0; i < bLen; i++ {
 		if b.data[i] != otherBitSet.data[i] {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
@@ -186,7 +188,7 @@ func (b *BitSet) length() int {
 
 func (b *BitSet) String() string {
 	vals := make([]string, 0, b.length())
-	
+
 	for i, v := range b.data {
 		for v != 0 {
 			n := bits.TrailingZeros64(v)
@@ -194,7 +196,7 @@ func (b *BitSet) String() string {
 			v &= ^(uint64(1) << n)
 		}
 	}
-	
+
 	return "{" + strings.Join(vals, ", ") + "}"
 }
 
@@ -229,7 +231,7 @@ func (a *AltDict) values() []interface{} {
 }
 
 func EscapeWhitespace(s string, escapeSpaces bool) string {
-	
+
 	s = strings.Replace(s, "\t", "\\t", -1)
 	s = strings.Replace(s, "\n", "\\n", -1)
 	s = strings.Replace(s, "\r", "\\r", -1)
@@ -242,29 +244,29 @@ func EscapeWhitespace(s string, escapeSpaces bool) string {
 //goland:noinspection GoUnusedExportedFunction
 func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	st := make([]string, len(sa))
-	
+
 	for i, s := range sa {
 		st[i] = fmt.Sprintf("%v", s)
 	}
-	
+
 	return st
 }
 
 //goland:noinspection GoUnusedExportedFunction
 func PrintArrayJavaStyle(sa []string) string {
 	var buffer bytes.Buffer
-	
+
 	buffer.WriteString("[")
-	
+
 	for i, s := range sa {
 		buffer.WriteString(s)
 		if i != len(sa)-1 {
 			buffer.WriteString(", ")
 		}
 	}
-	
+
 	buffer.WriteString("]")
-	
+
 	return buffer.String()
 }
 
@@ -280,12 +282,12 @@ func murmurUpdate(h int, value int) int {
 	const r2 uint32 = 13
 	const m uint32 = 5
 	const n uint32 = 0xE6546B64
-	
+
 	k := uint32(value)
 	k *= c1
 	k = (k << r1) | (k >> (32 - r1))
 	k *= c2
-	
+
 	hash := uint32(h) ^ k
 	hash = (hash << r2) | (hash >> (32 - r2))
 	hash = hash*m + n
@@ -300,6 +302,27 @@ func murmurFinish(h int, numberOfWords int) int {
 	hash ^= hash >> 13
 	hash *= 0xc2b2ae35
 	hash ^= hash >> 16
-	
+
 	return int(hash)
+}
+
+func isDirectory(dir string) (bool, error) {
+	fileInfo, err := os.Stat(dir)
+	if err != nil {
+		switch {
+		case errors.Is(err, syscall.ENOENT):
+			// The given directory does not exist, so we will try to create it
+			//
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				return false, err
+			}
+
+			return true, nil
+		case err != nil:
+			return false, err
+		default:
+		}
+	}
+	return fileInfo.IsDir(), err
 }

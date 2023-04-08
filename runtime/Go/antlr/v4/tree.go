@@ -33,7 +33,7 @@ type ParseTree interface {
 
 type RuleNode interface {
 	ParseTree
-	
+
 	GetRuleContext() RuleContext
 	GetBaseRuleContext() *BaseRuleContext
 }
@@ -45,7 +45,7 @@ type TerminalNode interface {
 
 type ErrorNode interface {
 	TerminalNode
-	
+
 	errorNode()
 }
 
@@ -111,10 +111,10 @@ var _ TerminalNode = &TerminalNodeImpl{}
 
 func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
-	
+
 	tn.parentCtx = nil
 	tn.symbol = symbol
-	
+
 	return tn
 }
 
@@ -170,7 +170,7 @@ func (t *TerminalNodeImpl) String() string {
 	if t.symbol.GetTokenType() == TokenEOF {
 		return "<EOF>"
 	}
-	
+
 	return t.symbol.GetText()
 }
 
@@ -261,7 +261,7 @@ func (i *IterativeParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 	var indexStack []int
 	currentNode := t
 	currentIndex := 0
-	
+
 	for currentNode != nil {
 		// pre-order visit
 		switch tt := currentNode.(type) {
@@ -280,7 +280,7 @@ func (i *IterativeParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 			currentNode = currentNode.GetChild(0)
 			continue
 		}
-		
+
 		for {
 			// post-order visit
 			if ruleNode, ok := currentNode.(RuleNode); ok {

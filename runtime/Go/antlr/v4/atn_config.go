@@ -18,7 +18,6 @@ const (
 // path(s) to the root is the rule invocation(s) chain used to arrive in the
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
-//
 type ATNConfig struct {
 	precedenceFilterSuppressed     bool
 	state                          ATNState
@@ -41,8 +40,8 @@ func NewATNConfig5(state ATNState, alt int, context *PredictionContext, semantic
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
-	
-	pac := ATNCPool.Get()
+
+	pac := &ATNConfig{}
 	pac.state = state
 	pac.alt = alt
 	pac.context = context
@@ -51,40 +50,40 @@ func NewATNConfig5(state ATNState, alt int, context *PredictionContext, semantic
 	return pac
 }
 
-// NewATNConfig4 creates a new ATNConfig instance given an existing config, and a state only
+// NewATNConfig4 creates a new ATNConfig instance given an existing runtimeConfig, and a state only
 func NewATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
 	return NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
-// NewATNConfig3 creates a new ATNConfig instance given an existing config, a state and a semantic context
+// NewATNConfig3 creates a new ATNConfig instance given an existing runtimeConfig, a state and a semantic context
 func NewATNConfig3(c *ATNConfig, state ATNState, semanticContext SemanticContext) *ATNConfig {
 	return NewATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
-// NewATNConfig2 creates a new ATNConfig instance given an existing config, and a context only
+// NewATNConfig2 creates a new ATNConfig instance given an existing runtimeConfig, and a context only
 func NewATNConfig2(c *ATNConfig, semanticContext SemanticContext) *ATNConfig {
 	return NewATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
 }
 
-// NewATNConfig1 creates a new ATNConfig instance given an existing config, a state, and a context only
+// NewATNConfig1 creates a new ATNConfig instance given an existing runtimeConfig, a state, and a context only
 func NewATNConfig1(c *ATNConfig, state ATNState, context *PredictionContext) *ATNConfig {
 	return NewATNConfig(c, state, context, c.GetSemanticContext())
 }
 
-// NewATNConfig creates a new ATNConfig instance given an existing config, a state, a context and a semantic context, other 'constructors'
+// NewATNConfig creates a new ATNConfig instance given an existing runtimeConfig, a state, a context and a semantic context, other 'constructors'
 // are just wrappers around this one.
 func NewATNConfig(c *ATNConfig, state ATNState, context *PredictionContext, semanticContext SemanticContext) *ATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Remove this - probably put here for some bug that is now fixed
 	}
-	b := ATNCPool.Get()
+	b := &ATNConfig{}
 	b.InitATNConfig(c, state, c.GetAlt(), context, semanticContext)
 	b.cType = parserConfig
 	return b
 }
 
 func (a *ATNConfig) InitATNConfig(c *ATNConfig, state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) {
-	
+
 	a.state = state
 	a.alt = alt
 	a.context = context
@@ -159,7 +158,7 @@ func (a *ATNConfig) Equals(o Collectable[*ATNConfig]) bool {
 // predict the same alternative, and syntactic/semantic contexts are the same.
 func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
 	var other, ok = o.(*ATNConfig)
-	
+
 	if !ok {
 		return false
 	}
@@ -168,22 +167,22 @@ func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
 	} else if other == nil {
 		return false
 	}
-	
+
 	var equal bool
-	
+
 	if a.context == nil {
 		equal = other.context == nil
 	} else {
 		equal = a.context.Equals(other.context)
 	}
-	
+
 	var (
 		nums = a.state.GetStateNumber() == other.state.GetStateNumber()
 		alts = a.alt == other.alt
 		cons = a.semanticContext.Equals(other.semanticContext)
 		sups = a.precedenceFilterSuppressed == other.precedenceFilterSuppressed
 	)
-	
+
 	return nums && alts && cons && sups && equal
 }
 
@@ -207,7 +206,7 @@ func (a *ATNConfig) PHash() int {
 	if a.context != nil {
 		c = a.context.Hash()
 	}
-	
+
 	h := murmurInit(7)
 	h = murmurUpdate(h, a.state.GetStateNumber())
 	h = murmurUpdate(h, a.alt)
@@ -219,24 +218,24 @@ func (a *ATNConfig) PHash() int {
 // String returns a string representation of the ATNConfig, usually used for debugging purposes
 func (a *ATNConfig) String() string {
 	var s1, s2, s3 string
-	
+
 	if a.context != nil {
 		s1 = ",[" + fmt.Sprint(a.context) + "]"
 	}
-	
+
 	if a.semanticContext != SemanticContextNone {
 		s2 = "," + fmt.Sprint(a.semanticContext)
 	}
-	
+
 	if a.reachesIntoOuterContext > 0 {
 		s3 = ",up=" + fmt.Sprint(a.reachesIntoOuterContext)
 	}
-	
+
 	return fmt.Sprintf("(%v,%v%v%v%v)", a.state, a.alt, s1, s2, s3)
 }
 
 func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *ATNConfig {
-	lac := ATNCPool.Get()
+	lac := &ATNConfig{}
 	lac.state = state
 	lac.alt = alt
 	lac.context = context
@@ -246,7 +245,7 @@ func NewLexerATNConfig6(state ATNState, alt int, context *PredictionContext) *AT
 }
 
 func NewLexerATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
-	lac := ATNCPool.Get()
+	lac := &ATNConfig{}
 	lac.lexerActionExecutor = c.lexerActionExecutor
 	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
@@ -255,7 +254,7 @@ func NewLexerATNConfig4(c *ATNConfig, state ATNState) *ATNConfig {
 }
 
 func NewLexerATNConfig3(c *ATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *ATNConfig {
-	lac := ATNCPool.Get()
+	lac := &ATNConfig{}
 	lac.lexerActionExecutor = lexerActionExecutor
 	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), c.GetContext(), c.GetSemanticContext())
@@ -264,7 +263,7 @@ func NewLexerATNConfig3(c *ATNConfig, state ATNState, lexerActionExecutor *Lexer
 }
 
 func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext) *ATNConfig {
-	lac := ATNCPool.Get()
+	lac := &ATNConfig{}
 	lac.lexerActionExecutor = c.lexerActionExecutor
 	lac.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	lac.InitATNConfig(c, state, c.GetAlt(), context, c.GetSemanticContext())
@@ -274,7 +273,7 @@ func NewLexerATNConfig2(c *ATNConfig, state ATNState, context *PredictionContext
 
 //goland:noinspection GoUnusedExportedFunction
 func NewLexerATNConfig1(state ATNState, alt int, context *PredictionContext) *ATNConfig {
-	lac := ATNCPool.Get()
+	lac := &ATNConfig{}
 	lac.state = state
 	lac.alt = alt
 	lac.context = context
@@ -314,7 +313,7 @@ func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	} else if a.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
 		return false
 	}
-	
+
 	switch {
 	case a.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
 		return true
@@ -325,12 +324,12 @@ func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	default:
 		return false // One but not both, are nil
 	}
-	
+
 	return a.PEquals(otherT)
 }
 
 func checkNonGreedyDecision(source *ATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)
-	
+
 	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())
 }

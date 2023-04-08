@@ -19,15 +19,15 @@ type LexerActionExecutor struct {
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
-	
+
 	if lexerActions == nil {
 		lexerActions = make([]LexerAction, 0)
 	}
-	
+
 	l := new(LexerActionExecutor)
-	
+
 	l.lexerActions = lexerActions
-	
+
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link ATNConfig//hashCode} operation.
 	l.cachedHash = murmurInit(0)
@@ -35,7 +35,7 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 		l.cachedHash = murmurUpdate(l.cachedHash, a.Hash())
 	}
 	l.cachedHash = murmurFinish(l.cachedHash, len(lexerActions))
-	
+
 	return l
 }
 
@@ -47,7 +47,7 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 	if lexerActionExecutor == nil {
 		return NewLexerActionExecutor([]LexerAction{lexerAction})
 	}
-	
+
 	return NewLexerActionExecutor(append(lexerActionExecutor.lexerActions, lexerAction))
 }
 
@@ -78,7 +78,6 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 //
 // The func returns a [LexerActionExecutor] that stores input stream offsets
 // for all position-dependent lexer actions.
-//
 func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
 	var updatedLexerActions []LexerAction
 	for i := 0; i < len(l.lexerActions); i++ {
@@ -94,7 +93,7 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 	if updatedLexerActions == nil {
 		return l
 	}
-	
+
 	return NewLexerActionExecutor(updatedLexerActions)
 }
 
@@ -119,13 +118,13 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {
 	requiresSeek := false
 	stopIndex := input.Index()
-	
+
 	defer func() {
 		if requiresSeek {
 			input.Seek(stopIndex)
 		}
 	}()
-	
+
 	for i := 0; i < len(l.lexerActions); i++ {
 		lexerAction := l.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
@@ -146,7 +145,7 @@ func (l *LexerActionExecutor) Hash() int {
 		// TODO: Why is this here? l should not be nil
 		return 61
 	}
-	
+
 	// TODO: This is created from the action itself when the struct is created - will this be an issue at some point? Java uses the runtime assign hashcode
 	return l.cachedHash
 }
