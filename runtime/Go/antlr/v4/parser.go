@@ -11,16 +11,16 @@ import (
 
 type Parser interface {
 	Recognizer
-	
+
 	GetInterpreter() *ParserATNSimulator
-	
+
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() ParserRuleContext
 	SetParserRuleContext(ParserRuleContext)
 	Consume() Token
 	GetParseListeners() []ParseTreeListener
-	
+
 	GetErrorHandler() ErrorStrategy
 	SetErrorHandler(ErrorStrategy)
 	GetInputStream() IntStream
@@ -34,15 +34,15 @@ type Parser interface {
 
 type BaseParser struct {
 	*BaseRecognizer
-	
+
 	Interpreter     *ParserATNSimulator
 	BuildParseTrees bool
-	
+
 	input           TokenStream
 	errHandler      ErrorStrategy
 	precedenceStack IntStack
 	ctx             ParserRuleContext
-	
+
 	tracer         *TraceListener
 	parseListeners []ParseTreeListener
 	_SyntaxErrors  int
@@ -53,44 +53,44 @@ type BaseParser struct {
 //
 //goland:noinspection GoUnusedExportedFunction
 func NewBaseParser(input TokenStream) *BaseParser {
-	
+
 	p := new(BaseParser)
-	
+
 	p.BaseRecognizer = NewBaseRecognizer()
-	
+
 	// The input stream.
 	p.input = nil
-	
+
 	// The error handling strategy for the parser. The default value is a new
 	// instance of {@link DefaultErrorStrategy}.
 	p.errHandler = NewDefaultErrorStrategy()
 	p.precedenceStack = make([]int, 0)
 	p.precedenceStack.Push(0)
-	
+
 	// The ParserRuleContext object for the currently executing rule.
 	// p.is always non-nil during the parsing process.
 	p.ctx = nil
-	
+
 	// Specifies whether the parser should construct a parse tree during
 	// the parsing process. The default value is {@code true}.
 	p.BuildParseTrees = true
-	
+
 	// When setTrace(true) is called, a reference to the
 	// TraceListener is stored here, so it can be easily removed in a
 	// later call to setTrace(false). The listener itself is
 	// implemented as a parser listener so p.field is not directly used by
 	// other parser methods.
 	p.tracer = nil
-	
+
 	// The list of ParseTreeListener listeners registered to receive
 	// events during the parse.
 	p.parseListeners = nil
-	
+
 	// The number of syntax errors Reported during parsing. p.value is
 	// incremented each time NotifyErrorListeners is called.
 	p._SyntaxErrors = 0
 	p.SetInputStream(input)
-	
+
 	return p
 }
 
@@ -144,9 +144,9 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 // mismatched symbol
 
 func (p *BaseParser) Match(ttype int) Token {
-	
+
 	t := p.GetCurrentToken()
-	
+
 	if t.GetTokenType() == ttype {
 		p.errHandler.ReportMatch(p)
 		p.Consume()
@@ -156,13 +156,13 @@ func (p *BaseParser) Match(ttype int) Token {
 			return nil
 		}
 		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
-			
+
 			// we must have conjured up a new token during single token
 			// insertion if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
 	}
-	
+
 	return t
 }
 
@@ -249,9 +249,9 @@ func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 // If listener is nil or has not been added as a parse
 // listener, this func does nothing.
 func (p *BaseParser) RemoveParseListener(listener ParseTreeListener) {
-	
+
 	if p.parseListeners != nil {
-		
+
 		idx := -1
 		for i, v := range p.parseListeners {
 			if v == listener {
@@ -259,14 +259,14 @@ func (p *BaseParser) RemoveParseListener(listener ParseTreeListener) {
 				break
 			}
 		}
-		
+
 		if idx == -1 {
 			return
 		}
-		
+
 		// remove the listener from the slice
 		p.parseListeners = append(p.parseListeners[0:idx], p.parseListeners[idx+1:]...)
-		
+
 		if len(p.parseListeners) == 0 {
 			p.parseListeners = nil
 		}
@@ -295,7 +295,7 @@ func (p *BaseParser) TriggerExitRuleEvent() {
 		// reverse order walk of listeners
 		ctx := p.ctx
 		l := len(p.parseListeners) - 1
-		
+
 		for i := range p.parseListeners {
 			listener := p.parseListeners[l-i]
 			ctx.ExitRule(listener)
@@ -324,10 +324,10 @@ func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 // GetATNWithBypassAlts - the ATN with bypass alternatives is expensive to create, so we create it
 // lazily.
 func (p *BaseParser) GetATNWithBypassAlts() {
-	
+
 	// TODO - Implement this?
 	panic("Not implemented!")
-	
+
 	//	serializedAtn := p.getSerializedATN()
 	//	if (serializedAtn == nil) {
 	//		panic("The current parser does not support an ATN with bypass alternatives.")
@@ -355,7 +355,7 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 
 //goland:noinspection GoUnusedParameter
 func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Lexer) {
-	
+
 	panic("NewParseTreePatternMatcher not implemented!")
 	//
 	//	if (lexer == nil) {
@@ -369,7 +369,7 @@ func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Le
 	//	if (lexer == nil) {
 	//		panic("Parser can't discover a lexer to use")
 	//	}
-	
+
 	//	m := NewParseTreePatternMatcher(lexer, p)
 	//	return m.compile(pattern, patternRuleIndex)
 }
@@ -426,7 +426,7 @@ func (p *BaseParser) Consume() Token {
 					l.VisitErrorNode(node)
 				}
 			}
-			
+
 		} else {
 			node := p.ctx.AddTokenNode(o)
 			if p.parseListeners != nil {
@@ -437,7 +437,7 @@ func (p *BaseParser) Consume() Token {
 		}
 		//        node.invokingState = p.state
 	}
-	
+
 	return o
 }
 
@@ -496,7 +496,7 @@ func (p *BaseParser) GetPrecedence() int {
 	if len(p.precedenceStack) == 0 {
 		return -1
 	}
-	
+
 	return p.precedenceStack[len(p.precedenceStack)-1]
 }
 
@@ -519,7 +519,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 	previous.SetParent(localctx)
 	previous.SetInvokingState(state)
 	previous.SetStop(p.input.LT(-1))
-	
+
 	p.ctx = localctx
 	p.ctx.SetStart(previous.GetStart())
 	if p.BuildParseTrees {
@@ -602,7 +602,7 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	if following.contains(TokenEpsilon) && symbol == TokenEOF {
 		return true
 	}
-	
+
 	return false
 }
 
@@ -625,7 +625,7 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 	if ok {
 		return ruleIndex
 	}
-	
+
 	return -1
 }
 
@@ -646,13 +646,13 @@ func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 		} else {
 			stack = append(stack, p.GetRuleNames()[ruleIndex])
 		}
-		
+
 		vp := c.GetParent()
-		
+
 		if vp == nil {
 			break
 		}
-		
+
 		c = vp.(ParserRuleContext)
 	}
 	return stack

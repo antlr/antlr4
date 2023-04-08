@@ -34,6 +34,7 @@ const (
 )
 
 // TODO: JI These are meant to be atomics - this does not seem to match the Java runtime here
+//
 //goland:noinspection GoUnusedGlobalVariable
 var (
 	BasePredictionContextglobalNodeCount = 1
@@ -59,7 +60,7 @@ type PredictionContext struct {
 }
 
 func NewEmptyPredictionContext() *PredictionContext {
-	nep := PCPool.Get()
+	nep := &PredictionContext{}
 	nep.cachedHash = calculateEmptyHash()
 	nep.pcType = PredictionContextEmpty
 	nep.returnState = BasePredictionContextEmptyReturnState
@@ -67,7 +68,7 @@ func NewEmptyPredictionContext() *PredictionContext {
 }
 
 func NewBaseSingletonPredictionContext(parent *PredictionContext, returnState int) *PredictionContext {
-	pc := PCPool.Get()
+	pc := &PredictionContext{}
 	pc.pcType = PredictionContextSingleton
 	pc.returnState = returnState
 	pc.parentCtx = parent
@@ -100,8 +101,8 @@ func NewArrayPredictionContext(parents []*PredictionContext, returnStates []int)
 		hash = murmurUpdate(hash, returnState)
 	}
 	hash = murmurFinish(hash, len(parents)<<1)
-	
-	nec := PCPool.Get()
+
+	nec := &PredictionContext{}
 	nec.cachedHash = hash
 	nec.pcType = PredictionContextArray
 	nec.parents = parents
@@ -137,7 +138,7 @@ func (p *PredictionContext) ArrayEquals(o Collectable[*PredictionContext]) bool 
 	if p.cachedHash != other.Hash() {
 		return false // can't be same if hash is different
 	}
-	
+
 	// Must compare the actual array elements and not just the array address
 	//
 	return slices.Equal(p.returnStates, other.returnStates) &&
@@ -154,20 +155,20 @@ func (p *PredictionContext) SingletonEquals(other Collectable[*PredictionContext
 	if otherP == nil {
 		return false
 	}
-	
+
 	if p.cachedHash != otherP.Hash() {
 		return false // Can't be same if hash is different
 	}
-	
+
 	if p.returnState != otherP.getReturnState(0) {
 		return false
 	}
-	
+
 	// Both parents must be nil if one is
 	if p.parentCtx == nil {
 		return otherP.parentCtx == nil
 	}
-	
+
 	return p.parentCtx.Equals(otherP.parentCtx)
 }
 
@@ -224,27 +225,27 @@ func (p *PredictionContext) String() string {
 		return "$"
 	case PredictionContextSingleton:
 		var up string
-		
+
 		if p.parentCtx == nil {
 			up = ""
 		} else {
 			up = p.parentCtx.String()
 		}
-		
+
 		if len(up) == 0 {
 			if p.returnState == BasePredictionContextEmptyReturnState {
 				return "$"
 			}
-			
+
 			return strconv.Itoa(p.returnState)
 		}
-		
+
 		return strconv.Itoa(p.returnState) + " " + up
 	case PredictionContextArray:
 		if p.isEmpty() {
 			return "[]"
 		}
-		
+
 		s := "["
 		for i := 0; i < len(p.returnStates); i++ {
 			if i > 0 {
@@ -262,7 +263,7 @@ func (p *PredictionContext) String() string {
 			}
 		}
 		return s + "]"
-	
+
 	default:
 		return "unknown"
 	}
@@ -308,18 +309,18 @@ func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) *Predict
 	parent := predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
 	state := a.states[outerContext.GetInvokingState()]
 	transition := state.GetTransitions()[0]
-	
+
 	return SingletonBasePredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
-func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
-	
+func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap2) *PredictionContext {
+
 	// Share same graph if both same
 	//
 	if a == b || a.Equals(b) {
 		return a
 	}
-	
+
 	if a.pcType == PredictionContextSingleton && b.pcType == PredictionContextSingleton {
 		return mergeSingletons(a, b, rootIsWildcard, mergeCache)
 	}
@@ -333,7 +334,7 @@ func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *Pr
 			return b
 		}
 	}
-	
+
 	// Convert either Singleton or Empty to arrays, so that we can merge them
 	//
 	ara := convertToArray(a)
@@ -383,7 +384,7 @@ func convertToArray(pc *PredictionContext) *PredictionContext {
 // otherwise false to indicate a full-context merge
 // @param mergeCache
 // /
-func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
+func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap2) *PredictionContext {
 	if mergeCache != nil {
 		previous, present := mergeCache.Get(a, b)
 		if present {
@@ -394,7 +395,7 @@ func mergeSingletons(a, b *PredictionContext, rootIsWildcard bool, mergeCache *J
 			return previous
 		}
 	}
-	
+
 	rootMerge := mergeRoot(a, b, rootIsWildcard)
 	if rootMerge != nil {
 		if mergeCache != nil {
@@ -542,18 +543,18 @@ func mergeRoot(a, b *PredictionContext, rootIsWildcard bool) *PredictionContext 
 // <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 //
 //goland:noinspection GoBoolExpressions
-func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap) *PredictionContext {
+func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMap2) *PredictionContext {
 	if mergeCache != nil {
 		previous, present := mergeCache.Get(a, b)
 		if present {
-			if ParserATNSimulatorTraceATNSim {
+			if runtimeConfig.parserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
 			return previous
 		}
 		previous, present = mergeCache.Get(b, a)
 		if present {
-			if ParserATNSimulatorTraceATNSim {
+			if runtimeConfig.parserATNSimulatorTraceATNSim {
 				fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> previous")
 			}
 			return previous
@@ -563,7 +564,7 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 	i := 0 // walks a
 	j := 0 // walks b
 	k := 0 // walks target M array
-	
+
 	mergedReturnStates := make([]int, len(a.returnStates)+len(b.returnStates))
 	mergedParents := make([]*PredictionContext, len(a.returnStates)+len(b.returnStates))
 	// walk and merge to yield mergedParents, mergedReturnStates
@@ -625,16 +626,16 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 		mergedParents = mergedParents[0:k]
 		mergedReturnStates = mergedReturnStates[0:k]
 	}
-	
+
 	M := NewArrayPredictionContext(mergedParents, mergedReturnStates)
-	
+
 	// if we created same array as a or b, return that instead
 	// TODO: JI track whether this is possible above during merge sort for speed and possibly avoid an allocation
 	if M.Equals(a) {
 		if mergeCache != nil {
 			mergeCache.Put(a, b, a)
 		}
-		if ParserATNSimulatorTraceATNSim {
+		if runtimeConfig.parserATNSimulatorTraceATNSim {
 			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> a")
 		}
 		return a
@@ -643,17 +644,17 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 		if mergeCache != nil {
 			mergeCache.Put(a, b, b)
 		}
-		if ParserATNSimulatorTraceATNSim {
+		if runtimeConfig.parserATNSimulatorTraceATNSim {
 			fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> b")
 		}
 		return b
 	}
 	combineCommonParents(&mergedParents)
-	
+
 	if mergeCache != nil {
 		mergeCache.Put(a, b, M)
 	}
-	if ParserATNSimulatorTraceATNSim {
+	if runtimeConfig.parserATNSimulatorTraceATNSim {
 		fmt.Println("mergeArrays a=" + a.String() + ",b=" + b.String() + " -> " + M.String())
 	}
 	return M
@@ -661,10 +662,11 @@ func mergeArrays(a, b *PredictionContext, rootIsWildcard bool, mergeCache *JPCMa
 
 // Make pass over all M parents and merge any Equals() ones.
 // Note that we pass a pointer to the slice as we want to modify it in place.
+//
 //goland:noinspection GoUnusedFunction
 func combineCommonParents(parents *[]*PredictionContext) {
-	uniqueParents := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst, "combineCommonParents for PredictionContext")
-	
+	uniqueParents := NewJStore[*PredictionContext, Comparator[*PredictionContext]](pContextEqInst, PredictionContextCollection, "combineCommonParents for PredictionContext")
+
 	for p := 0; p < len(*parents); p++ {
 		parent := (*parents)[p]
 		_, _ = uniqueParents.Put(parent)
@@ -675,7 +677,7 @@ func combineCommonParents(parents *[]*PredictionContext) {
 	}
 }
 
-func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *JMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]]) *PredictionContext {
+func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *VisitRecord) *PredictionContext {
 	if context.isEmpty() {
 		return context
 	}
@@ -683,6 +685,7 @@ func getCachedBasePredictionContext(context *PredictionContext, contextCache *Pr
 	if present {
 		return existing
 	}
+
 	existing, present = contextCache.Get(context)
 	if present {
 		visited.Put(context, existing)
@@ -719,6 +722,6 @@ func getCachedBasePredictionContext(context *PredictionContext, contextCache *Pr
 	contextCache.add(updated)
 	visited.Put(updated, updated)
 	visited.Put(context, updated)
-	
+
 	return updated
 }

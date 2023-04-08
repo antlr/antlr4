@@ -37,18 +37,18 @@ type BaseTransition struct {
 }
 
 func NewBaseTransition(target ATNState) *BaseTransition {
-	
+
 	if target == nil {
 		panic("target cannot be nil.")
 	}
-	
+
 	t := new(BaseTransition)
-	
+
 	t.target = target
 	// Are we epsilon, action, sempred?
 	t.isEpsilon = false
 	t.intervalSet = nil
-	
+
 	return t
 }
 
@@ -339,7 +339,7 @@ func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 		},
 	}
 
-  if set != nil {
+	if set != nil {
 		t.intervalSet = set
 	} else {
 		t.intervalSet = NewIntervalSet()
@@ -375,7 +375,7 @@ func NewNotSetTransition(target ATNState, set *IntervalSet) *NotSetTransition {
 		t.intervalSet = NewIntervalSet()
 		t.intervalSet.addOne(TokenInvalidType)
 	}
-	
+
 	return t
 }
 

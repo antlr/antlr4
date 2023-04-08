@@ -22,10 +22,9 @@ func (b *BaseATNSimulator) getCachedContext(context *PredictionContext) *Predict
 	if b.sharedContextCache == nil {
 		return context
 	}
-	
-	// TODO: Should this be guarded by a mutex?
-	visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst)
-	
+
+	//visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst, PredictionVisitedCollection, "Visit map in getCachedContext()")
+	visited := NewVisitRecord()
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }
 

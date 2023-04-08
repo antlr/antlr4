@@ -2,7 +2,11 @@ package antlr
 
 import "fmt"
 
-var BasePredictionContextEMPTY = NewEmptyPredictionContext()
+var BasePredictionContextEMPTY = &PredictionContext{
+	cachedHash:  calculateEmptyHash(),
+	pcType:      PredictionContextEmpty,
+	returnState: BasePredictionContextEmptyReturnState,
+}
 
 // PredictionContextCache is Used to cache [PredictionContext] objects. It is used for the shared
 // context cash associated with contexts in DFA states. This cache
@@ -13,7 +17,7 @@ type PredictionContextCache struct {
 
 func NewPredictionContextCache() *PredictionContextCache {
 	return &PredictionContextCache{
-		cache: NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst),
+		cache: NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst, PredictionContextCacheCollection, "NewPredictionContextCache()"),
 	}
 }
 
@@ -24,7 +28,7 @@ func (p *PredictionContextCache) add(ctx *PredictionContext) *PredictionContext 
 	if ctx.isEmpty() {
 		return BasePredictionContextEMPTY
 	}
-	
+
 	// Put will return the existing entry if it is present (note this is done via Equals, not whether it is
 	// the same pointer), otherwise it will add the new entry and return that.
 	//

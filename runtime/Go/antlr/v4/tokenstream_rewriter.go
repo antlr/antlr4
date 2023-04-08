@@ -94,7 +94,7 @@ const (
 // Define the rewrite operation hierarchy
 
 type RewriteOperation interface {
-	
+
 	// Execute the rewrite operation by possibly adding to the buffer.
 	// Return the index of the next token to operate on.
 	Execute(buffer *bytes.Buffer) int
@@ -174,7 +174,7 @@ func (op *BaseRewriteOperation) String() string {
 		op.tokens.Get(op.GetIndex()),
 		op.text,
 	)
-	
+
 }
 
 type InsertBeforeOp struct {
