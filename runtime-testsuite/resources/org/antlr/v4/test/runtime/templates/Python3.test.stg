@@ -168,7 +168,7 @@ class LeafListener(MockListener):
 >>
 
 WalkListener(s) ::= <<
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .TListener import TListener
 else:
     from TListener import TListener
