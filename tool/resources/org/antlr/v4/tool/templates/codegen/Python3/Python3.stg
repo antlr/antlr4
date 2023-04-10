@@ -65,7 +65,7 @@ else:
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<file.parserName> import <file.parserName>
 else:
     from <file.parserName> import <file.parserName>
@@ -92,7 +92,7 @@ del <file.parserName>
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<file.parserName> import <file.parserName>
 else:
     from <file.parserName> import <file.parserName>
@@ -123,7 +123,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<superClass> import <superClass>
 else:
     from <superClass> import <superClass>
@@ -773,7 +773,7 @@ else:
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<superClass> import <superClass>
 else:
     from <superClass> import <superClass>
