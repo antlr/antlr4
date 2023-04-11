@@ -149,6 +149,7 @@ func (s *goRunStats) Report(dir string, prefix string) error {
 
 func (s *goRunStats) Reset() {
 	s.jStats = nil
+	s.topNByUsed = nil
 	s.topNByMax = nil
 }
 
