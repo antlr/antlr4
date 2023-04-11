@@ -4,7 +4,7 @@ package antlr
 
 // This file is compiled when the build configuration antlr.stats is not enabled.
 // which then allows the compiler to optimize out all the code that is not used.
-var collectStats = false
+const collectStats = false
 
 // goRunStats is a dummy struct used when build configuration antlr.stats is not enabled.
 type goRunStats struct {
