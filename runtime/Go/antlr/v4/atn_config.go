@@ -40,7 +40,7 @@ func NewATNConfig5(state ATNState, alt int, context *PredictionContext, semantic
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
-	
+
 	pac := &ATNConfig{}
 	pac.state = state
 	pac.alt = alt
@@ -83,7 +83,7 @@ func NewATNConfig(c *ATNConfig, state ATNState, context *PredictionContext, sema
 }
 
 func (a *ATNConfig) InitATNConfig(c *ATNConfig, state ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) {
-	
+
 	a.state = state
 	a.alt = alt
 	a.context = context
@@ -158,7 +158,7 @@ func (a *ATNConfig) Equals(o Collectable[*ATNConfig]) bool {
 // predict the same alternative, and syntactic/semantic contexts are the same.
 func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
 	var other, ok = o.(*ATNConfig)
-	
+
 	if !ok {
 		return false
 	}
@@ -167,22 +167,22 @@ func (a *ATNConfig) PEquals(o Collectable[*ATNConfig]) bool {
 	} else if other == nil {
 		return false
 	}
-	
+
 	var equal bool
-	
+
 	if a.context == nil {
 		equal = other.context == nil
 	} else {
 		equal = a.context.Equals(other.context)
 	}
-	
+
 	var (
 		nums = a.state.GetStateNumber() == other.state.GetStateNumber()
 		alts = a.alt == other.alt
 		cons = a.semanticContext.Equals(other.semanticContext)
 		sups = a.precedenceFilterSuppressed == other.precedenceFilterSuppressed
 	)
-	
+
 	return nums && alts && cons && sups && equal
 }
 
@@ -206,7 +206,7 @@ func (a *ATNConfig) PHash() int {
 	if a.context != nil {
 		c = a.context.Hash()
 	}
-	
+
 	h := murmurInit(7)
 	h = murmurUpdate(h, a.state.GetStateNumber())
 	h = murmurUpdate(h, a.alt)
@@ -218,19 +218,19 @@ func (a *ATNConfig) PHash() int {
 // String returns a string representation of the ATNConfig, usually used for debugging purposes
 func (a *ATNConfig) String() string {
 	var s1, s2, s3 string
-	
+
 	if a.context != nil {
 		s1 = ",[" + fmt.Sprint(a.context) + "]"
 	}
-	
+
 	if a.semanticContext != SemanticContextNone {
 		s2 = "," + fmt.Sprint(a.semanticContext)
 	}
-	
+
 	if a.reachesIntoOuterContext > 0 {
 		s3 = ",up=" + fmt.Sprint(a.reachesIntoOuterContext)
 	}
-	
+
 	return fmt.Sprintf("(%v,%v%v%v%v)", a.state, a.alt, s1, s2, s3)
 }
 
@@ -313,7 +313,7 @@ func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	} else if a.passedThroughNonGreedyDecision != otherT.passedThroughNonGreedyDecision {
 		return false
 	}
-	
+
 	switch {
 	case a.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
 		return true
@@ -324,12 +324,12 @@ func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 	default:
 		return false // One but not both, are nil
 	}
-	
+
 	return a.PEquals(otherT)
 }
 
 func checkNonGreedyDecision(source *ATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)
-	
+
 	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())
 }
