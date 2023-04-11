@@ -1126,7 +1126,7 @@ Set<a.escapedName; format="cap">(<a.type>)}; separator="\n\n">
 }
 
 type <struct.escapedName> struct {
-	<if(contextSuperClass)>*<contextSuperClass><else>*antlr.BaseParserRuleContext<endif>
+	<if(contextSuperClass)>*<contextSuperClass><else>antlr.BaseParserRuleContext<endif>
 	parser antlr.Parser
 	<if(attrs)>
 	<attrs; separator="\n">
@@ -1135,9 +1135,22 @@ type <struct.escapedName> struct {
 
 func NewEmpty<struct.escapedName>() *<struct.escapedName> {
 	var p = new(<struct.escapedName>)
-	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(nil, -1)
+	<if(contextSuperClass)>
+	p.<contextSuperClass> = New<contextSuperClass>(nil, -1) // Jim super
+	<else>
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	<endif>
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 	return p
+}
+
+func InitEmpty<struct.escapedName>(p *<struct.escapedName>)  {
+	<if(contextSuperClass)>
+	p.<contextSuperClass> = New<contextSuperClass>(nil, -1) // Jim super
+	<else>
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	<endif>
+	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 }
 
 func (*<struct.escapedName>) Is<struct.escapedName>() {}
@@ -1145,7 +1158,11 @@ func (*<struct.escapedName>) Is<struct.escapedName>() {}
 func New<struct.escapedName>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.escapedName> <a.type>}>) *<struct.escapedName> {
 	var p = new(<struct.escapedName>)
 
-	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(parent, invokingState)
+	<if(contextSuperClass)>
+	p.<contextSuperClass> = New<contextSuperClass>(parent, invokingState)
+	<else>
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
+	<endif>
 
 	p.parser = parser
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
@@ -1225,8 +1242,8 @@ func (s *<struct.escapedName>) GetParser() antlr.Parser { return s.parser }
 
 <if(struct.provideCopyFrom)>
 
-func (s *<struct.escapedName>) CopyFrom(ctx *<struct.escapedName>) {
-	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
+func (s *<struct.escapedName>) CopyAll(ctx *<struct.escapedName>) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
 	<struct.attrs:{a | s.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 }
 <endif>
@@ -1252,7 +1269,7 @@ func (s *<struct.escapedName>) ToStringTree(ruleNames []string, recog antlr.Reco
 
 AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
 type <struct.escapedName> struct {
-	*<currentRule.name; format="cap">Context
+	<currentRule.name; format="cap">Context
 	<if(attrs)>
 	<attrs; separator="\n">
 	<endif>
@@ -1261,9 +1278,9 @@ type <struct.escapedName> struct {
 func New<struct.escapedName>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct.escapedName> {
 	var p = new(<struct.escapedName>)
 
-	p.<currentRule.name; format="cap">Context = NewEmpty<currentRule.name; format="cap">Context()
+	InitEmpty<currentRule.name; format="cap">Context(&p.<currentRule.name; format="cap">Context)
 	p.parser = parser
-	p.CopyFrom(ctx.(*<currentRule.name; format="cap">Context))
+	p.CopyAll(ctx.(*<currentRule.name; format="cap">Context))
 
 	return p
 }

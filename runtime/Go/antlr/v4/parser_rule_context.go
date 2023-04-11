@@ -31,7 +31,9 @@ type ParserRuleContext interface {
 }
 
 type BaseParserRuleContext struct {
-	*BaseRuleContext
+	parentCtx     RuleContext
+	invokingState int
+	RuleIndex     int
 
 	start, stop Token
 	exception   RecognitionException
@@ -40,8 +42,22 @@ type BaseParserRuleContext struct {
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
 	prc := new(BaseParserRuleContext)
+	InitBaseParserRuleContext(prc, parent, invokingStateNumber)
+	return prc
+}
 
-	prc.BaseRuleContext = NewBaseRuleContext(parent, invokingStateNumber)
+func InitBaseParserRuleContext(prc *BaseParserRuleContext, parent ParserRuleContext, invokingStateNumber int) {
+	// What context invoked b rule?
+	prc.parentCtx = parent
+
+	// What state invoked the rule associated with b context?
+	// The "return address" is the followState of invokingState
+	// If parent is nil, b should be -1.
+	if parent == nil {
+		prc.invokingState = -1
+	} else {
+		prc.invokingState = invokingStateNumber
+	}
 
 	prc.RuleIndex = -1
 	// * If we are debugging or building a parse tree for a Visitor,
@@ -56,8 +72,6 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 	// The exception that forced prc rule to return. If the rule successfully
 	// completed, prc is {@code nil}.
 	prc.exception = nil
-
-	return prc
 }
 
 func (prc *BaseParserRuleContext) SetException(e RecognitionException) {
@@ -338,6 +352,50 @@ func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) s
 	}
 	s += "]"
 	return s
+}
+
+func (prc *BaseParserRuleContext) SetParent(v Tree) {
+	if v == nil {
+		prc.parentCtx = nil
+	} else {
+		prc.parentCtx = v.(RuleContext)
+	}
+}
+
+func (prc *BaseParserRuleContext) GetInvokingState() int {
+	return prc.invokingState
+}
+
+func (prc *BaseParserRuleContext) SetInvokingState(t int) {
+	prc.invokingState = t
+}
+
+func (prc *BaseParserRuleContext) GetRuleIndex() int {
+	return prc.RuleIndex
+}
+
+func (prc *BaseParserRuleContext) GetAltNumber() int {
+	return ATNInvalidAltNumber
+}
+
+func (prc *BaseParserRuleContext) SetAltNumber(_ int) {}
+
+// IsEmpty returns true if the context of b is empty.
+//
+// A context is empty if there is no invoking state, meaning nobody calls
+// current context.
+func (prc *BaseParserRuleContext) IsEmpty() bool {
+	return prc.invokingState == -1
+}
+
+// GetParent returns the combined text of all child nodes. This method only considers
+// tokens which have been added to the parse tree.
+//
+// Since tokens on hidden channels (e.g. whitespace or comments) are not
+// added to the parse trees, they will not appear in the output of this
+// method.
+func (prc *BaseParserRuleContext) GetParent() Tree {
+	return prc.parentCtx
 }
 
 var ParserRuleContextEmpty = NewBaseParserRuleContext(nil, -1)

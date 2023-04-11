@@ -677,7 +677,6 @@ func combineCommonParents(parents *[]*PredictionContext) {
 	}
 }
 
-//func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *JMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]]) *PredictionContext {
 func getCachedBasePredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited *VisitRecord) *PredictionContext {
 	if context.isEmpty() {
 		return context

@@ -33,9 +33,7 @@ type ParseTree interface {
 
 type RuleNode interface {
 	ParseTree
-
 	GetRuleContext() RuleContext
-	GetBaseRuleContext() *BaseRuleContext
 }
 
 type TerminalNode interface {

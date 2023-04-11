@@ -122,11 +122,11 @@ type JStore[T any, C Comparator[T]] struct {
 }
 
 func NewJStore[T any, C Comparator[T]](comparator Comparator[T], cType CollectionSource, desc string) *JStore[T, C] {
-	
+
 	if comparator == nil {
 		panic("comparator cannot be nil")
 	}
-	
+
 	s := &JStore[T, C]{
 		store:      make(map[int][]T, 1),
 		comparator: comparator,
@@ -136,7 +136,7 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T], cType Collectio
 			Source:      cType,
 			Description: desc,
 		}
-		
+
 		// Track where we created it from  if we are being asked to do so
 		if runtimeConfig.statsTraceStacks {
 			s.stats.CreateStack = debug.Stack()
@@ -158,12 +158,12 @@ func NewJStore[T any, C Comparator[T]](comparator Comparator[T], cType Collectio
 //
 // If the given value is not present in the store, then the value is added to the store and returned as v and exists is set to false.
 func (s *JStore[T, C]) Put(value T) (v T, exists bool) {
-	
+
 	if collectStats {
 		s.stats.Puts++
 	}
 	kh := s.comparator.Hash1(value)
-	
+
 	var hClash bool
 	for _, v1 := range s.store[kh] {
 		hClash = true
@@ -182,7 +182,7 @@ func (s *JStore[T, C]) Put(value T) (v T, exists bool) {
 		s.stats.PutHashConflicts++
 	}
 	s.store[kh] = append(s.store[kh], value)
-	
+
 	if collectStats {
 		if len(s.store[kh]) > s.stats.MaxSlotSize {
 			s.stats.MaxSlotSize = len(s.store[kh])
@@ -243,7 +243,7 @@ func (s *JStore[T, C]) SortedSlice(less func(i, j T) bool) []T {
 	sort.Slice(vs, func(i, j int) bool {
 		return less(vs[i], vs[j])
 	})
-	
+
 	return vs
 }
 
@@ -303,7 +303,7 @@ func (m *JMap[K, V, C]) Put(key K, val V) (V, bool) {
 		m.stats.Puts++
 	}
 	kh := m.comparator.Hash1(key)
-	
+
 	var hClash bool
 	for _, e := range m.store[kh] {
 		hClash = true
@@ -443,7 +443,7 @@ func (pcm *JPCMap) Get(k1, k2 *PredictionContext) (*PredictionContext, bool) {
 }
 
 func (pcm *JPCMap) Put(k1, k2, v *PredictionContext) {
-	
+
 	if collectStats {
 		pcm.stats.Puts++
 	}
@@ -472,7 +472,7 @@ func (pcm *JPCMap) Put(k1, k2, v *PredictionContext) {
 		} else {
 			m2 = NewJMap[*PredictionContext, *PredictionContext, *ObjEqComparator[*PredictionContext]](pContextEqInst, PredictionContextCacheCollection, "map entry")
 		}
-		
+
 		m2.Put(k2, v)
 		pcm.store.Put(k1, m2)
 		pcm.size++
@@ -515,7 +515,7 @@ func (pcm *JPCMap2) Get(k1, k2 *PredictionContext) (*PredictionContext, bool) {
 	if collectStats {
 		pcm.stats.Gets++
 	}
-	
+
 	h := dHash(k1, k2)
 	var hClash bool
 	for _, e := range pcm.store[h] {
