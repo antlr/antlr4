@@ -1,12 +1,15 @@
 package main
 import (
-	"test/parser"
-	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"fmt"
-	"os"
+    "github.com/antlr/antlr4/runtime/Go/antlr/v4"
+    "os"
+    "test/parser"
 )
 
 <if(parserName)>
+
+import "reflect"
+
 type TreeShapeListener struct {
 	*parser.Base<grammarName>Listener
 }
@@ -18,8 +21,14 @@ func NewTreeShapeListener() *TreeShapeListener {
 func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 	for i := 0; i\<ctx.GetChildCount(); i++ {
 		child := ctx.GetChild(i)
-		parentR,ok := child.GetParent().(antlr.RuleNode)
-		if !ok || parentR.GetBaseRuleContext() != ctx.GetBaseRuleContext() {
+		parentR, ok := child.GetParent().(antlr.ParserRuleContext)
+
+		// Have to use reflect here - we need to compare the underlying pointers, but we
+		// do not know the types of the underlying structs, just that they will be the same
+		// type.
+		parPointer := reflect.ValueOf(parentR).Elem().Addr().Pointer()
+		ctxPointer := reflect.ValueOf(ctx).Elem().Addr().Pointer()
+		if !ok || parPointer != ctxPointer {
 			panic("Invalid parse tree shape detected.")
 		}
 	}
