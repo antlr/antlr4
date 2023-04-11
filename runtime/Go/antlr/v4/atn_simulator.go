@@ -22,9 +22,9 @@ func (b *BaseATNSimulator) getCachedContext(context *PredictionContext) *Predict
 	if b.sharedContextCache == nil {
 		return context
 	}
-
-	//visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst, PredictionVisitedCollection, "Visit map in getCachedContext()")
-	visited := NewVisitRecord()
+	
+	visited := NewJMap[*PredictionContext, *PredictionContext, Comparator[*PredictionContext]](pContextEqInst, PredictionVisitedCollection, "Visit map in getCachedContext()")
+	//visited := NewVisitRecord()
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }
 

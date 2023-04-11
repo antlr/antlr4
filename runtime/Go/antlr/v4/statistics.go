@@ -18,13 +18,13 @@ import (
 
 // Tells various components to collect statistics - because it is only true when this file is included, it will
 // allow the compiler to completely eliminate all the code that is only used when collecting statistics.
-var collectStats = true
+const collectStats = true
 
 // goRunStats is a collection of all the various data the ANTLR runtime has collected about a particular run.
 // It is exported so that it can be used by others to look for things that are not already looked for in the
 // runtime statistics.
 type goRunStats struct {
-
+	
 	// jStats is a slice of all the [JStatRec] records that have been created, which is one for EVERY collection created
 	// during a run. It is exported so that it can be used by others to look for things that are not already looked for
 	// within this package.
@@ -97,7 +97,7 @@ func WithTopN(topN int) statsOption {
 //
 // [Jim Idle]: https:://github.com/jim-idle
 func (s *goRunStats) Analyze() {
-
+	
 	// Look for anything that looks strange and record it in our local maps etc for the report to present it
 	//
 	s.CollectionAnomalies()
@@ -106,17 +106,17 @@ func (s *goRunStats) Analyze() {
 
 // TopNCollections looks through all the statistical records and gathers the top ten collections by size.
 func (s *goRunStats) TopNCollections() {
-
+	
 	// Let's sort the stat records by MaxSize
 	//
 	sort.Slice(s.jStats, func(i, j int) bool {
 		return s.jStats[i].MaxSize > s.jStats[j].MaxSize
 	})
-
+	
 	for i := 0; i < len(s.jStats) && i < s.topN; i++ {
 		s.topNByMax = append(s.topNByMax, s.jStats[i])
 	}
-
+	
 	// Sort by the number of times used
 	//
 	sort.Slice(s.jStats, func(i, j int) bool {
@@ -131,7 +131,7 @@ func (s *goRunStats) TopNCollections() {
 // path, which should represent a directory. Generated files will be prefixed with the given prefix and will be
 // given a type name such as `anomalies` and a time stamp such as `2021-09-01T12:34:56` and a .md suffix.
 func (s *goRunStats) Report(dir string, prefix string) error {
-
+	
 	isDir, err := isDirectory(dir)
 	switch {
 	case err != nil:
@@ -140,7 +140,7 @@ func (s *goRunStats) Report(dir string, prefix string) error {
 		return fmt.Errorf("output directory `%s` is not a directory", dir)
 	}
 	s.reportCollections(dir, prefix)
-
+	
 	// Clean out any old data in case the user forgets
 	//
 	s.Reset()
@@ -169,7 +169,7 @@ background-color: black;
 </style>
 ++++`)
 	_ = f.Close()
-
+	
 	fname := filepath.Join(dir, prefix+"_"+"_"+collectionsFile+"_"+".adoc")
 	// If the file doesn't exist, create it, or append to the file
 	f, err = os.OpenFile(fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -183,9 +183,9 @@ background-color: black;
 		}
 	}(f)
 	_, _ = f.WriteString("= Collections for " + prefix + "\n\n")
-
+	
 	_, _ = f.WriteString("== Summary\n")
-
+	
 	if s.unusedCollections != nil {
 		_, _ = f.WriteString("=== Unused Collections\n")
 		_, _ = f.WriteString("Unused collections incur a penalty for allocation that makes them a candidate for either\n")
@@ -193,18 +193,18 @@ background-color: black;
 		_, _ = f.WriteString(" consider removing it. If you are using a collection that is used, but not very often,\n")
 		_, _ = f.WriteString(" you should consider using lazy initialization to defer the allocation until it is\n")
 		_, _ = f.WriteString(" actually needed.\n\n")
-
+		
 		_, _ = f.WriteString("\n.Unused collections\n")
 		_, _ = f.WriteString(`[cols="<3,>1"]` + "\n\n")
 		_, _ = f.WriteString("|===\n")
 		_, _ = f.WriteString("| Type | Count\n")
-
+		
 		for k, v := range s.unusedCollections {
 			_, _ = f.WriteString("| " + CollectionDescriptors[k].SybolicName + " | " + strconv.Itoa(v) + "\n")
 		}
 		f.WriteString("|===\n\n")
 	}
-
+	
 	_, _ = f.WriteString("\n.Summary of Collections\n")
 	_, _ = f.WriteString(`[cols="<3,>1"]` + "\n\n")
 	_, _ = f.WriteString("|===\n")
@@ -214,7 +214,7 @@ background-color: black;
 	}
 	_, _ = f.WriteString("| Total | " + strconv.Itoa(len(s.jStats)) + "\n")
 	_, _ = f.WriteString("|===\n\n")
-
+	
 	_, _ = f.WriteString("\n.Summary of Top " + strconv.Itoa(s.topN) + " Collections by MaxSize\n")
 	_, _ = f.WriteString(`[cols="<1,<3,>1,>1,>1,>1"]` + "\n\n")
 	_, _ = f.WriteString("|===\n")
@@ -229,7 +229,7 @@ background-color: black;
 		_, _ = f.WriteString("\n")
 	}
 	_, _ = f.WriteString("|===\n\n")
-
+	
 	_, _ = f.WriteString("\n.Summary of Top " + strconv.Itoa(s.topN) + " Collections by Access\n")
 	_, _ = f.WriteString(`[cols="<1,<3,>1,>1,>1,>1,>1"]` + "\n\n")
 	_, _ = f.WriteString("|===\n")
@@ -260,11 +260,11 @@ func (s *goRunStats) CollectionAnomalies() {
 	defer s.jStatsLock.RUnlock()
 	s.counts = make(map[CollectionSource]int, len(s.jStats))
 	for _, c := range s.jStats {
-
+		
 		// Accumlate raw counts
 		//
 		s.counts[c.Source]++
-
+		
 		// Look for allocated but unused collections and count them
 		if c.MaxSize == 0 && c.Puts == 0 {
 			if s.unusedCollections == nil {
@@ -276,5 +276,5 @@ func (s *goRunStats) CollectionAnomalies() {
 			fmt.Println("Collection ", c.Description, "accumulated a max size of ", c.MaxSize, " - this is probably too large and indicates a poorly formed grammar")
 		}
 	}
-
+	
 }
