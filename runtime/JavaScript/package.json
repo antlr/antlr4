@@ -49,7 +49,19 @@
     "node": ">=16"
   },
   "exports": {
-    "import": "./dist/antlr4.node.mjs",
-    "require": "./dist/antlr4.node.cjs"
+    ".": {
+      "node": {
+        "types": "src/index.node.d.ts",
+        "import": "./dist/antlr4.node.mjs",
+        "require": "./dist/antlr4.node.cjs",
+        "default": "./dist/antlr4.node.mjs"
+      },
+      "browser": {
+        "types": "src/index.web.d.ts",
+        "import": "./dist/antlr4.web.mjs",
+        "require": "./dist/antlr4.web.cjs",
+        "default": "./dist/antlr4.web.mjs"
+      }
+    }
   }
 }
