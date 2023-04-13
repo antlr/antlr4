@@ -136,6 +136,3 @@ runtime/Cpp/runtime/libantlr4-runtime.dylib
 
 # Go test and performance trace files
 **/*.pprof
-runtime/Go/antlr/internal/testrig/antlr/*.jar
-runtime/Go/antlr/internal/testrig/antlr/test/test*
-runtime/Go/antlr/internal/testrig/antlrinput
