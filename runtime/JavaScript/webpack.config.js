@@ -6,15 +6,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-const buildConfig = ( platform, extentions ) => ({
+const buildConfig = ( platform, extensions ) => ({
     mode: "production",
     entry: `./src/antlr4/index.${platform}.js`,
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: `antlr4.${platform}.${extentions}`,
-        chunkFormat: extentions === "mjs" ? "module" : "commonjs",
+        filename: `antlr4.${platform}.${extensions}`,
+        chunkFormat: extensions === "mjs" ? "module" : "commonjs",
         library: {
-            type: extentions === "mjs" ? "module" : "commonjs"
+            type: extensions === "mjs" ? "module" : "commonjs"
         }
     },
 
@@ -54,7 +54,7 @@ const buildConfig = ( platform, extentions ) => ({
     plugins: [ new ESLintPlugin() ],
     devtool: "source-map",
     experiments: {
-        outputModule: extentions === "mjs"
+        outputModule: extensions === "mjs"
     },
 })
 
