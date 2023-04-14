@@ -86,10 +86,15 @@ public abstract class UnicodeDataTemplateController {
 		for (Map.Entry<String, IntervalSet> entry : propertyCodePointRanges.entrySet()) {
 			rawPropertyCodePointRanges.put(entry.getKey().toLowerCase(Locale.US), convertToRawArray(entry.getValue()));
 		}
+		List<String> rawPropertyAliases = new ArrayList<>(propertyAliases.size() * 2);
+		for (Map.Entry<String, String> entry : propertyAliases.entrySet()) {
+			rawPropertyAliases.add(entry.getKey().toLowerCase(Locale.US));
+			rawPropertyAliases.add(entry.getValue().toLowerCase(Locale.US));
+		}
 
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put("rawPropertyCodePointRanges", rawPropertyCodePointRanges);
-		properties.put("propertyAliases", propertyAliases);
+		properties.put("rawPropertyAliases", rawPropertyAliases);
 		return properties;
 	}
 
