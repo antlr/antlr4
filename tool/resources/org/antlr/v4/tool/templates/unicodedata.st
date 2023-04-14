@@ -1,4 +1,4 @@
-unicodedata(propertyCodePointRanges, propertyAliases) ::= <<
+unicodedata(rawPropertyCodePointRanges, propertyAliases) ::= <<
 package org.antlr.v4.unicode;
 
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Interval;
@@ -14,29 +15,24 @@ import org.antlr.v4.runtime.misc.Interval;
  * Code-generated utility class mapping Unicode properties to Unicode code point ranges.
  */
 public abstract class UnicodeData {
-       private static final Map\<String, IntervalSet\> propertyCodePointRanges = new HashMap\<\>(<length(propertyCodePointRanges)>);
+		private static final Map\<String, IntervalSet\> propertyCodePointRanges = new HashMap\<\>(<length(rawPropertyCodePointRanges)>);
        private static final Map\<String, String\> propertyAliases = new HashMap\<\>(<length(propertyAliases)>);
 
        // Work around Java 64k bytecode method limit by splitting up static
        // initialization into one method per Unicode property
 
-       <propertyCodePointRanges.keys:{ k | // Unicode code points with property "<k>"
-static private class PropertyAdder<i> {
-        static private void addProperty<i>() {
-               List\<Interval\> intervals = Arrays.asList(
-                       <propertyCodePointRanges.(k).intervals:{ interval | Interval.of(<interval.a>, <interval.b>)}; separator=",\n">
-               );
-               IntervalSet codePointRanges = new IntervalSet(intervals);
-               codePointRanges.setReadonly(true);
-               propertyCodePointRanges.put("<k>".toLowerCase(Locale.US), codePointRanges);
-       \}
-\}
+		private static void addProperty(String propertyName, int[] rawIntervals) {
+			List\<Interval> intervals = new ArrayList\<>(rawIntervals.length / 2);
+			for (int i = 0; i \< rawIntervals.length; i += 2) {
+				intervals.add(new Interval(rawIntervals[i], rawIntervals[i + 1]));
+			}
+			IntervalSet result = new IntervalSet(intervals);
+			result.setReadonly(true);
+			propertyCodePointRanges.put(propertyName, result);
+		}
 
-static private void addProperty<i>() {
-        PropertyAdder<i>.addProperty<i>();
-\}
-
-}; separator="\n\n">
+		<rawPropertyCodePointRanges.keys:{ k |
+static private void addProperty<i>() { addProperty("<k>", new int[] { <rawPropertyCodePointRanges.(k):{j | <j>}; separator=",", wrap> \}); \}}; separator="\n">
 
        static private class PropertyAliasesAdder {
 <propertyAliases.keys:{ k |
@@ -59,7 +55,7 @@ static private void addProperty<i>() {
 
        // Put it all together
        static {
-              <propertyCodePointRanges.keys:{ k | addProperty<i>(); }; separator="\n">
+			<rawPropertyCodePointRanges.keys:{ k | addProperty<i>();}; separator="\n">
               addPropertyAliases();
        }
 
