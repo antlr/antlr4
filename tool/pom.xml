@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
-			<version>71.1</version>
+			<version>72.1</version>
 		</dependency>
 	</dependencies>
 	<build>
