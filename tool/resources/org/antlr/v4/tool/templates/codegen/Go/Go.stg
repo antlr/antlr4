@@ -1,3 +1,8 @@
+GoTypeMap ::= [
+	"boolean":"bool",
+	default : key
+]
+
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Code generated from <grammarFileName> by ANTLR <ANTLRVersion>. DO NOT EDIT.
 >>
@@ -931,14 +936,14 @@ SetNonLocalAttr(s, rhsChunks) ::= "p.GetInvokingContext(<s.ruleIndex>).(*<s.rule
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.listName>, <labelref(a.label)>)"
 
-TokenDecl(t) ::= "<t.escapedName> <TokenLabelType()>"
+TokenDecl(t) ::= "<t.escapedName> <GoTypeMap.(TokenLabelType())>"
 TokenTypeDecl(t) ::= "<t.escapedName> int"
 TokenListDecl(t) ::= "<t.escapedName> []antlr.Token"
 
 RuleContextDecl(r) ::= "<r.escapedName> I<r.ctxName> "
 RuleContextListDecl(rdecl) ::= "<rdecl.escapedName> []I<rdecl.ctxName>"
 
-AttributeDecl(d) ::= "<d.escapedName> <d.type><if(d.initValue)>// TODO = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.escapedName> <GoTypeMap.(d.type)><if(d.initValue)>// TODO = <d.initValue><endif>"
 
 ContextTokenGetterDecl(t) ::= <<
 <t.escapedName; format="cap">() antlr.TerminalNode<if(!t.signature)> {
