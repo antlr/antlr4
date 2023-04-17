@@ -144,7 +144,7 @@ struct <lexer.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <lexer.grammarName; format = "lower">LexerOnceFlag;
-<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+static thread_local <lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
   assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
@@ -238,7 +238,7 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 <sempredFuncs.values; separator="\n">
 
 void <lexer.name>::initialize() {
-  ::antlr4::internal::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
+  <lexer.grammarName; format = "lower">LexerInitialize();
 }
 >>
 
@@ -364,7 +364,7 @@ struct <parser.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <parser.grammarName; format = "lower">ParserOnceFlag;
-<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+static thread_local <parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
   assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
@@ -435,7 +435,7 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 <sempredFuncs.values; separator="\n"><endif>
 
 void <parser.name>::initialize() {
-  ::antlr4::internal::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
+  <parser.grammarName; format = "lower">ParserInitialize();
 }
 >>
 
