@@ -5,8 +5,7 @@
 package antlr
 
 import (
-	"bytes"
-	"io"
+	"bufio"
 	"os"
 )
 
@@ -14,38 +13,53 @@ import (
 //  when you construct the object.
 
 type FileStream struct {
-	*InputStream
-
+	InputStream
 	filename string
 }
 
 //goland:noinspection GoUnusedExportedFunction
 func NewFileStream(fileName string) (*FileStream, error) {
 
-	buf := bytes.NewBuffer(nil)
-
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
+
 	defer func(f *os.File) {
 		errF := f.Close()
 		if errF != nil {
 		}
 	}(f)
-	_, err = io.Copy(buf, f)
+
+	reader := bufio.NewReader(f)
+	fInfo, err := f.Stat()
 	if err != nil {
 		return nil, err
 	}
 
-	fs := new(FileStream)
+	fs := &FileStream{
+		InputStream: InputStream{
+			index: 0,
+			size:  int(fInfo.Size()),
+			name:  fileName,
+		},
+		filename: fileName,
+	}
 
-	fs.filename = fileName
-	s := buf.String()
-	fs.InputStream = NewInputStream(s)
+	// Pre-build the buffer and read runes efficiently
+	//
+	fs.data = make([]rune, 0, fs.size)
+	for {
+		r, _, err := reader.ReadRune()
+		if err != nil {
+			break
+		}
+		fs.data = append(fs.data, r)
+	}
 
+	// All done.
+	//
 	return fs, nil
-
 }
 
 func (f *FileStream) GetSourceName() string {

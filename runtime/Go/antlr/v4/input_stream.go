@@ -4,6 +4,11 @@
 
 package antlr
 
+import (
+	"bufio"
+	"io"
+)
+
 type InputStream struct {
 	name  string
 	index int
@@ -11,16 +16,43 @@ type InputStream struct {
 	size  int
 }
 
+// NewIoStream creates a new input stream from the given io.Reader reader.
+// Note that the reader is read completely into memory and so it must actually
+// have a stopping point - you cannot pass in a reader on an open-ended source such
+// as a socket for instance.
+func NewIoStream(reader io.Reader) *InputStream {
+
+	rReader := bufio.NewReader(reader)
+
+	is := &InputStream{
+		name:  "<empty>",
+		index: 0,
+	}
+
+	// Pre-build the buffer and read runes reasonably efficiently given that
+	// we don't exactly know how big the input is.
+	//
+	is.data = make([]rune, 0, 512)
+	for {
+		r, _, err := rReader.ReadRune()
+		if err != nil {
+			break
+		}
+		is.data = append(is.data, r)
+	}
+	is.size = len(is.data) // number of runes
+	return is
+}
+
 // NewInputStream creates a new input stream from the given string
 func NewInputStream(data string) *InputStream {
 
-	is := new(InputStream)
-
-	is.name = "<empty>"
-	is.index = 0
-	is.data = []rune(data)
-	is.size = len(is.data) // number of runes
-
+	is := &InputStream{
+		name:  "<empty>",
+		index: 0,
+		data:  []rune(data), // This is actually the most efficient way
+	}
+	is.size = len(is.data) // number of runes, but we could also use len(data), which is efficient too
 	return is
 }
 
