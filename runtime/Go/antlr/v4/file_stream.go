@@ -40,7 +40,6 @@ func NewFileStream(fileName string) (*FileStream, error) {
 	fs := &FileStream{
 		InputStream: InputStream{
 			index: 0,
-			size:  int(fInfo.Size()),
 			name:  fileName,
 		},
 		filename: fileName,
@@ -48,7 +47,7 @@ func NewFileStream(fileName string) (*FileStream, error) {
 
 	// Pre-build the buffer and read runes efficiently
 	//
-	fs.data = make([]rune, 0, fs.size)
+	fs.data = make([]rune, 0, fInfo.Size())
 	for {
 		r, _, err := reader.ReadRune()
 		if err != nil {
@@ -56,6 +55,7 @@ func NewFileStream(fileName string) (*FileStream, error) {
 		}
 		fs.data = append(fs.data, r)
 	}
+	fs.size = len(fs.data) // Size in runes
 
 	// All done.
 	//
