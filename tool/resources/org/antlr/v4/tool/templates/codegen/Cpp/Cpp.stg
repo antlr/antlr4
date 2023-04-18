@@ -144,7 +144,11 @@ struct <lexer.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <lexer.grammarName; format = "lower">LexerOnceFlag;
+<if (lexer.lockFreeCppTarget)>
 static thread_local <lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+<else>
+<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+<endif>
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
   assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
@@ -238,7 +242,11 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 <sempredFuncs.values; separator="\n">
 
 void <lexer.name>::initialize() {
+<if (lexer.lockFreeCppTarget)>
   <lexer.grammarName; format = "lower">LexerInitialize();
+<else>
+  ::antlr4::internal::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
+<endif>
 }
 >>
 
@@ -364,7 +372,11 @@ struct <parser.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <parser.grammarName; format = "lower">ParserOnceFlag;
+<if (parser.lockFreeCppTarget)>
 static thread_local <parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+<else>
+<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+<endif>
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
   assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
@@ -435,7 +447,11 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 <sempredFuncs.values; separator="\n"><endif>
 
 void <parser.name>::initialize() {
+<if (parser.lockFreeCppTarget)>
   <parser.grammarName; format = "lower">ParserInitialize();
+<else>
+  ::antlr4::internal::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
+<endif>
 }
 >>
 
