@@ -82,6 +82,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("language");
 		parserOptions.add("accessLevel");
 		parserOptions.add("exportMacro");
+		parserOptions.add("lockFreeCppTarget");
 		parserOptions.add(caseInsensitiveOptionName);
 	}
 
