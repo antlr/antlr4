@@ -14,8 +14,12 @@ package parser // <file.grammarName>
 import (
 	"fmt"
 	"strconv"
-  "sync"
+  	"sync"
 
+	<if(namedActions.includes)>
+	// Grammar author supplied additional includes
+	<namedActions.includes>
+	<endif>
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 )
 
@@ -147,6 +151,10 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 type <parser.name> struct {
 	<superClass; null="*antlr.BaseParser">
+	<if(namedActions.structmembers)>
+	// Grammar author supplied members of the instance struct
+	<namedActions.structmembers>
+	<endif>
 }
 
 var <parser.grammarName; format="lower">ParserStaticData struct {
@@ -214,7 +222,8 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 }
 
 <if(namedActions.members)>
-
+// Note that '@members' cannot be changed now, but this should have been 'globals'
+// If you are looking to have variables for each instance, use '@structmembers'
 <namedActions.members>
 <endif>
 
@@ -1440,13 +1449,15 @@ package parser
 
 import (
 	"fmt"
-  "sync"
+  	"sync"
 	"unicode"
-
+	<if(namedActions.includes)>
+	// Grammar author supplied additional includes
+	<namedActions.includes>
+	<endif>
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 )
 <if(namedActions.header)>
-
 <namedActions.header>
 <endif>
 
@@ -1467,6 +1478,10 @@ type <lexer.name> struct {
 	<if(superClass)><superClass><else>*antlr.BaseLexer<endif>
 	channelNames []string
 	modeNames []string
+	<if(namedActions.structmembers)>
+    // Grammar author supplied members of the instance struct
+    <namedActions.structmembers>
+    <endif>
 	// TODO: EOF string
 }
 
