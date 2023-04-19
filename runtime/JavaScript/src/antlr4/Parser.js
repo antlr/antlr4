@@ -279,13 +279,19 @@ export default class Parser extends Recognizer {
 
     getTokenStream() {
         return this._input;
-    }
-
+    }    
     // Set the token stream and reset the parser.
     setTokenStream(input) {
         this._input = null;
         this.reset();
         this._input = input;
+    }
+    /**
+	 * Gets the number of syntax errors reported during parsing. This value is
+	 * incremented each time {@link //notifyErrorListeners} is called.	 
+	 */
+    getNumberOfSyntaxErrors() {
+        return this._syntaxErrors;
     }
 
     /**
