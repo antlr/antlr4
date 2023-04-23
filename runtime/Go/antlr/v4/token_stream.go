@@ -8,6 +8,7 @@ type TokenStream interface {
 	IntStream
 
 	LT(k int) Token
+	Reset()
 
 	Get(index int) Token
 	GetTokenSource() TokenSource
