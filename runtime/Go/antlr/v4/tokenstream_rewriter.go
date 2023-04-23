@@ -304,7 +304,7 @@ func (tsr *TokenStreamRewriter) RollbackDefault(instructionIndex int) {
 	tsr.Rollback(DefaultProgramName, instructionIndex)
 }
 
-// DeleteProgram reset the program so that no instructions exist
+// DeleteProgram Reset the program so that no instructions exist
 func (tsr *TokenStreamRewriter) DeleteProgram(programName string) {
 	tsr.Rollback(programName, MinTokenIndex) //TODO: double test on that cause lower bound is not included
 }

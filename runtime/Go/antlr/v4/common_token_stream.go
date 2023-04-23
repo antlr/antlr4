@@ -66,7 +66,9 @@ func (c *CommonTokenStream) Mark() int {
 
 func (c *CommonTokenStream) Release(_ int) {}
 
-func (c *CommonTokenStream) reset() {
+func (c *CommonTokenStream) Reset() {
+	c.fetchedEOF = false
+	c.tokens = make([]Token, 0)
 	c.Seek(0)
 }
 
@@ -196,6 +198,7 @@ func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 	c.tokenSource = tokenSource
 	c.tokens = make([]Token, 0)
 	c.index = -1
+	c.fetchedEOF = false
 }
 
 // NextTokenOnChannel returns the index of the next token on channel given a
