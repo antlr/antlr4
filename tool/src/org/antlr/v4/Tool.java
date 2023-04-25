@@ -112,6 +112,7 @@ public class Tool {
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
 	public boolean exact_output_dir = false;
+	public boolean lock_free_cpp_target = false;
 
     public final static Option[] optionDefs = {
 		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -133,6 +134,7 @@ public class Tool {
 		new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",                         "-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	    new Option("exact_output_dir",            "-Xexact-output-dir", "all output goes into -o dir regardless of paths/package"),
+	    new Option("lock_free_cpp_target",         "-lock-free-cpp-target", "generate lock-free C++ lexer and/or parser "),
 	};
 
 	// helper vars for option management

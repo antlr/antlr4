@@ -78,7 +78,7 @@ public abstract class Recognizer extends OutputModelObject {
 		else {
 			superClass = null;
 		}
-		lockFreeCppTarget = "ON".equals(g.getOptionString("lockFreeCppTarget"));
+		lockFreeCppTarget = g.tool.lock_free_cpp_target;
 
 		tokenNames = translateTokenStringsToTarget(g.getTokenDisplayNames(), gen);
 		literalNames = translateTokenStringsToTarget(g.getTokenLiteralNames(), gen);
