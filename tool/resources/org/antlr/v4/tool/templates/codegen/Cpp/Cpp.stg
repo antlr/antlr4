@@ -144,14 +144,19 @@ struct <lexer.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <lexer.grammarName; format = "lower">LexerOnceFlag;
-<if (lexer.lockFreeCppTarget)>
-static thread_local <lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
-<else>
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
+static thread_local
+#endif
 <lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
-<endif>
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
+  if (<lexer.grammarName; format = "lower">LexerStaticData != nullptr) {
+    return;
+  }
+#else
   assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
+#endif
   auto staticData = std::make_unique\<<lexer.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
@@ -242,11 +247,11 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 <sempredFuncs.values; separator="\n">
 
 void <lexer.name>::initialize() {
-<if (lexer.lockFreeCppTarget)>
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
   <lexer.grammarName; format = "lower">LexerInitialize();
-<else>
+#else
   ::antlr4::internal::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
-<endif>
+#endif
 }
 >>
 
@@ -372,14 +377,19 @@ struct <parser.name; format = "cap">StaticData final {
 };
 
 ::antlr4::internal::OnceFlag <parser.grammarName; format = "lower">ParserOnceFlag;
-<if (parser.lockFreeCppTarget)>
-static thread_local <parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
-<else>
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
+static thread_local
+#endif
 <parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
-<endif>
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
+  if (<parser.grammarName; format = "lower">ParserStaticData != nullptr) {
+    return;
+  }
+#else
   assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
+#endif
   auto staticData = std::make_unique\<<parser.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
@@ -447,11 +457,11 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 <sempredFuncs.values; separator="\n"><endif>
 
 void <parser.name>::initialize() {
-<if (parser.lockFreeCppTarget)>
+#if ANTLR4_USE_THREAD_LOCAL_CACHE
   <parser.grammarName; format = "lower">ParserInitialize();
-<else>
+#else
   ::antlr4::internal::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
-<endif>
+#endif
 }
 >>
 
