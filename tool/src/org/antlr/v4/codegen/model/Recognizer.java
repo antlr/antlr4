@@ -45,7 +45,6 @@ public abstract class Recognizer extends OutputModelObject {
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
 		new LinkedHashMap<Rule, RuleSempredFunction>();
-	@ModelElement public boolean lockFreeCppTarget;
 
 	public Recognizer(OutputModelFactory factory) {
 		super(factory);
@@ -78,7 +77,6 @@ public abstract class Recognizer extends OutputModelObject {
 		else {
 			superClass = null;
 		}
-		lockFreeCppTarget = g.tool.lock_free_cpp_target;
 
 		tokenNames = translateTokenStringsToTarget(g.getTokenDisplayNames(), gen);
 		literalNames = translateTokenStringsToTarget(g.getTokenLiteralNames(), gen);
