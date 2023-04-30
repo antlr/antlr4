@@ -60,8 +60,10 @@ public class TerminalNodeImpl implements TerminalNode {
 
 	@Override
 	public String toString() {
-			if ( symbol.getType() == Token.EOF ) return "<EOF>";
-			return symbol.getText();
+		if (symbol.getType() == Token.EOF) {
+			return "<EOF>";
+		}
+		return symbol.getText();
 	}
 
 	@Override

@@ -61,10 +61,10 @@ public class Utils {
 	public static String escapeWhitespace(String s, boolean escapeSpaces) {
 		StringBuilder buf = new StringBuilder();
 		for (char c : s.toCharArray()) {
-			if ( c==' ' && escapeSpaces ) buf.append('\u00B7');
-			else if ( c=='\t' ) buf.append("\\t");
-			else if ( c=='\n' ) buf.append("\\n");
-			else if ( c=='\r' ) buf.append("\\r");
+			if (c == ' ' && escapeSpaces) buf.append('\u00B7');
+			else if (c == '\t') buf.append("\\t");
+			else if (c == '\n') buf.append("\\n");
+			else if (c == '\r') buf.append("\\r");
 			else buf.append(c);
 		}
 		return buf.toString();

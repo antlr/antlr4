@@ -7,6 +7,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Utils;
 
 import java.io.Serializable;
 
@@ -159,17 +160,18 @@ public class CommonToken implements WritableToken, Serializable {
 
 	@Override
 	public String getText() {
-		if ( text!=null ) {
+		if (text != null) {
 			return text;
 		}
 
 		CharStream input = getInputStream();
-		if ( input==null ) return null;
-		int n = input.size();
-		if ( start<n && stop<n) {
-			return input.getText(Interval.of(start,stop));
+		if (input == null) {
+			return "<no text>";
 		}
-		else {
+		
+		if (start <= stop && stop < input.size()) {
+			return input.getText(Interval.of(start, stop));
+		} else {
 			return "<EOF>";
 		}
 	}
@@ -263,22 +265,17 @@ public class CommonToken implements WritableToken, Serializable {
 
 	public String toString(Recognizer<?, ?> r) {
 		String channelStr = "";
-		if ( channel>0 ) {
-			channelStr=",channel="+channel;
+		if (channel > 0) {
+			channelStr = ",channel=" + channel;
 		}
-		String txt = getText();
-		if ( txt!=null ) {
-			txt = txt.replace("\n","\\n");
-			txt = txt.replace("\r","\\r");
-			txt = txt.replace("\t","\\t");
-		}
-		else {
-			txt = "<no text>";
-		}
+		String txt = Utils.escapeWhitespace(getText(), false);
 		String typeString = String.valueOf(type);
-		if ( r!=null ) {
+		if (r != null) {
 			typeString = r.getVocabulary().getDisplayName(type);
 		}
-		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+typeString+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+		return "[@" + getTokenIndex() + "," +
+			start + ":" + stop + "='" + txt + "',<" + typeString+">" +
+			channelStr + "," + line + ":" + getCharPositionInLine() +
+			"]";
 	}
 }
