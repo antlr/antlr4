@@ -162,35 +162,35 @@ type <parser.name> struct {
 	<endif>
 }
 
-var <parser.grammarName; format="lower">ParserStaticData struct {
+var <parser.grammarName; format="cap">ParserStaticData struct {
   once                   sync.Once
   serializedATN          []int32
-  literalNames           []string
-  symbolicNames          []string
-  ruleNames              []string
-  predictionContextCache *antlr.PredictionContextCache
+  LiteralNames           []string
+  SymbolicNames          []string
+  RuleNames              []string
+  PredictionContextCache *antlr.PredictionContextCache
   atn                    *antlr.ATN
   decisionToDFA          []*antlr.DFA
 }
 
 func <parser.grammarName; format="lower">ParserInit() {
-  staticData := &<parser.grammarName; format="lower">ParserStaticData
+  staticData := &<parser.grammarName; format="cap">ParserStaticData
 <if(parser.literalNames)>
-  staticData.literalNames = []string{
+  staticData.LiteralNames = []string{
     <parser.literalNames; null="\"\"", separator=", ", wrap>,
   }
 <endif>
 <if(parser.symbolicNames)>
-  staticData.symbolicNames = []string{
+  staticData.SymbolicNames = []string{
     <parser.symbolicNames; null="\"\"", separator=", ", wrap>,
   }
 <endif>
 <if(parser.ruleNames)>
-  staticData.ruleNames = []string{
+  staticData.RuleNames = []string{
     <parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
   }
 <endif>
-  staticData.predictionContextCache = antlr.NewPredictionContextCache()
+  staticData.PredictionContextCache = antlr.NewPredictionContextCache()
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
   staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -207,7 +207,7 @@ func <parser.grammarName; format="lower">ParserInit() {
 // New<parser.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
 func <parser.name; format="cap">Init() {
-  staticData := &<parser.grammarName; format="lower">ParserStaticData
+  staticData := &<parser.grammarName; format="cap">ParserStaticData
   staticData.once.Do(<parser.grammarName; format="lower">ParserInit)
 }
 
@@ -216,11 +216,11 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	<parser.name; format="cap">Init()
 	this := new(<parser.name>)
 	this.BaseParser = antlr.NewBaseParser(input)
-  staticData := &<parser.grammarName; format="lower">ParserStaticData
-	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.predictionContextCache)
-	this.RuleNames = staticData.ruleNames
-	this.LiteralNames = staticData.literalNames
-	this.SymbolicNames = staticData.symbolicNames
+  staticData := &<parser.grammarName; format="cap">ParserStaticData
+	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
+	this.RuleNames = staticData.RuleNames
+	this.LiteralNames = staticData.LiteralNames
+	this.SymbolicNames = staticData.SymbolicNames
 	this.GrammarFileName = "<parser.grammarFileName>"
 
 	return this
@@ -1490,43 +1490,43 @@ type <lexer.name> struct {
 	// TODO: EOF string
 }
 
-var <lexer.grammarName; format="lower">LexerStaticData struct {
+var <lexer.grammarName; format="cap">LexerStaticData struct {
   once                   sync.Once
   serializedATN          []int32
-  channelNames           []string
-  modeNames              []string
-  literalNames           []string
-  symbolicNames          []string
-  ruleNames              []string
-  predictionContextCache *antlr.PredictionContextCache
+  ChannelNames           []string
+  ModeNames              []string
+  LiteralNames           []string
+  SymbolicNames          []string
+  RuleNames              []string
+  PredictionContextCache *antlr.PredictionContextCache
   atn                    *antlr.ATN
   decisionToDFA          []*antlr.DFA
 }
 
 func <lexer.grammarName; format="lower">LexerInit() {
-  staticData := &<lexer.grammarName; format="lower">LexerStaticData
-  staticData.channelNames = []string{
+  staticData := &<lexer.grammarName; format="cap">LexerStaticData
+  staticData.ChannelNames = []string{
     "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
   }
-  staticData.modeNames = []string{
+  staticData.ModeNames = []string{
     <lexer.escapedModeNames:{m | "<m>"}; separator=", ", wrap>,
   }
 <if(lexer.literalNames)>
-  staticData.literalNames = []string{
+  staticData.LiteralNames = []string{
     <lexer.literalNames; null="\"\"", separator=", ", wrap>,
   }
 <endif>
 <if(lexer.symbolicNames)>
-  staticData.symbolicNames = []string{
+  staticData.SymbolicNames = []string{
     <lexer.symbolicNames; null="\"\"", separator=", ", wrap>,
   }
 <endif>
 <if(lexer.ruleNames)>
-  staticData.ruleNames = []string{
+  staticData.RuleNames = []string{
     <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap>,
   }
 <endif>
-  staticData.predictionContextCache = antlr.NewPredictionContextCache()
+  staticData.PredictionContextCache = antlr.NewPredictionContextCache()
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
   staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -1543,7 +1543,7 @@ func <lexer.grammarName; format="lower">LexerInit() {
 // New<lexer.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
 func <lexer.name; format="cap">Init() {
-  staticData := &<lexer.grammarName; format="lower">LexerStaticData
+  staticData := &<lexer.grammarName; format="cap">LexerStaticData
   staticData.once.Do(<lexer.grammarName; format="lower">LexerInit)
 }
 
@@ -1552,13 +1552,13 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
   <lexer.name; format="cap">Init()
 	l := new(<lexer.name>)
 	l.BaseLexer = antlr.NewBaseLexer(input)
-  staticData := &<lexer.grammarName; format="lower">LexerStaticData
-	l.Interpreter = antlr.NewLexerATNSimulator(l, staticData.atn, staticData.decisionToDFA, staticData.predictionContextCache)
-	l.channelNames = staticData.channelNames
-	l.modeNames = staticData.modeNames
-	l.RuleNames = staticData.ruleNames
-	l.LiteralNames = staticData.literalNames
-	l.SymbolicNames = staticData.symbolicNames
+  staticData := &<lexer.grammarName; format="cap">LexerStaticData
+	l.Interpreter = antlr.NewLexerATNSimulator(l, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
+	l.channelNames = staticData.ChannelNames
+	l.modeNames = staticData.ModeNames
+	l.RuleNames = staticData.RuleNames
+	l.LiteralNames = staticData.LiteralNames
+	l.SymbolicNames = staticData.SymbolicNames
 	l.GrammarFileName = "<lexer.grammarFileName>"
 	// TODO: l.EOF = antlr.TokenEOF
 
