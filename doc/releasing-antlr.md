@@ -94,6 +94,8 @@ git push origin master
 
 This section addresses a [circular dependency regarding XPath](https://github.com/antlr/antlr4/issues/3600). In the java target I avoided a circular dependency (gen 4.12.0 parser for XPath using 4.12.0 which needs it to build) by hand building the parser: runtime/Java/src/org/antlr/v4/runtime/tree/xpath/XPath.java.  Probably we won't have to rerun this for the patch releases, just major ones that alter the ATN serialization.
 
+Note: C++ needs a regen too. Fails with exception during xpath run.
+
 ```
 cd ~/antlr/code/antlr4/runtime/CSharp/src/Tree/Xpath
 java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=CSharp XPathLexer.g4
