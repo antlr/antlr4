@@ -1428,6 +1428,7 @@ type <lexer.name> struct {
 	<if(superClass)><superClass><else>*antlr.BaseLexer<endif>
 	channelNames []string
 	modeNames []string
+	<namedActions.declarations>
 	// TODO: EOF string
 }
 
@@ -1501,6 +1502,7 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	l.LiteralNames = staticData.literalNames
 	l.SymbolicNames = staticData.symbolicNames
 	l.GrammarFileName = "<lexer.grammarFileName>"
+	<namedActions.construction>
 	// TODO: l.EOF = antlr.TokenEOF
 
 	return l
