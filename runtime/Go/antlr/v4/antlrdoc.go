@@ -11,15 +11,24 @@ From a grammar, ANTLR generates a parser that can build parse trees and also gen
 # Go Runtime
 
 At version 4.11.x and prior, the Go runtime was not properly versioned for go modules. After this point, the runtime
-source code is held in the `runtime/Go/antlr/v4` directory, and the go.mod file is updated to reflect the version of
-ANTLR4 that it is compatible with (I.E. uses the /v4 path). The runtime is now available as a go module, and can be
-imported as `github.com/antlr/antlr4/runtime/Go/antlr/v4` (the go get command should also be used with this path). See
-the main documentation for the ANTLR4 project for more information.
+source code to be imported was held in the `runtime/Go/antlr/v4` directory, and the go.mod file was updated to reflect the version of
+ANTLR4 that it is compatible with (I.E. uses the /v4 path).
 
-This means that if you are using the source code without modules, you should also use the source code in /v4. Though
-we highly recommend that you use go modules, as they are now idiomatic Go.
+However, this was found to be problematic, as it meant that with the runtime embedded so far underneath the root
+of the repo, the `go get` and related commands could not properly resolve the location of the go runtime source code.
+This meant that the reference to the runtime in your `go.mod` file would refer to the correct source code, but would not
+list the release tag such as @4.12.0 - this was confusing, to say the least.
 
-I am aware that this change will prove Hyrum's Law, but am prepared to live with it for teh common good. JI
+As of 4.12.1, the runtime is now available as a go module in its own repo, and can be imported as `github.com/antlr-go/antlr`
+(the go get command should also be used with this path). See the main documentation for the ANTLR4 project for more information,
+which is available at [ANTLR docs]. The documentation for using the Go runtime is available at [Go runtime docs].
+
+This means that if you are using the source code without modules, you should also use the source code in the [new repo].
+Though we highly recommend that you use go modules, as they are now idiomatic for Go.
+
+I am aware that this change will prove Hyrum's Law, but am prepared to live with it for the common good.
+
+Go runtime author: [Jim Idle] jimi@idle.ws
 
 # Code Generation
 
@@ -30,26 +39,28 @@ runtime for the Go target.
 To generate code for the go target, it is generally recommended to place the source grammar files in a package of
 their own, and use the `.sh` script method of generating code, using the go generate directive. In that same directory
 it is usual, though not required, to place the antlr tool that should be used to generate the code. That does mean
-that the antlr tool JAR file will be checked in to your source code control though, so you are free to use any other
+that the antlr tool JAR file will be checked in to your source code control though, so you are, of course, free to use any other
 way of specifying the version of the ANTLR tool to use, such as aliasing in `.zshrc` or equivalent, or a profile in
-your IDE, or configuration in your CI system.
+your IDE, or configuration in your CI system. Checking in the jar does mean that it is easy to reproduce the build as
+it was at any point in its history.
 
-Here is a general template for an ANTLR based recognizer in Go:
+Here is a general/recommended template for an ANTLR based recognizer in Go:
 
 	.
-	├── myproject
 	├── parser
 	│     ├── mygrammar.g4
 	│     ├── antlr-4.12.0-complete.jar
 	│     ├── error_listeners.go
 	│     ├── generate.go
 	│     ├── generate.sh
+	├── parsing   - generated code goes here
 	├── go.mod
 	├── go.sum
 	├── main.go
 	└── main_test.go
 
-Make sure that the package statement in your grammar file(s) reflects the go package they exist in.
+Make sure that the package statement in your grammar file(s) reflects the go package the generated code will exist in.
+
 The generate.go file then looks like this:
 
 	package parser
@@ -60,14 +71,20 @@ And the generate.sh file will look similar to this:
 
 	#!/bin/sh
 
-	alias antlr4='java -Xmx500M -cp "./antlr4-4.12.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-	antlr4 -Dlanguage=Go -no-visitor -package parser *.g4
+	alias antlr4='java -Xmx500M -cp "./antlr4-4.12.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+	antlr4 -Dlanguage=Go -no-visitor -package parsing *.g4
 
-depending on whether you want visitors or listeners or any other ANTLR options.
+depending on whether you want visitors or listeners or any other ANTLR options. Not that another option here
+is to generate the code into a
 
-From the command line at the root of your package “myproject” you can then simply issue the command:
+From the command line at the root of your source package (location of go.mo)d) you can then simply issue the command:
 
 	go generate ./...
+
+Which will generate the code for the parser, and place it in the parsing package. You can then use the generated code
+by importing the parsing package.
+
+There are no hard and fast rules on this. It is just a recommendation. You can generate the code in any way and to anywhere you like.
 
 # Copyright Notice
 
@@ -77,5 +94,9 @@ Use of this file is governed by the BSD 3-clause license, which can be found in 
 
 [target languages]: https://github.com/antlr/antlr4/tree/master/runtime
 [LICENSE.txt]: https://github.com/antlr/antlr4/blob/master/LICENSE.txt
+[ANTLR docs]: https://github.com/antlr/antlr4/blob/master/doc/index.md
+[new repo]: https://github.com/antlr-go/antlr
+[Jim Idle]: https://github.com/jimidle
+[Go runtime docs]: https://github.com/antlr/antlr4/blob/master/doc/go-target.md
 */
 package antlr
