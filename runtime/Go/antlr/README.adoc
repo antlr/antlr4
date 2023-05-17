@@ -1,4 +1,17 @@
-= Migration to v4 from non tagged code
+= Migration to v4
 
-Please note that the source code that was previously located here is now located in the `/v4` subdirectory to accommodate
-go modules. If you are not using modules, then use the code in the `/v4` subdirectory from here on out.
+== If you are using `GOPATH` and not modules
+
+Please note that the source code that was previously located in this directory is now located in the official release repository at: github.com/antlr4-go/antlr please use the code in that repo if you have a reason not to use modules.
+
+== If you are using modules
+
+Your driver code etc. should now be importing from the new release only repo for the runtime:
+
+```go
+import (
+ github.com/antlr4-go/antlr
+)
+```
+
+Please consult
