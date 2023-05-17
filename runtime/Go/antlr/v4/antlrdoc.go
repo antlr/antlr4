@@ -50,10 +50,10 @@ Here is a general/recommended template for an ANTLR based recognizer in Go:
 	├── parser
 	│     ├── mygrammar.g4
 	│     ├── antlr-4.12.0-complete.jar
-	│     ├── error_listeners.go
 	│     ├── generate.go
-	│     ├── generate.sh
+	│     └── generate.sh
 	├── parsing   - generated code goes here
+	│     └── error_listeners.go
 	├── go.mod
 	├── go.sum
 	├── main.go
