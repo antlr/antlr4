@@ -49,7 +49,7 @@ Here is a general/recommended template for an ANTLR based recognizer in Go:
 	.
 	├── parser
 	│     ├── mygrammar.g4
-	│     ├── antlr-4.12.0-complete.jar
+	│     ├── antlr-4.12.1-complete.jar
 	│     ├── generate.go
 	│     └── generate.sh
 	├── parsing   - generated code goes here
