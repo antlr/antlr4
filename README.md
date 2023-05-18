@@ -38,11 +38,13 @@ The default branch for this repo is [`master`](https://github.com/antlr/antlr4/t
 
 <img src="doc/images/new-antlr-branches.png" width="500">
 
-Targets such as Go that pull directly from the repository can use the default `master` branch but can also pull from the active `dev` branch:
+The Go target now has its own dedicated repo:
 
 ```bash
-$ go get github.com/antlr/antlr4/runtime/Go/antlr@dev
+$ go get github.com/antlr4-go/antlr
 ```
+**Note**
+The dedicated Go repo is for `go get` and `import` only. Go runtime development is still performed in the main `antlr/antlr4` repo. 
 
 ## Authors and major contributors
 
