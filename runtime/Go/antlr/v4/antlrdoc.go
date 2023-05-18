@@ -19,7 +19,7 @@ of the repo, the `go get` and related commands could not properly resolve the lo
 This meant that the reference to the runtime in your `go.mod` file would refer to the correct source code, but would not
 list the release tag such as @4.12.0 - this was confusing, to say the least.
 
-As of 4.12.1, the runtime is now available as a go module in its own repo, and can be imported as `github.com/antlr-go/antlr`
+As of 4.12.1, the runtime is now available as a go module in its own repo, and can be imported as `github.com/antlr4-go/antlr`
 (the go get command should also be used with this path). See the main documentation for the ANTLR4 project for more information,
 which is available at [ANTLR docs]. The documentation for using the Go runtime is available at [Go runtime docs].
 
@@ -95,7 +95,7 @@ Use of this file is governed by the BSD 3-clause license, which can be found in 
 [target languages]: https://github.com/antlr/antlr4/tree/master/runtime
 [LICENSE.txt]: https://github.com/antlr/antlr4/blob/master/LICENSE.txt
 [ANTLR docs]: https://github.com/antlr/antlr4/blob/master/doc/index.md
-[new repo]: https://github.com/antlr-go/antlr
+[new repo]: https://github.com/antlr4-go/antlr
 [Jim Idle]: https://github.com/jimidle
 [Go runtime docs]: https://github.com/antlr/antlr4/blob/master/doc/go-target.md
 */
