@@ -1,4 +1,4 @@
-# Generated from Expr.g4 by ANTLR 4.9.3
+# Generated from Expr.g4 by ANTLR 4.11.2-SNAPSHOT
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -86,7 +86,7 @@ class ExprParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.9.3")
+        self.checkVersion("4.11.2-SNAPSHOT")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
@@ -137,7 +137,7 @@ class ExprParser ( Parser ):
                 self.state = 17 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not (_la==ExprParser.T__0):
+                if not (_la==1):
                     break
 
         except RecognitionException as re:
@@ -202,7 +202,7 @@ class ExprParser ( Parser ):
             self.state = 27
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==ExprParser.T__2:
+            while _la==3:
                 self.state = 23
                 self.match(ExprParser.T__2)
                 self.state = 24
@@ -270,7 +270,7 @@ class ExprParser ( Parser ):
                 self.state = 37 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << ExprParser.T__1) | (1 << ExprParser.T__6) | (1 << ExprParser.RETURN) | (1 << ExprParser.ID) | (1 << ExprParser.INT))) != 0)):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 57476) != 0)):
                     break
 
             self.state = 39
@@ -603,7 +603,7 @@ class ExprParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
                         self.state = 62
                         _la = self._input.LA(1)
-                        if not(_la==ExprParser.MUL or _la==ExprParser.DIV):
+                        if not(_la==9 or _la==10):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
@@ -621,7 +621,7 @@ class ExprParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
                         self.state = 65
                         _la = self._input.LA(1)
-                        if not(_la==ExprParser.ADD or _la==ExprParser.SUB):
+                        if not(_la==11 or _la==12):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
@@ -725,19 +725,19 @@ class ExprParser ( Parser ):
             self.state = 78
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [ExprParser.INT]:
+            if token in [15]:
                 localctx = ExprParser.IntContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 72
                 self.match(ExprParser.INT)
                 pass
-            elif token in [ExprParser.ID]:
+            elif token in [14]:
                 localctx = ExprParser.IdContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 73
                 self.match(ExprParser.ID)
                 pass
-            elif token in [ExprParser.T__1]:
+            elif token in [2]:
                 localctx = ExprParser.ParensContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
                 self.state = 74

@@ -68,7 +68,7 @@ It's also worth doing a quick check to see if you find any other references to a
 
 ```bash
 mvn clean
-find . -type f -exec grep -l '4\.11.1' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
+find . -type f -exec grep -l '4\.12.0' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
 ```
 
 Commit to repository.
@@ -94,17 +94,20 @@ git push origin master
 
 This section addresses a [circular dependency regarding XPath](https://github.com/antlr/antlr4/issues/3600). In the java target I avoided a circular dependency (gen 4.12.0 parser for XPath using 4.12.0 which needs it to build) by hand building the parser: runtime/Java/src/org/antlr/v4/runtime/tree/xpath/XPath.java.  Probably we won't have to rerun this for the patch releases, just major ones that alter the ATN serialization.
 
-```
+```bash
+cd ~/antlr/code/antlr4/runtime/Cpp/runtime/src/tree/xpath
+java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.13.0-SNAPSHOT/antlr4-4.13.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Cpp XPathLexer.g4
+
 cd ~/antlr/code/antlr4/runtime/CSharp/src/Tree/Xpath
-java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=CSharp XPathLexer.g4
+java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.13-0-SNAPSHOT/antlr4-4.13-0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=CSharp XPathLexer.g4
+
+cd ~/antlr/code/antlr4/runtime/Python2/src/antlr4/xpath
+java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.13-0-SNAPSHOT/antlr4-4.13-0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python2 XPathLexer.g4
 
 cd ~/antlr/code/antlr4/runtime/Python3/tests/expr
-java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python2 Expr.g4
-java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python2 XPathLexer.g4
-
-cd ~/antlr/code/antlr4/runtime/Python3/tests/expr
-java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python3 Expr.g4
-java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.12.0-SNAPSHOT/antlr4-4.12.0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python3 XPathLexer.g4
+java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.13-0-SNAPSHOT/antlr4-4.13-0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python3 Expr.g4
+cd ~/antlr/code/antlr4/runtime/Python3/src/antlr4/xpath
+java -cp ":/Users/parrt/.m2/repository/org/antlr/antlr4/4.13-0-SNAPSHOT/antlr4-4.13-0-SNAPSHOT-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=Python3 XPathLexer.g4
 ```
 
 ## Maven Repository Settings
