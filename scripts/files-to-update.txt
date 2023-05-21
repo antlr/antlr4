@@ -31,6 +31,7 @@ runtime/CSharp/src/Antlr4.csproj
 runtime/JavaScript/package-lock.json
 runtime/JavaScript/package.json
 runtime/JavaScript/src/antlr4/Recognizer.js
+runtime/JavaScript/spec/rewriter/Makefile
 runtime-testsuite/resources/org/antlr/v4/test/runtime/helpers/package_ts.json
 
 # Allow doc files to have multiple values updated
