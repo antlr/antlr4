@@ -6,10 +6,8 @@
 # Lines starting with '*' allow multiple changes in single file
 
 docker/Dockerfile
-runtime/Go/antlr/recognizer.go
 runtime/Go/antlr/v4/recognizer.go
 runtime/Go/antlr/v4/antlrdoc.go
-runtime/Go/antlr/antlrdoc.go
 runtime/Python3/pyproject.toml
 runtime/Python3/src/antlr4/Recognizer.py
 runtime/Python2/setup.py

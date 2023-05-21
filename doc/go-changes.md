@@ -1,8 +1,8 @@
 # Changes to the Go Runtime over time
 
-## v4.12.0 to v4.12.1
+## v4.12.0 to v4.13.0
 
-Strictly speaking, if ANTLR was a go only project following [SemVer](https://semver.org/) release v4.12.1 would be
+Strictly speaking, if ANTLR was a go only project following [SemVer](https://semver.org/) release v4.13.0 would be
 at least a minor version change and arguably a bump to v5. However, we must follow the ANTLR conventions here or the
 release numbers would quickly become confusing. I apologize for being unable to follow the Go release rules absolutely 
 to the letter.

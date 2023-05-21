@@ -91,8 +91,8 @@ golang.org/x/exp
 ```
 
 A complete list of releases can be found on [the release page](https://github.com/antlr/antlr4/releases). The Go 
-runtime will be tagged using standard Go tags, so release 4.12.1 in the `antlr4-go/antlr` repo, will be tagged with 
-`v4.12.1` and go get will pick that up from the ANTLR repo.
+runtime will be tagged using standard Go tags, so release 4.13.0 in the `antlr4-go/antlr` repo, will be tagged with 
+`v4.13.0` and go get will pick that up from the ANTLR repo.
 
 #### 3. Configuring `go generate` in your project
 
@@ -108,7 +108,7 @@ place the ANTLR grammar files in their own package in your project structure. He
 	├── myproject
 	├── parser
 	│     ├── mygrammar.g4
-	│     ├── antlr-4.12.1-complete.jar
+	│     ├── antlr-4.13.0-complete.jar
 	│     ├── generate.go
 	│     └── generate.sh
 	├── parsing  # Generated code goes here
@@ -133,7 +133,7 @@ And the `generate.sh` file will look similar to this:
 ```shell
 	#!/bin/sh
 
-	alias antlr4='java -Xmx500M -cp "./antlr-4.12.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+	alias antlr4='java -Xmx500M -cp "./antlr-4.13.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
 	antlr4 -Dlanguage=Go -no-visitor -package parsing *.g4
 ```
 
@@ -172,10 +172,10 @@ So the command `go get github.com/antlr/antlr4/runtime/Go/antlr` would just brin
 whatever was the `HEAD` of the master branch. While this *kind of* worked, it is obviously subject to problems and does
 not fit properly with the idiomatic ways of Go.
 
-As of v4.12.1 the runtime code exists in its own repo, `github.com/antlr4-go/antlr`, and is correctly tagged. 
+As of v4.13.0 the runtime code exists in its own repo, `github.com/antlr4-go/antlr`, and is correctly tagged. 
 However, this means you need to perform a few simple actions in order to upgrade to the `/v4` path. 
 
- - Firstly, make sure that you are using an ANTLR tool jar with a version number of 4.12.1 or greater.
+ - Firstly, make sure that you are using an ANTLR tool jar with a version number of 4.13.0 or greater.
  - Next you replace any mention of the old (default) path to ANTLR in your go source files.
  - If using modules, remove any existing reference to the ANTLR Go runtime
  - Now regenerate your grammar files either manually or using `go generate ./...` (see above)
@@ -197,7 +197,7 @@ go mod tidy
 Should fix up your `go.mod` file to reference only the `v4` version of the ANTLR Go runtime:
 
 ```shell
-require github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.12.1
+require github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.13.0
 ```
 
 From this point on, your go mod commands will work correctly with the ANTLR repo and upgrades and downgrades will work
