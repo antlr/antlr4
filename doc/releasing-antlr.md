@@ -347,6 +347,7 @@ Then run the python build and upload:
 cd ~/antlr/code/antlr4/runtime/Python2
 # assume you have ~/.pypirc set up
 pip install build twine
+python -m build
 twine upload dist/antlr4-python2-runtime-4.13.0.tar.gz
 ```
 
