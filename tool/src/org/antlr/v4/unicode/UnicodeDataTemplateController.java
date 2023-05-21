@@ -7,17 +7,13 @@
 package org.antlr.v4.unicode;
 
 import com.ibm.icu.lang.UCharacter;
-import com.ibm.icu.lang.UCharacterCategory;
 import com.ibm.icu.lang.UProperty;
-import com.ibm.icu.lang.UScript;
 import com.ibm.icu.text.UnicodeSet;
 import com.ibm.icu.util.RangeValueIterator;
-
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * StringTemplate controller used to generate parameters to feed
@@ -86,10 +82,31 @@ public abstract class UnicodeDataTemplateController {
 		addUnicodeIntPropertyCodesToNames(propertyAliases);
 		propertyAliases.put("EP", "Extended_Pictographic");
 
+		Map<String, List<Integer>> rawPropertyCodePointRanges = new LinkedHashMap<>();
+		for (Map.Entry<String, IntervalSet> entry : propertyCodePointRanges.entrySet()) {
+			rawPropertyCodePointRanges.put(entry.getKey().toLowerCase(Locale.US), convertToRawArray(entry.getValue()));
+		}
+		List<String> rawPropertyAliases = new ArrayList<>(propertyAliases.size() * 2);
+		for (Map.Entry<String, String> entry : propertyAliases.entrySet()) {
+			rawPropertyAliases.add(entry.getKey().toLowerCase(Locale.US));
+			rawPropertyAliases.add(entry.getValue().toLowerCase(Locale.US));
+		}
+
 		Map<String, Object> properties = new LinkedHashMap<>();
-		properties.put("propertyCodePointRanges", propertyCodePointRanges);
-		properties.put("propertyAliases", propertyAliases);
+		properties.put("rawPropertyCodePointRanges", rawPropertyCodePointRanges);
+		properties.put("rawPropertyAliases", rawPropertyAliases);
 		return properties;
+	}
+
+	private static List<Integer> convertToRawArray(IntervalSet intervalSet) {
+		List<Interval> intervals = intervalSet.getIntervals();
+		int intervalSetSize = intervals.size();
+		List<Integer> rawArray = new ArrayList<>(intervalSetSize * 2);
+		for (Interval interval : intervals) {
+			rawArray.add(interval.a);
+			rawArray.add(interval.b);
+		}
+		return rawArray;
 	}
 
 	private static String getShortPropertyName(int property) {

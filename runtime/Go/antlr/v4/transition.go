@@ -72,7 +72,7 @@ func (t *BaseTransition) getSerializationType() int {
 	return t.serializationType
 }
 
-func (t *BaseTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *BaseTransition) Matches(_, _, _ int) bool {
 	panic("Not implemented")
 }
 
@@ -89,6 +89,7 @@ const (
 	TransitionPRECEDENCE = 10
 )
 
+//goland:noinspection GoUnusedGlobalVariable
 var TransitionserializationNames = []string{
 	"INVALID",
 	"EPSILON",
@@ -127,19 +128,22 @@ var TransitionserializationNames = []string{
 //	TransitionPRECEDENCE
 //}
 
+// AtomTransition
 // TODO: make all transitions sets? no, should remove set edges
 type AtomTransition struct {
-	*BaseTransition
+	BaseTransition
 }
 
 func NewAtomTransition(target ATNState, intervalSet int) *AtomTransition {
-
-	t := new(AtomTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.label = intervalSet // The token type or character value or, signifies special intervalSet.
+	t := &AtomTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionATOM,
+			label:             intervalSet,
+			isEpsilon:         false,
+		},
+	}
 	t.intervalSet = t.makeLabel()
-	t.serializationType = TransitionATOM
 
 	return t
 }
@@ -150,7 +154,7 @@ func (t *AtomTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *AtomTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *AtomTransition) Matches(symbol, _, _ int) bool {
 	return t.label == symbol
 }
 
@@ -159,48 +163,45 @@ func (t *AtomTransition) String() string {
 }
 
 type RuleTransition struct {
-	*BaseTransition
-
+	BaseTransition
 	followState           ATNState
 	ruleIndex, precedence int
 }
 
 func NewRuleTransition(ruleStart ATNState, ruleIndex, precedence int, followState ATNState) *RuleTransition {
-
-	t := new(RuleTransition)
-	t.BaseTransition = NewBaseTransition(ruleStart)
-
-	t.ruleIndex = ruleIndex
-	t.precedence = precedence
-	t.followState = followState
-	t.serializationType = TransitionRULE
-	t.isEpsilon = true
-
-	return t
+	return &RuleTransition{
+		BaseTransition: BaseTransition{
+			target:            ruleStart,
+			isEpsilon:         true,
+			serializationType: TransitionRULE,
+		},
+		ruleIndex:   ruleIndex,
+		precedence:  precedence,
+		followState: followState,
+	}
 }
 
-func (t *RuleTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RuleTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
 type EpsilonTransition struct {
-	*BaseTransition
-
+	BaseTransition
 	outermostPrecedenceReturn int
 }
 
 func NewEpsilonTransition(target ATNState, outermostPrecedenceReturn int) *EpsilonTransition {
-
-	t := new(EpsilonTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.serializationType = TransitionEPSILON
-	t.isEpsilon = true
-	t.outermostPrecedenceReturn = outermostPrecedenceReturn
-	return t
+	return &EpsilonTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionEPSILON,
+			isEpsilon:         true,
+		},
+		outermostPrecedenceReturn: outermostPrecedenceReturn,
+	}
 }
 
-func (t *EpsilonTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *EpsilonTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -209,19 +210,20 @@ func (t *EpsilonTransition) String() string {
 }
 
 type RangeTransition struct {
-	*BaseTransition
-
+	BaseTransition
 	start, stop int
 }
 
 func NewRangeTransition(target ATNState, start, stop int) *RangeTransition {
-
-	t := new(RangeTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.serializationType = TransitionRANGE
-	t.start = start
-	t.stop = stop
+	t := &RangeTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionRANGE,
+			isEpsilon:         false,
+		},
+		start: start,
+		stop:  stop,
+	}
 	t.intervalSet = t.makeLabel()
 	return t
 }
@@ -232,7 +234,7 @@ func (t *RangeTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *RangeTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RangeTransition) Matches(symbol, _, _ int) bool {
 	return symbol >= t.start && symbol <= t.stop
 }
 
@@ -252,40 +254,41 @@ type AbstractPredicateTransition interface {
 }
 
 type BaseAbstractPredicateTransition struct {
-	*BaseTransition
+	BaseTransition
 }
 
 func NewBasePredicateTransition(target ATNState) *BaseAbstractPredicateTransition {
-
-	t := new(BaseAbstractPredicateTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	return t
+	return &BaseAbstractPredicateTransition{
+		BaseTransition: BaseTransition{
+			target: target,
+		},
+	}
 }
 
 func (a *BaseAbstractPredicateTransition) IAbstractPredicateTransitionFoo() {}
 
 type PredicateTransition struct {
-	*BaseAbstractPredicateTransition
-
+	BaseAbstractPredicateTransition
 	isCtxDependent       bool
 	ruleIndex, predIndex int
 }
 
 func NewPredicateTransition(target ATNState, ruleIndex, predIndex int, isCtxDependent bool) *PredicateTransition {
-
-	t := new(PredicateTransition)
-	t.BaseAbstractPredicateTransition = NewBasePredicateTransition(target)
-
-	t.serializationType = TransitionPREDICATE
-	t.ruleIndex = ruleIndex
-	t.predIndex = predIndex
-	t.isCtxDependent = isCtxDependent // e.g., $i ref in pred
-	t.isEpsilon = true
-	return t
+	return &PredicateTransition{
+		BaseAbstractPredicateTransition: BaseAbstractPredicateTransition{
+			BaseTransition: BaseTransition{
+				target:            target,
+				serializationType: TransitionPREDICATE,
+				isEpsilon:         true,
+			},
+		},
+		isCtxDependent: isCtxDependent,
+		ruleIndex:      ruleIndex,
+		predIndex:      predIndex,
+	}
 }
 
-func (t *PredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PredicateTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -298,26 +301,25 @@ func (t *PredicateTransition) String() string {
 }
 
 type ActionTransition struct {
-	*BaseTransition
-
+	BaseTransition
 	isCtxDependent                    bool
 	ruleIndex, actionIndex, predIndex int
 }
 
 func NewActionTransition(target ATNState, ruleIndex, actionIndex int, isCtxDependent bool) *ActionTransition {
-
-	t := new(ActionTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.serializationType = TransitionACTION
-	t.ruleIndex = ruleIndex
-	t.actionIndex = actionIndex
-	t.isCtxDependent = isCtxDependent // e.g., $i ref in pred
-	t.isEpsilon = true
-	return t
+	return &ActionTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionACTION,
+			isEpsilon:         true,
+		},
+		isCtxDependent: isCtxDependent,
+		ruleIndex:      ruleIndex,
+		actionIndex:    actionIndex,
+	}
 }
 
-func (t *ActionTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *ActionTransition) Matches(_, _, _ int) bool {
 	return false
 }
 
@@ -326,26 +328,27 @@ func (t *ActionTransition) String() string {
 }
 
 type SetTransition struct {
-	*BaseTransition
+	BaseTransition
 }
 
 func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
+	t := &SetTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionSET,
+		},
+	}
 
-	t := new(SetTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.serializationType = TransitionSET
 	if set != nil {
 		t.intervalSet = set
 	} else {
 		t.intervalSet = NewIntervalSet()
 		t.intervalSet.addOne(TokenInvalidType)
 	}
-
 	return t
 }
 
-func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *SetTransition) Matches(symbol, _, _ int) bool {
 	return t.intervalSet.contains(symbol)
 }
 
@@ -354,16 +357,24 @@ func (t *SetTransition) String() string {
 }
 
 type NotSetTransition struct {
-	*SetTransition
+	SetTransition
 }
 
 func NewNotSetTransition(target ATNState, set *IntervalSet) *NotSetTransition {
-
-	t := new(NotSetTransition)
-
-	t.SetTransition = NewSetTransition(target, set)
-
-	t.serializationType = TransitionNOTSET
+	t := &NotSetTransition{
+		SetTransition: SetTransition{
+			BaseTransition: BaseTransition{
+				target:            target,
+				serializationType: TransitionNOTSET,
+			},
+		},
+	}
+	if set != nil {
+		t.intervalSet = set
+	} else {
+		t.intervalSet = NewIntervalSet()
+		t.intervalSet.addOne(TokenInvalidType)
+	}
 
 	return t
 }
@@ -377,16 +388,16 @@ func (t *NotSetTransition) String() string {
 }
 
 type WildcardTransition struct {
-	*BaseTransition
+	BaseTransition
 }
 
 func NewWildcardTransition(target ATNState) *WildcardTransition {
-
-	t := new(WildcardTransition)
-	t.BaseTransition = NewBaseTransition(target)
-
-	t.serializationType = TransitionWILDCARD
-	return t
+	return &WildcardTransition{
+		BaseTransition: BaseTransition{
+			target:            target,
+			serializationType: TransitionWILDCARD,
+		},
+	}
 }
 
 func (t *WildcardTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
@@ -398,24 +409,24 @@ func (t *WildcardTransition) String() string {
 }
 
 type PrecedencePredicateTransition struct {
-	*BaseAbstractPredicateTransition
-
+	BaseAbstractPredicateTransition
 	precedence int
 }
 
 func NewPrecedencePredicateTransition(target ATNState, precedence int) *PrecedencePredicateTransition {
-
-	t := new(PrecedencePredicateTransition)
-	t.BaseAbstractPredicateTransition = NewBasePredicateTransition(target)
-
-	t.serializationType = TransitionPRECEDENCE
-	t.precedence = precedence
-	t.isEpsilon = true
-
-	return t
+	return &PrecedencePredicateTransition{
+		BaseAbstractPredicateTransition: BaseAbstractPredicateTransition{
+			BaseTransition: BaseTransition{
+				target:            target,
+				serializationType: TransitionPRECEDENCE,
+				isEpsilon:         true,
+			},
+		},
+		precedence: precedence,
+	}
 }
 
-func (t *PrecedencePredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PrecedencePredicateTransition) Matches(_, _, _ int) bool {
 	return false
 }
 

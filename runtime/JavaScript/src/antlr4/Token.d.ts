@@ -7,6 +7,7 @@ export declare class Token {
     tokenIndex: number;
     line: number;
     column: number;
+    channel: number;
     text: string;
     type: number;
     start : number;

@@ -2,6 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+import { stringHashCode } from "../utils/stringHashCode.js";
+
 export default class HashCode {
 
     constructor() {
@@ -27,7 +29,7 @@ export default class HashCode {
                         k = value;
                         break;
                     case 'string':
-                        k = value.hashCode();
+                        k = stringHashCode(value);
                         break;
                     default:
                         if(value.updateHashCode)

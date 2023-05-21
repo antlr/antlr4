@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  cpp-builds:
+  cpp-lib-build:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -26,6 +26,7 @@ jobs:
           windows-2022
         ]
         compiler: [ clang, gcc ]
+        unity_build: [ ON, OFF ]
         exclude:
           - os: windows-2022
             compiler: gcc
@@ -95,7 +96,7 @@ jobs:
 
         cd runtime/Cpp
 
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -DCMAKE_UNITY_BUILD=${{ matrix.unity_build }} -DCMAKE_UNITY_BUILD_BATCH_SIZE=20 -S . -B out/Debug
         if %errorlevel% neq 0 exit /b %errorlevel%
 
         cmake --build out/Debug -j %NUMBER_OF_PROCESSORS%
@@ -130,7 +131,7 @@ jobs:
 
         cd runtime/Cpp
 
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -DCMAKE_UNITY_BUILD=${{ matrix.unity_build }} -DCMAKE_UNITY_BUILD_BATCH_SIZE=20 -S . -B out/Debug
         cmake --build out/Debug --parallel
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
@@ -140,11 +141,12 @@ jobs:
       if: always()
       run: |
         cd ${{ github.workspace }}/..
-        tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz antlr4
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz ${{ github.workspace }}/.
 
     - name: Archive artifacts
       if: always()
+      continue-on-error: true
       uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.compiler }}
@@ -338,11 +340,12 @@ jobs:
       if: always()
       run: |
         cd ${{ github.workspace }}/..
-        tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz antlr4
+        tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.target }}.tgz ${{ github.workspace }}/.
 
     - name: Archive artifacts
       if: always()
+      continue-on-error: true
       uses: actions/upload-artifact@v3
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.target }}

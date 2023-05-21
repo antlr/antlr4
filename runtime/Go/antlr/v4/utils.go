@@ -9,8 +9,10 @@ import (
 	"errors"
 	"fmt"
 	"math/bits"
+	"os"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 func intMin(a, b int) int {
@@ -31,7 +33,7 @@ func intMax(a, b int) int {
 
 type IntStack []int
 
-var ErrEmptyStack = errors.New("Stack is empty")
+var ErrEmptyStack = errors.New("stack is empty")
 
 func (s *IntStack) Pop() (int, error) {
 	l := len(*s) - 1
@@ -47,33 +49,13 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-type comparable interface {
-	Equals(other Collectable[any]) bool
-}
-
-func standardEqualsFunction(a Collectable[any], b Collectable[any]) bool {
-
-	return a.Equals(b)
-}
-
-func standardHashFunction(a interface{}) int {
-	if h, ok := a.(hasher); ok {
-		return h.Hash()
-	}
-
-	panic("Not Hasher")
-}
-
-type hasher interface {
-	Hash() int
-}
-
 const bitsPerWord = 64
 
 func indexForBit(bit int) int {
 	return bit / bitsPerWord
 }
 
+//goland:noinspection GoUnusedExportedFunction,GoUnusedFunction
 func wordForBit(data []uint64, bit int) uint64 {
 	idx := indexForBit(bit)
 	if idx >= len(data) {
@@ -94,6 +76,8 @@ type BitSet struct {
 	data []uint64
 }
 
+// NewBitSet creates a new bitwise set
+// TODO: See if we can replace with the standard library's BitSet
 func NewBitSet() *BitSet {
 	return &BitSet{}
 }
@@ -123,7 +107,7 @@ func (b *BitSet) or(set *BitSet) {
 	setLen := set.minLen()
 	maxLen := intMax(bLen, setLen)
 	if maxLen > len(b.data) {
-		// Increase the size of len(b.data) to repesent the bits in both sets.
+		// Increase the size of len(b.data) to represent the bits in both sets.
 		data := make([]uint64, maxLen)
 		copy(data, b.data)
 		b.data = data
@@ -246,37 +230,6 @@ func (a *AltDict) values() []interface{} {
 	return vs
 }
 
-type DoubleDict struct {
-	data map[int]map[int]interface{}
-}
-
-func NewDoubleDict() *DoubleDict {
-	dd := new(DoubleDict)
-	dd.data = make(map[int]map[int]interface{})
-	return dd
-}
-
-func (d *DoubleDict) Get(a, b int) interface{} {
-	data := d.data[a]
-
-	if data == nil {
-		return nil
-	}
-
-	return data[b]
-}
-
-func (d *DoubleDict) set(a, b int, o interface{}) {
-	data := d.data[a]
-
-	if data == nil {
-		data = make(map[int]interface{})
-		d.data[a] = data
-	}
-
-	data[b] = o
-}
-
 func EscapeWhitespace(s string, escapeSpaces bool) string {
 
 	s = strings.Replace(s, "\t", "\\t", -1)
@@ -288,6 +241,7 @@ func EscapeWhitespace(s string, escapeSpaces bool) string {
 	return s
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	st := make([]string, len(sa))
 
@@ -298,6 +252,7 @@ func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	return st
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func PrintArrayJavaStyle(sa []string) string {
 	var buffer bytes.Buffer
 
@@ -349,4 +304,25 @@ func murmurFinish(h int, numberOfWords int) int {
 	hash ^= hash >> 16
 
 	return int(hash)
+}
+
+func isDirectory(dir string) (bool, error) {
+	fileInfo, err := os.Stat(dir)
+	if err != nil {
+		switch {
+		case errors.Is(err, syscall.ENOENT):
+			// The given directory does not exist, so we will try to create it
+			//
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				return false, err
+			}
+
+			return true, nil
+		case err != nil:
+			return false, err
+		default:
+		}
+	}
+	return fileInfo.IsDir(), err
 }

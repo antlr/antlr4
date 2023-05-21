@@ -35,6 +35,8 @@ type Token interface {
 
 	GetTokenSource() TokenSource
 	GetInputStream() CharStream
+
+	String() string
 }
 
 type BaseToken struct {
@@ -53,7 +55,7 @@ type BaseToken struct {
 const (
 	TokenInvalidType = 0
 
-	// During lookahead operations, this "token" signifies we hit rule end ATN state
+	// TokenEpsilon  - during lookahead operations, this "token" signifies we hit the rule end [ATN] state
 	// and did not follow it despite needing to.
 	TokenEpsilon = -2
 
@@ -61,15 +63,16 @@ const (
 
 	TokenEOF = -1
 
-	// All tokens go to the parser (unless Skip() is called in that rule)
+	// TokenDefaultChannel is the default channel upon which tokens are sent to the parser.
+	//
+	// All tokens go to the parser (unless [Skip] is called in the lexer rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
-
 	TokenDefaultChannel = 0
 
-	// Anything on different channel than DEFAULT_CHANNEL is not parsed
-	// by parser.
-
+	// TokenHiddenChannel defines the normal hidden channel - the parser wil not see tokens that are not on [TokenDefaultChannel].
+	//
+	// Anything on a different channel than TokenDefaultChannel is not parsed by parser.
 	TokenHiddenChannel = 1
 )
 
@@ -118,21 +121,22 @@ func (b *BaseToken) GetInputStream() CharStream {
 }
 
 type CommonToken struct {
-	*BaseToken
+	BaseToken
 }
 
 func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start, stop int) *CommonToken {
 
-	t := new(CommonToken)
+	t := &CommonToken{
+		BaseToken: BaseToken{
+			source:     source,
+			tokenType:  tokenType,
+			channel:    channel,
+			start:      start,
+			stop:       stop,
+			tokenIndex: -1,
+		},
+	}
 
-	t.BaseToken = new(BaseToken)
-
-	t.source = source
-	t.tokenType = tokenType
-	t.channel = channel
-	t.start = start
-	t.stop = stop
-	t.tokenIndex = -1
 	if t.source.tokenSource != nil {
 		t.line = source.tokenSource.GetLine()
 		t.column = source.tokenSource.GetCharPositionInLine()

@@ -8,13 +8,14 @@ type TokenStream interface {
 	IntStream
 
 	LT(k int) Token
+	Reset()
 
 	Get(index int) Token
 	GetTokenSource() TokenSource
 	SetTokenSource(TokenSource)
 
 	GetAllText() string
-	GetTextFromInterval(*Interval) string
+	GetTextFromInterval(Interval) string
 	GetTextFromRuleContext(RuleContext) string
 	GetTextFromTokens(Token, Token) string
 }

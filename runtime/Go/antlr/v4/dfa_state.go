@@ -22,30 +22,31 @@ func (p *PredPrediction) String() string {
 	return "(" + fmt.Sprint(p.pred) + ", " + fmt.Sprint(p.alt) + ")"
 }
 
-// DFAState represents a set of possible ATN configurations. As Aho, Sethi,
+// DFAState represents a set of possible [ATN] configurations. As Aho, Sethi,
 // Ullman p. 117 says: "The DFA uses its state to keep track of all possible
 // states the ATN can be in after reading each input symbol. That is to say,
-// after reading input a1a2..an, the DFA is in a state that represents the
+// after reading input a1, a2,..an, the DFA is in a state that represents the
 // subset T of the states of the ATN that are reachable from the ATN's start
-// state along some path labeled a1a2..an." In conventional NFA-to-DFA
-// conversion, therefore, the subset T would be a bitset representing the set of
-// states the ATN could be in. We need to track the alt predicted by each state
+// state along some path labeled a1a2..an."
+//
+// In conventional NFA-to-DFA conversion, therefore, the subset T would be a bitset representing the set of
+// states the [ATN] could be in. We need to track the alt predicted by each state
 // as well, however. More importantly, we need to maintain a stack of states,
 // tracking the closure operations as they jump from rule to rule, emulating
 // rule invocations (method calls). I have to add a stack to simulate the proper
 // lookahead sequences for the underlying LL grammar from which the ATN was
 // derived.
 //
-// I use a set of ATNConfig objects, not simple states. An ATNConfig is both a
-// state (ala normal conversion) and a RuleContext describing the chain of rules
+// I use a set of [ATNConfig] objects, not simple states. An [ATNConfig] is both a
+// state (ala normal conversion) and a [RuleContext] describing the chain of rules
 // (if any) followed to arrive at that state.
 //
-// A DFAState may have multiple references to a particular state, but with
-// different ATN contexts (with same or different alts) meaning that state was
+// A [DFAState] may have multiple references to a particular state, but with
+// different [ATN] contexts (with same or different alts) meaning that state was
 // reached via a different set of rule invocations.
 type DFAState struct {
 	stateNumber int
-	configs     ATNConfigSet
+	configs     *ATNConfigSet
 
 	// edges elements point to the target of the symbol. Shift up by 1 so (-1)
 	// Token.EOF maps to the first element.
@@ -53,7 +54,7 @@ type DFAState struct {
 
 	isAcceptState bool
 
-	// prediction is the ttype we match or alt we predict if the state is accept.
+	// prediction is the 'ttype' we match or alt we predict if the state is 'accept'.
 	// Set to ATN.INVALID_ALT_NUMBER when predicates != nil or
 	// requiresFullContext.
 	prediction int
@@ -81,9 +82,9 @@ type DFAState struct {
 	predicates []*PredPrediction
 }
 
-func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
+func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 	if configs == nil {
-		configs = NewBaseATNConfigSet(false)
+		configs = NewATNConfigSet(false)
 	}
 
 	return &DFAState{configs: configs, stateNumber: stateNumber}
@@ -94,7 +95,7 @@ func (d *DFAState) GetAltSet() []int {
 	var alts []int
 
 	if d.configs != nil {
-		for _, c := range d.configs.GetItems() {
+		for _, c := range d.configs.configs {
 			alts = append(alts, c.GetAlt())
 		}
 	}

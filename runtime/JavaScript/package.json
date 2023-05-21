@@ -4,7 +4,7 @@
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "browser": "dist/antlr4.web.js",
-  "main": "dist/antlr4.node.js",
+  "main": "dist/antlr4.node.mjs",
   "types": "src/antlr4/index.d.ts",
   "repository": "antlr/antlr4.git",
   "keywords": [
@@ -25,6 +25,7 @@
     "@babel/preset-env": "^7.19.4",
     "@types/node": "^18.7.23",
     "babel-loader": "^8.2.5",
+    "c8": "^7.12.0",
     "compression-webpack-plugin": "^10.0.0",
     "eslint": "^8.23.1",
     "eslint-webpack-plugin": "^3.2.0",
@@ -40,9 +41,27 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "jasmine"
+    "test": "jasmine",
+    "coverage": "c8 jasmine",
+    "lint": "eslint src/antlr4/"
   },
   "engines": {
     "node": ">=16"
+  },
+  "exports": {
+    ".": {
+      "node": {
+        "types": "src/index.node.d.ts",
+        "import": "./dist/antlr4.node.mjs",
+        "require": "./dist/antlr4.node.cjs",
+        "default": "./dist/antlr4.node.mjs"
+      },
+      "browser": {
+        "types": "src/index.web.d.ts",
+        "import": "./dist/antlr4.web.mjs",
+        "require": "./dist/antlr4.web.cjs",
+        "default": "./dist/antlr4.web.mjs"
+      }
+    }
   }
 }

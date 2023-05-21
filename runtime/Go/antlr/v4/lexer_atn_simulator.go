@@ -10,10 +10,8 @@ import (
 	"strings"
 )
 
+//goland:noinspection GoUnusedGlobalVariable
 var (
-	LexerATNSimulatorDebug    = false
-	LexerATNSimulatorDFADebug = false
-
 	LexerATNSimulatorMinDFAEdge = 0
 	LexerATNSimulatorMaxDFAEdge = 127 // forces unicode to stay in ATN
 
@@ -32,11 +30,11 @@ type ILexerATNSimulator interface {
 }
 
 type LexerATNSimulator struct {
-	*BaseATNSimulator
+	BaseATNSimulator
 
 	recog              Lexer
 	predictionMode     int
-	mergeCache         DoubleDict
+	mergeCache         *JPCMap2
 	startIndex         int
 	Line               int
 	CharPositionInLine int
@@ -46,27 +44,35 @@ type LexerATNSimulator struct {
 }
 
 func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *LexerATNSimulator {
-	l := new(LexerATNSimulator)
-
-	l.BaseATNSimulator = NewBaseATNSimulator(atn, sharedContextCache)
+	l := &LexerATNSimulator{
+		BaseATNSimulator: BaseATNSimulator{
+			atn:                atn,
+			sharedContextCache: sharedContextCache,
+		},
+	}
 
 	l.decisionToDFA = decisionToDFA
 	l.recog = recog
+
 	// The current token's starting index into the character stream.
 	// Shared across DFA to ATN simulation in case the ATN fails and the
 	// DFA did not have a previous accept state. In l case, we use the
 	// ATN-generated exception object.
 	l.startIndex = -1
-	// line number 1..n within the input///
+
+	// line number 1..n within the input
 	l.Line = 1
+
 	// The index of the character relative to the beginning of the line
-	// 0..n-1///
+	// 0..n-1
 	l.CharPositionInLine = 0
+
 	l.mode = LexerDefaultMode
+
 	// Used during DFA/ATN exec to record the most recent accept configuration
 	// info
 	l.prevAccept = NewSimState()
-	// done
+
 	return l
 }
 
@@ -114,7 +120,7 @@ func (l *LexerATNSimulator) reset() {
 func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	startState := l.atn.modeToStartState[l.mode]
 
-	if LexerATNSimulatorDebug {
+	if runtimeConfig.lexerATNSimulatorDebug {
 		fmt.Println("MatchATN mode " + strconv.Itoa(l.mode) + " start: " + startState.String())
 	}
 	oldMode := l.mode
@@ -126,7 +132,7 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 
 	predict := l.execATN(input, next)
 
-	if LexerATNSimulatorDebug {
+	if runtimeConfig.lexerATNSimulatorDebug {
 		fmt.Println("DFA after MatchATN: " + l.decisionToDFA[oldMode].ToLexerString())
 	}
 	return predict
@@ -134,18 +140,18 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 
 func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 
-	if LexerATNSimulatorDebug {
+	if runtimeConfig.lexerATNSimulatorDebug {
 		fmt.Println("start state closure=" + ds0.configs.String())
 	}
 	if ds0.isAcceptState {
-		// allow zero-length tokens
+		// allow zero-Length tokens
 		l.captureSimState(l.prevAccept, input, ds0)
 	}
 	t := input.LA(1)
 	s := ds0 // s is current/from DFA state
 
 	for { // while more work
-		if LexerATNSimulatorDebug {
+		if runtimeConfig.lexerATNSimulatorDebug {
 			fmt.Println("execATN loop starting closure: " + s.configs.String())
 		}
 
@@ -188,7 +194,7 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 			}
 		}
 		t = input.LA(1)
-		s = target // flip current DFA target becomes Newsrc/from state
+		s = target // flip current DFA target becomes new src/from state
 	}
 
 	return l.failOrAccept(l.prevAccept, input, s.configs, t)
@@ -214,43 +220,39 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 		return nil
 	}
 	target := s.getIthEdge(t - LexerATNSimulatorMinDFAEdge)
-	if LexerATNSimulatorDebug && target != nil {
+	if runtimeConfig.lexerATNSimulatorDebug && target != nil {
 		fmt.Println("reuse state " + strconv.Itoa(s.stateNumber) + " edge to " + strconv.Itoa(target.stateNumber))
 	}
 	return target
 }
 
-// Compute a target state for an edge in the DFA, and attempt to add the
-// computed state and corresponding edge to the DFA.
+// computeTargetState computes a target state for an edge in the [DFA], and attempt to add the
+// computed state and corresponding edge to the [DFA].
 //
-// @param input The input stream
-// @param s The current DFA state
-// @param t The next input symbol
-//
-// @return The computed target DFA state for the given input symbol
-// {@code t}. If {@code t} does not lead to a valid DFA state, l method
-// returns {@link //ERROR}.
+// The func returns the computed target [DFA] state for the given input symbol t.
+// If this does not lead to a valid [DFA] state, this method
+// returns ATNSimulatorError.
 func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
 	reach := NewOrderedATNConfigSet()
 
 	// if we don't find an existing DFA state
 	// Fill reach starting from closure, following t transitions
-	l.getReachableConfigSet(input, s.configs, reach.BaseATNConfigSet, t)
+	l.getReachableConfigSet(input, s.configs, reach, t)
 
 	if len(reach.configs) == 0 { // we got nowhere on t from s
 		if !reach.hasSemanticContext {
 			// we got nowhere on t, don't panic out l knowledge it'd
-			// cause a failover from DFA later.
+			// cause a fail-over from DFA later.
 			l.addDFAEdge(s, t, ATNSimulatorError, nil)
 		}
 		// stop when we can't Match any more char
 		return ATNSimulatorError
 	}
 	// Add an edge from s to target DFA found/created for reach
-	return l.addDFAEdge(s, t, nil, reach.BaseATNConfigSet)
+	return l.addDFAEdge(s, t, nil, reach)
 }
 
-func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream, reach ATNConfigSet, t int) int {
+func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream, reach *ATNConfigSet, t int) int {
 	if l.prevAccept.dfaState != nil {
 		lexerActionExecutor := prevAccept.dfaState.lexerActionExecutor
 		l.accept(input, lexerActionExecutor, l.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
@@ -265,34 +267,35 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 	panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, reach))
 }
 
-// Given a starting configuration set, figure out all ATN configurations
-// we can reach upon input {@code t}. Parameter {@code reach} is a return
-// parameter.
-func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
+// getReachableConfigSet when given a starting configuration set, figures out all [ATN] configurations
+// we can reach upon input t.
+//
+// Parameter reach is a return parameter.
+func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *ATNConfigSet, reach *ATNConfigSet, t int) {
 	// l is used to Skip processing for configs which have a lower priority
-	// than a config that already reached an accept state for the same rule
+	// than a runtimeConfig that already reached an accept state for the same rule
 	SkipAlt := ATNInvalidAltNumber
 
-	for _, cfg := range closure.GetItems() {
-		currentAltReachedAcceptState := (cfg.GetAlt() == SkipAlt)
-		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
+	for _, cfg := range closure.configs {
+		currentAltReachedAcceptState := cfg.GetAlt() == SkipAlt
+		if currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision {
 			continue
 		}
 
-		if LexerATNSimulatorDebug {
+		if runtimeConfig.lexerATNSimulatorDebug {
 
-			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String()) // l.recog, true))
+			fmt.Printf("testing %s at %s\n", l.GetTokenName(t), cfg.String())
 		}
 
 		for _, trans := range cfg.GetState().GetTransitions() {
 			target := l.getReachableTarget(trans, t)
 			if target != nil {
-				lexerActionExecutor := cfg.(*LexerATNConfig).lexerActionExecutor
+				lexerActionExecutor := cfg.lexerActionExecutor
 				if lexerActionExecutor != nil {
 					lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.Index() - l.startIndex)
 				}
-				treatEOFAsEpsilon := (t == TokenEOF)
-				config := NewLexerATNConfig3(cfg.(*LexerATNConfig), target, lexerActionExecutor)
+				treatEOFAsEpsilon := t == TokenEOF
+				config := NewLexerATNConfig3(cfg, target, lexerActionExecutor)
 				if l.closure(input, config, reach,
 					currentAltReachedAcceptState, true, treatEOFAsEpsilon) {
 					// any remaining configs for l alt have a lower priority
@@ -305,7 +308,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 }
 
 func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerActionExecutor, startIndex, index, line, charPos int) {
-	if LexerATNSimulatorDebug {
+	if runtimeConfig.lexerATNSimulatorDebug {
 		fmt.Printf("ACTION %v\n", lexerActionExecutor)
 	}
 	// seek to after last char in token
@@ -325,7 +328,7 @@ func (l *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNState
 	return nil
 }
 
-func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *OrderedATNConfigSet {
+func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *ATNConfigSet {
 	configs := NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
 		target := p.GetTransitions()[i].getTarget()
@@ -336,25 +339,24 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 	return configs
 }
 
-// Since the alternatives within any lexer decision are ordered by
-// preference, l method stops pursuing the closure as soon as an accept
+// closure since the alternatives within any lexer decision are ordered by
+// preference, this method stops pursuing the closure as soon as an accept
 // state is reached. After the first accept state is reached by depth-first
-// search from {@code config}, all other (potentially reachable) states for
-// l rule would have a lower priority.
+// search from runtimeConfig, all other (potentially reachable) states for
+// this rule would have a lower priority.
 //
-// @return {@code true} if an accept state is reached, otherwise
-// {@code false}.
-func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
+// The func returns true if an accept state is reached.
+func (l *LexerATNSimulator) closure(input CharStream, config *ATNConfig, configs *ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 
-	if LexerATNSimulatorDebug {
-		fmt.Println("closure(" + config.String() + ")") // config.String(l.recog, true) + ")")
+	if runtimeConfig.lexerATNSimulatorDebug {
+		fmt.Println("closure(" + config.String() + ")")
 	}
 
 	_, ok := config.state.(*RuleStopState)
 	if ok {
 
-		if LexerATNSimulatorDebug {
+		if runtimeConfig.lexerATNSimulatorDebug {
 			if l.recog != nil {
 				fmt.Printf("closure at %s rule stop %s\n", l.recog.GetRuleNames()[config.state.GetRuleIndex()], config)
 			} else {
@@ -401,10 +403,10 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 }
 
 // side-effect: can alter configs.hasSemanticContext
-func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNConfig, trans Transition,
-	configs ATNConfigSet, speculative, treatEOFAsEpsilon bool) *LexerATNConfig {
+func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *ATNConfig, trans Transition,
+	configs *ATNConfigSet, speculative, treatEOFAsEpsilon bool) *ATNConfig {
 
-	var cfg *LexerATNConfig
+	var cfg *ATNConfig
 
 	if trans.getSerializationType() == TransitionRULE {
 
@@ -435,10 +437,10 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 
 		pt := trans.(*PredicateTransition)
 
-		if LexerATNSimulatorDebug {
+		if runtimeConfig.lexerATNSimulatorDebug {
 			fmt.Println("EVAL rule " + strconv.Itoa(trans.(*PredicateTransition).ruleIndex) + ":" + strconv.Itoa(pt.predIndex))
 		}
-		configs.SetHasSemanticContext(true)
+		configs.hasSemanticContext = true
 		if l.evaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative) {
 			cfg = NewLexerATNConfig4(config, trans.getTarget())
 		}
@@ -449,7 +451,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 			// TODO: if the entry rule is invoked recursively, some
 			// actions may be executed during the recursive call. The
 			// problem can appear when hasEmptyPath() is true but
-			// isEmpty() is false. In l case, the config needs to be
+			// isEmpty() is false. In this case, the config needs to be
 			// split into two contexts - one with just the empty path
 			// and another with everything but the empty path.
 			// Unfortunately, the current algorithm does not allow
@@ -476,26 +478,18 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 	return cfg
 }
 
-// Evaluate a predicate specified in the lexer.
+// evaluatePredicate eEvaluates a predicate specified in the lexer.
 //
-// <p>If {@code speculative} is {@code true}, l method was called before
-// {@link //consume} for the Matched character. This method should call
-// {@link //consume} before evaluating the predicate to ensure position
-// sensitive values, including {@link Lexer//GetText}, {@link Lexer//GetLine},
-// and {@link Lexer//getcolumn}, properly reflect the current
-// lexer state. This method should restore {@code input} and the simulator
-// to the original state before returning (i.e. undo the actions made by the
-// call to {@link //consume}.</p>
+// If speculative is true, this method was called before
+// [consume] for the Matched character. This method should call
+// [consume] before evaluating the predicate to ensure position
+// sensitive values, including [GetText], [GetLine],
+// and [GetColumn], properly reflect the current
+// lexer state. This method should restore input and the simulator
+// to the original state before returning, i.e. undo the actions made by the
+// call to [Consume].
 //
-// @param input The input stream.
-// @param ruleIndex The rule containing the predicate.
-// @param predIndex The index of the predicate within the rule.
-// @param speculative {@code true} if the current index in {@code input} is
-// one character before the predicate's location.
-//
-// @return {@code true} if the specified predicate evaluates to
-// {@code true}.
-// /
+// The func returns true if the specified predicate evaluates to true.
 func (l *LexerATNSimulator) evaluatePredicate(input CharStream, ruleIndex, predIndex int, speculative bool) bool {
 	// assume true if no recognizer was provided
 	if l.recog == nil {
@@ -527,7 +521,7 @@ func (l *LexerATNSimulator) captureSimState(settings *SimState, input CharStream
 	settings.dfaState = dfaState
 }
 
-func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfgs ATNConfigSet) *DFAState {
+func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfgs *ATNConfigSet) *DFAState {
 	if to == nil && cfgs != nil {
 		// leading to l call, ATNConfigSet.hasSemanticContext is used as a
 		// marker indicating dynamic predicate evaluation makes l edge
@@ -539,10 +533,9 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// TJP notes: next time through the DFA, we see a pred again and eval.
 		// If that gets us to a previously created (but dangling) DFA
 		// state, we can continue in pure DFA mode from there.
-		// /
-		suppressEdge := cfgs.HasSemanticContext()
-		cfgs.SetHasSemanticContext(false)
-
+		//
+		suppressEdge := cfgs.hasSemanticContext
+		cfgs.hasSemanticContext = false
 		to = l.addDFAState(cfgs, true)
 
 		if suppressEdge {
@@ -554,7 +547,7 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// Only track edges within the DFA bounds
 		return to
 	}
-	if LexerATNSimulatorDebug {
+	if runtimeConfig.lexerATNSimulatorDebug {
 		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
 	}
 	l.atn.edgeMu.Lock()
@@ -572,13 +565,12 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 // configurations already. This method also detects the first
 // configuration containing an ATN rule stop state. Later, when
 // traversing the DFA, we will know which rule to accept.
-func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool) *DFAState {
+func (l *LexerATNSimulator) addDFAState(configs *ATNConfigSet, suppressEdge bool) *DFAState {
 
 	proposed := NewDFAState(-1, configs)
-	var firstConfigWithRuleStopState ATNConfig
+	var firstConfigWithRuleStopState *ATNConfig
 
-	for _, cfg := range configs.GetItems() {
-
+	for _, cfg := range configs.configs {
 		_, ok := cfg.GetState().(*RuleStopState)
 
 		if ok {
@@ -588,14 +580,14 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 	}
 	if firstConfigWithRuleStopState != nil {
 		proposed.isAcceptState = true
-		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
+		proposed.lexerActionExecutor = firstConfigWithRuleStopState.lexerActionExecutor
 		proposed.setPrediction(l.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()])
 	}
 	dfa := l.decisionToDFA[l.mode]
 
 	l.atn.stateMu.Lock()
 	defer l.atn.stateMu.Unlock()
-	existing, present := dfa.states.Get(proposed)
+	existing, present := dfa.Get(proposed)
 	if present {
 
 		// This state was already present, so just return it.
@@ -605,10 +597,11 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet, suppressEdge bool)
 
 		// We need to add the new state
 		//
-		proposed.stateNumber = dfa.states.Len()
-		configs.SetReadOnly(true)
+		proposed.stateNumber = dfa.Len()
+		configs.readOnly = true
+		configs.configLookup = nil // Not needed now
 		proposed.configs = configs
-		dfa.states.Put(proposed)
+		dfa.Put(proposed)
 	}
 	if !suppressEdge {
 		dfa.setS0(proposed)
@@ -620,7 +613,7 @@ func (l *LexerATNSimulator) getDFA(mode int) *DFA {
 	return l.decisionToDFA[mode]
 }
 
-// Get the text Matched so far for the current token.
+// GetText returns the text [Match]ed so far for the current token.
 func (l *LexerATNSimulator) GetText(input CharStream) string {
 	// index is first lookahead char, don't include.
 	return input.GetTextFromInterval(NewInterval(l.startIndex, input.Index()-1))

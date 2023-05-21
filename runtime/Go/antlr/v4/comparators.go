@@ -22,13 +22,16 @@ package antlr
 type ObjEqComparator[T Collectable[T]] struct{}
 
 var (
-	aStateEqInst    = &ObjEqComparator[ATNState]{}
-	aConfEqInst     = &ObjEqComparator[ATNConfig]{}
-	aConfCompInst   = &ATNConfigComparator[ATNConfig]{}
-	atnConfCompInst = &BaseATNConfigComparator[ATNConfig]{}
+	aStateEqInst = &ObjEqComparator[ATNState]{}
+	aConfEqInst  = &ObjEqComparator[*ATNConfig]{}
+
+	// aConfCompInst is the comparator used for the ATNConfigSet for the configLookup cache
+	aConfCompInst   = &ATNConfigComparator[*ATNConfig]{}
+	atnConfCompInst = &BaseATNConfigComparator[*ATNConfig]{}
 	dfaStateEqInst  = &ObjEqComparator[*DFAState]{}
 	semctxEqInst    = &ObjEqComparator[SemanticContext]{}
-	atnAltCfgEqInst = &ATNAltConfigComparator[ATNConfig]{}
+	atnAltCfgEqInst = &ATNAltConfigComparator[*ATNConfig]{}
+	pContextEqInst  = &ObjEqComparator[*PredictionContext]{}
 )
 
 // Equals2 delegates to the Equals() method of type T
@@ -44,14 +47,14 @@ func (c *ObjEqComparator[T]) Hash1(o T) int {
 
 type SemCComparator[T Collectable[T]] struct{}
 
-// ATNConfigComparator is used as the compartor for the configLookup field of an ATNConfigSet
+// ATNConfigComparator is used as the comparator for the configLookup field of an ATNConfigSet
 // and has a custom Equals() and Hash() implementation, because equality is not based on the
 // standard Hash() and Equals() methods of the ATNConfig type.
 type ATNConfigComparator[T Collectable[T]] struct {
 }
 
 // Equals2 is a custom comparator for ATNConfigs specifically for configLookup
-func (c *ATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
+func (c *ATNConfigComparator[T]) Equals2(o1, o2 *ATNConfig) bool {
 
 	// Same pointer, must be equal, even if both nil
 	//
@@ -72,7 +75,8 @@ func (c *ATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 }
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup
-func (c *ATNConfigComparator[T]) Hash1(o ATNConfig) int {
+func (c *ATNConfigComparator[T]) Hash1(o *ATNConfig) int {
+
 	hash := 7
 	hash = 31*hash + o.GetState().GetStateNumber()
 	hash = 31*hash + o.GetAlt()
@@ -85,7 +89,7 @@ type ATNAltConfigComparator[T Collectable[T]] struct {
 }
 
 // Equals2 is a custom comparator for ATNConfigs specifically for configLookup
-func (c *ATNAltConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
+func (c *ATNAltConfigComparator[T]) Equals2(o1, o2 *ATNConfig) bool {
 
 	// Same pointer, must be equal, even if both nil
 	//
@@ -105,21 +109,21 @@ func (c *ATNAltConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 }
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup
-func (c *ATNAltConfigComparator[T]) Hash1(o ATNConfig) int {
+func (c *ATNAltConfigComparator[T]) Hash1(o *ATNConfig) int {
 	h := murmurInit(7)
 	h = murmurUpdate(h, o.GetState().GetStateNumber())
 	h = murmurUpdate(h, o.GetContext().Hash())
 	return murmurFinish(h, 2)
 }
 
-// BaseATNConfigComparator is used as the comparator for the configLookup field of a BaseATNConfigSet
+// BaseATNConfigComparator is used as the comparator for the configLookup field of a ATNConfigSet
 // and has a custom Equals() and Hash() implementation, because equality is not based on the
 // standard Hash() and Equals() methods of the ATNConfig type.
 type BaseATNConfigComparator[T Collectable[T]] struct {
 }
 
 // Equals2 is a custom comparator for ATNConfigs specifically for baseATNConfigSet
-func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
+func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 *ATNConfig) bool {
 
 	// Same pointer, must be equal, even if both nil
 	//
@@ -141,7 +145,6 @@ func (c *BaseATNConfigComparator[T]) Equals2(o1, o2 ATNConfig) bool {
 
 // Hash1 is custom hash implementation for ATNConfigs specifically for configLookup, but in fact just
 // delegates to the standard Hash() method of the ATNConfig type.
-func (c *BaseATNConfigComparator[T]) Hash1(o ATNConfig) int {
-
+func (c *BaseATNConfigComparator[T]) Hash1(o *ATNConfig) int {
 	return o.Hash()
 }

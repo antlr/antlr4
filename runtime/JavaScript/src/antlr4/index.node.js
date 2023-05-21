@@ -44,10 +44,11 @@ import DiagnosticErrorListener from "./error/DiagnosticErrorListener.js"
 import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
+import TokenStreamRewriter from './TokenStreamRewriter.js';
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
-    ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
+    ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils, TokenStreamRewriter
 }
 
 export {
@@ -57,9 +58,3 @@ export {
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
     arrayToString
 }
-
-/* eslint no-unused-vars: [ "off"] */
-// need to import unused to force loading
-import StringHashCode from './utils/stringHashCode.js';
-import CodePointAt from './polyfills/codepointat.js';
-import FromCodePoint from './polyfills/fromcodepoint.js';

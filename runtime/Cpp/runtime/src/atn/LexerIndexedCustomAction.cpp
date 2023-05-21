@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "atn/HashUtils.h"
 #include "misc/MurmurHash.h"
 #include "Lexer.h"
 #include "support/CPPUtils.h"
@@ -14,14 +15,6 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 using namespace antlrcpp;
-
-namespace {
-
-  bool cachedHashCodeEqual(size_t lhs, size_t rhs) {
-    return lhs == rhs || lhs == 0 || rhs == 0;
-  }
-
-}
 
 LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<const LexerAction> action)
     : LexerAction(LexerActionType::INDEXED_CUSTOM, true), _action(std::move(action)), _offset(offset) {}

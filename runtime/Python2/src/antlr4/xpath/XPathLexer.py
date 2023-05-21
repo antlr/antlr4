@@ -1,11 +1,9 @@
-# Generated from XPathLexer.g4 by ANTLR 4.9.3
+# Generated from XPathLexer.g4 by ANTLR 4.11.2-SNAPSHOT
+# encoding: utf-8
+from __future__ import print_function
 from antlr4 import *
 from io import StringIO
 import sys
-if sys.version_info[1] > 5:
-    from typing import TextIO
-else:
-    from typing.io import TextIO
 
 
 def serializedATN():
@@ -47,29 +45,29 @@ class XPathLexer(Lexer):
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
 
-    modeNames = [ "DEFAULT_MODE" ]
+    modeNames = [ u"DEFAULT_MODE" ]
 
-    literalNames = [ "<INVALID>",
-            "'//'", "'/'", "'*'", "'!'" ]
+    literalNames = [ u"<INVALID>",
+            u"'//'", u"'/'", u"'*'", u"'!'" ]
 
-    symbolicNames = [ "<INVALID>",
-            "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG", 
-            "ID", "STRING" ]
+    symbolicNames = [ u"<INVALID>",
+            u"TOKEN_REF", u"RULE_REF", u"ANYWHERE", u"ROOT", u"WILDCARD", 
+            u"BANG", u"ID", u"STRING" ]
 
-    ruleNames = [ "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar", 
-                  "NameStartChar", "STRING" ]
+    ruleNames = [ u"ANYWHERE", u"ROOT", u"WILDCARD", u"BANG", u"ID", u"NameChar", 
+                  u"NameStartChar", u"STRING" ]
 
-    grammarFileName = "XPathLexer.g4"
+    grammarFileName = u"XPathLexer.g4"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
-        super().__init__(input, output)
-        self.checkVersion("4.9.3")
+    def __init__(self, input=None, output=sys.stdout):
+        super(XPathLexer, self).__init__(input, output=output)
+        self.checkVersion("4.11.2-SNAPSHOT")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
 
 
-    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
+    def action(self, localctx, ruleIndex, actionIndex):
         if self._actions is None:
             actions = dict()
             actions[4] = self.ID_action 
@@ -81,7 +79,7 @@ class XPathLexer(Lexer):
             raise Exception("No registered action for:" + str(ruleIndex))
 
 
-    def ID_action(self, localctx:RuleContext , actionIndex:int):
+    def ID_action(self, localctx , actionIndex):
         if actionIndex == 0:
 
                             char = self.text[0]

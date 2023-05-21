@@ -289,6 +289,15 @@ export default class Parser extends Recognizer {
     }
 
     /**
+	 * Gets the number of syntax errors reported during parsing. This value is
+	 * incremented each time {@link //notifyErrorListeners} is called.	 
+	 */
+    get syntaxErrorsCount() {
+        return this._syntaxErrors;
+    }
+
+
+    /**
      * Match needs to return the current input symbol, which gets put
      * into the label for the associated token ref; e.g., x=ID.
      */

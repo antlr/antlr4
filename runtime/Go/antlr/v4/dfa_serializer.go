@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// DFASerializer is a DFA walker that knows how to dump them to serialized
+// DFASerializer is a DFA walker that knows how to dump the DFA states to serialized
 // strings.
 type DFASerializer struct {
 	dfa           *DFA
