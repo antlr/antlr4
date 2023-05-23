@@ -4,114 +4,124 @@
   ~ can be found in the LICENSE.txt file in the project root.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.antlr</groupId>
-		<artifactId>antlr4-master</artifactId>
-		<version>4.13.1-SNAPSHOT</version>
-	</parent>
-	<artifactId>antlr4-runtime-testsuite</artifactId>
-	<name>ANTLR 4 Runtime Tests (4th generation)</name>
-	<description>A collection of tests for ANTLR 4 Runtime libraries.</description>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-master</artifactId>
+        <version>4.13.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>antlr4-runtime-testsuite</artifactId>
+    <name>ANTLR 4 Runtime Tests (4th generation)</name>
+    <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
-	<prerequisites>
-		<maven>3.8</maven>
-	</prerequisites>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
 
-	<inceptionYear>2009</inceptionYear>
+    <inceptionYear>2009</inceptionYear>
 
-	<properties>
-		<jUnitVersion>5.9.0</jUnitVersion>
-	</properties>
+    <properties>
+        <jUnitVersion>5.9.0</jUnitVersion>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>ST4</artifactId>
-			<version>4.3.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${jUnitVersion}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${jUnitVersion}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>1.1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.openjdk.jol</groupId>
-		    <artifactId>jol-core</artifactId>
-		    <version>0.16</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>4.3.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${jUnitVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${jUnitVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.1.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.16</version>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<testSourceDirectory>test</testSourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.0</version>
-				<configuration>
-					<!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
-					<argLine>-Dfile.encoding=UTF-8</argLine>
+    <build>
+        <testSourceDirectory>test</testSourceDirectory>
+        <resources>
+            <resource>
+                <!-- need to tell surefire where to get the jupiter config from. It isn't in the default dir for some reason -->
+                <directory>${project.basedir}/resources</directory>
+                <includes>
+                    <include>junit-platform.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>${project.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>antlr4</goal>
-						</goals>
-						<configuration>
-							<sourceDirectory>${basedir}/test</sourceDirectory>
-							<outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
-							<visitor>true</visitor>
-							<generateTestSources>true</generateTestSources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/test</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
+                            <visitor>true</visitor>
+                            <generateTestSources>true</generateTestSources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -122,5 +132,5 @@
                 </configuration>
             </plugin>
         </plugins>
-	</build>
+    </build>
 </project>
