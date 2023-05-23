@@ -26,7 +26,7 @@ public abstract class OutputFile extends OutputModelObject {
         super(factory);
         this.fileName = fileName;
         Grammar g = factory.getGrammar();
-		grammarFileName = g.fileName;
+		grammarFileName = g.fileName.replace("\\", "/"); // Prevent a path with windows delim and u breaking Java pre-parser on comments
 		ANTLRVersion = Tool.VERSION;
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
