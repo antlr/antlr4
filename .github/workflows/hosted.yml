@@ -215,7 +215,7 @@ jobs:
       if: startswith(matrix.os, 'macos')
       run: brew install ninja
 
-    - name: Set up JDK 11
+    - name: Set up JDK
       id: setup-java
       uses: actions/setup-java@v3
       with:
@@ -247,7 +247,7 @@ jobs:
         python-version: '3.x'
         architecture: 'x64'
 
-    - name: Set up Node 16
+    - name: Set up Node
       if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
       uses: actions/setup-node@v3.6.0
       with:
@@ -264,19 +264,19 @@ jobs:
       with:
         dotnet-version: '7.0.x'
 
-    - name: Setup Dart 2.12.1
+    - name: Setup Dart
       if: matrix.target == 'dart'
       uses: dart-lang/setup-dart@v1.3
       with:
         sdk: 2.12.1
 
-    - name: Setup Go 1.19
+    - name: Setup Go
       if: matrix.target == 'go'
       uses: actions/setup-go@v3.3.1
       with:
         go-version: '^1.19'
 
-    - name: Setup PHP 8.2
+    - name: Setup PHP
       if: matrix.target == 'php'
       uses: shivammathur/setup-php@2.22.0
       with:
