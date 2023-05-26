@@ -253,6 +253,11 @@ jobs:
       with:
         node-version: '16'
 
+    - name: Set up TypeScript Node
+      if: matrix.target == 'typescript'
+      run:
+        npm install -g typescript ts-node webpack webpack-cli
+
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
       uses: actions/setup-dotnet@v3.0.3
