@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import { stringHashCode } from "../utils/stringHashCode.js";
+import { stringHashCode } from '../utils/stringHashCode.js';
 
 export default class HashCode {
 
@@ -21,22 +21,22 @@ export default class HashCode {
             else {
                 let k = 0;
                 switch (typeof(value)) {
-                    case 'undefined':
-                    case 'function':
-                        continue;
-                    case 'number':
-                    case 'boolean':
-                        k = value;
-                        break;
-                    case 'string':
-                        k = stringHashCode(value);
-                        break;
-                    default:
-                        if(value.updateHashCode)
-                            value.updateHashCode(this);
-                        else
-                            console.log("No updateHashCode for " + value.toString())
-                        continue;
+                case 'undefined':
+                case 'function':
+                    continue;
+                case 'number':
+                case 'boolean':
+                    k = value;
+                    break;
+                case 'string':
+                    k = stringHashCode(value);
+                    break;
+                default:
+                    if(value.updateHashCode)
+                        value.updateHashCode(this);
+                    else
+                        console.log('No updateHashCode for ' + value.toString());
+                    continue;
                 }
                 k = k * 0xCC9E2D51;
                 k = (k << 15) | (k >>> (32 - 15));

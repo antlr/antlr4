@@ -58,7 +58,7 @@ export default class RuleContext extends RuleNode {
         return this.invokingState === -1;
     }
 
-// satisfy the ParseTree / SyntaxTree interface
+    // satisfy the ParseTree / SyntaxTree interface
     getSourceInterval() {
         return Interval.INVALID_INTERVAL;
     }
@@ -81,11 +81,11 @@ export default class RuleContext extends RuleNode {
      */
     getText() {
         if (this.getChildCount() === 0) {
-            return "";
+            return '';
         } else {
             return this.children.map(function (child) {
                 return child.getText();
-            }).join("");
+            }).join('');
         }
     }
 
@@ -136,7 +136,7 @@ export default class RuleContext extends RuleNode {
         ruleNames = ruleNames || null;
         stop = stop || null;
         let p = this;
-        let s = "[";
+        let s = '[';
         while (p !== null && p !== stop) {
             if (ruleNames === null) {
                 if (!p.isEmpty()) {
@@ -145,15 +145,15 @@ export default class RuleContext extends RuleNode {
             } else {
                 const ri = p.ruleIndex;
                 const ruleName = (ri >= 0 && ri < ruleNames.length) ? ruleNames[ri]
-                    : "" + ri;
+                    : '' + ri;
                 s += ruleName;
             }
             if (p.parentCtx !== null && (ruleNames !== null || !p.parentCtx.isEmpty())) {
-                s += " ";
+                s += ' ';
             }
             p = p.parentCtx;
         }
-        s += "]";
+        s += ']';
         return s;
     }
 }

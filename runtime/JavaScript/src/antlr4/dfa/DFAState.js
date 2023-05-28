@@ -4,8 +4,8 @@
  */
 
 import ATNConfigSet from '../atn/ATNConfigSet.js';
-import HashCode from "../misc/HashCode.js";
-import HashSet from "../misc/HashSet.js";
+import HashCode from '../misc/HashCode.js';
+import HashSet from '../misc/HashSet.js';
 
 
 /**
@@ -34,36 +34,36 @@ import HashSet from "../misc/HashSet.js";
  * meaning that state was reached via a different set of rule invocations.</p>
  */
 export default class DFAState {
-	constructor(stateNumber, configs) {
-		if (stateNumber === null) {
-			stateNumber = -1;
-		}
-		if (configs === null) {
-			configs = new ATNConfigSet();
-		}
-		this.stateNumber = stateNumber;
-		this.configs = configs;
-		/**
+    constructor(stateNumber, configs) {
+        if (stateNumber === null) {
+            stateNumber = -1;
+        }
+        if (configs === null) {
+            configs = new ATNConfigSet();
+        }
+        this.stateNumber = stateNumber;
+        this.configs = configs;
+        /**
 		 * {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
 		 * {@link Token//EOF} maps to {@code edges[0]}.
 		 */
-		this.edges = null;
-		this.isAcceptState = false;
-		/**
+        this.edges = null;
+        this.isAcceptState = false;
+        /**
 		 * if accept state, what ttype do we match or alt do we predict?
 		 * This is set to {@link ATN//INVALID_ALT_NUMBER} when {@link//predicates}
 		 * {@code !=null} or {@link //requiresFullContext}.
 		 */
-		this.prediction = 0;
-		this.lexerActionExecutor = null;
-		/**
+        this.prediction = 0;
+        this.lexerActionExecutor = null;
+        /**
 		 * Indicates that this state was created during SLL prediction that
 		 * discovered a conflict between the configurations in the state. Future
 		 * {@link ParserATNSimulator//execATN} invocations immediately jumped doing
 		 * full context prediction if this field is true.
 		 */
-		this.requiresFullContext = false;
-		/**
+        this.requiresFullContext = false;
+        /**
 		 * During SLL parsing, this is a list of predicates associated with the
 		 * ATN configurations of the DFA state. When we have predicates,
 		 * {@link //requiresFullContext} is {@code false} since full context
@@ -79,30 +79,30 @@ export default class DFAState {
 		 * <p>This list is computed by {@link
 		 * ParserATNSimulator//predicateDFAState}.</p>
 		 */
-		this.predicates = null;
-		return this;
-	}
+        this.predicates = null;
+        return this;
+    }
 
-	/**
+    /**
 	 * Get the set of all alts mentioned by all ATN configurations in this
 	 * DFA state.
 	 */
-	getAltSet() {
-		const alts = new HashSet();
-		if (this.configs !== null) {
-			for (let i = 0; i < this.configs.length; i++) {
-				const c = this.configs[i];
-				alts.add(c.alt);
-			}
-		}
-		if (alts.length === 0) {
-			return null;
-		} else {
-			return alts;
-		}
-	}
+    getAltSet() {
+        const alts = new HashSet();
+        if (this.configs !== null) {
+            for (let i = 0; i < this.configs.length; i++) {
+                const c = this.configs[i];
+                alts.add(c.alt);
+            }
+        }
+        if (alts.length === 0) {
+            return null;
+        } else {
+            return alts;
+        }
+    }
 
-	/**
+    /**
 	 * Two {@link DFAState} instances are equal if their ATN configuration sets
 	 * are the same. This method is used to see if a state already exists.
 	 *
@@ -115,28 +115,28 @@ export default class DFAState {
 	 * exists that has this exact set of ATN configurations. The
 	 * {@link //stateNumber} is irrelevant.</p>
 	 */
-	equals(other) {
-		// compare set of ATN configurations in this set with other
-		return this === other ||
+    equals(other) {
+        // compare set of ATN configurations in this set with other
+        return this === other ||
 				(other instanceof DFAState &&
 					this.configs.equals(other.configs));
-	}
+    }
 
-	toString() {
-		let s = "" + this.stateNumber + ":" + this.configs;
-		if(this.isAcceptState) {
-			s = s + "=>";
-			if (this.predicates !== null)
-				s = s + this.predicates;
-			else
-				s = s + this.prediction;
-		}
-		return s;
-	}
+    toString() {
+        let s = '' + this.stateNumber + ':' + this.configs;
+        if(this.isAcceptState) {
+            s = s + '=>';
+            if (this.predicates !== null)
+                s = s + this.predicates;
+            else
+                s = s + this.prediction;
+        }
+        return s;
+    }
 
-	hashCode() {
-		const hash = new HashCode();
-		hash.update(this.configs);
-		return hash.finish();
-	}
+    hashCode() {
+        const hash = new HashCode();
+        hash.update(this.configs);
+        return hash.finish();
+    }
 }

@@ -6,7 +6,7 @@
 import InputStream from './InputStream.js';
 import CharStream from './CharStream.js';
 const isNode =
-	typeof process !== "undefined" &&
+	typeof process !== 'undefined' &&
 	process.versions != null &&
 	process.versions.node != null;
 import fs from 'fs';
@@ -17,24 +17,24 @@ import fs from 'fs';
  */
 export default class FileStream extends InputStream {
 
-	static fromPath(path, encoding, callback) {
-		if(!isNode)
-			throw new Error("FileStream is only available when running in Node!");
-		fs.readFile(path, encoding, function(err, data) {
-			let is = null;
-			if (data !== null) {
-				is = new CharStream(data, true);
-			}
-			callback(err, is);
-		});
+    static fromPath(path, encoding, callback) {
+        if(!isNode)
+            throw new Error('FileStream is only available when running in Node!');
+        fs.readFile(path, encoding, function(err, data) {
+            let is = null;
+            if (data !== null) {
+                is = new CharStream(data, true);
+            }
+            callback(err, is);
+        });
 
-	}
+    }
 
-	constructor(fileName, encoding, decodeToUnicodeCodePoints) {
-		if(!isNode)
-			throw new Error("FileStream is only available when running in Node!");
-		const data = fs.readFileSync(fileName, encoding || "utf-8" );
-		super(data, decodeToUnicodeCodePoints);
-		this.fileName = fileName;
-	}
+    constructor(fileName, encoding, decodeToUnicodeCodePoints) {
+        if(!isNode)
+            throw new Error('FileStream is only available when running in Node!');
+        const data = fs.readFileSync(fileName, encoding || 'utf-8' );
+        super(data, decodeToUnicodeCodePoints);
+        this.fileName = fileName;
+    }
 }

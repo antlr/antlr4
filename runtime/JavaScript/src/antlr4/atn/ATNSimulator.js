@@ -6,7 +6,7 @@
 import DFAState from '../dfa/DFAState.js';
 import ATNConfigSet from './ATNConfigSet.js';
 import { getCachedPredictionContext } from '../context/PredictionContextUtils.js';
-import HashMap from "../misc/HashMap.js";
+import HashMap from '../misc/HashMap.js';
 
 export default class ATNSimulator {
     constructor(atn, sharedContextCache) {

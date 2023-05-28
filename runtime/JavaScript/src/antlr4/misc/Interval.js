@@ -22,7 +22,7 @@ export default class Interval {
         if(this.start===this.stop-1) {
             return this.start.toString();
         } else {
-            return this.start.toString() + ".." + (this.stop-1).toString();
+            return this.start.toString() + '..' + (this.stop-1).toString();
         }
     }
 

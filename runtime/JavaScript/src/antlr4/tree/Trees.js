@@ -7,7 +7,7 @@ import Token from '../Token.js';
 import ErrorNode from './ErrorNode.js';
 import TerminalNode from './TerminalNode.js';
 import RuleNode from './RuleNode.js';
-import escapeWhitespace from "../utils/escapeWhitespace.js";
+import escapeWhitespace from '../utils/escapeWhitespace.js';
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 const Trees = {
@@ -28,7 +28,7 @@ const Trees = {
         if(c===0) {
             return s;
         }
-        let res = "(" + s + ' ';
+        let res = '(' + s + ' ';
         if(c>0) {
             s = Trees.toStringTree(tree.getChild(0), ruleNames);
             res = res.concat(s);
@@ -37,7 +37,7 @@ const Trees = {
             s = Trees.toStringTree(tree.getChild(i), ruleNames);
             res = res.concat(' ' + s);
         }
-        res = res.concat(")");
+        res = res.concat(')');
         return res;
     },
 
@@ -53,7 +53,7 @@ const Trees = {
                 const altNumber = context.getAltNumber();
                 // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
                 if ( altNumber != 0 ) {
-                    return ruleNames[t.ruleIndex]+":"+altNumber;
+                    return ruleNames[t.ruleIndex]+':'+altNumber;
                 }
                 return ruleNames[t.ruleIndex];
             } else if ( t instanceof ErrorNode) {
@@ -135,6 +135,6 @@ const Trees = {
         }
         return nodes;
     }
-}
+};
 
 export default Trees;

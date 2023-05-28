@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import ErrorListener from "./ErrorListener.js";
+import ErrorListener from './ErrorListener.js';
 
 /**
  * {@inheritDoc}
@@ -23,7 +23,7 @@ export default class ConsoleErrorListener extends ErrorListener {
     }
 
     syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-        console.error("line " + line + ":" + column + " " + msg);
+        console.error('line ' + line + ':' + column + ' ' + msg);
     }
 }
 

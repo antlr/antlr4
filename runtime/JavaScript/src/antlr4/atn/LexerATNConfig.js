@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import DecisionState from "../state/DecisionState.js";
-import ATNConfig from "./ATNConfig.js";
+import DecisionState from '../state/DecisionState.js';
+import ATNConfig from './ATNConfig.js';
 
 export default class LexerATNConfig extends ATNConfig {
     constructor(params, config) {

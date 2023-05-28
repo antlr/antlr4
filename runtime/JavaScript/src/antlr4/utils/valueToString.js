@@ -3,5 +3,5 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 export default function valueToString(v) {
-    return v === null ? "null" : v;
+    return v === null ? 'null' : v;
 }

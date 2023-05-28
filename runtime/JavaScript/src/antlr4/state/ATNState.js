@@ -126,19 +126,19 @@ ATNState.PLUS_LOOP_BACK = 11;
 ATNState.LOOP_END = 12;
 
 ATNState.serializationNames = [
-            "INVALID",
-            "BASIC",
-            "RULE_START",
-            "BLOCK_START",
-            "PLUS_BLOCK_START",
-            "STAR_BLOCK_START",
-            "TOKEN_START",
-            "RULE_STOP",
-            "BLOCK_END",
-            "STAR_LOOP_BACK",
-            "STAR_LOOP_ENTRY",
-            "PLUS_LOOP_BACK",
-            "LOOP_END" ];
+    'INVALID',
+    'BASIC',
+    'RULE_START',
+    'BLOCK_START',
+    'PLUS_BLOCK_START',
+    'STAR_BLOCK_START',
+    'TOKEN_START',
+    'RULE_STOP',
+    'BLOCK_END',
+    'STAR_LOOP_BACK',
+    'STAR_LOOP_ENTRY',
+    'PLUS_LOOP_BACK',
+    'LOOP_END' ];
 
 ATNState.INVALID_STATE_NUMBER = -1;
 

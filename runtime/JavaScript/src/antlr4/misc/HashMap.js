@@ -2,10 +2,10 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import standardEqualsFunction from "../utils/standardEqualsFunction.js";
-import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
+import standardEqualsFunction from '../utils/standardEqualsFunction.js';
+import standardHashCodeFunction from '../utils/standardHashCodeFunction.js';
 
-const HASH_KEY_PREFIX = "h-";
+const HASH_KEY_PREFIX = 'h-';
 
 export default class HashMap {
 
@@ -27,10 +27,10 @@ export default class HashMap {
                     return oldValue;
                 }
             }
-            entries.push({key:key, value:value});
+            entries.push({ key:key, value:value });
             return value;
         } else {
-            this.data[hashKey] = [{key:key, value:value}];
+            this.data[hashKey] = [{ key:key, value:value }];
             return value;
         }
     }
@@ -75,7 +75,7 @@ export default class HashMap {
 
     toString() {
         const ss = this.entries().map(e => '{' + e.key + ':' + e.value + '}');
-        return '[' + ss.join(", ") + ']';
+        return '[' + ss.join(', ') + ']';
     }
 
     get length() {

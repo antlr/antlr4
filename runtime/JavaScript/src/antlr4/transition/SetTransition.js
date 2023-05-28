@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 // A transition containing a set of values.
-import IntervalSet from "../misc/IntervalSet.js";
+import IntervalSet from '../misc/IntervalSet.js';
 import Token from '../Token.js';
-import Transition from "./Transition.js";
+import Transition from './Transition.js';
 
 export default class SetTransition extends Transition {
     constructor(target, set) {

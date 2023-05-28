@@ -1,4 +1,4 @@
-import {CharStream} from "./CharStream";
+import { CharStream } from './CharStream';
 
 export declare class Token {
 

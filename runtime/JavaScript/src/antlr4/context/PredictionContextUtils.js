@@ -2,12 +2,12 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import RuleContext from "./RuleContext.js";
-import PredictionContext from "./PredictionContext.js";
-import ArrayPredictionContext from "./ArrayPredictionContext.js";
-import SingletonPredictionContext from "./SingletonPredictionContext.js";
-import EmptyPredictionContext from "./EmptyPredictionContext.js";
-import HashMap from "../misc/HashMap.js";
+import RuleContext from './RuleContext.js';
+import PredictionContext from './PredictionContext.js';
+import ArrayPredictionContext from './ArrayPredictionContext.js';
+import SingletonPredictionContext from './SingletonPredictionContext.js';
+import EmptyPredictionContext from './EmptyPredictionContext.js';
+import HashMap from '../misc/HashMap.js';
 
 /**
  * Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
@@ -132,12 +132,12 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
     if (mergeCache !== null) {
         let previous = mergeCache.get(a, b);
         if (previous !== null) {
-            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
+            if ( PredictionContext.trace_atn_sim ) console.log('mergeArrays a='+a+',b='+b+' -> previous');
             return previous;
         }
         previous = mergeCache.get(b, a);
         if (previous !== null) {
-            if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> previous");
+            if ( PredictionContext.trace_atn_sim ) console.log('mergeArrays a='+a+',b='+b+' -> previous');
             return previous;
         }
     }
@@ -217,14 +217,14 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, a);
         }
-        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> a");
+        if ( PredictionContext.trace_atn_sim ) console.log('mergeArrays a='+a+',b='+b+' -> a');
         return a;
     }
     if (M.equals(b)) {
         if (mergeCache !== null) {
             mergeCache.set(a, b, b);
         }
-        if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> b");
+        if ( PredictionContext.trace_atn_sim ) console.log('mergeArrays a='+a+',b='+b+' -> b');
         return b;
     }
     combineCommonParents(mergedParents);
@@ -233,7 +233,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
         mergeCache.set(a, b, M);
     }
 
-    if ( PredictionContext.trace_atn_sim ) console.log("mergeArrays a="+a+",b="+b+" -> "+M);
+    if ( PredictionContext.trace_atn_sim ) console.log('mergeArrays a='+a+',b='+b+' -> '+M);
 
     return M;
 }

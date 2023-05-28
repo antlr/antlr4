@@ -2,11 +2,11 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import standardHashCodeFunction from "../utils/standardHashCodeFunction.js";
-import standardEqualsFunction from "../utils/standardEqualsFunction.js";
-import arrayToString from "../utils/arrayToString.js";
+import standardHashCodeFunction from '../utils/standardHashCodeFunction.js';
+import standardEqualsFunction from '../utils/standardEqualsFunction.js';
+import arrayToString from '../utils/arrayToString.js';
 
-const HASH_KEY_PREFIX = "h-";
+const HASH_KEY_PREFIX = 'h-';
 
 export default class HashSet {
 

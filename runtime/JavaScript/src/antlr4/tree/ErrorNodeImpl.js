@@ -9,7 +9,7 @@
  * and deletion as well as during "consume until error recovery set"
  * upon no viable alternative exceptions.
  */
-import TerminalNodeImpl from "./TerminalNodeImpl.js";
+import TerminalNodeImpl from './TerminalNodeImpl.js';
 
 export default class ErrorNodeImpl extends TerminalNodeImpl {
     constructor(token) {

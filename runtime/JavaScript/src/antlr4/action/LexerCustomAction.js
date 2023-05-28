@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import {default as LexerActionType } from "../atn/LexerActionType.js";
-import LexerAction from "./LexerAction.js";
+import { default as LexerActionType } from '../atn/LexerActionType.js';
+import LexerAction from './LexerAction.js';
 
 /**
  * Executes a custom lexer action by calling {@link Recognizer//action} with the

@@ -1,5 +1,5 @@
-import Token from "./Token.js";
-import Interval from "./misc/Interval.js";
+import Token from './Token.js';
+import Interval from './misc/Interval.js';
 
 /**
  * @typedef {import("./CommonTokenStream").default} CommonTokenStream
@@ -9,7 +9,7 @@ import Interval from "./misc/Interval.js";
 
 export default class TokenStreamRewriter {
     // eslint-disable-next-line no-undef
-    static DEFAULT_PROGRAM_NAME = "default";
+    static DEFAULT_PROGRAM_NAME = 'default';
 
     /**
      * @param {CommonTokenStream} tokens The token stream to modify
@@ -36,7 +36,7 @@ export default class TokenStreamRewriter {
     insertAfter(tokenOrIndex, text, programName = TokenStreamRewriter.DEFAULT_PROGRAM_NAME) {
         /** @type {number} */
         let index;
-        if (typeof tokenOrIndex === "number") {
+        if (typeof tokenOrIndex === 'number') {
             index = tokenOrIndex;
         } else {
             index = tokenOrIndex.tokenIndex;
@@ -57,7 +57,7 @@ export default class TokenStreamRewriter {
     insertBefore(tokenOrIndex, text, programName = TokenStreamRewriter.DEFAULT_PROGRAM_NAME) {
         /** @type {number} */
         let index;
-        if (typeof tokenOrIndex === "number") {
+        if (typeof tokenOrIndex === 'number') {
             index = tokenOrIndex;
         } else {
             index = tokenOrIndex.tokenIndex;
@@ -86,10 +86,10 @@ export default class TokenStreamRewriter {
      * @param {string} [programName]
      */
     replace(from, to, text, programName = TokenStreamRewriter.DEFAULT_PROGRAM_NAME) {
-        if (typeof from !== "number") {
+        if (typeof from !== 'number') {
             from = from.tokenIndex;
         }
-        if (typeof to !== "number") {
+        if (typeof to !== 'number') {
             to = to.tokenIndex;
         }
         if (from > to || from < 0 || to < 0 || to >= this.tokens.size) {
@@ -107,7 +107,7 @@ export default class TokenStreamRewriter {
      * @param {string} [programName]
      */
     delete(from, to, programName = TokenStreamRewriter.DEFAULT_PROGRAM_NAME) {
-        if (typeof to === "undefined") {
+        if (typeof to === 'undefined') {
             to = from;
         }
         this.replace(from, to, null, programName);
@@ -149,7 +149,7 @@ export default class TokenStreamRewriter {
             interval = new Interval(0, this.tokens.size - 1);
         }
 
-        if (typeof intervalOrProgram === "string") {
+        if (typeof intervalOrProgram === 'string') {
             programName = intervalOrProgram;
         }
 
@@ -205,7 +205,7 @@ export default class TokenStreamRewriter {
             }
         }
 
-        return buf.join("");
+        return buf.join('');
     }
 
     /**
@@ -230,7 +230,7 @@ export default class TokenStreamRewriter {
                     // E.g., insert before 2, delete 2..2; update replace
                     // text to include insert before, kill insert
                     rewrites[iop.instructionIndex] = undefined;
-                    rop.text = iop.text.toString() + (rop.text != null ? rop.text.toString() : "");
+                    rop.text = iop.text.toString() + (rop.text != null ? rop.text.toString() : '');
                 }
                 else if (iop.index > rop.index && iop.index <= rop.lastIndex) {
                     // delete insert as it's a no-op.
@@ -310,7 +310,7 @@ export default class TokenStreamRewriter {
                 continue;
             }
             if (m.get(op.index) != null) {
-                throw new Error("should only be one op per index");
+                throw new Error('should only be one op per index');
             }
             m.set(op.index, op);
         }
@@ -323,8 +323,8 @@ export default class TokenStreamRewriter {
      * @returns {string}
      */
     catOpText(a, b) {
-        let x = "";
-        let y = "";
+        let x = '';
+        let y = '';
         if (a != null) {
             x = a.toString();
         }
@@ -356,15 +356,15 @@ class RewriteOperation {
         this.tokens = tokens;
         this.instructionIndex = instructionIndex;
         this.index = index;
-        this.text = text === undefined ? "" : text;
+        this.text = text === undefined ? '' : text;
     }
 
     toString() {
         let opName = this.constructor.name;
-        const $index = opName.indexOf("$");
+        const $index = opName.indexOf('$');
         opName = opName.substring($index + 1, opName.length);
-        return "<" + opName + "@" + this.tokens.get(this.index) +
-            ":\"" + this.text + "\">";
+        return '<' + opName + '@' + this.tokens.get(this.index) +
+            ':"' + this.text + '">';
     }
 }
 
@@ -433,10 +433,10 @@ class ReplaceOp extends RewriteOperation {
 
     toString() {
         if (this.text == null) {
-            return "<DeleteOp@" + this.tokens.get(this.index) +
-                ".." + this.tokens.get(this.lastIndex) + ">";
+            return '<DeleteOp@' + this.tokens.get(this.index) +
+                '..' + this.tokens.get(this.lastIndex) + '>';
         }
-        return "<ReplaceOp@" + this.tokens.get(this.index) +
-            ".." + this.tokens.get(this.lastIndex) + ":\"" + this.text + "\">";
+        return '<ReplaceOp@' + this.tokens.get(this.index) +
+            '..' + this.tokens.get(this.lastIndex) + ':"' + this.text + '">';
     }
 }

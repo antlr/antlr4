@@ -4,10 +4,10 @@
  */
 
 import LexerIndexedCustomAction from '../action/LexerIndexedCustomAction.js';
-import HashCode from "../misc/HashCode.js";
+import HashCode from '../misc/HashCode.js';
 
 export default class LexerActionExecutor {
-	/**
+    /**
 	 * Represents an executor for a sequence of lexer actions which traversed during
 	 * the matching operation of a lexer rule (token).
 	 *
@@ -15,18 +15,18 @@ export default class LexerActionExecutor {
 	 * efficiently, ensuring that actions appearing only at the end of the rule do
 	 * not cause bloating of the {@link DFA} created for the lexer.</p>
 	 */
-	constructor(lexerActions) {
-		this.lexerActions = lexerActions === null ? [] : lexerActions;
-		/**
+    constructor(lexerActions) {
+        this.lexerActions = lexerActions === null ? [] : lexerActions;
+        /**
 		 * Caches the result of {@link //hashCode} since the hash code is an element
 		 * of the performance-critical {@link LexerATNConfig//hashCode} operation
 		 */
-		this.cachedHashCode = HashCode.hashStuff(lexerActions); // "".join([str(la) for la in
-		// lexerActions]))
-		return this;
-	}
+        this.cachedHashCode = HashCode.hashStuff(lexerActions); // "".join([str(la) for la in
+        // lexerActions]))
+        return this;
+    }
 
-	/**
+    /**
 	 * Creates a {@link LexerActionExecutor} which encodes the current offset
 	 * for position-dependent lexer actions.
 	 *
@@ -55,26 +55,26 @@ export default class LexerActionExecutor {
 	 * @return {LexerActionExecutor} A {@link LexerActionExecutor} which stores input stream offsets
 	 * for all position-dependent lexer actions.
 	 */
-	fixOffsetBeforeMatch(offset) {
-		let updatedLexerActions = null;
-		for (let i = 0; i < this.lexerActions.length; i++) {
-			if (this.lexerActions[i].isPositionDependent &&
+    fixOffsetBeforeMatch(offset) {
+        let updatedLexerActions = null;
+        for (let i = 0; i < this.lexerActions.length; i++) {
+            if (this.lexerActions[i].isPositionDependent &&
 					!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
-				if (updatedLexerActions === null) {
-					updatedLexerActions = this.lexerActions.concat([]);
-				}
-				updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
-						this.lexerActions[i]);
-			}
-		}
-		if (updatedLexerActions === null) {
-			return this;
-		} else {
-			return new LexerActionExecutor(updatedLexerActions);
-		}
-	}
+                if (updatedLexerActions === null) {
+                    updatedLexerActions = this.lexerActions.concat([]);
+                }
+                updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
+                    this.lexerActions[i]);
+            }
+        }
+        if (updatedLexerActions === null) {
+            return this;
+        } else {
+            return new LexerActionExecutor(updatedLexerActions);
+        }
+    }
 
-	/**
+    /**
 	 * Execute the actions encapsulated by this executor within the context of a
 	 * particular {@link Lexer}.
 	 *
@@ -93,59 +93,59 @@ export default class LexerActionExecutor {
 	 * {@link IntStream//seek} to set the {@code input} position to the beginning
 	 * of the token.
 	 */
-	execute(lexer, input, startIndex) {
-		let requiresSeek = false;
-		const stopIndex = input.index;
-		try {
-			for (let i = 0; i < this.lexerActions.length; i++) {
-				let lexerAction = this.lexerActions[i];
-				if (lexerAction instanceof LexerIndexedCustomAction) {
-					const offset = lexerAction.offset;
-					input.seek(startIndex + offset);
-					lexerAction = lexerAction.action;
-					requiresSeek = (startIndex + offset) !== stopIndex;
-				} else if (lexerAction.isPositionDependent) {
-					input.seek(stopIndex);
-					requiresSeek = false;
-				}
-				lexerAction.execute(lexer);
-			}
-		} finally {
-			if (requiresSeek) {
-				input.seek(stopIndex);
-			}
-		}
-	}
+    execute(lexer, input, startIndex) {
+        let requiresSeek = false;
+        const stopIndex = input.index;
+        try {
+            for (let i = 0; i < this.lexerActions.length; i++) {
+                let lexerAction = this.lexerActions[i];
+                if (lexerAction instanceof LexerIndexedCustomAction) {
+                    const offset = lexerAction.offset;
+                    input.seek(startIndex + offset);
+                    lexerAction = lexerAction.action;
+                    requiresSeek = (startIndex + offset) !== stopIndex;
+                } else if (lexerAction.isPositionDependent) {
+                    input.seek(stopIndex);
+                    requiresSeek = false;
+                }
+                lexerAction.execute(lexer);
+            }
+        } finally {
+            if (requiresSeek) {
+                input.seek(stopIndex);
+            }
+        }
+    }
 
-	hashCode() {
-		return this.cachedHashCode;
-	}
+    hashCode() {
+        return this.cachedHashCode;
+    }
 
-	updateHashCode(hash) {
-		hash.update(this.cachedHashCode);
-	}
+    updateHashCode(hash) {
+        hash.update(this.cachedHashCode);
+    }
 
-	equals(other) {
-		if (this === other) {
-			return true;
-		} else if (!(other instanceof LexerActionExecutor)) {
-			return false;
-		} else if (this.cachedHashCode != other.cachedHashCode) {
-			return false;
-		} else if (this.lexerActions.length != other.lexerActions.length) {
-			return false;
-		} else {
-			const numActions = this.lexerActions.length
-			for (let idx = 0; idx < numActions; ++idx) {
-				if (!this.lexerActions[idx].equals(other.lexerActions[idx])) {
-					return false;
-				}
-			}
-			return true;
-		}
-	}
+    equals(other) {
+        if (this === other) {
+            return true;
+        } else if (!(other instanceof LexerActionExecutor)) {
+            return false;
+        } else if (this.cachedHashCode != other.cachedHashCode) {
+            return false;
+        } else if (this.lexerActions.length != other.lexerActions.length) {
+            return false;
+        } else {
+            const numActions = this.lexerActions.length;
+            for (let idx = 0; idx < numActions; ++idx) {
+                if (!this.lexerActions[idx].equals(other.lexerActions[idx])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 
-	/**
+    /**
 	 * Creates a {@link LexerActionExecutor} which executes the actions for
 	 * the input {@code lexerActionExecutor} followed by a specified
 	 * {@code lexerAction}.
@@ -160,11 +160,11 @@ export default class LexerActionExecutor {
 	 * @return {LexerActionExecutor} A {@link LexerActionExecutor} for executing the combine actions
 	 * of {@code lexerActionExecutor} and {@code lexerAction}.
 	 */
-	static append(lexerActionExecutor, lexerAction) {
-		if (lexerActionExecutor === null) {
-			return new LexerActionExecutor([ lexerAction ]);
-		}
-		const lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ]);
-		return new LexerActionExecutor(lexerActions);
-	}
+    static append(lexerActionExecutor, lexerAction) {
+        if (lexerActionExecutor === null) {
+            return new LexerActionExecutor([ lexerAction ]);
+        }
+        const lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ]);
+        return new LexerActionExecutor(lexerActions);
+    }
 }

@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import PredicateTransition from "../transition/PredicateTransition.js";
-import RecognitionException from "./RecognitionException.js";
+import PredicateTransition from '../transition/PredicateTransition.js';
+import RecognitionException from './RecognitionException.js';
 
 /**
  * A semantic predicate failed during validation. Validation of predicates
@@ -19,8 +19,8 @@ export default class FailedPredicateException extends RecognitionException {
             recognizer: recognizer,
             input: recognizer.getInputStream(), ctx: recognizer._ctx
         });
-        const s = recognizer._interp.atn.states[recognizer.state]
-        const trans = s.transitions[0]
+        const s = recognizer._interp.atn.states[recognizer.state];
+        const trans = s.transitions[0];
         if (trans instanceof PredicateTransition) {
             this.ruleIndex = trans.ruleIndex;
             this.predicateIndex = trans.predIndex;
@@ -38,6 +38,6 @@ function formatMessage(predicate, message) {
     if (message !==null) {
         return message;
     } else {
-        return "failed predicate: {" + predicate + "}?";
+        return 'failed predicate: {' + predicate + '}?';
     }
 }

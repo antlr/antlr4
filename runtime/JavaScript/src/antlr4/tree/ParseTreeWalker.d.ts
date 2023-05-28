@@ -1,5 +1,5 @@
-import {ParseTreeListener} from "./ParseTreeListener";
-import {ParseTree} from "./ParseTree";
+import { ParseTreeListener } from './ParseTreeListener';
+import { ParseTree } from './ParseTree';
 
 export declare class ParseTreeWalker {
     static DEFAULT: ParseTreeWalker;

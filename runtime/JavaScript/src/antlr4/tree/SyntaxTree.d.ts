@@ -1,3 +1,3 @@
-import {Tree} from "./Tree";
+import { Tree } from './Tree';
 
 export declare class SyntaxTree extends Tree {}

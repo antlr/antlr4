@@ -8,10 +8,10 @@ import RuleStopState from '../state/RuleStopState.js';
 import ATNConfigSet from './ATNConfigSet.js';
 import ATNConfig from './ATNConfig.js';
 import SemanticContext from './SemanticContext.js';
-import BitSet from "../misc/BitSet.js";
-import AltDict from "../misc/AltDict.js";
-import HashCode from "../misc/HashCode.js";
-import HashMap from "../misc/HashMap.js";
+import BitSet from '../misc/BitSet.js';
+import AltDict from '../misc/AltDict.js';
+import HashCode from '../misc/HashCode.js';
+import HashMap from '../misc/HashMap.js';
 
 /**
  * This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -194,7 +194,7 @@ const PredictionMode = {
                 const dup = new ATNConfigSet();
                 for(let i=0;i<configs.items.length;i++) {
                     let c = configs.items[i];
-                    c = new ATNConfig({semanticContext:SemanticContext.NONE}, c);
+                    c = new ATNConfig({ semanticContext:SemanticContext.NONE }, c);
                     dup.add(c);
                 }
                 configs = dup;

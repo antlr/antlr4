@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import IntervalSet from "../misc/IntervalSet.js";
-import Transition from "./Transition.js";
+import IntervalSet from '../misc/IntervalSet.js';
+import Transition from './Transition.js';
 
 export default class RangeTransition extends Transition {
     constructor(target, start, stop) {
@@ -25,6 +25,6 @@ export default class RangeTransition extends Transition {
     }
 
     toString() {
-        return "'" + String.fromCharCode(this.start) + "'..'" + String.fromCharCode(this.stop) + "'";
+        return '\'' + String.fromCharCode(this.start) + '\'..\'' + String.fromCharCode(this.stop) + '\'';
     }
 }

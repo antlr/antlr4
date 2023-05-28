@@ -1,4 +1,4 @@
-import { Token } from "./Token";
+import { Token } from './Token';
 
 export declare class CommonToken extends Token {
     constructor(source: number, type: number, channel: number, start: number, stop: number);

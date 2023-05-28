@@ -4,13 +4,16 @@
     "module": "ES2020",
     "moduleResolution": "Node",
     "sourceMap": true,
-    "esModuleInterop":true,
+    "esModuleInterop": true,
+    "rootDir": "./src",
     "lib": [
       "ES2020"
     ],
     "noImplicitAny": true,
     "strictNullChecks": true,
     "preserveConstEnums": true,
+    "allowJs": true,
+    "strict": true,
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -19,7 +22,7 @@
     ],
   },
   "include": [
-    "**/*.d.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"

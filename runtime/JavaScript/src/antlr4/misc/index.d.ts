@@ -1,3 +1,3 @@
-export * from './Interval'
+export * from './Interval';
 export * from './IntervalSet';
 

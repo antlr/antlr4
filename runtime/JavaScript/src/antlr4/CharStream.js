@@ -14,7 +14,7 @@ import Token from './Token.js';
  */
 export default class CharStream {
     constructor(data, decodeToUnicodeCodePoints) {
-        this.name = "<empty>";
+        this.name = '<empty>';
         this.strdata = data;
         this.decodeToUnicodeCodePoints = decodeToUnicodeCodePoints || false;
         // _loadString - Vacuum all input from a string and then treat it like a buffer.
@@ -47,7 +47,7 @@ export default class CharStream {
     consume() {
         if (this._index >= this._size) {
             // assert this.LA(1) == Token.EOF
-            throw ("cannot consume EOF");
+            throw ('cannot consume EOF');
         }
         this._index += 1;
     }
@@ -70,7 +70,7 @@ export default class CharStream {
         return this.LA(offset);
     }
 
-// mark/release do nothing; we have entire buffer
+    // mark/release do nothing; we have entire buffer
     mark() {
         return -1;
     }
@@ -97,10 +97,10 @@ export default class CharStream {
             stop = this._size - 1;
         }
         if (start >= this._size) {
-            return "";
+            return '';
         } else {
             if (this.decodeToUnicodeCodePoints) {
-                let result = "";
+                let result = '';
                 for (let i = start; i <= stop; i++) {
                     result += String.fromCodePoint(this.data[i]);
                 }

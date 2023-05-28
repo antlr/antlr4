@@ -2,9 +2,9 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import PrecedencePredicate from "../atn/PrecedencePredicate.js";
-import Transition from "./Transition.js";
-import AbstractPredicateTransition from "../atn/AbstractPredicateTransition.js";
+import PrecedencePredicate from '../atn/PrecedencePredicate.js';
+import Transition from './Transition.js';
+import AbstractPredicateTransition from '../atn/AbstractPredicateTransition.js';
 
 export default class PrecedencePredicateTransition extends AbstractPredicateTransition {
     constructor(target, precedence) {
@@ -23,6 +23,6 @@ export default class PrecedencePredicateTransition extends AbstractPredicateTran
     }
 
     toString() {
-        return this.precedence + " >= _p";
+        return this.precedence + ' >= _p';
     }
 }

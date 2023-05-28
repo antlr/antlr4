@@ -9,14 +9,14 @@ export default class AltDict {
     }
 
     get(key) {
-        return this.data["k-" + key] || null;
+        return this.data['k-' + key] || null;
     }
 
     set(key, value) {
-        this.data["k-" + key] = value;
+        this.data['k-' + key] = value;
     }
 
     values() {
-        return Object.keys(this.data).filter(key => key.startsWith("k-")).map(key => this.data[key], this);
+        return Object.keys(this.data).filter(key => key.startsWith('k-')).map(key => this.data[key], this);
     }
 }

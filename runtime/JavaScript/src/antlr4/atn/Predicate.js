@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import SemanticContext from "./SemanticContext.js";
+import SemanticContext from './SemanticContext.js';
 
 export default class Predicate extends SemanticContext {
 
@@ -35,7 +35,7 @@ export default class Predicate extends SemanticContext {
     }
 
     toString() {
-        return "{" + this.ruleIndex + ":" + this.predIndex + "}?";
+        return '{' + this.ruleIndex + ':' + this.predIndex + '}?';
     }
 }
 

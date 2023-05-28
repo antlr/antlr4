@@ -15,9 +15,9 @@ export default class Recognizer {
     }
 
     checkVersion(toolVersion) {
-        const runtimeVersion = "4.13.0";
+        const runtimeVersion = '4.13.0';
         if (runtimeVersion!==toolVersion) {
-            console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
+            console.log('ANTLR runtime and generated code versions disagree: '+runtimeVersion+'!='+toolVersion);
         }
     }
 
@@ -44,7 +44,7 @@ export default class Recognizer {
             const length = literalNames.length > symbolicNames.length ? literalNames.length : symbolicNames.length;
             this.tokenNames = [];
             for(let i=0; i<length; i++) {
-                this.tokenNames[i] = literalNames[i] || symbolicNames[i] || "<INVALID";
+                this.tokenNames[i] = literalNames[i] || symbolicNames[i] || '<INVALID';
             }
         }
         return this.tokenNames;
@@ -53,7 +53,7 @@ export default class Recognizer {
     getTokenTypeMap() {
         const tokenNames = this.getTokenNames();
         if (tokenNames===null) {
-            throw("The current recognizer does not provide a list of token names.");
+            throw('The current recognizer does not provide a list of token names.');
         }
         let result = this.tokenTypeMapCache[tokenNames];
         if(result===undefined) {
@@ -71,7 +71,7 @@ export default class Recognizer {
     getRuleIndexMap() {
         const ruleNames = this.ruleNames;
         if (ruleNames===null) {
-            throw("The current recognizer does not provide a list of rule names.");
+            throw('The current recognizer does not provide a list of rule names.');
         }
         let result = this.ruleIndexMapCache[ruleNames]; // todo: should it be Recognizer.ruleIndexMapCache ?
         if(result===undefined) {
@@ -94,7 +94,7 @@ export default class Recognizer {
     getErrorHeader(e) {
         const line = e.getOffendingToken().line;
         const column = e.getOffendingToken().column;
-        return "line " + line + ":" + column;
+        return 'line ' + line + ':' + column;
     }
 
     /**
@@ -112,18 +112,18 @@ export default class Recognizer {
      * {@link DefaultErrorStrategy//getTokenErrorDisplay}.*/
     getTokenErrorDisplay(t) {
         if (t===null) {
-            return "<no token>";
+            return '<no token>';
         }
         let s = t.text;
         if (s===null) {
             if (t.type===Token.EOF) {
-                s = "<EOF>";
+                s = '<EOF>';
             } else {
-                s = "<" + t.type + ">";
+                s = '<' + t.type + '>';
             }
         }
-        s = s.replace("\n","\\n").replace("\r","\\r").replace("\t","\\t");
-        return "'" + s + "'";
+        s = s.replace('\n','\\n').replace('\r','\\r').replace('\t','\\t');
+        return '\'' + s + '\'';
     }
 
     getErrorListenerDispatch() {

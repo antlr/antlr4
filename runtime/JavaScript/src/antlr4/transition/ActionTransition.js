@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import Transition from "./Transition.js";
+import Transition from './Transition.js';
 
 export default class ActionTransition extends Transition {
     constructor(target, ruleIndex, actionIndex, isCtxDependent) {
@@ -19,6 +19,6 @@ export default class ActionTransition extends Transition {
     }
 
     toString() {
-        return "action_" + this.ruleIndex + ":" + this.actionIndex;
+        return 'action_' + this.ruleIndex + ':' + this.actionIndex;
     }
 }

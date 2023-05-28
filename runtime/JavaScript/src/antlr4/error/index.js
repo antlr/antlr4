@@ -16,4 +16,4 @@ import ErrorListener from './ErrorListener.js';
 export default {
     RecognitionException, NoViableAltException, LexerNoViableAltException, InputMismatchException, FailedPredicateException,
     DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy, ErrorListener
-}
+};

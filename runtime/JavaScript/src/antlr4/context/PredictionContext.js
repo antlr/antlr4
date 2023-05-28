@@ -5,11 +5,11 @@
 
 export default class PredictionContext {
 
-	constructor(cachedHashCode) {
-		this.cachedHashCode = cachedHashCode;
-	}
+    constructor(cachedHashCode) {
+        this.cachedHashCode = cachedHashCode;
+    }
 
-	/**
+    /**
 	 * Stores the computed hash code of this {@link PredictionContext}. The hash
 	 * code is computed in parts to match the following reference algorithm.
 	 *
@@ -35,21 +35,21 @@ export default class PredictionContext {
 	 * </pre>
 	 * This means only the {@link //EMPTY} context is in set.
 	 */
-	isEmpty() {
-		return this === PredictionContext.EMPTY;
-	}
+    isEmpty() {
+        return this === PredictionContext.EMPTY;
+    }
 
-	hasEmptyPath() {
-		return this.getReturnState(this.length - 1) === PredictionContext.EMPTY_RETURN_STATE;
-	}
+    hasEmptyPath() {
+        return this.getReturnState(this.length - 1) === PredictionContext.EMPTY_RETURN_STATE;
+    }
 
-	hashCode() {
-		return this.cachedHashCode;
-	}
+    hashCode() {
+        return this.cachedHashCode;
+    }
 
-	updateHashCode(hash) {
-		hash.update(this.cachedHashCode);
-	}
+    updateHashCode(hash) {
+        hash.update(this.cachedHashCode);
+    }
 }
 
 /**

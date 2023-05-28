@@ -4,27 +4,27 @@
  */
 
 import SemanticContext from './SemanticContext.js';
-import HashCode from "../misc/HashCode.js";
+import HashCode from '../misc/HashCode.js';
 
 function checkParams(params, isCfg) {
-	if(params===null) {
-		const result = { state:null, alt:null, context:null, semanticContext:null };
-		if(isCfg) {
-			result.reachesIntoOuterContext = 0;
-		}
-		return result;
-	} else {
-		const props = {};
-		props.state = params.state || null;
-		props.alt = (params.alt === undefined) ? null : params.alt;
-		props.context = params.context || null;
-		props.semanticContext = params.semanticContext || null;
-		if(isCfg) {
-			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
-			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false;
-		}
-		return props;
-	}
+    if(params===null) {
+        const result = { state:null, alt:null, context:null, semanticContext:null };
+        if(isCfg) {
+            result.reachesIntoOuterContext = 0;
+        }
+        return result;
+    } else {
+        const props = {};
+        props.state = params.state || null;
+        props.alt = (params.alt === undefined) ? null : params.alt;
+        props.context = params.context || null;
+        props.semanticContext = params.semanticContext || null;
+        if(isCfg) {
+            props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
+            props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false;
+        }
+        return props;
+    }
 }
 
 export default class ATNConfig {
@@ -122,13 +122,13 @@ export default class ATNConfig {
     }
 
     toString() {
-        return "(" + this.state + "," + this.alt +
-            (this.context!==null ? ",[" + this.context.toString() + "]" : "") +
+        return '(' + this.state + ',' + this.alt +
+            (this.context!==null ? ',[' + this.context.toString() + ']' : '') +
             (this.semanticContext !== SemanticContext.NONE ?
-                    ("," + this.semanticContext.toString())
-                    : "") +
+                (',' + this.semanticContext.toString())
+                : '') +
             (this.reachesIntoOuterContext>0 ?
-                    (",up=" + this.reachesIntoOuterContext)
-                    : "") + ")";
+                (',up=' + this.reachesIntoOuterContext)
+                : '') + ')';
     }
 }

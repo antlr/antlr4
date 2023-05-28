@@ -2,9 +2,9 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import PredictionContext from "./PredictionContext.js";
-import equalArrays from "../utils/equalArrays.js";
-import HashCode from "../misc/HashCode.js";
+import PredictionContext from './PredictionContext.js';
+import equalArrays from '../utils/equalArrays.js';
+import HashCode from '../misc/HashCode.js';
 
 export default class ArrayPredictionContext extends PredictionContext {
 
@@ -53,25 +53,25 @@ export default class ArrayPredictionContext extends PredictionContext {
 
     toString() {
         if (this.isEmpty()) {
-            return "[]";
+            return '[]';
         } else {
-            let s = "[";
+            let s = '[';
             for (let i = 0; i < this.returnStates.length; i++) {
                 if (i > 0) {
-                    s = s + ", ";
+                    s = s + ', ';
                 }
                 if (this.returnStates[i] === PredictionContext.EMPTY_RETURN_STATE) {
-                    s = s + "$";
+                    s = s + '$';
                     continue;
                 }
                 s = s + this.returnStates[i];
                 if (this.parents[i] !== null) {
-                    s = s + " " + this.parents[i];
+                    s = s + ' ' + this.parents[i];
                 } else {
-                    s = s + "null";
+                    s = s + 'null';
                 }
             }
-            return s + "]";
+            return s + ']';
         }
     }
 

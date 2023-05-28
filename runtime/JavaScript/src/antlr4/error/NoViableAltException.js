@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import RecognitionException from "./RecognitionException.js";
+import RecognitionException from './RecognitionException.js';
 
 /**
  * Indicates that the parser could not decide which of two or more paths
@@ -17,7 +17,7 @@ export default class NoViableAltException extends RecognitionException {
         offendingToken = offendingToken || recognizer.getCurrentToken();
         startToken = startToken || recognizer.getCurrentToken();
         input = input || recognizer.getInputStream();
-        super({message: "", recognizer: recognizer, input: input, ctx: ctx});
+        super({ message: '', recognizer: recognizer, input: input, ctx: ctx });
         // Which configurations did we try at input.index() that couldn't match
         // input.LT(1)?//
         this.deadEndConfigs = deadEndConfigs;

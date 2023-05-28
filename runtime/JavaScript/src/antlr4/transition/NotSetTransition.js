@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import Transition from "./Transition.js";
-import SetTransition from "./SetTransition.js";
+import Transition from './Transition.js';
+import SetTransition from './SetTransition.js';
 
 export default class NotSetTransition extends SetTransition {
     constructor(target, set) {
