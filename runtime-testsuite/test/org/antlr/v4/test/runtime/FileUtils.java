@@ -17,6 +17,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
+import java.util.Optional;
 
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
 
@@ -40,6 +41,17 @@ public class FileUtils {
 			ioe.printStackTrace(System.err);
 		}
 		return null;
+	}
+
+	public static Optional<String> readFileIfExists(String dir, String fileName) {
+		try {
+			return Optional.of(String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8")));
+		}
+		catch (IOException ioe) {
+			// do nothing
+		}
+		// return empty file contents
+		return Optional.empty();
 	}
 
 	public static void replaceInFile(Path sourcePath, String target, String replacement) throws IOException {
