@@ -19,10 +19,6 @@ void main(List\<String> args) async {
   ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
   parser.setInterpreter(profiler);
 <endif>
-<if(profile)>
-  ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
-  parser.setInterpreter(profiler);
-<endif>
   ParserRuleContext tree = parser.<parserStartRuleName>();
 <if(profile)>
   print('[${profiler.getDecisionInfo().join(', ')}]');
