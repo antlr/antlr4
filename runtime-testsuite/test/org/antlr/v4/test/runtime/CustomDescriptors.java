@@ -52,7 +52,7 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\n'+;\n" +
 						"SEPARATOR: '\\n';",
-				null, false, false, false,  PredictionMode.LL, null, uri);
+				null, false, false, false,  PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLineSeparatorCrLfDescriptor() {
@@ -73,7 +73,7 @@ public class CustomDescriptors {
 				"lexer grammar L;\n" +
 						"T: ~'\\r'+;\n" +
 						"SEPARATOR: '\\r\\n';",
-				null, false, false, false, PredictionMode.LL, null, uri);
+				null, false, false, false, PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLargeLexerDescriptor() {
@@ -100,7 +100,7 @@ public class CustomDescriptors {
 				"",
 				grammarName,
 				grammar.toString(),
-				null, false, false, false, PredictionMode.LL, null, uri);
+				null, false, false, false, PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getAtnStatesSizeMoreThan65535Descriptor() {
@@ -149,7 +149,7 @@ public class CustomDescriptors {
 				"",
 				grammarName,
 				grammar.toString(),
-				null, false, false, false, PredictionMode.LL,
+				null, false, false, false, PredictionMode.LL, true,
 				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "TypeScript", "Dart"},
 				uri);
 	}
@@ -195,6 +195,6 @@ public class CustomDescriptors {
 				"r",
 				"P",
 				grammar,
-				null, false, false, false, PredictionMode.LL, null, uri);
+				null, false, false, false, PredictionMode.LL, true, null, uri);
 	}
 }

@@ -53,6 +53,9 @@ $tokens = new CommonTokenStream($lexer);
 <if(parserName)>
 $parser = new <parserName>($tokens);
 $parser->getInterpreter()->setPredictionMode(PredictionMode::<predictionMode>);
+<if(!buildParseTree)>
+$parser->setBuildParseTree(false);
+<endif>
 <if(showDiagnosticErrors)>
 $parser->addErrorListener(new DiagnosticErrorListener());
 <endif>

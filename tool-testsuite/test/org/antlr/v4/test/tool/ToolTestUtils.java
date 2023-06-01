@@ -87,7 +87,7 @@ public class ToolTestUtils {
 	) {
 		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
 				input, profile, showDiagnosticErrors, false, false, endStage, "Java",
-				JavaRunner.runtimeTestParserName, PredictionMode.LL);
+				JavaRunner.runtimeTestParserName, PredictionMode.LL, true);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {

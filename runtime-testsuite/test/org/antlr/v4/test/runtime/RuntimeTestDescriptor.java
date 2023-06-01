@@ -56,6 +56,8 @@ public class RuntimeTestDescriptor {
 
 	public final PredictionMode predictionMode;
 
+	public final boolean buildParseTree;
+
 	public final String[] skipTargets;
 
 	public final URI uri;
@@ -65,7 +67,7 @@ public class RuntimeTestDescriptor {
 								 String startRule,
 								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
 								 boolean showDiagnosticErrors, boolean traceATN, boolean showDFA, PredictionMode predictionMode,
-								 String[] skipTargets, URI uri) {
+								 boolean buildParseTree, String[] skipTargets, URI uri) {
 		this.testType = testType;
 		this.name = name;
 		this.notes = notes;
@@ -80,6 +82,7 @@ public class RuntimeTestDescriptor {
 		this.showDiagnosticErrors = showDiagnosticErrors;
 		this.traceATN = traceATN;
 		this.predictionMode = predictionMode;
+		this.buildParseTree = buildParseTree;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
 		this.uri = uri;
 	}
