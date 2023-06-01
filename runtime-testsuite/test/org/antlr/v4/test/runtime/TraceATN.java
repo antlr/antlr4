@@ -156,7 +156,6 @@ public class TraceATN {
 				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
-				false,
 				targetName,
 				superClass
 		);

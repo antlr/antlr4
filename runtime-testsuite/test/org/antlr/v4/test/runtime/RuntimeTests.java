@@ -165,7 +165,6 @@ public abstract class RuntimeTests {
 				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
-				false,
 				targetName,
 				superClass
 		);
