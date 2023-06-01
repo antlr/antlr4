@@ -17,9 +17,8 @@ public class Test {
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>
 <if(traceATN)>
-	    ParserATNSimulator.trace_atn_sim = true;
+		ParserATNSimulator.trace_atn_sim = true;
 <endif>
-		parser.BuildParseTree = true;
 		var tree = parser.<parserStartRuleName>();
 		ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);
 <else>

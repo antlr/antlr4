@@ -40,7 +40,6 @@ public void MyParseMethod() {
       ITokenSource lexer = new MyGrammarLexer(stream);
       ITokenStream tokens = new CommonTokenStream(lexer);
       MyGrammarParser parser = new MyGrammarParser(tokens);
-      parser.BuildParseTree = true;
       IParseTree tree = parser.StartRule();
 }
 ```

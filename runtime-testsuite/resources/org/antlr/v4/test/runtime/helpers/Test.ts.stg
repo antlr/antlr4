@@ -41,7 +41,6 @@ function main(argv: string[]): void {
 <if(showDiagnosticErrors)>
     parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
-    parser.buildParseTrees = true;
     parser.printer = {
         println : function(s: string) { console.log(s); },
         print : function(s: string) { process.stdout.write(s); }

@@ -51,7 +51,6 @@ func main() {
 <if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>
-	p.BuildParseTrees = true
 	tree := p.<parserStartRuleName>()
 	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 <else>

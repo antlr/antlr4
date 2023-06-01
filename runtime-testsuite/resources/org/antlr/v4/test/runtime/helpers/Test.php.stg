@@ -58,7 +58,6 @@ $parser->addErrorListener(new ConsoleErrorListener());
 <if(traceATN)>
 ParserATNSimulator::$traceAtnSimulation = true;
 <endif>
-$parser->setBuildParseTree(true);
 $tree = $parser-><parserStartRuleName>();
 
 ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);

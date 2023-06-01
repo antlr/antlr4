@@ -89,7 +89,6 @@ void main(List<String> args) async {
   final tokens = CommonTokenStream(lexer);
   final parser = JSONParser(tokens);
   parser.addErrorListener(DiagnosticErrorListener());
-  parser.buildParseTree = true;
   final tree = parser.json();
   ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree);
 }
