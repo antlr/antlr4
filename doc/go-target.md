@@ -258,7 +258,6 @@ func main() {
 	stream := antlr.NewCommonTokenStream(lexer,0)
 	p := parser.NewJSONParser(stream)
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-	p.BuildParseTrees = true
 	tree := p.Json()
 	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 }

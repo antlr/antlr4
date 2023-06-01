@@ -39,7 +39,6 @@ def main(argv):
 <if(showDiagnosticErrors)>
     parser.addErrorListener(DiagnosticErrorListener())
 <endif>
-    parser.buildParseTrees = True
     tree = parser.<parserStartRuleName>()
     ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
 <else>

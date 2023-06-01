@@ -19,7 +19,6 @@ void main(List\<String> args) async {
   ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
   parser.setInterpreter(profiler);
 <endif>
-  parser.buildParseTree = true;
 <if(profile)>
   ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
   parser.setInterpreter(profiler);
