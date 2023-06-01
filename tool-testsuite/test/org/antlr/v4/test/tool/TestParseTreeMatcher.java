@@ -392,11 +392,11 @@ public class TestParseTreeMatcher {
 		String lexerName = grammarName+"Lexer";
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, input,
-				false, false, Stage.Execute, true);
+				false, false, Stage.Execute);
 		try (JavaRunner runner = new JavaRunner()) {
 			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
 			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
-			Parser parser = compiledState.initializeLexerAndParser("").b;
+			Parser parser = compiledState.initializeDummyLexerAndParser().b;
 
 			ParseTreePattern p = parser.compileParseTreePattern(pattern, parser.getRuleIndex(startRule));
 
@@ -413,11 +413,11 @@ public class TestParseTreeMatcher {
 	) throws Exception {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, null,
-				false, false, Stage.Compile, false);
+				false, false, Stage.Compile);
 		try (JavaRunner runner = new JavaRunner()) {
 			JavaCompiledState compiledState = (JavaCompiledState) runner.run(runOptions);
 
-			Pair<Lexer, Parser> lexerParserPair = compiledState.initializeLexerAndParser("");
+			Pair<Lexer, Parser> lexerParserPair = compiledState.initializeDummyLexerAndParser();
 
 			return new ParseTreePatternMatcher(lexerParserPair.a, lexerParserPair.b);
 		}
