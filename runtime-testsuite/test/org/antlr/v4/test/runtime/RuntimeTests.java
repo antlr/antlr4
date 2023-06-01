@@ -167,7 +167,8 @@ public abstract class RuntimeTests {
 				Stage.Execute,
 				targetName,
 				superClass,
-				descriptor.predictionMode
+				descriptor.predictionMode,
+				descriptor.buildParseTree
 		);
 
 		State result = runner.run(runOptions);

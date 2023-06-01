@@ -34,6 +34,9 @@ int main(int argc, const char* argv[]) {
 <if(parserName)>
   <parserName> parser(&tokens);
   parser.getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(antlr4::atn::PredictionMode::<predictionMode>);
+<if(!buildParseTree)>
+  parser.setBuildParseTree(false);
+<endif>
 <if(showDiagnosticErrors)>
   DiagnosticErrorListener errorListener;
   parser.addErrorListener(&errorListener);

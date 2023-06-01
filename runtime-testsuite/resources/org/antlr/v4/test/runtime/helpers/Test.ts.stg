@@ -47,6 +47,9 @@ function main(argv: string[]): void {
         print : function(s: string) { process.stdout.write(s); }
     };
     parser._interp.predictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+    parser.buildParseTrees = false;
+<endif>
     const tree = parser.<parserStartRuleName>();
     ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
 <else>

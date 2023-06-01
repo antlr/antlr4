@@ -37,6 +37,9 @@ def main(argv):
 <if(parserName)>
     parser = <parserName>(stream)
     parser._interp.predictionMode = PredictionMode.<predictionMode>
+<if(!buildParseTree)>
+    parser.buildParseTrees = False
+<endif>
 <if(showDiagnosticErrors)>
     parser.addErrorListener(DiagnosticErrorListener())
 <endif>

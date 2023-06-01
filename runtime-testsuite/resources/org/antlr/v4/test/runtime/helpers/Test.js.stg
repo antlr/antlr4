@@ -38,6 +38,9 @@ function main(argv) {
     };
     parser.printer = new printer();
     parser._interp.predictionMode = antlr4.atn.PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+    parser.buildParseTrees = false;
+<endif>
 <if(traceATN)>
     parser._interp.trace_atn_sim = true;
     antlr4.context.PredictionContext.trace_atn_sim = true;

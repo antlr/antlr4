@@ -158,7 +158,8 @@ public class TraceATN {
 				Stage.Execute,
 				targetName,
 				superClass,
-				PredictionMode.LL
+				PredictionMode.LL,
+				true
 		);
 
 		State result = runner.run(runOptions);
@@ -210,6 +211,7 @@ public class TraceATN {
 					true,
 					false,
 					PredictionMode.LL,
+					true,
 					null,
 					null);
 

@@ -188,6 +188,7 @@ public class JavaRunner extends RuntimeRunner {
 					parser.setInterpreter(profiler);
 				}
 				parser.getInterpreter().setPredictionMode(runOptions.predictionMode);
+				parser.setBuildParseTree(runOptions.buildParseTree);
 
 				Method startRule;
 				Object[] args = null;

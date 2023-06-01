@@ -49,6 +49,9 @@ func main() {
 <if(parserName)>
 	p := parser.New<parserName>(stream)
 	p.Interpreter.SetPredictionMode(antlr.PredictionMode<predictionMode>)
+<if(!buildParseTree)>
+	p.BuildParseTrees = false
+<endif>
 <if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>
