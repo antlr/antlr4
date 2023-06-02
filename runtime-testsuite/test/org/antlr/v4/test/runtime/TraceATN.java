@@ -120,7 +120,7 @@ public class TraceATN {
 		String lexerName, parserName;
 		boolean useListenerOrVisitor;
 		String superClass;
-		if (descriptor.testType == GrammarType.Parser || descriptor.testType == GrammarType.CompositeParser) {
+		if (descriptor.testType == GrammarType.Parser) {
 			lexerName = grammarName + "Lexer";
 			parserName = grammarName + "Parser";
 			useListenerOrVisitor = true;
@@ -197,7 +197,7 @@ public class TraceATN {
 			String input = new String(Files.readAllBytes(Paths.get(inputFileName)));
 
 			RuntimeTestDescriptor descriptor = new RuntimeTestDescriptor(
-					GrammarType.CompositeParser,
+					GrammarType.Parser,
 					"TraceATN-" + grammarFileName,
 					"",
 					input,

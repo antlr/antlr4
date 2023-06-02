@@ -129,7 +129,7 @@ public abstract class RuntimeTests {
 		String lexerName, parserName;
 		boolean useListenerOrVisitor;
 		String superClass;
-		if (descriptor.testType == GrammarType.Parser || descriptor.testType == GrammarType.CompositeParser) {
+		if (descriptor.testType == GrammarType.Parser) {
 			lexerName = grammarName + "Lexer";
 			parserName = grammarName + "Parser";
 			useListenerOrVisitor = true;

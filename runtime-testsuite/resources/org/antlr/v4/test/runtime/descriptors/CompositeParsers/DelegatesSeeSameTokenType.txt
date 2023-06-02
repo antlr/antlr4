@@ -11,7 +11,7 @@ public static final int WS=7;
 public static final int A=4;
 
 [type]
-CompositeParser
+Parser
 
 [grammar]
 grammar M;

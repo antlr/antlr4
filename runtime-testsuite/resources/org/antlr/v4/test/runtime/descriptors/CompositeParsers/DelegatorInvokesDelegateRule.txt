@@ -1,5 +1,5 @@
 [type]
-CompositeParser
+Parser
 
 [grammar]
 grammar M;
