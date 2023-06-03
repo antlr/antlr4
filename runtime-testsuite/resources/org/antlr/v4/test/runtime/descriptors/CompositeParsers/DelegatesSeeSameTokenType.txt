@@ -10,9 +10,6 @@ public static final int B=5;
 public static final int WS=7;
 public static final int A=4;
 
-[type]
-Parser
-
 [grammar]
 grammar M;
 import S,T;

@@ -2,9 +2,6 @@
 This is a regression test for #6 "NullPointerException in getMissingSymbol".
 https://github.com/antlr/antlr4/issues/6
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 start : ID+;

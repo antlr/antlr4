@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests;
+import static org.antlr.v4.test.tool.ToolTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("unused")
@@ -221,19 +221,14 @@ public class TestParserProfiler {
 			"PLUS : '+' ;\n" +
 			"MULT : '*' ;\n";
 
-		RunOptions runOptions = createOptionsForJavaToolTests("T.g4", grammar, "TParser", "TLexer",
-				false, false, "s", "xyz;abc;z.q",
-				true, false, Stage.Execute);
-		try (JavaRunner runner = new JavaRunner()) {
-			ExecutedState state = (ExecutedState) runner.run(runOptions);
-			String expecting =
-					"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
-							"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +
-							" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
-							"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
-			assertEquals(expecting, state.output);
-			assertEquals("", state.errors);
-		}
+		ExecutedState state = execParser(grammar, "s", "xyz;abc;z.q", false, null, true);
+		assertEquals(
+				"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
+				"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +
+				" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
+				"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n",
+				state.output);
+		assertEquals("", state.errors);
 	}
 
 	public DecisionInfo[] interpAndGetDecisionInfo(

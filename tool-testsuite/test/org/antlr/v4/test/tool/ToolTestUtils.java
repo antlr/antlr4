@@ -18,58 +18,48 @@ import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.ExecutedState;
+import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.antlr.v4.test.runtime.states.State;
+import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
-import static org.antlr.v4.test.runtime.Generator.antlrOnString;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.TempDirectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ToolTestUtils {
-	public static ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, null, false);
+	public static ExecutedState execLexer(String grammarStr, String input) {
+		return execLexer(grammarStr, input, null, false);
 	}
 
-	public static ExecutedState execLexer(String grammarFileName, String grammarStr, String lexerName, String input,
-									  Path tempDir, boolean saveTestDir) {
-		return execRecognizer(grammarFileName, grammarStr, null, lexerName,
-				null, input, false, tempDir, saveTestDir);
+	public static ExecutedState execLexer(String grammarStr, String input, Path tempDir, boolean saveTestDir) {
+		return execRecognizer(grammarStr, null, input, false, tempDir, saveTestDir, false);
 	}
 
-	public static ExecutedState execParser(String grammarFileName, String grammarStr,
-									   String parserName, String lexerName, String startRuleName,
-									   String input, boolean showDiagnosticErrors
+	public static ExecutedState execParser(String grammarStr, String startRuleName, String input, boolean showDiagnosticErrors) {
+		return execParser(grammarStr, startRuleName, input, showDiagnosticErrors, null, false);
+	}
+
+	public static ExecutedState execParser(String grammarStr, String startRuleName,
+									String input, boolean showDiagnosticErrors, Path workingDir, boolean profile
 	) {
-		return execParser(grammarFileName, grammarStr, parserName, lexerName, startRuleName,
-				input, showDiagnosticErrors, null);
+		return execRecognizer(grammarStr, startRuleName, input, showDiagnosticErrors, workingDir, false, profile);
 	}
 
-	public static ExecutedState execParser(String grammarFileName, String grammarStr,
-									String parserName, String lexerName, String startRuleName,
-									String input, boolean showDiagnosticErrors, Path workingDir
-	) {
-		return execRecognizer(grammarFileName, grammarStr, parserName, lexerName,
-				startRuleName, input, showDiagnosticErrors, workingDir, false);
-	}
-
-	private static ExecutedState execRecognizer(String grammarFileName, String grammarStr,
-										 String parserName, String lexerName, String startRuleName,
+	private static ExecutedState execRecognizer(String grammarStr, String startRuleName,
 										 String input, boolean showDiagnosticErrors,
-										 Path workingDir, boolean saveTestDir) {
-		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, lexerName,
+										 Path workingDir, boolean saveTestDir, boolean profile) {
+		RunOptions runOptions = createExecOptionsForJavaToolTests(grammarStr,
 				false, true, startRuleName, input,
-				false, showDiagnosticErrors, Stage.Execute);
+				profile, showDiagnosticErrors);
 		try (JavaRunner runner = new JavaRunner(workingDir, saveTestDir)) {
 			State result = runner.run(runOptions);
 			if (!(result instanceof ExecutedState)) {
@@ -79,15 +69,14 @@ public class ToolTestUtils {
 		}
 	}
 
-	public static RunOptions createOptionsForJavaToolTests(
-			String grammarFileName, String grammarStr, String parserName, String lexerName,
+	public static RunOptions createExecOptionsForJavaToolTests(
+			String grammarStr,
 			boolean useListener, boolean useVisitor, String startRuleName,
-			String input, boolean profile, boolean showDiagnosticErrors,
-			Stage endStage
+			String input, boolean profile, boolean showDiagnosticErrors
 	) {
-		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
-				input, profile, showDiagnosticErrors, false, false, endStage, "Java",
-				JavaRunner.runtimeTestParserName, PredictionMode.LL, true);
+		return new RunOptions(new String[] {grammarStr}, null, useListener, useVisitor, startRuleName,
+				input, profile, showDiagnosticErrors, false, false, Stage.Execute,
+				null, PredictionMode.LL, true, null);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {
@@ -95,43 +84,42 @@ public class ToolTestUtils {
 			String grammarStr = pairs[i];
 			String expect = pairs[i + 1];
 
-			String[] lines = grammarStr.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
+			GeneratedState state = generate(grammarStr, null);
+			ErrorQueue errorQueue = state.errorQueue;
 
-			String tempDirName = "AntlrTestErrors-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
-			String tempTestDir = Paths.get(TempDirectory, tempDirName).toString();
-
-			try {
-				ErrorQueue equeue = antlrOnString(tempTestDir, null, fileName, grammarStr, false);
-
-				String actual = equeue.toString(true);
-				actual = actual.replace(tempTestDir + File.separator, "");
-				String msg = grammarStr;
-				msg = msg.replace("\n", "\\n");
-				msg = msg.replace("\r", "\\r");
-				msg = msg.replace("\t", "\\t");
-
-				assertEquals(expect, actual, "error in: " + msg);
-			}
-			finally {
-				try {
-					deleteDirectory(new File(tempTestDir));
-				} catch (IOException ignored) {
+			StringBuilder buf = new StringBuilder();
+			for (ANTLRMessage message : errorQueue.all) {
+				ANTLRMessage newMessage = new ANTLRMessage(message.getErrorType(), message.getCause(), message.offendingToken, message.getArgs());
+				newMessage.line = message.line;
+				newMessage.charPosition = message.charPosition;
+				if (message.fileName != null) {
+					newMessage.fileName = new File(message.fileName).getName();
 				}
+				ST st = errorQueue.tool.errMgr.getMessageTemplate(newMessage);
+				buf.append(st.render());
+				buf.append("\n");
 			}
+
+			String msg = grammarStr;
+			msg = msg.replace("\n", "\\n");
+			msg = msg.replace("\r", "\\r");
+			msg = msg.replace("\t", "\\t");
+
+			assertEquals(expect, buf.toString(), "error in: " + msg);
 		}
 	}
 
-	public static String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if ( grIndex>=0 && semi>=0 ) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
+	public static GeneratedState generate(String grammar, String slaveGrammar) {
+		return generate(grammar, slaveGrammar != null ? new String[] {slaveGrammar} : null, null, null, false);
+	}
+
+	public static GeneratedState generate(String grammar, String[] slaveGrammars, Path workingDir, String[] extraOptions, boolean saveTestDir) {
+		RunOptions runOptions = RunOptions.createGenerationOptions(new String[] {grammar},
+				slaveGrammars, false, false, null, extraOptions);
+
+		try (Runner runner = new Runner(workingDir, saveTestDir)) {
+			return Generator.generate(runOptions, null, runner.getTempDirPath(), extraOptions);
 		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
 	}
 
 	public static List<String> realElements(List<String> elements) {

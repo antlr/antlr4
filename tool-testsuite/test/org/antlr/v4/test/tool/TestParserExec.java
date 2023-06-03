@@ -62,8 +62,7 @@ public class TestParserExec {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
-		ExecutedState executedState = execParser("T.g4", grammar, "TParser", "TLexer",
-				"s", "abc 34", true);
+		ExecutedState executedState = execParser(grammar, "s", "abc 34", true);
 		String expecting =
 			"Decision 0:\n" +
 			"s0-ID->s1\n" +
@@ -81,8 +80,7 @@ public class TestParserExec {
 	// TODO: port to test framework (can we simplify the Psl grammar?)
 	@Test public void testFailedPredicateExceptionState() throws Exception {
 		String grammar = load("Psl.g4");
-		ExecutedState executedState = execParser("Psl.g4", grammar,
-				"PslParser", "PslLexer", "floating_constant", " . 234", false);
+		ExecutedState executedState = execParser(grammar,"floating_constant", " . 234", false);
 		assertEquals("", executedState.output);
 		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", executedState.errors);
 	}
@@ -116,12 +114,8 @@ public class TestParserExec {
 			"    | '«' '/' ID '»'\n" +
 			"    ;";
 
-		execLexer("ModeTagsLexer.g4", lexerGrammar, "ModeTagsLexer", "",
-				tempDir, true);
-		ExecutedState executedState = execParser("ModeTagsParser.g4", parserGrammar,
-				"ModeTagsParser", "ModeTagsLexer",
-				"file", "", false,
-				tempDir);
+		execLexer(lexerGrammar, "", tempDir, true);
+		ExecutedState executedState = execParser(parserGrammar, "file", "", false, tempDir, false);
 		assertEquals("", executedState.output);
 		assertEquals("", executedState.errors);
 	}
@@ -149,8 +143,7 @@ public class TestParserExec {
 			"WS : [ \\t\\n\\r]+ -> skip ; // toss out all whitespace\n";
 
 		String input = "2 9 10 3 1 2 3";
-		ExecutedState executedState = execParser("Data.g4", grammar,
-				"DataParser", "DataLexer", "file", input, false);
+		ExecutedState executedState = execParser(grammar, "file", input, false);
 		assertEquals("6\n", executedState.output);
 		assertEquals("", executedState.errors);
 	}
@@ -169,10 +162,7 @@ public class TestParserExec {
 				"WS: [ \\t\\n\\r]+ -> skip;";
 
 		String input = "NEW Abc (Not a AND not B)";
-		ExecutedState executedState = execParser(
-				"CaseInsensitiveGrammar.g4", grammar,
-				"CaseInsensitiveGrammarParser", "CaseInsensitiveGrammarLexer",
-				"e", input, false);
+		ExecutedState executedState = execParser(grammar,"e", input, false);
 		assertEquals("", executedState.output);
 		assertEquals("", executedState.errors);
 	}

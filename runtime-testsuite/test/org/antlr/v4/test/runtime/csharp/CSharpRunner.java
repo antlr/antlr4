@@ -23,9 +23,6 @@ public class CSharpRunner extends RuntimeRunner {
 	public String getTitleName() { return "C#"; }
 
 	@Override
-	public String getExtension() { return "cs"; }
-
-	@Override
 	public String getRuntimeToolName() { return "dotnet"; }
 
 	@Override

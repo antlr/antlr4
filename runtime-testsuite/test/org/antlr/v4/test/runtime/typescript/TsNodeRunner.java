@@ -9,9 +9,6 @@ import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 
-import java.io.File;
-import java.nio.file.Files;
-
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
@@ -45,16 +42,7 @@ public class TsNodeRunner extends RuntimeRunner {
 	}
 
 	@Override
-	public String getExtension() { return "ts"; }
-
-	@Override
 	protected String getExecFileName() { return getTestFileName() + ".ts"; }
-
-	@Override
-	public String getBaseListenerSuffix() { return null; }
-
-	@Override
-	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
 	public String getRuntimeToolName() { return "ts-node"  + (isWindows() ? ".cmd" : ""); }

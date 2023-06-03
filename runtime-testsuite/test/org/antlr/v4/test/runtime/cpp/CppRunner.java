@@ -120,7 +120,8 @@ public class CppRunner extends RuntimeRunner {
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		if (isWindows()) {
-			writeVisualStudioProjectFile(runOptions.grammarName, runOptions.lexerName, runOptions.parserName,
+			writeVisualStudioProjectFile(generatedState.getMainGrammarFile().grammarName,
+					generatedState.lexerName, generatedState.parserName,
 					runOptions.useListener, runOptions.useVisitor);
 		}
 

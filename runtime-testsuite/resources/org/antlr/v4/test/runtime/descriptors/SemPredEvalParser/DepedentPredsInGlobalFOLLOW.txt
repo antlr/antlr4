@@ -2,9 +2,6 @@
 We cannot collect predicates that are dependent on local context if
 we are doing a global follow. They appear as if they were not there at all.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 @parser::members {

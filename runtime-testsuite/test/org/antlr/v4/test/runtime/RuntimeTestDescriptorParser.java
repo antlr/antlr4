@@ -14,8 +14,8 @@ import java.util.*;
 
 public class RuntimeTestDescriptorParser {
 	private final static String notesSectionName = "notes";
-	private final static String typeSectionName = "type";
 	private final static String grammarSectionName = "grammar";
+	private final static String lexerGrammarSectionName = "lexerGrammar";
 	private final static String slaveGrammarSectionName = "slaveGrammar";
 	private final static String startSectionName = "start";
 	private final static String inputSectionName = "input";
@@ -26,8 +26,8 @@ public class RuntimeTestDescriptorParser {
 
 	private final static Set<String> sections = new HashSet<>(Arrays.asList(
 		notesSectionName,
-		typeSectionName,
 		grammarSectionName,
+		lexerGrammarSectionName,
 		slaveGrammarSectionName,
 		startSectionName,
 		inputSectionName,
@@ -114,10 +114,8 @@ public class RuntimeTestDescriptorParser {
 		pairs.add(new Pair<>(currentField, currentValue.toString()));
 
 		String notes = "";
-		GrammarType testType = GrammarType.Lexer;
-		String grammar = "";
-		String grammarName = "";
-		List<Pair<String, String>> slaveGrammars = new ArrayList<>();
+		List<String> grammars = new ArrayList<>();
+		List<String> slaveGrammars = new ArrayList<>();
 		String startRule = "";
 		String input = "";
 		String output = "";
@@ -144,16 +142,12 @@ public class RuntimeTestDescriptorParser {
 				case notesSectionName:
 					notes = value;
 					break;
-				case typeSectionName:
-					testType = Enum.valueOf(GrammarType.class, value);
-					break;
 				case grammarSectionName:
-					grammarName = getGrammarName(value.split("\n")[0]);
-					grammar = value;
+					grammars.add(value);
 					break;
 				case slaveGrammarSectionName:
-					String gname = getGrammarName(value.split("\n")[0]);
-					slaveGrammars.add(new Pair<>(gname, value));
+					slaveGrammars.add(value);
+					break;
 				case startSectionName:
 					startRule = value;
 					break;
@@ -198,20 +192,8 @@ public class RuntimeTestDescriptorParser {
 					throw new RuntimeException("Unknown descriptor section ignored: "+section);
 			}
 		}
-		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDiagnosticErrors, traceATN, showDFA, predictionMode, buildParseTree, skipTargets, uri);
-	}
-
-	/** Get A, B, or C from:
-	 * "lexer grammar A;" "grammar B;" "parser grammar C;"
-	 */
-	private static String getGrammarName(String grammarDeclLine) {
-		int gi = grammarDeclLine.indexOf("grammar ");
-		if ( gi<0 ) {
-			return "<unknown grammar name>";
-		}
-		gi += "grammar ".length();
-		int gsemi = grammarDeclLine.indexOf(';');
-		return grammarDeclLine.substring(gi, gsemi);
+		return new RuntimeTestDescriptor(name, notes, input, output, errors, startRule,
+				grammars.toArray(new String[0]), slaveGrammars.toArray(new String[0]),
+				showDiagnosticErrors, traceATN, showDFA, predictionMode, buildParseTree, skipTargets, uri);
 	}
 }

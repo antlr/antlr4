@@ -3,9 +3,6 @@ This is a regression test for antlr/antlr4#433 "Not all context accessor
 methods are generated when an alternative rule label is used for multiple
 alternatives".  https://github.com/antlr/antlr4/issues/433
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 s : e {<writeln("$e.v")>};

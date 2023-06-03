@@ -9,11 +9,8 @@ package org.antlr.v4.test.runtime;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
 public class RunOptions {
-	public final String grammarFileName;
-	public final String grammarStr;
-	public final String parserName;
-	public final String lexerName;
-	public final String grammarName;
+	public final String[] grammars;
+	public final String[] slaveGrammars;
 	public final boolean useListener;
 	public final boolean useVisitor;
 	public final String startRuleName;
@@ -26,39 +23,59 @@ public class RunOptions {
 	public final String superClass;
 	public final PredictionMode predictionMode;
 	public final boolean buildParseTree;
+	public final String[] extraGenerationOptions;
 
-	public RunOptions(String grammarFileName, String grammarStr, String parserName, String lexerName,
+	public static RunOptions createGenerationOptions(String[] grammars, String[] slaveGrammars, boolean useListener, boolean useVisitor,
+													 String superClass, String[] extraGenerationOptions
+	) {
+		return new RunOptions(
+				grammars,
+				slaveGrammars,
+				useListener,
+				useVisitor,
+				null,
+				null,
+				false,
+				false,
+				false,
+				false,
+				Stage.Generate,
+				superClass,
+				PredictionMode.LL,
+				false,
+				extraGenerationOptions
+		);
+	}
+
+	public static RunOptions createCompilationOptions(String[] grammars, String[] slaveGrammars, boolean useListener, boolean useVisitor,
+													  String superClass, String[] extraGenerationOptions) {
+		return new RunOptions(
+				grammars,
+				slaveGrammars,
+				useListener,
+				useVisitor,
+				null,
+				null,
+				false,
+				false,
+				false,
+				false,
+				Stage.Compile,
+				superClass,
+				PredictionMode.LL,
+				false,
+				extraGenerationOptions
+		);
+	}
+
+	public RunOptions(String[] grammars, String[] slaveGrammars,
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,
 					  boolean traceATN, boolean showDFA, Stage endStage,
-					  String language, String superClass, PredictionMode predictionMode, boolean buildParseTree) {
-		this.grammarFileName = grammarFileName;
-		this.grammarStr = grammarStr;
-		this.parserName = parserName;
-		this.lexerName = lexerName;
-		String grammarName = null;
-		boolean isCombinedGrammar = lexerName != null && parserName != null || language.equals("Go");
-		if (isCombinedGrammar) {
-			if (parserName != null) {
-				grammarName = parserName.endsWith("Parser")
-					? parserName.substring(0, parserName.length() - "Parser".length())
-					: parserName;
-			}
-			else if (lexerName != null) {
-				grammarName = lexerName.endsWith("Lexer")
-					? lexerName.substring(0, lexerName.length() - "Lexer".length())
-					: lexerName;
-			}
-		}
-		else {
-			if (parserName != null) {
-				grammarName = parserName;
-			}
-			else {
-				grammarName = lexerName;
-			}
-		}
-		this.grammarName = grammarName;
+					  String superClass, PredictionMode predictionMode, boolean buildParseTree,
+					  String[] extraGenerationOptions) {
+		this.grammars = grammars;
+		this.slaveGrammars = slaveGrammars;
 		this.useListener = useListener;
 		this.useVisitor = useVisitor;
 		this.startRuleName = startRuleName;
@@ -71,5 +88,6 @@ public class RunOptions {
 		this.superClass = superClass;
 		this.predictionMode = predictionMode;
 		this.buildParseTree = buildParseTree;
+		this.extraGenerationOptions = extraGenerationOptions;
 	}
 }

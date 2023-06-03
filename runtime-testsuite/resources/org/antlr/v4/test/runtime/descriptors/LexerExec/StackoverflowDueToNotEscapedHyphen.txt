@@ -1,9 +1,6 @@
 [notes]
 https://github.com/antlr/antlr4/issues/1943
 
-[type]
-Lexer
-
 [grammar]
 lexer grammar L;
 WORD   : [a-z-+]+;

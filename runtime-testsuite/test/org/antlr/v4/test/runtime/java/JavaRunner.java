@@ -74,14 +74,13 @@ public class JavaRunner extends RuntimeRunner {
 	protected void writeInputFile(RunOptions runOptions) {}
 
 	@Override
-	protected void writeRecognizerFile(RunOptions runOptions) {}
+	protected void writeRecognizerFile(RunOptions runOptions, GeneratedState generatedState) {}
 
 	@Override
 	protected JavaCompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		String tempTestDir = getTempDirPath();
 
-		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		GeneratedFile firstFile = generatedFiles.get(0);
+		GeneratedFile firstFile = generatedState.generatedFiles.get(0);
 
 		if (!firstFile.isParser) {
 			try {
@@ -106,11 +105,11 @@ public class JavaRunner extends RuntimeRunner {
 			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
 			List<File> files = new ArrayList<>();
-			if (runOptions.lexerName != null) {
-				files.add(new File(tempTestDir, runOptions.lexerName + ".java"));
+			if (generatedState.lexerName != null) {
+				files.add(new File(tempTestDir, generatedState.lexerName + ".java"));
 			}
-			if (runOptions.parserName != null) {
-				files.add(new File(tempTestDir, runOptions.parserName + ".java"));
+			if (generatedState.parserName != null) {
+				files.add(new File(tempTestDir, generatedState.parserName + ".java"));
 			}
 
 			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
@@ -122,14 +121,16 @@ public class JavaRunner extends RuntimeRunner {
 			JavaCompiler.CompilationTask task =
 					compiler.getTask(null, fileManager, null, compileOptions, null,
 							compilationUnits);
-			task.call();
+			if (!task.call()) {
+				throw new RuntimeException("Compilation failed");
+			}
 
 			loader = new URLClassLoader(new URL[]{new File(tempTestDir).toURI().toURL()}, systemClassLoader);
-			if (runOptions.lexerName != null) {
-				lexer = loader.loadClass(runOptions.lexerName).asSubclass(Lexer.class);
+			if (generatedState.lexerName != null) {
+				lexer = loader.loadClass(generatedState.lexerName).asSubclass(Lexer.class);
 			}
-			if (runOptions.parserName != null) {
-				parser = loader.loadClass(runOptions.parserName).asSubclass(Parser.class);
+			if (generatedState.parserName != null) {
+				parser = loader.loadClass(generatedState.parserName).asSubclass(Parser.class);
 			}
 		} catch (Exception ex) {
 			exception = ex;
@@ -155,7 +156,8 @@ public class JavaRunner extends RuntimeRunner {
 
 			CommonTokenStream tokenStream;
 			RuntimeTestLexer lexer;
-			if (runOptions.lexerName != null) {
+			GeneratedState generatedState = (GeneratedState) compiledState.previousState;
+			if (generatedState.lexerName != null) {
 				lexer = (RuntimeTestLexer) javaCompiledState.initializeLexer(runOptions.input);
 				lexer.setOutStream(outStream);
 				lexer.removeErrorListeners();
@@ -166,7 +168,7 @@ public class JavaRunner extends RuntimeRunner {
 				tokenStream = null;
 			}
 
-			if (runOptions.parserName != null) {
+			if (generatedState.parserName != null) {
 				RuntimeTestParser parser = (RuntimeTestParser) javaCompiledState.initializeParser(tokenStream);
 				parser.setOutStream(outStream);
 				parser.removeErrorListeners();

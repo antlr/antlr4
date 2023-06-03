@@ -10,7 +10,6 @@ import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -25,41 +24,6 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	public String getLexerSuffix() {
-		return "_lexer";
-	}
-
-	@Override
-	public String getParserSuffix() {
-		return "_parser";
-	}
-
-	@Override
-	public String getBaseListenerSuffix() {
-		return "_base_listener";
-	}
-
-	@Override
-	public String getListenerSuffix() {
-		return "_listener";
-	}
-
-	@Override
-	public String getBaseVisitorSuffix() {
-		return "_base_visitor";
-	}
-
-	@Override
-	public String getVisitorSuffix() {
-		return "_visitor";
-	}
-
-	@Override
-	protected String grammarNameToFileName(String grammarName) {
-		return grammarName.toLowerCase();
-	}
-
-	@Override
 	public String[] getExtraRunArgs() {
 		return new String[]{"run"};
 	}
@@ -70,7 +34,6 @@ public class GoRunner extends RuntimeRunner {
 
 	private static String cachedGoMod;
 	private static String cachedGoSum;
-	private static ArrayList<String> options = new ArrayList<>();
 
 	static {
 		environment = new HashMap<>();
@@ -113,19 +76,6 @@ public class GoRunner extends RuntimeRunner {
 			default:
 		}
 		return rn;
-	}
-
-	@Override
-	protected List<String> getTargetToolOptions(RunOptions ro) {
-		// Unfortunately this cannot be cached because all the synchronization is out of whack, and
-		// we end up return the options before they are populated. I prefer to make this small change
-		// at the expense of an object rather than try to change teh synchronized initialization, which is
-		// very fragile.
-		// Also, the options may need to change in the future according to the test options. This is safe
-		ArrayList<String> options = new ArrayList<>();
-		options.add("-o");
-		options.add(tempTestDir.resolve("parser").toString());
-		return options;
 	}
 
 	@Override

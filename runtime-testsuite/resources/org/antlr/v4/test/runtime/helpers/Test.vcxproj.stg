@@ -64,14 +64,14 @@
     \<ClCompile Include="<parserName>.cpp" />
 <endif>
 
-<if(useListener)>
+<if(parserName && useListener)>
     \<ClInclude Include="<grammarName>BaseListener.h" />
     \<ClCompile Include="<grammarName>BaseListener.cpp" />
     \<ClInclude Include="<grammarName>Listener.h" />
     \<ClCompile Include="<grammarName>Listener.cpp" />
 <endif>
 
-<if(useVisitor)>
+<if(parserName && useVisitor)>
     \<ClInclude Include="<grammarName>BaseVisitor.h" />
     \<ClCompile Include="<grammarName>BaseVisitor.cpp" />
     \<ClInclude Include="<grammarName>Visitor.h" />

@@ -2,9 +2,6 @@
 This is a regression test for antlr/antlr4#248 "Including grammar with only
 fragments breaks generated lexer".  https://github.com/antlr/antlr4/issues/248
 
-[type]
-Parser
-
 [grammar]
 grammar Test;
 import Unicode;

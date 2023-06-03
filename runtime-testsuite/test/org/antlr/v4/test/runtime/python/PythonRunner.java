@@ -10,9 +10,6 @@ import org.stringtemplate.v4.ST;
 
 public abstract class PythonRunner extends RuntimeRunner {
 	@Override
-	public String getExtension() { return "py"; }
-
-	@Override
 	protected void addExtraRecognizerParameters(ST template) {
 		template.add("python3", getLanguage().equals("Python3"));
 	}

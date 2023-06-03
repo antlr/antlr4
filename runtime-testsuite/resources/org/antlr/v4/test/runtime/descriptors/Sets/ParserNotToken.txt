@@ -1,6 +1,3 @@
-[type]
-Parser
-
 [grammar]
 grammar T;
 a : ~'x' 'z' {<InputText():writeln()>} ;

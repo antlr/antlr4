@@ -5,9 +5,6 @@ zero-length tokens"
 https://github.com/antlr/antlr4/issues/687
 https://github.com/antlr/antlr4/issues/688
 
-[type]
-Lexer
-
 [grammar]
 lexer grammar L;
 BeginString

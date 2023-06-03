@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime.states;
 
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.GeneratedFile;
+import org.antlr.v4.test.runtime.GrammarFile;
 import org.antlr.v4.test.runtime.Stage;
 
 import java.util.List;
@@ -20,8 +21,15 @@ public class GeneratedState extends State {
 		return Stage.Generate;
 	}
 
+	public final List<GrammarFile> grammarFiles;
 	public final ErrorQueue errorQueue;
+	public final String lexerName;
+	public final String parserName;
 	public final List<GeneratedFile> generatedFiles;
+
+	public GrammarFile getMainGrammarFile() {
+		return grammarFiles.get(0);
+	}
 
 	@Override
 	public boolean containsErrors() {
@@ -38,9 +46,14 @@ public class GeneratedState extends State {
 		return result;
 	}
 
-	public GeneratedState(ErrorQueue errorQueue, List<GeneratedFile>  generatedFiles, Exception exception) {
+	public GeneratedState(List<GrammarFile> grammarFiles, ErrorQueue errorQueue, String lexerName, String parserName,
+						  List<GeneratedFile> generatedFiles, Exception exception
+	) {
 		super(null, exception);
+		this.grammarFiles = grammarFiles;
 		this.errorQueue = errorQueue;
+		this.lexerName = lexerName;
+		this.parserName = parserName;
 		this.generatedFiles = generatedFiles;
 	}
 }

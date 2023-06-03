@@ -1,9 +1,6 @@
 [notes]
 https://github.com/antlr/antlr4/pull/3889
 
-[type]
-Lexer
-
 [grammar]
 lexer grammar L;
 

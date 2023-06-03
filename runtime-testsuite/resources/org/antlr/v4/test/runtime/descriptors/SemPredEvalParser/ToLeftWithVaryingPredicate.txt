@@ -4,9 +4,6 @@ like we would do for a symbol table. We simply execute
 the predicates assuming that all necessary information is available.
 The i++ action is done outside of the prediction and so it is executed.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 @parser::members {<InitIntMember("i","0")>}
