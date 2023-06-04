@@ -2,8 +2,8 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import HashCode from "./HashCode.js";
-import equalArrays from "../utils/equalArrays.js";
+import HashCode from './HashCode.js';
+import equalArrays from '../utils/equalArrays.js';
 
 export default class BitSet {
 
@@ -44,7 +44,7 @@ export default class BitSet {
     }
 
     toString() {
-        return "{" + this.values().join(", ") + "}";
+        return '{' + this.values().join(', ') + '}';
     }
 
     get length(){

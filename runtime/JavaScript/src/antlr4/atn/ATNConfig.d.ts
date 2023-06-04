@@ -1,4 +1,4 @@
-import { ATNState } from "../state";
+import { ATNState } from '../state';
 
 export declare class ATNConfig {
     state: ATNState;

@@ -1,4 +1,4 @@
-import {ATN} from "../atn";
+import { ATN } from '../atn';
 
 export declare class ATNState {
     atn: ATN;

@@ -10,4 +10,4 @@ import ParserATNSimulator from './ParserATNSimulator.js';
 import PredictionMode from './PredictionMode.js';
 import PredictionContextCache from './PredictionContextCache.js';
 
-export default { ATN, ATNDeserializer, LexerATNSimulator, ParserATNSimulator, PredictionMode, PredictionContextCache }
+export default { ATN, ATNDeserializer, LexerATNSimulator, ParserATNSimulator, PredictionMode, PredictionContextCache };

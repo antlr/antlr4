@@ -4,7 +4,7 @@
  */
 export default class ParseCancellationException extends Error {
     constructor() {
-        super()
+        super();
         Error.captureStackTrace(this, ParseCancellationException);
     }
 }

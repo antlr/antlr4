@@ -1,11 +1,11 @@
-import {TokenStream} from "./TokenStream";
-import {Recognizer} from "./Recognizer";
-import {ErrorStrategy, RecognitionException} from "./error";
-import {IntervalSet} from "./misc";
-import {ParserATNSimulator} from "./atn";
-import {Token} from "./Token";
-import {ParserRuleContext} from "./context";
-import {Printer} from "./utils";
+import { TokenStream } from './TokenStream';
+import { Recognizer } from './Recognizer';
+import { ErrorStrategy, RecognitionException } from './error';
+import { IntervalSet } from './misc';
+import { ParserATNSimulator } from './atn';
+import { Token } from './Token';
+import { ParserRuleContext } from './context';
+import { Printer } from './utils';
 
 export declare class Parser extends Recognizer<Token> {
 

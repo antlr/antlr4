@@ -14,8 +14,8 @@ import AbstractPredicateTransition from './AbstractPredicateTransition.js';
 import { predictionContextFromRuleContext } from '../context/PredictionContextUtils.js';
 import PredictionContext from '../context/PredictionContext.js';
 import SingletonPredictionContext from '../context/SingletonPredictionContext.js';
-import BitSet from "../misc/BitSet.js";
-import HashSet from "../misc/HashSet.js";
+import BitSet from '../misc/BitSet.js';
+import HashSet from '../misc/HashSet.js';
 
 export default class LL1Analyzer {
     constructor(atn) {
@@ -43,7 +43,7 @@ export default class LL1Analyzer {
             const lookBusy = new HashSet();
             const seeThruPreds = false; // fail to get lookahead upon pred
             this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
-                  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
+                look[alt], lookBusy, new BitSet(), seeThruPreds, false);
             // Wipe out lookahead for this alternative if we found nothing
             // or we had a predicate when we !seeThruPreds
             if (look[alt].length===0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
@@ -111,7 +111,7 @@ export default class LL1Analyzer {
      * is {@code null}.
      */
     _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-        const c = new ATNConfig({state:s, alt:0, context: ctx}, null);
+        const c = new ATNConfig({ state:s, alt:0, context: ctx }, null);
         if (lookBusy.has(c)) {
             return;
         }

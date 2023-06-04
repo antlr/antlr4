@@ -1,20 +1,20 @@
 import path from 'path';
 import ESLintPlugin from 'eslint-webpack-plugin';
-import {fileURLToPath} from "url";
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
 const buildConfig = ( platform, extensions ) => ({
-    mode: "production",
+    mode: 'production',
     entry: `./src/antlr4/index.${platform}.js`,
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: `antlr4.${platform}.${extensions}`,
-        chunkFormat: extensions === "mjs" ? "module" : "commonjs",
+        chunkFormat: extensions === 'mjs' ? 'module' : 'commonjs',
         library: {
-            type: extensions === "mjs" ? "module" : "commonjs"
+            type: extensions === 'mjs' ? 'module' : 'commonjs'
         }
     },
 
@@ -22,7 +22,7 @@ const buildConfig = ( platform, extensions ) => ({
         module: {
             rules: [{
                 test: /\.js$/,
-                exclude: [ /node_modules/, path.resolve(__dirname, "src/FileStream.js") ],
+                exclude: [ /node_modules/, path.resolve(__dirname, 'src/FileStream.js') ],
                 use: [ 'babel-loader' ]
             }]
         },
@@ -52,16 +52,16 @@ const buildConfig = ( platform, extensions ) => ({
     }),
     target: platform,
     plugins: [ new ESLintPlugin() ],
-    devtool: "source-map",
+    devtool: 'source-map',
     experiments: {
-        outputModule: extensions === "mjs"
+        outputModule: extensions === 'mjs'
     },
-})
+});
 
 
 export default [
-    buildConfig("node", "cjs"),
-    buildConfig("node", "mjs"),
-    buildConfig("web", "cjs"),
-    buildConfig("web", "mjs"),
+    buildConfig('node', 'cjs'),
+    buildConfig('node', 'mjs'),
+    buildConfig('web', 'cjs'),
+    buildConfig('web', 'mjs'),
 ];

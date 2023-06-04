@@ -1,4 +1,4 @@
-import Token from "./Token.js";
+import Token from './Token.js';
 
 export default class CommonToken extends Token {
     constructor(source, type, channel, start, stop) {
@@ -45,21 +45,21 @@ export default class CommonToken extends Token {
         t.line = this.line;
         t.column = this.column;
         if (type === Token.EOF)
-            t.text = "";
+            t.text = '';
         return t;
     }
 
     toString() {
         let txt = this.text;
         if (txt !== null) {
-            txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
+            txt = txt.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
         } else {
-            txt = "<no text>";
+            txt = '<no text>';
         }
-        return "[@" + this.tokenIndex + "," + this.start + ":" + this.stop + "='" +
-            txt + "',<" + this.type + ">" +
-            (this.channel > 0 ? ",channel=" + this.channel : "") + "," +
-            this.line + ":" + this.column + "]";
+        return '[@' + this.tokenIndex + ',' + this.start + ':' + this.stop + '=\'' +
+            txt + '\',<' + this.type + '>' +
+            (this.channel > 0 ? ',channel=' + this.channel : '') + ',' +
+            this.line + ':' + this.column + ']';
     }
 
     get text(){
@@ -74,7 +74,7 @@ export default class CommonToken extends Token {
         if (this.start < n && this.stop < n) {
             return input.getText(this.start, this.stop);
         } else {
-            return "<EOF>";
+            return '<EOF>';
         }
     }
 

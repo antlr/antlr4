@@ -52,9 +52,9 @@ import LexerModeAction from '../action/LexerModeAction.js';
 const SERIALIZED_VERSION = 4;
 
 function initArray( length, value) {
-	const tmp = [];
-	tmp[length-1] = value;
-	return tmp.map(function(i) {return value;});
+    const tmp = [];
+    tmp[length-1] = value;
+    return tmp.map(function(i) {return value;});
 }
 
 export default class ATNDeserializer {
@@ -101,14 +101,14 @@ export default class ATNDeserializer {
                 const v = c.charCodeAt(0);
                 return v > 1 ? v - 2 : v + 65534;
             };
-            const temp = data.split("").map(adjust);
+            const temp = data.split('').map(adjust);
             // don't adjust the first value since that's the version number
             temp[0] = data.charCodeAt(0);
             this.data = temp;
             this.pos = 0;
             return true;
         } else {
-            this.data = data
+            this.data = data;
             this.pos = 0;
             return false;
         }
@@ -123,7 +123,7 @@ export default class ATNDeserializer {
     checkVersion(legacy) {
         const version = this.readInt();
         if ( !legacy && version !== SERIALIZED_VERSION ) {
-            throw ("Could not deserialize ATN with version " + version + " (expected " + SERIALIZED_VERSION + ").");
+            throw ('Could not deserialize ATN with version ' + version + ' (expected ' + SERIALIZED_VERSION + ').');
         }
     }
 
@@ -278,12 +278,12 @@ export default class ATNDeserializer {
             if (state instanceof BlockStartState) {
                 // we need to know the end state to set its start state
                 if (state.endState === null) {
-                    throw ("IllegalState");
+                    throw ('IllegalState');
                 }
                 // block end states can only be associated to a single block start
                 // state
                 if ( state.endState.startState !== null) {
-                    throw ("IllegalState");
+                    throw ('IllegalState');
                 }
                 state.endState.startState = state;
             }
@@ -375,7 +375,7 @@ export default class ATNDeserializer {
                 }
             }
             if (excludeTransition === null) {
-                throw ("Couldn't identify final state of the precedence rule prefix section.");
+                throw ('Couldn\'t identify final state of the precedence rule prefix section.');
             }
         } else {
             endState = atn.ruleToStopState[idx];
@@ -483,7 +483,7 @@ export default class ATNDeserializer {
                     this.checkCondition(state.transitions[1].target instanceof StarBlockStartState);
                     this.checkCondition(state.nonGreedy);
                 } else {
-                    throw("IllegalState");
+                    throw('IllegalState');
                 }
             } else if (state instanceof StarLoopbackState) {
                 this.checkCondition(state.transitions.length === 1);
@@ -507,7 +507,7 @@ export default class ATNDeserializer {
     checkCondition(condition, message) {
         if (!condition) {
             if (message === undefined || message===null) {
-                message = "IllegalState";
+                message = 'IllegalState';
             }
             throw (message);
         }
@@ -547,7 +547,7 @@ export default class ATNDeserializer {
         case Transition.WILDCARD:
             return new WildcardTransition(target);
         default:
-            throw "The specified transition type: " + type + " is not valid.";
+            throw 'The specified transition type: ' + type + ' is not valid.';
         }
     }
 
@@ -570,7 +570,7 @@ export default class ATNDeserializer {
             this.stateFactories = sf;
         }
         if (type>this.stateFactories.length || this.stateFactories[type] === null) {
-            throw("The specified state type " + type + " is not valid.");
+            throw('The specified state type ' + type + ' is not valid.');
         } else {
             const s = this.stateFactories[type]();
             if (s!==null) {
@@ -594,7 +594,7 @@ export default class ATNDeserializer {
             this.actionFactories = af;
         }
         if (type>this.actionFactories.length || this.actionFactories[type] === null) {
-            throw("The specified lexer action type " + type + " is not valid.");
+            throw('The specified lexer action type ' + type + ' is not valid.');
         } else {
             return this.actionFactories[type](data1, data2);
         }

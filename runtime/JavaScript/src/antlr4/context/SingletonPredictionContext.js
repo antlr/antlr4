@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import PredictionContext from './PredictionContext.js';
-import HashCode from "../misc/HashCode.js";
+import HashCode from '../misc/HashCode.js';
 
 export default class SingletonPredictionContext extends PredictionContext {
 
@@ -40,22 +40,22 @@ export default class SingletonPredictionContext extends PredictionContext {
             if(this.returnState !== other.returnState)
                 return false;
             else if(this.parentCtx==null)
-                return other.parentCtx==null
+                return other.parentCtx==null;
             else
                 return this.parentCtx.equals(other.parentCtx);
         }
     }
 
     toString() {
-        const up = this.parentCtx === null ? "" : this.parentCtx.toString();
+        const up = this.parentCtx === null ? '' : this.parentCtx.toString();
         if (up.length === 0) {
             if (this.returnState === PredictionContext.EMPTY_RETURN_STATE) {
-                return "$";
+                return '$';
             } else {
-                return "" + this.returnState;
+                return '' + this.returnState;
             }
         } else {
-            return "" + this.returnState + " " + up;
+            return '' + this.returnState + ' ' + up;
         }
     }
 

@@ -12,6 +12,6 @@ export default class PredPrediction {
     }
 
     toString() {
-        return "(" + this.pred + ", " + this.alt + ")";
+        return '(' + this.pred + ', ' + this.alt + ')';
     }
 }

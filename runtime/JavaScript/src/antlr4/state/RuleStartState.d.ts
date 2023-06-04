@@ -1,4 +1,4 @@
-import {ATNState, RuleStopState} from "./index";
+import { ATNState, RuleStopState } from './index';
 
 export declare class RuleStartState extends ATNState {
     stopState: RuleStopState;

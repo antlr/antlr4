@@ -4,7 +4,7 @@
  */
 
 
-import arrayToString from "../utils/arrayToString.js";
+import arrayToString from '../utils/arrayToString.js';
 
 /**
  * A DFA walker that knows how to dump them to serialized strings.
@@ -17,34 +17,34 @@ export default class DFASerializer {
     }
 
     toString() {
-       if(this.dfa.s0 === null) {
-           return null;
-       }
-       let buf = "";
-       const states = this.dfa.sortedStates();
-       for(let i=0; i<states.length; i++) {
-           const s = states[i];
-           if(s.edges!==null) {
+        if(this.dfa.s0 === null) {
+            return null;
+        }
+        let buf = '';
+        const states = this.dfa.sortedStates();
+        for(let i=0; i<states.length; i++) {
+            const s = states[i];
+            if(s.edges!==null) {
                 const n = s.edges.length;
                 for(let j=0;j<n;j++) {
                     const t = s.edges[j] || null;
                     if(t!==null && t.stateNumber !== 0x7FFFFFFF) {
                         buf = buf.concat(this.getStateString(s));
-                        buf = buf.concat("-");
+                        buf = buf.concat('-');
                         buf = buf.concat(this.getEdgeLabel(j));
-                        buf = buf.concat("->");
+                        buf = buf.concat('->');
                         buf = buf.concat(this.getStateString(t));
                         buf = buf.concat('\n');
                     }
                 }
-           }
-       }
-       return buf.length===0 ? null : buf;
+            }
+        }
+        return buf.length===0 ? null : buf;
     }
 
     getEdgeLabel(i) {
         if (i===0) {
-            return "EOF";
+            return 'EOF';
         } else if(this.literalNames !==null || this.symbolicNames!==null) {
             return this.literalNames[i-1] || this.symbolicNames[i-1];
         } else {
@@ -53,12 +53,12 @@ export default class DFASerializer {
     }
 
     getStateString(s) {
-        const baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
+        const baseStateStr = ( s.isAcceptState ? ':' : '') + 's' + s.stateNumber + ( s.requiresFullContext ? '^' : '');
         if(s.isAcceptState) {
             if (s.predicates !== null) {
-                return baseStateStr + "=>" + arrayToString(s.predicates);
+                return baseStateStr + '=>' + arrayToString(s.predicates);
             } else {
-                return baseStateStr + "=>" + s.prediction.toString();
+                return baseStateStr + '=>' + s.prediction.toString();
             }
         } else {
             return baseStateStr;

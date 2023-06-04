@@ -1,5 +1,5 @@
-import {RuleNode} from "../tree";
-import {Parser} from "../Parser";
+import { RuleNode } from '../tree';
+import { Parser } from '../Parser';
 
 export declare class RuleContext extends RuleNode {
     parentCtx: RuleContext | undefined;

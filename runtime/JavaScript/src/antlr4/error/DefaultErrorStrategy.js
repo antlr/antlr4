@@ -2,14 +2,14 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import FailedPredicateException from "./FailedPredicateException.js";
-import InputMismatchException from "./InputMismatchException.js";
-import NoViableAltException from "./NoViableAltException.js";
-import ATNState from "../state/ATNState.js";
+import FailedPredicateException from './FailedPredicateException.js';
+import InputMismatchException from './InputMismatchException.js';
+import NoViableAltException from './NoViableAltException.js';
+import ATNState from '../state/ATNState.js';
 import Token from '../Token.js';
-import Interval from "../misc/Interval.js";
-import IntervalSet from "../misc/IntervalSet.js";
-import ErrorStrategy from "./ErrorStrategy.js";
+import Interval from '../misc/Interval.js';
+import IntervalSet from '../misc/IntervalSet.js';
+import ErrorStrategy from './ErrorStrategy.js';
 
 /**
  * This is the default implementation of {@link ANTLRErrorStrategy} used for
@@ -114,7 +114,7 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
         } else if ( e instanceof FailedPredicateException ) {
             this.reportFailedPredicate(recognizer, e);
         } else {
-            console.log("unknown recognition error type: " + e.constructor.name);
+            console.log('unknown recognition error type: ' + e.constructor.name);
             console.log(e.stack);
             recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
         }
@@ -143,7 +143,7 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
             this.lastErrorStates = [];
         }
         this.lastErrorStates.push(recognizer.state);
-        const followSet = this.getErrorRecoverySet(recognizer)
+        const followSet = this.getErrorRecoverySet(recognizer);
         this.consumeUntil(recognizer, followSet);
     }
 
@@ -217,27 +217,27 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
             return;
         }
         switch (s.stateType) {
-            case ATNState.BLOCK_START:
-            case ATNState.STAR_BLOCK_START:
-            case ATNState.PLUS_BLOCK_START:
-            case ATNState.STAR_LOOP_ENTRY:
-                // report error and recover if possible
-                if( this.singleTokenDeletion(recognizer) !== null) {
-                    return;
-                } else {
-                    throw new InputMismatchException(recognizer);
-                }
-            case ATNState.PLUS_LOOP_BACK:
-            case ATNState.STAR_LOOP_BACK:
-                {
+        case ATNState.BLOCK_START:
+        case ATNState.STAR_BLOCK_START:
+        case ATNState.PLUS_BLOCK_START:
+        case ATNState.STAR_LOOP_ENTRY:
+            // report error and recover if possible
+            if( this.singleTokenDeletion(recognizer) !== null) {
+                return;
+            } else {
+                throw new InputMismatchException(recognizer);
+            }
+        case ATNState.PLUS_LOOP_BACK:
+        case ATNState.STAR_LOOP_BACK:
+            {
                 this.reportUnwantedToken(recognizer);
                 const expecting = new IntervalSet();
                 expecting.addSet(recognizer.getExpectedTokens());
                 const whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer));
                 this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
-                }
-                break;
-            default:
+            }
+            break;
+        default:
             // do nothing if we can't identify the exact kind of ATN state
         }
     }
@@ -252,18 +252,18 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * @param e the recognition exception
      */
     reportNoViableAlternative(recognizer, e) {
-        const tokens = recognizer.getTokenStream()
-        let input
+        const tokens = recognizer.getTokenStream();
+        let input;
         if(tokens !== null) {
             if (e.startToken.type===Token.EOF) {
-                input = "<EOF>";
+                input = '<EOF>';
             } else {
                 input = tokens.getText(new Interval(e.startToken.tokenIndex, e.offendingToken.tokenIndex));
             }
         } else {
-            input = "<unknown input>";
+            input = '<unknown input>';
         }
-        const msg = "no viable alternative at input " + this.escapeWSAndQuote(input)
+        const msg = 'no viable alternative at input ' + this.escapeWSAndQuote(input);
         recognizer.notifyErrorListeners(msg, e.offendingToken, e);
     }
 
@@ -277,8 +277,8 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * @param e the recognition exception
      */
     reportInputMismatch(recognizer, e) {
-        const msg = "mismatched input " + this.getTokenErrorDisplay(e.offendingToken) +
-            " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames)
+        const msg = 'mismatched input ' + this.getTokenErrorDisplay(e.offendingToken) +
+            ' expecting ' + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames);
         recognizer.notifyErrorListeners(msg, e.offendingToken, e);
     }
 
@@ -292,8 +292,8 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * @param e the recognition exception
      */
     reportFailedPredicate(recognizer, e) {
-        const ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex]
-        const msg = "rule " + ruleName + " " + e.message
+        const ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex];
+        const msg = 'rule ' + ruleName + ' ' + e.message;
         recognizer.notifyErrorListeners(msg, e.offendingToken, e);
     }
 
@@ -321,11 +321,11 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
             return;
         }
         this.beginErrorCondition(recognizer);
-        const t = recognizer.getCurrentToken()
-        const tokenName = this.getTokenErrorDisplay(t)
-        const expecting = this.getExpectedTokens(recognizer)
-        const msg = "extraneous input " + tokenName + " expecting " +
-            expecting.toString(recognizer.literalNames, recognizer.symbolicNames)
+        const t = recognizer.getCurrentToken();
+        const tokenName = this.getTokenErrorDisplay(t);
+        const expecting = this.getExpectedTokens(recognizer);
+        const msg = 'extraneous input ' + tokenName + ' expecting ' +
+            expecting.toString(recognizer.literalNames, recognizer.symbolicNames);
         recognizer.notifyErrorListeners(msg, t, null);
     }
 
@@ -351,10 +351,10 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
             return;
         }
         this.beginErrorCondition(recognizer);
-        const t = recognizer.getCurrentToken()
-        const expecting = this.getExpectedTokens(recognizer)
-        const msg = "missing " + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) +
-            " at " + this.getTokenErrorDisplay(t)
+        const t = recognizer.getCurrentToken();
+        const expecting = this.getExpectedTokens(recognizer);
+        const msg = 'missing ' + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) +
+            ' at ' + this.getTokenErrorDisplay(t);
         recognizer.notifyErrorListeners(msg, t, null);
     }
 
@@ -410,7 +410,7 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      */
     recoverInline(recognizer) {
         // SINGLE TOKEN DELETION
-        const matchedSymbol = this.singleTokenDeletion(recognizer)
+        const matchedSymbol = this.singleTokenDeletion(recognizer);
         if (matchedSymbol !== null) {
             // we have deleted the extra token.
             // now, move past ttype token as if all were ok
@@ -443,14 +443,14 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * strategy for the current mismatched input, otherwise {@code false}
      */
     singleTokenInsertion(recognizer) {
-        const currentSymbolType = recognizer.getTokenStream().LA(1)
+        const currentSymbolType = recognizer.getTokenStream().LA(1);
         // if current token is consistent with what could come after current
         // ATN state, then we know we're missing a token; error recovery
         // is free to conjure up and insert the missing token
-        const atn = recognizer._interp.atn
-        const currentState = atn.states[recognizer.state]
-        const next = currentState.transitions[0].target
-        const expectingAtLL2 = atn.nextTokens(next, recognizer._ctx)
+        const atn = recognizer._interp.atn;
+        const currentState = atn.states[recognizer.state];
+        const next = currentState.transitions[0].target;
+        const expectingAtLL2 = atn.nextTokens(next, recognizer._ctx);
         if (expectingAtLL2.contains(currentSymbolType) ){
             this.reportMissingToken(recognizer);
             return true;
@@ -479,8 +479,8 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * {@code null}
      */
     singleTokenDeletion(recognizer) {
-        const nextTokenType = recognizer.getTokenStream().LA(2)
-        const expecting = this.getExpectedTokens(recognizer)
+        const nextTokenType = recognizer.getTokenStream().LA(2);
+        const expecting = this.getExpectedTokens(recognizer);
         if (expecting.contains(nextTokenType)) {
             this.reportUnwantedToken(recognizer);
             // print("recoverFromMismatchedToken deleting " \
@@ -489,7 +489,7 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
             // + " is what we want", file=sys.stderr)
             recognizer.consume(); // simply delete extra token
             // we want to return the token we're actually matching
-            const matchedSymbol = recognizer.getCurrentToken()
+            const matchedSymbol = recognizer.getCurrentToken();
             this.reportMatch(recognizer); // we know current token is correct
             return matchedSymbol;
         } else {
@@ -519,17 +519,17 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      *
      */
     getMissingSymbol(recognizer) {
-        const currentSymbol = recognizer.getCurrentToken()
-        const expecting = this.getExpectedTokens(recognizer)
-        const expectedTokenType = expecting.first() // get any element
-        let tokenText
+        const currentSymbol = recognizer.getCurrentToken();
+        const expecting = this.getExpectedTokens(recognizer);
+        const expectedTokenType = expecting.first(); // get any element
+        let tokenText;
         if (expectedTokenType===Token.EOF) {
-            tokenText = "<missing EOF>";
+            tokenText = '<missing EOF>';
         } else {
-            tokenText = "<missing " + recognizer.literalNames[expectedTokenType] + ">";
+            tokenText = '<missing ' + recognizer.literalNames[expectedTokenType] + '>';
         }
-        let current = currentSymbol
-        const lookback = recognizer.getTokenStream().LT(-1)
+        let current = currentSymbol;
+        const lookback = recognizer.getTokenStream().LT(-1);
         if (current.type===Token.EOF && lookback !== null) {
             current = lookback;
         }
@@ -553,24 +553,24 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      */
     getTokenErrorDisplay(t) {
         if (t === null) {
-            return "<no token>";
+            return '<no token>';
         }
-        let s = t.text
+        let s = t.text;
         if (s === null) {
             if (t.type===Token.EOF) {
-                s = "<EOF>";
+                s = '<EOF>';
             } else {
-                s = "<" + t.type + ">";
+                s = '<' + t.type + '>';
             }
         }
         return this.escapeWSAndQuote(s);
     }
 
     escapeWSAndQuote(s) {
-        s = s.replace(/\n/g,"\\n");
-        s = s.replace(/\r/g,"\\r");
-        s = s.replace(/\t/g,"\\t");
-        return "'" + s + "'";
+        s = s.replace(/\n/g,'\\n');
+        s = s.replace(/\r/g,'\\r');
+        s = s.replace(/\t/g,'\\t');
+        return '\'' + s + '\'';
     }
 
     /**
@@ -667,14 +667,14 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
      * at run-time upon error to avoid overhead during parsing.
      */
     getErrorRecoverySet(recognizer) {
-        const atn = recognizer._interp.atn
-        let ctx = recognizer._ctx
-        const recoverSet = new IntervalSet()
+        const atn = recognizer._interp.atn;
+        let ctx = recognizer._ctx;
+        const recoverSet = new IntervalSet();
         while (ctx !== null && ctx.invokingState>=0) {
             // compute what follows who invoked us
-            const invokingState = atn.states[ctx.invokingState]
-            const rt = invokingState.transitions[0]
-            const follow = atn.nextTokens(rt.followState)
+            const invokingState = atn.states[ctx.invokingState];
+            const rt = invokingState.transitions[0];
+            const follow = atn.nextTokens(rt.followState);
             recoverSet.addSet(follow);
             ctx = ctx.parentCtx;
         }
@@ -682,9 +682,9 @@ export default class DefaultErrorStrategy extends ErrorStrategy {
         return recoverSet;
     }
 
-// Consume tokens until one matches the given token set.//
+    // Consume tokens until one matches the given token set.//
     consumeUntil(recognizer, set) {
-        let ttype = recognizer.getTokenStream().LA(1)
+        let ttype = recognizer.getTokenStream().LA(1);
         while( ttype !== Token.EOF && !set.contains(ttype)) {
             recognizer.consume();
             ttype = recognizer.getTokenStream().LA(1);

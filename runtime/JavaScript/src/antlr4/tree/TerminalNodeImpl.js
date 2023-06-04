@@ -2,9 +2,9 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import Interval from "../misc/Interval.js";
+import Interval from '../misc/Interval.js';
 import Token from '../Token.js';
-import TerminalNode from "./TerminalNode.js";
+import TerminalNode from './TerminalNode.js';
 
 export default class TerminalNodeImpl extends TerminalNode {
     constructor(symbol) {
@@ -51,7 +51,7 @@ export default class TerminalNodeImpl extends TerminalNode {
 
     toString() {
         if (this.symbol.type === Token.EOF) {
-            return "<EOF>";
+            return '<EOF>';
         } else {
             return this.symbol.text;
         }

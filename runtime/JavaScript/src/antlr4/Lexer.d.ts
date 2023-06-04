@@ -1,7 +1,7 @@
-import {Recognizer} from "./Recognizer";
-import {LexerATNSimulator} from "./atn";
-import {CharStream} from "./CharStream";
-import {Token} from "./Token";
+import { Recognizer } from './Recognizer';
+import { LexerATNSimulator } from './atn';
+import { CharStream } from './CharStream';
+import { Token } from './Token';
 
 export declare class Lexer extends Recognizer<number> {
 

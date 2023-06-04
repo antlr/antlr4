@@ -10,7 +10,7 @@ import Recognizer from './Recognizer.js';
 import DefaultErrorStrategy from './error/DefaultErrorStrategy.js';
 import ATNDeserializer from './atn/ATNDeserializer.js';
 import ATNDeserializationOptions from './atn/ATNDeserializationOptions.js';
-import TraceListener from "./TraceListener.js";
+import TraceListener from './TraceListener.js';
 
 export default class Parser extends Recognizer {
     /**
@@ -179,7 +179,7 @@ export default class Parser extends Recognizer {
      */
     addParseListener(listener) {
         if (listener === null) {
-            throw "listener";
+            throw 'listener';
         }
         if (this._parseListeners === null) {
             this._parseListeners = [];
@@ -256,7 +256,7 @@ export default class Parser extends Recognizer {
     getATNWithBypassAlts() {
         const serializedAtn = this.getSerializedATN();
         if (serializedAtn === null) {
-            throw "The current parser does not support an ATN with bypass alternatives.";
+            throw 'The current parser does not support an ATN with bypass alternatives.';
         }
         let result = this.bypassAltsAtnCache[serializedAtn];
         if (result === null) {
@@ -573,7 +573,7 @@ export default class Parser extends Recognizer {
             // compute what follows who invoked us
             const ruleIndex = p.ruleIndex;
             if (ruleIndex < 0) {
-                stack.push("n/a");
+                stack.push('n/a');
             } else {
                 stack.push(this.ruleNames[ruleIndex]);
             }
@@ -596,7 +596,7 @@ export default class Parser extends Recognizer {
                 if (seenOne) {
                     console.log();
                 }
-                this.printer.println("Decision " + dfa.decision + ":");
+                this.printer.println('Decision ' + dfa.decision + ':');
                 this.printer.print(dfa.toString(this.literalNames, this.symbolicNames));
                 seenOne = true;
             }

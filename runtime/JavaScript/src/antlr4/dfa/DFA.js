@@ -8,44 +8,44 @@ import StarLoopEntryState from '../state/StarLoopEntryState.js';
 import ATNConfigSet from './../atn/ATNConfigSet.js';
 import DFASerializer from './DFASerializer.js';
 import LexerDFASerializer from './LexerDFASerializer.js';
-import HashSet from "../misc/HashSet.js";
+import HashSet from '../misc/HashSet.js';
 
 export default class DFA {
-	constructor(atnStartState, decision) {
-		if (decision === undefined) {
-			decision = 0;
-		}
-		/**
+    constructor(atnStartState, decision) {
+        if (decision === undefined) {
+            decision = 0;
+        }
+        /**
 		 * From which ATN state did we create this DFA?
 		 */
-		this.atnStartState = atnStartState;
-		this.decision = decision;
-		/**
+        this.atnStartState = atnStartState;
+        this.decision = decision;
+        /**
 		 * A set of all DFA states. Use {@link Map} so we can get old state back
 		 * ({@link Set} only allows you to see if it's there).
 		 */
-		this._states = new HashSet();
-		this.s0 = null;
-		/**
+        this._states = new HashSet();
+        this.s0 = null;
+        /**
 		 * {@code true} if this DFA is for a precedence decision; otherwise,
 		 * {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 		 * {@link //setPrecedenceDfa}
 		 */
-		this.precedenceDfa = false;
-		if (atnStartState instanceof StarLoopEntryState)
-		{
-			if (atnStartState.isPrecedenceDecision) {
-				this.precedenceDfa = true;
-				const precedenceState = new DFAState(null, new ATNConfigSet());
-				precedenceState.edges = [];
-				precedenceState.isAcceptState = false;
-				precedenceState.requiresFullContext = false;
-				this.s0 = precedenceState;
-			}
-		}
-	}
+        this.precedenceDfa = false;
+        if (atnStartState instanceof StarLoopEntryState)
+        {
+            if (atnStartState.isPrecedenceDecision) {
+                this.precedenceDfa = true;
+                const precedenceState = new DFAState(null, new ATNConfigSet());
+                precedenceState.edges = [];
+                precedenceState.isAcceptState = false;
+                precedenceState.requiresFullContext = false;
+                this.s0 = precedenceState;
+            }
+        }
+    }
 
-	/**
+    /**
 	 * Get the start state for a specific precedence value.
 	 *
 	 * @param precedence The current precedence.
@@ -55,18 +55,18 @@ export default class DFA {
 	 * @throws IllegalStateException if this is not a precedence DFA.
 	 * @see //isPrecedenceDfa()
 	 */
-	getPrecedenceStartState(precedence) {
-		if (!(this.precedenceDfa)) {
-			throw ("Only precedence DFAs may contain a precedence start state.");
-		}
-		// s0.edges is never null for a precedence DFA
-		if (precedence < 0 || precedence >= this.s0.edges.length) {
-			return null;
-		}
-		return this.s0.edges[precedence] || null;
-	}
+    getPrecedenceStartState(precedence) {
+        if (!(this.precedenceDfa)) {
+            throw ('Only precedence DFAs may contain a precedence start state.');
+        }
+        // s0.edges is never null for a precedence DFA
+        if (precedence < 0 || precedence >= this.s0.edges.length) {
+            return null;
+        }
+        return this.s0.edges[precedence] || null;
+    }
 
-	/**
+    /**
 	 * Set the start state for a specific precedence value.
 	 *
 	 * @param precedence The current precedence.
@@ -76,23 +76,23 @@ export default class DFA {
 	 * @throws IllegalStateException if this is not a precedence DFA.
 	 * @see //isPrecedenceDfa()
 	 */
-	setPrecedenceStartState(precedence, startState) {
-		if (!(this.precedenceDfa)) {
-			throw ("Only precedence DFAs may contain a precedence start state.");
-		}
-		if (precedence < 0) {
-			return;
-		}
+    setPrecedenceStartState(precedence, startState) {
+        if (!(this.precedenceDfa)) {
+            throw ('Only precedence DFAs may contain a precedence start state.');
+        }
+        if (precedence < 0) {
+            return;
+        }
 
-		/**
+        /**
 		 * synchronization on s0 here is ok. when the DFA is turned into a
 		 * precedence DFA, s0 will be initialized once and not updated again
 		 * s0.edges is never null for a precedence DFA
 		 */
-		this.s0.edges[precedence] = startState;
-	}
+        this.s0.edges[precedence] = startState;
+    }
 
-	/**
+    /**
 	 * Sets whether this is a precedence DFA. If the specified value differs
 	 * from the current DFA configuration, the following actions are taken;
 	 * otherwise no changes are made to the current DFA.
@@ -109,51 +109,51 @@ export default class DFA {
 	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
 	 * {@code false}
 	 */
-	setPrecedenceDfa(precedenceDfa) {
-		if (this.precedenceDfa!==precedenceDfa) {
-			this._states = new HashSet();
-			if (precedenceDfa) {
-				const precedenceState = new DFAState(null, new ATNConfigSet());
-				precedenceState.edges = [];
-				precedenceState.isAcceptState = false;
-				precedenceState.requiresFullContext = false;
-				this.s0 = precedenceState;
-			} else {
-				this.s0 = null;
-			}
-			this.precedenceDfa = precedenceDfa;
-		}
-	}
+    setPrecedenceDfa(precedenceDfa) {
+        if (this.precedenceDfa!==precedenceDfa) {
+            this._states = new HashSet();
+            if (precedenceDfa) {
+                const precedenceState = new DFAState(null, new ATNConfigSet());
+                precedenceState.edges = [];
+                precedenceState.isAcceptState = false;
+                precedenceState.requiresFullContext = false;
+                this.s0 = precedenceState;
+            } else {
+                this.s0 = null;
+            }
+            this.precedenceDfa = precedenceDfa;
+        }
+    }
 
-	/**
+    /**
 	 * Return a list of all states in this DFA, ordered by state number.
 	 */
-	sortedStates() {
-		const list = this._states.values();
-		return list.sort(function(a, b) {
-			return a.stateNumber - b.stateNumber;
-		});
-	}
+    sortedStates() {
+        const list = this._states.values();
+        return list.sort(function(a, b) {
+            return a.stateNumber - b.stateNumber;
+        });
+    }
 
-	toString(literalNames, symbolicNames) {
-		literalNames = literalNames || null;
-		symbolicNames = symbolicNames || null;
-		if (this.s0 === null) {
-			return "";
-		}
-		const serializer = new DFASerializer(this, literalNames, symbolicNames);
-		return serializer.toString();
-	}
+    toString(literalNames, symbolicNames) {
+        literalNames = literalNames || null;
+        symbolicNames = symbolicNames || null;
+        if (this.s0 === null) {
+            return '';
+        }
+        const serializer = new DFASerializer(this, literalNames, symbolicNames);
+        return serializer.toString();
+    }
 
-	toLexerString() {
-		if (this.s0 === null) {
-			return "";
-		}
-		const serializer = new LexerDFASerializer(this);
-		return serializer.toString();
-	}
+    toLexerString() {
+        if (this.s0 === null) {
+            return '';
+        }
+        const serializer = new LexerDFASerializer(this);
+        return serializer.toString();
+    }
 
-	get states(){
-		return this._states;
-	}
+    get states(){
+        return this._states;
+    }
 }

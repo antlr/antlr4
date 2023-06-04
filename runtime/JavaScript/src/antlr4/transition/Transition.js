@@ -20,7 +20,7 @@ export default class Transition {
     constructor(target) {
         // The target of this transition.
         if (target===undefined || target===null) {
-            throw "target cannot be null.";
+            throw 'target cannot be null.';
         }
         this.target = target;
         // Are we epsilon, action, sempred?
@@ -45,29 +45,29 @@ Transition.WILDCARD = 9;
 Transition.PRECEDENCE = 10;
 
 Transition.serializationNames = [
-            "INVALID",
-            "EPSILON",
-            "RANGE",
-            "RULE",
-            "PREDICATE",
-            "ATOM",
-            "ACTION",
-            "SET",
-            "NOT_SET",
-            "WILDCARD",
-            "PRECEDENCE"
-        ];
+    'INVALID',
+    'EPSILON',
+    'RANGE',
+    'RULE',
+    'PREDICATE',
+    'ATOM',
+    'ACTION',
+    'SET',
+    'NOT_SET',
+    'WILDCARD',
+    'PRECEDENCE'
+];
 
 Transition.serializationTypes = {
-        EpsilonTransition: Transition.EPSILON,
-        RangeTransition: Transition.RANGE,
-        RuleTransition: Transition.RULE,
-        PredicateTransition: Transition.PREDICATE,
-        AtomTransition: Transition.ATOM,
-        ActionTransition: Transition.ACTION,
-        SetTransition: Transition.SET,
-        NotSetTransition: Transition.NOT_SET,
-        WildcardTransition: Transition.WILDCARD,
-        PrecedencePredicateTransition: Transition.PRECEDENCE
-    };
+    EpsilonTransition: Transition.EPSILON,
+    RangeTransition: Transition.RANGE,
+    RuleTransition: Transition.RULE,
+    PredicateTransition: Transition.PREDICATE,
+    AtomTransition: Transition.ATOM,
+    ActionTransition: Transition.ACTION,
+    SetTransition: Transition.SET,
+    NotSetTransition: Transition.NOT_SET,
+    WildcardTransition: Transition.WILDCARD,
+    PrecedencePredicateTransition: Transition.PRECEDENCE
+};
 

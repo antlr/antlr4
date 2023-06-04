@@ -24,7 +24,7 @@
  * @param action The lexer action to execute at a particular offset in the
  * input {@link CharStream}.
  */
-import LexerAction from "./LexerAction.js";
+import LexerAction from './LexerAction.js';
 
 
 export default class LexerIndexedCustomAction extends LexerAction {

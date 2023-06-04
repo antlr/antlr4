@@ -11,4 +11,4 @@ import ParseTreeVisitor from './ParseTreeVisitor.js';
 import ParseTreeWalker from './ParseTreeWalker.js';
 import { default as Trees } from './Trees.js';
 
-export default { Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker }
+export default { Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker };

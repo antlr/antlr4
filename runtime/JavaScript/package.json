@@ -24,6 +24,8 @@
     "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-env": "^7.19.4",
     "@types/node": "^18.7.23",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
     "babel-loader": "^8.2.5",
     "c8": "^7.12.0",
     "compression-webpack-plugin": "^10.0.0",
@@ -42,8 +44,10 @@
   "scripts": {
     "build": "webpack",
     "test": "jasmine",
+    "test:types": "tsc --noEmit",
     "coverage": "c8 jasmine",
-    "lint": "eslint src/antlr4/"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "engines": {
     "node": ">=16"
@@ -51,13 +55,13 @@
   "exports": {
     ".": {
       "node": {
-        "types": "src/index.node.d.ts",
+        "types": "./src/index.node.d.ts",
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
         "default": "./dist/antlr4.node.mjs"
       },
       "browser": {
-        "types": "src/index.web.d.ts",
+        "types": "./src/index.web.d.ts",
         "import": "./dist/antlr4.web.mjs",
         "require": "./dist/antlr4.web.cjs",
         "default": "./dist/antlr4.web.mjs"

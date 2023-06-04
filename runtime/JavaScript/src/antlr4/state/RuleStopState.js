@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import ATNState from "./ATNState.js";
+import ATNState from './ATNState.js';
 
 /**
  * The last node in the ATN for a rule, unless that rule is the start symbol.

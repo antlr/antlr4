@@ -29,27 +29,27 @@ import ATNDeserializer from './atn/ATNDeserializer.js';
 import LexerATNSimulator from './atn/LexerATNSimulator.js';
 import ParserATNSimulator from './atn/ParserATNSimulator.js';
 import PredictionContextCache from './atn/PredictionContextCache.js';
-import DFA from "./dfa/DFA.js";
-import RecognitionException from "./error/RecognitionException.js";
-import FailedPredicateException from "./error/FailedPredicateException.js";
-import NoViableAltException from "./error/NoViableAltException.js";
-import BailErrorStrategy from "./error/BailErrorStrategy.js";
+import DFA from './dfa/DFA.js';
+import RecognitionException from './error/RecognitionException.js';
+import FailedPredicateException from './error/FailedPredicateException.js';
+import NoViableAltException from './error/NoViableAltException.js';
+import BailErrorStrategy from './error/BailErrorStrategy.js';
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
-import ParseTreeListener from "./tree/ParseTreeListener.js";
-import ParseTreeVisitor from "./tree/ParseTreeVisitor.js";
-import ParseTreeWalker from "./tree/ParseTreeWalker.js";
-import ErrorListener from "./error/ErrorListener.js"
-import DiagnosticErrorListener from "./error/DiagnosticErrorListener.js"
-import RuleNode from "./tree/RuleNode.js"
-import TerminalNode from "./tree/TerminalNode.js"
-import arrayToString from "./utils/arrayToString.js"
+import ParseTreeListener from './tree/ParseTreeListener.js';
+import ParseTreeVisitor from './tree/ParseTreeVisitor.js';
+import ParseTreeWalker from './tree/ParseTreeWalker.js';
+import ErrorListener from './error/ErrorListener.js';
+import DiagnosticErrorListener from './error/DiagnosticErrorListener.js';
+import RuleNode from './tree/RuleNode.js';
+import TerminalNode from './tree/TerminalNode.js';
+import arrayToString from './utils/arrayToString.js';
 import TokenStreamRewriter from './TokenStreamRewriter.js';
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils, TokenStreamRewriter
-}
+};
 
 export {
     Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
@@ -57,4 +57,4 @@ export {
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
     arrayToString
-}
+};

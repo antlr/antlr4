@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 export default function escapeWhitespace(s, escapeSpaces) {
-    s = s.replace(/\t/g, "\\t")
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r");
+    s = s.replace(/\t/g, '\\t')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
     if (escapeSpaces) {
-        s = s.replace(/ /g, "\u00B7");
+        s = s.replace(/ /g, '\u00B7');
     }
     return s;
 }

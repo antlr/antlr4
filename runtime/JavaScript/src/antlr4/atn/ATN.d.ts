@@ -1,6 +1,6 @@
-import {IntervalSet} from "../misc";
-import {RuleContext} from "../context";
-import {ATNState, DecisionState, RuleStartState, RuleStopState} from "../state";
+import { IntervalSet } from '../misc';
+import { RuleContext } from '../context';
+import { ATNState, DecisionState, RuleStartState, RuleStopState } from '../state';
 
 export declare class ATN {
 

@@ -9,7 +9,7 @@ import CharStream from './CharStream.js';
  * @deprecated Use CharStream instead
 */
 export default class InputStream extends CharStream {
-	constructor(data, decodeToUnicodeCodePoints) {
-		super(data, decodeToUnicodeCodePoints);
-	}
+    constructor(data, decodeToUnicodeCodePoints) {
+        super(data, decodeToUnicodeCodePoints);
+    }
 }

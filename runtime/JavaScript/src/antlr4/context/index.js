@@ -4,4 +4,4 @@
  */
 import PredictionContext from './PredictionContext.js';
 
-export default { PredictionContext }
+export default { PredictionContext };

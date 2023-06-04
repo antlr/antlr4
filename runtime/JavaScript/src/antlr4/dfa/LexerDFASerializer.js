@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import DFASerializer from "./DFASerializer.js";
+import DFASerializer from './DFASerializer.js';
 
 export default class LexerDFASerializer extends DFASerializer {
     constructor(dfa) {
@@ -10,6 +10,6 @@ export default class LexerDFASerializer extends DFASerializer {
     }
 
     getEdgeLabel(i) {
-        return "'" + String.fromCharCode(i) + "'";
+        return '\'' + String.fromCharCode(i) + '\'';
     }
 }

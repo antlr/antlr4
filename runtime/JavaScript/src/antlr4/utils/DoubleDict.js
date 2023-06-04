@@ -2,7 +2,7 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import HashMap from "../misc/HashMap.js";
+import HashMap from '../misc/HashMap.js';
 
 export default class DoubleDict {
 

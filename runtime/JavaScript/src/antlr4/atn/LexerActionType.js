@@ -19,4 +19,4 @@ export default {
     SKIP: 6,
     //The type of a {@link LexerTypeAction} action.
     TYPE: 7
-}
+};

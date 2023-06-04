@@ -126,7 +126,7 @@ export default class ATN {
      */
     getExpectedTokens(stateNumber, ctx ) {
         if ( stateNumber < 0 || stateNumber >= this.states.length ) {
-            throw("Invalid state number.");
+            throw('Invalid state number.');
         }
         const s = this.states[stateNumber];
         let following = this.nextTokens(s);

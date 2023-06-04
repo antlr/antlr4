@@ -1,6 +1,6 @@
-import {ErrorListener} from "./ErrorListener";
-import {Recognizer} from "../Recognizer";
-import {RecognitionException} from "./RecognitionException";
+import { ErrorListener } from './ErrorListener';
+import { Recognizer } from '../Recognizer';
+import { RecognitionException } from './RecognitionException';
 
 export declare class DiagnosticErrorListener<TSymbol> implements ErrorListener<TSymbol> {
 
