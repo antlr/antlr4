@@ -18,8 +18,9 @@ import fs from 'fs';
 export default class FileStream extends InputStream {
 
 	static fromPath(path, encoding, callback) {
-		if(!isNode)
+		if(!isNode) {
 			throw new Error("FileStream is only available when running in Node!");
+		}
 		fs.readFile(path, encoding, function(err, data) {
 			let is = null;
 			if (data !== null) {
