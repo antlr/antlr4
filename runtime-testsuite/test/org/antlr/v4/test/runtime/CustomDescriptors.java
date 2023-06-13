@@ -30,7 +30,8 @@ public class CustomDescriptors {
 				});
 		descriptors.put("ParserExec",
 				new RuntimeTestDescriptor[] {
-						getMultiTokenAlternativeDescriptor()
+						getMultiTokenAlternativeDescriptor(),
+						getEscapedCharactersInTokenLiteralsDescriptor()
 				});
 	}
 
@@ -196,5 +197,68 @@ public class CustomDescriptors {
 				"P",
 				grammar,
 				null, false, false, false, PredictionMode.LL, true, null, uri);
+	}
+
+	private static RuntimeTestDescriptor getEscapedCharactersInTokenLiteralsDescriptor() {
+		String grammar = "grammar EscapedCharactersInTokenLiterals;\n" +
+				"\n" +
+				"r: t+ {<write(\"$text\")>};\n" +
+				"t\n" +
+				"    : '\\t'\n" +
+				"    | '\\b'\n" +
+				"    | '\\n'\n" +
+				"    | '\\r'\n" +
+				"    | '\\f'\n" +
+				"    | '\\''\n" +
+				"    | '\"'\n" +
+				"    | '\\\\\\\\'\n" +
+				"    | '\\u0007'\n" +
+				"    | '\\u000B'\n" +
+				"    | '\\u001B'\n" +
+				"    | '?'\n" +
+				"    | '\\u0000'\n" +
+				"    | '$'\n" +
+				"    | 'X'\n" +
+				"    ;\n" +
+				"\n" +
+				"// Java\n" +
+				"TAB: '\\t';\n" +
+				"BACK_SPACE: '\\b';\n" +
+				"LINE_FEED: '\\n';\n" +
+				"CARRIAGE_RETURN: '\\r';\n" +
+				"FORM_FEED: '\\f';\n" +
+				"QUOTE: '\\'';\n" +
+				"DOUBLE_QUOTE: '\"';\n" +
+				"BACK_SLASH: '\\\\\\\\';\n" +
+				"\n" +
+				"// C++\n" +
+				"ALERT: '\\u0007';\n" +
+				"VERTICAL_TAB: '\\u000B';\n" +
+				"ESCAPE: '\\u001B';\n" +
+				"QUESTION: '?';\n" +
+				"\n" +
+				"// C#\n" +
+				"NULL_CHAR: '\\u0000';\n" +
+				"\n" +
+				"// Dart & PHP\n" +
+				"DOLLAR: '$';\n" +
+				"\n" +
+				"// NORMAL:\n" +
+				"X: 'X';\n" +
+				"\n";
+
+		String input = "\t\b\n\f'\"\\\u0007\u000B\u001B?\u0000$X";
+
+		return new RuntimeTestDescriptor(
+				GrammarType.Parser,
+				"EscapedCharactersInTokenLiterals",
+				"https://github.com/antlr/antlr4/issues/2281, https://github.com/antlr/antlr4/issues/2885",
+				input,
+				input,
+				"",
+				"r",
+				"EscapedCharactersInTokenLiterals",
+				grammar,
+				null, false, false, null, uri);
 	}
 }

@@ -53,7 +53,7 @@ public class PHPTarget extends Target {
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\\');
 		addEscapedChar(map, '$');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		targetCharValueEscape = map;
 	}
 
@@ -74,14 +74,6 @@ public class PHPTarget extends Target {
 	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
-	}
-
-	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
-															   boolean escapeSpecial) {
-		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
-		targetStringLiteral = targetStringLiteral.replace("$", "\\$");
-		return targetStringLiteral;
 	}
 
 	@Override

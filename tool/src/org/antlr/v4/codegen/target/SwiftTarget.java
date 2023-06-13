@@ -27,7 +27,7 @@ public class SwiftTarget extends Target {
 		addEscapedChar(map, '\t', 't');
 		addEscapedChar(map, '\n', 'n');
 		addEscapedChar(map, '\r', 'r');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\'');
 		targetCharValueEscape = map;
 	}
@@ -63,16 +63,6 @@ public class SwiftTarget extends Target {
 	@Override
 	protected String escapeWord(String word) {
 		return "`" + word + "`";
-	}
-
-    @Override
-    protected void genFile(Grammar g, ST outputFileST, String fileName) {
-        super.genFile(g,outputFileST,fileName);
-    }
-
-	@Override
-	public boolean isATNSerializedAsInts() {
-		return true;
 	}
 
 	@Override

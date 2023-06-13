@@ -41,7 +41,7 @@ public abstract class Target {
 		addEscapedChar(map, '\r', 'r');
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\'');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\\');
 		defaultCharValueEscape = map;
 	}
@@ -135,144 +135,58 @@ public abstract class Target {
 		return name;
 	}
 
-	public String[] getTokenTypesAsTargetLabels(Grammar g, int[] ttypes) {
-		String[] labels = new String[ttypes.length];
-		for (int i=0; i<ttypes.length; i++) {
-			labels[i] = getTokenTypeAsTargetLabel(g, ttypes[i]);
-		}
-		return labels;
-	}
-
-	/** Given a random string of Java unicode chars, return a new string with
-	 *  optionally appropriate quote characters for target language and possibly
-	 *  with some escaped characters.  For example, if the incoming string has
-	 *  actual newline characters, the output of this method would convert them
-	 *  to the two char sequence \n for Java, C, C++, ...  The new string has
-	 *  double-quotes around it as well.  Example String in memory:
-	 *
-	 *     a"[newlinechar]b'c[carriagereturnchar]d[tab]e\f
-	 *
-	 *  would be converted to the valid Java s:
-	 *
-	 *     "a\"\nb'c\rd\te\\f"
-	 *
-	 *  or
-	 *
-	 *     a\"\nb'c\rd\te\\f
-	 *
-	 *  depending on the quoted arg.
-	 */
-	public String getTargetStringLiteralFromString(String s, boolean quoted) {
-		if ( s==null ) {
-			return null;
-		}
-
-		StringBuilder buf = new StringBuilder();
-		if ( quoted ) {
-			buf.append('"');
-		}
-		for (int i=0; i < s.length(); ) {
-			int c = s.codePointAt(i);
-			String escaped = c <= Character.MAX_VALUE ? getTargetCharValueEscape().get((char)c) : null;
-			if (c != '\'' && escaped != null) { // don't escape single quotes in strings for java
-				buf.append(escaped);
-			}
-			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
-				appendUnicodeEscapedCodePoint(i, buf);
-			}
-			else
-			{
-				buf.appendCodePoint(c);
-			}
-			i += Character.charCount(c);
-		}
-		if ( quoted ) {
-			buf.append('"');
-		}
-		return buf.toString();
-	}
-
-	private void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
-		if (escape) {
-			sb.append("\\");
-		}
-		appendUnicodeEscapedCodePoint(codePoint, sb);
-	}
-
 	/**
-	 * Escape the Unicode code point appropriately for this language
-	 * and append the escaped value to {@code sb}.
-	 * It exists for flexibility and backward compatibility with external targets
-	 * The static method {@link UnicodeEscapes#appendEscapedCodePoint(StringBuilder, int, String)} can be used as well
-	 * if default escaping method (Java) is used or language is officially supported
-	 */
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
-	}
-
-	public String getTargetStringLiteralFromString(String s) {
-		return getTargetStringLiteralFromString(s, true);
-	}
-
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
-		return getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, false);
-	}
-
-	/**
-	 * <p>Convert from an ANTLR string literal found in a grammar file to an
-	 * equivalent string literal in the target language.
-	 *</p>
-	 * <p>
-	 * For Java, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
-	 * Expect single quotes around the incoming literal. Just flip the quotes
-	 * and replace double quotes with {@code \"}.
+	 * <p>Convert from an ANTLR string literal or predicate content found in a grammar file to an
+	 * equivalent string literal in the target language. The returning string is double-quoted
 	 * </p>
 	 * <p>
-	 * Note that we have decided to allow people to use '\"' without penalty, so
-	 * we must build the target string in a loop as {@link String#replace}
-	 * cannot handle both {@code \"} and {@code "} without a lot of messing
-	 * around.
+	 * Example input string:
+	 *
+	 *    a"[newlinechar]b'c[carriagereturnchar]d[tab]e\f
+	 *
+	 * would be converted to the valid target string literal if keepEscaping is false:
+	 *
+	 *    "a\"\nb'c\rd\te\\f"
+	 *
+	 * otherwise, if keepEscaping is true (it used for token names):
+	 *
+	 *    "a\"\\nb'c\\rd\\te\\f"
+	 *
+	 * keepEscaping parameter is only actual for ANTLR string literals
 	 * </p>
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(
-		CodeGenerator generator,
-		String literal,
-		boolean addQuotes,
-		boolean escapeSpecial)
-	{
+	public final String getTargetStringLiteralFromAntlrGrammar(String literal, boolean keepEscaping) {
 		StringBuilder sb = new StringBuilder();
 
-		if ( addQuotes ) sb.append('"');
-
-		for (int i = 1; i < literal.length() -1; ) {
+		Map<Character, String> targetCharValueEscape = getTargetCharValueEscape();
+		sb.append('"');
+		for (int i = 0; i < literal.length(); ) {
 			int codePoint = literal.codePointAt(i);
 			int toAdvance = Character.charCount(codePoint);
-			if  (codePoint == '\\') {
+			if  (keepEscaping && codePoint == '\\') {
 				// Anything escaped is what it is! We assume that
-				// people know how to escape characters correctly. However
+				// people know how to escape characters correctly. However,
 				// we catch anything that does not need an escape in Java (which
 				// is what the default implementation is dealing with and remove
-				// the escape. The C target does this for instance.
+				// the escape.
 				//
 				int escapedCodePoint = literal.codePointAt(i+toAdvance);
 				toAdvance++;
 				switch (escapedCodePoint) {
 					// Pass through any escapes that Java also needs
-					//
 					case    'n':
 					case    'r':
 					case    't':
 					case    'b':
 					case    'f':
-					case    '\\':
-						// Pass the escape through
-						if (escapeSpecial && escapedCodePoint != '\\') {
-							sb.append('\\');
-						}
-						sb.append('\\');
-						sb.appendCodePoint(escapedCodePoint);
+						sb.append("\\\\").appendCodePoint(escapedCodePoint);
 						break;
-
+					case    '\'':
+						sb.append('\''); // No need to escaped single quote since all strings in targets are enclosed in double quotes
+						break;
+					case    '\\':
+						sb.append("\\\\");
+						break;
 					case    'u':    // Either unnnn or u{nnnnnn}
 						if (literal.charAt(i+toAdvance) == '{') {
 							while (literal.charAt(i+toAdvance) != '}') {
@@ -283,32 +197,22 @@ public abstract class Target {
 						else {
 							toAdvance += 4;
 						}
-						if ( i+toAdvance <= literal.length() ) { // we might have an invalid \\uAB or something
-							String fullEscape = literal.substring(i, i+toAdvance);
-							appendUnicodeEscapedCodePoint(
-								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
-								sb,
-								escapeSpecial);
-						}
+						assert i + toAdvance <= literal.length();  // invalid \\uAB or something should be reported before
+						String fullEscape = literal.substring(i, i+toAdvance);
+						sb.append('\\');
+						UnicodeEscapes.appendEscapedCodePoint(sb, CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape), getLanguage());
 						break;
 					default:
-						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
-							appendUnicodeEscapedCodePoint(escapedCodePoint, sb, escapeSpecial);
-						}
-						else {
-							sb.appendCodePoint(escapedCodePoint);
-						}
-						break;
+						assert false : "Invalid escape sequence should be checked before";
 				}
 			}
 			else {
-				if (codePoint == 0x22) {
-					// ANTLR doesn't escape " in literal strings,
-					// but every other language needs to do so.
-					sb.append("\\\"");
+				String targetEscapedChar = targetCharValueEscape.get((char) codePoint);
+				if (codePoint != '\'' && targetEscapedChar != null) { // No need to escaped single quote since all strings in targets are enclosed in double quotes
+					sb.append(targetEscapedChar);
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
-					appendUnicodeEscapedCodePoint(codePoint, sb, escapeSpecial);
+					UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
 				}
 				else {
 					sb.appendCodePoint(codePoint);
@@ -316,8 +220,7 @@ public abstract class Target {
 			}
 			i += toAdvance;
 		}
-
-		if ( addQuotes ) sb.append('"');
+		sb.append('"');
 
 		return sb.toString();
 	}
@@ -519,8 +422,6 @@ public abstract class Target {
 	 * This is primarily needed by Java target to limit size of any single ATN string
 	 * to 65k length.
 	 *
-	 * @see SerializedATN#getSegments
-	 *
 	 * @return the serialized ATN segment limit
 	 */
 	public int getSerializedATNSegmentLimit() {
@@ -534,40 +435,6 @@ public abstract class Target {
 	 *  @since 4.5
 	 */
 	public int getInlineTestSetWordSize() { return 64; }
-
-	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		switch (idNode.getParent().getType()) {
-			case ANTLRParser.ASSIGN:
-				switch (idNode.getParent().getParent().getType()) {
-					case ANTLRParser.ELEMENT_OPTIONS:
-					case ANTLRParser.OPTIONS:
-						return false;
-
-					default:
-						break;
-				}
-
-				break;
-
-			case ANTLRParser.AT:
-			case ANTLRParser.ELEMENT_OPTIONS:
-				return false;
-
-			case ANTLRParser.LEXER_ACTION_CALL:
-				if (idNode.getChildIndex() == 0) {
-					// first child is the command name which is part of the ANTLR language
-					return false;
-				}
-
-				// arguments to the command should be checked
-				break;
-
-			default:
-				break;
-		}
-
-		return getReservedWords().contains(idNode.getText());
-	}
 
 	@Deprecated
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {

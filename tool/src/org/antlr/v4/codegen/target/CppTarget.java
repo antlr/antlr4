@@ -24,7 +24,7 @@ public class CppTarget extends Target {
 		addEscapedChar(map, '\f', 'f');
 		addEscapedChar(map, '\r', 'r');
 		addEscapedChar(map, (char)0x001B, 'e');
-		addEscapedChar(map, '\"');
+		addEscapedChar(map, '"');
 		addEscapedChar(map, '\'');
 		addEscapedChar(map, '?');
 		addEscapedChar(map, '\\');
@@ -66,18 +66,6 @@ public class CppTarget extends Target {
 	}
 
 	public boolean needsHeader() { return true; }
-
-    @Override
-	protected boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
-		if (codePoint == '?') {
-			// in addition to the default escaped code points, also escape ? to prevent trigraphs
-			// ideally, we would escape ? with \?, but escaping as unicode \u003F works as well
-			return true;
-		}
-		else {
-			return super.shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint);
-		}
-	}
 
 	@Override
 	public String getRecognizerFileName(boolean header) {

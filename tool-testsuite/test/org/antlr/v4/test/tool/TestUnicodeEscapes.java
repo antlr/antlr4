@@ -61,6 +61,8 @@ public class TestUnicodeEscapes {
 	}
 
 	private void checkUnicodeEscape(String expected, int input, String language) {
-		assertEquals(expected, UnicodeEscapes.escapeCodePoint(input, language));
+		StringBuilder result = new StringBuilder();
+		UnicodeEscapes.appendEscapedCodePoint(result, input, language);
+		assertEquals(expected, result.toString());
 	}
 }

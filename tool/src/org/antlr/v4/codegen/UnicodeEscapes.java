@@ -11,12 +11,9 @@ package org.antlr.v4.codegen;
  * languages' syntax.
  */
 public class UnicodeEscapes {
-	public static String escapeCodePoint(int codePoint, String language) {
-		StringBuilder result = new StringBuilder();
-		appendEscapedCodePoint(result, codePoint, language);
-		return result.toString();
-	}
-
+	/**
+	 * Escape the Unicode code point appropriately for this language and append the escaped value to {@code sb}.
+	 */
 	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, String language) {
 		switch (language) {
 			case "CSharp":
