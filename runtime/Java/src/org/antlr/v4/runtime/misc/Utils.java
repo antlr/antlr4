@@ -70,6 +70,16 @@ public class Utils {
 		return buf.toString();
 	}
 
+	/** @since 4.10.2 */
+	public static String escapeJSONString(String s) {
+		s = s.replace("\\", "\\\\");
+		s = s.replace("\"", "\\\"");
+		s = s.replace("\n", "\\n");
+		s = s.replace("\r", "\\r");
+		s = s.replace("\t", "\\t");
+		return s;
+	}
+
 	public static void writeFile(String fileName, String content) throws IOException {
 		writeFile(fileName, content, null);
 	}

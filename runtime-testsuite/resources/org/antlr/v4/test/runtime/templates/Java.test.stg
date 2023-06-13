@@ -56,6 +56,8 @@ BailErrorStrategy() ::= <%setErrorHandler(new BailErrorStrategy());%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(this)%>
 
+ToJSON(s) ::= <%JsonSerializer.toJSON(<s>,this)%>
+
 Column() ::= "this.getCharPositionInLine()"
 
 Text() ::= "this.getText()"

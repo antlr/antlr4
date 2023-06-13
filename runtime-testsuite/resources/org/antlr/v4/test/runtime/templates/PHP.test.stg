@@ -38,6 +38,7 @@ BuildParseTrees() ::= "\$this->setBuildParseTree(true);"
 BailErrorStrategy() ::= <%\$this->setErrorHandler(new Antlr\\Antlr4\\Runtime\\Error\\BailErrorStrategy());%>
 
 ToStringTree(s) ::= <%<s>->toStringTree(\$this->getRuleNames())%>
+ToJSON(s) ::= ""
 Column() ::= "\$this->getCharPositionInLine()"
 Text() ::= "\$this->getText()"
 ValEquals(a,b) ::= <%<a>===<b>%>

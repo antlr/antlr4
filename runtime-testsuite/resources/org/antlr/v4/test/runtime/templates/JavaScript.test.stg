@@ -55,6 +55,7 @@ BuildParseTrees() ::= "this.buildParseTrees = true;"
 BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(null, this)%>
+ToJSON(s) ::= ""
 
 Column() ::= "this.column"
 

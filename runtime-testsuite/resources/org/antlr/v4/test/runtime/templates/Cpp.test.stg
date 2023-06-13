@@ -35,6 +35,8 @@ BuildParseTrees() ::= "setBuildParseTree(true);"
 BailErrorStrategy() ::= "_errHandler = std::make_shared\<BailErrorStrategy>();"
 
 ToStringTree(s) ::= "<s>->toStringTree(this)"
+ToJSON(s) ::= ""
+
 Column() ::= "getCharPositionInLine()"
 Text() ::= "getText()"
 ValEquals(a,b) ::= "<a> == <b>"

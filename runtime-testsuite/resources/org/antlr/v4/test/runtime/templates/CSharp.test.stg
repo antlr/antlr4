@@ -56,6 +56,8 @@ BailErrorStrategy() ::= <%ErrorHandler = new BailErrorStrategy();%>
 
 ToStringTree(s) ::= <%<s>.ToStringTree(this)%>
 
+ToJSON(s) ::= ""
+
 Column() ::= "this.Column"
 
 Text() ::= "this.Text"

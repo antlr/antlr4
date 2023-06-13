@@ -6,11 +6,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Predicate;

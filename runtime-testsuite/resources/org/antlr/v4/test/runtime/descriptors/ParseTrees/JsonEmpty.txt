@@ -1,0 +1,53 @@
+[type]
+Parser
+
+[grammar]
+grammar VisitorCalc;
+
+s
+@init {
+   <BuildParseTrees()>
+}
+@after {
+<ToJSON("$ctx"):writeln()>
+}
+    :	expr EOF
+	|
+	;
+
+expr
+	:	INT						# number
+	|   ID                      # var
+	|   ID '(' ')'              # func
+	|	expr (MUL | DIV) expr	# multiply
+	|	expr (ADD | SUB) expr	# add
+	;
+
+INT : [0-9]+;
+ID  : [a-zA-Z_]+ ;
+MUL : '*';
+DIV : '/';
+ADD : '+';
+SUB : '-';
+WS : [ \t]+ -> channel(HIDDEN);
+
+[start]
+s
+
+[input]
+
+
+[output]
+"""{"rules":["s","expr"],"input":"","tokens":[{"type":-1,"line":1,"pos":0,"channel":0,"start":0,"stop":-1}],"tree":"0"}
+"""
+
+[skip]
+Cpp
+CSharp
+Dart
+Go
+JavaScript
+PHP
+Swift
+Python2
+Python3
