@@ -1,6 +1,3 @@
-[type]
-CompositeParser
-
 [grammar]
 grammar M;
 import S;

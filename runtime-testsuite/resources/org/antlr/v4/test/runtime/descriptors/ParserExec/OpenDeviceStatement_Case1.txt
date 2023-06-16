@@ -1,9 +1,6 @@
 [notes]
 This is a regression test for antlr/antlr4#1545, case 1.
 
-[type]
-Parser
-
 [grammar]
 grammar OpenDeviceStatement;
 program : statement+ '.' ;

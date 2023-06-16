@@ -2,9 +2,6 @@
 This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
 https://github.com/antlr/antlr4/issues/218
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 cppCompilationUnit : content+ EOF;

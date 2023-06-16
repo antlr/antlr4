@@ -1,9 +1,6 @@
 [notes]
 https://github.com/antlr/antlr4/issues/1070
 
-[type]
-Parser
-
 [grammar]
 grammar G;
 

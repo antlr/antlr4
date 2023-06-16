@@ -3,9 +3,6 @@ This is a regression test for antlr/antlr4#195 "label 'label' type
 mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
 https://github.com/antlr/antlr4/issues/195
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 start : a* EOF;

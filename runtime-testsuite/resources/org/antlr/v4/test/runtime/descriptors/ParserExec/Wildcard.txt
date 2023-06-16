@@ -1,9 +1,6 @@
 [notes]
 Match assignments, ignore other tokens with wildcard.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 a : (assign|.)+ EOF ;

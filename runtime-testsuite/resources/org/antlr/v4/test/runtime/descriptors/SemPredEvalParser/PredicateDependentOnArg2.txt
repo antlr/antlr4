@@ -8,9 +8,6 @@ they should be ignored. It will not affect recognition, however. We
 are really making sure the ATN simulation doesn't crash with context
 object issues when it encounters preds during FOLLOW.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 @parser::members {<InitIntMember("i","0")>}

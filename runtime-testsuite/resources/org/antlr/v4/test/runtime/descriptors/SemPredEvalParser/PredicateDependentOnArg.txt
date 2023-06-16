@@ -4,9 +4,6 @@ information to predict the alternatives. This is the special case
 where we know exactly which context we are in. The context stack
 is empty and we have not dipped into the outer context to make a decision.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 @parser::members {<InitIntMember("i","0")>}

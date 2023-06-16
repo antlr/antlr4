@@ -1,6 +1,3 @@
-[type]
-Parser
-
 [grammar]
 grammar T;
 s : b[2] ';' |  b[2] '.' ; // decision in s drills down to ctx-dependent pred in a;

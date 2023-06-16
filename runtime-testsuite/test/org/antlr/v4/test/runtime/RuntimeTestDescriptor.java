@@ -7,19 +7,14 @@
 package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.misc.Pair;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 
 /** This object represents all the information we need about a single test and is the
  * in-memory representation of a descriptor file
  */
 public class RuntimeTestDescriptor {
-	/** A type in {"Lexer", "Parser", "CompositeLexer", "CompositeParser"} */
-	public final GrammarType testType;
-
 	/** Return a string representing the name of the target currently testing
 	 *  this descriptor.
 	 *  Multiple instances of the same descriptor class
@@ -40,11 +35,11 @@ public class RuntimeTestDescriptor {
 
 	/** The rule at which parsing should start */
 	public final String startRule;
-	public final String grammarName;
 
-	public final String grammar;
+	public final String[] grammars;
+
 	/** List of grammars imported into the grammar */
-	public final List<Pair<String, String>> slaveGrammars;
+	public final String[] slaveGrammars;
 
 	/** For lexical tests, dump the DFA of the default lexer mode to stdout */
 	public final boolean showDFA;
@@ -62,22 +57,19 @@ public class RuntimeTestDescriptor {
 
 	public final URI uri;
 
-	public RuntimeTestDescriptor(GrammarType testType, String name, String notes,
+	public RuntimeTestDescriptor(String name, String notes,
 								 String input, String output, String errors,
-								 String startRule,
-								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
+								 String startRule, String[] grammars, String[] slaveGrammars,
 								 boolean showDiagnosticErrors, boolean traceATN, boolean showDFA, PredictionMode predictionMode,
 								 boolean buildParseTree, String[] skipTargets, URI uri) {
-		this.testType = testType;
 		this.name = name;
 		this.notes = notes;
 		this.input = input;
 		this.output = output;
 		this.errors = errors;
 		this.startRule = startRule;
-		this.grammarName = grammarName;
-		this.grammar = grammar;
-		this.slaveGrammars = slaveGrammars;
+		this.grammars = grammars;
+		this.slaveGrammars = slaveGrammars == null ? new String[0] : slaveGrammars;
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
 		this.traceATN = traceATN;

@@ -13,8 +13,28 @@ import java.net.URI;
 import java.util.*;
 
 public class RuntimeTestDescriptorParser {
+	private final static String notesSectionName = "notes";
+	private final static String grammarSectionName = "grammar";
+	private final static String lexerGrammarSectionName = "lexerGrammar";
+	private final static String slaveGrammarSectionName = "slaveGrammar";
+	private final static String startSectionName = "start";
+	private final static String inputSectionName = "input";
+	private final static String outputSectionName = "output";
+	private final static String errorsSectionName = "errors";
+	private final static String flagsSectionName = "flags";
+	private final static String skipSectionName = "skip";
+
 	private final static Set<String> sections = new HashSet<>(Arrays.asList(
-			"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip"
+		notesSectionName,
+		grammarSectionName,
+		lexerGrammarSectionName,
+		slaveGrammarSectionName,
+		startSectionName,
+		inputSectionName,
+		outputSectionName,
+		errorsSectionName,
+		flagsSectionName,
+		skipSectionName
 	));
 
 	/**  Read stuff like:
@@ -94,10 +114,8 @@ public class RuntimeTestDescriptorParser {
 		pairs.add(new Pair<>(currentField, currentValue.toString()));
 
 		String notes = "";
-		GrammarType testType = GrammarType.Lexer;
-		String grammar = "";
-		String grammarName = "";
-		List<Pair<String, String>> slaveGrammars = new ArrayList<>();
+		List<String> grammars = new ArrayList<>();
+		List<String> slaveGrammars = new ArrayList<>();
 		String startRule = "";
 		String input = "";
 		String output = "";
@@ -121,32 +139,28 @@ public class RuntimeTestDescriptorParser {
 				value = value + "\n"; // if multi line and not quoted, leave \n on end.
 			}
 			switch (section) {
-				case "notes":
+				case notesSectionName:
 					notes = value;
 					break;
-				case "type":
-					testType = Enum.valueOf(GrammarType.class, value);
+				case grammarSectionName:
+					grammars.add(value);
 					break;
-				case "grammar":
-					grammarName = getGrammarName(value.split("\n")[0]);
-					grammar = value;
+				case slaveGrammarSectionName:
+					slaveGrammars.add(value);
 					break;
-				case "slaveGrammar":
-					String gname = getGrammarName(value.split("\n")[0]);
-					slaveGrammars.add(new Pair<>(gname, value));
-				case "start":
+				case startSectionName:
 					startRule = value;
 					break;
-				case "input":
+				case inputSectionName:
 					input = value;
 					break;
-				case "output":
+				case outputSectionName:
 					output = value;
 					break;
-				case "errors":
+				case errorsSectionName:
 					errors = value;
 					break;
-				case "flags":
+				case flagsSectionName:
 					String[] flags = value.split("\n");
 					for (String f : flags) {
 						String[] parts = f.split("=", 2);
@@ -166,30 +180,20 @@ public class RuntimeTestDescriptorParser {
 							case "notBuildParseTree":
 								buildParseTree = false;
 								break;
+							default:
+								throw new RuntimeException("Unknown flag: " + parts[0]);
 						}
 					}
 					break;
-				case "skip":
+				case skipSectionName:
 					skipTargets = value.split("\n");
 					break;
 				default:
 					throw new RuntimeException("Unknown descriptor section ignored: "+section);
 			}
 		}
-		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDiagnosticErrors, traceATN, showDFA, predictionMode, buildParseTree, skipTargets, uri);
-	}
-
-	/** Get A, B, or C from:
-	 * "lexer grammar A;" "grammar B;" "parser grammar C;"
-	 */
-	private static String getGrammarName(String grammarDeclLine) {
-		int gi = grammarDeclLine.indexOf("grammar ");
-		if ( gi<0 ) {
-			return "<unknown grammar name>";
-		}
-		gi += "grammar ".length();
-		int gsemi = grammarDeclLine.indexOf(';');
-		return grammarDeclLine.substring(gi, gsemi);
+		return new RuntimeTestDescriptor(name, notes, input, output, errors, startRule,
+				grammars.toArray(new String[0]), slaveGrammars.toArray(new String[0]),
+				showDiagnosticErrors, traceATN, showDFA, predictionMode, buildParseTree, skipTargets, uri);
 	}
 }

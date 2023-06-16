@@ -36,7 +36,6 @@ public class CustomDescriptors {
 
 	private static RuntimeTestDescriptor getLineSeparatorLfDescriptor() {
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
 				"LineSeparatorLf",
 				"",
 				"1\n2\n3",
@@ -48,16 +47,14 @@ public class CustomDescriptors {
 						"[@5,5:4='<EOF>',<-1>,3:1]\n",
 				"",
 				null,
-				"L",
-				"lexer grammar L;\n" +
+				new String [] { "lexer grammar L;\n" +
 						"T: ~'\\n'+;\n" +
-						"SEPARATOR: '\\n';",
-				null, false, false, false,  PredictionMode.LL, true, null, uri);
+						"SEPARATOR: '\\n';" }, null,
+				false, false, false,  PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLineSeparatorCrLfDescriptor() {
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
 				"LineSeparatorCrLf",
 				"",
 				"1\r\n2\r\n3",
@@ -69,26 +66,23 @@ public class CustomDescriptors {
 						"[@5,7:6='<EOF>',<-1>,3:1]\n",
 				"",
 				"",
-				"L",
-				"lexer grammar L;\n" +
+				new String [] { "lexer grammar L;\n" +
 						"T: ~'\\r'+;\n" +
-						"SEPARATOR: '\\r\\n';",
-				null, false, false, false, PredictionMode.LL, true, null, uri);
+						"SEPARATOR: '\\r\\n';" }, null,
+				false, false, false, PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getLargeLexerDescriptor() {
 		final int tokensCount = 4000;
-		final String grammarName = "L";
 
 		StringBuilder grammar = new StringBuilder();
-		grammar.append("lexer grammar ").append(grammarName).append(";\n");
+		grammar.append("lexer grammar ").append("L").append(";\n");
 		grammar.append("WS: [ \\t\\r\\n]+ -> skip;\n");
 		for (int i = 0; i < tokensCount; i++) {
 			grammar.append("KW").append(i).append(" : 'KW' '").append(i).append("';\n");
 		}
 
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
 				"LargeLexer",
 				"This is a regression test for antlr/antlr4#76 \"Serialized ATN strings\n" +
 						"should be split when longer than 2^16 bytes (class file limitation)\"\n" +
@@ -98,9 +92,8 @@ public class CustomDescriptors {
 						"[@1,5:4='<EOF>',<-1>,1:5]\n",
 				"",
 				"",
-				grammarName,
-				grammar.toString(),
-				null, false, false, false, PredictionMode.LL, true, null, uri);
+				new String [] { grammar.toString() },null,
+				 false, false, false, PredictionMode.LL, true, null, uri);
 	}
 
 	private static RuntimeTestDescriptor getAtnStatesSizeMoreThan65535Descriptor() {
@@ -140,16 +133,14 @@ public class CustomDescriptors {
 				.append("='<EOF>',<-1>,").append(tokensCount + 1).append(":0]\n");
 
 		return new RuntimeTestDescriptor(
-				GrammarType.Lexer,
 				"AtnStatesSizeMoreThan65535",
 				"Regression for https://github.com/antlr/antlr4/issues/1863",
 				input.toString(),
 				output.toString(),
 				"",
 				"",
-				grammarName,
-				grammar.toString(),
-				null, false, false, false, PredictionMode.LL, true,
+				new String[] { grammar.toString() }, null,
+				 false, false, false, PredictionMode.LL, true,
 				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "TypeScript", "Dart"},
 				uri);
 	}
@@ -186,15 +177,13 @@ public class CustomDescriptors {
 				"WS: [ ]+ -> skip;";
 
 		return new RuntimeTestDescriptor(
-				GrammarType.Parser,
 				"MultiTokenAlternative",
 				"https://github.com/antlr/antlr4/issues/3698, https://github.com/antlr/antlr4/issues/3703",
 				input.toString(),
 				output + "\n",
 				"",
 				"r",
-				"P",
-				grammar,
-				null, false, false, false, PredictionMode.LL, true, null, uri);
+				new String[] { grammar }, null,
+				false, false, false, PredictionMode.LL, true, null, uri);
 	}
 }

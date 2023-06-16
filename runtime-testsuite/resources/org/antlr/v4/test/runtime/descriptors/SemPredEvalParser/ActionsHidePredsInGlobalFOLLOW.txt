@@ -4,9 +4,6 @@ predicates and so we cannot evaluate any semantic predicate
 encountered after having seen a regular action. This includes
 during global follow operations.
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 @parser::members {

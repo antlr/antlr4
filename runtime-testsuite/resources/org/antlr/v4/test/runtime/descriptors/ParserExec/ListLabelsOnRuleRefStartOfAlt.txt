@@ -1,9 +1,6 @@
 [notes]
 Checks that this compiles; see https://github.com/antlr/antlr4/issues/2016
 
-[type]
-Parser
-
 [grammar]
 grammar Test;
 

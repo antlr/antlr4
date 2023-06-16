@@ -4,9 +4,6 @@ file".  https://github.com/antlr/antlr4/issues/677
 This test treats `,` and `>>` as part of a single compound operator (similar
 to a ternary operator).
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 s @after {<ToStringTree("$ctx"):writeln()>} : expr EOF;

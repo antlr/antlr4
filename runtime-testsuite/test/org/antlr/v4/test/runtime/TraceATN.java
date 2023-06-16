@@ -111,44 +111,14 @@ public class TraceATN {
 		}
 	}
 
-	public String test(RuntimeTestDescriptor descriptor, RuntimeRunner runner, String targetName) {
+	public String test(RuntimeTestDescriptor descriptor, RuntimeRunner runner) {
 		FileUtils.mkdir(runner.getTempDirPath());
 
-		String grammarName = descriptor.grammarName;
-		String grammar = descriptor.grammar;
-
-		String lexerName, parserName;
-		boolean useListenerOrVisitor;
-		String superClass;
-		if (descriptor.testType == GrammarType.Parser || descriptor.testType == GrammarType.CompositeParser) {
-			lexerName = grammarName + "Lexer";
-			parserName = grammarName + "Parser";
-			useListenerOrVisitor = true;
-			if ( targetName!=null && targetName.equals("Java") ) {
-				superClass = JavaRunner.runtimeTestParserName;
-			}
-			else {
-				superClass = null;
-			}
-		}
-		else {
-			lexerName = grammarName;
-			parserName = null;
-			useListenerOrVisitor = false;
-			if (targetName.equals("Java")) {
-				superClass = JavaRunner.runtimeTestLexerName;
-			}
-			else {
-				superClass = null;
-			}
-		}
-
-		RunOptions runOptions = new RunOptions(grammarName + ".g4",
-				grammar,
-				parserName,
-				lexerName,
-				useListenerOrVisitor,
-				useListenerOrVisitor,
+		RunOptions runOptions = new RunOptions(
+				descriptor.grammars,
+				null,
+				true,
+				true,
 				descriptor.startRule,
 				descriptor.input,
 				false,
@@ -156,10 +126,10 @@ public class TraceATN {
 				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
-				targetName,
-				superClass,
+				null,
 				PredictionMode.LL,
-				true
+				true,
+				null
 		);
 
 		State result = runner.run(runOptions);
@@ -197,15 +167,13 @@ public class TraceATN {
 			String input = new String(Files.readAllBytes(Paths.get(inputFileName)));
 
 			RuntimeTestDescriptor descriptor = new RuntimeTestDescriptor(
-					GrammarType.CompositeParser,
 					"TraceATN-" + grammarFileName,
 					"",
 					input,
 					"",
 					"",
 					startRuleName,
-					grammarName,
-					grammar,
+					new String[] {grammar},
 					null,
 					false,
 					true,
@@ -217,7 +185,7 @@ public class TraceATN {
 
 			RuntimeRunner runner = getRunner(targetName);
 
-			String result = test(descriptor, runner, targetName);
+			String result = test(descriptor, runner);
 			System.out.println(result);
 		}
 	}

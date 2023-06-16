@@ -425,7 +425,7 @@ public class TestATNLexerInterpreter {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
 				"LITERAL_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
-		ExecutedState executedState = execLexer("L.g4", grammar, "L", "F");
+		ExecutedState executedState = execLexer(grammar, "F");
 
 		assertEquals("line 1:0 token recognition error at: 'F'\n", executedState.errors);
 	}
@@ -435,7 +435,7 @@ public class TestATNLexerInterpreter {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
 				"SET_WITH_NOT: ~[a-c];\n";        // ~[a-cA-C]
-		ExecutedState executedState = execLexer("L.g4", grammar, "L", "B");
+		ExecutedState executedState = execLexer(grammar, "B");
 
 		assertEquals("line 1:0 token recognition error at: 'B'\n", executedState.errors);
 	}
@@ -517,7 +517,7 @@ public class TestATNLexerInterpreter {
 				"options { caseInsensitive=true; }\n" +
 				"STRING options { caseInsensitive=false; } : 'N'? '\\'' (~'\\'' | '\\'\\'')* '\\'';\n";
 
-		ExecutedState executedState = execLexer("L.g4", grammar, "L", "n'sample'");
+		ExecutedState executedState = execLexer(grammar, "n'sample'");
 		assertEquals("line 1:0 token recognition error at: 'n'\n", executedState.errors);
 	}
 

@@ -1,6 +1,3 @@
-[type]
-Parser
-
 [grammar]
 grammar T;
 s : a {<writeln("\"alt 1\"")>}

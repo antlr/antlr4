@@ -2,9 +2,9 @@ package org.antlr.v4.test.runtime;
 
 public class GeneratedFile {
 	public final String name;
-	public final boolean isParser;
+	public final Boolean isParser;
 
-	public GeneratedFile(String name, boolean isParser) {
+	public GeneratedFile(String name, Boolean isParser) {
 		this.name = name;
 		this.isParser = isParser;
 	}

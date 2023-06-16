@@ -3,9 +3,6 @@ for https://github.com/antlr/antlr4/issues/1398.
 Seeing through a large expression takes 5 _minutes_ on
 my fast box to complete.  After fix, it's instantaneous.
 
-[type]
-Parser
-
 [grammar]
 grammar Expr;
 

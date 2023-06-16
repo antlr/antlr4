@@ -1,6 +1,3 @@
-[type]
-Parser
-
 [grammar]
 grammar T;
 s : a a a; // do 3x: once in ATN, next in DFA then INT in ATN

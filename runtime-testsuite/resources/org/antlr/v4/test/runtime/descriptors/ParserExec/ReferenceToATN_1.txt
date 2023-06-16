@@ -2,9 +2,6 @@
 This is a regression test for antlr/antlr4#561 "Issue with parser
 generation in 4.2.2" https://github.com/antlr/antlr4/issues/561
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 a : (ID|ATN)* ATN? {<writeln("$text")>} ;

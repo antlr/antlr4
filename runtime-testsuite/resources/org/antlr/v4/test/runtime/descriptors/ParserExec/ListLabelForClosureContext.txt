@@ -2,9 +2,6 @@
 This is a regression test for antlr/antlr4#299 "Repeating subtree not
 accessible in visitor".  https://github.com/antlr/antlr4/issues/299
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 ifStatement

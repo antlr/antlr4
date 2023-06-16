@@ -12,7 +12,6 @@ import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
 
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 
@@ -23,15 +22,6 @@ public class NodeRunner extends RuntimeRunner {
 	}
 
 	@Override
-	public String getExtension() { return "js"; }
-
-	@Override
-	public String getBaseListenerSuffix() { return null; }
-
-	@Override
-	public String getBaseVisitorSuffix() { return null; }
-
-	@Override
 	public String getRuntimeToolName() { return "node"; }
 
 	private final static String normalizedRuntimePath = getRuntimePath("JavaScript").replace('\\', '/');
@@ -40,8 +30,7 @@ public class NodeRunner extends RuntimeRunner {
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		for (GeneratedFile generatedFile : generatedFiles) {
+		for (GeneratedFile generatedFile : generatedState.generatedFiles) {
 			try {
 				FileUtils.replaceInFile(Paths.get(getTempDirPath(), generatedFile.name),
 						"import antlr4 from 'antlr4';",

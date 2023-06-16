@@ -6,9 +6,6 @@ Was working for C++ but I think it was not parsing correctly (Nov 2022)
 So I'll make it skip for now and will add bug. I believe it is not
 merging arrays properly.
 
-[type]
-Parser
-
 [grammar]
 grammar Expr;
 

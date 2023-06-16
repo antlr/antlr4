@@ -1,9 +1,6 @@
 [notes]
 Loopback doesn't eval predicate at start of alt
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 file_

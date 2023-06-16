@@ -2,9 +2,6 @@
 This test is meant to test the expected solution to antlr/antlr4#42.
 https://github.com/antlr/antlr4/issues/42
 
-[type]
-Parser
-
 [grammar]
 grammar T;
 s : stmt EOF ;

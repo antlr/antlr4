@@ -20,7 +20,7 @@ public class TestDollarParser {
                       "a : ID  { outStream.println(new java.io.File($parser.getSourceName()).getAbsolutePath()); }\n" +
                       "  ;\n" +
                       "ID : 'a'..'z'+ ;\n";
-		ExecutedState executedState = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", true);
+		ExecutedState executedState = execParser(grammar, "a", "x", true);
 		assertTrue(executedState.output.contains("input"));
 		assertEquals("", executedState.errors);
 	}
