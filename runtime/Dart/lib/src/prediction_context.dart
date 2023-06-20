@@ -7,7 +7,7 @@
 import 'package:collection/collection.dart';
 
 import 'atn/atn.dart';
-import 'misc/pair.dart';
+import 'misc/misc.dart';
 import 'recognizer.dart';
 import 'rule_context.dart';
 import 'util/murmur_hash.dart';

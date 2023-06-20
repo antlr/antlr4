@@ -7,7 +7,7 @@
 import '../../../error/error.dart';
 import '../../../input_stream.dart';
 import '../../../lexer.dart';
-import '../../../misc/multi_map.dart';
+import '../../../misc/misc.dart';
 import '../../../parser.dart';
 import '../../../parser_interpreter.dart';
 import '../../../parser_rule_context.dart';
