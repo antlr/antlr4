@@ -33,7 +33,16 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   late Pair<TokenSource, CharStream?> _tokenFactorySourcePair;
 
   @override
-  TokenFactory tokenFactory = CommonTokenFactory.DEFAULT;
+  TokenFactory get tokenFactory {
+    return _factory;
+  }
+
+  @override
+  set tokenFactory(TokenFactory factory) {
+    _factory = factory;
+  }
+
+  TokenFactory _factory = CommonTokenFactory.DEFAULT;
 
   /// The goal of all lexer rules/methods is to create a token object.
   /// this is an instance variable as multiple rules may collaborate to
