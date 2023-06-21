@@ -150,7 +150,7 @@ public class CustomDescriptors {
 				grammarName,
 				grammar.toString(),
 				null, false, false, false, PredictionMode.LL, true,
-				new String[] {"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "TypeScript", "Dart"},
+				new String[] {"CSharp", "Python3", "Go", "PHP", "Swift", "JavaScript", "TypeScript", "Dart"},
 				uri);
 	}
 

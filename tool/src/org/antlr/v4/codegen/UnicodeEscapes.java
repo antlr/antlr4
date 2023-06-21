@@ -20,7 +20,6 @@ public class UnicodeEscapes {
 	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, String language) {
 		switch (language) {
 			case "CSharp":
-			case "Python2":
 			case "Python3":
 			case "Cpp":
 			case "Go":
