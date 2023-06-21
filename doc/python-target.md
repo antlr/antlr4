@@ -2,16 +2,10 @@
 
 The examples from the ANTLR 4 book converted to Python are [here](https://github.com/jszheng/py3antlr4book).
 
-There are 2 Python targets: `Python2` and `Python3`. This is because there is only limited compatibility between those 2 versions of the language. Please refer to the [Python documentation](https://wiki.python.org/moin/Python2orPython3) for full details.
+There is ONE Python target: `Python3`. This is because there is only limited compatibility between those 2 versions of the language. Please refer to the [Python documentation](https://wiki.python.org/moin/Python3) for full details.
 
 How to create a Python lexer or parser?
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
-
-```
-$ antlr4 -Dlanguage=Python2 MyGrammar.g4
-```
-
-or
 
 ```
 $ antlr4 -Dlanguage=Python3 MyGrammar.g4
@@ -21,9 +15,8 @@ For a full list of antlr4 tool options, please visit the tool documentation page
 
 ## Where can I get the runtime?
 
-Once you've generated the lexer and/or parser code, you need to download the runtime. The Python runtimes are available from PyPI:
+Once you've generated the lexer and/or parser code, you need to download the runtime. The Python runtime are available from PyPI:
 
-* https://pypi.python.org/pypi/antlr4-python2-runtime/
 * https://pypi.python.org/pypi/antlr4-python3-runtime/
 
 The runtimes are provided in the form of source code, so no additional installation is required.
