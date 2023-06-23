@@ -39,8 +39,10 @@ if __name__ == '__main__':
     main(sys.argv)
 ```
 * requirements.txt:
-We suggest a file that contains the packages that the program needs that are loaded
-with pip. The file must include a reference to the Antlr Python3 runtime.
+This file contains a list of the
+required packages for the program. Required
+packages are downloaded by `pip`. The file
+must include a reference to the Antlr Python3 runtime.
 ```
 antlr4-python3-runtime==4.13.0
 ```
@@ -50,11 +52,13 @@ You should provide a script that builds the program.
 pip install -r requirements.txt
 antlr4 -v 4.13.0 -Dlanguage=Python3 Expr.g4
 ```
-_It is important that the versions of Antlr used to generate the parser and lexer,
-and the Antlr Python3 runtime match. E.g., 4.13.0. Using build files will help eliminate
-common errors that happen._
+_It is vital that the versions for the
+Antlr tool used to generate the parser
+and the Antlr Python3 runtime match.
+E.g., 4.13.0. Using build files will help
+eliminate common errors that happen._
 
-_For a full list of antlr4 tool options, please visit the [ANTLR Tool Command Line Options](https://github.com/antlr/antlr4/blob/master/doc/tool-options.md) documentation._
+_For a list of antlr4 tool options, please visit the [ANTLR Tool Command Line Options](https://github.com/antlr/antlr4/blob/master/doc/tool-options.md) documentation._
 * Input, e.g., input.txt:
 ```
 -(1 + 2)/3;
@@ -70,16 +74,19 @@ python Driver.py input.txt
 
 ## Visitors
 
-Antlr listeners and visitors are implementations that traverse a parse tree in their own unique way, and are
-used to implement [static](https://en.wikipedia.org/wiki/Static_program_analysis) or [dynamic](https://en.wikipedia.org/wiki/Dynamic_program_analysis)
-program analysis. It's important to understand the similarities and differences of the Antlr listener and visitor code.
-For further information, see https://tomassetti.me/listeners-and-visitors/. A visitor can traverse the nodes in the
-parse tree in any arbirary order, by default in a bottom-up, left-to-right order. 
+Antlr listeners and visitors are implementations that traverse a parse tree in unique ways. But both are used to implement
+[static](https://en.wikipedia.org/wiki/Static_program_analysis) or [dynamic](https://en.wikipedia.org/wiki/Dynamic_program_analysis)
+program analysis. It is essential to understand when to choose a listener versus a visitor.
+For further information, see https://tomassetti.me/listeners-and-visitors/.
+A visitor is the best choice when computing a synthesized attribute.
+Alternatively, a listener is the best choice when computing both synthesized
+and inherited attributes.
 
-To implement a visitor, you will need to add the `-visitor` option when
-generating the parser, add a class that subclasses the generated visitor, and code that implements the analysis.
+To implement a visitor, add the `-visitor` option to the `antlr4` command.
+Add a class that inherits from the generated visitor
+with code that implements the analysis.
 
-As an example, the following code implements an expression evaluator for the Expr.g4 grammar using a visitor.
+For example, the following code implements an expression evaluator for the Expr.g4 grammar using a visitor.
 
 * Driver.py:
 ```python
@@ -155,6 +162,10 @@ there are `enter` and `exit` methods called during the LR tranversal. You can us
 to implement both [inherited](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes)
 and [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
 analysis.
+
+To implement a listener, add the `-listener` option to the `antlr4` command.
+Add a class that inherits from the generated listener
+with code that implements the analysis.
 
 The following example implements an expression evaluator using a listener.
 
