@@ -194,46 +194,36 @@ class ListenerInterp(ExprListener):
         self.result = {}
 
     def exitAtom(self, ctx:ExprParser.AtomContext):
-        print("atom")
         self.result[ctx] = int(ctx.getText())
 
     def exitExpr(self, ctx:ExprParser.ExprContext):
-        print("expr")
         if ctx.getChildCount() == 3:
             if ctx.getChild(0).getText() == "(":
                 self.result[ctx] = self.result[ctx.getChild(1)]
-                return
-            opc = ctx.getChild(1).getText()
-            v1 = self.result[ctx.getChild(0)]
-            v2 = self.result[ctx.getChild(2)]
-            if opc == "+":
-                self.result[ctx] = v1 + v2
-            elif opc == "-":
-                self.result[ctx] = v1 - v2
-            elif opc == "*":
-                self.result[ctx] = v1 * v2
-            elif opc == "/":
-                self.result[ctx] = v1 / v2
             else:
-                ctx.result[ctx] = 0
-            return
+                opc = ctx.getChild(1).getText()
+                v1 = self.result[ctx.getChild(0)]
+                v2 = self.result[ctx.getChild(2)]
+                if opc == "+":
+                    self.result[ctx] = v1 + v2
+                elif opc == "-":
+                    self.result[ctx] = v1 - v2
+                elif opc == "*":
+                    self.result[ctx] = v1 * v2
+                elif opc == "/":
+                    self.result[ctx] = v1 / v2
+                else:
+                    ctx.result[ctx] = 0
         elif ctx.getChildCount() == 2:
             opc = ctx.getChild(0).getText()
             if opc == "+":
                 v = self.result[ctx.getChild(1)]
                 self.result[ctx] = v
-                return
             elif opc == "-":
                 v = self.result[ctx.getChild(1)]
                 self.result[ctx] = - v
-                return
-            else:
-                return
         elif ctx.getChildCount() == 1:
             self.result[ctx] = self.result[ctx.getChild(0)]
-            return
-        else:
-            return
 
     def exitStart_(self, ctx:ExprParser.Start_Context):
         for i in range(0, ctx.getChildCount(), 2):
