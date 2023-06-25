@@ -174,7 +174,6 @@ jobs:
           javascript,
           typescript,
           php,
-          python2,
           python3,
           # swift,
         ]
@@ -232,13 +231,6 @@ jobs:
     - name: Add msbuild to PATH
       if: startswith(matrix.os, 'windows') && (matrix.target == 'cpp')
       uses: microsoft/setup-msbuild@v1.1
-
-    - name: Set up Python 2
-      if: matrix.target == 'python2'
-      uses: actions/setup-python@v4
-      with:
-        python-version: '2.x'
-        architecture: 'x64'
 
     - name: Set up Python 3
       if: matrix.target == 'python3'
@@ -316,7 +308,6 @@ jobs:
         cd runtime-testsuite
         switch ("${{ matrix.target }}")
         {
-          python2 { mvn -X '-Dantlr-python2-exec="${{ env.pythonLocation }}\python.exe"' '-Dtest=python2.**' test }
           python3 { mvn -X '-Dantlr-python3-exec="${{ env.pythonLocation }}\python.exe"' '-Dtest=python3.**' test }
           default { mvn -X '-Dtest=${{ matrix.target }}.**' test }
         }
@@ -331,7 +322,6 @@ jobs:
 
         cd runtime-testsuite
         case ${{ matrix.target }} in
-          python2) mvn -X '-Dantlr-python2-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python2.**' test ;;
           python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
