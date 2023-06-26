@@ -2,20 +2,15 @@
 
 ## Requirements
 
-<<<<<<< HEAD
 You will need to install the minimum requirements for Python and Pip.
 See https://www.python.org/downloads/, version 3.6 or better, 
 and https://www.geeksforgeeks.org/how-to-install-pip-on-windows/.
-=======
-There is ONE Python target: `Python3`. This is because there is only limited compatibility between those 2 versions of the language. Please refer to the [Python documentation](https://wiki.python.org/moin/Python3) for full details.
->>>>>>> 004792243 (Removing Python2 from additional places.)
 
 ## A minimal example
 
 An example of a parser with the Python3 target consists of the following files.
 * An Antlr4 grammar, e.g., Expr.g4:
 ```
-<<<<<<< HEAD
 grammar Expr;
 start_ : expr (';' expr)* EOF;
 expr : atom | ('+' | '-') expr | expr '**' expr | expr ('*' | '/') expr | expr ('+' | '-') expr | '(' expr ')' | atom ;
@@ -26,36 +21,6 @@ WS : [ \t\n\r]+ -> skip ;
 * Driver.py:
 The driver code consists at a minimum code to open a file, create a lexer, token stream,
 and parser, then call the parser.
-=======
-$ antlr4 -Dlanguage=Python3 MyGrammar.g4
-```
-
-For a full list of antlr4 tool options, please visit the tool documentation page.
-
-## Where can I get the runtime?
-
-Once you've generated the lexer and/or parser code, you need to download the runtime. The Python runtime are available from PyPI:
-
-* https://pypi.python.org/pypi/antlr4-python3-runtime/
-
-The runtimes are provided in the form of source code, so no additional installation is required.
-
-We will not document here how to refer to the runtime from your Python project, since this would differ a lot depending on your project type and IDE. 
-
-## How do I run the generated lexer and/or parser?
-
-Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "startRule". The tool will have generated for you the following files:
-
-* MyGrammarLexer.py
-* MyGrammarParser.py
-* MyGrammarListener.py (if you have not activated the -no-listener option)
-* MyGrammarVisitor.py (if you have activated the -visitor option)
-
-(Developers used to Java/C# AntLR will notice that there is no base listener or visitor generated, this is because Python having no support for interfaces, the generated listener and visitor are fully fledged classes)
-
-Now a fully functioning script might look like the following:
- 
->>>>>>> 004792243 (Removing Python2 from additional places.)
 ```python
 import sys
 from antlr4 import *
