@@ -10,13 +10,14 @@ are comments](https://github.com/antlr/grammars-v4/blob/43fbb16fec1d474d38a603cc
 and should be placed on a token stream other than the default token stream.
 But, if the 'C' does not begin in
 column 1, then the input is invalid and should be flagged as so.
-```fortran
-c Hello World.
-   c This is a syntax error because 'c' does not start in column 1
-program hello
-    print *, 'Hello World!'
-end
-```
+	```fortran
+	c Hello World.
+	   c This is a syntax error because 'c' does not start in column 1
+	program hello
+		print *, 'Hello World!'
+	end
+	```
+
 * In CSharp, two [greater-than signs](https://util.unicode.org/UnicodeJsps/character.jsp?a=003E)
 `'>>'` can either mean
 [a right shift expression](https://github.com/antlr/grammars-v4/blob/43fbb16fec1d474d38a603cc6a6bcbe5edf07b1e/csharp/examples/AllInOneNoPreprocessor.cs#L657C15-L657C17)
@@ -26,15 +27,15 @@ Since lexers in Antlr are not parser aware,
 the lexer must tokenize the two greater-than signs as two separate tokens.
 A semantic predicate should be added to disallow a space between the two greater-than signs when parsing an
 expression.
-```C#
-class Foo {
-    void Func()
-    {
-        int x = 1000 > > 2;               // syntax error if a space exists in the double greater-than sign
-    }
-    Dictionary<int, List<int> > mapping;  // nested template declaration, valid
-}
-```
+	```C#
+	class Foo {
+		void Func()
+		{
+			int x = 1000 > > 2;               // syntax error if a space exists in the double greater-than sign
+		}
+		Dictionary<int, List<int> > mapping;  // nested template declaration, valid
+	}
+	```
 
 Antlr does not have a general-purpose language for actions and predicates;
 these must be written in the target language of the generated the parser.
