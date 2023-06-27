@@ -94,7 +94,7 @@ Use of this file is governed by the BSD 3-clause license, which can be found in 
 
 [target languages]: https://github.com/antlr/antlr4/tree/master/runtime
 [LICENSE.txt]: https://github.com/antlr/antlr4/blob/master/LICENSE.txt
-[ANTLR docs]: https://github.com/antlr/antlr4/blob/master/doc/README.md
+[ANTLR docs]: https://github.com/antlr/antlr4/blob/master/doc/index.md
 [new repo]: https://github.com/antlr4-go/antlr
 [Jim Idle]: https://github.com/jimidle
 [Go runtime docs]: https://github.com/antlr/antlr4/blob/master/doc/go-target.md
