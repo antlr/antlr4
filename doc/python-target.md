@@ -81,15 +81,12 @@ Antlr generates two types of tree traversals: visitors and listeners.
 Understanding when to choose a visitor versus a listener is a good idea.
 For further information, see https://tomassetti.me/listeners-and-visitors/.
 
-You can use this tree walker
-to implement both [inherited](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes)
-and [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
-analysis.
-
-A visitor is the best choice when computing only a single synthesized attribute.
+A visitor is the best choice when computing only a single [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
+or when you want to control the order of parse tree nodes visited.
 Alternatively, a listener is the best choice when computing both synthesized
-and inherited attributes.
-But, in many situations, they are interchangeable.
+and [inherited attributes](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes).
+
+In many situations, they are interchangeable.
 
 ### Visitors
 
