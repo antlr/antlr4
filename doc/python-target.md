@@ -56,9 +56,9 @@ _It is vital that the versions for the
 Antlr tool used to generate the parser
 and the Antlr Python3 runtime match.
 E.g., 4.13.0. Using build files will help
-eliminate common errors that happen._
+eliminate common errors from happening._
 
-_For a list of antlr4 tool options, please visit the [ANTLR Tool Command Line Options](https://github.com/antlr/antlr4/blob/master/doc/tool-options.md) documentation._
+_For a list of antlr4 tool options, please visit [ANTLR Tool Command Line Options](https://github.com/antlr/antlr4/blob/master/doc/tool-options.md)._
 * Input, e.g., input.txt:
     ```
     -(1 + 2)/3;
@@ -66,21 +66,23 @@ _For a list of antlr4 tool options, please visit the [ANTLR Tool Command Line Op
     2+3;
     8*9
     ```
-* Run script
-You should provide a script to run your program.
+* A run script, which runs your program.
     ```
     python Driver.py input.txt
     ```
 
 ## Visitors
 
-Antlr listeners and visitors are implementations that traverse a parse tree in unique ways. But both are used to implement
+Antlr listeners and visitors are implementations that traverse a parse tree in slightly different ways.
+Tree traversal is used to implement
 [static](https://en.wikipedia.org/wiki/Static_program_analysis) or [dynamic](https://en.wikipedia.org/wiki/Dynamic_program_analysis)
-program analysis. It is essential to understand when to choose a listener versus a visitor.
+program analysis.
+Understanding when to choose a listener versus a visitor is a good idea.
 For further information, see https://tomassetti.me/listeners-and-visitors/.
-A visitor is the best choice when computing a synthesized attribute.
+A visitor is the best choice when computing only a synthesized attribute.
 Alternatively, a listener is the best choice when computing both synthesized
 and inherited attributes.
+But, in most situations, they are interchangeable.
 
 To implement a visitor, add the `-visitor` option to the `antlr4` command.
 Add a class that inherits from the generated visitor
@@ -157,7 +159,7 @@ For example, the following code implements an expression evaluator for the Expr.
 
 ## Listeners
  
-Antlr listeners are an alternative to implement program analysis. It differs from a visitor in that
+Antlr listeners can be used to implement program analysis. It differs from a visitor in that
 there are `enter` and `exit` methods called during the LR tranversal. You can use this tree walker
 to implement both [inherited](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes)
 and [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
