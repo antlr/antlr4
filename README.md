@@ -78,11 +78,11 @@ ANTLR project lead and supreme dictator for life
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
 * [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python3, JavaScript, Go, C++, Swift, Dart, PHP)
-* __Note: As of version 4.14, we are dropping support for Python 2. We love the Python
+* _Note: As of version 4.14, we are dropping support for Python 2. We love the Python
 community, but Python 2 support was officially halted in Jan 2020. More recently,
 GiHub also dropped support for Python 2, which has made it impossible for us to
 maintain a consistent level of quality across targets (we use GitHub for our CI).
-Long live Python 3!__
+Long live Python 3!_
 * [Java API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration, differences](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md)
