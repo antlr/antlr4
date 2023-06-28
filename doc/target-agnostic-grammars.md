@@ -46,19 +46,21 @@ using _target-agnostic format_.
 
 ## Rules in writing target-agnostic grammars
 
-1) Create target-specific source code files that contain methods in a base class for
+1) You will need to [split your grammar](https://github.com/antlr/antlr4/blob/dev/doc/grammars.md#grammar-structure)
+into separate lexer and parser grammars. Then, add `options { tokenVocab=...; }` to the parser grammar.
+2) Create target-specific source code files that contain methods in a base class for
 the parser or lexer grammar. In these source code files, write the code for the semantic
-predicate. For example, `Python3LexerBase.{cpp,h}`, `Python3ParserBase.{cpp,h}`.
-2) In the grammar(s), add `options { superClass=... }`. This will
+predicate. For example, the files for the Cpp target would be `Python3LexerBase.{cpp,h}`, `Python3ParserBase.{cpp,h}`.
+3) In the grammar(s), add `options { superClass=... }`. This will
 [superclass the recognizer](https://github.com/antlr/antlr4/blob/dev/doc/options.md#superclass).
 For example, `options { superclass=Python3ParserBase; }`.
-3) In the grammar(s), write code to make a single
+4) In the grammar(s), write code to make a single
 call to the base-class method. The call should have a `this.` string
 before the name of the method, e.g., `OPEN_PAREN : '(' {this.openBrace();};`
 The action code must not reference Antlr attributes,
 variables, types, or have semi-colons as statement separators or
 control-flow statements of any kind.
-4) For some targets like Cpp and PHP, you may need to add code to include source
+5) For some targets like Cpp and PHP, you may need to add code to include source
 code files so that the generated code compiles.
 For these, add a comment
 such as `// Insert here @header for lexer include.` or `// Insert here @header for parser include.`
