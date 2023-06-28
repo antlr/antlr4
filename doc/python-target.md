@@ -8,7 +8,7 @@ and https://www.geeksforgeeks.org/how-to-install-pip-on-windows/.
 
 ## A simple example targeting Python3
 
-An example of a parser with the Python3 target consists of the following files.
+An example of a parser for the Python3 target consists of the following files.
 * An Antlr4 grammar, e.g., Expr.g4:
     ```antlr
     grammar Expr;
@@ -19,8 +19,8 @@ An example of a parser with the Python3 target consists of the following files.
     WS : [ \t\n\r]+ -> skip ;
     ```
 * Driver.py:
-The driver code consists at a minimum code to open a file, create a lexer, token stream,
-and parser, then call the parser.
+The driver code opens a file, creates a lexer, token stream,
+and parser, then calls the parser.
     ```python
     import sys
     from antlr4 import *
