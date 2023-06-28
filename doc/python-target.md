@@ -71,22 +71,36 @@ _For a list of antlr4 tool options, please visit [ANTLR Tool Command Line Option
     python Driver.py input.txt
     ```
 
-## Visitors
+## Parse tree traversal
 
-Antlr listeners and visitors are implementations that traverse a parse tree in slightly different ways.
 Tree traversal is used to implement
 [static](https://en.wikipedia.org/wiki/Static_program_analysis) or [dynamic](https://en.wikipedia.org/wiki/Dynamic_program_analysis)
 program analysis.
-Understanding when to choose a listener versus a visitor is a good idea.
+Antlr generates two types of tree traversals: visitors and listeners.
+
+Understanding when to choose a visitor versus a listener is a good idea.
 For further information, see https://tomassetti.me/listeners-and-visitors/.
-A visitor is the best choice when computing only a synthesized attribute.
+
+You can use this tree walker
+to implement both [inherited](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes)
+and [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
+analysis.
+
+A visitor is the best choice when computing only a single synthesized attribute.
 Alternatively, a listener is the best choice when computing both synthesized
 and inherited attributes.
-But, in most situations, they are interchangeable.
+But, in many situations, they are interchangeable.
+
+### Visitors
+
+Antlr visitors generally implement a post-order tree walk. If you write
+`visit...` methods, the method must contain code to visit the children
+in the order you want. For a post-order tree walk, visit the children first.
 
 To implement a visitor, add the `-visitor` option to the `antlr4` command.
-Add a class that inherits from the generated visitor
-with code that implements the analysis.
+Create a class that inherits from the generated visitor,
+then add `visit` methods that implement the analysis. Your driver code
+should call the `visit()` method for the root of the parse tree.
 
 For example, the following code implements an expression evaluator for the Expr.g4 grammar using a visitor.
 
@@ -157,13 +171,11 @@ For example, the following code implements an expression evaluator for the Expr.
             return 0
     ```
 
-## Listeners
- 
-Antlr listeners can be used to implement program analysis. It differs from a visitor in that
-there are `enter` and `exit` methods called during the LR tranversal. You can use this tree walker
-to implement both [inherited](https://en.wikipedia.org/wiki/Attribute_grammar#Inherited_attributes)
-and [synthesized attribute](https://en.wikipedia.org/wiki/Attribute_grammar#Synthesized_attributes)
-analysis.
+### Listeners
+
+Antlr listeners perform an LR tree traversal. `enter` and `exit` methods are
+called during the tranversal. A parse tree node is visited twice, first for
+the `enter` method, then the `exit` method after all children have been walked.
 
 To implement a listener, add the `-listener` option to the `antlr4` command.
 Add a class that inherits from the generated listener
