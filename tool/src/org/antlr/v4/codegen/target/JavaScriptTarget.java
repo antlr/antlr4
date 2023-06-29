@@ -35,7 +35,8 @@ public class JavaScriptTarget extends Target {
 		"null", "true", "false",
 
 		// misc
-		"rule", "parserRule"
+		"rule", "parserRule",
+		"state", "reset"
 	));
 
 	public JavaScriptTarget(CodeGenerator gen) {

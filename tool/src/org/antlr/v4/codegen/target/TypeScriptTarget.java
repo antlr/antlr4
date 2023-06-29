@@ -6,7 +6,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.misc.CharSupport;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -75,7 +74,8 @@ public class TypeScriptTarget extends Target {
 			"while",
 			"with",
 			"yield",
-			"of"
+			"of",
+		    "state", "reset"
 	));
 
 	public TypeScriptTarget(CodeGenerator gen) {
@@ -86,7 +86,7 @@ public class TypeScriptTarget extends Target {
 	protected Set<String> getReservedWords() {
 		return reservedWords;
 	}
-	
+
 	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
