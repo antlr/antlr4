@@ -19,6 +19,7 @@ import java.util.Set;
 
 public class SwiftTarget extends Target {
 	protected static final Map<Character, String> targetCharValueEscape;
+
 	static {
 		// https://docs.swift.org/swift-book/LanguageGuide/StringsAndCharacters.html
 		HashMap<Character, String> map = new HashMap<>();
@@ -32,23 +33,23 @@ public class SwiftTarget extends Target {
 		targetCharValueEscape = map;
 	}
 
-    protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
-            "associatedtype", "class", "deinit", "enum", "extension", "func", "import", "init", "inout", "internal",
-            "let", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var",
-            "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if",
-            "in", "repeat", "return", "switch", "where", "while",
-            "as", "catch", "dynamicType", "false", "is", "nil", "rethrows", "super", "self", "Self", "throw", "throws",
-            "true", "try", "__COLUMN__", "__FILE__", "__FUNCTION__","__LINE__", "#column", "#file", "#function", "#line", "_" , "#available", "#else", "#elseif", "#endif", "#if", "#selector",
-            "associativity", "convenience", "dynamic", "didSet", "final", "get", "infix", "indirect", "lazy",
-            "left", "mutating", "none", "nonmutating", "optional", "override", "postfix", "precedence",
-            "prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet",
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
+		"associatedtype", "class", "deinit", "enum", "extension", "func", "import", "init", "inout", "internal",
+		"let", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var",
+		"break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if",
+		"in", "repeat", "return", "switch", "where", "while",
+		"as", "catch", "dynamicType", "false", "is", "nil", "rethrows", "super", "self", "Self", "throw", "throws",
+		"true", "try", "__COLUMN__", "__FILE__", "__FUNCTION__", "__LINE__", "#column", "#file", "#function", "#line", "_", "#available", "#else", "#elseif", "#endif", "#if", "#selector",
+		"associativity", "convenience", "dynamic", "didSet", "final", "get", "infix", "indirect", "lazy",
+		"left", "mutating", "none", "nonmutating", "optional", "override", "postfix", "precedence",
+		"prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet",
 
-             "rule", "parserRule"
+		"rule", "parserRule"
 	));
 
-    public SwiftTarget(CodeGenerator gen) {
-        super(gen);
-    }
+	public SwiftTarget(CodeGenerator gen) {
+		super(gen);
+	}
 
 	@Override
 	public Map<Character, String> getTargetCharValueEscape() {
@@ -63,16 +64,6 @@ public class SwiftTarget extends Target {
 	@Override
 	protected String escapeWord(String word) {
 		return "`" + word + "`";
-	}
-
-    @Override
-    protected void genFile(Grammar g, ST outputFileST, String fileName) {
-        super.genFile(g,outputFileST,fileName);
-    }
-
-	@Override
-	public boolean isATNSerializedAsInts() {
-		return true;
 	}
 
 	@Override
