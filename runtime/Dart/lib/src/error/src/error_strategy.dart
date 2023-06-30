@@ -10,7 +10,7 @@ import 'package:logging/logging.dart';
 
 import '../../atn/atn.dart';
 import '../../interval_set.dart';
-import '../../misc/pair.dart';
+import '../../misc/misc.dart';
 import '../../parser.dart';
 import '../../parser_rule_context.dart';
 import '../../rule_context.dart';
