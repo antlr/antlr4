@@ -9,7 +9,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 
-import '../../misc/pair.dart';
+import '../../misc/misc.dart';
 import '../../prediction_context.dart';
 import '../../util/bit_set.dart';
 import '../../util/utils.dart';

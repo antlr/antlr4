@@ -6,7 +6,7 @@
 
 import 'input_stream.dart';
 import 'interval_set.dart';
-import 'misc/pair.dart';
+import 'misc/misc.dart';
 import 'token.dart';
 import 'token_source.dart';
 

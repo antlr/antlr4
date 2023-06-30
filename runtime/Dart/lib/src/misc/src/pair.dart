@@ -4,7 +4,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import '../util/murmur_hash.dart';
+import '../../util/murmur_hash.dart';
 
 class Pair<A, B> {
   final A a;

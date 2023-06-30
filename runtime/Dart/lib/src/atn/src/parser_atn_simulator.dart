@@ -13,7 +13,7 @@ import '../../dfa/dfa.dart';
 import '../../error/error.dart';
 import '../../input_stream.dart';
 import '../../interval_set.dart';
-import '../../misc/pair.dart';
+import '../../misc/misc.dart';
 import '../../parser.dart';
 import '../../parser_rule_context.dart';
 import '../../prediction_context.dart';
