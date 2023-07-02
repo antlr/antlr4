@@ -20,6 +20,7 @@ type Lexer interface {
 	Recognizer
 
 	Emit() Token
+	EmitToken(Token)
 
 	SetChannel(int)
 	PushMode(int)
@@ -311,7 +312,7 @@ func (b *BaseLexer) EmitToken(token Token) {
 // /
 func (b *BaseLexer) Emit() Token {
 	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
-	b.EmitToken(t)
+	b.Virt.EmitToken(t)
 	return t
 }
 
