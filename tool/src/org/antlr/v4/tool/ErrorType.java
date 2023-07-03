@@ -1235,6 +1235,18 @@ public enum ErrorType {
 	 */
 	@Deprecated
 	V3_SYNPRED(205, "(...)=> syntactic predicates are not supported in ANTLR 4", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 206.
+	 *
+	 * <p>cannot find actions template file <em>filename</em></p>
+	 */
+	CANNOT_FIND_ACTIONS_TEMPLATE_FILE_GIVEN_ON_CMDLINE(206, "cannot find action templates file <arg> given for <arg2>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 207.
+	 *
+	 * <p>error reading action templates file <em>filename</em>: <em>reason</em></p>
+	 */
+	ERROR_READING_ACTION_TEMPLATES_FILE(207, "error reading action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
 

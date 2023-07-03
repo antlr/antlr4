@@ -27,6 +27,10 @@ import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STGroupString;
+import org.stringtemplate.v4.compiler.STException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +57,10 @@ public class GrammarTransformPipeline {
         integrateImportedGrammars(g);
 		reduceBlocksToSets(root);
         expandParameterizedLoops(root);
+
+		if (g.getActionTemplates() != null)	 {
+			expandActionTemplates(root);
+		}
 
         tool.log("grammar", "after: "+root.toStringTree());
 	}
@@ -509,4 +517,43 @@ public class GrammarTransformPipeline {
 		return lexerAST;
 	}
 
+	public void expandActionTemplates(GrammarRootAST root) {
+		String fileName = root.g.getActionTemplates();
+		try {
+			STGroupFile actionTemplates = new STGroupFile(fileName);
+			TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
+			v.visit(root, new TreeVisitorAction() {
+				@Override
+				public Object pre(Object t) {
+					if (((GrammarAST) t).getType() == ANTLRParser.ACTION) {
+						return expandActionTemplate((GrammarAST) t, actionTemplates);
+					}
+					return t;
+				}
+				@Override
+				public Object post(Object t) {
+					return t;
+				}
+			});
+		} catch (IllegalArgumentException e) {
+			if (e.getMessage() != null && e.getMessage().startsWith("No such group file")) {
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_ACTIONS_TEMPLATE_FILE_GIVEN_ON_CMDLINE, e, fileName, root.g.name);
+			} else {
+				tool.errMgr.toolError(ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e, fileName, e.getMessage());
+			}
+		} catch (STException e) {
+			tool.errMgr.toolError(ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e, fileName, e.getMessage());
+		}
+	}
+
+	public GrammarAST expandActionTemplate(GrammarAST t, STGroupFile actionTemplates) {
+		String grammarFileInfo = t.g.fileName + " " + t.getLine() + 1 + ":" + t.getCharPositionInLine();
+		String actionText = t.getText().substring(1, t.getText().length() - 1);
+		STGroupString actionTemplateGroup = new STGroupString(grammarFileInfo, "action() ::= << " + actionText + " >>");
+		actionTemplateGroup.importTemplates(actionTemplates);
+		ST actionTemplate = actionTemplateGroup.getInstanceOf("action");
+		String expandedTemplate = actionTemplate.render();
+		t.setText(expandedTemplate);
+		return t;
+	}
 }

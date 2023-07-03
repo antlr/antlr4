@@ -172,6 +172,10 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			options.add("-DsuperClass=" + runOptions.superClass);
 		}
 
+		if (runOptions.actionTemplates != null && runOptions.actionTemplates.length() > 0) {
+			options.add("-DactionTemplates=" + runOptions.actionTemplates);
+		}
+
 		// See if the target wants to add tool options.
 		//
 		List<String> targetOpts = getTargetToolOptions(runOptions);
