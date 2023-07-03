@@ -80,7 +80,7 @@ public class TestActionTemplates {
 	}
 
 	@Test void testActionTemplateHeader(@TempDir Path tempDir) {
-		String sb =
+		String actionTemplates =
 			"normalizerImports() ::= <<\n" +
 			"import java.text.Normalizer;\n" +
 			"import java.text.Normalizer.Form;\n" +
@@ -89,9 +89,9 @@ public class TestActionTemplates {
 			"getText() ::= <<getText()>>\n" +
 			"setText(s) ::= <<setText(<s>);>>";
 
-		writeActionTemplatesFile(tempDir, sb);
+		writeActionTemplatesFile(tempDir, actionTemplates);
 
-		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String actionTemplatesFile = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
 			"lexer grammar L;\n"+
@@ -103,7 +103,7 @@ public class TestActionTemplates {
 			"ID_CONTINUE: [\\p{XID_Continue}] ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 
-		State state = execLexer(grammar, "This _is \ufb01ne", tempDir, actionTemplates);
+		State state = execLexer(grammar, "This _is \ufb01ne", tempDir, actionTemplatesFile);
 
 		String expecting =
 			"[@0,0:3='This',<1>,1:0]\n"+
