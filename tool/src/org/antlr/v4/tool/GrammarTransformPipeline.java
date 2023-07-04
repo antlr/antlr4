@@ -537,7 +537,7 @@ public class GrammarTransformPipeline {
 			});
 		} catch (IllegalArgumentException e) {
 			if (e.getMessage() != null && e.getMessage().startsWith("No such group file")) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_ACTIONS_TEMPLATE_FILE_GIVEN_ON_CMDLINE, e, fileName, root.g.name);
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE, e, fileName, root.g.name);
 			} else {
 				tool.errMgr.toolError(ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e, fileName, e.getMessage());
 			}

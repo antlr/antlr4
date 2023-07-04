@@ -1238,9 +1238,9 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 206.
 	 *
-	 * <p>cannot find actions template file <em>filename</em></p>
+	 * <p>cannot find action templates file <em>filename</em></p>
 	 */
-	CANNOT_FIND_ACTIONS_TEMPLATE_FILE_GIVEN_ON_CMDLINE(206, "cannot find action templates file <arg> given for <arg2>", ErrorSeverity.ERROR),
+	CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE(206, "cannot find action templates file <arg> given for <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 207.
 	 *
