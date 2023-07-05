@@ -133,7 +133,7 @@ public class TestActionTemplates {
 
 		assertEquals(
 			"State: Generate; \n" +
-			"error(210):  error rendering action template file " + actionTemplates + ": Java.stg 1:11: mismatched input ':' expecting '::='\n" +
+			"error(209):  error compiling action templates file " + actionTemplates + ": Java.stg 1:11: mismatched input ':' expecting '::='\n" +
 			"error(212): " + grammarFile + ":2:14: error rendering action template: 2:16: no such template: /writeln\n",
 			generated.getErrorMessage());
 	}

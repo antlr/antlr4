@@ -528,12 +528,18 @@ public class GrammarTransformPipeline {
 
 			@Override
 			public void compileTimeError(STMessage stMessage) {
-				reportActionTemplateError(stMessage);
+				errorManager.toolError(
+					ErrorType.ERROR_COMPILING_ACTION_TEMPLATES_FILE,
+					actionTemplateGroupFile.fileName,
+					stMessage.toString());
 			}
 
 			@Override
 			public void runTimeError(STMessage stMessage) {
-				reportActionTemplateError(stMessage);
+				errorManager.toolError(
+					ErrorType.ERROR_RENDERING_ACTION_TEMPLATES_FILE,
+					actionTemplateGroupFile.fileName,
+					stMessage.toString());
 			}
 
 			@Override
@@ -544,13 +550,6 @@ public class GrammarTransformPipeline {
 			@Override
 			public void internalError(STMessage stMessage) {
 				reportInternalError(stMessage);
-			}
-
-			private void reportActionTemplateError(STMessage stMessage) {
-				errorManager.toolError(
-					ErrorType.ERROR_RENDERING_ACTION_TEMPLATE_FILE,
-					actionTemplateGroupFile.fileName,
-					stMessage.toString());
 			}
 
 			private void reportInternalError(STMessage stMessage) {

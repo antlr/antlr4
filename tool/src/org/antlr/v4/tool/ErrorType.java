@@ -1238,13 +1238,13 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 206.
 	 *
-	 * <p>cannot find action templates file <em>filename</em></p>
+	 * <p>cannot find action templates file <em>filename</em> given for <em>grammar</em></p>
 	 */
 	CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE(206, "cannot find action templates file <arg> given for <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 207.
 	 *
-	 * <p>cannot find action tempaltes file <em>filename</em></p>
+	 * <p>cannot find action templates file <em>filename</em></p>
 	 */
 	CANNOT_FIND_ACTION_TEMPLATES_FILE_REFD_IN_GRAMMAR(207, "cannot find action templates file <arg>", ErrorSeverity.ERROR),
 	/**
@@ -1256,15 +1256,15 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 209.
 	 *
-	 * <p>error compiling action template file <em>filename</em>: <em>reason</em></p>
+	 * <p>error compiling action templates file <em>filename</em>: <em>reason</em></p>
 	 */
-	ERROR_COMPILING_ACTION_TEMPLATE_FILE(209, "error compiling action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
+	ERROR_COMPILING_ACTION_TEMPLATES_FILE(209, "error compiling action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 210.
 	 *
-	 * <p>error rendering action template file <em>filename</em>: <em>reason</em></p>
+	 * <p>error rendering action templates file <em>filename</em>: <em>reason</em></p>
 	 */
-	ERROR_RENDERING_ACTION_TEMPLATE_FILE(210, "error rendering action template file <arg>: <arg2>", ErrorSeverity.ERROR),
+	ERROR_RENDERING_ACTION_TEMPLATES_FILE(210, "error rendering action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 211.
 	 *
