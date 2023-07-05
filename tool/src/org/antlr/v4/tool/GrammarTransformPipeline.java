@@ -7,6 +7,7 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
@@ -27,11 +28,12 @@ import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.STGroupString;
+import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.compiler.STException;
+import org.stringtemplate.v4.misc.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -517,16 +519,262 @@ public class GrammarTransformPipeline {
 		return lexerAST;
 	}
 
-	public void expandActionTemplates(GrammarRootAST root) {
-		String fileName = root.g.getActionTemplates();
+	/**
+	 * Create an error listener for .stg action template group files provided via grammar options or via the command line.
+	 */
+	private STErrorListener createActionTemplateErrorListener(GrammarAST ast, STGroupFile actionTemplateGroupFile) {
+		return new STErrorListener() {
+			private final ErrorManager errorManager = ast.g.tool.errMgr;
+
+			@Override
+			public void compileTimeError(STMessage stMessage) {
+				reportActionTemplateError(stMessage);
+			}
+
+			@Override
+			public void runTimeError(STMessage stMessage) {
+				reportActionTemplateError(stMessage);
+			}
+
+			@Override
+			public void IOError(STMessage stMessage) {
+				reportInternalError(stMessage);
+			}
+
+			@Override
+			public void internalError(STMessage stMessage) {
+				reportInternalError(stMessage);
+			}
+
+			private void reportActionTemplateError(STMessage stMessage) {
+				errorManager.toolError(
+					ErrorType.ERROR_RENDERING_ACTION_TEMPLATE_FILE,
+					actionTemplateGroupFile.fileName,
+					stMessage.toString());
+			}
+
+			private void reportInternalError(STMessage stMessage) {
+				errorManager.toolError(ErrorType.INTERNAL_ERROR, stMessage.cause, stMessage.toString());
+			}
+		};
+	}
+
+	/**
+	 * Create an error listener for action templates embedded inside a grammar's actions and semantic predicates.
+	 */
+	private STErrorListener createGrammarErrorListener(GrammarAST ast) {
+		return new STErrorListener() {
+			private final ErrorManager errorManager = ast.g.tool.errMgr;
+
+			/**
+			 * Get the STCompiletimeMesage error message content, translating the source location
+			 * according to the action token's position in the grammar.
+			 */
+			private String getSTCompiletimeErrorMessage(STCompiletimeMessage stMsg) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+
+				if (stMsg.token != null) {
+					int linePos = ast.getLine() + stMsg.token.getLine() - 1;
+					int charPos = stMsg.token.getCharPositionInLine();
+					if (stMsg.token.getLine() == 1) {
+						charPos += ast.getCharPositionInLine();
+					}
+					pw.print(linePos + ":" + charPos + ": ");
+				}
+
+				String msg = String.format(stMsg.error.message, stMsg.arg, stMsg.arg2);
+
+				pw.print(msg);
+
+				return sw.toString();
+			}
+
+			/**
+			 * Get the STLexerMessage error message content, translating the source location
+			 * according to the action token's position in the grammar.
+			 */
+			private String getSTLexerErrorMessage(STLexerMessage stMsg) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+
+				// From STLexerMessage.toString
+				RecognitionException re = (RecognitionException)stMsg.cause;
+				int linePos = ast.getLine() + re.line - 1;
+				int charPos = re.charPositionInLine;
+				if (re.line == 1) {
+					charPos += ast.getCharPositionInLine();
+				}
+				pw.print(linePos + ":" + charPos + ": ");
+
+				String msg = String.format(stMsg.error.message, stMsg.msg);
+
+				pw.print(msg);
+
+				return sw.toString();
+			}
+
+			@Override
+			public void compileTimeError(STMessage stMessage) {
+				if (stMessage instanceof STCompiletimeMessage) {
+					STCompiletimeMessage compileMessage = (STCompiletimeMessage) stMessage;
+					errorManager.grammarError(ErrorType.ERROR_COMPILING_ACTION_TEMPLATE, ast.g.fileName, ast.getToken(), getSTCompiletimeErrorMessage(compileMessage));
+				}
+				else if (stMessage instanceof STLexerMessage) {
+					STLexerMessage lexerMessage = (STLexerMessage) stMessage;
+					errorManager.grammarError(ErrorType.ERROR_COMPILING_ACTION_TEMPLATE, ast.g.fileName, ast.getToken(), getSTLexerErrorMessage(lexerMessage));
+				}
+				else {
+					errorManager.grammarError(ErrorType.ERROR_COMPILING_ACTION_TEMPLATE, ast.g.fileName, ast.getToken(), stMessage.toString());
+				}
+			}
+
+			/**
+			 * Get the STRuntimeMessage error location Coordinate.
+			 */
+			private Coordinate getSTRuntimeMessageSourceLocation(STRuntimeMessage msg) {
+				// From STRuntimeMessage.getSourceLocation
+				if (msg.ip >= 0 && msg.self != null && msg.self.impl != null) {
+					Interval I = msg.self.impl.sourceMap[msg.ip];
+					if (I == null) {
+						return null;
+					} else {
+						int i = I.a;
+						return Misc.getLineCharPosition(msg.self.impl.template, i);
+					}
+				} else {
+					return null;
+				}
+			}
+
+			/**
+			 * Get the STRuntimeMessage error message content, translating the source location
+			 * according to the action token's position in the grammar.
+			 */
+			private String getSTRuntimeErrorMessage(STRuntimeMessage stMsg) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				Coordinate coord = getSTRuntimeMessageSourceLocation(stMsg);
+
+				if (coord != null) {
+					int linePos = ast.getLine() + coord.line - 1;
+					int charPos = coord.charPosition;
+					if (coord.line == 1) {
+						charPos += ast.getCharPositionInLine();
+					}
+					pw.print(linePos + ":" + charPos + ": ");
+				}
+
+				// From STMessage.toString
+				String msg = String.format(stMsg.error.message, stMsg.arg, stMsg.arg2, stMsg.arg3);
+
+				pw.print(msg);
+
+				if (stMsg.cause != null) {
+					pw.print("\nCaused by: ");
+					stMsg.cause.printStackTrace(pw);
+				}
+
+				return sw.toString();
+			}
+
+			@Override
+			public void runTimeError(STMessage stMessage) {
+				if (stMessage instanceof STRuntimeMessage) {
+					STRuntimeMessage runtimeMessage = (STRuntimeMessage) stMessage;
+					errorManager.grammarError(
+						ErrorType.ERROR_RENDERING_ACTION_TEMPLATE,
+						ast.g.fileName,
+						ast.getToken(),
+						getSTRuntimeErrorMessage(runtimeMessage));
+				} else {
+					errorManager.grammarError(
+						ErrorType.ERROR_RENDERING_ACTION_TEMPLATE,
+						ast.g.fileName,
+						ast.getToken(),
+						stMessage.toString());
+				}
+			}
+
+			@Override
+			public void IOError(STMessage stMessage) {
+				reportError(stMessage);
+			}
+
+			@Override
+			public void internalError(STMessage stMessage) {
+				reportError(stMessage);
+			}
+
+			private void reportError(STMessage stMessage) {
+				errorManager.toolError(ErrorType.INTERNAL_ERROR, stMessage.cause, stMessage.toString());
+			}
+		};
+	}
+
+	public STGroupFile loadActionTemplatesGroupFile(GrammarRootAST root) {
+		Grammar grammar = root.g;
+		ErrorManager errorManager = grammar.tool.errMgr;
+		String actionTemplatesFile = grammar.getActionTemplates();
+
 		try {
-			STGroupFile actionTemplates = new STGroupFile(fileName);
-			TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
-			v.visit(root, new TreeVisitorAction() {
+			STGroupFile actionTemplates = new STGroupFile(actionTemplatesFile);
+			STErrorListener errorListener = createActionTemplateErrorListener(root, actionTemplates);
+
+			// Force load the action templates group file
+			actionTemplates.setListener(errorListener);
+			actionTemplates.load();
+
+			return actionTemplates;
+
+		} catch (IllegalArgumentException e) {
+			if (e.getMessage() != null && e.getMessage().startsWith("No such group file")) {
+				// Check whether this action template file came from options in the grammar file
+				GrammarAST optionAST = root.getOptionAST("actionTemplates");
+
+				if (optionAST != null && actionTemplatesFile.equals(optionAST.getToken().getText())) {
+					errorManager.grammarError(
+						ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_REFD_IN_GRAMMAR,
+						grammar.fileName,
+						optionAST.getToken(), actionTemplatesFile);
+				} else {
+					errorManager.toolError(
+						ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE,
+						actionTemplatesFile,
+						grammar.name);
+				}
+
+			} else {
+				errorManager.toolError(
+					ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e,
+					actionTemplatesFile,
+					e.getMessage());
+			}
+		} catch (STException e) {
+			errorManager.toolError(
+				ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e,
+				actionTemplatesFile,
+				e.getMessage());
+		}
+
+		return null;
+	}
+
+	public void expandActionTemplates(GrammarRootAST root) {
+		Grammar grammar = root.g;
+		ErrorManager errorManager = grammar.tool.errMgr;
+
+		STGroupFile actionTemplates = loadActionTemplatesGroupFile(root);
+
+		if (actionTemplates != null) {
+			TreeVisitor visitor = new TreeVisitor(new GrammarASTAdaptor());
+			visitor.visit(root, new TreeVisitorAction() {
 				@Override
 				public Object pre(Object t) {
-					if (((GrammarAST) t).getType() == ANTLRParser.ACTION) {
-						return expandActionTemplate((GrammarAST) t, actionTemplates);
+					GrammarAST grammarAST = (GrammarAST) t;
+					int tokenType = grammarAST.getType();
+					if (tokenType == ANTLRParser.ACTION || tokenType == ANTLRParser.SEMPRED) {
+						return expandActionTemplate((GrammarAST) t, errorManager, actionTemplates);
 					}
 					return t;
 				}
@@ -535,25 +783,31 @@ public class GrammarTransformPipeline {
 					return t;
 				}
 			});
-		} catch (IllegalArgumentException e) {
-			if (e.getMessage() != null && e.getMessage().startsWith("No such group file")) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE, e, fileName, root.g.name);
-			} else {
-				tool.errMgr.toolError(ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e, fileName, e.getMessage());
-			}
-		} catch (STException e) {
-			tool.errMgr.toolError(ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e, fileName, e.getMessage());
 		}
 	}
 
-	public GrammarAST expandActionTemplate(GrammarAST t, STGroupFile actionTemplates) {
-		String grammarFileInfo = t.g.fileName + " " + t.getLine() + 1 + ":" + t.getCharPositionInLine();
-		String actionText = t.getText().substring(1, t.getText().length() - 1);
-		STGroupString actionTemplateGroup = new STGroupString(grammarFileInfo, "action() ::= << " + actionText + " >>");
-		actionTemplateGroup.importTemplates(actionTemplates);
+	public GrammarAST expandActionTemplate(GrammarAST ast, ErrorManager errMgr, STGroupFile actionTemplateGroupFile) {
+		// Trim the curly braces and trailing question mark
+		// from an action or semantic predicate
+		String actionText = ast.getText()
+			.substring(1,
+				ast.getType() == ANTLRParser.SEMPRED
+					? ast.getText().length() - 2
+					: ast.getText().length() - 1);
+
+		STGroupString actionTemplateGroup = new STGroupString(
+			ast.g.fileName, "action() ::= << " + actionText + " >>");
+
+		actionTemplateGroup.importTemplates(actionTemplateGroupFile);
+
+		actionTemplateGroup.setListener(createGrammarErrorListener(ast));
+
 		ST actionTemplate = actionTemplateGroup.getInstanceOf("action");
-		String expandedTemplate = actionTemplate.render();
-		t.setText(expandedTemplate);
-		return t;
+
+		if (actionTemplate != null) {
+			ast.setText(actionTemplate.render());
+		}
+
+		return ast;
 	}
 }

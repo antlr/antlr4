@@ -27,11 +27,14 @@ public class TestActionTemplates {
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
 		assertInstanceOf(GeneratedState.class, state);
+
 		GeneratedState generated = (GeneratedState) state;
+
 		assertTrue(generated.containsErrors());
+
 		assertEquals(
 			"State: Generate; \n" +
-			"error(207):  error reading action templates file " + actionTemplates + ": " +
+			"error(208):  error reading action templates file " + actionTemplates + ": " +
 			"Group file names must end in .stg: " + actionTemplates + "\n",
 			generated.getErrorMessage());
 	}
@@ -46,15 +49,144 @@ public class TestActionTemplates {
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
 		assertInstanceOf(GeneratedState.class, state);
+
 		GeneratedState generated = (GeneratedState) state;
+
 		assertTrue(generated.containsErrors());
+
 		assertEquals(
 			"State: Generate; \n" +
 			"error(206):  cannot find action templates file " + actionTemplates + " given for L\n",
 			generated.getErrorMessage());
 	}
 
-	@Test void testActionTemplateLexerAction(@TempDir Path tempDir) {
+	@Test void testUnlexableActionTemplate(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String grammarFile = tempDir + FileSeparator + "L.g4";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {<¢>} ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		assertInstanceOf(GeneratedState.class, state);
+
+		GeneratedState generated = (GeneratedState) state;
+
+		assertTrue(generated.containsErrors());
+
+		assertEquals(
+			"State: Generate; \n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 2:16: invalid character '¢'\n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 2:14: this doesn't look like a template: \" <¢> \"\n",
+			generated.getErrorMessage());
+	}
+
+	@Test void testUnlexableMultilineActionTemplate(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String grammarFile = tempDir + FileSeparator + "L.g4";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {\n" +
+			"  <¢>\n" +
+			"};\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		assertInstanceOf(GeneratedState.class, state);
+
+		GeneratedState generated = (GeneratedState) state;
+
+		assertTrue(generated.containsErrors());
+
+		assertEquals(
+			"State: Generate; \n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 3:3: invalid character '¢'\n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 3:0: mismatched input '  ' expecting EOF\n",
+			generated.getErrorMessage());
+	}
+
+	@Test void testInvalidActionTemplateGroup(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) := <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String grammarFile = tempDir + FileSeparator + "L.g4";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		GeneratedState generated = (GeneratedState) state;
+
+		assertTrue(generated.containsErrors());
+
+		assertEquals(
+			"State: Generate; \n" +
+			"error(210):  error rendering action template file " + actionTemplates + ": Java.stg 1:11: mismatched input ':' expecting '::='\n" +
+			"error(212): " + grammarFile + ":2:14: error rendering action template: 2:16: no such template: /writeln\n",
+			generated.getErrorMessage());
+	}
+
+	@Test void testInvalidActionTemplate(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String grammarFile = tempDir + FileSeparator + "L.g4";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {<writeln(\"I\")} ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		GeneratedState generated = (GeneratedState) state;
+
+		assertTrue(generated.containsErrors());
+
+		assertEquals(
+			"State: Generate; \n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 2:29: premature EOF\n",
+			generated.getErrorMessage());
+	}
+
+	@Test void testInvalidMultilineActionTemplate(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+		String grammarFile = tempDir + FileSeparator + "L.g4";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {\n"+
+			"  <writeln(\"I\")\n"+
+			"};\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		GeneratedState generated = (GeneratedState) state;
+
+		assertTrue(generated.containsErrors());
+
+		assertEquals(
+			"State: Generate; \n" +
+			"error(211): " + grammarFile + ":2:14: error compiling action template: 4:1: premature EOF\n",
+			generated.getErrorMessage());
+	}
+
+	@Test void testValidActionTemplate(@TempDir Path tempDir) {
 		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
 
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
@@ -62,6 +194,33 @@ public class TestActionTemplates {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
+
+		// Should have identical output to TestLexerActions.testActionExecutedInDFA
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<1>,1:0]\n" +
+			"[@1,3:4='34',<1>,1:3]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+
+		assertInstanceOf(ExecutedState.class, state);
+
+		assertEquals(expecting, ((ExecutedState) state).output);
+	}
+
+	@Test void testValidMultilineActionTemplate(@TempDir Path tempDir) {
+		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = tempDir + FileSeparator + "Java.stg";
+
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {\n"+
+			"  <writeln(\"I\")>\n"+
+			"};\n"+
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);

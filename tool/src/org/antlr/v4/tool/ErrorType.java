@@ -1244,9 +1244,39 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 207.
 	 *
+	 * <p>cannot find action tempaltes file <em>filename</em></p>
+	 */
+	CANNOT_FIND_ACTION_TEMPLATES_FILE_REFD_IN_GRAMMAR(207, "cannot find action templates file <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 208.
+	 *
 	 * <p>error reading action templates file <em>filename</em>: <em>reason</em></p>
 	 */
-	ERROR_READING_ACTION_TEMPLATES_FILE(207, "error reading action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
+	ERROR_READING_ACTION_TEMPLATES_FILE(208, "error reading action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 209.
+	 *
+	 * <p>error compiling action template file <em>filename</em>: <em>reason</em></p>
+	 */
+	ERROR_COMPILING_ACTION_TEMPLATE_FILE(209, "error compiling action templates file <arg>: <arg2>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 210.
+	 *
+	 * <p>error rendering action template file <em>filename</em>: <em>reason</em></p>
+	 */
+	ERROR_RENDERING_ACTION_TEMPLATE_FILE(210, "error rendering action template file <arg>: <arg2>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 211.
+	 *
+	 * <p>error compiling action template: <em>reason</em></p>
+	 */
+	ERROR_COMPILING_ACTION_TEMPLATE(211, "error compiling action template: <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 212.
+	 *
+	 * <p>error rendering action template: <em>reason</em></p>
+	 */
+	ERROR_RENDERING_ACTION_TEMPLATE(212, "error rendering action template: <arg>", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
 
