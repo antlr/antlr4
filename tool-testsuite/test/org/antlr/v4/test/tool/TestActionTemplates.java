@@ -5,6 +5,7 @@ import org.antlr.v4.test.runtime.Stage;
 import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
+import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.antlr.v4.test.runtime.states.State;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -275,8 +276,52 @@ public class TestActionTemplates {
 		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
+	@Test
+	void testActionTemplateSemanticPredicate(@TempDir Path tempDir) {
+		String actionTemplates = "pred() ::= <<true>>";
+
+		writeActionTemplatesFile(tempDir, actionTemplates);
+
+		String actionTemplatesFile = tempDir + FileSeparator + "Java.stg";
+
+		String grammar =
+			"grammar P;\n"+
+			"file : atom EOF ;\n"+
+			"atom : scientific | { <pred()> }? variable ;\n"+
+			"variable: VARIABLE ;\n"+
+			"scientific: SCIENTIFIC_NUMBER ;\n"+
+			"VARIABLE : VALID_ID_START VALID_ID_CHAR* ;\n" +
+			"SCIENTIFIC_NUMBER : NUMBER (E SIGN? UNSIGNED_INTEGER)? ;\n"+
+			"fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_' ;\n"+
+			"fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;\n"+
+			"fragment NUMBER : ('0' .. '9') + ('.' ('0' .. '9') +)? ;\n"+
+			"fragment UNSIGNED_INTEGER : ('0' .. '9')+ ;\n"+
+			"fragment E : 'E' | 'e' ;\n"+
+			"fragment SIGN : ('+' | '-') ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execParser(grammar, "Bla", tempDir, "file", actionTemplatesFile);
+
+		assertInstanceOf(ExecutedState.class, state);
+
+		ExecutedState executedState = (ExecutedState) state;
+
+		// We can never match the input unless pred() expands to true
+		assertEquals("", executedState.output);
+		assertEquals("", executedState.errors);
+	}
+
 	void writeActionTemplatesFile(Path tempDir, String template) {
 		writeFile(tempDir.toString(), "Java.stg", template);
+	}
+
+	State execParser(String grammarStr, String input, Path tempDir, String startRule, String actionTemplates) {
+		RunOptions runOptions = createOptionsForJavaToolTests("P.g4", grammarStr, "PParser", "PLexer",
+			false, true, startRule, input,
+			false, false, Stage.Execute, actionTemplates);
+		try (JavaRunner runner = new JavaRunner(tempDir, false)) {
+			return runner.run(runOptions);
+		}
 	}
 
 	State execLexer(String grammarStr, String input, Path tempDir, String actionTemplates) {
