@@ -32,6 +32,7 @@ import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.compiler.STException;
 import org.stringtemplate.v4.misc.*;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -711,10 +712,62 @@ public class GrammarTransformPipeline {
 		};
 	}
 
+	public File getActionTemplatesGroupFile(GrammarRootAST root, String actionTemplates) {
+		// Try for an absolute path
+		File importedFile = new File(actionTemplates);
+
+		if (!importedFile.exists()) {
+			// Next try the input directory
+			importedFile = new File(root.g.tool.inputDirectory, actionTemplates);
+			if (!importedFile.exists()) {
+				// Next try the parent directory of the grammar file
+				File grammarFile = new File(root.g.fileName);
+				String parentDir = grammarFile.getParent();
+				importedFile = new File(parentDir, actionTemplates);
+				if (!importedFile.exists()) {
+					// Next try the lib directory
+					importedFile = new File(root.g.tool.libDirectory, actionTemplates);
+					if (!importedFile.exists()) {
+						return null;
+					}
+				}
+			}
+		}
+
+		return importedFile;
+	}
+
+	public void cannotFindActionTemplatesFileError(GrammarRootAST root) {
+		Grammar grammar = root.g;
+		ErrorManager errorManager = grammar.tool.errMgr;
+		String actionTemplatesFile = grammar.getActionTemplates();
+
+		// Check whether this action template file came from options in the grammar file
+		GrammarAST optionAST = root.getOptionAST("actionTemplates");
+
+		if (optionAST != null && actionTemplatesFile.equals(optionAST.getToken().getText())) {
+			errorManager.grammarError(
+				ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_REFD_IN_GRAMMAR,
+				grammar.fileName,
+				optionAST.getToken(), actionTemplatesFile);
+		} else {
+			errorManager.toolError(
+				ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE,
+				actionTemplatesFile,
+				grammar.name);
+		}
+	}
+
 	public STGroupFile loadActionTemplatesGroupFile(GrammarRootAST root) {
 		Grammar grammar = root.g;
 		ErrorManager errorManager = grammar.tool.errMgr;
 		String actionTemplatesFile = grammar.getActionTemplates();
+		File actionTemplatesGroupFile = getActionTemplatesGroupFile(root, actionTemplatesFile);
+
+		if (actionTemplatesGroupFile == null) {
+			cannotFindActionTemplatesFileError(root);
+			return null;
+		}
 
 		try {
 			STGroupFile actionTemplates = new STGroupFile(actionTemplatesFile);
@@ -728,21 +781,7 @@ public class GrammarTransformPipeline {
 
 		} catch (IllegalArgumentException e) {
 			if (e.getMessage() != null && e.getMessage().startsWith("No such group file")) {
-				// Check whether this action template file came from options in the grammar file
-				GrammarAST optionAST = root.getOptionAST("actionTemplates");
-
-				if (optionAST != null && actionTemplatesFile.equals(optionAST.getToken().getText())) {
-					errorManager.grammarError(
-						ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_REFD_IN_GRAMMAR,
-						grammar.fileName,
-						optionAST.getToken(), actionTemplatesFile);
-				} else {
-					errorManager.toolError(
-						ErrorType.CANNOT_FIND_ACTION_TEMPLATES_FILE_GIVEN_ON_CMDLINE,
-						actionTemplatesFile,
-						grammar.name);
-				}
-
+				cannotFindActionTemplatesFileError(root);
 			} else {
 				errorManager.toolError(
 					ErrorType.ERROR_READING_ACTION_TEMPLATES_FILE, e,

@@ -5,7 +5,6 @@ import org.antlr.v4.test.runtime.Stage;
 import org.antlr.v4.test.runtime.java.JavaRunner;
 import org.antlr.v4.test.runtime.states.ExecutedState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
-import org.antlr.v4.test.runtime.states.JavaCompiledState;
 import org.antlr.v4.test.runtime.states.State;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,7 +17,9 @@ import static org.antlr.v4.test.tool.ToolTestUtils.createOptionsForJavaToolTests
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestActionTemplates {
-	@Test() void testIncorrectActionTemplateGroupExtension(@TempDir Path tempDir) {
+	@Test void testIncorrectActionTemplateGroupExtension(@TempDir Path tempDir) {
+		writeFile(tempDir.toString(), "Java.st", "");
+
 		String actionTemplates = tempDir + FileSeparator + "Java.st";
 
 		String grammar =
@@ -40,7 +41,7 @@ public class TestActionTemplates {
 			generated.getErrorMessage());
 	}
 
-	@Test() void testActionTemplateFileMissing(@TempDir Path tempDir) {
+	@Test void testActionTemplateFileMissing(@TempDir Path tempDir) {
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
@@ -276,8 +277,7 @@ public class TestActionTemplates {
 		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
-	@Test
-	void testActionTemplateSemanticPredicate(@TempDir Path tempDir) {
+	@Test void testActionTemplateSemanticPredicate(@TempDir Path tempDir) {
 		String actionTemplates = "pred() ::= <<true>>";
 
 		writeActionTemplatesFile(tempDir, actionTemplates);
