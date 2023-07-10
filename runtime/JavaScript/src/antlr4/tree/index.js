@@ -3,12 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+import AbstractParseTreeVisitor from './AbstractParseTreeVisitor.js';
 import RuleNode from './RuleNode.js';
 import ErrorNode from './ErrorNode.js';
 import TerminalNode from './TerminalNode.js';
 import ParseTreeListener from './ParseTreeListener.js';
-import ParseTreeVisitor from './ParseTreeVisitor.js';
 import ParseTreeWalker from './ParseTreeWalker.js';
 import { default as Trees } from './Trees.js';
 
-export default { Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker }
+export default { AbstractParseTreeVisitor, Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeWalker }
