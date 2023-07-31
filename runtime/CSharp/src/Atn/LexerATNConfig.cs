@@ -92,12 +92,12 @@ namespace Antlr4.Runtime.Atn
 			{
 				return true;
 			}
-			else if (!(other is LexerATNConfig))
+
+			if (!(other is LexerATNConfig lexerOther))
 			{
 				return false;
 			}
 
-			LexerATNConfig lexerOther = (LexerATNConfig)other;
 			if (passedThroughNonGreedyDecision != lexerOther.passedThroughNonGreedyDecision)
 			{
 				return false;
@@ -108,13 +108,13 @@ namespace Antlr4.Runtime.Atn
 				return false;
 			}
 
-			return base.Equals(other);
+			return base.Equals(lexerOther);
 		}
 
 		private static bool checkNonGreedyDecision(LexerATNConfig source, ATNState target)
 		{
 			return source.passedThroughNonGreedyDecision
-				|| target is DecisionState && ((DecisionState)target).nonGreedy;
+				|| target is DecisionState decisionState && decisionState.nonGreedy;
 		}
 	}
 }

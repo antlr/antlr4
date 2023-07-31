@@ -61,13 +61,12 @@ namespace Antlr4.Runtime.Misc
 
         public override bool Equals(object o)
         {
-            if (!(o is Antlr4.Runtime.Misc.Interval))
+            if (!(o is Interval other))
             {
                 return false;
             }
 
-            Antlr4.Runtime.Misc.Interval other = (Antlr4.Runtime.Misc.Interval)o;
-            return this.a == other.a && this.b == other.b;
+            return a == other.a && b == other.b;
         }
 
         public override int GetHashCode()

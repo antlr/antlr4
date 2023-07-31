@@ -157,21 +157,21 @@ namespace Antlr4.Runtime
             }
             // don't report spurious errors
             BeginErrorCondition(recognizer);
-            if (e is NoViableAltException)
+            if (e is NoViableAltException exception)
             {
-                ReportNoViableAlternative(recognizer, (NoViableAltException)e);
+                ReportNoViableAlternative(recognizer, exception);
             }
             else
             {
-                if (e is InputMismatchException)
+                if (e is InputMismatchException mismatchException)
                 {
-                    ReportInputMismatch(recognizer, (InputMismatchException)e);
+                    ReportInputMismatch(recognizer, mismatchException);
                 }
                 else
                 {
-                    if (e is FailedPredicateException)
+                    if (e is FailedPredicateException predicateException)
                     {
-                        ReportFailedPredicate(recognizer, (FailedPredicateException)e);
+                        ReportFailedPredicate(recognizer, predicateException);
                     }
                     else
                     {

@@ -220,11 +220,11 @@ namespace Antlr4.Runtime.Atn
                 foreach (ILexerAction lexerAction in lexerActions)
                 {
                     ILexerAction action = lexerAction;
-                    if (action is LexerIndexedCustomAction)
+                    if (action is LexerIndexedCustomAction customAction)
                     {
-                        int offset = ((LexerIndexedCustomAction)action).Offset;
+                        int offset = customAction.Offset;
                         input.Seek(startIndex + offset);
-                        action = ((LexerIndexedCustomAction)action).Action;
+                        action = customAction.Action;
                         requiresSeek = (startIndex + offset) != stopIndex;
                     }
                     else
@@ -258,14 +258,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return true;
             }
-            else
+
+            if (!(obj is LexerActionExecutor other))
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerActionExecutor))
-                {
-                    return false;
-                }
+                return false;
             }
-            Antlr4.Runtime.Atn.LexerActionExecutor other = (Antlr4.Runtime.Atn.LexerActionExecutor)obj;
+
             return hashCode == other.hashCode && Arrays.Equals(lexerActions, other.lexerActions);
         }
     }

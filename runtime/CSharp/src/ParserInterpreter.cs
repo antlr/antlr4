@@ -54,13 +54,13 @@ namespace Antlr4.Runtime
             this.pushRecursionContextStates = new BitSet(atn.states.Count);
             foreach (ATNState state in atn.states)
             {
-                if (!(state is StarLoopEntryState))
+                if (!(state is StarLoopEntryState entryState))
                 {
                     continue;
                 }
-				if (((StarLoopEntryState)state).isPrecedenceDecision)
+				if (entryState.isPrecedenceDecision)
                 {
-                    this.pushRecursionContextStates.Set(state.stateNumber);
+                    pushRecursionContextStates.Set(entryState.stateNumber);
                 }
             }
 			

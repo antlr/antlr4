@@ -399,24 +399,21 @@ namespace Antlr4.Runtime.Tree.Pattern
                 throw new ArgumentException("patternTree cannot be null");
             }
             // x and <ID>, x and y, or x and x; or could be mismatched types
-            if (tree is ITerminalNode && patternTree is ITerminalNode)
+            if (tree is ITerminalNode t1 && patternTree is ITerminalNode t2)
             {
-                ITerminalNode t1 = (ITerminalNode)tree;
-                ITerminalNode t2 = (ITerminalNode)patternTree;
                 IParseTree mismatchedNode = null;
                 // both are tokens and they have same type
                 if (t1.Symbol.Type == t2.Symbol.Type)
                 {
-                    if (t2.Symbol is TokenTagToken)
+                    if (t2.Symbol is TokenTagToken tokenTagToken)
                     {
                         // x and <ID>
-                        TokenTagToken tokenTagToken = (TokenTagToken)t2.Symbol;
                         // track label->list-of-nodes for both token name and label (if any)
 
-                        labels.Map(tokenTagToken.TokenName, tree);
+                        labels.Map(tokenTagToken.TokenName, t1);
                         if (tokenTagToken.Label != null)
                         {
-                            labels.Map(tokenTagToken.Label, tree);
+                            labels.Map(tokenTagToken.Label, t1);
                         }
                     }
                     else
@@ -444,10 +441,8 @@ namespace Antlr4.Runtime.Tree.Pattern
                 }
                 return mismatchedNode;
             }
-            if (tree is ParserRuleContext && patternTree is ParserRuleContext)
+            if (tree is ParserRuleContext r1 && patternTree is ParserRuleContext r2)
             {
-                ParserRuleContext r1 = (ParserRuleContext)tree;
-                ParserRuleContext r2 = (ParserRuleContext)patternTree;
                 IParseTree mismatchedNode = null;
                 // (expr ...) and <expr>
                 RuleTagToken ruleTagToken = GetRuleTagToken(r2);
@@ -456,10 +451,10 @@ namespace Antlr4.Runtime.Tree.Pattern
                     if (r1.RuleIndex == r2.RuleIndex)
                     {
                         // track label->list-of-nodes for both rule name and label (if any)
-                        labels.Map(ruleTagToken.RuleName, tree);
+                        labels.Map(ruleTagToken.RuleName, r1);
                         if (ruleTagToken.Label != null)
                         {
-                            labels.Map(ruleTagToken.Label, tree);
+                            labels.Map(ruleTagToken.Label, r1);
                         }
                     }
                     else
@@ -504,16 +499,15 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </summary>
         protected internal virtual RuleTagToken GetRuleTagToken(IParseTree t)
         {
-            if (t is IRuleNode)
+            if (t is IRuleNode node)
             {
-                IRuleNode r = (IRuleNode)t;
-                if (r.ChildCount == 1 && r.GetChild(0) is ITerminalNode)
+                if (node.ChildCount == 1 && node.GetChild(0) is ITerminalNode)
                 {
-                    ITerminalNode c = (ITerminalNode)r.GetChild(0);
-                    if (c.Symbol is RuleTagToken)
+                    ITerminalNode c = (ITerminalNode)node.GetChild(0);
+                    if (c.Symbol is RuleTagToken token)
                     {
                         //					System.out.println("rule tag subtree "+t.toStringTree(parser));
-                        return (RuleTagToken)c.Symbol;
+                        return token;
                     }
                 }
             }
@@ -528,9 +522,8 @@ namespace Antlr4.Runtime.Tree.Pattern
             IList<IToken> tokens = new List<IToken>();
             foreach (Chunk chunk in chunks)
             {
-                if (chunk is TagChunk)
+                if (chunk is TagChunk tagChunk)
                 {
-                    TagChunk tagChunk = (TagChunk)chunk;
                     // add special rule token or conjure up new token from name
                     if (System.Char.IsUpper(tagChunk.Tag[0]))
                     {
@@ -691,9 +684,8 @@ namespace Antlr4.Runtime.Tree.Pattern
             for (int i_2 = 0; i_2 < chunks.Count; i_2++)
             {
                 Chunk c = chunks[i_2];
-                if (c is TextChunk)
+                if (c is TextChunk tc)
                 {
-                    TextChunk tc = (TextChunk)c;
                     string unescaped = tc.Text.Replace(escape, string.Empty);
                     if (unescaped.Length < tc.Text.Length)
                     {

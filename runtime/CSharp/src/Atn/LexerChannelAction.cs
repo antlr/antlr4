@@ -111,14 +111,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return true;
             }
-            else
+
+            if (!(obj is LexerChannelAction action))
             {
-                if (!(obj is Antlr4.Runtime.Atn.LexerChannelAction))
-                {
-                    return false;
-                }
+                return false;
             }
-            return channel == ((Antlr4.Runtime.Atn.LexerChannelAction)obj).channel;
+            return channel == action.channel;
         }
 
         public override string ToString()

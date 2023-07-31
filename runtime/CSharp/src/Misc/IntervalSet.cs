@@ -203,9 +203,8 @@ namespace Antlr4.Runtime.Misc
             {
                 return this;
             }
-            if (set is Antlr4.Runtime.Misc.IntervalSet)
+            if (set is IntervalSet other)
             {
-                Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)set;
                 // walk set and add each interval
                 int n = other.intervals.Count;
                 for (int i = 0; i < n; i++)
@@ -240,10 +239,10 @@ namespace Antlr4.Runtime.Misc
                 return null;
             }
             // nothing in common with null set
-            Antlr4.Runtime.Misc.IntervalSet vocabularyIS;
-            if (vocabulary is Antlr4.Runtime.Misc.IntervalSet)
+            IntervalSet vocabularyIS;
+            if (vocabulary is IntervalSet set)
             {
-                vocabularyIS = (Antlr4.Runtime.Misc.IntervalSet)vocabulary;
+                vocabularyIS = set;
             }
             else
             {
@@ -259,9 +258,9 @@ namespace Antlr4.Runtime.Misc
             {
                 return new Antlr4.Runtime.Misc.IntervalSet(this);
             }
-            if (a is Antlr4.Runtime.Misc.IntervalSet)
+            if (a is IntervalSet set)
             {
-                return Subtract(this, (Antlr4.Runtime.Misc.IntervalSet)a);
+                return Subtract(this, set);
             }
             Antlr4.Runtime.Misc.IntervalSet other = new Antlr4.Runtime.Misc.IntervalSet();
             other.AddAll(a);
@@ -600,12 +599,12 @@ namespace Antlr4.Runtime.Misc
         /// </remarks>
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Antlr4.Runtime.Misc.IntervalSet))
+            if (obj == null || !(obj is Antlr4.Runtime.Misc.IntervalSet other))
             {
                 return false;
             }
-            Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)obj;
-            return this.intervals.SequenceEqual(other.intervals);
+
+            return intervals.SequenceEqual(other.intervals);
         }
 
         public override string ToString()

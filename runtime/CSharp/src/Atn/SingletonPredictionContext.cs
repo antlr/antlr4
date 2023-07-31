@@ -67,18 +67,16 @@ namespace Antlr4.Runtime.Atn
             {
                 return true;
             }
-            else
+
+            if (!(o is SingletonPredictionContext other))
             {
-                if (!(o is Antlr4.Runtime.Atn.SingletonPredictionContext))
-                {
-                    return false;
-                }
+	            return false;
             }
-            if (this.GetHashCode() != o.GetHashCode())
+            if (GetHashCode() != other.GetHashCode())
             {
                 return false;
             }
-			Antlr4.Runtime.Atn.SingletonPredictionContext other = (Antlr4.Runtime.Atn.SingletonPredictionContext)o;
+
             return returnState == other.returnState && (parent != null && parent.Equals(other.parent));
         }
 

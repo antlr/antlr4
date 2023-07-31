@@ -25,9 +25,8 @@ namespace Antlr4.Runtime.Tree.Xpath
             IList<IParseTree> nodes = new List<IParseTree>();
             foreach (ITree c in Trees.GetChildren(t))
             {
-                if (c is ITerminalNode)
+                if (c is ITerminalNode tnode)
                 {
-                    ITerminalNode tnode = (ITerminalNode)c;
                     if ((tnode.Symbol.Type == tokenType && !invert) || (tnode.Symbol.Type != tokenType && invert))
                     {
                         nodes.Add(tnode);
