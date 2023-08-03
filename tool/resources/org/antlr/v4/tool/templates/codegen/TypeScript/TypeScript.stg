@@ -135,7 +135,7 @@ export default class <parser.name> extends <superClass; null="Parser"> {
 	<if(parser.tokens)>
 	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 	<endif>
-	public static readonly EOF = Token.EOF;
+	public static override readonly EOF = Token.EOF;
 	<parser.rules:{r | public static readonly RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 	public static readonly literalNames: (string | null)[] = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 	public static readonly symbolicNames: (string | null)[] = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
