@@ -85,7 +85,7 @@ namespace Antlr4.Runtime
             recognizer.NotifyErrorListeners(message);
         }
 
-        public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState)
+        public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs)
         {
             string format = "reportAttemptingFullContext d={0}, input='{1}'";
             string decision = GetDecisionDescription(recognizer, dfa);
@@ -94,7 +94,7 @@ namespace Antlr4.Runtime
             recognizer.NotifyErrorListeners(message);
         }
 
-        public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState)
+        public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs)
         {
             string format = "reportContextSensitivity d={0}, input='{1}'";
             string decision = GetDecisionDescription(recognizer, dfa);

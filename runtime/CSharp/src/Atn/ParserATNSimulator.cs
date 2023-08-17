@@ -2286,7 +2286,7 @@ namespace Antlr4.Runtime.Atn
 								   ", input=" + parser.TokenStream.GetText(interval));
 			}
 			if (parser != null)
-				parser.ErrorListenerDispatch.ReportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, null /*configs*/);
+				parser.ErrorListenerDispatch.ReportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
 		}
 
 		protected virtual void ReportContextSensitivity(DFA dfa, int prediction, ATNConfigSet configs, int startIndex, int stopIndex)
@@ -2297,7 +2297,7 @@ namespace Antlr4.Runtime.Atn
 				Console.WriteLine("ReportContextSensitivity decision=" + dfa.decision + ":" + configs +
 								   ", input=" + parser.TokenStream.GetText(interval));
 			}
-			if (parser != null) parser.ErrorListenerDispatch.ReportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, null /*configs*/);
+			if (parser != null) parser.ErrorListenerDispatch.ReportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);
 		}
 
 		/** If context sensitive parsing, we know it's ambiguity not conflict */

@@ -122,7 +122,7 @@ namespace Antlr4.Runtime
         /// the simulator state when the SLL conflict was
         /// detected
         /// </param>
-        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState);
+        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs);
 
         /// <summary>
         /// This method is called by the parser when a full-context prediction has a
@@ -173,6 +173,6 @@ namespace Antlr4.Runtime
         /// the simulator state when the unambiguous prediction
         /// was determined
         /// </param>
-        void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState);
+        void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs);
     }
 }
