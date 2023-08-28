@@ -13,9 +13,8 @@ ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *
     : _readOnly(false), _verifyATN(options->_verifyATN),
       _generateRuleBypassTransitions(options->_generateRuleBypassTransitions) {}
 
-const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {
-  static const ATNDeserializationOptions* const defaultOptions = new ATNDeserializationOptions();
-  return *defaultOptions;
+ATNDeserializationOptions ATNDeserializationOptions::getDefaultOptions() {
+  return ATNDeserializationOptions();
 }
 
 void ATNDeserializationOptions::makeReadOnly() {

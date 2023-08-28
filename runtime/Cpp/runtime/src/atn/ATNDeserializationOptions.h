@@ -22,7 +22,7 @@ public:
 
   ATNDeserializationOptions& operator=(const ATNDeserializationOptions&) = default;
 
-  static const ATNDeserializationOptions& getDefaultOptions();
+  static ATNDeserializationOptions getDefaultOptions();
 
   bool isReadOnly() const { return _readOnly; }
 
