@@ -118,9 +118,9 @@ namespace Antlr4.Runtime
         /// <c>configs</c>
         /// .
         /// </param>
-        /// <param name="conflictState">
-        /// the simulator state when the SLL conflict was
-        /// detected
+        /// <param name="configs">
+        /// the ATN configuration set where the ambiguity was
+        /// identified
         /// </param>
         void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs);
 
@@ -169,8 +169,8 @@ namespace Antlr4.Runtime
         /// finally determined
         /// </param>
         /// <param name="prediction">the unambiguous result of the full-context prediction</param>
-        /// <param name="acceptState">
-        /// the simulator state when the unambiguous prediction
+        /// <param name="configs">
+        /// the ATN configuration set where the unambiguous prediction
         /// was determined
         /// </param>
         void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs);
