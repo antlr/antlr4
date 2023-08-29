@@ -78,7 +78,7 @@ If you are already using the repo and import `github.com/antlr4-go/antlr/v4` the
 using the standard.
 
 ```shell
-go get -u github.com/antlr4-go/antlr
+go get -u get github.com/antlr4-go/antlr
 ```
 
 If you have not yet upgraded existing projects to the `/v4` module path, consult the section *Upgrading to v4
