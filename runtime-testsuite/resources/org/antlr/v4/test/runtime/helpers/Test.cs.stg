@@ -13,13 +13,16 @@ public class Test {
 		var tokens = new CommonTokenStream(lex);
 <if(parserName)>
 		var parser = new <parserName>(tokens);
+		parser.Interpreter.PredictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+		parser.BuildParseTree = false;
+<endif>
 <if(showDiagnosticErrors)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>
 <if(traceATN)>
-	    ParserATNSimulator.trace_atn_sim = true;
+		ParserATNSimulator.trace_atn_sim = true;
 <endif>
-		parser.BuildParseTree = true;
 		var tree = parser.<parserStartRuleName>();
 		ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);
 <else>

@@ -1103,7 +1103,7 @@ public class TestPerformance {
 
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, body, parserName, lexerName,
 				false, true, null, null,
-				false, false, Stage.Compile, false);
+				false, false, Stage.Compile);
 		try (RuntimeRunner runner = new JavaRunner()) {
 			return (JavaCompiledState) runner.run(runOptions);
 		}
@@ -1136,7 +1136,7 @@ public class TestPerformance {
             final Constructor<? extends Parser> parserCtor = javaCompiledState.parser.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-			javaCompiledState.initializeLexerAndParser("");
+			javaCompiledState.initializeDummyLexerAndParser();
 
             return new ParserFactory() {
 

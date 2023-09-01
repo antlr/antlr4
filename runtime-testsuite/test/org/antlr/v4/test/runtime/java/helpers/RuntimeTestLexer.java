@@ -1,3 +1,5 @@
+package org.antlr.v4.test.runtime.java.helpers;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 

@@ -165,9 +165,10 @@ public abstract class RuntimeTests {
 				descriptor.traceATN,
 				descriptor.showDFA,
 				Stage.Execute,
-				false,
 				targetName,
-				superClass
+				superClass,
+				descriptor.predictionMode,
+				descriptor.buildParseTree
 		);
 
 		State result = runner.run(runOptions);

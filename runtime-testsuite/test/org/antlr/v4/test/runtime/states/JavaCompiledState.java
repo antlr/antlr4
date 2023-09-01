@@ -8,10 +8,8 @@ package org.antlr.v4.test.runtime.states;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.test.runtime.RuntimeRunner;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class JavaCompiledState extends CompiledState {
@@ -31,17 +29,26 @@ public class JavaCompiledState extends CompiledState {
 		this.parser = parser;
 	}
 
+	public Pair<Lexer, Parser> initializeDummyLexerAndParser()
+			throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+		return initializeLexerAndParser("");
+	}
+
 	public Pair<Lexer, Parser> initializeLexerAndParser(String input)
-			throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
-
-		Constructor<? extends Lexer> lexerConstructor = lexer.getConstructor(CharStream.class);
-		Lexer lexer = lexerConstructor.newInstance(in);
-
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		Constructor<? extends Parser> parserConstructor = parser.getConstructor(TokenStream.class);
-		Parser parser = parserConstructor.newInstance(tokens);
+			throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		Lexer lexer = initializeLexer(input);
+		Parser parser = initializeParser(new CommonTokenStream(lexer));
 		return new Pair<>(lexer, parser);
+	}
+
+	public Lexer initializeLexer(String input)
+		throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		CharStream inputString = CharStreams.fromString(input, RuntimeRunner.InputFileName);
+		return lexer.getConstructor(CharStream.class).newInstance(inputString);
+	}
+
+	public Parser initializeParser(CommonTokenStream tokenStream)
+			throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		return parser.getConstructor(TokenStream.class).newInstance(tokenStream);
 	}
 }

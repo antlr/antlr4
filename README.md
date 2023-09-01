@@ -21,7 +21,9 @@
 
 ## Versioning
 
-ANTLR 4 supports 10 target languages, and ensuring consistency across these targets is a unique and highly valuable feature.
+ANTLR 4 supports 10 target languages
+(Cpp, CSharp, Dart, Java, JavaScript, PHP, Python3, Swift, TypeScript),
+and ensuring consistency across these targets is a unique and highly valuable feature.
 To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
 As such, ANTLR versioning does not strictly follow semver semantics:
 
@@ -75,7 +77,12 @@ ANTLR project lead and supreme dictator for life
 * [Official site](http://www.antlr.org/)
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
-* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python2|3, JavaScript, Go, C++, Swift, Dart, PHP)
+* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python3, JavaScript, Go, C++, Swift, Dart, PHP)
+* _Note: As of version 4.14, we are dropping support for Python 2. We love the Python
+community, but Python 2 support was officially halted in Jan 2020. More recently,
+GiHub also dropped support for Python 2, which has made it impossible for us to
+maintain a consistent level of quality across targets (we use GitHub for our CI).
+Long live Python 3!_
 * [Java API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration, differences](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md)
