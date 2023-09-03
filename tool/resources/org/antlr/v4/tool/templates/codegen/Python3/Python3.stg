@@ -53,9 +53,10 @@ from antlr4 import *
 from io import StringIO
 import sys
 if sys.version_info[1] > 5:
-	from typing import TextIO
+	from typing import List, TextIO, Dict, Any
 else:
-	from typing.io import TextIO
+	from typing.io import List, TextIO, Dict, Any
+from typing import Optional
 
 <namedActions.header>
 <parser>
@@ -217,11 +218,11 @@ def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
 >>
 
 parser_ctor(p) ::= <<
-def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
+def __init__(self, input:TokenStream, output:TextIO = sys.stdout) -> None:
     super().__init__(input, output)
     self.checkVersion("<file.ANTLRVersion>")
     self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
-    self._predicates = None
+    self._predicates : Dict[int, Any] = dict()
 
 >>
 
@@ -262,8 +263,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
-
-def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>:<a.type><endif>}>):
+def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>:<a.type><endif>}>) -> <currentRule.ctxType>:
 
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.escapedName>}>)
     self.enterRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>)
@@ -295,7 +295,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.escapedName>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
+def <currentRule.escapedName>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>) -> <currentRule.ctxType>:
     _parentctx = self._ctx
     _parentState = self.state
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.escapedName>}>)
@@ -606,7 +606,7 @@ def <t.name>_list(self):
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-def <t.escapedName>(self, i:int=None):
+def <t.escapedName>(self, i:Optional[int]=None):
     if i is None:
         return self.getTokens(<parser.name>.<t.name>)
     else:
@@ -627,7 +627,7 @@ def <r.name>_list(self):
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-def <r.escapedName>(self, i:int=None):
+def <r.escapedName>(self, i:Optional[int]=None):
     if i is None:
         return self.getTypedRuleContexts(<parser.name>.<r.ctxName>)
     else:
@@ -652,11 +652,11 @@ CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
-    __slots__ = 'parser'
+    __slots__ = [ 'parser', <struct.attrs:{a | '<a.escapedName>'}; separator=","> ]
 
-    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.escapedName><if(a.type)>:<a.type><endif>=None}>):
+    def __init__(self, parser, parent:Optional[ParserRuleContext]=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.escapedName><if(a.type)>:<a.type><endif>=None}>):
         super().__init__(parent, invokingState)
-        self.parser = parser
+        self.parser : Parser = parser
         <attrs:{a | <a>}; separator="\n">
         <struct.ctorAttrs:{a | self.<a.escapedName> = <a.escapedName>}; separator="\n">
 
@@ -762,9 +762,9 @@ from antlr4 import *
 from io import StringIO
 import sys
 if sys.version_info[1] > 5:
-    from typing import TextIO
+    from typing import List, TextIO, Dict, Any
 else:
-    from typing.io import TextIO
+    from typing.io import List, TextIO, Dict, Any
 
 <namedActions.header>
 
@@ -813,12 +813,12 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     grammarFileName = "<lexer.grammarFileName>"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
+    def __init__(self, input=None, output:TextIO = sys.stdout) -> None:
         super().__init__(input, output)
         self.checkVersion("<lexerFile.ANTLRVersion>")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
-        self._predicates = None
+        self._predicates : Dict[int, Any] = dict()
 
     <namedActions.members>
 
@@ -827,7 +827,7 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 >>
 
 SerializedATN(model) ::= <<
-def serializedATN():
+def serializedATN()  -> List[int]:
     return [
         <model.serialized: {s | <s>}; separator=",", wrap>
     ]

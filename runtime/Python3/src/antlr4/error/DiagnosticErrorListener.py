@@ -31,12 +31,12 @@ from antlr4.error.ErrorListener import ErrorListener
 
 class DiagnosticErrorListener(ErrorListener):
 
-    def __init__(self, exactOnly:bool=True):
+    def __init__(self, exactOnly:bool=True) -> None:
         # whether all ambiguities or only exact ambiguities are reported.
         self.exactOnly = exactOnly
 
     def reportAmbiguity(self, recognizer:Parser, dfa:DFA, startIndex:int,
-                       stopIndex:int, exact:bool, ambigAlts:set, configs:ATNConfigSet):
+                       stopIndex:int, exact:bool, ambigAlts:set, configs:ATNConfigSet) -> None:
         if self.exactOnly and not exact:
             return
 
@@ -52,7 +52,7 @@ class DiagnosticErrorListener(ErrorListener):
 
 
     def reportAttemptingFullContext(self, recognizer:Parser, dfa:DFA, startIndex:int,
-                       stopIndex:int, conflictingAlts:set, configs:ATNConfigSet):
+                       stopIndex:int, conflictingAlts:set, configs:ATNConfigSet) -> None:
         with StringIO() as buf:
             buf.write("reportAttemptingFullContext d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
@@ -62,7 +62,7 @@ class DiagnosticErrorListener(ErrorListener):
             recognizer.notifyErrorListeners(buf.getvalue())
 
     def reportContextSensitivity(self, recognizer:Parser, dfa:DFA, startIndex:int,
-                       stopIndex:int, prediction:int, configs:ATNConfigSet):
+                       stopIndex:int, prediction:int, configs:ATNConfigSet) -> None:
         with StringIO() as buf:
             buf.write("reportContextSensitivity d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
@@ -71,7 +71,7 @@ class DiagnosticErrorListener(ErrorListener):
             buf.write("'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
-    def getDecisionDescription(self, recognizer:Parser, dfa:DFA):
+    def getDecisionDescription(self, recognizer:Parser, dfa:DFA) -> str:
         decision = dfa.decision
         ruleIndex = dfa.atnStartState.ruleIndex
 
@@ -96,7 +96,7 @@ class DiagnosticErrorListener(ErrorListener):
     # @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
     # returns the set of alternatives represented in {@code configs}.
     #
-    def getConflictingAlts(self, reportedAlts:set, configs:ATNConfigSet):
+    def getConflictingAlts(self, reportedAlts:set, configs:ATNConfigSet) -> set:
         if reportedAlts is not None:
             return reportedAlts
 

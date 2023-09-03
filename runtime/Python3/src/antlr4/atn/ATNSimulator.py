@@ -9,6 +9,8 @@ from antlr4.atn.ATNConfigSet import ATNConfigSet
 from antlr4.dfa.DFAState import DFAState
 
 
+from antlr4.PredictionContext import SingletonPredictionContext
+from antlr4.PredictionContext import ArrayPredictionContext
 class ATNSimulator(object):
     __slots__ = ('atn', 'sharedContextCache', '__dict__')
 
@@ -36,11 +38,11 @@ class ATNSimulator(object):
     #  more time I think and doesn't save on the overall footprint
     #  so it's not worth the complexity.</p>
     #/
-    def __init__(self, atn:ATN, sharedContextCache:PredictionContextCache):
+    def __init__(self, atn:ATN, sharedContextCache:PredictionContextCache) -> None:
         self.atn = atn
         self.sharedContextCache = sharedContextCache
 
-    def getCachedContext(self, context:PredictionContext):
+    def getCachedContext(self, context:PredictionContext) -> SingletonPredictionContext | None | ArrayPredictionContext:
         if self.sharedContextCache is None:
             return context
         visited = dict()

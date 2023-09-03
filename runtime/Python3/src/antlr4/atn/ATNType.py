@@ -13,5 +13,5 @@ class ATNType(IntEnum):
     PARSER = 1
 
     @classmethod
-    def fromOrdinal(cls, i:int):
+    def fromOrdinal(cls, i:int) -> "ATNType":
         return cls._value2member_map_[i]

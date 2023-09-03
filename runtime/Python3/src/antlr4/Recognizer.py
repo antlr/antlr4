@@ -16,12 +16,12 @@ class Recognizer(object):
     tokenTypeMapCache = dict()
     ruleIndexMapCache = dict()
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._listeners = [ ConsoleErrorListener.INSTANCE ]
-        self._interp = None
+        self._interp : Optional[ATNSimulator] = None 
         self._stateNumber = -1
 
-    def extractVersion(self, version):
+    def extractVersion(self, version) -> tuple:
         pos = version.find(".")
         major = version[0:pos]
         version = version[pos+1:]
@@ -33,23 +33,23 @@ class Recognizer(object):
         minor = version[0:pos]
         return major, minor
 
-    def checkVersion(self, toolVersion):
+    def checkVersion(self, toolVersion) -> None:
         runtimeVersion = "4.13.0"
         rvmajor, rvminor = self.extractVersion(runtimeVersion)
         tvmajor, tvminor = self.extractVersion(toolVersion)
         if rvmajor!=tvmajor or rvminor!=tvminor:
             print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
 
-    def addErrorListener(self, listener):
+    def addErrorListener(self, listener) -> None:
         self._listeners.append(listener)
 
-    def removeErrorListener(self, listener):
+    def removeErrorListener(self, listener) -> None:
         self._listeners.remove(listener)
 
-    def removeErrorListeners(self):
+    def removeErrorListeners(self) -> None:
         self._listeners = []
 
-    def getTokenTypeMap(self):
+    def getTokenTypeMap(self) -> zip:
         tokenNames = self.getTokenNames()
         if tokenNames is None:
             from antlr4.error.Errors import UnsupportedOperationException
@@ -65,7 +65,7 @@ class Recognizer(object):
     #
     # <p>Used for XPath and tree pattern compilation.</p>
     #
-    def getRuleIndexMap(self):
+    def getRuleIndexMap(self) -> zip:
         ruleNames = self.getRuleNames()
         if ruleNames is None:
             from antlr4.error.Errors import UnsupportedOperationException
@@ -76,7 +76,7 @@ class Recognizer(object):
             self.ruleIndexMapCache[ruleNames] = result
         return result
 
-    def getTokenType(self, tokenName:str):
+    def getTokenType(self, tokenName:str) -> int:
         ttype = self.getTokenTypeMap().get(tokenName, None)
         if ttype is not None:
             return ttype
@@ -104,7 +104,7 @@ class Recognizer(object):
     # feature when necessary. For example, see
     # {@link DefaultErrorStrategy#getTokenErrorDisplay}.
     #
-    def getTokenErrorDisplay(self, t:Token):
+    def getTokenErrorDisplay(self, t:Token) -> str:
         if t is None:
             return "<no token>"
         s = t.text
@@ -118,19 +118,19 @@ class Recognizer(object):
         s = s.replace("\t","\\t")
         return "'" + s + "'"
 
-    def getErrorListenerDispatch(self):
+    def getErrorListenerDispatch(self) -> ProxyErrorListener:
         return ProxyErrorListener(self._listeners)
 
     # subclass needs to override these if there are sempreds or actions
     # that the ATN interp needs to execute
-    def sempred(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
+    def sempred(self, localctx:RuleContext, ruleIndex:int, actionIndex:int) -> bool:
         return True
 
-    def precpred(self, localctx:RuleContext , precedence:int):
+    def precpred(self, localctx:RuleContext , precedence:int) -> bool:
         return True
 
     @property
-    def state(self):
+    def state(self) -> int:
         return self._stateNumber
 
     # Indicate that the recognizer has changed internal state that is
@@ -141,7 +141,7 @@ class Recognizer(object):
     #  configuration information.
 
     @state.setter
-    def state(self, atnState:int):
+    def state(self, atnState:int) -> None:
         self._stateNumber = atnState
 
 del RecognitionException

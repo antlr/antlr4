@@ -14,15 +14,17 @@ from antlr4.atn.ATNDeserializationOptions import ATNDeserializationOptions
 
 SERIALIZED_VERSION = 4
 
+from antlr4.atn.ATN import ATN
+from antlr4.atn.ATN import ATN
 class ATNDeserializer (object):
     __slots__ = ('deserializationOptions', 'data', 'pos')
 
-    def __init__(self, options : ATNDeserializationOptions = None):
+    def __init__(self, options : ATNDeserializationOptions = None) -> None:
         if options is None:
             options = ATNDeserializationOptions.defaultOptions
         self.deserializationOptions = options
 
-    def deserialize(self, data : [int]):
+    def deserialize(self, data : [int]) -> ATN:
         self.data = data
         self.pos = 0
         self.checkVersion()
@@ -44,18 +46,18 @@ class ATNDeserializer (object):
             self.verifyATN(atn)
         return atn
 
-    def checkVersion(self):
+    def checkVersion(self) -> None:
         version = self.readInt()
         if version != SERIALIZED_VERSION:
             raise Exception("Could not deserialize ATN with version " + str(version) + " (expected " + str(SERIALIZED_VERSION) + ").")
 
-    def readATN(self):
+    def readATN(self) -> ATN:
         idx = self.readInt()
         grammarType = ATNType.fromOrdinal(idx)
         maxTokenType = self.readInt()
         return ATN(grammarType, maxTokenType)
 
-    def readStates(self, atn:ATN):
+    def readStates(self, atn:ATN) -> None:
         loopBackStateNumbers = []
         endStateNumbers = []
         nstates = self.readInt()
@@ -93,7 +95,7 @@ class ATNDeserializer (object):
             stateNumber = self.readInt()
             atn.states[stateNumber].isPrecedenceRule = True
 
-    def readRules(self, atn:ATN):
+    def readRules(self, atn:ATN) -> None:
         nrules = self.readInt()
         if atn.grammarType == ATNType.LEXER:
             atn.ruleToTokenType = [0] * nrules
@@ -114,13 +116,13 @@ class ATNDeserializer (object):
             atn.ruleToStopState[state.ruleIndex] = state
             atn.ruleToStartState[state.ruleIndex].stopState = state
 
-    def readModes(self, atn:ATN):
+    def readModes(self, atn:ATN) -> None:
         nmodes = self.readInt()
         for i in range(0, nmodes):
             s = self.readInt()
             atn.modeToStartState.append(atn.states[s])
 
-    def readSets(self, atn:ATN, sets:list):
+    def readSets(self, atn:ATN, sets:list) -> None:
         m = self.readInt()
         for i in range(0, m):
             iset = IntervalSet()
@@ -134,7 +136,7 @@ class ATNDeserializer (object):
                 i2 = self.readInt()
                 iset.addRange(range(i1, i2 + 1)) # range upper limit is exclusive
 
-    def readEdges(self, atn:ATN, sets:list):
+    def readEdges(self, atn:ATN, sets:list) -> None:
         nedges = self.readInt()
         for i in range(0, nedges):
             src = self.readInt()
@@ -181,7 +183,7 @@ class ATNDeserializer (object):
                     if isinstance(target, StarLoopEntryState):
                         target.loopBackState = state
 
-    def readDecisions(self, atn:ATN):
+    def readDecisions(self, atn:ATN) -> None:
         ndecisions = self.readInt()
         for i in range(0, ndecisions):
             s = self.readInt()
@@ -189,7 +191,7 @@ class ATNDeserializer (object):
             atn.decisionToState.append(decState)
             decState.decision = i
 
-    def readLexerActions(self, atn:ATN):
+    def readLexerActions(self, atn:ATN) -> None:
         if atn.grammarType == ATNType.LEXER:
             count = self.readInt()
             atn.lexerActions = [ None ] * count
@@ -200,7 +202,7 @@ class ATNDeserializer (object):
                 lexerAction = self.lexerActionFactory(actionType, data1, data2)
                 atn.lexerActions[i] = lexerAction
 
-    def generateRuleBypassTransitions(self, atn:ATN):
+    def generateRuleBypassTransitions(self, atn:ATN) -> None:
 
         count = len(atn.ruleToStartState)
         atn.ruleToTokenType = [ 0 ] * count
@@ -210,7 +212,7 @@ class ATNDeserializer (object):
         for i in range(0, count):
             self.generateRuleBypassTransition(atn, i)
 
-    def generateRuleBypassTransition(self, atn:ATN, idx:int):
+    def generateRuleBypassTransition(self, atn:ATN, idx:int) -> None:
 
         bypassStart = BasicBlockStartState()
         bypassStart.ruleIndex = idx
@@ -268,7 +270,7 @@ class ATNDeserializer (object):
         bypassStart.addTransition(EpsilonTransition(matchState))
 
 
-    def stateIsEndStateFor(self, state:ATNState, idx:int):
+    def stateIsEndStateFor(self, state:ATNState, idx:int) -> None:
         if state.ruleIndex != idx:
             return None
         if not isinstance(state, StarLoopEntryState):
@@ -292,7 +294,7 @@ class ATNDeserializer (object):
     #
     # @param atn The ATN.
     #
-    def markPrecedenceDecisions(self, atn:ATN):
+    def markPrecedenceDecisions(self, atn:ATN) -> None:
         for state in atn.states:
             if not isinstance(state, StarLoopEntryState):
                 continue
@@ -308,7 +310,7 @@ class ATNDeserializer (object):
                             isinstance(maybeLoopEndState.transitions[0].target, RuleStopState):
                         state.isPrecedenceDecision = True
 
-    def verifyATN(self, atn:ATN):
+    def verifyATN(self, atn:ATN) -> None:
         if not self.deserializationOptions.verifyATN:
             return
         # verify assumptions
@@ -355,7 +357,7 @@ class ATNDeserializer (object):
             else:
                 self.checkCondition(len(state.transitions) <= 1 or isinstance(state, RuleStopState))
 
-    def checkCondition(self, condition:bool, message=None):
+    def checkCondition(self, condition:bool, message=None) -> None:
         if not condition:
             if message is None:
                 message = "IllegalState"

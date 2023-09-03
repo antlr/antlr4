@@ -10,11 +10,11 @@ class Chunk(object):
 class TagChunk(Chunk):
     __slots__ = ('tag', 'label')
 
-    def __init__(self, tag:str, label:str=None):
+    def __init__(self, tag:str, label:str=None) -> None:
         self.tag = tag
         self.label = label
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.label is None:
             return self.tag
         else:
@@ -23,8 +23,8 @@ class TagChunk(Chunk):
 class TextChunk(Chunk):
     __slots__ = 'text'
 
-    def __init__(self, text:str):
+    def __init__(self, text:str) -> None:
         self.text = text
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "'" + self.text + "'"

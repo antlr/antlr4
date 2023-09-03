@@ -12,15 +12,19 @@ from antlr4.Token import Token
 INVALID_INTERVAL = (-1, -2)
 
 class Tree(object):
+    __slots__ = []
     pass
 
 class SyntaxTree(Tree):
+    __slots__ = []
     pass
 
 class ParseTree(SyntaxTree):
+    __slots__ = []
     pass
 
 class RuleNode(ParseTree):
+    __slots__ = []
     pass
 
 class TerminalNode(ParseTree):
@@ -52,13 +56,13 @@ class ParseTreeVisitor(object):
     def visitErrorNode(self, node):
         return self.defaultResult()
 
-    def defaultResult(self):
+    def defaultResult(self) -> None:
         return None
 
     def aggregateResult(self, aggregate, nextResult):
         return nextResult
 
-    def shouldVisitNextChild(self, node, currentResult):
+    def shouldVisitNextChild(self, node, currentResult) -> bool:
         return True
 
 ParserRuleContext = None
@@ -82,13 +86,13 @@ del ParserRuleContext
 class TerminalNodeImpl(TerminalNode):
     __slots__ = ('parentCtx', 'symbol')
 
-    def __init__(self, symbol:Token):
+    def __init__(self, symbol:Token) -> None:
         self.parentCtx = None
         self.symbol = symbol
-    def __setattr__(self, key, value):
+    def __setattr__(self, key, value) -> None:
         super().__setattr__(key, value)
 
-    def getChild(self, i:int):
+    def getChild(self, i:int) -> None:
         return None
 
     def getSymbol(self):
@@ -100,13 +104,13 @@ class TerminalNodeImpl(TerminalNode):
     def getPayload(self):
         return self.symbol
 
-    def getSourceInterval(self):
+    def getSourceInterval(self) -> tuple:
         if self.symbol is None:
             return INVALID_INTERVAL
         tokenIndex = self.symbol.tokenIndex
         return (tokenIndex, tokenIndex)
 
-    def getChildCount(self):
+    def getChildCount(self) -> int:
         return 0
 
     def accept(self, visitor:ParseTreeVisitor):
@@ -115,7 +119,7 @@ class TerminalNodeImpl(TerminalNode):
     def getText(self):
         return self.symbol.text
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.symbol.type == Token.EOF:
             return "<EOF>"
         else:
@@ -129,7 +133,7 @@ class TerminalNodeImpl(TerminalNode):
 
 class ErrorNodeImpl(TerminalNodeImpl,ErrorNode):
 
-    def __init__(self, token:Token):
+    def __init__(self, token:Token) -> None:
         super().__init__(token)
 
     def accept(self, visitor:ParseTreeVisitor):
@@ -140,7 +144,7 @@ class ParseTreeWalker(object):
 
     DEFAULT = None
 
-    def walk(self, listener:ParseTreeListener, t:ParseTree):
+    def walk(self, listener:ParseTreeListener, t:ParseTree) -> None:
         """
 	    Performs a walk on the given parse tree starting at the root and going down recursively
 	    with depth-first search. On each node, {@link ParseTreeWalker#enterRule} is called before
@@ -166,7 +170,7 @@ class ParseTreeWalker(object):
     # {@link RuleContext}-specific event. First we trigger the generic and then
     # the rule specific. We to them in reverse order upon finishing the node.
     #
-    def enterRule(self, listener:ParseTreeListener, r:RuleNode):
+    def enterRule(self, listener:ParseTreeListener, r:RuleNode) -> None:
         """
 	    Enters a grammar rule by first triggering the generic event {@link ParseTreeListener#enterEveryRule}
 	    then by triggering the event specific to the given parse tree node
@@ -177,7 +181,7 @@ class ParseTreeWalker(object):
         listener.enterEveryRule(ctx)
         ctx.enterRule(listener)
 
-    def exitRule(self, listener:ParseTreeListener, r:RuleNode):
+    def exitRule(self, listener:ParseTreeListener, r:RuleNode) -> None:
         """
 	    Exits a grammar rule by first triggering the event specific to the given parse tree node
 	    then by triggering the generic event {@link ParseTreeListener#exitEveryRule}

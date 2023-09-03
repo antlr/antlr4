@@ -8,7 +8,7 @@ else:
     from typing.io import TextIO
 
 
-def serializedATN():
+def serializedATN() -> list[int]:
     return [
         4,0,8,50,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,
         6,7,6,2,7,7,7,1,0,1,0,1,0,1,1,1,1,1,2,1,2,1,3,1,3,1,4,1,4,5,4,29,
@@ -61,7 +61,7 @@ class XPathLexer(Lexer):
 
     grammarFileName = "XPathLexer.g4"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
+    def __init__(self, input=None, output:TextIO = sys.stdout) -> None:
         super().__init__(input, output)
         self.checkVersion("4.11.2-SNAPSHOT")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
@@ -69,7 +69,7 @@ class XPathLexer(Lexer):
         self._predicates = None
 
 
-    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
+    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int) -> None:
         if self._actions is None:
             actions = dict()
             actions[4] = self.ID_action 
@@ -81,7 +81,7 @@ class XPathLexer(Lexer):
             raise Exception("No registered action for:" + str(ruleIndex))
 
 
-    def ID_action(self, localctx:RuleContext , actionIndex:int):
+    def ID_action(self, localctx:RuleContext , actionIndex:int) -> None:
         if actionIndex == 0:
 
                             char = self.text[0]

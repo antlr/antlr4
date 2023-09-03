@@ -26,7 +26,7 @@ class RuleTagToken(Token):
     # @exception IllegalArgumentException if {@code ruleName} is {@code null}
     # or empty.
 
-    def __init__(self, ruleName:str, bypassTokenType:int, label:str=None):
+    def __init__(self, ruleName:str, bypassTokenType:int, label:str=None) -> None:
         if ruleName is None or len(ruleName)==0:
             raise Exception("ruleName cannot be null or empty.")
         self.source = None

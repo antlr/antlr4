@@ -38,7 +38,7 @@ class Trees(object):
             return buf.getvalue()
 
     @classmethod
-    def getNodeText(cls, t:Tree, ruleNames:list=None, recog:Parser=None):
+    def getNodeText(cls, t:Tree, ruleNames:list=None, recog:Parser=None) -> str:
         if recog is not None:
             ruleNames = recog.ruleNames
         if ruleNames is not None:
@@ -60,14 +60,14 @@ class Trees(object):
 
     # Return ordered list of all children of this node
     @classmethod
-    def getChildren(cls, t:Tree):
+    def getChildren(cls, t:Tree) -> list:
         return [ t.getChild(i) for i in range(0, t.getChildCount()) ]
 
     # Return a list of all ancestors of this node.  The first node of
     #  list is the root and the last is the parent of this node.
     #
     @classmethod
-    def getAncestors(cls, t:Tree):
+    def getAncestors(cls, t:Tree) -> list:
         ancestors = []
         t = t.getParent()
         while t is not None:
@@ -76,21 +76,21 @@ class Trees(object):
         return ancestors
 
     @classmethod
-    def findAllTokenNodes(cls, t:ParseTree, ttype:int):
+    def findAllTokenNodes(cls, t:ParseTree, ttype:int) -> list:
         return cls.findAllNodes(t, ttype, True)
 
     @classmethod
-    def findAllRuleNodes(cls, t:ParseTree, ruleIndex:int):
+    def findAllRuleNodes(cls, t:ParseTree, ruleIndex:int) -> list:
         return cls.findAllNodes(t, ruleIndex, False)
 
     @classmethod
-    def findAllNodes(cls, t:ParseTree, index:int, findTokens:bool):
+    def findAllNodes(cls, t:ParseTree, index:int, findTokens:bool) -> list:
         nodes = []
         cls._findAllNodes(t, index, findTokens, nodes)
         return nodes
 
     @classmethod
-    def _findAllNodes(cls, t:ParseTree, index:int, findTokens:bool, nodes:list):
+    def _findAllNodes(cls, t:ParseTree, index:int, findTokens:bool, nodes:list) -> None:
         from antlr4.ParserRuleContext import ParserRuleContext
         # check this node (the root) first
         if findTokens and isinstance(t, TerminalNode):
@@ -104,7 +104,7 @@ class Trees(object):
             cls._findAllNodes(t.getChild(i), index, findTokens, nodes)
 
     @classmethod
-    def descendants(cls, t:ParseTree):
+    def descendants(cls, t:ParseTree) -> list:
         nodes = [t]
         for i in range(0, t.getChildCount()):
             nodes.extend(cls.descendants(t.getChild(i)))

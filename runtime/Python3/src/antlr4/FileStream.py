@@ -16,7 +16,7 @@ from antlr4.InputStream import InputStream
 class FileStream(InputStream):
     __slots__ = 'fileName'
 
-    def __init__(self, fileName:str, encoding:str='ascii', errors:str='strict'):
+    def __init__(self, fileName:str, encoding:str='ascii', errors:str='strict') -> None:
         super().__init__(self.readDataFrom(fileName, encoding, errors))
         self.fileName = fileName
 

@@ -36,19 +36,18 @@ from antlr4.error.Errors import LexerNoViableAltException, UnsupportedOperationE
 class SimState(object):
     __slots__ = ('index', 'line', 'column', 'dfaState')
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self.index = -1
         self.line = 0
         self.column = -1
         self.dfaState = None
 
-# need forward declaration
-Lexer = None
-LexerATNSimulator = None
-
+from antlr4.atn.ATNConfig import LexerATNConfig
+from antlr4.atn.ATNConfigSet import OrderedATNConfigSet
+from antlr4.dfa.DFAState import DFAState
 class LexerATNSimulator(ATNSimulator):
     __slots__ = (
         'decisionToDFA', 'recog', 'startIndex', 'line', 'column', 'mode',
@@ -63,7 +62,7 @@ class LexerATNSimulator(ATNSimulator):
 
     ERROR = None
 
-    def __init__(self, recog:Lexer, atn:ATN, decisionToDFA:list, sharedContextCache:PredictionContextCache):
+    def __init__(self, recog:Lexer, atn:ATN, decisionToDFA:list, sharedContextCache:PredictionContextCache) -> None:
         super().__init__(atn, sharedContextCache)
         self.decisionToDFA = decisionToDFA
         self.recog = recog
@@ -85,13 +84,13 @@ class LexerATNSimulator(ATNSimulator):
         self.prevAccept = SimState()
 
 
-    def copyState(self, simulator:LexerATNSimulator ):
+    def copyState(self, simulator:"LexerATNSimulator" ) -> None:
         self.column = simulator.column
         self.line = simulator.line
         self.mode = simulator.mode
         self.startIndex = simulator.startIndex
 
-    def match(self, input:InputStream , mode:int):
+    def match(self, input:InputStream , mode:int) -> int:
         self.mode = mode
         mark = input.mark()
         try:
@@ -105,14 +104,14 @@ class LexerATNSimulator(ATNSimulator):
         finally:
             input.release(mark)
 
-    def reset(self):
+    def reset(self) -> None:
         self.prevAccept.reset()
         self.startIndex = -1
         self.line = 1
         self.column = 0
         self.mode = self.DEFAULT_MODE
 
-    def matchATN(self, input:InputStream):
+    def matchATN(self, input:InputStream) -> int:
         startState = self.atn.modeToStartState[self.mode]
 
         if LexerATNSimulator.debug:
@@ -134,7 +133,7 @@ class LexerATNSimulator(ATNSimulator):
 
         return predict
 
-    def execATN(self, input:InputStream, ds0:DFAState):
+    def execATN(self, input:InputStream, ds0:DFAState) -> int:
         if LexerATNSimulator.debug:
             print("start state closure=" + str(ds0.configs))
 
@@ -203,7 +202,7 @@ class LexerATNSimulator(ATNSimulator):
     # @return The existing target DFA state for the given input symbol
     # {@code t}, or {@code null} if the target state for this edge is not
     # already cached
-    def getExistingTargetState(self, s:DFAState, t:int):
+    def getExistingTargetState(self, s:DFAState, t:int) -> None:
         if s.edges is None or t < self.MIN_DFA_EDGE or t > self.MAX_DFA_EDGE:
             return None
 
@@ -223,7 +222,7 @@ class LexerATNSimulator(ATNSimulator):
     # @return The computed target DFA state for the given input symbol
     # {@code t}. If {@code t} does not lead to a valid DFA state, this method
     # returns {@link #ERROR}.
-    def computeTargetState(self, input:InputStream, s:DFAState, t:int):
+    def computeTargetState(self, input:InputStream, s:DFAState, t:int) -> DFAState | None:
         reach = OrderedATNConfigSet()
 
         # if we don't find an existing DFA state
@@ -242,7 +241,7 @@ class LexerATNSimulator(ATNSimulator):
         # Add an edge from s to target DFA found/created for reach
         return self.addDFAEdge(s, t, cfgs=reach)
 
-    def failOrAccept(self, prevAccept:SimState , input:InputStream, reach:ATNConfigSet, t:int):
+    def failOrAccept(self, prevAccept:SimState , input:InputStream, reach:ATNConfigSet, t:int) -> int:
         if self.prevAccept.dfaState is not None:
             lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor
             self.accept(input, lexerActionExecutor, self.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
@@ -256,7 +255,7 @@ class LexerATNSimulator(ATNSimulator):
     # Given a starting configuration set, figure out all ATN configurations
     #  we can reach upon input {@code t}. Parameter {@code reach} is a return
     #  parameter.
-    def getReachableConfigSet(self, input:InputStream, closure:ATNConfigSet, reach:ATNConfigSet, t:int):
+    def getReachableConfigSet(self, input:InputStream, closure:ATNConfigSet, reach:ATNConfigSet, t:int) -> None:
         # this is used to skip processing for configs which have a lower priority
         # than a config that already reached an accept state for the same rule
         skipAlt = ATN.INVALID_ALT_NUMBER
@@ -282,7 +281,7 @@ class LexerATNSimulator(ATNSimulator):
                         # the one that just reached an accept state.
                         skipAlt = cfg.alt
 
-    def accept(self, input:InputStream, lexerActionExecutor:LexerActionExecutor, startIndex:int, index:int, line:int, charPos:int):
+    def accept(self, input:InputStream, lexerActionExecutor:LexerActionExecutor, startIndex:int, index:int, line:int, charPos:int) -> None:
         if LexerATNSimulator.debug:
             print("ACTION", lexerActionExecutor)
 
@@ -294,13 +293,13 @@ class LexerATNSimulator(ATNSimulator):
         if lexerActionExecutor is not None and self.recog is not None:
             lexerActionExecutor.execute(self.recog, input, startIndex)
 
-    def getReachableTarget(self, trans:Transition, t:int):
+    def getReachableTarget(self, trans:Transition, t:int) -> None:
         if trans.matches(t, 0, self.MAX_CHAR_VALUE):
             return trans.target
         else:
             return None
 
-    def computeStartState(self, input:InputStream, p:ATNState):
+    def computeStartState(self, input:InputStream, p:ATNState) -> OrderedATNConfigSet:
         initialContext = PredictionContext.EMPTY
         configs = OrderedATNConfigSet()
         for i in range(0,len(p.transitions)):
@@ -318,7 +317,7 @@ class LexerATNSimulator(ATNSimulator):
     # @return {@code true} if an accept state is reached, otherwise
     # {@code false}.
     def closure(self, input:InputStream, config:LexerATNConfig, configs:ATNConfigSet, currentAltReachedAcceptState:bool,
-                speculative:bool, treatEofAsEpsilon:bool):
+                speculative:bool, treatEofAsEpsilon:bool) -> bool:
         if LexerATNSimulator.debug:
             print("closure(" + str(config) + ")")
 
@@ -362,7 +361,7 @@ class LexerATNSimulator(ATNSimulator):
 
     # side-effect: can alter configs.hasSemanticContext
     def getEpsilonTarget(self, input:InputStream, config:LexerATNConfig, t:Transition, configs:ATNConfigSet,
-                                           speculative:bool, treatEofAsEpsilon:bool):
+                                           speculative:bool, treatEofAsEpsilon:bool) -> LexerATNConfig | None:
         c = None
         if t.serializationType==Transition.RULE:
                 newContext = SingletonPredictionContext.create(config.context, t.followState.stateNumber)
@@ -448,7 +447,7 @@ class LexerATNSimulator(ATNSimulator):
     # @return {@code true} if the specified predicate evaluates to
     # {@code true}.
     #/
-    def evaluatePredicate(self, input:InputStream, ruleIndex:int, predIndex:int, speculative:bool):
+    def evaluatePredicate(self, input:InputStream, ruleIndex:int, predIndex:int, speculative:bool) -> bool:
         # assume true if no recognizer was provided
         if self.recog is None:
             return True
@@ -469,7 +468,7 @@ class LexerATNSimulator(ATNSimulator):
             input.seek(index)
             input.release(marker)
 
-    def captureSimState(self, settings:SimState, input:InputStream, dfaState:DFAState):
+    def captureSimState(self, settings:SimState, input:InputStream, dfaState:DFAState) -> None:
         settings.index = input.index
         settings.line = self.line
         settings.column = self.column
@@ -549,7 +548,7 @@ class LexerATNSimulator(ATNSimulator):
         # index is first lookahead char, don't include.
         return input.getText(self.startIndex, input.index-1)
 
-    def consume(self, input:InputStream):
+    def consume(self, input:InputStream) -> None:
         curChar = input.LA(1)
         if curChar==ord('\n'):
             self.line += 1
@@ -558,7 +557,7 @@ class LexerATNSimulator(ATNSimulator):
             self.column += 1
         input.consume()
 
-    def getTokenName(self, t:int):
+    def getTokenName(self, t:int) -> str:
         if t==-1:
             return "EOF"
         else:

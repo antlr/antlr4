@@ -36,7 +36,7 @@ class SemanticContext(object):
     # prediction, so we passed in the outer context here in case of context
     # dependent predicate evaluation.</p>
     #
-    def eval(self, parser:Recognizer , outerContext:RuleContext ):
+    def eval(self, parser:Recognizer , outerContext:RuleContext ) -> eval:
         pass
 
     #
@@ -57,13 +57,13 @@ class SemanticContext(object):
     # semantic context after precedence predicates are evaluated.</li>
     # </ul>
     #
-    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
+    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext) -> SemanticContext:
         return self
 
 # need forward declaration
 AND = None
 
-def andContext(a:SemanticContext, b:SemanticContext):
+def andContext(a:SemanticContext, b:SemanticContext) -> AND:
     if a is None or a is SemanticContext.NONE:
         return b
     if b is None or b is SemanticContext.NONE:
@@ -77,7 +77,7 @@ def andContext(a:SemanticContext, b:SemanticContext):
 # need forward declaration
 OR = None
 
-def orContext(a:SemanticContext, b:SemanticContext):
+def orContext(a:SemanticContext, b:SemanticContext) -> OR:
     if a is None:
         return b
     if b is None:
@@ -90,7 +90,7 @@ def orContext(a:SemanticContext, b:SemanticContext):
     else:
         return result
 
-def filterPrecedencePredicates(collection:set):
+def filterPrecedencePredicates(collection:set) -> list:
     return [context for context in collection if isinstance(context, PrecedencePredicate)]
 
 
@@ -100,19 +100,19 @@ class EmptySemanticContext(SemanticContext):
 class Predicate(SemanticContext):
     __slots__ = ('ruleIndex', 'predIndex', 'isCtxDependent')
 
-    def __init__(self, ruleIndex:int=-1, predIndex:int=-1, isCtxDependent:bool=False):
+    def __init__(self, ruleIndex:int=-1, predIndex:int=-1, isCtxDependent:bool=False) -> None:
         self.ruleIndex = ruleIndex
         self.predIndex = predIndex
         self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
 
-    def eval(self, parser:Recognizer , outerContext:RuleContext ):
+    def eval(self, parser:Recognizer , outerContext:RuleContext ) -> eval:
         localctx = outerContext if self.isCtxDependent else None
         return parser.sempred(localctx, self.ruleIndex, self.predIndex)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.ruleIndex, self.predIndex, self.isCtxDependent))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, Predicate):
@@ -121,31 +121,31 @@ class Predicate(SemanticContext):
                self.predIndex == other.predIndex and \
                self.isCtxDependent == other.isCtxDependent
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{" + str(self.ruleIndex) + ":" + str(self.predIndex) + "}?"
 
 
 class PrecedencePredicate(SemanticContext):
 
-    def __init__(self, precedence:int=0):
+    def __init__(self, precedence:int=0) -> None:
         self.precedence = precedence
 
-    def eval(self, parser:Recognizer , outerContext:RuleContext ):
+    def eval(self, parser:Recognizer , outerContext:RuleContext ) -> eval:
         return parser.precpred(outerContext, self.precedence)
 
-    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
+    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext) -> None:
         if parser.precpred(outerContext, self.precedence):
             return SemanticContext.NONE
         else:
             return None
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self.precedence < other.precedence
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return 31
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, PrecedencePredicate):
@@ -153,7 +153,7 @@ class PrecedencePredicate(SemanticContext):
         else:
             return self.precedence == other.precedence
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{" + str(self.precedence) + ">=prec}?"
 
 
@@ -163,7 +163,7 @@ del AND
 class AND(SemanticContext):
     __slots__ = 'opnds'
 
-    def __init__(self, a:SemanticContext, b:SemanticContext):
+    def __init__(self, a:SemanticContext, b:SemanticContext) -> None:
         operands = set()
         if isinstance( a, AND ):
             operands.update(a.opnds)
@@ -182,7 +182,7 @@ class AND(SemanticContext):
 
         self.opnds = list(operands)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, AND):
@@ -190,7 +190,7 @@ class AND(SemanticContext):
         else:
             return self.opnds == other.opnds
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         h = 0
         for o in self.opnds:
             h = hash((h, o))
@@ -203,10 +203,10 @@ class AND(SemanticContext):
     # The evaluation of predicates by this context is short-circuiting, but
     # unordered.</p>
     #
-    def eval(self, parser:Recognizer, outerContext:RuleContext):
+    def eval(self, parser:Recognizer, outerContext:RuleContext) -> bool:
         return all(opnd.eval(parser, outerContext) for opnd in self.opnds)
 
-    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
+    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext) -> AND | None:
         differs = False
         operands = []
         for context in self.opnds:
@@ -232,7 +232,7 @@ class AND(SemanticContext):
 
         return result
 
-    def __str__(self):
+    def __str__(self) -> str:
         with StringIO() as buf:
             first = True
             for o in self.opnds:
@@ -249,7 +249,7 @@ del OR
 class OR (SemanticContext):
     __slots__ = 'opnds'
 
-    def __init__(self, a:SemanticContext, b:SemanticContext):
+    def __init__(self, a:SemanticContext, b:SemanticContext) -> None:
         operands = set()
         if isinstance( a, OR ):
             operands.update(a.opnds)
@@ -269,7 +269,7 @@ class OR (SemanticContext):
 
         self.opnds = list(operands)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, OR):
@@ -277,7 +277,7 @@ class OR (SemanticContext):
         else:
             return self.opnds == other.opnds
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         h = 0
         for o in self.opnds:
             h = hash((h, o))
@@ -287,10 +287,10 @@ class OR (SemanticContext):
     # The evaluation of predicates by this context is short-circuiting, but
     # unordered.</p>
     #
-    def eval(self, parser:Recognizer, outerContext:RuleContext):
+    def eval(self, parser:Recognizer, outerContext:RuleContext) -> bool:
         return any(opnd.eval(parser, outerContext) for opnd in self.opnds)
 
-    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
+    def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext) -> OR | None:
         differs = False
         operands = []
         for context in self.opnds:
@@ -316,7 +316,7 @@ class OR (SemanticContext):
 
         return result
 
-    def __str__(self):
+    def __str__(self) -> str:
         with StringIO() as buf:
             first = True
             for o in self.opnds:

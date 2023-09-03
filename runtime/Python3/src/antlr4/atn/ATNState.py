@@ -106,7 +106,7 @@ class ATNState(object):
 
     INVALID_STATE_NUMBER = -1
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Which ATN are we in?
         self.atn = None
         self.stateNumber = ATNState.INVALID_STATE_NUMBER
@@ -118,22 +118,22 @@ class ATNState(object):
         # Used to cache lookahead during parsing, not used during construction
         self.nextTokenWithinRule = None
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.stateNumber
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return isinstance(other, ATNState) and self.stateNumber==other.stateNumber
 
-    def onlyHasEpsilonTransitions(self):
+    def onlyHasEpsilonTransitions(self) -> bool:
         return self.epsilonOnlyTransitions
 
-    def isNonGreedyExitState(self):
+    def isNonGreedyExitState(self) -> bool:
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.stateNumber)
 
-    def addTransition(self, trans:Transition, index:int=-1):
+    def addTransition(self, trans:Transition, index:int=-1) -> None:
         if len(self.transitions)==0:
             self.epsilonOnlyTransitions = trans.isEpsilon
         elif self.epsilonOnlyTransitions != trans.isEpsilon:
@@ -146,14 +146,14 @@ class ATNState(object):
 
 class BasicState(ATNState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.BASIC
 
 
 class DecisionState(ATNState):
     __slots__ = ('decision', 'nonGreedy')
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.decision = -1
         self.nonGreedy = False
@@ -162,13 +162,13 @@ class DecisionState(ATNState):
 class BlockStartState(DecisionState):
     __slots__ = 'endState'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.endState = None
 
 class BasicBlockStartState(BlockStartState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.BLOCK_START
 
@@ -176,7 +176,7 @@ class BasicBlockStartState(BlockStartState):
 class BlockEndState(ATNState):
     __slots__ = 'startState'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.BLOCK_END
         self.startState = None
@@ -188,14 +188,14 @@ class BlockEndState(ATNState):
 #
 class RuleStopState(ATNState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.RULE_STOP
 
 class RuleStartState(ATNState):
     __slots__ = ('stopState', 'isPrecedenceRule')
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.RULE_START
         self.stopState = None
@@ -206,7 +206,7 @@ class RuleStartState(ATNState):
 #
 class PlusLoopbackState(DecisionState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.PLUS_LOOP_BACK
 
@@ -218,7 +218,7 @@ class PlusLoopbackState(DecisionState):
 class PlusBlockStartState(BlockStartState):
     __slots__ = 'loopBackState'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.PLUS_BLOCK_START
         self.loopBackState = None
@@ -226,13 +226,13 @@ class PlusBlockStartState(BlockStartState):
 # The block that begins a closure loop.
 class StarBlockStartState(BlockStartState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.STAR_BLOCK_START
 
 class StarLoopbackState(ATNState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.STAR_LOOP_BACK
 
@@ -240,7 +240,7 @@ class StarLoopbackState(ATNState):
 class StarLoopEntryState(DecisionState):
     __slots__ = ('loopBackState', 'isPrecedenceDecision')
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.STAR_LOOP_ENTRY
         self.loopBackState = None
@@ -251,7 +251,7 @@ class StarLoopEntryState(DecisionState):
 class LoopEndState(ATNState):
     __slots__ = 'loopBackState'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.LOOP_END
         self.loopBackState = None
@@ -259,6 +259,6 @@ class LoopEndState(ATNState):
 # The Tokens rule start state linking to each lexer rule start state */
 class TokensStartState(DecisionState):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stateType = self.TOKEN_START

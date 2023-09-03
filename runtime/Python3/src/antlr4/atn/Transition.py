@@ -56,7 +56,7 @@ class Transition (object):
 
     serializationTypes = dict()
 
-    def __init__(self, target:ATNState):
+    def __init__(self, target:ATNState) -> None:
         # The target of this transition.
         if target is None:
             raise Exception("target cannot be null.")
@@ -70,27 +70,27 @@ class Transition (object):
 class AtomTransition(Transition):
     __slots__ = ('label_', 'serializationType')
 
-    def __init__(self, target:ATNState, label:int):
+    def __init__(self, target:ATNState, label:int) -> None:
         super().__init__(target)
         self.label_ = label # The token type or character value; or, signifies special label.
         self.label = self.makeLabel()
         self.serializationType = self.ATOM
 
-    def makeLabel(self):
+    def makeLabel(self) -> IntervalSet:
         s = IntervalSet()
         s.addOne(self.label_)
         return s
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return self.label_ == symbol
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.label_)
 
 class RuleTransition(Transition):
     __slots__ = ('ruleIndex', 'precedence', 'followState', 'serializationType')
 
-    def __init__(self, ruleStart:RuleStartState, ruleIndex:int, precedence:int, followState:ATNState):
+    def __init__(self, ruleStart:RuleStartState, ruleIndex:int, precedence:int, followState:ATNState) -> None:
         super().__init__(ruleStart)
         self.ruleIndex = ruleIndex # ptr to the rule definition object for this rule ref
         self.precedence = precedence
@@ -98,56 +98,57 @@ class RuleTransition(Transition):
         self.serializationType = self.RULE
         self.isEpsilon = True
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return False
 
 
 class EpsilonTransition(Transition):
     __slots__ = ('serializationType', 'outermostPrecedenceReturn')
 
-    def __init__(self, target, outermostPrecedenceReturn=-1):
+    def __init__(self, target: "ATNState", outermostPrecedenceReturn: int=-1) -> None:
         super(EpsilonTransition, self).__init__(target)
         self.serializationType = self.EPSILON
         self.isEpsilon = True
         self.outermostPrecedenceReturn = outermostPrecedenceReturn
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "epsilon"
 
+from antlr4.IntervalSet import IntervalSet
 class RangeTransition(Transition):
     __slots__ = ('serializationType', 'start', 'stop')
 
-    def __init__(self, target:ATNState, start:int, stop:int):
+    def __init__(self, target:ATNState, start:int, stop:int) -> None:
         super().__init__(target)
         self.serializationType = self.RANGE
         self.start = start
         self.stop = stop
         self.label = self.makeLabel()
 
-    def makeLabel(self):
+    def makeLabel(self) -> IntervalSet:
         s = IntervalSet()
         s.addRange(range(self.start, self.stop + 1))
         return s
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return symbol >= self.start and symbol <= self.stop
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "'" + chr(self.start) + "'..'" + chr(self.stop) + "'"
 
 class AbstractPredicateTransition(Transition):
 
-    def __init__(self, target:ATNState):
+    def __init__(self, target:ATNState) -> None:
         super().__init__(target)
 
 
 class PredicateTransition(AbstractPredicateTransition):
     __slots__ = ('serializationType', 'ruleIndex', 'predIndex', 'isCtxDependent')
 
-    def __init__(self, target:ATNState, ruleIndex:int, predIndex:int, isCtxDependent:bool):
+    def __init__(self, target:ATNState, ruleIndex:int, predIndex:int, isCtxDependent:bool) -> None:
         super().__init__(target)
         self.serializationType = self.PREDICATE
         self.ruleIndex = ruleIndex
@@ -155,19 +156,19 @@ class PredicateTransition(AbstractPredicateTransition):
         self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
         self.isEpsilon = True
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return False
 
-    def getPredicate(self):
+    def getPredicate(self) -> Predicate:
         return Predicate(self.ruleIndex, self.predIndex, self.isCtxDependent)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "pred_" + str(self.ruleIndex) + ":" + str(self.predIndex)
 
 class ActionTransition(Transition):
     __slots__ = ('serializationType', 'ruleIndex', 'actionIndex', 'isCtxDependent')
 
-    def __init__(self, target:ATNState, ruleIndex:int, actionIndex:int=-1, isCtxDependent:bool=False):
+    def __init__(self, target:ATNState, ruleIndex:int, actionIndex:int=-1, isCtxDependent:bool=False) -> None:
         super().__init__(target)
         self.serializationType = self.ACTION
         self.ruleIndex = ruleIndex
@@ -175,17 +176,17 @@ class ActionTransition(Transition):
         self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
         self.isEpsilon = True
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "action_"+self.ruleIndex+":"+self.actionIndex
 
 # A transition containing a set of values.
 class SetTransition(Transition):
     __slots__ = 'serializationType'
 
-    def __init__(self, target:ATNState, set:IntervalSet):
+    def __init__(self, target:ATNState, set:IntervalSet) -> None:
         super().__init__(target)
         self.serializationType = self.SET
         if set is not None:
@@ -194,58 +195,58 @@ class SetTransition(Transition):
             self.label = IntervalSet()
             self.label.addRange(range(Token.INVALID_TYPE, Token.INVALID_TYPE + 1))
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return symbol in self.label
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.label)
 
 class NotSetTransition(SetTransition):
 
-    def __init__(self, target:ATNState, set:IntervalSet):
+    def __init__(self, target:ATNState, set:IntervalSet) -> None:
         super().__init__(target, set)
         self.serializationType = self.NOT_SET
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return symbol >= minVocabSymbol \
             and symbol <= maxVocabSymbol \
             and not super(type(self), self).matches(symbol, minVocabSymbol, maxVocabSymbol)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '~' + super(type(self), self).__str__()
 
 
 class WildcardTransition(Transition):
     __slots__ = 'serializationType'
 
-    def __init__(self, target:ATNState):
+    def __init__(self, target:ATNState) -> None:
         super().__init__(target)
         self.serializationType = self.WILDCARD
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return symbol >= minVocabSymbol and symbol <= maxVocabSymbol
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "."
 
 
 class PrecedencePredicateTransition(AbstractPredicateTransition):
     __slots__ = ('serializationType', 'precedence')
 
-    def __init__(self, target:ATNState, precedence:int):
+    def __init__(self, target:ATNState, precedence:int) -> None:
         super().__init__(target)
         self.serializationType = self.PRECEDENCE
         self.precedence = precedence
         self.isEpsilon = True
 
-    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int):
+    def matches( self, symbol:int, minVocabSymbol:int,  maxVocabSymbol:int) -> bool:
         return False
 
 
-    def getPredicate(self):
+    def getPredicate(self) -> PrecedencePredicate:
         return PrecedencePredicate(self.precedence)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.precedence + " >= _p"
 
 

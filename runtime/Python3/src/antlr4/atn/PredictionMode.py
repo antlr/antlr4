@@ -173,7 +173,7 @@ class PredictionMode(Enum):
     # {@link ATNConfigSet} will merge everything ignoring predicates.</p>
     #
     @classmethod
-    def hasSLLConflictTerminatingPrediction(cls, mode:PredictionMode, configs:ATNConfigSet):
+    def hasSLLConflictTerminatingPrediction(cls, mode:PredictionMode, configs:ATNConfigSet) -> bool:
         # Configs in rule stop states indicate reaching the end of the decision
         # rule (local context) or end of start rule (full context). If all
         # configs meet this condition, then none of the configurations is able
@@ -209,7 +209,7 @@ class PredictionMode(Enum):
     # @return {@code true} if any configuration in {@code configs} is in a
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
-    def hasConfigInRuleStopState(cls, configs:ATNConfigSet):
+    def hasConfigInRuleStopState(cls, configs:ATNConfigSet) -> bool:
         return any(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     # Checks if all configurations in {@code configs} are in a
@@ -221,7 +221,7 @@ class PredictionMode(Enum):
     # @return {@code true} if all configurations in {@code configs} are in a
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
-    def allConfigsInRuleStopStates(cls, configs:ATNConfigSet):
+    def allConfigsInRuleStopStates(cls, configs:ATNConfigSet) -> bool:
         return all(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     #
@@ -366,7 +366,7 @@ class PredictionMode(Enum):
     # {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
     #
     @classmethod
-    def resolvesToJustOneViableAlt(cls, altsets:list):
+    def resolvesToJustOneViableAlt(cls, altsets:list) -> int:
         return cls.getSingleViableAlt(altsets)
 
     #
@@ -378,7 +378,7 @@ class PredictionMode(Enum):
     # {@link BitSet#cardinality cardinality} &gt; 1, otherwise {@code false}
     #
     @classmethod
-    def allSubsetsConflict(cls, altsets:list):
+    def allSubsetsConflict(cls, altsets:list) -> bool:
         return not cls.hasNonConflictingAltSet(altsets)
 
     #
@@ -390,7 +390,7 @@ class PredictionMode(Enum):
     # {@link BitSet#cardinality cardinality} 1, otherwise {@code false}
     #
     @classmethod
-    def hasNonConflictingAltSet(cls, altsets:list):
+    def hasNonConflictingAltSet(cls, altsets:list) -> bool:
         return any(len(alts) == 1 for alts in altsets)
 
     #
@@ -402,7 +402,7 @@ class PredictionMode(Enum):
     # {@link BitSet#cardinality cardinality} &gt; 1, otherwise {@code false}
     #
     @classmethod
-    def hasConflictingAltSet(cls, altsets:list):
+    def hasConflictingAltSet(cls, altsets:list) -> bool:
         return any(len(alts) > 1 for alts in altsets)
 
     #
@@ -413,7 +413,7 @@ class PredictionMode(Enum):
     # others, otherwise {@code false}
     #
     @classmethod
-    def allSubsetsEqual(cls, altsets:list):
+    def allSubsetsEqual(cls, altsets:list) -> bool:
         if not altsets:
             return True
         first = next(iter(altsets))
@@ -427,7 +427,7 @@ class PredictionMode(Enum):
     # @param altsets a collection of alternative subsets
     #
     @classmethod
-    def getUniqueAlt(cls, altsets:list):
+    def getUniqueAlt(cls, altsets:list) -> int:
         all = cls.getAlts(altsets)
         if len(all)==1:
             return next(iter(all))
@@ -474,7 +474,7 @@ class PredictionMode(Enum):
     # </pre>
     #
     @classmethod
-    def getStateToAltMap(cls, configs:ATNConfigSet):
+    def getStateToAltMap(cls, configs:ATNConfigSet) -> dict:
         m = dict()
         for c in configs:
             alts = m.get(c.state, None)
@@ -485,11 +485,11 @@ class PredictionMode(Enum):
         return m
 
     @classmethod
-    def hasStateAssociatedWithOneAlt(cls, configs:ATNConfigSet):
+    def hasStateAssociatedWithOneAlt(cls, configs:ATNConfigSet) -> bool:
         return any(len(alts) == 1 for alts in cls.getStateToAltMap(configs).values())
 
     @classmethod
-    def getSingleViableAlt(cls, altsets:list):
+    def getSingleViableAlt(cls, altsets:list) -> int:
         viableAlts = set()
         for alts in altsets:
             minAlt = min(alts)

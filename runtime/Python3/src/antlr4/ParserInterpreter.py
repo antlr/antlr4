@@ -31,6 +31,7 @@ from antlr4.atn.Transition import Transition
 from antlr4.error.Errors import RecognitionException, UnsupportedOperationException, FailedPredicateException
 
 
+from antlr4.ParserRuleContext import InterpreterRuleContext
 class ParserInterpreter(Parser):
     __slots__ = (
         'grammarFileName', 'atn', 'tokenNames', 'ruleNames', 'decisionToDFA',
@@ -38,7 +39,7 @@ class ParserInterpreter(Parser):
         'pushRecursionContextStates'
     )
 
-    def __init__(self, grammarFileName:str, tokenNames:list, ruleNames:list, atn:ATN, input:TokenStream):
+    def __init__(self, grammarFileName:str, tokenNames:list, ruleNames:list, atn:ATN, input:TokenStream) -> None:
         super().__init__(input)
         self.grammarFileName = grammarFileName
         self.atn = atn
@@ -58,7 +59,7 @@ class ParserInterpreter(Parser):
         self._interp = ParserATNSimulator(self, atn, self.decisionToDFA, self.sharedContextCache)
 
     # Begin parsing at startRuleIndex#
-    def parse(self, startRuleIndex:int):
+    def parse(self, startRuleIndex:int) -> InterpreterRuleContext:
         startRuleStartState = self.atn.ruleToStartState[startRuleIndex]
         rootContext = InterpreterRuleContext(None, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
         if startRuleStartState.isPrecedenceRule:
@@ -89,14 +90,14 @@ class ParserInterpreter(Parser):
                     self._errHandler.reportError(self, e)
                     self._errHandler.recover(self, e)
 
-    def enterRecursionRule(self, localctx:ParserRuleContext, state:int, ruleIndex:int, precedence:int):
+    def enterRecursionRule(self, localctx:ParserRuleContext, state:int, ruleIndex:int, precedence:int) -> None:
         self._parentContextStack.append((self._ctx, localctx.invokingState))
         super().enterRecursionRule(localctx, state, ruleIndex, precedence)
 
     def getATNState(self):
         return self.atn.states[self.state]
 
-    def visitState(self, p:ATNState):
+    def visitState(self, p:ATNState) -> None:
         edge = 0
         if len(p.transitions) > 1:
             self._errHandler.sync(self)
@@ -157,7 +158,7 @@ class ParserInterpreter(Parser):
 
         self.state = transition.target.stateNumber
 
-    def visitRuleStopState(self, p:ATNState):
+    def visitRuleStopState(self, p:ATNState) -> None:
         ruleStartState = self.atn.ruleToStartState[p.ruleIndex]
         if ruleStartState.isPrecedenceRule:
             parentContext = self._parentContextStack.pop()

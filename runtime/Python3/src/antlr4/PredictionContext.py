@@ -48,29 +48,29 @@ class PredictionContext(object):
     # </pre>
     #/
 
-    def __init__(self, cachedHashCode:int):
+    def __init__(self, cachedHashCode:int) -> None:
         self.cachedHashCode = cachedHashCode
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 0
 
     # This means only the {@link #EMPTY} context is in set.
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         return self is self.EMPTY
 
-    def hasEmptyPath(self):
+    def hasEmptyPath(self) -> bool:
         return self.getReturnState(len(self) - 1) == self.EMPTY_RETURN_STATE
 
     def getReturnState(self, index:int):
         raise IllegalStateException("illegal!")
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.cachedHashCode
 
-def calculateHashCode(parent:PredictionContext, returnState:int):
+def calculateHashCode(parent:PredictionContext, returnState:int) -> int:
     return hash("") if parent is None else hash((hash(parent), returnState))
 
-def calculateListsHashCode(parents:[], returnStates:[] ):
+def calculateListsHashCode(parents:[], returnStates:[] ) -> int:
     h = 0
     for parent, returnState in zip(parents, returnStates):
         h = hash((h, calculateHashCode(parent, returnState)))
@@ -82,7 +82,7 @@ def calculateListsHashCode(parents:[], returnStates:[] ):
 
 class PredictionContextCache(object):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.cache = dict()
 
     #  Add a context to the cache and return it. If the context already exists,
@@ -101,27 +101,27 @@ class PredictionContextCache(object):
     def get(self, ctx:PredictionContext):
         return self.cache.get(ctx, None)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.cache)
 
 
 class SingletonPredictionContext(PredictionContext):
 
     @staticmethod
-    def create(parent:PredictionContext , returnState:int ):
+    def create(parent:PredictionContext , returnState:int ) -> SingletonPredictionContext:
         if returnState == PredictionContext.EMPTY_RETURN_STATE and parent is None:
             # someone can pass in the bits of an array ctx that mean $
             return SingletonPredictionContext.EMPTY
         else:
             return SingletonPredictionContext(parent, returnState)
 
-    def __init__(self, parent:PredictionContext, returnState:int):
+    def __init__(self, parent:PredictionContext, returnState:int) -> None:
         hashCode = calculateHashCode(parent, returnState)
         super().__init__(hashCode)
         self.parentCtx = parent
         self.returnState = returnState
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 1
 
     def getParent(self, index:int):
@@ -130,7 +130,7 @@ class SingletonPredictionContext(PredictionContext):
     def getReturnState(self, index:int):
         return self.returnState
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif other is None:
@@ -140,10 +140,10 @@ class SingletonPredictionContext(PredictionContext):
         else:
             return self.returnState == other.returnState and self.parentCtx == other.parentCtx
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.cachedHashCode
 
-    def __str__(self):
+    def __str__(self) -> str:
         up = "" if self.parentCtx is None else str(self.parentCtx)
         if len(up)==0:
             if self.returnState == self.EMPTY_RETURN_STATE:
@@ -156,19 +156,19 @@ class SingletonPredictionContext(PredictionContext):
 
 class EmptyPredictionContext(SingletonPredictionContext):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(None, PredictionContext.EMPTY_RETURN_STATE)
 
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         return True
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self is other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.cachedHashCode
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "$"
 
 
@@ -179,17 +179,17 @@ class ArrayPredictionContext(PredictionContext):
     #  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
     #  returnState == {@link #EMPTY_RETURN_STATE}.
 
-    def __init__(self, parents:list, returnStates:list):
+    def __init__(self, parents:list, returnStates:list) -> None:
         super().__init__(calculateListsHashCode(parents, returnStates))
         self.parents = parents
         self.returnStates = returnStates
 
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         # since EMPTY_RETURN_STATE can only appear in the last position, we
         # don't need to verify that size==1
         return self.returnStates[0]==PredictionContext.EMPTY_RETURN_STATE
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.returnStates)
 
     def getParent(self, index:int):
@@ -198,7 +198,7 @@ class ArrayPredictionContext(PredictionContext):
     def getReturnState(self, index:int):
         return self.returnStates[index]
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, ArrayPredictionContext):
@@ -208,7 +208,7 @@ class ArrayPredictionContext(PredictionContext):
         else:
             return self.returnStates==other.returnStates and self.parents==other.parents
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.isEmpty():
             return "[]"
         with StringIO() as buf:
@@ -228,7 +228,7 @@ class ArrayPredictionContext(PredictionContext):
             buf.write("]")
             return buf.getvalue()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.cachedHashCode
 
 
@@ -236,7 +236,7 @@ class ArrayPredictionContext(PredictionContext):
 #  Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 #  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 #/
-def PredictionContextFromRuleContext(atn:ATN, outerContext:RuleContext=None):
+def PredictionContextFromRuleContext(atn:ATN, outerContext:RuleContext=None) -> SingletonPredictionContext | None:
     if outerContext is None:
         outerContext = RuleContext.EMPTY
 
@@ -252,7 +252,7 @@ def PredictionContextFromRuleContext(atn:ATN, outerContext:RuleContext=None):
     return SingletonPredictionContext.create(parent, transition.followState.stateNumber)
 
 
-def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCache:dict):
+def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCache:dict) -> SingletonPredictionContext | None | ArrayPredictionContext | ArrayPredictionContext | None | SingletonPredictionContext:
 
     # share same graph if both same
     if a==b:
@@ -304,7 +304,7 @@ def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCa
 # otherwise false to indicate a full-context merge
 # @param mergeCache
 #/
-def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIsWildcard:bool, mergeCache:dict):
+def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIsWildcard:bool, mergeCache:dict) -> ArrayPredictionContext | SingletonPredictionContext | None:
     if mergeCache is not None:
         previous = mergeCache.get((a,b), None)
         if previous is not None:
@@ -401,7 +401,7 @@ def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, 
 # @param rootIsWildcard {@code true} if this is a local-context merge,
 # otherwise false to indicate a full-context merge
 #/
-def mergeRoot(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIsWildcard:bool):
+def mergeRoot(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIsWildcard:bool) -> ArrayPredictionContext | None:
     if rootIsWildcard:
         if a == PredictionContext.EMPTY:
             return PredictionContext.EMPTY  ## + b =#
@@ -440,7 +440,7 @@ def mergeRoot(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIs
 # {@link SingletonPredictionContext}.<br>
 # <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 #/
-def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildcard:bool, mergeCache:dict):
+def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildcard:bool, mergeCache:dict) -> ArrayPredictionContext | SingletonPredictionContext | None:
     if mergeCache is not None:
         previous = mergeCache.get((a,b), None)
         if previous is not None:
@@ -538,7 +538,7 @@ def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildca
 # Make pass over all <em>M</em> {@code parents}; merge any {@code equals()}
 # ones.
 #/
-def combineCommonParents(parents:list):
+def combineCommonParents(parents:list) -> None:
     uniqueParents = dict()
 
     for p in range(0, len(parents)):
@@ -549,7 +549,7 @@ def combineCommonParents(parents:list):
     for p in range(0, len(parents)):
         parents[p] = uniqueParents[parents[p]]
 
-def getCachedPredictionContext(context:PredictionContext, contextCache:PredictionContextCache, visited:dict):
+def getCachedPredictionContext(context:PredictionContext, contextCache:PredictionContextCache, visited:dict) -> SingletonPredictionContext | None | ArrayPredictionContext:
     if context.isEmpty():
         return context
     existing = visited.get(context)
@@ -611,7 +611,7 @@ def getCachedPredictionContext(context:PredictionContext, contextCache:Predictio
 #	}
 
 # ter's recursive version of Sam's getAllNodes()
-def getAllContextNodes(context:PredictionContext, nodes:list=None, visited:dict=None):
+def getAllContextNodes(context:PredictionContext, nodes:list=None, visited:dict=None) -> list:
     if nodes is None:
         nodes = list()
         return getAllContextNodes(context, nodes, visited)

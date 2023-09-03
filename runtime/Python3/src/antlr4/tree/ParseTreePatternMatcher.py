@@ -80,7 +80,7 @@ ParseTreePattern = None
 
 class CannotInvokeStartRule(Exception):
 
-    def __init__(self, e:Exception):
+    def __init__(self, e:Exception) -> None:
         super().__init__(e)
 
 class StartRuleDoesNotConsumeFullPattern(Exception):
@@ -88,6 +88,7 @@ class StartRuleDoesNotConsumeFullPattern(Exception):
     pass
 
 
+from antlr4.tree.ParseTreeMatch import ParseTreeMatch
 class ParseTreePatternMatcher(object):
     __slots__ = ('lexer', 'parser', 'start', 'stop', 'escape')
 
@@ -95,7 +96,7 @@ class ParseTreePatternMatcher(object):
     # {@link Parser} object. The lexer input stream is altered for tokenizing
     # the tree patterns. The parser is used as a convenient mechanism to get
     # the grammar name, plus token, rule names.
-    def __init__(self, lexer:Lexer, parser:Parser):
+    def __init__(self, lexer:Lexer, parser:Parser) -> None:
         self.lexer = lexer
         self.parser = parser
         self.start = "<"
@@ -112,7 +113,7 @@ class ParseTreePatternMatcher(object):
     # @exception IllegalArgumentException if {@code start} is {@code null} or empty.
     # @exception IllegalArgumentException if {@code stop} is {@code null} or empty.
     #
-    def setDelimiters(self, start:str, stop:str, escapeLeft:str):
+    def setDelimiters(self, start:str, stop:str, escapeLeft:str) -> None:
         if start is None or len(start)==0:
             raise Exception("start cannot be null or empty")
         if stop is None or len(stop)==0:
@@ -129,7 +130,7 @@ class ParseTreePatternMatcher(object):
     # Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
     #  compiled pattern instead of a string representation of a tree pattern.
     #
-    def matchesPattern(self, tree:ParseTree, pattern:ParseTreePattern):
+    def matchesPattern(self, tree:ParseTree, pattern:ParseTreePattern) -> bool:
         mismatchedNode = self.matchImpl(tree, pattern.patternTree, dict())
         return mismatchedNode is None
 
@@ -138,7 +139,7 @@ class ParseTreePatternMatcher(object):
     # {@code tree} and return a {@link ParseTreeMatch} object that contains the
     # matched elements, or the node at which the match failed.
     #
-    def matchRuleIndex(self, tree:ParseTree, pattern:str, patternRuleIndex:int):
+    def matchRuleIndex(self, tree:ParseTree, pattern:str, patternRuleIndex:int) -> ParseTreeMatch:
         p = self.compileTreePattern(pattern, patternRuleIndex)
         return self.matchPattern(tree, p)
 
@@ -148,7 +149,7 @@ class ParseTreePatternMatcher(object):
     # node at which the match failed. Pass in a compiled pattern instead of a
     # string representation of a tree pattern.
     #
-    def matchPattern(self, tree:ParseTree, pattern:ParseTreePattern):
+    def matchPattern(self, tree:ParseTree, pattern:ParseTreePattern) -> ParseTreeMatch:
         labels = dict()
         mismatchedNode = self.matchImpl(tree, pattern.patternTree, labels)
         from antlr4.tree.ParseTreeMatch import ParseTreeMatch
@@ -158,7 +159,7 @@ class ParseTreePatternMatcher(object):
     # For repeated use of a tree pattern, compile it to a
     # {@link ParseTreePattern} using this method.
     #
-    def compileTreePattern(self, pattern:str, patternRuleIndex:int):
+    def compileTreePattern(self, pattern:str, patternRuleIndex:int) -> ParseTreePattern:
         tokenList = self.tokenize(pattern)
         tokenSrc = ListTokenSource(tokenList)
         tokens = CommonTokenStream(tokenSrc)
@@ -256,7 +257,7 @@ class ParseTreePatternMatcher(object):
         # if nodes aren't both tokens or both rule nodes, can't match
         return tree
 
-    def map(self, labels, label, tree):
+    def map(self, labels, label, tree) -> None:
         v = labels.get(label, None)
         if v is None:
             v = list()
@@ -264,7 +265,7 @@ class ParseTreePatternMatcher(object):
         v.append(tree)
 
     # Is {@code t} {@code (expr <expr>)} subtree?#
-    def getRuleTagToken(self, tree:ParseTree):
+    def getRuleTagToken(self, tree:ParseTree) -> None:
         if isinstance( tree, RuleNode ):
             if tree.getChildCount()==1 and isinstance(tree.getChild(0), TerminalNode ):
                 c = tree.getChild(0)
@@ -272,7 +273,7 @@ class ParseTreePatternMatcher(object):
                     return c.symbol
         return None
 
-    def tokenize(self, pattern:str):
+    def tokenize(self, pattern:str) -> list:
         # split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
         chunks = self.split(pattern)
 
@@ -303,7 +304,7 @@ class ParseTreePatternMatcher(object):
         return tokens
 
     # Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by {@link #tokenize}.#
-    def split(self, pattern:str):
+    def split(self, pattern:str) -> list:
         p = 0
         n = len(pattern)
         chunks = list()

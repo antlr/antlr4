@@ -22,7 +22,7 @@ LexerActionExecutor = None
 class LexerActionExecutor(object):
     __slots__ = ('lexerActions', 'hashCode')
 
-    def __init__(self, lexerActions:list=list()):
+    def __init__(self, lexerActions:list=list()) -> None:
         self.lexerActions = lexerActions
         # Caches the result of {@link #hashCode} since the hash code is an element
         # of the performance-critical {@link LexerATNConfig#hashCode} operation.
@@ -43,7 +43,7 @@ class LexerActionExecutor(object):
     # @return A {@link LexerActionExecutor} for executing the combine actions
     # of {@code lexerActionExecutor} and {@code lexerAction}.
     @staticmethod
-    def append(lexerActionExecutor:LexerActionExecutor , lexerAction:LexerAction ):
+    def append(lexerActionExecutor:LexerActionExecutor , lexerAction:LexerAction ) -> LexerActionExecutor:
         if lexerActionExecutor is None:
             return LexerActionExecutor([ lexerAction ])
 
@@ -78,7 +78,7 @@ class LexerActionExecutor(object):
     # @return A {@link LexerActionExecutor} which stores input stream offsets
     # for all position-dependent lexer actions.
     #/
-    def fixOffsetBeforeMatch(self, offset:int):
+    def fixOffsetBeforeMatch(self, offset:int) -> LexerActionExecutor:
         updatedLexerActions = None
         for i in range(0, len(self.lexerActions)):
             if self.lexerActions[i].isPositionDependent and not isinstance(self.lexerActions[i], LexerIndexedCustomAction):
@@ -110,7 +110,7 @@ class LexerActionExecutor(object):
     # {@link IntStream#seek} to set the {@code input} position to the beginning
     # of the token.
     #/
-    def execute(self, lexer:Lexer, input:InputStream, startIndex:int):
+    def execute(self, lexer:Lexer, input:InputStream, startIndex:int) -> None:
         requiresSeek = False
         stopIndex = input.index
         try:
@@ -128,10 +128,10 @@ class LexerActionExecutor(object):
             if requiresSeek:
                 input.seek(stopIndex)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.hashCode
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerActionExecutor):

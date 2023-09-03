@@ -11,6 +11,9 @@ from antlr4.atn.ATNType import ATNType
 from antlr4.atn.ATNState import ATNState, DecisionState
 
 
+from antlr4.IntervalSet import IntervalSet
+from antlr4.IntervalSet import IntervalSet
+from antlr4.IntervalSet import IntervalSet
 class ATN(object):
     __slots__ = (
         'grammarType', 'maxTokenType', 'states', 'decisionToState',
@@ -21,7 +24,7 @@ class ATN(object):
     INVALID_ALT_NUMBER = 0
 
     # Used for runtime deserialization of ATNs from strings#/
-    def __init__(self, grammarType:ATNType , maxTokenType:int ):
+    def __init__(self, grammarType:ATNType , maxTokenType:int ) -> None:
         # The type of the ATN.
         self.grammarType = grammarType
         # The maximum value for any symbol recognized by a transition in the ATN.
@@ -51,7 +54,7 @@ class ATN(object):
     #  If {@code ctx} is null, the set of tokens will not include what can follow
     #  the rule surrounding {@code s}. In other words, the set will be
     #  restricted to tokens reachable staying within {@code s}'s rule.
-    def nextTokensInContext(self, s:ATNState, ctx:RuleContext):
+    def nextTokensInContext(self, s:ATNState, ctx:RuleContext) -> IntervalSet:
         from antlr4.LL1Analyzer import LL1Analyzer
         anal = LL1Analyzer(self)
         return anal.LOOK(s, ctx=ctx)
@@ -66,19 +69,19 @@ class ATN(object):
         s.nextTokenWithinRule.readonly = True
         return s.nextTokenWithinRule
 
-    def nextTokens(self, s:ATNState, ctx:RuleContext = None):
+    def nextTokens(self, s:ATNState, ctx:RuleContext = None) -> IntervalSet:
         if ctx==None:
             return self.nextTokensNoContext(s)
         else:
             return self.nextTokensInContext(s, ctx)
 
-    def addState(self, state:ATNState):
+    def addState(self, state:ATNState) -> None:
         if state is not None:
             state.atn = self
             state.stateNumber = len(self.states)
         self.states.append(state)
 
-    def removeState(self, state:ATNState):
+    def removeState(self, state:ATNState) -> None:
         self.states[state.stateNumber] = None # just free mem, don't shift states in list
 
     def defineDecisionState(self, s:DecisionState):
@@ -86,7 +89,7 @@ class ATN(object):
         s.decision = len(self.decisionToState)-1
         return s.decision
 
-    def getDecisionState(self, decision:int):
+    def getDecisionState(self, decision:int) -> None:
         if len(self.decisionToState)==0:
             return None
         else:
@@ -110,7 +113,7 @@ class ATN(object):
     # @throws IllegalArgumentException if the ATN does not contain a state with
     # number {@code stateNumber}
     #/
-    def getExpectedTokens(self, stateNumber:int, ctx:RuleContext ):
+    def getExpectedTokens(self, stateNumber:int, ctx:RuleContext ) -> IntervalSet:
         if stateNumber < 0 or stateNumber >= len(self.states):
             raise Exception("Invalid state number.")
         s = self.states[stateNumber]

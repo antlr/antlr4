@@ -26,7 +26,7 @@ def beautify_lisp_string(in_string):
     return out_string
 
 
-def main():
+def main() -> None:
 
     #############################################################
     # parse options

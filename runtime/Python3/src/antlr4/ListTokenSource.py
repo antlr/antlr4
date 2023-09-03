@@ -32,7 +32,7 @@ class ListTokenSource(TokenSource):
     #
     # @exception NullPointerException if {@code tokens} is {@code null}
     #
-    def __init__(self, tokens:list, sourceName:str=None):
+    def __init__(self, tokens:list, sourceName:str=None) -> None:
         if tokens is None:
             raise ReferenceError("tokens cannot be null")
         self.tokens = tokens
@@ -51,7 +51,7 @@ class ListTokenSource(TokenSource):
     # {@inheritDoc}
     #
     @property
-    def column(self):
+    def column(self) -> int:
         if self.pos < len(self.tokens):
             return self.tokens[self.pos].column
         elif self.eofToken is not None:
@@ -96,7 +96,7 @@ class ListTokenSource(TokenSource):
     # {@inheritDoc}
     #
     @property
-    def line(self):
+    def line(self) -> int:
         if self.pos < len(self.tokens):
             return self.tokens[self.pos].line
         elif self.eofToken is not None:
@@ -120,7 +120,7 @@ class ListTokenSource(TokenSource):
     #
     # {@inheritDoc}
     #
-    def getInputStream(self):
+    def getInputStream(self) -> None:
         if self.pos < len(self.tokens):
             return self.tokens[self.pos].getInputStream()
         elif self.eofToken is not None:
@@ -134,7 +134,7 @@ class ListTokenSource(TokenSource):
     #
     # {@inheritDoc}
     #
-    def getSourceName(self):
+    def getSourceName(self) -> str:
         if self.sourceName is not None:
             return self.sourceName
         inputStream = self.getInputStream()

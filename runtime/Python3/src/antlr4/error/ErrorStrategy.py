@@ -38,9 +38,10 @@ class ErrorStrategy(object):
 # This is the default implementation of {@link ANTLRErrorStrategy} used for
 # error reporting and recovery in ANTLR parsers.
 #
+from antlr4.IntervalSet import IntervalSet
 class DefaultErrorStrategy(ErrorStrategy):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         # Indicates whether the error strategy is currently "recovering from an
         # error". This is used to suppress reporting multiple error messages while
@@ -63,7 +64,7 @@ class DefaultErrorStrategy(ErrorStrategy):
 
     # <p>The default implementation simply calls {@link #endErrorCondition} to
     # ensure that the handler is not in error recovery mode.</p>
-    def reset(self, recognizer:Parser):
+    def reset(self, recognizer:Parser) -> None:
         self.endErrorCondition(recognizer)
 
     #
@@ -72,10 +73,10 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     # @param recognizer the parser instance
     #
-    def beginErrorCondition(self, recognizer:Parser):
+    def beginErrorCondition(self, recognizer:Parser) -> None:
         self.errorRecoveryMode = True
 
-    def inErrorRecoveryMode(self, recognizer:Parser):
+    def inErrorRecoveryMode(self, recognizer:Parser) -> bool:
         return self.errorRecoveryMode
 
     #
@@ -84,7 +85,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     # @param recognizer
     #
-    def endErrorCondition(self, recognizer:Parser):
+    def endErrorCondition(self, recognizer:Parser) -> None:
         self.errorRecoveryMode = False
         self.lastErrorStates = None
         self.lastErrorIndex = -1
@@ -94,7 +95,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     # <p>The default implementation simply calls {@link #endErrorCondition}.</p>
     #
-    def reportMatch(self, recognizer:Parser):
+    def reportMatch(self, recognizer:Parser) -> None:
         self.endErrorCondition(recognizer)
 
     #
@@ -116,7 +117,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # the exception</li>
     # </ul>
     #
-    def reportError(self, recognizer:Parser, e:RecognitionException):
+    def reportError(self, recognizer:Parser, e:RecognitionException) -> None:
        # if we've already reported an error and have not matched a token
        # yet successfully, don't report any errors.
         if self.inErrorRecoveryMode(recognizer):
@@ -139,7 +140,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # until we find one in the resynchronization set--loosely the set of tokens
     # that can follow the current rule.</p>
     #
-    def recover(self, recognizer:Parser, e:RecognitionException):
+    def recover(self, recognizer:Parser, e:RecognitionException) -> None:
         if self.lastErrorIndex==recognizer.getInputStream().index \
             and self.lastErrorStates is not None \
             and recognizer.state in self.lastErrorStates:
@@ -201,7 +202,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # some reason speed is suffering for you, you can turn off this
     # functionality by simply overriding this method as a blank { }.</p>
     #
-    def sync(self, recognizer:Parser):
+    def sync(self, recognizer:Parser) -> None:
         # If already recovering, don't try to sync
         if self.inErrorRecoveryMode(recognizer):
             return
@@ -248,7 +249,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @param recognizer the parser instance
     # @param e the recognition exception
     #
-    def reportNoViableAlternative(self, recognizer:Parser, e:NoViableAltException):
+    def reportNoViableAlternative(self, recognizer:Parser, e:NoViableAltException) -> None:
         tokens = recognizer.getTokenStream()
         if tokens is not None:
             if e.startToken.type==Token.EOF:
@@ -269,7 +270,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @param recognizer the parser instance
     # @param e the recognition exception
     #
-    def reportInputMismatch(self, recognizer:Parser, e:InputMismatchException):
+    def reportInputMismatch(self, recognizer:Parser, e:InputMismatchException) -> None:
         msg = "mismatched input " + self.getTokenErrorDisplay(e.offendingToken) \
               + " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames)
         recognizer.notifyErrorListeners(msg, e.offendingToken, e)
@@ -283,7 +284,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @param recognizer the parser instance
     # @param e the recognition exception
     #
-    def reportFailedPredicate(self, recognizer, e):
+    def reportFailedPredicate(self, recognizer, e) -> None:
         ruleName = recognizer.ruleNames[recognizer._ctx.getRuleIndex()]
         msg = "rule " + ruleName + " " + e.message
         recognizer.notifyErrorListeners(msg, e.offendingToken, e)
@@ -305,7 +306,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     # @param recognizer the parser instance
     #
-    def reportUnwantedToken(self, recognizer:Parser):
+    def reportUnwantedToken(self, recognizer:Parser) -> None:
         if self.inErrorRecoveryMode(recognizer):
             return
 
@@ -333,7 +334,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     # @param recognizer the parser instance
     #
-    def reportMissingToken(self, recognizer:Parser):
+    def reportMissingToken(self, recognizer:Parser) -> None:
         if self.inErrorRecoveryMode(recognizer):
             return
         self.beginErrorCondition(recognizer)
@@ -423,7 +424,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @return {@code true} if single-token insertion is a viable recovery
     # strategy for the current mismatched input, otherwise {@code false}
     #
-    def singleTokenInsertion(self, recognizer:Parser):
+    def singleTokenInsertion(self, recognizer:Parser) -> bool:
         currentSymbolType = recognizer.getTokenStream().LA(1)
         # if current token is consistent with what could come after current
         # ATN state, then we know we're missing a token; error recovery
@@ -456,7 +457,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     # deletion successfully recovers from the mismatched input, otherwise
     # {@code null}
     #
-    def singleTokenDeletion(self, recognizer:Parser):
+    def singleTokenDeletion(self, recognizer:Parser) -> None:
         nextTokenType = recognizer.getTokenStream().LA(2)
         expecting = self.getExpectedTokens(recognizer)
         if nextTokenType in expecting:
@@ -524,7 +525,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #  your token objects because you don't have to go modify your lexer
     #  so that it creates a new Java type.
     #
-    def getTokenErrorDisplay(self, t:Token):
+    def getTokenErrorDisplay(self, t:Token) -> str:
         if t is None:
             return "<no token>"
         s = t.text
@@ -535,7 +536,7 @@ class DefaultErrorStrategy(ErrorStrategy):
                 s = "<" + str(t.type) + ">"
         return self.escapeWSAndQuote(s)
 
-    def escapeWSAndQuote(self, s:str):
+    def escapeWSAndQuote(self, s:str) -> str:
         s = s.replace("\n","\\n")
         s = s.replace("\r","\\r")
         s = s.replace("\t","\\t")
@@ -633,7 +634,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #  Like Grosch I implement context-sensitive FOLLOW sets that are combined
     #  at run-time upon error to avoid overhead during parsing.
     #
-    def getErrorRecoverySet(self, recognizer:Parser):
+    def getErrorRecoverySet(self, recognizer:Parser) -> IntervalSet:
         atn = recognizer._interp.atn
         ctx = recognizer._ctx
         recoverSet = IntervalSet()
@@ -648,7 +649,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         return recoverSet
 
     # Consume tokens until one matches the given token set.#
-    def consumeUntil(self, recognizer:Parser, set_:set):
+    def consumeUntil(self, recognizer:Parser, set_:set) -> None:
         ttype = recognizer.getTokenStream().LA(1)
         while ttype != Token.EOF and not ttype in set_:
             recognizer.consume()
@@ -689,7 +690,7 @@ class BailErrorStrategy(DefaultErrorStrategy):
     #  rule function catches.  Use {@link Exception#getCause()} to get the
     #  original {@link RecognitionException}.
     #
-    def recover(self, recognizer:Parser, e:RecognitionException):
+    def recover(self, recognizer:Parser, e:RecognitionException) -> None:
         context = recognizer._ctx
         while context is not None:
             context.exception = e
@@ -699,7 +700,7 @@ class BailErrorStrategy(DefaultErrorStrategy):
     # Make sure we don't attempt to recover inline; if the parser
     #  successfully recovers, it won't throw an exception.
     #
-    def recoverInline(self, recognizer:Parser):
+    def recoverInline(self, recognizer:Parser) -> None:
         self.recover(recognizer, InputMismatchException(recognizer))
 
     # Make sure we don't attempt to recover from problems in subrules.#

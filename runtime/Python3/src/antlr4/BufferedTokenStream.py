@@ -17,21 +17,18 @@ from io import StringIO
 from antlr4.Token import Token
 from antlr4.error.Errors import IllegalStateException
 
-# need forward declaration
-Lexer = None
-
 # this is just to keep meaningful parameter types to Parser
 class TokenStream(object):
-
-    pass
+    def LT(self, k:int) -> Optional[Token]:
+        pass
 
 
 class BufferedTokenStream(TokenStream):
     __slots__ = ('tokenSource', 'tokens', 'index', 'fetchedEOF')
 
-    def __init__(self, tokenSource:Lexer):
+    def __init__(self, tokenSource:Lexer) -> None:
         # The {@link TokenSource} from which tokens for this stream are fetched.
-        self.tokenSource = tokenSource
+        self.tokenSource : Lexer = tokenSource
 
         # A collection of all tokens fetched from the token source. The list is
         # considered a complete view of the input once {@link #fetchedEOF} is set
@@ -62,17 +59,17 @@ class BufferedTokenStream(TokenStream):
         # <ul>
         self.fetchedEOF = False
 
-    def mark(self):
+    def mark(self) -> int:
         return 0
 
     def release(self, marker:int):
         # no resources to release
         pass
 
-    def reset(self):
+    def reset(self) -> None:
         self.seek(0)
 
-    def seek(self, index:int):
+    def seek(self, index:int) -> None:
         self.lazyInit()
         self.index = self.adjustSeekIndex(index)
 
@@ -80,7 +77,7 @@ class BufferedTokenStream(TokenStream):
         self.lazyInit()
         return self.tokens[index]
 
-    def consume(self):
+    def consume(self) -> None:
         skipEofCheck = False
         if self.index >= 0:
             if self.fetchedEOF:
@@ -106,7 +103,7 @@ class BufferedTokenStream(TokenStream):
     #    {@code false}.
     # @see #get(int i)
     #/
-    def sync(self, i:int):
+    def sync(self, i:int) -> bool:
         n = i - len(self.tokens) + 1 # how many more elements we need?
         if n > 0 :
             fetched = self.fetch(n)
@@ -117,7 +114,7 @@ class BufferedTokenStream(TokenStream):
     #
     # @return The actual number of elements added to the buffer.
     #/
-    def fetch(self, n:int):
+    def fetch(self, n:int) -> int:
         if self.fetchedEOF:
             return 0
         for i in range(0, n):
@@ -131,7 +128,7 @@ class BufferedTokenStream(TokenStream):
 
 
     # Get all tokens from start..stop inclusively#/
-    def getTokens(self, start:int, stop:int, types:set=None):
+    def getTokens(self, start:int, stop:int, types:set=None) -> list | None:
         if start<0 or stop<0:
             return None
         self.lazyInit()
@@ -149,12 +146,12 @@ class BufferedTokenStream(TokenStream):
     def LA(self, i:int):
         return self.LT(i).type
 
-    def LB(self, k:int):
+    def LB(self, k:int) -> None:
         if (self.index-k) < 0:
             return None
         return self.tokens[self.index-k]
 
-    def LT(self, k:int):
+    def LT(self, k:int) -> Optional[Token]:
         self.lazyInit()
         if k==0:
             return None
@@ -179,19 +176,19 @@ class BufferedTokenStream(TokenStream):
     # @param i The target token index.
     # @return The adjusted target token index.
 
-    def adjustSeekIndex(self, i:int):
+    def adjustSeekIndex(self, i:int) -> int:
         return i
 
-    def lazyInit(self):
+    def lazyInit(self) -> None:
         if self.index == -1:
             self.setup()
 
-    def setup(self):
+    def setup(self) -> None:
         self.sync(0)
         self.index = self.adjustSeekIndex(0)
 
     # Reset this token stream by setting its token source.#/
-    def setTokenSource(self, tokenSource:Lexer):
+    def setTokenSource(self, tokenSource:Lexer) -> None:
         self.tokenSource = tokenSource
         self.tokens = []
         self.index = -1
@@ -202,7 +199,7 @@ class BufferedTokenStream(TokenStream):
     #  Return i if tokens[i] is on channel.  Return the index of the EOF token
     # if there are no tokens on channel between i and EOF.
     #/
-    def nextTokenOnChannel(self, i:int, channel:int):
+    def nextTokenOnChannel(self, i:int, channel:int) -> int:
         self.sync(i)
         if i>=len(self.tokens):
             return len(self.tokens) - 1
@@ -218,7 +215,7 @@ class BufferedTokenStream(TokenStream):
     # Given a starting index, return the index of the previous token on channel.
     #  Return i if tokens[i] is on channel. Return -1 if there are no tokens
     #  on channel between i and 0.
-    def previousTokenOnChannel(self, i:int, channel:int):
+    def previousTokenOnChannel(self, i:int, channel:int) -> int:
         while i>=0 and self.tokens[i].channel!=channel:
             i -= 1
         return i
@@ -226,7 +223,7 @@ class BufferedTokenStream(TokenStream):
     # Collect all tokens on specified channel to the right of
     #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
     #  EOF. If channel is -1, find any non default channel token.
-    def getHiddenTokensToRight(self, tokenIndex:int, channel:int=-1):
+    def getHiddenTokensToRight(self, tokenIndex:int, channel:int=-1) -> list | None:
         self.lazyInit()
         if tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
@@ -241,7 +238,7 @@ class BufferedTokenStream(TokenStream):
     # Collect all tokens on specified channel to the left of
     #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     #  If channel is -1, find any non default channel token.
-    def getHiddenTokensToLeft(self, tokenIndex:int, channel:int=-1):
+    def getHiddenTokensToLeft(self, tokenIndex:int, channel:int=-1) -> list | None:
         self.lazyInit()
         if tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
@@ -255,7 +252,7 @@ class BufferedTokenStream(TokenStream):
         return self.filterForChannel(from_, to, channel)
 
 
-    def filterForChannel(self, left:int, right:int, channel:int):
+    def filterForChannel(self, left:int, right:int, channel:int) -> list | None:
         hidden = []
         for i in range(left, right+1):
             t = self.tokens[i]
@@ -273,7 +270,7 @@ class BufferedTokenStream(TokenStream):
         return self.tokenSource.getSourceName()
 
     # Get the text of all tokens in this buffer.#/
-    def getText(self, start:int=None, stop:int=None):
+    def getText(self, start:int=None, stop:int=None) -> str:
         self.lazyInit()
         self.fill()
         if isinstance(start, Token):
@@ -296,7 +293,7 @@ class BufferedTokenStream(TokenStream):
 
 
     # Get all tokens from lexer until EOF#/
-    def fill(self):
+    def fill(self) -> None:
         self.lazyInit()
         while self.fetch(1000)==1000:
             pass

@@ -14,6 +14,8 @@ class TokenFactory(object):
 
     pass
 
+from antlr4.Token import CommonToken
+from antlr4.Token import CommonToken
 class CommonTokenFactory(TokenFactory):
     __slots__ = 'copyText'
 
@@ -26,7 +28,7 @@ class CommonTokenFactory(TokenFactory):
     #
     DEFAULT = None
 
-    def __init__(self, copyText:bool=False):
+    def __init__(self, copyText:bool=False) -> None:
         # Indicates whether {@link CommonToken#setText} should be called after
         # constructing tokens to explicitly set the text. This is useful for cases
         # where the input stream might not be able to provide arbitrary substrings
@@ -43,7 +45,7 @@ class CommonTokenFactory(TokenFactory):
         #
         self.copyText = copyText
 
-    def create(self, source, type:int, text:str, channel:int, start:int, stop:int, line:int, column:int):
+    def create(self, source, type:int, text:str, channel:int, start:int, stop:int, line:int, column:int) -> CommonToken:
         t = CommonToken(source, type, channel, start, stop)
         t.line = line
         t.column = column
@@ -53,7 +55,7 @@ class CommonTokenFactory(TokenFactory):
             t.text = source[1].getText(start,stop)
         return t
 
-    def createThin(self, type:int, text:str):
+    def createThin(self, type:int, text:str) -> CommonToken:
         t = CommonToken(type=type)
         t.text = text
         return t

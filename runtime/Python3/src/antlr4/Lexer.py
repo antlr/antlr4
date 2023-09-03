@@ -43,14 +43,14 @@ class Lexer(Recognizer, TokenSource):
     MIN_CHAR_VALUE = 0x0000
     MAX_CHAR_VALUE = 0x10FFFF
 
-    def __init__(self, input:InputStream, output:TextIO = sys.stdout):
+    def __init__(self, input:InputStream, output:TextIO = sys.stdout) -> None:
         super().__init__()
         self._input = input
         self._output = output
         self._factory = CommonTokenFactory.DEFAULT
         self._tokenFactorySourcePair = (self, input)
 
-        self._interp = None # child classes must populate this
+        self._interp : Optional[ATNSimulator] = None # child classes must populate this
 
         # The goal of all lexer rules/methods is to create a token object.
         #  self is an instance variable as multiple rules may collaborate to
@@ -91,7 +91,7 @@ class Lexer(Recognizer, TokenSource):
         self._text = None
 
 
-    def reset(self):
+    def reset(self) -> None:
         # wack Lexer state variables
         if self._input is not None:
             self._input.seek(0) # rewind the input
@@ -163,22 +163,22 @@ class Lexer(Recognizer, TokenSource):
     #  if token==null at end of any token rule, it creates one for you
     #  and emits it.
     #/
-    def skip(self):
+    def skip(self) -> None:
         self._type = self.SKIP
 
-    def more(self):
+    def more(self) -> None:
         self._type = self.MORE
 
-    def mode(self, m:int):
+    def mode(self, m:int) -> None:
         self._mode = m
 
-    def pushMode(self, m:int):
+    def pushMode(self, m:int) -> None:
         if self._interp.debug:
             print("pushMode " + str(m), file=self._output)
         self._modeStack.append(self._mode)
         self.mode(m)
 
-    def popMode(self):
+    def popMode(self) -> int:
         if len(self._modeStack)==0:
             raise Exception("Empty Stack")
         if self._interp.debug:
@@ -192,7 +192,7 @@ class Lexer(Recognizer, TokenSource):
         return self._input
 
     @inputStream.setter
-    def inputStream(self, input:InputStream):
+    def inputStream(self, input:InputStream) -> None:
         self._input = None
         self._tokenFactorySourcePair = (self, self._input)
         self.reset()
@@ -208,7 +208,7 @@ class Lexer(Recognizer, TokenSource):
     #  and getToken (to push tokens into a list and pull from that list
     #  rather than a single variable as self implementation does).
     #/
-    def emitToken(self, token:Token):
+    def emitToken(self, token:Token) -> None:
         self._token = token
 
     # The standard method called to automatically emit a token at the
@@ -232,11 +232,11 @@ class Lexer(Recognizer, TokenSource):
         return eof
 
     @property
-    def type(self):
+    def type(self) -> int:
         return self._type
 
     @type.setter
-    def type(self, type:int):
+    def type(self, type:int) -> None:
         self._type = type
 
     @property
@@ -244,7 +244,7 @@ class Lexer(Recognizer, TokenSource):
         return self._interp.line
 
     @line.setter
-    def line(self, line:int):
+    def line(self, line:int) -> None:
         self._interp.line = line
 
     @property
@@ -252,7 +252,7 @@ class Lexer(Recognizer, TokenSource):
         return self._interp.column
 
     @column.setter
-    def column(self, column:int):
+    def column(self, column:int) -> None:
         self._interp.column = column
 
     # What is the index of the current character of lookahead?#/
@@ -271,13 +271,13 @@ class Lexer(Recognizer, TokenSource):
     # Set the complete text of self token; it wipes any previous
     #  changes to the text.
     @text.setter
-    def text(self, txt:str):
+    def text(self, txt:str) -> None:
         self._text = txt
 
     # Return a list of all Token objects in input char stream.
     #  Forces load of all tokens. Does not include EOF token.
     #/
-    def getAllTokens(self):
+    def getAllTokens(self) -> list:
         tokens = []
         t = self.nextToken()
         while t.type!=Token.EOF:
@@ -285,7 +285,7 @@ class Lexer(Recognizer, TokenSource):
             t = self.nextToken()
         return tokens
 
-    def notifyListeners(self, e:LexerNoViableAltException):
+    def notifyListeners(self, e:LexerNoViableAltException) -> None:
         start = self._tokenStartCharIndex
         stop = self._input.index
         text = self._input.getText(start, stop)
@@ -299,7 +299,7 @@ class Lexer(Recognizer, TokenSource):
                 buf.write(self.getErrorDisplayForChar(c))
             return buf.getvalue()
 
-    def getErrorDisplayForChar(self, c:str):
+    def getErrorDisplayForChar(self, c:str) -> str:
         if ord(c[0])==Token.EOF:
             return "<EOF>"
         elif c=='\n':
@@ -311,7 +311,7 @@ class Lexer(Recognizer, TokenSource):
         else:
             return c
 
-    def getCharErrorDisplay(self, c:str):
+    def getCharErrorDisplay(self, c:str) -> str:
         return "'" + self.getErrorDisplayForChar(c) + "'"
 
     # Lexers can normally match any char in it's vocabulary after matching
@@ -319,7 +319,7 @@ class Lexer(Recognizer, TokenSource):
     #  it all works out.  You can instead use the rule invocation stack
     #  to do sophisticated error recovery if you are in a fragment rule.
     #/
-    def recover(self, re:RecognitionException):
+    def recover(self, re:RecognitionException) -> None:
         if self._input.LA(1) != Token.EOF:
             if isinstance(re, LexerNoViableAltException):
                     # skip a char and try again

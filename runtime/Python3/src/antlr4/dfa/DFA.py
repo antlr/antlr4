@@ -13,7 +13,7 @@ from antlr4.error.Errors import IllegalStateException
 class DFA(object):
     __slots__ = ('atnStartState', 'decision', '_states', 's0', 'precedenceDfa')
 
-    def __init__(self, atnStartState:DecisionState, decision:int=0):
+    def __init__(self, atnStartState:DecisionState, decision:int=0) -> None:
         # From which ATN state did we create this DFA?
         self.atnStartState = atnStartState
         self.decision = decision
@@ -45,7 +45,7 @@ class DFA(object):
     # @throws IllegalStateException if this is not a precedence DFA.
     # @see #isPrecedenceDfa()
 
-    def getPrecedenceStartState(self, precedence:int):
+    def getPrecedenceStartState(self, precedence:int) -> None:
         if not self.precedenceDfa:
             raise IllegalStateException("Only precedence DFAs may contain a precedence start state.")
 
@@ -63,7 +63,7 @@ class DFA(object):
     # @throws IllegalStateException if this is not a precedence DFA.
     # @see #isPrecedenceDfa()
     #
-    def setPrecedenceStartState(self, precedence:int, startState:DFAState):
+    def setPrecedenceStartState(self, precedence:int, startState:DFAState) -> None:
         if not self.precedenceDfa:
             raise IllegalStateException("Only precedence DFAs may contain a precedence start state.")
 
@@ -94,7 +94,7 @@ class DFA(object):
     # @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
     # {@code false}
 
-    def setPrecedenceDfa(self, precedenceDfa:bool):
+    def setPrecedenceDfa(self, precedenceDfa:bool) -> None:
         if self.precedenceDfa != precedenceDfa:
             self._states = dict()
             if precedenceDfa:
@@ -108,24 +108,24 @@ class DFA(object):
             self.precedenceDfa = precedenceDfa
 
     @property
-    def states(self):
+    def states(self) -> dict:
         return self._states
 
     # Return a list of all states in this DFA, ordered by state number.
     def sortedStates(self):
         return sorted(self._states.keys(), key=lambda state: state.stateNumber)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.toString(None)
 
-    def toString(self, literalNames:list=None, symbolicNames:list=None):
+    def toString(self, literalNames:list=None, symbolicNames:list=None) -> str:
         if self.s0 is None:
             return ""
         from antlr4.dfa.DFASerializer import DFASerializer
         serializer = DFASerializer(self,literalNames,symbolicNames)
         return str(serializer)
 
-    def toLexerString(self):
+    def toLexerString(self) -> str:
         if self.s0 is None:
             return ""
         from antlr4.dfa.DFASerializer import LexerDFASerializer

@@ -10,20 +10,21 @@ from antlr4.Token import Token
 # need forward declarations
 IntervalSet = None
 
+from typing import Iterator
 class IntervalSet(object):
     __slots__ = ('intervals', 'readonly')
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.intervals = None
         self.readonly = False
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         if self.intervals is not None:
             for i in self.intervals:
                 for c in i:
                     yield c
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> int:
         i = 0
         for k in self:
             if i==item:
@@ -32,10 +33,10 @@ class IntervalSet(object):
                 i += 1
         return Token.INVALID_TYPE
 
-    def addOne(self, v:int):
+    def addOne(self, v:int) -> None:
         self.addRange(range(v, v+1))
 
-    def addRange(self, v:range):
+    def addRange(self, v:range) -> None:
         if self.intervals is None:
             self.intervals = list()
             self.intervals.append(v)
@@ -60,13 +61,13 @@ class IntervalSet(object):
             # greater than any existing
             self.intervals.append(v)
 
-    def addSet(self, other:IntervalSet):
+    def addSet(self, other:IntervalSet) -> IntervalSet:
         if other.intervals is not None:
             for i in other.intervals:
                 self.addRange(i)
         return self
 
-    def reduce(self, k:int):
+    def reduce(self, k:int) -> None:
         # only need to reduce if k is not the last
         if k<len(self.intervals)-1:
             l = self.intervals[k]
@@ -79,23 +80,23 @@ class IntervalSet(object):
                 self.intervals[k] = range(l.start, r.stop)
                 self.intervals.pop(k+1)
 
-    def complement(self, start, stop):
+    def complement(self, start, stop) -> IntervalSet:
         result = IntervalSet()
         result.addRange(range(start,stop+1))
         for i in self.intervals:
             result.removeRange(i)
         return result
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         if self.intervals is None:
             return False
         else:
             return any(item in i for i in self.intervals)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return sum(len(i) for i in self.intervals)
 
-    def removeRange(self, v):
+    def removeRange(self, v) -> None:
         if v.start==v.stop-1:
             self.removeOne(v.start)
         elif self.intervals is not None:
@@ -122,7 +123,7 @@ class IntervalSet(object):
                     self.intervals[k] = range(v.stop, i.stop)
                 k += 1
 
-    def removeOne(self, v):
+    def removeOne(self, v) -> None:
         if self.intervals is not None:
             k = 0
             for i in self.intervals:
@@ -150,7 +151,7 @@ class IntervalSet(object):
                 k += 1
 
 
-    def toString(self, literalNames:list, symbolicNames:list):
+    def toString(self, literalNames:list, symbolicNames:list) -> str:
         if self.intervals is None:
             return "{}"
         with StringIO() as buf:
@@ -167,7 +168,7 @@ class IntervalSet(object):
                 buf.write("}")
             return buf.getvalue()
 
-    def elementName(self, literalNames:list, symbolicNames:list, a:int):
+    def elementName(self, literalNames:list, symbolicNames:list, a:int) -> str:
         if a==Token.EOF:
             return "<EOF>"
         elif a==Token.EPSILON:

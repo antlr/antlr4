@@ -14,12 +14,12 @@ from antlr4.dfa.DFAState import DFAState
 class DFASerializer(object):
     __slots__ = ('dfa', 'literalNames', 'symbolicNames')
 
-    def __init__(self, dfa:DFA, literalNames:list=None, symbolicNames:list=None):
+    def __init__(self, dfa:DFA, literalNames:list=None, symbolicNames:list=None) -> None:
         self.dfa = dfa
         self.literalNames = literalNames
         self.symbolicNames = symbolicNames
 
-    def __str__(self):
+    def __str__(self) -> None:
         if self.dfa.s0 is None:
             return None
         with StringIO() as buf:
@@ -43,7 +43,7 @@ class DFASerializer(object):
             else:
                 return output
 
-    def getEdgeLabel(self, i:int):
+    def getEdgeLabel(self, i:int) -> str:
         if i==0:
             return "EOF"
         if self.literalNames is not None and i<=len(self.literalNames):
@@ -53,7 +53,7 @@ class DFASerializer(object):
         else:
             return str(i-1)
 
-    def getStateString(self, s:DFAState):
+    def getStateString(self, s:DFAState) -> str:
         n = s.stateNumber
         baseStateStr = ( ":" if s.isAcceptState else "") + "s" + str(n) + ( "^" if s.requiresFullContext else "")
         if s.isAcceptState:
@@ -66,8 +66,8 @@ class DFASerializer(object):
 
 class LexerDFASerializer(DFASerializer):
 
-    def __init__(self, dfa:DFA):
+    def __init__(self, dfa:DFA) -> None:
         super().__init__(dfa, None)
 
-    def getEdgeLabel(self, i:int):
+    def getEdgeLabel(self, i:int) -> str:
         return "'" + chr(i) + "'"

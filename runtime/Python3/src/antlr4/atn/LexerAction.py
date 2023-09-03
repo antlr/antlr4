@@ -6,10 +6,6 @@
 
 from enum import IntEnum
 
-# need forward declaration
-Lexer = None
-
-
 class LexerActionType(IntEnum):
 
     CHANNEL = 0     #The type of a {@link LexerChannelAction} action.
@@ -24,14 +20,14 @@ class LexerActionType(IntEnum):
 class LexerAction(object):
     __slots__ = ('actionType', 'isPositionDependent')
 
-    def __init__(self, action:LexerActionType):
+    def __init__(self, action:LexerActionType) -> None:
         self.actionType = action
         self.isPositionDependent = False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.actionType)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self is other
 
 
@@ -45,13 +41,13 @@ class LexerSkipAction(LexerAction):
     # Provides a singleton instance of this parameterless lexer action.
     INSTANCE = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(LexerActionType.SKIP)
 
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.skip()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "skip"
 
 LexerSkipAction.INSTANCE = LexerSkipAction()
@@ -61,17 +57,17 @@ LexerSkipAction.INSTANCE = LexerSkipAction()
 class LexerTypeAction(LexerAction):
     __slots__ = 'type'
 
-    def __init__(self, type:int):
+    def __init__(self, type:int) -> None:
         super().__init__(LexerActionType.TYPE)
         self.type = type
 
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.type = self.type
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.type))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerTypeAction):
@@ -79,7 +75,7 @@ class LexerTypeAction(LexerAction):
         else:
             return self.type == other.type
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "type(" + str(self.type) + ")"
 
 
@@ -88,19 +84,19 @@ class LexerTypeAction(LexerAction):
 class LexerPushModeAction(LexerAction):
     __slots__ = 'mode'
 
-    def __init__(self, mode:int):
+    def __init__(self, mode:int) -> None:
         super().__init__(LexerActionType.PUSH_MODE)
         self.mode = mode
 
     # <p>This action is implemented by calling {@link Lexer#pushMode} with the
     # value provided by {@link #getMode}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.pushMode(self.mode)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.mode))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerPushModeAction):
@@ -108,7 +104,7 @@ class LexerPushModeAction(LexerAction):
         else:
             return self.mode == other.mode
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "pushMode(" + str(self.mode) + ")"
 
 
@@ -120,14 +116,14 @@ class LexerPopModeAction(LexerAction):
 
     INSTANCE = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(LexerActionType.POP_MODE)
 
     # <p>This action is implemented by calling {@link Lexer#popMode}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.popMode()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "popMode"
 
 LexerPopModeAction.INSTANCE = LexerPopModeAction()
@@ -140,14 +136,14 @@ class LexerMoreAction(LexerAction):
 
     INSTANCE = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(LexerActionType.MORE)
 
     # <p>This action is implemented by calling {@link Lexer#popMode}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.more()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "more"
 
 LexerMoreAction.INSTANCE = LexerMoreAction()
@@ -157,19 +153,19 @@ LexerMoreAction.INSTANCE = LexerMoreAction()
 class LexerModeAction(LexerAction):
     __slots__ = 'mode'
 
-    def __init__(self, mode:int):
+    def __init__(self, mode:int) -> None:
         super().__init__(LexerActionType.MODE)
         self.mode = mode
 
     # <p>This action is implemented by calling {@link Lexer#mode} with the
     # value provided by {@link #getMode}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.mode(self.mode)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.mode))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerModeAction):
@@ -177,7 +173,7 @@ class LexerModeAction(LexerAction):
         else:
             return self.mode == other.mode
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "mode(" + str(self.mode) + ")"
 
 # Executes a custom lexer action by calling {@link Recognizer#action} with the
@@ -200,7 +196,7 @@ class LexerCustomAction(LexerAction):
     # @param actionIndex The action index to use for calls to
     # {@link Recognizer#action}.
     #/
-    def __init__(self, ruleIndex:int, actionIndex:int):
+    def __init__(self, ruleIndex:int, actionIndex:int) -> None:
         super().__init__(LexerActionType.CUSTOM)
         self.ruleIndex = ruleIndex
         self.actionIndex = actionIndex
@@ -208,13 +204,13 @@ class LexerCustomAction(LexerAction):
 
     # <p>Custom actions are implemented by calling {@link Lexer#action} with the
     # appropriate rule and action indexes.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer.action(None, self.ruleIndex, self.actionIndex)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.ruleIndex, self.actionIndex))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerCustomAction):
@@ -229,19 +225,19 @@ class LexerChannelAction(LexerAction):
 
     # Constructs a new {@code channel} action with the specified channel value.
     # @param channel The channel value to pass to {@link Lexer#setChannel}.
-    def __init__(self, channel:int):
+    def __init__(self, channel:int) -> None:
         super().__init__(LexerActionType.CHANNEL)
         self.channel = channel
 
     # <p>This action is implemented by calling {@link Lexer#setChannel} with the
     # value provided by {@link #getChannel}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         lexer._channel = self.channel
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.channel))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerChannelAction):
@@ -249,7 +245,7 @@ class LexerChannelAction(LexerAction):
         else:
             return self.channel == other.channel
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "channel(" + str(self.channel) + ")"
 
 # This implementation of {@link LexerAction} is used for tracking input offsets
@@ -274,7 +270,7 @@ class LexerIndexedCustomAction(LexerAction):
     # executed.
     # @param action The lexer action to execute at a particular offset in the
     # input {@link CharStream}.
-    def __init__(self, offset:int, action:LexerAction):
+    def __init__(self, offset:int, action:LexerAction) -> None:
         super().__init__(action.actionType)
         self.offset = offset
         self.action = action
@@ -282,14 +278,14 @@ class LexerIndexedCustomAction(LexerAction):
 
     # <p>This method calls {@link #execute} on the result of {@link #getAction}
     # using the provided {@code lexer}.</p>
-    def execute(self, lexer:Lexer):
+    def execute(self, lexer:Lexer) -> None:
         # assume the input stream position was properly set by the calling code
         self.action.execute(lexer)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.actionType, self.offset, self.action))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
         elif not isinstance(other, LexerIndexedCustomAction):

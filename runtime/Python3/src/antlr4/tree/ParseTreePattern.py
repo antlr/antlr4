@@ -25,7 +25,7 @@ class ParseTreePattern(object):
     # tree pattern.
     # @param patternTree The tree pattern in {@link ParseTree} form.
     #
-    def __init__(self, matcher:ParseTreePatternMatcher, pattern:str, patternRuleIndex:int , patternTree:ParseTree):
+    def __init__(self, matcher:ParseTreePatternMatcher, pattern:str, patternRuleIndex:int , patternTree:ParseTree) -> None:
         self.matcher = matcher
         self.patternRuleIndex = patternRuleIndex
         self.pattern = pattern
@@ -62,7 +62,7 @@ class ParseTreePattern(object):
     # successful matches. Unsuccessful matches are omitted from the result,
     # regardless of the reason for the failure.
     #
-    def findAll(self, tree:ParseTree, xpath:str):
+    def findAll(self, tree:ParseTree, xpath:str) -> list:
         subtrees = XPath.findAll(tree, xpath, self.matcher.parser)
         matches = list()
         for t in subtrees:

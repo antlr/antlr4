@@ -27,47 +27,45 @@
 from io import StringIO
 from antlr4.tree.Tree import RuleNode, INVALID_INTERVAL, ParseTreeVisitor
 from antlr4.tree.Trees import Trees
+from typing import Optional
 
-# need forward declarations
-RuleContext = None
-Parser = None
-
+from typing import Iterator
 class RuleContext(RuleNode):
     __slots__ = ('parentCtx', 'invokingState')
     EMPTY = None
 
-    def __init__(self, parent:RuleContext=None, invokingState:int=-1):
+    def __init__(self, parent:Optional["RuleContext"]=None, invokingState:int=-1) -> None:
         super().__init__()
         # What context invoked this rule?
-        self.parentCtx = parent
+        self.parentCtx: Optional[RuleContext] = parent
         # What state invoked the rule associated with this context?
         #  The "return address" is the followState of invokingState
         #  If parent is null, this should be -1.
         self.invokingState = invokingState
 
 
-    def depth(self):
+    def depth(self) -> int:
         n = 0
         p = self
         while p is not None:
-            p = p.parentCtx
+            p:Optional[RuleContext] = p.parentCtx
             n += 1
         return n
 
     # A context is empty if there is no invoking state; meaning nobody call
     #  current context.
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         return self.invokingState == -1
 
     # satisfy the ParseTree / SyntaxTree interface
 
-    def getSourceInterval(self):
+    def getSourceInterval(self) -> tuple:
         return INVALID_INTERVAL
 
-    def getRuleContext(self):
+    def getRuleContext(self) -> RuleContext:
         return self
 
-    def getPayload(self):
+    def getPayload(self) -> RuleContext:
         return self
 
    # Return the combined text of all child nodes. This method only considers
@@ -77,7 +75,7 @@ class RuleContext(RuleNode):
     #  added to the parse trees, they will not appear in the output of this
     #  method.
     #/
-    def getText(self):
+    def getText(self) -> str:
         if self.getChildCount() == 0:
             return ""
         with StringIO() as builder:
@@ -85,7 +83,7 @@ class RuleContext(RuleNode):
                 builder.write(child.getText())
             return builder.getvalue()
 
-    def getRuleIndex(self):
+    def getRuleIndex(self) -> int:
         return -1
 
     # For rule associated with this parse tree internal node, return
@@ -94,7 +92,7 @@ class RuleContext(RuleNode):
     # a subclass of ParserRuleContext with backing field and set
     # option contextSuperClass.
     # to set it.
-    def getAltNumber(self):
+    def getAltNumber(self) -> int:
         return 0 # should use ATN.INVALID_ALT_NUMBER but won't compile
 
     # Set the outer alternative number for this context node. Default
@@ -105,13 +103,13 @@ class RuleContext(RuleNode):
     def setAltNumber(self, altNumber:int):
         pass
 
-    def getChild(self, i:int):
+    def getChild(self, i:int) -> None:
         return None
 
-    def getChildCount(self):
+    def getChildCount(self) -> int:
         return 0
 
-    def getChildren(self):
+    def getChildren(self) -> Iterator:
         for c in []:
             yield c
 
@@ -173,7 +171,7 @@ class RuleContext(RuleNode):
    # Print out a whole tree, not just a node, in LISP format
    #  (root child1 .. childN). Print just a node if this is a leaf.
    #
-    def toStringTree(self, ruleNames:list=None, recog:Parser=None):
+    def toStringTree(self, ruleNames:list=None, recog:Optional["Parser"]=None):
         return Trees.toStringTree(self, ruleNames=ruleNames, recog=recog)
    #  }
    #
@@ -182,7 +180,7 @@ class RuleContext(RuleNode):
    #      return toStringTree((List<String>)null);
    #  }
    #
-    def __str__(self):
+    def __str__(self) -> str:
         return self.toString(None, None)
 
    #  @Override

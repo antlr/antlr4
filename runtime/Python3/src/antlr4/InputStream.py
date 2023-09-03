@@ -14,38 +14,38 @@ from antlr4.Token import Token
 class InputStream (object):
     __slots__ = ('name', 'strdata', '_index', 'data', '_size')
 
-    def __init__(self, data: str):
+    def __init__(self, data: str) -> None:
         self.name = "<empty>"
         self.strdata = data
         self._loadString()
 
-    def _loadString(self):
+    def _loadString(self) -> None:
         self._index = 0
         self.data = [ord(c) for c in self.strdata]
         self._size = len(self.data)
 
     @property
-    def index(self):
+    def index(self) -> int:
         return self._index
 
     @property
-    def size(self):
+    def size(self) -> int:
         return self._size
 
     # Reset the stream so that it's in the same state it was
     #  when the object was created *except* the data array is not
     #  touched.
     #
-    def reset(self):
+    def reset(self) -> None:
         self._index = 0
 
-    def consume(self):
+    def consume(self) -> None:
         if self._index >= self._size:
             assert self.LA(1) == Token.EOF
             raise Exception("cannot consume EOF")
         self._index += 1
 
-    def LA(self, offset: int):
+    def LA(self, offset: int) -> int:
         if offset==0:
             return 0 # undefined
         if offset<0:
@@ -55,11 +55,11 @@ class InputStream (object):
             return Token.EOF
         return self.data[pos]
 
-    def LT(self, offset: int):
+    def LT(self, offset: int) -> int:
         return self.LA(offset)
 
     # mark/release do nothing; we have entire buffer
-    def mark(self):
+    def mark(self) -> int:
         return -1
 
     def release(self, marker: int):
@@ -68,14 +68,14 @@ class InputStream (object):
     # consume() ahead until p==_index; can't just set p=_index as we must
     # update line and column. If we seek backwards, just set p
     #
-    def seek(self, _index: int):
+    def seek(self, _index: int) -> None:
         if _index<=self._index:
             self._index = _index # just jump; don't update stream state (line, ...)
             return
         # seek forward
         self._index = min(_index, self._size)
 
-    def getText(self, start :int, stop: int):
+    def getText(self, start :int, stop: int) -> str:
         if stop >= self._size:
             stop = self._size-1
         if start >= self._size:
@@ -83,5 +83,5 @@ class InputStream (object):
         else:
             return self.strdata[start:stop+1]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.strdata

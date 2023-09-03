@@ -33,7 +33,7 @@ class Token (object):
 
     HIDDEN_CHANNEL = 1
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.source = None
         self.type = None # token type of the token
         self.channel = None # The parser ignores everything not on DEFAULT_CHANNEL
@@ -57,7 +57,7 @@ class Token (object):
     # of the token.
 
     @text.setter
-    def text(self, text:str):
+    def text(self, text:str) -> None:
         self._text = text
 
 
@@ -73,7 +73,7 @@ class CommonToken(Token):
     # {@link #source} for tokens that do not have a source.
     EMPTY_SOURCE = (None, None)
 
-    def __init__(self, source:tuple = EMPTY_SOURCE, type:int = None, channel:int=Token.DEFAULT_CHANNEL, start:int=-1, stop:int=-1):
+    def __init__(self, source:tuple = EMPTY_SOURCE, type:int = None, channel:int=Token.DEFAULT_CHANNEL, start:int=-1, stop:int=-1) -> None:
         super().__init__()
         self.source = source
         self.type = type
@@ -99,7 +99,7 @@ class CommonToken(Token):
     #
     # @param oldToken The token to copy.
      #
-    def clone(self):
+    def clone(self) -> CommonToken:
         t = CommonToken(self.source, self.type, self.channel, self.start, self.stop)
         t.tokenIndex = self.tokenIndex
         t.line = self.line
@@ -108,7 +108,7 @@ class CommonToken(Token):
         return t
 
     @property
-    def text(self):
+    def text(self) -> str | None:
         if self._text is not None:
             return self._text
         input = self.getInputStream()
@@ -121,10 +121,10 @@ class CommonToken(Token):
             return "<EOF>"
 
     @text.setter
-    def text(self, text:str):
+    def text(self, text:str) -> None:
         self._text = text
 
-    def __str__(self):
+    def __str__(self) -> str:
         with StringIO() as buf:
             buf.write("[@")
             buf.write(str(self.tokenIndex))

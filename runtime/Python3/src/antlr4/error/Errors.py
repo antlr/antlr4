@@ -2,30 +2,21 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
-
-# need forward declaration
-Token = None
-Lexer = None
-Parser = None
-TokenStream = None
-ATNConfigSet = None
-ParserRulecontext = None
-PredicateTransition = None
-BufferedTokenStream = None
+from typing import Optional
 
 class UnsupportedOperationException(Exception):
 
-    def __init__(self, msg:str):
+    def __init__(self, msg:str) -> None:
         super().__init__(msg)
 
 class IllegalStateException(Exception):
 
-    def __init__(self, msg:str):
+    def __init__(self, msg:str) -> None:
         super().__init__(msg)
 
 class CancellationException(IllegalStateException):
 
-    def __init__(self, msg:str):
+    def __init__(self, msg:str) -> None:
         super().__init__(msg)
 
 # The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
@@ -41,16 +32,16 @@ from antlr4.Recognizer import Recognizer
 class RecognitionException(Exception):
 
 
-    def __init__(self, message:str=None, recognizer:Recognizer=None, input:InputStream=None, ctx:ParserRulecontext=None):
+    def __init__(self, message:Optional[str]=None, recognizer:Optional[Recognizer]=None, input:Optional[InputStream]=None, ctx:Optional[ParserRuleContext]=None) -> None:
         super().__init__(message)
-        self.message = message
-        self.recognizer = recognizer
-        self.input = input
-        self.ctx = ctx
+        self.message: Optional[str] = message
+        self.recognizer: Optional[Recognizer] = recognizer
+        self.input: Optional[InputStream] = input
+        self.ctx: Optional[ParserRuleContext] = ctx
         # The current {@link Token} when an error occurred. Since not all streams
         # support accessing symbols by index, we have to track the {@link Token}
         # instance itself.
-        self.offendingToken = None
+        self.offendingToken:Optional[Token] = None
         # Get the ATN state number the parser was in at the time the error
         # occurred. For {@link NoViableAltException} and
         # {@link LexerNoViableAltException} exceptions, this is the
@@ -72,7 +63,7 @@ class RecognitionException(Exception):
     # @return The set of token types that could potentially follow the current
     # state in the ATN, or {@code null} if the information is not available.
     #/
-    def getExpectedTokens(self):
+    def getExpectedTokens(self) -> None:
         if self.recognizer is not None:
             return self.recognizer.atn.getExpectedTokens(self.offendingState, self.ctx)
         else:
@@ -81,13 +72,14 @@ class RecognitionException(Exception):
 
 class LexerNoViableAltException(RecognitionException):
 
-    def __init__(self, lexer:Lexer, input:InputStream, startIndex:int, deadEndConfigs:ATNConfigSet):
+    def __init__(self, lexer:Lexer, input:InputStream, startIndex:int, deadEndConfigs:ATNConfigSet) -> None:
+        # FIX: This needs types
         super().__init__(message=None, recognizer=lexer, input=input, ctx=None)
         self.startIndex = startIndex
         self.deadEndConfigs = deadEndConfigs
         self.message = ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         symbol = ""
         if self.startIndex >= 0 and self.startIndex < self.input.size:
             symbol = self.input.getText(self.startIndex, self.startIndex)
@@ -102,7 +94,7 @@ class LexerNoViableAltException(RecognitionException):
 class NoViableAltException(RecognitionException):
 
     def __init__(self, recognizer:Parser, input:TokenStream=None, startToken:Token=None,
-                    offendingToken:Token=None, deadEndConfigs:ATNConfigSet=None, ctx:ParserRuleContext=None):
+                    offendingToken:Token=None, deadEndConfigs:ATNConfigSet=None, ctx:ParserRuleContext=None) -> None:
         if ctx is None:
             ctx = recognizer._ctx
         if offendingToken is None:
@@ -126,7 +118,7 @@ class NoViableAltException(RecognitionException):
 #
 class InputMismatchException(RecognitionException):
 
-    def __init__(self, recognizer:Parser):
+    def __init__(self, recognizer:Parser) -> None:
         super().__init__(recognizer=recognizer, input=recognizer.getInputStream(), ctx=recognizer._ctx)
         self.offendingToken = recognizer.getCurrentToken()
 
@@ -138,7 +130,7 @@ class InputMismatchException(RecognitionException):
 
 class FailedPredicateException(RecognitionException):
 
-    def __init__(self, recognizer:Parser, predicate:str=None, message:str=None):
+    def __init__(self, recognizer:Parser, predicate:str=None, message:str=None) -> None:
         super().__init__(message=self.formatMessage(predicate,message), recognizer=recognizer,
                          input=recognizer.getInputStream(), ctx=recognizer._ctx)
         s = recognizer._interp.atn.states[recognizer.state]
@@ -153,7 +145,7 @@ class FailedPredicateException(RecognitionException):
         self.predicate = predicate
         self.offendingToken = recognizer.getCurrentToken()
 
-    def formatMessage(self, predicate:str, message:str):
+    def formatMessage(self, predicate:str, message:str) -> str:
         if message is not None:
             return message
         else:
@@ -163,11 +155,3 @@ class ParseCancellationException(CancellationException):
 
     pass
 
-del Token
-del Lexer
-del Parser
-del TokenStream
-del ATNConfigSet
-del ParserRulecontext
-del PredicateTransition
-del BufferedTokenStream

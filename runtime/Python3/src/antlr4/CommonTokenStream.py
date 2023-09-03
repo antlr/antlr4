@@ -37,14 +37,14 @@ from antlr4.Token import Token
 class CommonTokenStream(BufferedTokenStream):
     __slots__ = 'channel'
 
-    def __init__(self, lexer:Lexer, channel:int=Token.DEFAULT_CHANNEL):
+    def __init__(self, lexer:Lexer, channel:int=Token.DEFAULT_CHANNEL) -> None:
         super().__init__(lexer)
         self.channel = channel
 
-    def adjustSeekIndex(self, i:int):
+    def adjustSeekIndex(self, i:int) -> int:
         return self.nextTokenOnChannel(i, self.channel)
 
-    def LB(self, k:int):
+    def LB(self, k:int) -> None:
         if k==0 or (self.index-k)<0:
             return None
         i = self.index
@@ -58,7 +58,7 @@ class CommonTokenStream(BufferedTokenStream):
             return None
         return self.tokens[i]
 
-    def LT(self, k:int):
+    def LT(self, k:int) -> Optional[Token]:
         self.lazyInit()
         if k == 0:
             return None
@@ -75,7 +75,7 @@ class CommonTokenStream(BufferedTokenStream):
         return self.tokens[i]
 
     # Count EOF just once.#/
-    def getNumberOfOnChannelTokens(self):
+    def getNumberOfOnChannelTokens(self) -> int:
         n = 0
         self.fill()
         for i in range(0, len(self.tokens)):

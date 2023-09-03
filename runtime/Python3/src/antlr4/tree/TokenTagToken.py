@@ -22,7 +22,7 @@ class TokenTagToken(CommonToken):
     # @param label The label associated with the token tag, or {@code null} if
     # the token tag is unlabeled.
     #
-    def __init__(self, tokenName:str, type:int, label:str=None):
+    def __init__(self, tokenName:str, type:int, label:str=None) -> None:
         super().__init__(type=type)
         self.tokenName = tokenName
         self.label = label
@@ -43,5 +43,5 @@ class TokenTagToken(CommonToken):
     # <p>The implementation for {@link TokenTagToken} returns a string of the form
     # {@code tokenName:type}.</p>
     #
-    def __str__(self):
+    def __str__(self) -> str:
         return self.tokenName + ":" + str(self.type)

@@ -13,11 +13,11 @@ from antlr4.atn.SemanticContext import SemanticContext
 class PredPrediction(object):
     __slots__ = ('alt', 'pred')
 
-    def __init__(self, pred:SemanticContext, alt:int):
+    def __init__(self, pred:SemanticContext, alt:int) -> None:
         self.alt = alt
         self.pred = pred
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "(" + str(self.pred) + ", " + str(self.alt) +  ")"
 
 # A DFA state represents a set of possible ATN configurations.
@@ -50,7 +50,7 @@ class DFAState(object):
         'lexerActionExecutor', 'requiresFullContext', 'predicates'
     )
 
-    def __init__(self, stateNumber:int=-1, configs:ATNConfigSet=ATNConfigSet()):
+    def __init__(self, stateNumber:int=-1, configs:ATNConfigSet=ATNConfigSet()) -> None:
         self.stateNumber = stateNumber
         self.configs = configs
         # {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
@@ -84,12 +84,12 @@ class DFAState(object):
 
     # Get the set of all alts mentioned by all ATN configurations in this
     #  DFA state.
-    def getAltSet(self):
+    def getAltSet(self) -> set | None:
         if self.configs is not None:
             return set(cfg.alt for cfg in self.configs) or None
         return None
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.configs)
 
     # Two {@link DFAState} instances are equal if their ATN configuration sets
@@ -103,7 +103,7 @@ class DFAState(object):
     # {@link ParserATNSimulator#addDFAState} we need to know if any other state
     # exists that has this exact set of ATN configurations. The
     # {@link #stateNumber} is irrelevant.</p>
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         # compare set of ATN configurations in this set with other
         if self is other:
             return True
@@ -112,7 +112,7 @@ class DFAState(object):
         else:
             return self.configs==other.configs
 
-    def __str__(self):
+    def __str__(self) -> str:
         with StringIO() as buf:
             buf.write(str(self.stateNumber))
             buf.write(":")
