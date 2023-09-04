@@ -262,6 +262,8 @@ All releases should be here: [https://repo1.maven.org/maven2/org/antlr/antlr4-ru
 
 **Push to npm**
 
+(I think this has to be run before the unit test can run locally as it installs the global lib)
+
 ```bash
 cd ~/antlr/code/antlr4/runtime/JavaScript
 rm -rf node_modules # seems we might need this later but try it here
