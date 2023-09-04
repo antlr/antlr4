@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.13.1</version>
+	<version>4.13.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
@@ -98,7 +98,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<project.build.outputTimestamp>1693865407</project.build.outputTimestamp>
+		<project.build.outputTimestamp>1693865452</project.build.outputTimestamp>
 		<antlr.testinprocess>true</antlr.testinprocess>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -120,7 +120,7 @@
         <url>https://github.com/antlr/antlr4/tree/master</url>
 		<connection>scm:git:git://github.com/antlr/antlr4.git</connection>
 		<developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
-		<tag>4.13.1</tag>
+		<tag>4.13.0</tag>
 	</scm>
 
 	<build>
