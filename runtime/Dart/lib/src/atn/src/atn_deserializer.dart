@@ -5,7 +5,7 @@
  */
 
 import '../../interval_set.dart';
-import '../../misc/pair.dart';
+import '../../misc/misc.dart';
 import '../../token.dart';
 import 'atn.dart';
 import 'atn_state.dart';

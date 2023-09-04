@@ -49,6 +49,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	private static String runtimeToolPath;
 	private static String compilerPath;
 
+	public final static String InputFileName = "input";
+
 	protected final String getCompilerPath() {
 		if (compilerPath == null) {
 			compilerPath = getCompilerName();
@@ -200,7 +202,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			return compiledState;
 		}
 
-		writeFile(getTempDirPath(), "input", runOptions.input);
+		writeInputFile(runOptions);
 
 		return execute(runOptions, compiledState);
 	}
@@ -246,6 +248,8 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		outputFileST.add("showDFA", runOptions.showDFA);
 		outputFileST.add("useListener", runOptions.useListener);
 		outputFileST.add("useVisitor", runOptions.useVisitor);
+		outputFileST.add("predictionMode", runOptions.predictionMode);
+		outputFileST.add("buildParseTree", runOptions.buildParseTree);
 		addExtraRecognizerParameters(outputFileST);
 		writeFile(getTempDirPath(), getTestFileWithExt(), outputFileST.render());
 	}
@@ -298,6 +302,10 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		return new CompiledState(generatedState, null);
 	}
 
+	protected void writeInputFile(RunOptions runOptions) {
+		writeFile(getTempDirPath(), InputFileName, runOptions.input);
+	}
+
 	protected ExecutedState execute(RunOptions runOptions, CompiledState compiledState) {
 		String output = null;
 		String errors = null;
@@ -313,7 +321,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 				args.addAll(Arrays.asList(extraRunArgs));
 			}
 			args.add(getExecFileName());
-			args.add("input");
+			args.add(InputFileName);
 			ProcessorResult result = Processor.run(args.toArray(new String[0]), getTempDirPath(), getExecEnvironment());
 			output = result.output;
 			errors = result.errors;

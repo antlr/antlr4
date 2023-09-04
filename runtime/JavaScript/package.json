@@ -1,6 +1,6 @@
 {
   "name": "antlr4",
-  "version": "4.12.0",
+  "version": "4.13.0",
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
   "browser": "dist/antlr4.web.js",
@@ -51,13 +51,13 @@
   "exports": {
     ".": {
       "node": {
-        "types": "src/index.node.d.ts",
+        "types": "./src/antlr4/index.d.ts",
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
         "default": "./dist/antlr4.node.mjs"
       },
       "browser": {
-        "types": "src/index.web.d.ts",
+        "types": "./src/antlr4/index.d.ts",
         "import": "./dist/antlr4.web.mjs",
         "require": "./dist/antlr4.web.cjs",
         "default": "./dist/antlr4.web.mjs"

@@ -14,6 +14,7 @@ use Antlr\Antlr4\Runtime\Tree\ParseTreeListener;
 use Antlr\Antlr4\Runtime\Tree\ParseTreeWalker;
 use Antlr\Antlr4\Runtime\Tree\RuleNode;
 use Antlr\Antlr4\Runtime\Tree\TerminalNode;
+use Antlr\Antlr4\Runtime\Atn\PredictionMode;
 
 $runtime = \getenv('RUNTIME');
 
@@ -51,6 +52,10 @@ $lexer->addErrorListener(new ConsoleErrorListener());
 $tokens = new CommonTokenStream($lexer);
 <if(parserName)>
 $parser = new <parserName>($tokens);
+$parser->getInterpreter()->setPredictionMode(PredictionMode::<predictionMode>);
+<if(!buildParseTree)>
+$parser->setBuildParseTree(false);
+<endif>
 <if(showDiagnosticErrors)>
 $parser->addErrorListener(new DiagnosticErrorListener());
 <endif>
@@ -58,7 +63,6 @@ $parser->addErrorListener(new ConsoleErrorListener());
 <if(traceATN)>
 ParserATNSimulator::$traceAtnSimulation = true;
 <endif>
-$parser->setBuildParseTree(true);
 $tree = $parser-><parserStartRuleName>();
 
 ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);

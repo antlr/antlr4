@@ -9,7 +9,7 @@ import 'dart:collection';
 import 'atn/atn.dart';
 import 'dfa/dfa.dart';
 import 'error/error.dart';
-import 'misc/pair.dart';
+import 'misc/misc.dart';
 import 'parser.dart';
 import 'parser_rule_context.dart';
 import 'token.dart';

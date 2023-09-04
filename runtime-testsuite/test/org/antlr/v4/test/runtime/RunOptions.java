@@ -6,6 +6,8 @@
 
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
+
 public class RunOptions {
 	public final String grammarFileName;
 	public final String grammarStr;
@@ -21,14 +23,15 @@ public class RunOptions {
 	public final boolean traceATN;
 	public final boolean showDFA;
 	public final Stage endStage;
-	public final boolean returnObject;
 	public final String superClass;
+	public final PredictionMode predictionMode;
+	public final boolean buildParseTree;
 
 	public RunOptions(String grammarFileName, String grammarStr, String parserName, String lexerName,
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,
-					  boolean traceATN, boolean showDFA, Stage endStage, boolean returnObject,
-					  String language, String superClass) {
+					  boolean traceATN, boolean showDFA, Stage endStage,
+					  String language, String superClass, PredictionMode predictionMode, boolean buildParseTree) {
 		this.grammarFileName = grammarFileName;
 		this.grammarStr = grammarStr;
 		this.parserName = parserName;
@@ -65,7 +68,8 @@ public class RunOptions {
 		this.traceATN = traceATN;
 		this.showDFA = showDFA;
 		this.endStage = endStage;
-		this.returnObject = returnObject;
 		this.superClass = superClass;
+		this.predictionMode = predictionMode;
+		this.buildParseTree = buildParseTree;
 	}
 }

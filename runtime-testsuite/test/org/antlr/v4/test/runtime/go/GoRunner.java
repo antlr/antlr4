@@ -64,7 +64,7 @@ public class GoRunner extends RuntimeRunner {
 		return new String[]{"run"};
 	}
 
-	private static final String GoRuntimeImportPath = "github.com/antlr/antlr4/runtime/Go/antlr/v4";
+	private static final String GoRuntimeImportPath = "github.com/antlr4-go/antlr/v4";
 
 	private final static Map<String, String> environment;
 

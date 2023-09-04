@@ -206,9 +206,8 @@ func (b *BaseLexer) NextToken() Token {
 		continueOuter := false
 		for {
 			b.thetype = TokenInvalidType
-			ttype := LexerSkip
 
-			ttype = b.safeMatch()
+			ttype := b.safeMatch() // Defaults to LexerSkip
 
 			if b.input.LA(1) == TokenEOF {
 				b.hitEOF = true

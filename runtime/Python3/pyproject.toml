@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "antlr4-python3-runtime"
+version = "4.13.0"
+authors = [{name = "Eric Vergnaud", email = "eric.vergnaud@wanadoo.fr"}, {name = "Terence Parr"}, {name = "Sam Harwell"}]
+license = {text = "BSD"}
+description = "ANTLR 4.13.0 runtime for Python 3"
+urls = {Homepage = "http://www.antlr.org"}
+dependencies = ["typing ; python_version<'3.5'"]
+
+[project.scripts]
+pygrun = "antlr4._pygrun:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["antlr4", "antlr4.*"]
+where = ["src"]

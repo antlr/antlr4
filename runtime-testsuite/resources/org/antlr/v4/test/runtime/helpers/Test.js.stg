@@ -31,16 +31,19 @@ function main(argv) {
 <if(showDiagnosticErrors)>
     parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());
 <endif>
-    parser.buildParseTrees = true;
     const printer = function() {
         this.println = function(s) { console.log(s); }
         this.print = function(s) { process.stdout.write(s); }
         return this;
     };
     parser.printer = new printer();
+    parser._interp.predictionMode = antlr4.atn.PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+    parser.buildParseTrees = false;
+<endif>
 <if(traceATN)>
-	parser._interp.trace_atn_sim = true;
-	antlr4.context.PredictionContext.trace_atn_sim = true;
+    parser._interp.trace_atn_sim = true;
+    antlr4.context.PredictionContext.trace_atn_sim = true;
 <endif>
     var tree = parser.<parserStartRuleName>();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);

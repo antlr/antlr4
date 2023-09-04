@@ -1,7 +1,7 @@
 package main
 import (
 	"fmt"
-    "github.com/antlr/antlr4/runtime/Go/antlr/v4"
+    "github.com/antlr4-go/antlr/v4"
     "os"
     "test/parser"
 )
@@ -48,10 +48,13 @@ func main() {
 	stream := antlr.NewCommonTokenStream(lexer,0)
 <if(parserName)>
 	p := parser.New<parserName>(stream)
+	p.Interpreter.SetPredictionMode(antlr.PredictionMode<predictionMode>)
+<if(!buildParseTree)>
+	p.BuildParseTrees = false
+<endif>
 <if(showDiagnosticErrors)>
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 <endif>
-	p.BuildParseTrees = true
 	tree := p.<parserStartRuleName>()
 	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 <else>
