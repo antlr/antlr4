@@ -18,7 +18,7 @@ package antlr
 // type safety and avoid having to implement this for every type that we want to perform comparison on.
 //
 // This comparator works by using the standard Hash() and Equals() methods of the type T that is being compared. Which
-// allows us to use it in any collection instance that does nto require a special hash or equals implementation.
+// allows us to use it in any collection instance that does not require a special hash or equals implementation.
 type ObjEqComparator[T Collectable[T]] struct{}
 
 var (

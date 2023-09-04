@@ -26,10 +26,13 @@ let parser = try <parserName>(tokens)
 <if(showDiagnosticErrors)>
 parser.addErrorListener(DiagnosticErrorListener())
 <endif>
-parser.setBuildParseTree(true)
 <if(profile)>
 let profiler = ProfilingATNSimulator(parser)
 parser.setInterpreter(profiler)
+<endif>
+parser.getInterpreter().setPredictionMode(PredictionMode.<predictionMode>)
+<if(!buildParseTree)>
+parser.setBuildParseTree(false)
 <endif>
 let tree = try parser.<parserStartRuleName>()
 <if(profile)>

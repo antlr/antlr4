@@ -84,7 +84,6 @@ $lexer = new JSONLexer($input);
 $tokens = new CommonTokenStream($lexer);
 $parser = new JSONParser($tokens);
 $parser->addErrorListener(new DiagnosticErrorListener());
-$parser->setBuildParseTree(true);
 $tree = $parser->json();
 
 ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);

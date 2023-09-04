@@ -44,7 +44,7 @@ On Windows, the `pip` command doesn't just work---you need to add the `...\local
 
 1. Go to the Microsoft Store
 2. Search in Microsoft Store for Python
-3. Select the newest version of Python (3.10).
+3. Select the newest version of Python (3.11).
 4. Click the "Get" button. Store installs python and pip at "c:\Users...\AppData\Local\Microsoft\WindowsApps\python.exe" and "c:\Users...\AppData\Local\Microsoft\WindowsApps\pip.exe", respectively. And, it updates the search path immediately with the install.
 5. Open a "cmd" terminal.
 6. You can now type "python" and "pip", and "pip install antlr4-tools". 7. Unfortunately, it does not add that to the search path.

@@ -5,11 +5,16 @@
  */
 package org.antlr.v4.test.runtime.java;
 
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.java.helpers.CustomStreamErrorListener;
+import org.antlr.v4.test.runtime.java.helpers.RuntimeTestLexer;
+import org.antlr.v4.test.runtime.java.helpers.RuntimeTestParser;
+import org.antlr.v4.test.runtime.java.helpers.TreeShapeListener;
 import org.antlr.v4.test.runtime.states.*;
 
 import javax.tools.JavaCompiler;
@@ -28,7 +33,6 @@ import java.util.List;
 
 import static org.antlr.v4.test.runtime.FileUtils.replaceInFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.PathSeparator;
-import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTextFromResource;
 
 public class JavaRunner extends RuntimeRunner {
 	@Override
@@ -38,17 +42,15 @@ public class JavaRunner extends RuntimeRunner {
 
 	public static final String classPath = System.getProperty("java.class.path");
 
-	public static final String runtimeTestLexerName = "RuntimeTestLexer";
-	public static final String runtimeTestParserName = "RuntimeTestParser";
+	public static final String runtimeTestLexerName = "org.antlr.v4.test.runtime.java.helpers.RuntimeTestLexer";
+	public static final String runtimeTestParserName = "org.antlr.v4.test.runtime.java.helpers.RuntimeTestParser";
 
-	private final static String testLexerContent;
-	private final static String testParserContent;
+	public static final String runtimeHelpersPath = Paths.get(RuntimeTestUtils.runtimeTestsuitePath.toString(),
+		"test", "org", "antlr", "v4", "test", "runtime", "java", "helpers").toString();
+
 	private static JavaCompiler compiler;
 
-	static {
-		testLexerContent = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + runtimeTestLexerName + ".java");
-		testParserContent = getTextFromResource("org/antlr/v4/test/runtime/helpers/" + runtimeTestParserName + ".java");
-	}
+	private final static DiagnosticErrorListener DiagnosticErrorListenerInstance = new DiagnosticErrorListener();
 
 	public JavaRunner(Path tempDir, boolean saveTestDir) {
 		super(tempDir, saveTestDir);
@@ -69,6 +71,12 @@ public class JavaRunner extends RuntimeRunner {
 	}
 
 	@Override
+	protected void writeInputFile(RunOptions runOptions) {}
+
+	@Override
+	protected void writeRecognizerFile(RunOptions runOptions) {}
+
+	@Override
 	protected JavaCompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
 		String tempTestDir = getTempDirPath();
 
@@ -76,7 +84,6 @@ public class JavaRunner extends RuntimeRunner {
 		GeneratedFile firstFile = generatedFiles.get(0);
 
 		if (!firstFile.isParser) {
-			FileUtils.writeFile(tempTestDir, runtimeTestLexerName + ".java", testLexerContent);
 			try {
 				// superClass for combined grammar generates the same extends base class for Lexer and Parser
 				// So, for lexer it should be replaced on correct base lexer class
@@ -86,9 +93,6 @@ public class JavaRunner extends RuntimeRunner {
 			} catch (IOException e) {
 				return new JavaCompiledState(generatedState, null, null, null, e);
 			}
-		}
-		if (generatedFiles.stream().anyMatch(file -> file.isParser)) {
-			FileUtils.writeFile(tempTestDir,  runtimeTestParserName + ".java", testParserContent);
 		}
 
 		ClassLoader loader = null;
@@ -102,14 +106,18 @@ public class JavaRunner extends RuntimeRunner {
 			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
 			List<File> files = new ArrayList<>();
-			File f = new File(tempTestDir, getTestFileWithExt());
-			files.add(f);
+			if (runOptions.lexerName != null) {
+				files.add(new File(tempTestDir, runOptions.lexerName + ".java"));
+			}
+			if (runOptions.parserName != null) {
+				files.add(new File(tempTestDir, runOptions.parserName + ".java"));
+			}
 
 			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 
 			Iterable<String> compileOptions =
 					Arrays.asList("-g", "-source", "1.8", "-target", "1.8", "-implicit:class", "-Xlint:-options", "-d",
-							tempTestDir, "-cp", tempTestDir + PathSeparator + classPath);
+							tempTestDir, "-cp", tempTestDir + PathSeparator + runtimeHelpersPath + PathSeparator + classPath);
 
 			JavaCompiler.CompilationTask task =
 					compiler.getTask(null, fileManager, null, compileOptions, null,
@@ -133,23 +141,55 @@ public class JavaRunner extends RuntimeRunner {
 	@Override
 	protected ExecutedState execute(RunOptions runOptions, CompiledState compiledState) {
 		JavaCompiledState javaCompiledState = (JavaCompiledState) compiledState;
-
-		ExecutedState result;
-		if (runOptions.returnObject) {
-			result = execWithObject(runOptions, javaCompiledState);
-		} else {
-			result = execCommon(javaCompiledState);
-		}
-		return result;
-	}
-
-	private JavaExecutedState execWithObject(RunOptions runOptions, JavaCompiledState javaCompiledState) {
+		String output = null;
+		String errors = null;
 		ParseTree parseTree = null;
 		Exception exception = null;
+
 		try {
-			Pair<Lexer, Parser> lexerParser = javaCompiledState.initializeLexerAndParser(runOptions.input);
+			InMemoryStreamHelper outputStreamHelper = InMemoryStreamHelper.initialize();
+			InMemoryStreamHelper errorsStreamHelper = InMemoryStreamHelper.initialize();
+
+			PrintStream outStream = new PrintStream(outputStreamHelper.pipedOutputStream);
+			CustomStreamErrorListener errorListener = new CustomStreamErrorListener(new PrintStream(errorsStreamHelper.pipedOutputStream));
+
+			CommonTokenStream tokenStream;
+			RuntimeTestLexer lexer;
+			if (runOptions.lexerName != null) {
+				lexer = (RuntimeTestLexer) javaCompiledState.initializeLexer(runOptions.input);
+				lexer.setOutStream(outStream);
+				lexer.removeErrorListeners();
+				lexer.addErrorListener(errorListener);
+				tokenStream = new CommonTokenStream(lexer);
+			} else {
+				lexer = null;
+				tokenStream = null;
+			}
 
 			if (runOptions.parserName != null) {
+				RuntimeTestParser parser = (RuntimeTestParser) javaCompiledState.initializeParser(tokenStream);
+				parser.setOutStream(outStream);
+				parser.removeErrorListeners();
+				parser.addErrorListener(errorListener);
+
+				if (runOptions.showDiagnosticErrors) {
+					parser.addErrorListener(DiagnosticErrorListenerInstance);
+				}
+
+				if (runOptions.traceATN) {
+					// Setting trace_atn_sim isn't thread-safe,
+					// But it's used only in helper TraceATN that is not integrated into tests infrastructure
+					ParserATNSimulator.trace_atn_sim = true;
+				}
+
+				ProfilingATNSimulator profiler = null;
+				if (runOptions.profile) {
+					profiler = new ProfilingATNSimulator(parser);
+					parser.setInterpreter(profiler);
+				}
+				parser.getInterpreter().setPredictionMode(runOptions.predictionMode);
+				parser.setBuildParseTree(runOptions.buildParseTree);
+
 				Method startRule;
 				Object[] args = null;
 				try {
@@ -159,44 +199,55 @@ public class JavaRunner extends RuntimeRunner {
 					startRule = javaCompiledState.parser.getMethod(runOptions.startRuleName, int.class);
 					args = new Integer[]{0};
 				}
-				parseTree = (ParseTree) startRule.invoke(lexerParser.b, args);
+
+				parseTree = (ParserRuleContext) startRule.invoke(parser, args);
+
+				if (runOptions.profile) {
+					outStream.println(Arrays.toString(profiler.getDecisionInfo()));
+				}
+
+				ParseTreeWalker.DEFAULT.walk(TreeShapeListener.INSTANCE, parseTree);
 			}
+			else {
+				assert tokenStream != null;
+				tokenStream.fill();
+				for (Object t : tokenStream.getTokens()) {
+					outStream.println(t);
+				}
+				if (runOptions.showDFA) {
+					outStream.print(lexer.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());
+				}
+			}
+
+			output = outputStreamHelper.close();
+			errors = errorsStreamHelper.close();
 		} catch (Exception ex) {
 			exception = ex;
 		}
-		return new JavaExecutedState(javaCompiledState, null, null, parseTree, exception);
+		return new JavaExecutedState(javaCompiledState, output, errors, parseTree, exception);
 	}
 
-	private ExecutedState execCommon(JavaCompiledState compiledState) {
-		Exception exception = null;
-		String output = null;
-		String errors = null;
-		try {
-			final Class<?> mainClass = compiledState.loader.loadClass(getTestFileName());
-			final Method recognizeMethod = mainClass.getDeclaredMethod("recognize", String.class,
-					PrintStream.class, PrintStream.class);
+	static class InMemoryStreamHelper {
+		private final PipedOutputStream pipedOutputStream;
+		private final StreamReader streamReader;
 
-			PipedInputStream stdoutIn = new PipedInputStream();
-			PipedInputStream stderrIn = new PipedInputStream();
-			PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
-			PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
-			StreamReader stdoutReader = new StreamReader(stdoutIn);
-			StreamReader stderrReader = new StreamReader(stderrIn);
-			stdoutReader.start();
-			stderrReader.start();
-
-			recognizeMethod.invoke(null, new File(getTempDirPath(), "input").getAbsolutePath(),
-					new PrintStream(stdoutOut), new PrintStream(stderrOut));
-
-			stdoutOut.close();
-			stderrOut.close();
-			stdoutReader.join();
-			stderrReader.join();
-			output = stdoutReader.toString();
-			errors = stderrReader.toString();
-		} catch (Exception ex) {
-			exception = ex;
+		private InMemoryStreamHelper(PipedOutputStream pipedOutputStream, StreamReader streamReader) {
+			this.pipedOutputStream = pipedOutputStream;
+			this.streamReader = streamReader;
 		}
-		return new JavaExecutedState(compiledState, output, errors, null, exception);
+
+		public static InMemoryStreamHelper initialize() throws IOException {
+			PipedInputStream pipedInputStream = new PipedInputStream();
+			PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
+			StreamReader stdoutReader = new StreamReader(pipedInputStream);
+			stdoutReader.start();
+			return new InMemoryStreamHelper(pipedOutputStream, stdoutReader);
+		}
+
+		public String close() throws InterruptedException, IOException {
+			pipedOutputStream.close();
+			streamReader.join();
+			return streamReader.toString();
+		}
 	}
 }

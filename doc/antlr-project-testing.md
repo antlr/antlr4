@@ -56,7 +56,6 @@ In order to perform the tests on all target languages, the following tools shoul
 
 * dotnet
 * Node.js
-* Python 2
 * Python 3
 * Go
 * Swift

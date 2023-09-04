@@ -7,7 +7,8 @@ import {
 	ParseTreeWalker,
 	RuleContext,
 	ParserRuleContext,
-	RuleNode
+	RuleNode,
+	PredictionMode
 } from 'antlr4';
 import <lexerName> from './<lexerName>.js';
 <if(parserName)>
@@ -41,11 +42,14 @@ function main(argv: string[]): void {
 <if(showDiagnosticErrors)>
     parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
-    parser.buildParseTrees = true;
     parser.printer = {
         println : function(s: string) { console.log(s); },
         print : function(s: string) { process.stdout.write(s); }
     };
+    parser._interp.predictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+    parser.buildParseTrees = false;
+<endif>
     const tree = parser.<parserStartRuleName>();
     ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);
 <else>

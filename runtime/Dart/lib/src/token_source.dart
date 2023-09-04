@@ -7,7 +7,7 @@
 import 'dart:math';
 
 import 'input_stream.dart';
-import 'misc/pair.dart';
+import 'misc/misc.dart';
 import 'token.dart';
 import 'token_factory.dart';
 

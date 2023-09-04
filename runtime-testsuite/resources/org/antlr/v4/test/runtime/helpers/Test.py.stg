@@ -36,10 +36,13 @@ def main(argv):
     stream = CommonTokenStream(lexer)
 <if(parserName)>
     parser = <parserName>(stream)
+    parser._interp.predictionMode = PredictionMode.<predictionMode>
+<if(!buildParseTree)>
+    parser.buildParseTrees = False
+<endif>
 <if(showDiagnosticErrors)>
     parser.addErrorListener(DiagnosticErrorListener())
 <endif>
-    parser.buildParseTrees = True
     tree = parser.<parserStartRuleName>()
     ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)
 <else>

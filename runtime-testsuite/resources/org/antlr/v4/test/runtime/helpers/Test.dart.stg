@@ -19,10 +19,9 @@ void main(List\<String> args) async {
   ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
   parser.setInterpreter(profiler);
 <endif>
-  parser.buildParseTree = true;
-<if(profile)>
-  ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
-  parser.setInterpreter(profiler);
+  parser.interpreter!.predictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+  parser.buildParseTree = false;
 <endif>
   ParserRuleContext tree = parser.<parserStartRuleName>();
 <if(profile)>

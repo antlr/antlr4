@@ -1,0 +1,20 @@
+[notes]
+Test for https://github.com/antlr/antlr4/issues/4128
+
+[type]
+Parser
+
+[grammar]
+grammar u;
+u : 'u' {<writeln("$text")>};
+
+[start]
+u
+
+[input]
+u
+
+[output]
+"""u
+"""
+
