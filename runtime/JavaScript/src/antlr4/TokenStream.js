@@ -3,5 +3,4 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 // this is just to keep meaningful parameter types to Parser
-export default class TokenStream {}
-
+export default class TokenStream { }

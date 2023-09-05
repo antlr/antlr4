@@ -1,4 +1,9 @@
-import {CharStream} from "./CharStream";
+/* Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
+import CharStream from "./CharStream.js";
 
 export declare class CharStreams {
     static fromString(data: string, decodeToUnicodeCodePoints?: boolean): CharStream;
@@ -7,3 +12,5 @@ export declare class CharStreams {
     static fromPath(path: string, encoding: string, callback: (err: Error, stream: CharStream) => void): void;
     static fromPathSync(path: string, encoding: string): CharStream;
 }
+
+export default CharStreams;

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 import Token from "./Token.js";
 
 export default class CommonToken extends Token {
@@ -62,7 +68,7 @@ export default class CommonToken extends Token {
             this.line + ":" + this.column + "]";
     }
 
-    get text(){
+    get text() {
         if (this._text !== null) {
             return this._text;
         }
@@ -87,4 +93,4 @@ export default class CommonToken extends Token {
  * An empty {@link Pair} which is used as the default value of
  * {@link //source} for tokens that do not have a source.
  */
-CommonToken.EMPTY_SOURCE = [ null, null ];
+CommonToken.EMPTY_SOURCE = [null, null];

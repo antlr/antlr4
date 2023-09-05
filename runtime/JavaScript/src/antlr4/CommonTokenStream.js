@@ -3,7 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-
 import Token from './Token.js';
 import BufferedTokenStream from './BufferedTokenStream.js';
 
@@ -34,7 +33,7 @@ import BufferedTokenStream from './BufferedTokenStream.js';
 export default class CommonTokenStream extends BufferedTokenStream {
     constructor(lexer, channel) {
         super(lexer);
-        this.channel = channel===undefined ? Token.DEFAULT_CHANNEL : channel;
+        this.channel = channel === undefined ? Token.DEFAULT_CHANNEL : channel;
     }
 
     adjustSeekIndex(i) {
@@ -42,7 +41,7 @@ export default class CommonTokenStream extends BufferedTokenStream {
     }
 
     LB(k) {
-        if (k===0 || this.index-k<0) {
+        if (k === 0 || this.index - k < 0) {
             return null;
         }
         let i = this.index;
@@ -84,12 +83,12 @@ export default class CommonTokenStream extends BufferedTokenStream {
     getNumberOfOnChannelTokens() {
         let n = 0;
         this.fill();
-        for (let i =0; i< this.tokens.length;i++) {
+        for (let i = 0; i < this.tokens.length; i++) {
             const t = this.tokens[i];
-            if( t.channel===this.channel) {
+            if (t.channel === this.channel) {
                 n += 1;
             }
-            if( t.type===Token.EOF) {
+            if (t.type === Token.EOF) {
                 break;
             }
         }

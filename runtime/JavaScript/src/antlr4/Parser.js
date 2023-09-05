@@ -289,9 +289,9 @@ export default class Parser extends Recognizer {
     }
 
     /**
-	 * Gets the number of syntax errors reported during parsing. This value is
-	 * incremented each time {@link //notifyErrorListeners} is called.	 
-	 */
+     * Gets the number of syntax errors reported during parsing. This value is
+     * incremented each time {@link //notifyErrorListeners} is called.
+     */
     get syntaxErrorsCount() {
         return this._syntaxErrors;
     }
@@ -632,8 +632,7 @@ export default class Parser extends Recognizer {
 }
 
 /**
- * this field maps from the serialized ATN string to the deserialized {@link
-    * ATN} with
+ * this field maps from the serialized ATN string to the deserialized {@link ATN} with
  * bypass alternatives.
  *
  * @see ATNDeserializationOptions//isGenerateRuleBypassTransitions()

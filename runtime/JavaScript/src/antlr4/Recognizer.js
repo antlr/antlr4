@@ -9,15 +9,15 @@ import ProxyErrorListener from './error/ProxyErrorListener.js';
 
 export default class Recognizer {
     constructor() {
-        this._listeners = [ ConsoleErrorListener.INSTANCE ];
+        this._listeners = [ConsoleErrorListener.INSTANCE];
         this._interp = null;
         this._stateNumber = -1;
     }
 
     checkVersion(toolVersion) {
         const runtimeVersion = "4.13.0";
-        if (runtimeVersion!==toolVersion) {
-            console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
+        if (runtimeVersion !== toolVersion) {
+            console.log("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion);
         }
     }
 
@@ -38,12 +38,12 @@ export default class Recognizer {
     }
 
     getTokenNames() {
-        if(!this.tokenNames) {
+        if (!this.tokenNames) {
             const literalNames = this.getLiteralNames();
             const symbolicNames = this.getSymbolicNames();
             const length = literalNames.length > symbolicNames.length ? literalNames.length : symbolicNames.length;
             this.tokenNames = [];
-            for(let i=0; i<length; i++) {
+            for (let i = 0; i < length; i++) {
                 this.tokenNames[i] = literalNames[i] || symbolicNames[i] || "<INVALID";
             }
         }
@@ -52,12 +52,12 @@ export default class Recognizer {
 
     getTokenTypeMap() {
         const tokenNames = this.getTokenNames();
-        if (tokenNames===null) {
-            throw("The current recognizer does not provide a list of token names.");
+        if (tokenNames === null) {
+            throw ("The current recognizer does not provide a list of token names.");
         }
         let result = this.tokenTypeMapCache[tokenNames];
-        if(result===undefined) {
-            result = tokenNames.reduce(function(o, k, i) { o[k] = i; });
+        if (result === undefined) {
+            result = tokenNames.reduce(function (o, k, i) { o[k] = i; });
             result.EOF = Token.EOF;
             this.tokenTypeMapCache[tokenNames] = result;
         }
@@ -70,12 +70,12 @@ export default class Recognizer {
      */
     getRuleIndexMap() {
         const ruleNames = this.ruleNames;
-        if (ruleNames===null) {
-            throw("The current recognizer does not provide a list of rule names.");
+        if (ruleNames === null) {
+            throw ("The current recognizer does not provide a list of rule names.");
         }
         let result = this.ruleIndexMapCache[ruleNames]; // todo: should it be Recognizer.ruleIndexMapCache ?
-        if(result===undefined) {
-            result = ruleNames.reduce(function(o, k, i) { o[k] = i; });
+        if (result === undefined) {
+            result = ruleNames.reduce(function (o, k, i) { o[k] = i; });
             this.ruleIndexMapCache[ruleNames] = result;
         }
         return result;
@@ -83,7 +83,7 @@ export default class Recognizer {
 
     getTokenType(tokenName) {
         const ttype = this.getTokenTypeMap()[tokenName];
-        if (ttype !==undefined) {
+        if (ttype !== undefined) {
             return ttype;
         } else {
             return Token.INVALID_TYPE;
@@ -111,18 +111,18 @@ export default class Recognizer {
      * feature when necessary. For example, see
      * {@link DefaultErrorStrategy//getTokenErrorDisplay}.*/
     getTokenErrorDisplay(t) {
-        if (t===null) {
+        if (t === null) {
             return "<no token>";
         }
         let s = t.text;
-        if (s===null) {
-            if (t.type===Token.EOF) {
+        if (s === null) {
+            if (t.type === Token.EOF) {
                 s = "<EOF>";
             } else {
                 s = "<" + t.type + ">";
             }
         }
-        s = s.replace("\n","\\n").replace("\r","\\r").replace("\t","\\t");
+        s = s.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
         return "'" + s + "'";
     }
 
@@ -138,7 +138,7 @@ export default class Recognizer {
         return true;
     }
 
-    precpred(localctx , precedence) {
+    precpred(localctx, precedence) {
         return true;
     }
 
@@ -146,7 +146,7 @@ export default class Recognizer {
         return this._interp.atn;
     }
 
-    get state(){
+    get state() {
         return this._stateNumber;
     }
 

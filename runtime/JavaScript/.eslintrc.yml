@@ -15,6 +15,7 @@ parserOptions:
   sourceType: module
   project: ['./tsconfig.json']
   ecmaVersion: 2022
+  requireConfigFile: false
 rules:
   no-unused-vars: ["error", { vars: "all", args: "none" }]
   no-prototype-builtins: ["off"]

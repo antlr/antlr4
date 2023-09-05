@@ -2,9 +2,10 @@
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
 export default class ParseCancellationException extends Error {
     constructor() {
-        super()
+        super();
         Error.captureStackTrace(this, ParseCancellationException);
     }
 }

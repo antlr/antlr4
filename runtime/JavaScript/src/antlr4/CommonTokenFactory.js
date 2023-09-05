@@ -4,8 +4,7 @@
  */
 
 import CommonToken from './CommonToken.js';
-
-class TokenFactory {}
+import TokenFactory from './TokenFactory.js';
 
 /**
  * This default implementation of {@link TokenFactory} creates
@@ -29,17 +28,17 @@ export default class CommonTokenFactory extends TokenFactory {
          * The default value is {@code false} to avoid the performance and memory
          * overhead of copying text for every token unless explicitly requested.</p>
          */
-        this.copyText = copyText===undefined ? false : copyText;
+        this.copyText = copyText === undefined ? false : copyText;
     }
 
     create(source, type, text, channel, start, stop, line, column) {
         const t = new CommonToken(source, type, channel, start, stop);
         t.line = line;
         t.column = column;
-        if (text !==null) {
+        if (text !== null) {
             t.text = text;
-        } else if (this.copyText && source[1] !==null) {
-            t.text = source[1].getText(start,stop);
+        } else if (this.copyText && source[1] !== null) {
+            t.text = source[1].getText(start, stop);
         }
         return t;
     }
