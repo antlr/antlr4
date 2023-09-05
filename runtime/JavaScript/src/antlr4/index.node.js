@@ -34,6 +34,7 @@ import RecognitionException from "./error/RecognitionException.js";
 import FailedPredicateException from "./error/FailedPredicateException.js";
 import NoViableAltException from "./error/NoViableAltException.js";
 import BailErrorStrategy from "./error/BailErrorStrategy.js";
+import DefaultErrorStrategy from "./error/DefaultErrorStrategy.js";
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import ParseTreeListener from "./tree/ParseTreeListener.js";
@@ -55,6 +56,6 @@ export {
     Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
-    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
+    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
     arrayToString
 }
