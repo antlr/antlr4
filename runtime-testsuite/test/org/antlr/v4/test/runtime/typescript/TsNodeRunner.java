@@ -35,7 +35,7 @@ public class TsNodeRunner extends RuntimeRunner {
 	}
 
 	private void npmInstallTsNodeAndWebpack() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "webpack-cli"}, null);
+		Processor.run(new String[] {NPM_EXEC, "--silent", "--force", "install", "-g", "typescript", "npx", "tsx", "webpack", "webpack-cli"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
@@ -57,7 +57,10 @@ public class TsNodeRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "ts-node"  + (isWindows() ? ".cmd" : ""); }
+	public String getRuntimeToolName() { return "npx"  + (isWindows() ? ".cmd" : ""); }
+
+    @Override
+    protected String[] getExtraRunArgs() { return new String[]{ "tsx" }; }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
