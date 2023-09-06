@@ -2,7 +2,7 @@ FROM eclipse-temurin:11 AS builder
 
 WORKDIR /opt/antlr4
 
-ARG ANTLR_VERSION="4.13.0"
+ARG ANTLR_VERSION="4.13.1"
 ARG MAVEN_OPTS="-Xmx1G"
 
 
