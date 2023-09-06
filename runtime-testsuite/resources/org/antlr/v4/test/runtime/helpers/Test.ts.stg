@@ -7,17 +7,16 @@ import {
 	ParseTreeWalker,
 	RuleContext,
 	ParserRuleContext,
-	RuleNode,
 	PredictionMode
 } from 'antlr4';
-import <lexerName> from './<lexerName>.js';
+import <lexerName> from './<lexerName>';
 <if(parserName)>
-import <parserName> from './<parserName>.js';
+import <parserName> from './<parserName>';
 <if(useListener)>
-import <grammarName>Listener from './<grammarName>Listener.js';
+import <grammarName>Listener from './<grammarName>Listener';
 <endif>
 <if(useVisitor)>
-import <grammarName>Visitor from './<grammarName>Visitor.js';
+import <grammarName>Visitor from './<grammarName>Visitor';
 <endif>
 
 class TreeShapeListener extends ParseTreeListener {
@@ -25,7 +24,7 @@ class TreeShapeListener extends ParseTreeListener {
         for (let i = 0; i \< ctx.getChildCount(); i++) {
             const child = ctx.getChild(i) as RuleContext;
             const parent = child.parentCtx;
-            if (parent!.ruleContext !== ctx || !(parent instanceof RuleNode)) {
+            if (parent!.ruleContext !== ctx || !(parent instanceof RuleContext)) {
                 throw `Invalid parse tree shape detected.`;
             }
         }
@@ -64,4 +63,3 @@ function main(argv: string[]): void {
 }
 
 main(process.argv);
-
