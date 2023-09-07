@@ -106,6 +106,9 @@
 						<configuration>
 							<sourceDirectory>${basedir}/test</sourceDirectory>
 							<outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
+							<options>
+								<contextSuperClass>org.antlr.v4.test.runtime.java.api.TreeRootForTesting</contextSuperClass>
+							</options>
 							<visitor>true</visitor>
 							<generateTestSources>true</generateTestSources>
 						</configuration>
