@@ -50,7 +50,7 @@ must include a reference to the Antlr Python3 runtime.
 You should provide a script that builds the program.
     ```
     pip install -r requirements.txt
-    antlr4 -v 4.13.0 -Dlanguage=Python3 Expr.g4
+    antlr4 -Dlanguage=Python3 Expr.g4
     ```
 _It is vital that the versions for the
 Antlr tool used to generate the parser
