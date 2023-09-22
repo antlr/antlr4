@@ -36,7 +36,9 @@ public class DartTarget extends Target {
 		"deferred", "hide", "return", "with",
 		"do", "if", "set", "yield",
 
-		"rule", "parserRule"
+                "rule", "parserRule",
+                "accept"
+
 	));
 
 	public DartTarget(CodeGenerator gen) {
