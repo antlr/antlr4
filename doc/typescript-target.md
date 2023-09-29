@@ -110,7 +110,7 @@ class CustomListener
         console.log("Enter Node 'myStartRule'");
     }
     exitMyStartRule(ctx: MyStartRuleContext) {
-        console.log("Enter Node 'myStartRule'");
+        console.log("Exit Node 'myStartRule'");
     }
 
 }
