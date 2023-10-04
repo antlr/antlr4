@@ -19,13 +19,9 @@ AppendStr(a,b) ::= "<a> + <b>"
 Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= <<
-// A noddy range over the list will not compile if it is not getting a slice
-// however, Go will not compile the generated code if the slice vs single value is wrong.
-// Makes the Java based tests suite work though.
-j1__ := make([]interface{}, len(<v>))
-j2__ := <v>
-for j3__ := range j2__ {
-   j1__[j3__] = j2__[j3__]
+// Go will not compile this generated code if the slice vs single value is wrong.
+for i := range localctx.(*ExpressionContext).GetArgs() {
+    _ = localctx.(*ExpressionContext).GetArgs()[i]
 }
 >>
 
@@ -86,6 +82,8 @@ TokenStartColumnEquals(i) ::= <%p.TokenStartColumn == <i>%>
 ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false)"
+
+ImportRuleInvocationStack() ::= ""
 
 RuleInvocationStack() ::= "antlr.PrintArrayJavaStyle(p.GetRuleInvocationStack(nil))"
 
@@ -340,5 +338,8 @@ func pred(v bool) bool {
 
 Invoke_pred(v) ::= <<pred(<v>)>>
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 StringType() ::= "string"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"
+ContextMember(ctx, member) ::= "<ctx>.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local; format={cap}>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"

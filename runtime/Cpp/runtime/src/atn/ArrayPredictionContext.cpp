@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "atn/SingletonPredictionContext.h"
+#include "atn/HashUtils.h"
 #include "misc/MurmurHash.h"
 #include "support/Casts.h"
 
@@ -17,12 +18,13 @@ using namespace antlrcpp;
 
 namespace {
 
-  bool cachedHashCodeEqual(size_t lhs, size_t rhs) {
-    return lhs == rhs || lhs == 0 || rhs == 0;
-  }
-
   bool predictionContextEqual(const Ref<const PredictionContext> &lhs, const Ref<const PredictionContext> &rhs) {
-    return *lhs == *rhs;
+    // parent PredictionContext pointers can be null during full context mode and
+    // the ctxs are in an ArrayPredictionContext.  If both are null, return true
+    // if just one is null, return false. If both are non-null, do comparison.
+    if ( lhs == nullptr ) return rhs == nullptr;
+    if ( rhs == nullptr ) return false; // lhs!=null and rhs==null
+    return *lhs == *rhs;                // both nonnull
   }
 
 }
@@ -75,11 +77,29 @@ bool ArrayPredictionContext::equals(const PredictionContext &other) const {
     return false;
   }
   const auto &array = downCast<const ArrayPredictionContext&>(other);
-  return returnStates.size() == array.returnStates.size() &&
-         parents.size() == array.parents.size() &&
-         cachedHashCodeEqual(cachedHashCode(), array.cachedHashCode()) &&
-         std::memcmp(returnStates.data(), array.returnStates.data(), returnStates.size() * sizeof(decltype(returnStates)::value_type)) == 0 &&
-         std::equal(parents.begin(), parents.end(), array.parents.begin(), predictionContextEqual);
+  const bool sameSize = returnStates.size() == array.returnStates.size() &&
+                        parents.size() == array.parents.size();
+  if ( !sameSize ) {
+      return false;
+  }
+
+  const bool sameHash = cachedHashCodeEqual(cachedHashCode(), array.cachedHashCode());
+  if ( !sameHash ) {
+      return false;
+  }
+
+  const size_t stateSizeBytes = sizeof(decltype(returnStates)::value_type);
+  const bool returnStateArraysEqual =
+          std::memcmp(returnStates.data(), array.returnStates.data(),
+                      returnStates.size() * stateSizeBytes) == 0;
+  if ( !returnStateArraysEqual ) {
+      return false;
+  }
+
+  // stack of contexts is the same
+  const bool parentCtxEqual =
+          std::equal(parents.begin(), parents.end(), array.parents.begin(), predictionContextEqual);
+  return parentCtxEqual;
 }
 
 std::string ArrayPredictionContext::toString() const {

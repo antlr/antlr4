@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.net.URI;
@@ -51,6 +52,12 @@ public class RuntimeTestDescriptor {
 	/** For parsing, engage the DiagnosticErrorListener, dumping results to stderr */
 	public final boolean showDiagnosticErrors;
 
+	public final boolean traceATN;
+
+	public final PredictionMode predictionMode;
+
+	public final boolean buildParseTree;
+
 	public final String[] skipTargets;
 
 	public final URI uri;
@@ -59,8 +66,8 @@ public class RuntimeTestDescriptor {
 								 String input, String output, String errors,
 								 String startRule,
 								 String grammarName, String grammar, List<Pair<String, String>> slaveGrammars,
-								 boolean showDFA, boolean showDiagnosticErrors, String[] skipTargets,
-								 URI uri) {
+								 boolean showDiagnosticErrors, boolean traceATN, boolean showDFA, PredictionMode predictionMode,
+								 boolean buildParseTree, String[] skipTargets, URI uri) {
 		this.testType = testType;
 		this.name = name;
 		this.notes = notes;
@@ -73,6 +80,9 @@ public class RuntimeTestDescriptor {
 		this.slaveGrammars = slaveGrammars;
 		this.showDFA = showDFA;
 		this.showDiagnosticErrors = showDiagnosticErrors;
+		this.traceATN = traceATN;
+		this.predictionMode = predictionMode;
+		this.buildParseTree = buildParseTree;
 		this.skipTargets = skipTargets != null ? skipTargets : new String[0];
 		this.uri = uri;
 	}

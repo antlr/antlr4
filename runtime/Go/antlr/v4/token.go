@@ -35,6 +35,8 @@ type Token interface {
 
 	GetTokenSource() TokenSource
 	GetInputStream() CharStream
+
+	String() string
 }
 
 type BaseToken struct {
@@ -53,7 +55,7 @@ type BaseToken struct {
 const (
 	TokenInvalidType = 0
 
-	// During lookahead operations, this "token" signifies we hit rule end ATN state
+	// TokenEpsilon  - during lookahead operations, this "token" signifies we hit the rule end [ATN] state
 	// and did not follow it despite needing to.
 	TokenEpsilon = -2
 
@@ -61,15 +63,16 @@ const (
 
 	TokenEOF = -1
 
-	// All tokens go to the parser (unless Skip() is called in that rule)
+	// TokenDefaultChannel is the default channel upon which tokens are sent to the parser.
+	//
+	// All tokens go to the parser (unless [Skip] is called in the lexer rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
-
 	TokenDefaultChannel = 0
 
-	// Anything on different channel than DEFAULT_CHANNEL is not parsed
-	// by parser.
-
+	// TokenHiddenChannel defines the normal hidden channel - the parser wil not see tokens that are not on [TokenDefaultChannel].
+	//
+	// Anything on a different channel than TokenDefaultChannel is not parsed by parser.
 	TokenHiddenChannel = 1
 )
 
@@ -101,6 +104,25 @@ func (b *BaseToken) GetSource() *TokenSourceCharStreamPair {
 	return b.source
 }
 
+func (b *BaseToken) GetText() string {
+	if b.text != "" {
+		return b.text
+	}
+	input := b.GetInputStream()
+	if input == nil {
+		return ""
+	}
+	n := input.Size()
+	if b.GetStart() < n && b.GetStop() < n {
+		return input.GetTextFromInterval(NewInterval(b.GetStart(), b.GetStop()))
+	}
+	return "<EOF>"
+}
+
+func (b *BaseToken) SetText(text string) {
+	b.text = text
+}
+
 func (b *BaseToken) GetTokenIndex() int {
 	return b.tokenIndex
 }
@@ -117,22 +139,45 @@ func (b *BaseToken) GetInputStream() CharStream {
 	return b.source.charStream
 }
 
+func (b *BaseToken) String() string {
+	txt := b.GetText()
+	if txt != "" {
+		txt = strings.Replace(txt, "\n", "\\n", -1)
+		txt = strings.Replace(txt, "\r", "\\r", -1)
+		txt = strings.Replace(txt, "\t", "\\t", -1)
+	} else {
+		txt = "<no text>"
+	}
+
+	var ch string
+	if b.GetChannel() > 0 {
+		ch = ",channel=" + strconv.Itoa(b.GetChannel())
+	} else {
+		ch = ""
+	}
+
+	return "[@" + strconv.Itoa(b.GetTokenIndex()) + "," + strconv.Itoa(b.GetStart()) + ":" + strconv.Itoa(b.GetStop()) + "='" +
+		txt + "',<" + strconv.Itoa(b.GetTokenType()) + ">" +
+		ch + "," + strconv.Itoa(b.GetLine()) + ":" + strconv.Itoa(b.GetColumn()) + "]"
+}
+
 type CommonToken struct {
-	*BaseToken
+	BaseToken
 }
 
 func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start, stop int) *CommonToken {
 
-	t := new(CommonToken)
+	t := &CommonToken{
+		BaseToken: BaseToken{
+			source:     source,
+			tokenType:  tokenType,
+			channel:    channel,
+			start:      start,
+			stop:       stop,
+			tokenIndex: -1,
+		},
+	}
 
-	t.BaseToken = new(BaseToken)
-
-	t.source = source
-	t.tokenType = tokenType
-	t.channel = channel
-	t.start = start
-	t.stop = stop
-	t.tokenIndex = -1
 	if t.source.tokenSource != nil {
 		t.line = source.tokenSource.GetLine()
 		t.column = source.tokenSource.GetCharPositionInLine()
@@ -165,45 +210,4 @@ func (c *CommonToken) clone() *CommonToken {
 	t.column = c.GetColumn()
 	t.text = c.GetText()
 	return t
-}
-
-func (c *CommonToken) GetText() string {
-	if c.text != "" {
-		return c.text
-	}
-	input := c.GetInputStream()
-	if input == nil {
-		return ""
-	}
-	n := input.Size()
-	if c.start < n && c.stop < n {
-		return input.GetTextFromInterval(NewInterval(c.start, c.stop))
-	}
-	return "<EOF>"
-}
-
-func (c *CommonToken) SetText(text string) {
-	c.text = text
-}
-
-func (c *CommonToken) String() string {
-	txt := c.GetText()
-	if txt != "" {
-		txt = strings.Replace(txt, "\n", "\\n", -1)
-		txt = strings.Replace(txt, "\r", "\\r", -1)
-		txt = strings.Replace(txt, "\t", "\\t", -1)
-	} else {
-		txt = "<no text>"
-	}
-
-	var ch string
-	if c.channel > 0 {
-		ch = ",channel=" + strconv.Itoa(c.channel)
-	} else {
-		ch = ""
-	}
-
-	return "[@" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
-		txt + "',<" + strconv.Itoa(c.tokenType) + ">" +
-		ch + "," + strconv.Itoa(c.line) + ":" + strconv.Itoa(c.column) + "]"
 }

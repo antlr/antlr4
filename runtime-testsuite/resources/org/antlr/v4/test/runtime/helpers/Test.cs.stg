@@ -1,5 +1,6 @@
 using System;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Tree;
 using System.Text;
 
@@ -12,10 +13,16 @@ public class Test {
 		var tokens = new CommonTokenStream(lex);
 <if(parserName)>
 		var parser = new <parserName>(tokens);
-<if(debug)>
+		parser.Interpreter.PredictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+		parser.BuildParseTree = false;
+<endif>
+<if(showDiagnosticErrors)>
 		parser.AddErrorListener(new DiagnosticErrorListener());
 <endif>
-		parser.BuildParseTree = true;
+<if(traceATN)>
+		ParserATNSimulator.trace_atn_sim = true;
+<endif>
 		var tree = parser.<parserStartRuleName>();
 		ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);
 <else>

@@ -59,6 +59,8 @@ For those using Java, here's a great [set of ANTLR in Intellij notes](https://do
 
 * [Parser and lexer interpreters](interpreters.md)
 
+* [Writing target-agnostic grammars](target-agnostic-grammars.md)
+
 * [Resources](resources.md)
 
 # Building / releasing ANTLR itself

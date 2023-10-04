@@ -6,8 +6,8 @@
 
 package org.antlr.v4.test.runtime.javascript;
 
-import org.antlr.v4.test.runtime.RuntimeTests;
 import org.antlr.v4.test.runtime.RuntimeRunner;
+import org.antlr.v4.test.runtime.RuntimeTests;
 
 public class JavaScriptRuntimeTests extends RuntimeTests {
 	@Override

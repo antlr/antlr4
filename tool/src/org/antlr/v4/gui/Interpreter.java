@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 
 /** Interpret a lexer/parser, optionally printing tree string and dumping profile info
  *
- *  $ java org.antlr.v4.runtime.misc.Intrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName inputFileName
+ *  $ java org.antlr.v4.gui.Interpreter [X.g4|XParser.g4 XLexer.g4] startRuleName inputFileName
  *        [-tree]
  *        [-gui]
  *        [-trace]
@@ -62,7 +62,7 @@ public class Interpreter {
 
 	public Interpreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.guIntrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
+			System.err.println("java org.antlr.v4.gui.Intrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
 					"  [-tokens] [-tree] [-gui] [-encoding encodingname]\n" +
 					"  [-trace] [-profile filename.csv] [input-filename(s)]");
 			System.err.println("Omitting input-filename makes rig read from stdin.");

@@ -9,6 +9,7 @@
  * we obtained this token.
  */
 export default class Token {
+
 	constructor() {
 		this.source = null;
 		this.type = null; // token type of the token

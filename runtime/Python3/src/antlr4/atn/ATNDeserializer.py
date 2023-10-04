@@ -22,7 +22,7 @@ class ATNDeserializer (object):
             options = ATNDeserializationOptions.defaultOptions
         self.deserializationOptions = options
 
-    def deserialize(self, data : int):
+    def deserialize(self, data : [int]):
         self.data = data
         self.pos = 0
         self.checkVersion()

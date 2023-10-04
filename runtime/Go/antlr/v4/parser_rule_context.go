@@ -31,7 +31,9 @@ type ParserRuleContext interface {
 }
 
 type BaseParserRuleContext struct {
-	*BaseRuleContext
+	parentCtx     RuleContext
+	invokingState int
+	RuleIndex     int
 
 	start, stop Token
 	exception   RecognitionException
@@ -40,8 +42,22 @@ type BaseParserRuleContext struct {
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
 	prc := new(BaseParserRuleContext)
+	InitBaseParserRuleContext(prc, parent, invokingStateNumber)
+	return prc
+}
 
-	prc.BaseRuleContext = NewBaseRuleContext(parent, invokingStateNumber)
+func InitBaseParserRuleContext(prc *BaseParserRuleContext, parent ParserRuleContext, invokingStateNumber int) {
+	// What context invoked b rule?
+	prc.parentCtx = parent
+
+	// What state invoked the rule associated with b context?
+	// The "return address" is the followState of invokingState
+	// If parent is nil, b should be -1.
+	if parent == nil {
+		prc.invokingState = -1
+	} else {
+		prc.invokingState = invokingStateNumber
+	}
 
 	prc.RuleIndex = -1
 	// * If we are debugging or building a parse tree for a Visitor,
@@ -56,8 +72,6 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 	// The exception that forced prc rule to return. If the rule successfully
 	// completed, prc is {@code nil}.
 	prc.exception = nil
-
-	return prc
 }
 
 func (prc *BaseParserRuleContext) SetException(e RecognitionException) {
@@ -90,14 +104,15 @@ func (prc *BaseParserRuleContext) GetText() string {
 	return s
 }
 
-// Double dispatch methods for listeners
-func (prc *BaseParserRuleContext) EnterRule(listener ParseTreeListener) {
+// EnterRule is called when any rule is entered.
+func (prc *BaseParserRuleContext) EnterRule(_ ParseTreeListener) {
 }
 
-func (prc *BaseParserRuleContext) ExitRule(listener ParseTreeListener) {
+// ExitRule is called when any rule is exited.
+func (prc *BaseParserRuleContext) ExitRule(_ ParseTreeListener) {
 }
 
-// * Does not set parent link other add methods do that///
+// * Does not set parent link other add methods do that
 func (prc *BaseParserRuleContext) addTerminalNodeChild(child TerminalNode) TerminalNode {
 	if prc.children == nil {
 		prc.children = make([]Tree, 0)
@@ -120,10 +135,9 @@ func (prc *BaseParserRuleContext) AddChild(child RuleContext) RuleContext {
 	return child
 }
 
-// * Used by EnterOuterAlt to toss out a RuleContext previously added as
-// we entered a rule. If we have // label, we will need to remove
-// generic ruleContext object.
-// /
+// RemoveLastChild is used by [EnterOuterAlt] to toss out a [RuleContext] previously added as
+// we entered a rule. If we have a label, we will need to remove
+// the generic ruleContext object.
 func (prc *BaseParserRuleContext) RemoveLastChild() {
 	if prc.children != nil && len(prc.children) > 0 {
 		prc.children = prc.children[0 : len(prc.children)-1]
@@ -293,7 +307,7 @@ func (prc *BaseParserRuleContext) GetChildCount() int {
 	return len(prc.children)
 }
 
-func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
+func (prc *BaseParserRuleContext) GetSourceInterval() Interval {
 	if prc.start == nil || prc.stop == nil {
 		return TreeInvalidInterval
 	}
@@ -340,6 +354,50 @@ func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) s
 	return s
 }
 
+func (prc *BaseParserRuleContext) SetParent(v Tree) {
+	if v == nil {
+		prc.parentCtx = nil
+	} else {
+		prc.parentCtx = v.(RuleContext)
+	}
+}
+
+func (prc *BaseParserRuleContext) GetInvokingState() int {
+	return prc.invokingState
+}
+
+func (prc *BaseParserRuleContext) SetInvokingState(t int) {
+	prc.invokingState = t
+}
+
+func (prc *BaseParserRuleContext) GetRuleIndex() int {
+	return prc.RuleIndex
+}
+
+func (prc *BaseParserRuleContext) GetAltNumber() int {
+	return ATNInvalidAltNumber
+}
+
+func (prc *BaseParserRuleContext) SetAltNumber(_ int) {}
+
+// IsEmpty returns true if the context of b is empty.
+//
+// A context is empty if there is no invoking state, meaning nobody calls
+// current context.
+func (prc *BaseParserRuleContext) IsEmpty() bool {
+	return prc.invokingState == -1
+}
+
+// GetParent returns the combined text of all child nodes. This method only considers
+// tokens which have been added to the parse tree.
+//
+// Since tokens on hidden channels (e.g. whitespace or comments) are not
+// added to the parse trees, they will not appear in the output of this
+// method.
+func (prc *BaseParserRuleContext) GetParent() Tree {
+	return prc.parentCtx
+}
+
 var ParserRuleContextEmpty = NewBaseParserRuleContext(nil, -1)
 
 type InterpreterRuleContext interface {
@@ -350,6 +408,7 @@ type BaseInterpreterRuleContext struct {
 	*BaseParserRuleContext
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewBaseInterpreterRuleContext(parent BaseInterpreterRuleContext, invokingStateNumber, ruleIndex int) *BaseInterpreterRuleContext {
 
 	prc := new(BaseInterpreterRuleContext)

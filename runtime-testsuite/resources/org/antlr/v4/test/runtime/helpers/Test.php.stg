@@ -2,22 +2,26 @@
 
 declare(strict_types=1);
 
+use Antlr\Antlr4\Runtime\Atn\ParserATNSimulator;
 use Antlr\Antlr4\Runtime\CommonTokenStream;
 use Antlr\Antlr4\Runtime\Error\Listeners\ConsoleErrorListener;
+use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
 use Antlr\Antlr4\Runtime\InputStream;
 use Antlr\Antlr4\Runtime\Lexer;
-use Antlr\Antlr4\Runtime\Error\Listeners\DiagnosticErrorListener;
 use Antlr\Antlr4\Runtime\ParserRuleContext;
 use Antlr\Antlr4\Runtime\Tree\ErrorNode;
 use Antlr\Antlr4\Runtime\Tree\ParseTreeListener;
 use Antlr\Antlr4\Runtime\Tree\ParseTreeWalker;
 use Antlr\Antlr4\Runtime\Tree\RuleNode;
 use Antlr\Antlr4\Runtime\Tree\TerminalNode;
+use Antlr\Antlr4\Runtime\Atn\PredictionMode;
 
 $runtime = \getenv('RUNTIME');
 
+require_once $runtime . '/vendor/autoload.php';
+
 \spl_autoload_register(function (string $class) use ($runtime) : void {
-    $file = \str_replace('\\\', \DIRECTORY_SEPARATOR, \str_replace('Antlr\Antlr4\Runtime\\\', $runtime . '\\\src\\\', $class)) . '.php';
+    $file = \str_replace('\\\', \DIRECTORY_SEPARATOR, $class) . '.php';
 
     if (\file_exists($file)) {
         require_once $file;
@@ -48,11 +52,17 @@ $lexer->addErrorListener(new ConsoleErrorListener());
 $tokens = new CommonTokenStream($lexer);
 <if(parserName)>
 $parser = new <parserName>($tokens);
-<if(debug)>
+$parser->getInterpreter()->setPredictionMode(PredictionMode::<predictionMode>);
+<if(!buildParseTree)>
+$parser->setBuildParseTree(false);
+<endif>
+<if(showDiagnosticErrors)>
 $parser->addErrorListener(new DiagnosticErrorListener());
 <endif>
 $parser->addErrorListener(new ConsoleErrorListener());
-$parser->setBuildParseTree(true);
+<if(traceATN)>
+ParserATNSimulator::$traceAtnSimulation = true;
+<endif>
 $tree = $parser-><parserStartRuleName>();
 
 ParseTreeWalker::default()->walk(new TreeShapeListener(), $tree);

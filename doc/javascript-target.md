@@ -100,7 +100,6 @@ const chars = new antlr4.InputStream(input);
 const lexer = new MyGrammarLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new MyGrammarParser(tokens);
-parser.buildParseTrees = true;
 const tree = parser.MyStartRule();
 ```
 
@@ -132,7 +131,6 @@ const chars = new antlr4.InputStream(input);
 const lexer = new MyGrammarLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new MyGrammarParser(tokens);
-parser.buildParseTrees = true;
 const tree = parser.MyQuery();
 
 class Visitor {
@@ -195,14 +193,13 @@ antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 
 ## What about TypeScript?
 
-We currently do not have a TypeScript target, but Sam Harwell is [working on a port](https://github.com/tunnelvisionlabs/antlr4ts). [Here](https://github.com/ChuckJonas/extract-interface-ts) is Section 4.3 of [ANTLR 4 book](http://a.co/5jUJYmh) converted to typescript.
+We have a [TypeScript target](typescript-target.md), based on the JavaScript target.
 
 ## How do I integrate my parser with ACE editor?
 
 This specific task is described in this [dedicated page](ace-javascript-target.md).
  
 ## How can I learn more about ANTLR?
- 
 
 Further information can be found from  "The definitive ANTLR 4 reference" book.
 

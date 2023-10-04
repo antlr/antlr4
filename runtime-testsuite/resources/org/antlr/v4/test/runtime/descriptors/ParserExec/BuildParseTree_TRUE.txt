@@ -1,0 +1,28 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+r
+   : a b {<ToStringTree("$ctx"):writeln()>}
+   ;
+a
+   : A
+   ;
+b
+   : B
+   ;
+A  : 'A';
+B  : 'B';
+WS  : [ \r\n\t]+ -> skip ;
+
+[start]
+r
+
+[input]
+A B
+
+[output]
+"""(r (a A) (b B))
+"""

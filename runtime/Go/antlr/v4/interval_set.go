@@ -14,20 +14,21 @@ type Interval struct {
 	Stop  int
 }
 
-/* stop is not included! */
-func NewInterval(start, stop int) *Interval {
-	i := new(Interval)
-
-	i.Start = start
-	i.Stop = stop
-	return i
+// NewInterval creates a new interval with the given start and stop values.
+func NewInterval(start, stop int) Interval {
+	return Interval{
+		Start: start,
+		Stop:  stop,
+	}
 }
 
-func (i *Interval) Contains(item int) bool {
+// Contains returns true if the given item is contained within the interval.
+func (i Interval) Contains(item int) bool {
 	return item >= i.Start && item < i.Stop
 }
 
-func (i *Interval) String() string {
+// String generates a string representation of the interval.
+func (i Interval) String() string {
 	if i.Start == i.Stop-1 {
 		return strconv.Itoa(i.Start)
 	}
@@ -35,15 +36,18 @@ func (i *Interval) String() string {
 	return strconv.Itoa(i.Start) + ".." + strconv.Itoa(i.Stop-1)
 }
 
-func (i *Interval) length() int {
+// Length returns the length of the interval.
+func (i Interval) Length() int {
 	return i.Stop - i.Start
 }
 
+// IntervalSet represents a collection of [Intervals], which may be read-only.
 type IntervalSet struct {
-	intervals []*Interval
+	intervals []Interval
 	readOnly  bool
 }
 
+// NewIntervalSet creates a new empty, writable, interval set.
 func NewIntervalSet() *IntervalSet {
 
 	i := new(IntervalSet)
@@ -52,6 +56,20 @@ func NewIntervalSet() *IntervalSet {
 	i.readOnly = false
 
 	return i
+}
+
+func (i *IntervalSet) Equals(other *IntervalSet) bool {
+	if len(i.intervals) != len(other.intervals) {
+		return false
+	}
+
+	for k, v := range i.intervals {
+		if v.Start != other.intervals[k].Start || v.Stop != other.intervals[k].Stop {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (i *IntervalSet) first() int {
@@ -70,16 +88,16 @@ func (i *IntervalSet) addRange(l, h int) {
 	i.addInterval(NewInterval(l, h+1))
 }
 
-func (i *IntervalSet) addInterval(v *Interval) {
+func (i *IntervalSet) addInterval(v Interval) {
 	if i.intervals == nil {
-		i.intervals = make([]*Interval, 0)
+		i.intervals = make([]Interval, 0)
 		i.intervals = append(i.intervals, v)
 	} else {
 		// find insert pos
 		for k, interval := range i.intervals {
 			// distinct range -> insert
 			if v.Stop < interval.Start {
-				i.intervals = append(i.intervals[0:k], append([]*Interval{v}, i.intervals[k:]...)...)
+				i.intervals = append(i.intervals[0:k], append([]Interval{v}, i.intervals[k:]...)...)
 				return
 			} else if v.Stop == interval.Start {
 				i.intervals[k].Start = v.Start
@@ -139,16 +157,16 @@ func (i *IntervalSet) contains(item int) bool {
 }
 
 func (i *IntervalSet) length() int {
-	len := 0
+	iLen := 0
 
 	for _, v := range i.intervals {
-		len += v.length()
+		iLen += v.Length()
 	}
 
-	return len
+	return iLen
 }
 
-func (i *IntervalSet) removeRange(v *Interval) {
+func (i *IntervalSet) removeRange(v Interval) {
 	if v.Start == v.Stop-1 {
 		i.removeOne(v.Start)
 	} else if i.intervals != nil {
@@ -162,7 +180,7 @@ func (i *IntervalSet) removeRange(v *Interval) {
 				i.intervals[k] = NewInterval(ni.Start, v.Start)
 				x := NewInterval(v.Stop, ni.Stop)
 				// i.intervals.splice(k, 0, x)
-				i.intervals = append(i.intervals[0:k], append([]*Interval{x}, i.intervals[k:]...)...)
+				i.intervals = append(i.intervals[0:k], append([]Interval{x}, i.intervals[k:]...)...)
 				return
 			} else if v.Start <= ni.Start && v.Stop >= ni.Stop {
 				//                i.intervals.splice(k, 1)
@@ -199,7 +217,7 @@ func (i *IntervalSet) removeOne(v int) {
 				x := NewInterval(ki.Start, v)
 				ki.Start = v + 1
 				//				i.intervals.splice(k, 0, x)
-				i.intervals = append(i.intervals[0:k], append([]*Interval{x}, i.intervals[k:]...)...)
+				i.intervals = append(i.intervals[0:k], append([]Interval{x}, i.intervals[k:]...)...)
 				return
 			}
 		}
@@ -223,7 +241,7 @@ func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []strin
 	return i.toIndexString()
 }
 
-func (i *IntervalSet) GetIntervals() []*Interval {
+func (i *IntervalSet) GetIntervals() []Interval {
 	return i.intervals
 }
 

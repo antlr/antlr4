@@ -4,6 +4,8 @@
 
 package antlr
 
+// DFA represents the Deterministic Finite Automaton used by the recognizer, including all the states it can
+// reach and the transitions between them.
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState
@@ -12,10 +14,9 @@ type DFA struct {
 
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there. Go maps implement key hash collisions and so on and are very
-	// good, but the DFAState is an object and can't be used directly as the key as it can in say JAva
+	// good, but the DFAState is an object and can't be used directly as the key as it can in say Java
 	// amd C#, whereby if the hashcode is the same for two objects, then Equals() is called against them
-	// to see if they really are the same object.
-	//
+	// to see if they really are the same object. Hence, we have our own map storage.
 	//
 	states *JStore[*DFAState, *ObjEqComparator[*DFAState]]
 
@@ -32,11 +33,11 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	dfa := &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{}),
+		states:        nil, // Lazy initialize
 	}
 	if s, ok := atnStartState.(*StarLoopEntryState); ok && s.precedenceRuleDecision {
 		dfa.precedenceDfa = true
-		dfa.s0 = NewDFAState(-1, NewBaseATNConfigSet(false))
+		dfa.s0 = NewDFAState(-1, NewATNConfigSet(false))
 		dfa.s0.isAcceptState = false
 		dfa.s0.requiresFullContext = false
 	}
@@ -95,12 +96,11 @@ func (d *DFA) getPrecedenceDfa() bool {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.getPrecedenceDfa() != precedenceDfa {
-		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](&ObjEqComparator[*DFAState]{})
+		d.states = nil // Lazy initialize
 		d.numstates = 0
 
 		if precedenceDfa {
-			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
-
+			precedenceState := NewDFAState(-1, NewATNConfigSet(false))
 			precedenceState.setEdges(make([]*DFAState, 0))
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -113,6 +113,31 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
+// Len returns the number of states in d. We use this instead of accessing states directly so that we can implement lazy
+// instantiation of the states JMap.
+func (d *DFA) Len() int {
+	if d.states == nil {
+		return 0
+	}
+	return d.states.Len()
+}
+
+// Get returns a state that matches s if it is present in the DFA state set. We defer to this
+// function instead of accessing states directly so that we can implement lazy instantiation of the states JMap.
+func (d *DFA) Get(s *DFAState) (*DFAState, bool) {
+	if d.states == nil {
+		return nil, false
+	}
+	return d.states.Get(s)
+}
+
+func (d *DFA) Put(s *DFAState) (*DFAState, bool) {
+	if d.states == nil {
+		d.states = NewJStore[*DFAState, *ObjEqComparator[*DFAState]](dfaStateEqInst, DFAStateCollection, "DFA via DFA.Put")
+	}
+	return d.states.Put(s)
+}
+
 func (d *DFA) getS0() *DFAState {
 	return d.s0
 }
@@ -121,9 +146,11 @@ func (d *DFA) setS0(s *DFAState) {
 	d.s0 = s
 }
 
-// sortedStates returns the states in d sorted by their state number.
+// sortedStates returns the states in d sorted by their state number, or an empty set if d.states is nil.
 func (d *DFA) sortedStates() []*DFAState {
-
+	if d.states == nil {
+		return []*DFAState{}
+	}
 	vs := d.states.SortedSlice(func(i, j *DFAState) bool {
 		return i.stateNumber < j.stateNumber
 	})

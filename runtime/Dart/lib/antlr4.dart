@@ -8,20 +8,24 @@ library antlr4;
 
 export 'src/atn/atn.dart';
 export 'src/dfa/dfa.dart';
-export 'src/tree/tree.dart';
 export 'src/error/error.dart';
-export 'src/rule_context.dart';
+export 'src/misc/misc.dart';
+export 'src/tree/tree.dart';
+
 export 'src/input_stream.dart';
-export 'src/token_stream.dart';
+export 'src/interval_set.dart';
 export 'src/lexer.dart';
 export 'src/parser.dart';
 export 'src/parser_rule_context.dart';
-export 'src/vocabulary.dart';
-export 'src/runtime_meta_data.dart';
-export 'src/token.dart';
 export 'src/prediction_context.dart';
 export 'src/recognizer.dart';
-export 'src/interval_set.dart';
+export 'src/rule_context.dart';
+export 'src/runtime_meta_data.dart';
+export 'src/token.dart';
+export 'src/token_factory.dart';
+export 'src/token_source.dart';
+export 'src/token_stream.dart';
+export 'src/vocabulary.dart';
 
 import 'src/util/platform_stub.dart'
     if (dart.library.io) 'src/util/platform_io.dart';

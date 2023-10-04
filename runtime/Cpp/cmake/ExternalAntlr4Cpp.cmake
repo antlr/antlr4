@@ -20,11 +20,11 @@ endif()
 file(MAKE_DIRECTORY "${ANTLR4_INCLUDE_DIRS}")
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(Configuration))
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime/$(Configuration))
 elseif(${CMAKE_GENERATOR} MATCHES "Xcode.*")
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(CONFIGURATION))
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime/$(CONFIGURATION))
 else()
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/runtime)
 endif()
 
 if(MSVC)
@@ -46,7 +46,7 @@ else()
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
     set(ANTLR4_RUNTIME_LIBRARIES
-        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.11.1.dll)
+        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.13.1.dll)
   elseif(APPLE)
     set(ANTLR4_RUNTIME_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dylib)

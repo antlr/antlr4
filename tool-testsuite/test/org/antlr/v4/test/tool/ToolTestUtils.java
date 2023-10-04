@@ -12,10 +12,7 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
@@ -72,7 +69,7 @@ public class ToolTestUtils {
 										 Path workingDir, boolean saveTestDir) {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, lexerName,
 				false, true, startRuleName, input,
-				false, showDiagnosticErrors, Stage.Execute, false);
+				false, showDiagnosticErrors, Stage.Execute);
 		try (JavaRunner runner = new JavaRunner(workingDir, saveTestDir)) {
 			State result = runner.run(runOptions);
 			if (!(result instanceof ExecutedState)) {
@@ -86,11 +83,11 @@ public class ToolTestUtils {
 			String grammarFileName, String grammarStr, String parserName, String lexerName,
 			boolean useListener, boolean useVisitor, String startRuleName,
 			String input, boolean profile, boolean showDiagnosticErrors,
-			Stage endStage, boolean returnObject
+			Stage endStage
 	) {
 		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
-				input, profile, showDiagnosticErrors, false, endStage, returnObject, "Java",
-				JavaRunner.runtimeTestParserName);
+				input, profile, showDiagnosticErrors, false, false, endStage, "Java",
+				JavaRunner.runtimeTestParserName, PredictionMode.LL, true);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {

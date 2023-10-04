@@ -233,11 +233,11 @@
 #
 import sys
 from antlr4 import DFA
-from antlr4.PredictionContext import PredictionContextCache, PredictionContext, SingletonPredictionContext, \
-    PredictionContextFromRuleContext
 from antlr4.BufferedTokenStream import TokenStream
 from antlr4.Parser import Parser
 from antlr4.ParserRuleContext import ParserRuleContext
+from antlr4.PredictionContext import PredictionContextCache, PredictionContext, SingletonPredictionContext, \
+    PredictionContextFromRuleContext
 from antlr4.RuleContext import RuleContext
 from antlr4.Token import Token
 from antlr4.Utils import str_list
@@ -245,9 +245,9 @@ from antlr4.atn.ATN import ATN
 from antlr4.atn.ATNConfig import ATNConfig
 from antlr4.atn.ATNConfigSet import ATNConfigSet
 from antlr4.atn.ATNSimulator import ATNSimulator
-from antlr4.atn.ATNState import StarLoopEntryState, DecisionState, RuleStopState, ATNState
+from antlr4.atn.ATNState import DecisionState, RuleStopState, ATNState
 from antlr4.atn.PredictionMode import PredictionMode
-from antlr4.atn.SemanticContext import SemanticContext, AND, andContext, orContext
+from antlr4.atn.SemanticContext import SemanticContext, andContext, orContext
 from antlr4.atn.Transition import Transition, RuleTransition, ActionTransition, PrecedencePredicateTransition, \
     PredicateTransition, AtomTransition, SetTransition, NotSetTransition
 from antlr4.dfa.DFAState import DFAState, PredPrediction
@@ -261,7 +261,7 @@ class ParserATNSimulator(ATNSimulator):
     )
 
     debug = False
-    debug_list_atn_decisions = False
+    trace_atn_sim = False
     dfa_debug = False
     retry_debug = False
 
@@ -292,7 +292,7 @@ class ParserATNSimulator(ATNSimulator):
         pass
 
     def adaptivePredict(self, input:TokenStream, decision:int, outerContext:ParserRuleContext):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("adaptivePredict decision " + str(decision) +
                                    " exec LA(1)==" + self.getLookaheadName(input) +
                                    " line " + str(input.LT(1).line) + ":" +
@@ -320,10 +320,10 @@ class ParserATNSimulator(ATNSimulator):
             if s0 is None:
                 if outerContext is None:
                     outerContext = ParserRuleContext.EMPTY
-                if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+                if ParserATNSimulator.debug:
                     print("predictATN decision " + str(dfa.decision) +
                                        " exec LA(1)==" + self.getLookaheadName(input) +
-                                       ", outerContext=" + outerContext.toString(self.parser.literalNames, None))
+                                       ", outerContext=" + str(outerContext));#outerContext.toString(self.parser.literalNames, None))
 
                 fullCtx = False
                 s0_closure = self.computeStartState(dfa.atnStartState, ParserRuleContext.EMPTY, fullCtx)
@@ -384,15 +384,13 @@ class ParserATNSimulator(ATNSimulator):
     #    conflict + preds
     #
     def execATN(self, dfa:DFA, s0:DFAState, input:TokenStream, startIndex:int, outerContext:ParserRuleContext ):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("execATN decision " + str(dfa.decision) +
-                    " exec LA(1)==" + self.getLookaheadName(input) +
+                    ", DFA state " + str(s0) +
+                    ", LA(1)==" + self.getLookaheadName(input) +
                     " line " + str(input.LT(1).line) + ":" + str(input.LT(1).column))
 
         previousD = s0
-
-        if ParserATNSimulator.debug:
-            print("s0 = " + str(s0))
 
         t = input.LA(1)
 
@@ -562,7 +560,7 @@ class ParserATNSimulator(ATNSimulator):
                                          input:TokenStream,
                                          startIndex:int,
                                          outerContext:ParserRuleContext):
-        if ParserATNSimulator.debug or ParserATNSimulator.debug_list_atn_decisions:
+        if ParserATNSimulator.debug or ParserATNSimulator.trace_atn_sim:
             print("execATNWithFullContext", str(s0))
         fullCtx = True
         foundExactAmbig = False
@@ -764,6 +762,10 @@ class ParserATNSimulator(ATNSimulator):
         if skippedStopStates is not None and ( (not fullCtx) or (not PredictionMode.hasConfigInRuleStopState(reach))):
             for c in skippedStopStates:
                 reach.add(c, self.mergeCache)
+
+        if ParserATNSimulator.trace_atn_sim:
+            print("computeReachSet", str(closure), "->", reach)
+
         if len(reach)==0:
             return None
         else:
@@ -808,6 +810,10 @@ class ParserATNSimulator(ATNSimulator):
         # always at least the implicit call to start rule
         initialContext = PredictionContextFromRuleContext(self.atn, ctx)
         configs = ATNConfigSet(fullCtx)
+
+        if ParserATNSimulator.trace_atn_sim:
+            print("computeStartState from ATN state "+str(p)+
+                  " initialContext="+str(initialContext))
 
         for i in range(0, len(p.transitions)):
             target = p.transitions[i].target
@@ -1095,7 +1101,7 @@ class ParserATNSimulator(ATNSimulator):
 
 
     def closureCheckingStopState(self, config:ATNConfig, configs:ATNConfigSet, closureBusy:set, collectPredicates:bool, fullCtx:bool, depth:int, treatEofAsEpsilon:bool):
-        if ParserATNSimulator.debug:
+        if ParserATNSimulator.trace_atn_sim:
             print("closure(" + str(config) + ")")
 
         if isinstance(config.state, RuleStopState):
@@ -1497,9 +1503,13 @@ class ParserATNSimulator(ATNSimulator):
         if t==Token.EOF:
             return "EOF"
         if self.parser is not None and \
-            self.parser.literalNames is not None and \
-            t < len(self.parser.literalNames):
-                 return self.parser.literalNames[t] + "<" + str(t) + ">"
+                self.parser.literalNames is not None and \
+                t < len(self.parser.literalNames):
+            return self.parser.literalNames[t] + "<" + str(t) + ">"
+        if self.parser is not None and \
+                self.parser.symbolicNames is not None and \
+                t < len(self.parser.symbolicNames):
+            return self.parser.symbolicNames[t] + "<" + str(t) + ">"
         else:
             return str(t)
 
@@ -1598,15 +1608,17 @@ class ParserATNSimulator(ATNSimulator):
 
         existing = dfa.states.get(D, None)
         if existing is not None:
+            if ParserATNSimulator.trace_atn_sim: print("addDFAState", str(D), "exists")
             return existing
 
         D.stateNumber = len(dfa.states)
         if not D.configs.readonly:
             D.configs.optimizeConfigs(self)
             D.configs.setReadonly(True)
+
+        if ParserATNSimulator.trace_atn_sim: print("addDFAState new", str(D))
+
         dfa.states[D] = D
-        if ParserATNSimulator.debug:
-            print("adding new DFA state: " + str(D))
         return D
 
     def reportAttemptingFullContext(self, dfa:DFA, conflictingAlts:set, configs:ATNConfigSet, startIndex:int, stopIndex:int):

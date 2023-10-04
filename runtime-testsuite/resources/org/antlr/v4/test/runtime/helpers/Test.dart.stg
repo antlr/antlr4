@@ -12,17 +12,16 @@ void main(List\<String> args) async {
   final tokens = CommonTokenStream(lex);
 <if(parserName)>
   final parser = <parserName>(tokens);
-<if(debug)>
+<if(showDiagnosticErrors)>
   parser.addErrorListener(new DiagnosticErrorListener());
 <endif>
 <if(profile)>
   ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
   parser.setInterpreter(profiler);
 <endif>
-  parser.buildParseTree = true;
-<if(profile)>
-  ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);
-  parser.setInterpreter(profiler);
+  parser.interpreter!.predictionMode = PredictionMode.<predictionMode>;
+<if(!buildParseTree)>
+  parser.buildParseTree = false;
 <endif>
   ParserRuleContext tree = parser.<parserStartRuleName>();
 <if(profile)>

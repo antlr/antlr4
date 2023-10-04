@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.net.URI;
@@ -103,6 +104,9 @@ public class RuntimeTestDescriptorParser {
 		String errors = "";
 		boolean showDFA = false;
 		boolean showDiagnosticErrors = false;
+		boolean traceATN = false;
+		PredictionMode predictionMode = PredictionMode.LL;
+		boolean buildParseTree = true;
 		String[] skipTargets = new String[0];
 		for (Pair<String,String> p : pairs) {
 			String section = p.a;
@@ -145,12 +149,22 @@ public class RuntimeTestDescriptorParser {
 				case "flags":
 					String[] flags = value.split("\n");
 					for (String f : flags) {
-						switch (f) {
+						String[] parts = f.split("=", 2);
+						switch (parts[0]) {
 							case "showDFA":
 								showDFA = true;
 								break;
 							case "showDiagnosticErrors":
 								showDiagnosticErrors = true;
+								break;
+							case "traceATN":
+								traceATN = true;
+								break;
+							case "predictionMode":
+								predictionMode = PredictionMode.valueOf(parts[1]);
+								break;
+							case "notBuildParseTree":
+								buildParseTree = false;
 								break;
 						}
 					}
@@ -163,7 +177,7 @@ public class RuntimeTestDescriptorParser {
 			}
 		}
 		return new RuntimeTestDescriptor(testType, name, notes, input, output, errors, startRule, grammarName, grammar,
-				slaveGrammars, showDFA, showDiagnosticErrors, skipTargets, uri);
+				slaveGrammars, showDiagnosticErrors, traceATN, showDFA, predictionMode, buildParseTree, skipTargets, uri);
 	}
 
 	/** Get A, B, or C from:

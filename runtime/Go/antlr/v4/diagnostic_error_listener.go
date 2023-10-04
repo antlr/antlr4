@@ -33,6 +33,7 @@ type DiagnosticErrorListener struct {
 	exactOnly bool
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 
 	n := new(DiagnosticErrorListener)
@@ -42,7 +43,7 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 	return n
 }
 
-func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	if d.exactOnly && !exact {
 		return
 	}
@@ -55,7 +56,7 @@ func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, s
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, _ *BitSet, _ *ATNConfigSet) {
 
 	msg := "reportAttemptingFullContext d=" +
 		d.getDecisionDescription(recognizer, dfa) +
@@ -64,7 +65,7 @@ func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser,
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, _ int, _ *ATNConfigSet) {
 	msg := "reportContextSensitivity d=" +
 		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +
@@ -96,12 +97,12 @@ func (d *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa 
 // @param configs The conflicting or ambiguous configuration set.
 // @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
-func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
+func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set *ATNConfigSet) *BitSet {
 	if ReportedAlts != nil {
 		return ReportedAlts
 	}
 	result := NewBitSet()
-	for _, c := range set.GetItems() {
+	for _, c := range set.configs {
 		result.add(c.GetAlt())
 	}
 

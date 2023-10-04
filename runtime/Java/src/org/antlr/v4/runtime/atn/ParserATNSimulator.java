@@ -6,17 +6,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -26,16 +16,7 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
 
@@ -267,10 +248,10 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  * the input.</p>
  */
 public class ParserATNSimulator extends ATNSimulator {
-	public static final boolean debug = false;
-	public static final boolean debug_list_atn_decisions = false;
-	public static final boolean dfa_debug = false;
-	public static final boolean retry_debug = false;
+	public static boolean debug = false;
+	public static boolean trace_atn_sim = false;
+	public static boolean dfa_debug = false;
+	public static boolean retry_debug = false;
 
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
 	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(getSafeEnv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
@@ -332,7 +313,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int adaptivePredict(TokenStream input, int decision,
 							   ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions )  {
+		if ( debug || trace_atn_sim )  {
 			System.out.println("adaptivePredict decision "+decision+
 								   " exec LA(1)=="+ getLookaheadName(input)+
 								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
@@ -363,12 +344,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
-				if ( debug || debug_list_atn_decisions )  {
-					System.out.println("predictATN decision "+ dfa.decision+
-									   " exec LA(1)=="+ getLookaheadName(input) +
-									   ", outerContext="+ outerContext.toString(parser));
-				}
-
 				boolean fullCtx = false;
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState,
@@ -439,15 +414,15 @@ public class ParserATNSimulator extends ATNSimulator {
 					   TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions) {
+		if ( debug || trace_atn_sim ) {
 			System.out.println("execATN decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input)+
+							   ", DFA state "+s0+
+							   ", LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+
 		}
 
 		DFAState previousD = s0;
-
-		if ( debug ) System.out.println("s0 = "+s0);
 
 		int t = input.LA(1);
 
@@ -650,7 +625,7 @@ public class ParserATNSimulator extends ATNSimulator {
 										 TokenStream input, int startIndex,
 										 ParserRuleContext outerContext)
 	{
-		if ( debug || debug_list_atn_decisions ) {
+		if ( debug || trace_atn_sim ) {
 			System.out.println("execATNWithFullContext "+s0);
 		}
 		boolean fullCtx = true;
@@ -896,6 +871,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
+		if ( trace_atn_sim ) {
+			System.out.println("computeReachSet "+closure+" -> "+reach);
+		}
+
 		if ( reach.isEmpty() ) return null;
 		return reach;
 	}
@@ -946,12 +925,16 @@ public class ParserATNSimulator extends ATNSimulator {
 
 
 	protected ATNConfigSet computeStartState(ATNState p,
-										  RuleContext ctx,
-										  boolean fullCtx)
+										     RuleContext ctx,
+										     boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
 		PredictionContext initialContext = PredictionContext.fromRuleContext(atn, ctx);
 		ATNConfigSet configs = new ATNConfigSet(fullCtx);
+
+		if ( trace_atn_sim )  {
+			System.out.println("computeStartState from ATN state "+p+" initialContext="+initialContext.toString(parser));
+		}
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -1462,7 +1445,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											int depth,
 											boolean treatEofAsEpsilon)
 	{
-		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
+		if ( trace_atn_sim ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
@@ -2120,15 +2103,22 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
-			if ( existing!=null ) return existing;
+
+			if ( existing!=null ) {
+				if ( trace_atn_sim ) System.out.println("addDFAState " + D + " exists");
+				return existing;
+			}
 
 			D.stateNumber = dfa.states.size();
+
 			if (!D.configs.isReadonly()) {
 				D.configs.optimizeConfigs(this);
 				D.configs.setReadonly(true);
 			}
+
+			if ( trace_atn_sim ) System.out.println("addDFAState new "+D);
+
 			dfa.states.put(D, D);
-			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
 		}
 	}

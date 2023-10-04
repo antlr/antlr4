@@ -83,6 +83,8 @@ class MockListener:
 
 GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
@@ -166,7 +168,7 @@ class LeafListener(MockListener):
 >>
 
 WalkListener(s) ::= <<
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .TListener import TListener
 else:
     from TListener import TListener
@@ -262,5 +264,8 @@ Declare_pred() ::= <<def pred(self, v):
 Invoke_pred(v) ::= <<self.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>.<rule>_list()"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, member) ::= "<ctx>.<member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>.<local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

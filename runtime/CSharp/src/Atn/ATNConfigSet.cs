@@ -311,7 +311,7 @@ namespace Antlr4.Runtime.Atn
 			buf.Append(']');
 			if (hasSemanticContext)
 				buf.Append(",hasSemanticContext=")
-				   .Append(hasSemanticContext);
+				   .Append(hasSemanticContext.ToString().ToLower());
 			if (uniqueAlt != ATN.INVALID_ALT_NUMBER)
 				buf.Append(",uniqueAlt=")
 				   .Append(uniqueAlt);

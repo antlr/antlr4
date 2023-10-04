@@ -64,11 +64,13 @@ public class GoRunner extends RuntimeRunner {
 		return new String[]{"run"};
 	}
 
-	private static final String GoRuntimeImportPath = "github.com/antlr/antlr4/runtime/Go/antlr/v4";
+	private static final String GoRuntimeImportPath = "github.com/antlr4-go/antlr/v4";
 
 	private final static Map<String, String> environment;
 
 	private static String cachedGoMod;
+	private static String cachedGoSum;
+	private static ArrayList<String> options = new ArrayList<>();
 
 	static {
 		environment = new HashMap<>();
@@ -76,18 +78,20 @@ public class GoRunner extends RuntimeRunner {
 	}
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		String cachePath = getCachePath();
 		mkdir(cachePath);
-		Path runtimeFilesPath = Paths.get(getRuntimePath("Go"), "antlr");
+		Path runtimeFilesPath = Paths.get(getRuntimePath("Go"), "antlr", "v4");
 		String runtimeToolPath = getRuntimeToolPath();
 		File goModFile = new File(cachePath, "go.mod");
 		if (goModFile.exists())
 			if (!goModFile.delete())
 				throw new IOException("Can't delete " + goModFile);
-		Processor.run(new String[] {runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
-		Processor.run(new String[] {runtimeToolPath, "mod", "edit",
+		Processor.run(new String[]{runtimeToolPath, "mod", "init", "test"}, cachePath, environment);
+		Processor.run(new String[]{runtimeToolPath, "mod", "edit",
 				"-replace=" + GoRuntimeImportPath + "=" + runtimeFilesPath}, cachePath, environment);
+		Processor.run(new String[]{runtimeToolPath, "mod", "edit",
+				"-require=" + GoRuntimeImportPath + "@v4.0.0"}, cachePath, environment);
 		cachedGoMod = readFile(cachePath + FileSeparator, "go.mod");
 	}
 
@@ -97,39 +101,59 @@ public class GoRunner extends RuntimeRunner {
 			return null;
 		}
 
-		return startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
+		// The rule name start is now translated to Start_ at runtime to avoid clashes with labels.
+		// Some tests use start as the first rule name, and we must cater for that
+		//
+		String rn = startRuleName.substring(0, 1).toUpperCase() + startRuleName.substring(1);
+		switch (rn) {
+			case "Start":
+			case "End":
+			case "Exception":
+				rn += "_";
+			default:
+		}
+		return rn;
+	}
+
+	@Override
+	protected List<String> getTargetToolOptions(RunOptions ro) {
+		// Unfortunately this cannot be cached because all the synchronization is out of whack, and
+		// we end up return the options before they are populated. I prefer to make this small change
+		// at the expense of an object rather than try to change teh synchronized initialization, which is
+		// very fragile.
+		// Also, the options may need to change in the future according to the test options. This is safe
+		ArrayList<String> options = new ArrayList<>();
+		options.add("-o");
+		options.add(tempTestDir.resolve("parser").toString());
+		return options;
 	}
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
-		List<GeneratedFile> generatedFiles = generatedState.generatedFiles;
-		String tempDirPath = getTempDirPath();
-		File generatedParserDir = new File(tempDirPath, "parser");
-		if (!generatedParserDir.mkdir()) {
-			return new CompiledState(generatedState, new Exception("can't make dir " + generatedParserDir));
-		}
-
-		// The generated files seem to need to be in the parser subdirectory.
-		// We have no need to change the import of the runtime because of go mod replace so, we could just generate them
-		// directly in to the parser subdir. But in case down the line, there is some reason to want to replace things in
-		// the generated code, then I will leave this here, and we can use replaceInFile()
+		// We have already created a suitable go.mod file, though it may need to have go mod tidy run on it one time
 		//
-		for (GeneratedFile generatedFile : generatedFiles) {
+		writeFile(getTempDirPath(), "go.mod", cachedGoMod);
+
+		// We need to run a go mod tidy once, now that we have source code. This will generate a valid go.sum file and
+		// recognize the indirect requirements in the go.mod file. Then we re-cache the go.mod and cache
+		// the go.sum and therefore save sparking a new process for all the remaining go tests. This is probably
+		// a race condition as these tests are run in parallel, but it does not matter as they are all going to
+		// generate the same go.mod and go.sum file anyway.
+		//
+		Exception ex = null;
+		if (cachedGoSum == null) {
 			try {
-				Path originalFile = Paths.get(tempDirPath, generatedFile.name);
-				Files.move(originalFile, Paths.get(tempDirPath, "parser", generatedFile.name));
-			} catch (IOException e) {
-				return new CompiledState(generatedState, e);
+				Processor.run(new String[]{getRuntimeToolPath(), "mod", "tidy"}, getTempDirPath(), environment);
+			} catch (InterruptedException | IOException e) {
+				ex = e;
 			}
+			cachedGoMod = readFile(getTempDirPath() + FileSeparator, "go.mod");
+			cachedGoSum = readFile(getTempDirPath() + FileSeparator, "go.sum");
 		}
 
-		writeFile(tempDirPath, "go.mod", cachedGoMod);
-		Exception ex = null;
-		try {
-			Processor.run(new String[] {getRuntimeToolPath(), "mod", "tidy"}, tempDirPath, environment);
-		} catch (InterruptedException | IOException e) {
-			ex = e;
-		}
+		// We can now write the go.sum file, which will allow the go compiler to build the module
+		//
+		writeFile(getTempDirPath(), "go.sum", cachedGoSum);
 
 		return new CompiledState(generatedState, ex);
 	}

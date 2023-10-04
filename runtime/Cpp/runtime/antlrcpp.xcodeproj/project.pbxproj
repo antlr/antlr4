@@ -29,12 +29,6 @@
 		276E5D3D1CDB57AA003FF4B4 /* ANTLRInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C111CDB57AA003FF4B4 /* ANTLRInputStream.h */; };
 		276E5D3E1CDB57AA003FF4B4 /* ANTLRInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C111CDB57AA003FF4B4 /* ANTLRInputStream.h */; };
 		276E5D3F1CDB57AA003FF4B4 /* ANTLRInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C111CDB57AA003FF4B4 /* ANTLRInputStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5D401CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C131CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp */; };
-		276E5D411CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C131CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp */; };
-		276E5D421CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C131CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp */; };
-		276E5D431CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C141CDB57AA003FF4B4 /* AbstractPredicateTransition.h */; };
-		276E5D441CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C141CDB57AA003FF4B4 /* AbstractPredicateTransition.h */; };
-		276E5D451CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C141CDB57AA003FF4B4 /* AbstractPredicateTransition.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5D461CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C151CDB57AA003FF4B4 /* ActionTransition.cpp */; };
 		276E5D471CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C151CDB57AA003FF4B4 /* ActionTransition.cpp */; };
 		276E5D481CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C151CDB57AA003FF4B4 /* ActionTransition.cpp */; };
@@ -83,12 +77,6 @@
 		276E5D731CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C241CDB57AA003FF4B4 /* ATNDeserializer.h */; };
 		276E5D741CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C241CDB57AA003FF4B4 /* ATNDeserializer.h */; };
 		276E5D751CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C241CDB57AA003FF4B4 /* ATNDeserializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5D761CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C251CDB57AA003FF4B4 /* ATNSerializer.cpp */; };
-		276E5D771CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C251CDB57AA003FF4B4 /* ATNSerializer.cpp */; };
-		276E5D781CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C251CDB57AA003FF4B4 /* ATNSerializer.cpp */; };
-		276E5D791CDB57AA003FF4B4 /* ATNSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C261CDB57AA003FF4B4 /* ATNSerializer.h */; };
-		276E5D7A1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C261CDB57AA003FF4B4 /* ATNSerializer.h */; };
-		276E5D7B1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C261CDB57AA003FF4B4 /* ATNSerializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5D7C1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C271CDB57AA003FF4B4 /* ATNSimulator.cpp */; };
 		276E5D7D1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C271CDB57AA003FF4B4 /* ATNSimulator.cpp */; };
 		276E5D7E1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C271CDB57AA003FF4B4 /* ATNSimulator.cpp */; };
@@ -110,21 +98,12 @@
 		276E5D911CDB57AA003FF4B4 /* AtomTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C2E1CDB57AA003FF4B4 /* AtomTransition.h */; };
 		276E5D921CDB57AA003FF4B4 /* AtomTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C2E1CDB57AA003FF4B4 /* AtomTransition.h */; };
 		276E5D931CDB57AA003FF4B4 /* AtomTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C2E1CDB57AA003FF4B4 /* AtomTransition.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5D941CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C2F1CDB57AA003FF4B4 /* BasicBlockStartState.cpp */; };
-		276E5D951CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C2F1CDB57AA003FF4B4 /* BasicBlockStartState.cpp */; };
-		276E5D961CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C2F1CDB57AA003FF4B4 /* BasicBlockStartState.cpp */; };
 		276E5D971CDB57AA003FF4B4 /* BasicBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C301CDB57AA003FF4B4 /* BasicBlockStartState.h */; };
 		276E5D981CDB57AA003FF4B4 /* BasicBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C301CDB57AA003FF4B4 /* BasicBlockStartState.h */; };
 		276E5D991CDB57AA003FF4B4 /* BasicBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C301CDB57AA003FF4B4 /* BasicBlockStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5D9A1CDB57AA003FF4B4 /* BasicState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C311CDB57AA003FF4B4 /* BasicState.cpp */; };
-		276E5D9B1CDB57AA003FF4B4 /* BasicState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C311CDB57AA003FF4B4 /* BasicState.cpp */; };
-		276E5D9C1CDB57AA003FF4B4 /* BasicState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C311CDB57AA003FF4B4 /* BasicState.cpp */; };
 		276E5D9D1CDB57AA003FF4B4 /* BasicState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C321CDB57AA003FF4B4 /* BasicState.h */; };
 		276E5D9E1CDB57AA003FF4B4 /* BasicState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C321CDB57AA003FF4B4 /* BasicState.h */; };
 		276E5D9F1CDB57AA003FF4B4 /* BasicState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C321CDB57AA003FF4B4 /* BasicState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5DA01CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */; };
-		276E5DA11CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */; };
-		276E5DA21CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */; };
 		276E5DA31CDB57AA003FF4B4 /* BlockEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C341CDB57AA003FF4B4 /* BlockEndState.h */; };
 		276E5DA41CDB57AA003FF4B4 /* BlockEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C341CDB57AA003FF4B4 /* BlockEndState.h */; };
 		276E5DA51CDB57AA003FF4B4 /* BlockEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C341CDB57AA003FF4B4 /* BlockEndState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -155,12 +134,6 @@
 		276E5DC11CDB57AA003FF4B4 /* DecisionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C3E1CDB57AA003FF4B4 /* DecisionState.h */; };
 		276E5DC21CDB57AA003FF4B4 /* DecisionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C3E1CDB57AA003FF4B4 /* DecisionState.h */; };
 		276E5DC31CDB57AA003FF4B4 /* DecisionState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C3E1CDB57AA003FF4B4 /* DecisionState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5DC41CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C3F1CDB57AA003FF4B4 /* EmptyPredictionContext.cpp */; };
-		276E5DC51CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C3F1CDB57AA003FF4B4 /* EmptyPredictionContext.cpp */; };
-		276E5DC61CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C3F1CDB57AA003FF4B4 /* EmptyPredictionContext.cpp */; };
-		276E5DC71CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */; };
-		276E5DC81CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */; };
-		276E5DC91CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5DCA1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */; };
 		276E5DCB1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */; };
 		276E5DCC1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */; };
@@ -263,9 +236,6 @@
 		276E5E301CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C631CDB57AA003FF4B4 /* LookaheadEventInfo.h */; };
 		276E5E311CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C631CDB57AA003FF4B4 /* LookaheadEventInfo.h */; };
 		276E5E321CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C631CDB57AA003FF4B4 /* LookaheadEventInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5E331CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C641CDB57AA003FF4B4 /* LoopEndState.cpp */; };
-		276E5E341CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C641CDB57AA003FF4B4 /* LoopEndState.cpp */; };
-		276E5E351CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C641CDB57AA003FF4B4 /* LoopEndState.cpp */; };
 		276E5E361CDB57AA003FF4B4 /* LoopEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C651CDB57AA003FF4B4 /* LoopEndState.h */; };
 		276E5E371CDB57AA003FF4B4 /* LoopEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C651CDB57AA003FF4B4 /* LoopEndState.h */; };
 		276E5E381CDB57AA003FF4B4 /* LoopEndState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C651CDB57AA003FF4B4 /* LoopEndState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -293,15 +263,9 @@
 		276E5E511CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C6E1CDB57AA003FF4B4 /* ParserATNSimulator.h */; };
 		276E5E521CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C6E1CDB57AA003FF4B4 /* ParserATNSimulator.h */; };
 		276E5E531CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C6E1CDB57AA003FF4B4 /* ParserATNSimulator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5E541CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C6F1CDB57AA003FF4B4 /* PlusBlockStartState.cpp */; };
-		276E5E551CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C6F1CDB57AA003FF4B4 /* PlusBlockStartState.cpp */; };
-		276E5E561CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C6F1CDB57AA003FF4B4 /* PlusBlockStartState.cpp */; };
 		276E5E571CDB57AA003FF4B4 /* PlusBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C701CDB57AA003FF4B4 /* PlusBlockStartState.h */; };
 		276E5E581CDB57AA003FF4B4 /* PlusBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C701CDB57AA003FF4B4 /* PlusBlockStartState.h */; };
 		276E5E591CDB57AA003FF4B4 /* PlusBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C701CDB57AA003FF4B4 /* PlusBlockStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5E5A1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C711CDB57AA003FF4B4 /* PlusLoopbackState.cpp */; };
-		276E5E5B1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C711CDB57AA003FF4B4 /* PlusLoopbackState.cpp */; };
-		276E5E5C1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C711CDB57AA003FF4B4 /* PlusLoopbackState.cpp */; };
 		276E5E5D1CDB57AA003FF4B4 /* PlusLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C721CDB57AA003FF4B4 /* PlusLoopbackState.h */; };
 		276E5E5E1CDB57AA003FF4B4 /* PlusLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C721CDB57AA003FF4B4 /* PlusLoopbackState.h */; };
 		276E5E5F1CDB57AA003FF4B4 /* PlusLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C721CDB57AA003FF4B4 /* PlusLoopbackState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -347,15 +311,9 @@
 		276E5E871CDB57AA003FF4B4 /* RangeTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C801CDB57AA003FF4B4 /* RangeTransition.h */; };
 		276E5E881CDB57AA003FF4B4 /* RangeTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C801CDB57AA003FF4B4 /* RangeTransition.h */; };
 		276E5E891CDB57AA003FF4B4 /* RangeTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C801CDB57AA003FF4B4 /* RangeTransition.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5E8A1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C811CDB57AA003FF4B4 /* RuleStartState.cpp */; };
-		276E5E8B1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C811CDB57AA003FF4B4 /* RuleStartState.cpp */; };
-		276E5E8C1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C811CDB57AA003FF4B4 /* RuleStartState.cpp */; };
 		276E5E8D1CDB57AA003FF4B4 /* RuleStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C821CDB57AA003FF4B4 /* RuleStartState.h */; };
 		276E5E8E1CDB57AA003FF4B4 /* RuleStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C821CDB57AA003FF4B4 /* RuleStartState.h */; };
 		276E5E8F1CDB57AA003FF4B4 /* RuleStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C821CDB57AA003FF4B4 /* RuleStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5E901CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C831CDB57AA003FF4B4 /* RuleStopState.cpp */; };
-		276E5E911CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C831CDB57AA003FF4B4 /* RuleStopState.cpp */; };
-		276E5E921CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C831CDB57AA003FF4B4 /* RuleStopState.cpp */; };
 		276E5E931CDB57AA003FF4B4 /* RuleStopState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C841CDB57AA003FF4B4 /* RuleStopState.h */; };
 		276E5E941CDB57AA003FF4B4 /* RuleStopState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C841CDB57AA003FF4B4 /* RuleStopState.h */; };
 		276E5E951CDB57AA003FF4B4 /* RuleStopState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C841CDB57AA003FF4B4 /* RuleStopState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -383,9 +341,6 @@
 		276E5EAB1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8C1CDB57AA003FF4B4 /* SingletonPredictionContext.h */; };
 		276E5EAC1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8C1CDB57AA003FF4B4 /* SingletonPredictionContext.h */; };
 		276E5EAD1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8C1CDB57AA003FF4B4 /* SingletonPredictionContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5EAE1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C8D1CDB57AA003FF4B4 /* StarBlockStartState.cpp */; };
-		276E5EAF1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C8D1CDB57AA003FF4B4 /* StarBlockStartState.cpp */; };
-		276E5EB01CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C8D1CDB57AA003FF4B4 /* StarBlockStartState.cpp */; };
 		276E5EB11CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8E1CDB57AA003FF4B4 /* StarBlockStartState.h */; };
 		276E5EB21CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8E1CDB57AA003FF4B4 /* StarBlockStartState.h */; };
 		276E5EB31CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C8E1CDB57AA003FF4B4 /* StarBlockStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -395,15 +350,9 @@
 		276E5EB71CDB57AA003FF4B4 /* StarLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C901CDB57AA003FF4B4 /* StarLoopbackState.h */; };
 		276E5EB81CDB57AA003FF4B4 /* StarLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C901CDB57AA003FF4B4 /* StarLoopbackState.h */; };
 		276E5EB91CDB57AA003FF4B4 /* StarLoopbackState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C901CDB57AA003FF4B4 /* StarLoopbackState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5EBA1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C911CDB57AA003FF4B4 /* StarLoopEntryState.cpp */; };
-		276E5EBB1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C911CDB57AA003FF4B4 /* StarLoopEntryState.cpp */; };
-		276E5EBC1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C911CDB57AA003FF4B4 /* StarLoopEntryState.cpp */; };
 		276E5EBD1CDB57AA003FF4B4 /* StarLoopEntryState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C921CDB57AA003FF4B4 /* StarLoopEntryState.h */; };
 		276E5EBE1CDB57AA003FF4B4 /* StarLoopEntryState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C921CDB57AA003FF4B4 /* StarLoopEntryState.h */; };
 		276E5EBF1CDB57AA003FF4B4 /* StarLoopEntryState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C921CDB57AA003FF4B4 /* StarLoopEntryState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5EC01CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C931CDB57AA003FF4B4 /* TokensStartState.cpp */; };
-		276E5EC11CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C931CDB57AA003FF4B4 /* TokensStartState.cpp */; };
-		276E5EC21CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C931CDB57AA003FF4B4 /* TokensStartState.cpp */; };
 		276E5EC31CDB57AA003FF4B4 /* TokensStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C941CDB57AA003FF4B4 /* TokensStartState.h */; };
 		276E5EC41CDB57AA003FF4B4 /* TokensStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C941CDB57AA003FF4B4 /* TokensStartState.h */; };
 		276E5EC51CDB57AA003FF4B4 /* TokensStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C941CDB57AA003FF4B4 /* TokensStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -644,12 +593,6 @@
 		276E5FBC1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBD1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBE1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
-		276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
-		276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
-		276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
-		276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
-		276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5FC51CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC61CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC71CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
@@ -805,12 +748,6 @@
 		2793DC8D1F08088F00A84290 /* ParseTreeListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC8C1F08088F00A84290 /* ParseTreeListener.cpp */; };
 		2793DC8E1F08088F00A84290 /* ParseTreeListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC8C1F08088F00A84290 /* ParseTreeListener.cpp */; };
 		2793DC8F1F08088F00A84290 /* ParseTreeListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC8C1F08088F00A84290 /* ParseTreeListener.cpp */; };
-		2793DC911F0808A200A84290 /* TerminalNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC901F0808A200A84290 /* TerminalNode.cpp */; };
-		2793DC921F0808A200A84290 /* TerminalNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC901F0808A200A84290 /* TerminalNode.cpp */; };
-		2793DC931F0808A200A84290 /* TerminalNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC901F0808A200A84290 /* TerminalNode.cpp */; };
-		2793DC961F0808E100A84290 /* ErrorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC941F0808E100A84290 /* ErrorNode.cpp */; };
-		2793DC971F0808E100A84290 /* ErrorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC941F0808E100A84290 /* ErrorNode.cpp */; };
-		2793DC981F0808E100A84290 /* ErrorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC941F0808E100A84290 /* ErrorNode.cpp */; };
 		2793DC991F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC951F0808E100A84290 /* ParseTreeVisitor.cpp */; };
 		2793DC9A1F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC951F0808E100A84290 /* ParseTreeVisitor.cpp */; };
 		2793DC9B1F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DC951F0808E100A84290 /* ParseTreeVisitor.cpp */; };
@@ -829,9 +766,6 @@
 		2793DCAD1F08095F00A84290 /* WritableToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCA31F08095F00A84290 /* WritableToken.cpp */; };
 		2793DCAE1F08095F00A84290 /* WritableToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCA31F08095F00A84290 /* WritableToken.cpp */; };
 		2793DCAF1F08095F00A84290 /* WritableToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCA31F08095F00A84290 /* WritableToken.cpp */; };
-		2793DCB31F08099C00A84290 /* BlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB01F08099C00A84290 /* BlockStartState.cpp */; };
-		2793DCB41F08099C00A84290 /* BlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB01F08099C00A84290 /* BlockStartState.cpp */; };
-		2793DCB51F08099C00A84290 /* BlockStartState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB01F08099C00A84290 /* BlockStartState.cpp */; };
 		2793DCB61F08099C00A84290 /* LexerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB11F08099C00A84290 /* LexerAction.cpp */; };
 		2793DCB71F08099C00A84290 /* LexerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB11F08099C00A84290 /* LexerAction.cpp */; };
 		2793DCB81F08099C00A84290 /* LexerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2793DCB11F08099C00A84290 /* LexerAction.cpp */; };
@@ -920,6 +854,69 @@
 		27DB44D91D0463DB007E790B /* XPathWildcardElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB449B1D045537007E790B /* XPathWildcardElement.cpp */; };
 		27DB44DA1D0463DB007E790B /* XPathWildcardElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449C1D045537007E790B /* XPathWildcardElement.h */; };
 		27F4A8561D4CEB2A00E067EE /* Any.h in Headers */ = {isa = PBXBuildFile; fileRef = 27F4A8551D4CEB2A00E067EE /* Any.h */; };
+		9B25DCA12910249100DF9703 /* FlatHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DC9F2910249100DF9703 /* FlatHashSet.h */; };
+		9B25DCA22910249100DF9703 /* FlatHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DC9F2910249100DF9703 /* FlatHashSet.h */; };
+		9B25DCA32910249100DF9703 /* FlatHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DC9F2910249100DF9703 /* FlatHashSet.h */; };
+		9B25DCA42910249100DF9703 /* FlatHashMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA02910249100DF9703 /* FlatHashMap.h */; };
+		9B25DCA52910249100DF9703 /* FlatHashMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA02910249100DF9703 /* FlatHashMap.h */; };
+		9B25DCA62910249100DF9703 /* FlatHashMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA02910249100DF9703 /* FlatHashMap.h */; };
+		9B25DCA82910252800DF9703 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA72910252800DF9703 /* Version.h */; };
+		9B25DCA92910252800DF9703 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA72910252800DF9703 /* Version.h */; };
+		9B25DCAA2910252800DF9703 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCA72910252800DF9703 /* Version.h */; };
+		9B25DCAC291025B700DF9703 /* ATNStateType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAB291025B700DF9703 /* ATNStateType.h */; };
+		9B25DCAD291025B700DF9703 /* ATNStateType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAB291025B700DF9703 /* ATNStateType.h */; };
+		9B25DCAE291025B700DF9703 /* ATNStateType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAB291025B700DF9703 /* ATNStateType.h */; };
+		9B25DCB0291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAF291026DE00DF9703 /* ParserATNSimulatorOptions.h */; };
+		9B25DCB1291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAF291026DE00DF9703 /* ParserATNSimulatorOptions.h */; };
+		9B25DCB2291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCAF291026DE00DF9703 /* ParserATNSimulatorOptions.h */; };
+		9B25DCB92910278000DF9703 /* PredictionContextCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB32910278000DF9703 /* PredictionContextCache.h */; };
+		9B25DCBA2910278000DF9703 /* PredictionContextCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB32910278000DF9703 /* PredictionContextCache.h */; };
+		9B25DCBB2910278000DF9703 /* PredictionContextCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB32910278000DF9703 /* PredictionContextCache.h */; };
+		9B25DCBC2910278000DF9703 /* PredictionContextMergeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB42910278000DF9703 /* PredictionContextMergeCache.h */; };
+		9B25DCBD2910278000DF9703 /* PredictionContextMergeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB42910278000DF9703 /* PredictionContextMergeCache.h */; };
+		9B25DCBE2910278000DF9703 /* PredictionContextMergeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB42910278000DF9703 /* PredictionContextMergeCache.h */; };
+		9B25DCBF2910278000DF9703 /* PredictionContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB52910278000DF9703 /* PredictionContextType.h */; };
+		9B25DCC02910278000DF9703 /* PredictionContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB52910278000DF9703 /* PredictionContextType.h */; };
+		9B25DCC12910278000DF9703 /* PredictionContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB52910278000DF9703 /* PredictionContextType.h */; };
+		9B25DCC22910278000DF9703 /* PredictionContextCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB62910278000DF9703 /* PredictionContextCache.cpp */; };
+		9B25DCC32910278000DF9703 /* PredictionContextCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB62910278000DF9703 /* PredictionContextCache.cpp */; };
+		9B25DCC42910278000DF9703 /* PredictionContextCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB62910278000DF9703 /* PredictionContextCache.cpp */; };
+		9B25DCC52910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB72910278000DF9703 /* PredictionContextMergeCacheOptions.h */; };
+		9B25DCC62910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB72910278000DF9703 /* PredictionContextMergeCacheOptions.h */; };
+		9B25DCC72910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCB72910278000DF9703 /* PredictionContextMergeCacheOptions.h */; };
+		9B25DCC82910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB82910278000DF9703 /* PredictionContextMergeCache.cpp */; };
+		9B25DCC92910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB82910278000DF9703 /* PredictionContextMergeCache.cpp */; };
+		9B25DCCA2910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCB82910278000DF9703 /* PredictionContextMergeCache.cpp */; };
+		9B25DCCD291027EE00DF9703 /* SemanticContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCB291027ED00DF9703 /* SemanticContextType.h */; };
+		9B25DCCE291027EE00DF9703 /* SemanticContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCB291027ED00DF9703 /* SemanticContextType.h */; };
+		9B25DCCF291027EE00DF9703 /* SemanticContextType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCB291027ED00DF9703 /* SemanticContextType.h */; };
+		9B25DCD0291027EE00DF9703 /* SerializedATNView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCC291027EE00DF9703 /* SerializedATNView.h */; };
+		9B25DCD1291027EE00DF9703 /* SerializedATNView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCC291027EE00DF9703 /* SerializedATNView.h */; };
+		9B25DCD2291027EE00DF9703 /* SerializedATNView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCCC291027EE00DF9703 /* SerializedATNView.h */; };
+		9B25DCD52910282B00DF9703 /* TransitionType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCD32910282B00DF9703 /* TransitionType.cpp */; };
+		9B25DCD62910282B00DF9703 /* TransitionType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCD32910282B00DF9703 /* TransitionType.cpp */; };
+		9B25DCD72910282B00DF9703 /* TransitionType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCD32910282B00DF9703 /* TransitionType.cpp */; };
+		9B25DCD82910282B00DF9703 /* TransitionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCD42910282B00DF9703 /* TransitionType.h */; };
+		9B25DCD92910282B00DF9703 /* TransitionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCD42910282B00DF9703 /* TransitionType.h */; };
+		9B25DCDA2910282B00DF9703 /* TransitionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCD42910282B00DF9703 /* TransitionType.h */; };
+		9B25DCDE2910287000DF9703 /* Synchronization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCDC2910287000DF9703 /* Synchronization.cpp */; };
+		9B25DCDF2910287000DF9703 /* Synchronization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCDC2910287000DF9703 /* Synchronization.cpp */; };
+		9B25DCE02910287000DF9703 /* Synchronization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCDC2910287000DF9703 /* Synchronization.cpp */; };
+		9B25DCE12910287000DF9703 /* Synchronization.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCDD2910287000DF9703 /* Synchronization.h */; };
+		9B25DCE22910287000DF9703 /* Synchronization.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCDD2910287000DF9703 /* Synchronization.h */; };
+		9B25DCE32910287000DF9703 /* Synchronization.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCDD2910287000DF9703 /* Synchronization.h */; };
+		9B25DCE5291028BC00DF9703 /* Casts.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE4291028BC00DF9703 /* Casts.h */; };
+		9B25DCE6291028BC00DF9703 /* Casts.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE4291028BC00DF9703 /* Casts.h */; };
+		9B25DCE7291028BC00DF9703 /* Casts.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE4291028BC00DF9703 /* Casts.h */; };
+		9B25DCEB291028D000DF9703 /* Unicode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE8291028D000DF9703 /* Unicode.h */; };
+		9B25DCEC291028D000DF9703 /* Unicode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE8291028D000DF9703 /* Unicode.h */; };
+		9B25DCED291028D000DF9703 /* Unicode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE8291028D000DF9703 /* Unicode.h */; };
+		9B25DCEE291028D000DF9703 /* Utf8.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE9291028D000DF9703 /* Utf8.h */; };
+		9B25DCEF291028D000DF9703 /* Utf8.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE9291028D000DF9703 /* Utf8.h */; };
+		9B25DCF0291028D000DF9703 /* Utf8.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B25DCE9291028D000DF9703 /* Utf8.h */; };
+		9B25DCF1291028D000DF9703 /* Utf8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCEA291028D000DF9703 /* Utf8.cpp */; };
+		9B25DCF2291028D000DF9703 /* Utf8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCEA291028D000DF9703 /* Utf8.cpp */; };
+		9B25DCF3291028D000DF9703 /* Utf8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B25DCEA291028D000DF9703 /* Utf8.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -933,8 +930,6 @@
 		276E5C0F1CDB57AA003FF4B4 /* ANTLRFileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRFileStream.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C101CDB57AA003FF4B4 /* ANTLRInputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ANTLRInputStream.cpp; sourceTree = "<group>"; };
 		276E5C111CDB57AA003FF4B4 /* ANTLRInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRInputStream.h; sourceTree = "<group>"; };
-		276E5C131CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractPredicateTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C141CDB57AA003FF4B4 /* AbstractPredicateTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractPredicateTransition.h; sourceTree = "<group>"; };
 		276E5C151CDB57AA003FF4B4 /* ActionTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionTransition.cpp; sourceTree = "<group>"; };
 		276E5C161CDB57AA003FF4B4 /* ActionTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionTransition.h; sourceTree = "<group>"; };
 		276E5C171CDB57AA003FF4B4 /* AmbiguityInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AmbiguityInfo.cpp; sourceTree = "<group>"; };
@@ -951,8 +946,6 @@
 		276E5C221CDB57AA003FF4B4 /* ATNDeserializationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializationOptions.h; sourceTree = "<group>"; };
 		276E5C231CDB57AA003FF4B4 /* ATNDeserializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C241CDB57AA003FF4B4 /* ATNDeserializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializer.h; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C251CDB57AA003FF4B4 /* ATNSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ATNSerializer.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		276E5C261CDB57AA003FF4B4 /* ATNSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNSerializer.h; sourceTree = "<group>"; };
 		276E5C271CDB57AA003FF4B4 /* ATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ATNSimulator.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		276E5C281CDB57AA003FF4B4 /* ATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ATNSimulator.h; sourceTree = "<group>"; wrapsLines = 0; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5C291CDB57AA003FF4B4 /* ATNState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNState.cpp; sourceTree = "<group>"; };
@@ -960,11 +953,8 @@
 		276E5C2C1CDB57AA003FF4B4 /* ATNType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNType.h; sourceTree = "<group>"; };
 		276E5C2D1CDB57AA003FF4B4 /* AtomTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AtomTransition.cpp; sourceTree = "<group>"; };
 		276E5C2E1CDB57AA003FF4B4 /* AtomTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtomTransition.h; sourceTree = "<group>"; };
-		276E5C2F1CDB57AA003FF4B4 /* BasicBlockStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicBlockStartState.cpp; sourceTree = "<group>"; };
 		276E5C301CDB57AA003FF4B4 /* BasicBlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicBlockStartState.h; sourceTree = "<group>"; };
-		276E5C311CDB57AA003FF4B4 /* BasicState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicState.cpp; sourceTree = "<group>"; };
 		276E5C321CDB57AA003FF4B4 /* BasicState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicState.h; sourceTree = "<group>"; };
-		276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockEndState.cpp; sourceTree = "<group>"; };
 		276E5C341CDB57AA003FF4B4 /* BlockEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockEndState.h; sourceTree = "<group>"; };
 		276E5C351CDB57AA003FF4B4 /* BlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockStartState.h; sourceTree = "<group>"; };
 		276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextSensitivityInfo.cpp; sourceTree = "<group>"; };
@@ -975,8 +965,6 @@
 		276E5C3C1CDB57AA003FF4B4 /* DecisionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecisionInfo.h; sourceTree = "<group>"; };
 		276E5C3D1CDB57AA003FF4B4 /* DecisionState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DecisionState.cpp; sourceTree = "<group>"; };
 		276E5C3E1CDB57AA003FF4B4 /* DecisionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecisionState.h; sourceTree = "<group>"; };
-		276E5C3F1CDB57AA003FF4B4 /* EmptyPredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EmptyPredictionContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyPredictionContext.h; sourceTree = "<group>"; };
 		276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpsilonTransition.cpp; sourceTree = "<group>"; };
 		276E5C421CDB57AA003FF4B4 /* EpsilonTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EpsilonTransition.h; sourceTree = "<group>"; };
 		276E5C431CDB57AA003FF4B4 /* ErrorInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorInfo.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1011,7 +999,6 @@
 		276E5C611CDB57AA003FF4B4 /* LL1Analyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LL1Analyzer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C621CDB57AA003FF4B4 /* LookaheadEventInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LookaheadEventInfo.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C631CDB57AA003FF4B4 /* LookaheadEventInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LookaheadEventInfo.h; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C641CDB57AA003FF4B4 /* LoopEndState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoopEndState.cpp; sourceTree = "<group>"; };
 		276E5C651CDB57AA003FF4B4 /* LoopEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoopEndState.h; sourceTree = "<group>"; };
 		276E5C671CDB57AA003FF4B4 /* NotSetTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotSetTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C681CDB57AA003FF4B4 /* NotSetTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotSetTransition.h; sourceTree = "<group>"; };
@@ -1021,9 +1008,7 @@
 		276E5C6C1CDB57AA003FF4B4 /* ParseInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseInfo.h; sourceTree = "<group>"; };
 		276E5C6D1CDB57AA003FF4B4 /* ParserATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserATNSimulator.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C6E1CDB57AA003FF4B4 /* ParserATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserATNSimulator.h; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C6F1CDB57AA003FF4B4 /* PlusBlockStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlusBlockStartState.cpp; sourceTree = "<group>"; };
 		276E5C701CDB57AA003FF4B4 /* PlusBlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlusBlockStartState.h; sourceTree = "<group>"; };
-		276E5C711CDB57AA003FF4B4 /* PlusLoopbackState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlusLoopbackState.cpp; sourceTree = "<group>"; };
 		276E5C721CDB57AA003FF4B4 /* PlusLoopbackState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlusLoopbackState.h; sourceTree = "<group>"; };
 		276E5C731CDB57AA003FF4B4 /* PrecedencePredicateTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PrecedencePredicateTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C741CDB57AA003FF4B4 /* PrecedencePredicateTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrecedencePredicateTransition.h; sourceTree = "<group>"; };
@@ -1039,9 +1024,7 @@
 		276E5C7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilingATNSimulator.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C7F1CDB57AA003FF4B4 /* RangeTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RangeTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C801CDB57AA003FF4B4 /* RangeTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RangeTransition.h; sourceTree = "<group>"; };
-		276E5C811CDB57AA003FF4B4 /* RuleStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleStartState.cpp; sourceTree = "<group>"; };
 		276E5C821CDB57AA003FF4B4 /* RuleStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleStartState.h; sourceTree = "<group>"; };
-		276E5C831CDB57AA003FF4B4 /* RuleStopState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleStopState.cpp; sourceTree = "<group>"; };
 		276E5C841CDB57AA003FF4B4 /* RuleStopState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleStopState.h; sourceTree = "<group>"; };
 		276E5C851CDB57AA003FF4B4 /* RuleTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleTransition.cpp; sourceTree = "<group>"; };
 		276E5C861CDB57AA003FF4B4 /* RuleTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleTransition.h; sourceTree = "<group>"; };
@@ -1051,13 +1034,10 @@
 		276E5C8A1CDB57AA003FF4B4 /* SetTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetTransition.h; sourceTree = "<group>"; };
 		276E5C8B1CDB57AA003FF4B4 /* SingletonPredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SingletonPredictionContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C8C1CDB57AA003FF4B4 /* SingletonPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingletonPredictionContext.h; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C8D1CDB57AA003FF4B4 /* StarBlockStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StarBlockStartState.cpp; sourceTree = "<group>"; };
 		276E5C8E1CDB57AA003FF4B4 /* StarBlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarBlockStartState.h; sourceTree = "<group>"; };
 		276E5C8F1CDB57AA003FF4B4 /* StarLoopbackState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StarLoopbackState.cpp; sourceTree = "<group>"; };
 		276E5C901CDB57AA003FF4B4 /* StarLoopbackState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarLoopbackState.h; sourceTree = "<group>"; };
-		276E5C911CDB57AA003FF4B4 /* StarLoopEntryState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StarLoopEntryState.cpp; sourceTree = "<group>"; };
 		276E5C921CDB57AA003FF4B4 /* StarLoopEntryState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarLoopEntryState.h; sourceTree = "<group>"; };
-		276E5C931CDB57AA003FF4B4 /* TokensStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TokensStartState.cpp; sourceTree = "<group>"; };
 		276E5C941CDB57AA003FF4B4 /* TokensStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokensStartState.h; sourceTree = "<group>"; };
 		276E5C951CDB57AA003FF4B4 /* Transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Transition.cpp; sourceTree = "<group>"; };
 		276E5C961CDB57AA003FF4B4 /* Transition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Transition.h; sourceTree = "<group>"; };
@@ -1138,8 +1118,6 @@
 		276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CPPUtils.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5CEA1CDB57AA003FF4B4 /* Declarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Declarations.h; sourceTree = "<group>"; };
-		276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Guid.cpp; sourceTree = "<group>"; };
-		276E5CEC1CDB57AA003FF4B4 /* Guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Guid.h; sourceTree = "<group>"; };
 		276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
 		276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
 		276E5CF01CDB57AA003FF4B4 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
@@ -1192,15 +1170,12 @@
 		2793DC841F08083F00A84290 /* TokenSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TokenSource.cpp; sourceTree = "<group>"; };
 		2793DC881F08087500A84290 /* Chunk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Chunk.cpp; sourceTree = "<group>"; };
 		2793DC8C1F08088F00A84290 /* ParseTreeListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseTreeListener.cpp; sourceTree = "<group>"; };
-		2793DC901F0808A200A84290 /* TerminalNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TerminalNode.cpp; sourceTree = "<group>"; };
-		2793DC941F0808E100A84290 /* ErrorNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorNode.cpp; sourceTree = "<group>"; };
 		2793DC951F0808E100A84290 /* ParseTreeVisitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseTreeVisitor.cpp; sourceTree = "<group>"; };
 		2793DC9C1F08090D00A84290 /* Any.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Any.cpp; sourceTree = "<group>"; };
 		2793DCA01F08095F00A84290 /* ANTLRErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ANTLRErrorListener.cpp; sourceTree = "<group>"; };
 		2793DCA11F08095F00A84290 /* ANTLRErrorStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ANTLRErrorStrategy.cpp; sourceTree = "<group>"; };
 		2793DCA21F08095F00A84290 /* Token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; };
 		2793DCA31F08095F00A84290 /* WritableToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WritableToken.cpp; sourceTree = "<group>"; };
-		2793DCB01F08099C00A84290 /* BlockStartState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockStartState.cpp; sourceTree = "<group>"; };
 		2793DCB11F08099C00A84290 /* LexerAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerAction.cpp; sourceTree = "<group>"; };
 		2794D8551CE7821B00FADD0F /* antlr4-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-common.h"; sourceTree = "<group>"; };
 		27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-runtime.h"; sourceTree = "<group>"; };
@@ -1233,6 +1208,27 @@
 		27F4A8551D4CEB2A00E067EE /* Any.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Any.h; sourceTree = "<group>"; };
 		37C147171B4D5A04008EDDDB /* libantlr4-runtime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libantlr4-runtime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D727AA1867AF1E007B6D10 /* libantlr4-runtime.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libantlr4-runtime.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B25DC9F2910249100DF9703 /* FlatHashSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatHashSet.h; sourceTree = "<group>"; };
+		9B25DCA02910249100DF9703 /* FlatHashMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatHashMap.h; sourceTree = "<group>"; };
+		9B25DCA72910252800DF9703 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
+		9B25DCAB291025B700DF9703 /* ATNStateType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNStateType.h; sourceTree = "<group>"; };
+		9B25DCAF291026DE00DF9703 /* ParserATNSimulatorOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserATNSimulatorOptions.h; sourceTree = "<group>"; };
+		9B25DCB32910278000DF9703 /* PredictionContextCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContextCache.h; sourceTree = "<group>"; };
+		9B25DCB42910278000DF9703 /* PredictionContextMergeCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContextMergeCache.h; sourceTree = "<group>"; };
+		9B25DCB52910278000DF9703 /* PredictionContextType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContextType.h; sourceTree = "<group>"; };
+		9B25DCB62910278000DF9703 /* PredictionContextCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionContextCache.cpp; sourceTree = "<group>"; };
+		9B25DCB72910278000DF9703 /* PredictionContextMergeCacheOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContextMergeCacheOptions.h; sourceTree = "<group>"; };
+		9B25DCB82910278000DF9703 /* PredictionContextMergeCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionContextMergeCache.cpp; sourceTree = "<group>"; };
+		9B25DCCB291027ED00DF9703 /* SemanticContextType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SemanticContextType.h; sourceTree = "<group>"; };
+		9B25DCCC291027EE00DF9703 /* SerializedATNView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerializedATNView.h; sourceTree = "<group>"; };
+		9B25DCD32910282B00DF9703 /* TransitionType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TransitionType.cpp; sourceTree = "<group>"; };
+		9B25DCD42910282B00DF9703 /* TransitionType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransitionType.h; sourceTree = "<group>"; };
+		9B25DCDC2910287000DF9703 /* Synchronization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Synchronization.cpp; sourceTree = "<group>"; };
+		9B25DCDD2910287000DF9703 /* Synchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Synchronization.h; sourceTree = "<group>"; };
+		9B25DCE4291028BC00DF9703 /* Casts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Casts.h; sourceTree = "<group>"; };
+		9B25DCE8291028D000DF9703 /* Unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unicode.h; sourceTree = "<group>"; };
+		9B25DCE9291028D000DF9703 /* Utf8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utf8.h; sourceTree = "<group>"; };
+		9B25DCEA291028D000DF9703 /* Utf8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utf8.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1276,6 +1272,7 @@
 			children = (
 				276E5C121CDB57AA003FF4B4 /* atn */,
 				276E5CAB1CDB57AA003FF4B4 /* dfa */,
+				9B25DCDB2910287000DF9703 /* internal */,
 				276E5CC91CDB57AA003FF4B4 /* misc */,
 				276E5CE41CDB57AA003FF4B4 /* support */,
 				276E5CF91CDB57AA003FF4B4 /* tree */,
@@ -1313,6 +1310,8 @@
 				276E5CB71CDB57AA003FF4B4 /* Exceptions.h */,
 				276E5CB81CDB57AA003FF4B4 /* FailedPredicateException.cpp */,
 				276E5CB91CDB57AA003FF4B4 /* FailedPredicateException.h */,
+				9B25DCA02910249100DF9703 /* FlatHashMap.h */,
+				9B25DC9F2910249100DF9703 /* FlatHashSet.h */,
 				276E5CBA1CDB57AA003FF4B4 /* InputMismatchException.cpp */,
 				276E5CBB1CDB57AA003FF4B4 /* InputMismatchException.h */,
 				276E5CBC1CDB57AA003FF4B4 /* InterpreterRuleContext.cpp */,
@@ -1360,6 +1359,7 @@
 				276E5D231CDB57AA003FF4B4 /* UnbufferedCharStream.h */,
 				276E5D241CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp */,
 				276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */,
+				9B25DCA72910252800DF9703 /* Version.h */,
 				276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */,
 				276E5D281CDB57AA003FF4B4 /* Vocabulary.h */,
 				2793DCA31F08095F00A84290 /* WritableToken.cpp */,
@@ -1372,8 +1372,6 @@
 		276E5C121CDB57AA003FF4B4 /* atn */ = {
 			isa = PBXGroup;
 			children = (
-				276E5C131CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp */,
-				276E5C141CDB57AA003FF4B4 /* AbstractPredicateTransition.h */,
 				276E5C151CDB57AA003FF4B4 /* ActionTransition.cpp */,
 				276E5C161CDB57AA003FF4B4 /* ActionTransition.h */,
 				276E5C171CDB57AA003FF4B4 /* AmbiguityInfo.cpp */,
@@ -1390,22 +1388,17 @@
 				276E5C221CDB57AA003FF4B4 /* ATNDeserializationOptions.h */,
 				276E5C231CDB57AA003FF4B4 /* ATNDeserializer.cpp */,
 				276E5C241CDB57AA003FF4B4 /* ATNDeserializer.h */,
-				276E5C251CDB57AA003FF4B4 /* ATNSerializer.cpp */,
-				276E5C261CDB57AA003FF4B4 /* ATNSerializer.h */,
 				276E5C271CDB57AA003FF4B4 /* ATNSimulator.cpp */,
 				276E5C281CDB57AA003FF4B4 /* ATNSimulator.h */,
 				276E5C291CDB57AA003FF4B4 /* ATNState.cpp */,
 				276E5C2A1CDB57AA003FF4B4 /* ATNState.h */,
+				9B25DCAB291025B700DF9703 /* ATNStateType.h */,
 				276E5C2C1CDB57AA003FF4B4 /* ATNType.h */,
 				276E5C2D1CDB57AA003FF4B4 /* AtomTransition.cpp */,
 				276E5C2E1CDB57AA003FF4B4 /* AtomTransition.h */,
-				276E5C2F1CDB57AA003FF4B4 /* BasicBlockStartState.cpp */,
 				276E5C301CDB57AA003FF4B4 /* BasicBlockStartState.h */,
-				276E5C311CDB57AA003FF4B4 /* BasicState.cpp */,
 				276E5C321CDB57AA003FF4B4 /* BasicState.h */,
-				276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */,
 				276E5C341CDB57AA003FF4B4 /* BlockEndState.h */,
-				2793DCB01F08099C00A84290 /* BlockStartState.cpp */,
 				276E5C351CDB57AA003FF4B4 /* BlockStartState.h */,
 				276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */,
 				276E5C381CDB57AA003FF4B4 /* ContextSensitivityInfo.h */,
@@ -1415,8 +1408,6 @@
 				276E5C3C1CDB57AA003FF4B4 /* DecisionInfo.h */,
 				276E5C3D1CDB57AA003FF4B4 /* DecisionState.cpp */,
 				276E5C3E1CDB57AA003FF4B4 /* DecisionState.h */,
-				276E5C3F1CDB57AA003FF4B4 /* EmptyPredictionContext.cpp */,
-				276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */,
 				276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */,
 				276E5C421CDB57AA003FF4B4 /* EpsilonTransition.h */,
 				276E5C431CDB57AA003FF4B4 /* ErrorInfo.cpp */,
@@ -1452,7 +1443,6 @@
 				276E5C611CDB57AA003FF4B4 /* LL1Analyzer.h */,
 				276E5C621CDB57AA003FF4B4 /* LookaheadEventInfo.cpp */,
 				276E5C631CDB57AA003FF4B4 /* LookaheadEventInfo.h */,
-				276E5C641CDB57AA003FF4B4 /* LoopEndState.cpp */,
 				276E5C651CDB57AA003FF4B4 /* LoopEndState.h */,
 				276E5C671CDB57AA003FF4B4 /* NotSetTransition.cpp */,
 				276E5C681CDB57AA003FF4B4 /* NotSetTransition.h */,
@@ -1462,9 +1452,8 @@
 				276E5C6C1CDB57AA003FF4B4 /* ParseInfo.h */,
 				276E5C6D1CDB57AA003FF4B4 /* ParserATNSimulator.cpp */,
 				276E5C6E1CDB57AA003FF4B4 /* ParserATNSimulator.h */,
-				276E5C6F1CDB57AA003FF4B4 /* PlusBlockStartState.cpp */,
+				9B25DCAF291026DE00DF9703 /* ParserATNSimulatorOptions.h */,
 				276E5C701CDB57AA003FF4B4 /* PlusBlockStartState.h */,
-				276E5C711CDB57AA003FF4B4 /* PlusLoopbackState.cpp */,
 				276E5C721CDB57AA003FF4B4 /* PlusLoopbackState.h */,
 				276E5C731CDB57AA003FF4B4 /* PrecedencePredicateTransition.cpp */,
 				276E5C741CDB57AA003FF4B4 /* PrecedencePredicateTransition.h */,
@@ -1474,34 +1463,39 @@
 				276E5C781CDB57AA003FF4B4 /* PredicateTransition.h */,
 				276E5C791CDB57AA003FF4B4 /* PredictionContext.cpp */,
 				276E5C7A1CDB57AA003FF4B4 /* PredictionContext.h */,
+				9B25DCB62910278000DF9703 /* PredictionContextCache.cpp */,
+				9B25DCB32910278000DF9703 /* PredictionContextCache.h */,
+				9B25DCB82910278000DF9703 /* PredictionContextMergeCache.cpp */,
+				9B25DCB42910278000DF9703 /* PredictionContextMergeCache.h */,
+				9B25DCB72910278000DF9703 /* PredictionContextMergeCacheOptions.h */,
+				9B25DCB52910278000DF9703 /* PredictionContextType.h */,
 				276E5C7B1CDB57AA003FF4B4 /* PredictionMode.cpp */,
 				276E5C7C1CDB57AA003FF4B4 /* PredictionMode.h */,
 				276E5C7D1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp */,
 				276E5C7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.h */,
 				276E5C7F1CDB57AA003FF4B4 /* RangeTransition.cpp */,
 				276E5C801CDB57AA003FF4B4 /* RangeTransition.h */,
-				276E5C811CDB57AA003FF4B4 /* RuleStartState.cpp */,
 				276E5C821CDB57AA003FF4B4 /* RuleStartState.h */,
-				276E5C831CDB57AA003FF4B4 /* RuleStopState.cpp */,
 				276E5C841CDB57AA003FF4B4 /* RuleStopState.h */,
 				276E5C851CDB57AA003FF4B4 /* RuleTransition.cpp */,
 				276E5C861CDB57AA003FF4B4 /* RuleTransition.h */,
 				276E5C871CDB57AA003FF4B4 /* SemanticContext.cpp */,
 				276E5C881CDB57AA003FF4B4 /* SemanticContext.h */,
+				9B25DCCB291027ED00DF9703 /* SemanticContextType.h */,
+				9B25DCCC291027EE00DF9703 /* SerializedATNView.h */,
 				276E5C891CDB57AA003FF4B4 /* SetTransition.cpp */,
 				276E5C8A1CDB57AA003FF4B4 /* SetTransition.h */,
 				276E5C8B1CDB57AA003FF4B4 /* SingletonPredictionContext.cpp */,
 				276E5C8C1CDB57AA003FF4B4 /* SingletonPredictionContext.h */,
-				276E5C8D1CDB57AA003FF4B4 /* StarBlockStartState.cpp */,
 				276E5C8E1CDB57AA003FF4B4 /* StarBlockStartState.h */,
 				276E5C8F1CDB57AA003FF4B4 /* StarLoopbackState.cpp */,
 				276E5C901CDB57AA003FF4B4 /* StarLoopbackState.h */,
-				276E5C911CDB57AA003FF4B4 /* StarLoopEntryState.cpp */,
 				276E5C921CDB57AA003FF4B4 /* StarLoopEntryState.h */,
-				276E5C931CDB57AA003FF4B4 /* TokensStartState.cpp */,
 				276E5C941CDB57AA003FF4B4 /* TokensStartState.h */,
 				276E5C951CDB57AA003FF4B4 /* Transition.cpp */,
 				276E5C961CDB57AA003FF4B4 /* Transition.h */,
+				9B25DCD32910282B00DF9703 /* TransitionType.cpp */,
+				9B25DCD42910282B00DF9703 /* TransitionType.h */,
 				276E5C971CDB57AA003FF4B4 /* WildcardTransition.cpp */,
 				276E5C981CDB57AA003FF4B4 /* WildcardTransition.h */,
 			);
@@ -1547,13 +1541,15 @@
 				276E5CE51CDB57AA003FF4B4 /* Arrays.cpp */,
 				276E5CE61CDB57AA003FF4B4 /* Arrays.h */,
 				276E5CE71CDB57AA003FF4B4 /* BitSet.h */,
+				9B25DCE4291028BC00DF9703 /* Casts.h */,
 				276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */,
 				276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */,
 				276E5CEA1CDB57AA003FF4B4 /* Declarations.h */,
-				276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */,
-				276E5CEC1CDB57AA003FF4B4 /* Guid.h */,
 				276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */,
 				276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */,
+				9B25DCE8291028D000DF9703 /* Unicode.h */,
+				9B25DCEA291028D000DF9703 /* Utf8.cpp */,
+				9B25DCE9291028D000DF9703 /* Utf8.h */,
 			);
 			path = support;
 			sourceTree = "<group>";
@@ -1564,7 +1560,6 @@
 				276E5D061CDB57AA003FF4B4 /* pattern */,
 				27DB448A1D045537007E790B /* xpath */,
 				276E5CFA1CDB57AA003FF4B4 /* AbstractParseTreeVisitor.h */,
-				2793DC941F0808E100A84290 /* ErrorNode.cpp */,
 				276E5CFB1CDB57AA003FF4B4 /* ErrorNode.h */,
 				276E5CFC1CDB57AA003FF4B4 /* ErrorNodeImpl.cpp */,
 				276E5CFD1CDB57AA003FF4B4 /* ErrorNodeImpl.h */,
@@ -1579,7 +1574,6 @@
 				276E5D031CDB57AA003FF4B4 /* ParseTreeVisitor.h */,
 				276E5D041CDB57AA003FF4B4 /* ParseTreeWalker.cpp */,
 				276E5D051CDB57AA003FF4B4 /* ParseTreeWalker.h */,
-				2793DC901F0808A200A84290 /* TerminalNode.cpp */,
 				276E5D181CDB57AA003FF4B4 /* TerminalNode.h */,
 				276E5D191CDB57AA003FF4B4 /* TerminalNodeImpl.cpp */,
 				276E5D1A1CDB57AA003FF4B4 /* TerminalNodeImpl.h */,
@@ -1592,8 +1586,8 @@
 		276E5D061CDB57AA003FF4B4 /* pattern */ = {
 			isa = PBXGroup;
 			children = (
-				276E5D071CDB57AA003FF4B4 /* Chunk.h */,
 				2793DC881F08087500A84290 /* Chunk.cpp */,
+				276E5D071CDB57AA003FF4B4 /* Chunk.h */,
 				276E5D081CDB57AA003FF4B4 /* ParseTreeMatch.cpp */,
 				276E5D091CDB57AA003FF4B4 /* ParseTreeMatch.h */,
 				276E5D0A1CDB57AA003FF4B4 /* ParseTreePattern.cpp */,
@@ -1667,6 +1661,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		9B25DCDB2910287000DF9703 /* internal */ = {
+			isa = PBXGroup;
+			children = (
+				9B25DCDC2910287000DF9703 /* Synchronization.cpp */,
+				9B25DCDD2910287000DF9703 /* Synchronization.h */,
+			);
+			path = internal;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1679,6 +1682,7 @@
 				276E5F431CDB57AA003FF4B4 /* IntStream.h in Headers */,
 				276E5D5D1CDB57AA003FF4B4 /* ATN.h in Headers */,
 				276E60601CDB57AA003FF4B4 /* UnbufferedCharStream.h in Headers */,
+				9B25DCAA2910252800DF9703 /* Version.h in Headers */,
 				276E5DD81CDB57AA003FF4B4 /* LexerAction.h in Headers */,
 				276E5FF71CDB57AA003FF4B4 /* ParseTree.h in Headers */,
 				276E5DA81CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
@@ -1686,11 +1690,11 @@
 				276E5D6F1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
 				27DB44CA1D0463DB007E790B /* XPath.h in Headers */,
 				276E5EDD1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
+				9B25DCBE2910278000DF9703 /* PredictionContextMergeCache.h in Headers */,
 				276E5DB71CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
 				27DB44D01D0463DB007E790B /* XPathRuleAnywhereElement.h in Headers */,
 				27AC52D21CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5E2C1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
-				276E5D7B1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
 				276E5EAD1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */,
 				276E5E1A1CDB57AA003FF4B4 /* LexerPushModeAction.h in Headers */,
 				276E5ECB1CDB57AA003FF4B4 /* Transition.h in Headers */,
@@ -1719,6 +1723,7 @@
 				276E5E8F1CDB57AA003FF4B4 /* RuleStartState.h in Headers */,
 				276E5E201CDB57AA003FF4B4 /* LexerSkipAction.h in Headers */,
 				276E5E381CDB57AA003FF4B4 /* LoopEndState.h in Headers */,
+				9B25DCED291028D000DF9703 /* Unicode.h in Headers */,
 				276E5D691CDB57AA003FF4B4 /* ATNConfigSet.h in Headers */,
 				276E5D391CDB57AA003FF4B4 /* ANTLRFileStream.h in Headers */,
 				276E5D301CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */,
@@ -1728,9 +1733,12 @@
 				276E5F191CDB57AA003FF4B4 /* DFAState.h in Headers */,
 				276E5FA61CDB57AA003FF4B4 /* Recognizer.h in Headers */,
 				276E60751CDB57AA003FF4B4 /* WritableToken.h in Headers */,
+				9B25DCD2291027EE00DF9703 /* SerializedATNView.h in Headers */,
 				276E5D3F1CDB57AA003FF4B4 /* ANTLRInputStream.h in Headers */,
 				276E5FD01CDB57AA003FF4B4 /* Token.h in Headers */,
+				9B25DCC12910278000DF9703 /* PredictionContextType.h in Headers */,
 				276E60421CDB57AA003FF4B4 /* TerminalNode.h in Headers */,
+				9B25DCCF291027EE00DF9703 /* SemanticContextType.h in Headers */,
 				276E5D751CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */,
 				276E5D871CDB57AA003FF4B4 /* ATNState.h in Headers */,
 				276E5E7D1CDB57AA003FF4B4 /* PredictionMode.h in Headers */,
@@ -1743,12 +1751,12 @@
 				276E5FB21CDB57AA003FF4B4 /* Arrays.h in Headers */,
 				276E5F821CDB57AA003FF4B4 /* NoViableAltException.h in Headers */,
 				276E5DEA1CDB57AA003FF4B4 /* LexerATNConfig.h in Headers */,
+				9B25DCA32910249100DF9703 /* FlatHashSet.h in Headers */,
 				276E60481CDB57AA003FF4B4 /* TerminalNodeImpl.h in Headers */,
 				27745F081CE49C000067C6A3 /* RuntimeMetaData.h in Headers */,
+				9B25DCBB2910278000DF9703 /* PredictionContextCache.h in Headers */,
 				276E5FF41CDB57AA003FF4B4 /* ErrorNodeImpl.h in Headers */,
 				276E5EC51CDB57AA003FF4B4 /* TokensStartState.h in Headers */,
-				276E5DC91CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */,
-				276E5D451CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */,
 				276E5F2B1CDB57AA003FF4B4 /* Exceptions.h in Headers */,
 				276E5F251CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
 				276E5E141CDB57AA003FF4B4 /* LexerPopModeAction.h in Headers */,
@@ -1760,13 +1768,15 @@
 				276E5E771CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60151CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				27DB44CC1D0463DB007E790B /* XPathElement.h in Headers */,
+				9B25DCF0291028D000DF9703 /* Utf8.h in Headers */,
 				276E5F581CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D811CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */,
-				276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602D1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E951CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
+				9B25DCE32910287000DF9703 /* Synchronization.h in Headers */,
 				276E5F761CDB57AA003FF4B4 /* Predicate.h in Headers */,
+				9B25DCB2291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */,
 				276E5F941CDB57AA003FF4B4 /* ParserRuleContext.h in Headers */,
 				276E5FEE1CDB57AA003FF4B4 /* ErrorNode.h in Headers */,
 				276E5EB91CDB57AA003FF4B4 /* StarLoopbackState.h in Headers */,
@@ -1775,10 +1785,12 @@
 				276E5E591CDB57AA003FF4B4 /* PlusBlockStartState.h in Headers */,
 				276E5D931CDB57AA003FF4B4 /* AtomTransition.h in Headers */,
 				276E5F521CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
+				9B25DCA62910249100DF9703 /* FlatHashMap.h in Headers */,
 				276E5F311CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E321CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0D1CDB57AA003FF4B4 /* DFA.h in Headers */,
 				276E606F1CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
+				9B25DCAE291025B700DF9703 /* ATNStateType.h in Headers */,
 				276E60541CDB57AA003FF4B4 /* Trees.h in Headers */,
 				276E5FB51CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				276E5F9A1CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
@@ -1812,6 +1824,7 @@
 				276E5ED11CDB57AA003FF4B4 /* WildcardTransition.h in Headers */,
 				276E600F1CDB57AA003FF4B4 /* Chunk.h in Headers */,
 				276E5FBB1CDB57AA003FF4B4 /* CPPUtils.h in Headers */,
+				9B25DCC72910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */,
 				276E5EE31CDB57AA003FF4B4 /* BufferedTokenStream.h in Headers */,
 				276E5DB11CDB57AA003FF4B4 /* ContextSensitivityInfo.h in Headers */,
 				276E5E021CDB57AA003FF4B4 /* LexerIndexedCustomAction.h in Headers */,
@@ -1822,6 +1835,7 @@
 				276E60211CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
 				276E5D631CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
 				27DB44D41D0463DB007E790B /* XPathTokenAnywhereElement.h in Headers */,
+				9B25DCE7291028BC00DF9703 /* Casts.h in Headers */,
 				27DB44D81D0463DB007E790B /* XPathWildcardAnywhereElement.h in Headers */,
 				276E5E4D1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F881CDB57AA003FF4B4 /* Parser.h in Headers */,
@@ -1830,6 +1844,7 @@
 				276E5E6B1CDB57AA003FF4B4 /* PredicateEvalInfo.h in Headers */,
 				276E5EEF1CDB57AA003FF4B4 /* CommonToken.h in Headers */,
 				270C67F31CDB4F1E00116E17 /* antlrcpp_ios.h in Headers */,
+				9B25DCDA2910282B00DF9703 /* TransitionType.h in Headers */,
 				276E60391CDB57AA003FF4B4 /* TokenTagToken.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1850,22 +1865,25 @@
 				276E5FE11CDB57AA003FF4B4 /* TokenStream.h in Headers */,
 				276E5D6E1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
 				276E5EDC1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
+				9B25DCBA2910278000DF9703 /* PredictionContextCache.h in Headers */,
 				276E5DB61CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
 				276E5E2B1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
 				27DB44BA1D0463DA007E790B /* XPathElement.h in Headers */,
-				276E5D7A1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
 				27C375881EA1059C00B5883C /* InterpreterDataReader.h in Headers */,
 				276E5EAC1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */,
 				276E5E191CDB57AA003FF4B4 /* LexerPushModeAction.h in Headers */,
 				276E5ECA1CDB57AA003FF4B4 /* Transition.h in Headers */,
+				9B25DCBD2910278000DF9703 /* PredictionContextMergeCache.h in Headers */,
 				276E5EA01CDB57AA003FF4B4 /* SemanticContext.h in Headers */,
 				276E5F5D1CDB57AA003FF4B4 /* ListTokenSource.h in Headers */,
+				9B25DCE22910287000DF9703 /* Synchronization.h in Headers */,
 				276E5F8D1CDB57AA003FF4B4 /* ParserInterpreter.h in Headers */,
 				27D414561DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */,
 				276E5DDD1CDB57AA003FF4B4 /* LexerActionExecutor.h in Headers */,
 				276E5F4B1CDB57AA003FF4B4 /* Lexer.h in Headers */,
 				276E5F631CDB57AA003FF4B4 /* Interval.h in Headers */,
 				276E5DA41CDB57AA003FF4B4 /* BlockEndState.h in Headers */,
+				9B25DCA92910252800DF9703 /* Version.h in Headers */,
 				27DB44C21D0463DA007E790B /* XPathTokenAnywhereElement.h in Headers */,
 				276E5E821CDB57AA003FF4B4 /* ProfilingATNSimulator.h in Headers */,
 				27DB44C41D0463DA007E790B /* XPathTokenElement.h in Headers */,
@@ -1873,6 +1891,8 @@
 				276E5E9A1CDB57AA003FF4B4 /* RuleTransition.h in Headers */,
 				27DB44B81D0463DA007E790B /* XPath.h in Headers */,
 				276E60021CDB57AA003FF4B4 /* ParseTreeProperty.h in Headers */,
+				9B25DCC02910278000DF9703 /* PredictionContextType.h in Headers */,
+				9B25DCEC291028D000DF9703 /* Unicode.h in Headers */,
 				276E5D8C1CDB57AA003FF4B4 /* ATNType.h in Headers */,
 				276E5FFC1CDB57AA003FF4B4 /* ParseTreeListener.h in Headers */,
 				276E5D9E1CDB57AA003FF4B4 /* BasicState.h in Headers */,
@@ -1911,26 +1931,26 @@
 				276E5E461CDB57AA003FF4B4 /* OrderedATNConfigSet.h in Headers */,
 				276E5DF51CDB57AA003FF4B4 /* LexerChannelAction.h in Headers */,
 				276E5FB11CDB57AA003FF4B4 /* Arrays.h in Headers */,
+				9B25DCA22910249100DF9703 /* FlatHashSet.h in Headers */,
 				276E5F811CDB57AA003FF4B4 /* NoViableAltException.h in Headers */,
 				276E5DE91CDB57AA003FF4B4 /* LexerATNConfig.h in Headers */,
 				276E60471CDB57AA003FF4B4 /* TerminalNodeImpl.h in Headers */,
 				276E5FF31CDB57AA003FF4B4 /* ErrorNodeImpl.h in Headers */,
 				276E5EC41CDB57AA003FF4B4 /* TokensStartState.h in Headers */,
-				276E5DC81CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */,
-				276E5D441CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */,
 				276E5F2A1CDB57AA003FF4B4 /* Exceptions.h in Headers */,
 				27DB44C61D0463DA007E790B /* XPathWildcardAnywhereElement.h in Headers */,
+				9B25DCE6291028BC00DF9703 /* Casts.h in Headers */,
 				276E5F241CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
 				276E5E131CDB57AA003FF4B4 /* LexerPopModeAction.h in Headers */,
 				276E5ED61CDB57AA003FF4B4 /* BailErrorStrategy.h in Headers */,
 				276E5DCE1CDB57AA003FF4B4 /* EpsilonTransition.h in Headers */,
 				276E5FBD1CDB57AA003FF4B4 /* Declarations.h in Headers */,
 				276E600B1CDB57AA003FF4B4 /* ParseTreeWalker.h in Headers */,
+				9B25DCCE291027EE00DF9703 /* SemanticContextType.h in Headers */,
 				276E5E761CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60141CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F571CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D801CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602C1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E941CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F751CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -1942,6 +1962,7 @@
 				276E5E581CDB57AA003FF4B4 /* PlusBlockStartState.h in Headers */,
 				276E5D921CDB57AA003FF4B4 /* AtomTransition.h in Headers */,
 				276E5F511CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
+				9B25DCB1291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */,
 				276E5F301CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E311CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0C1CDB57AA003FF4B4 /* DFA.h in Headers */,
@@ -1950,18 +1971,23 @@
 				276E5FB41CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				276E5F991CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
 				276E5E401CDB57AA003FF4B4 /* NotSetTransition.h in Headers */,
+				9B25DCD92910282B00DF9703 /* TransitionType.h in Headers */,
+				9B25DCD1291027EE00DF9703 /* SerializedATNView.h in Headers */,
 				276E5E881CDB57AA003FF4B4 /* RangeTransition.h in Headers */,
 				276E601A1CDB57AA003FF4B4 /* ParseTreePattern.h in Headers */,
 				276E5DFB1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE71CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
+				9B25DCC62910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */,
 				276E5DEF1CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
 				276E5DD41CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E251CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,
 				276E5DE31CDB57AA003FF4B4 /* LexerActionType.h in Headers */,
 				276E5D501CDB57AA003FF4B4 /* AmbiguityInfo.h in Headers */,
 				276E5E701CDB57AA003FF4B4 /* PredicateTransition.h in Headers */,
+				9B25DCEF291028D000DF9703 /* Utf8.h in Headers */,
 				276E5EE81CDB57AA003FF4B4 /* CharStream.h in Headers */,
 				276E60051CDB57AA003FF4B4 /* ParseTreeVisitor.h in Headers */,
+				9B25DCAD291025B700DF9703 /* ATNStateType.h in Headers */,
 				276E5D561CDB57AA003FF4B4 /* ArrayPredictionContext.h in Headers */,
 				276E5E521CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */,
 				2794D8571CE7821B00FADD0F /* antlr4-common.h in Headers */,
@@ -1991,6 +2017,7 @@
 				276E5F871CDB57AA003FF4B4 /* Parser.h in Headers */,
 				276E5DBC1CDB57AA003FF4B4 /* DecisionInfo.h in Headers */,
 				276E5DC21CDB57AA003FF4B4 /* DecisionState.h in Headers */,
+				9B25DCA52910249100DF9703 /* FlatHashMap.h in Headers */,
 				276E5E6A1CDB57AA003FF4B4 /* PredicateEvalInfo.h in Headers */,
 				276E5EEE1CDB57AA003FF4B4 /* CommonToken.h in Headers */,
 				276E60381CDB57AA003FF4B4 /* TokenTagToken.h in Headers */,
@@ -2006,6 +2033,7 @@
 				276E60311CDB57AA003FF4B4 /* TextChunk.h in Headers */,
 				276E5F411CDB57AA003FF4B4 /* IntStream.h in Headers */,
 				276E5D5B1CDB57AA003FF4B4 /* ATN.h in Headers */,
+				9B25DCA82910252800DF9703 /* Version.h in Headers */,
 				276E605E1CDB57AA003FF4B4 /* UnbufferedCharStream.h in Headers */,
 				276E5DD61CDB57AA003FF4B4 /* LexerAction.h in Headers */,
 				27DB44A41D045537007E790B /* XPathRuleAnywhereElement.h in Headers */,
@@ -2013,11 +2041,11 @@
 				27AC52D01CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5DA61CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
 				276E5FE01CDB57AA003FF4B4 /* TokenStream.h in Headers */,
+				9B25DCBC2910278000DF9703 /* PredictionContextMergeCache.h in Headers */,
 				276E5D6D1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
 				276E5EDB1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
 				276E5DB51CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
 				276E5E2A1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
-				276E5D791CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
 				276E5EAB1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */,
 				276E5E181CDB57AA003FF4B4 /* LexerPushModeAction.h in Headers */,
 				276E5EC91CDB57AA003FF4B4 /* Transition.h in Headers */,
@@ -2046,6 +2074,7 @@
 				276E5E1E1CDB57AA003FF4B4 /* LexerSkipAction.h in Headers */,
 				276E5E361CDB57AA003FF4B4 /* LoopEndState.h in Headers */,
 				276E5D671CDB57AA003FF4B4 /* ATNConfigSet.h in Headers */,
+				9B25DCEB291028D000DF9703 /* Unicode.h in Headers */,
 				276E5D371CDB57AA003FF4B4 /* ANTLRFileStream.h in Headers */,
 				27DB44B41D0463CC007E790B /* XPathLexer.h in Headers */,
 				276E5D2E1CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */,
@@ -2055,9 +2084,12 @@
 				276E5F171CDB57AA003FF4B4 /* DFAState.h in Headers */,
 				276E5FA41CDB57AA003FF4B4 /* Recognizer.h in Headers */,
 				276E60731CDB57AA003FF4B4 /* WritableToken.h in Headers */,
+				9B25DCD0291027EE00DF9703 /* SerializedATNView.h in Headers */,
 				276E5D3D1CDB57AA003FF4B4 /* ANTLRInputStream.h in Headers */,
 				276E5FCE1CDB57AA003FF4B4 /* Token.h in Headers */,
+				9B25DCBF2910278000DF9703 /* PredictionContextType.h in Headers */,
 				276E60401CDB57AA003FF4B4 /* TerminalNode.h in Headers */,
+				9B25DCCD291027EE00DF9703 /* SemanticContextType.h in Headers */,
 				276E5D731CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */,
 				276E5D851CDB57AA003FF4B4 /* ATNState.h in Headers */,
 				276E5E7B1CDB57AA003FF4B4 /* PredictionMode.h in Headers */,
@@ -2070,12 +2102,12 @@
 				276E5DF41CDB57AA003FF4B4 /* LexerChannelAction.h in Headers */,
 				276E5FB01CDB57AA003FF4B4 /* Arrays.h in Headers */,
 				276E5F801CDB57AA003FF4B4 /* NoViableAltException.h in Headers */,
+				9B25DCA12910249100DF9703 /* FlatHashSet.h in Headers */,
 				276E5DE81CDB57AA003FF4B4 /* LexerATNConfig.h in Headers */,
 				276E60461CDB57AA003FF4B4 /* TerminalNodeImpl.h in Headers */,
+				9B25DCB92910278000DF9703 /* PredictionContextCache.h in Headers */,
 				276E5FF21CDB57AA003FF4B4 /* ErrorNodeImpl.h in Headers */,
 				276E5EC31CDB57AA003FF4B4 /* TokensStartState.h in Headers */,
-				276E5DC71CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */,
-				276E5D431CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */,
 				276E5F291CDB57AA003FF4B4 /* Exceptions.h in Headers */,
 				276E5F231CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
 				27DB449E1D045537007E790B /* XPath.h in Headers */,
@@ -2087,13 +2119,15 @@
 				276E5E751CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60131CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F561CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
+				9B25DCEE291028D000DF9703 /* Utf8.h in Headers */,
 				276E5D7F1CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602B1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E931CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F741CDB57AA003FF4B4 /* Predicate.h in Headers */,
 				276E5F921CDB57AA003FF4B4 /* ParserRuleContext.h in Headers */,
+				9B25DCE12910287000DF9703 /* Synchronization.h in Headers */,
 				276E5FEC1CDB57AA003FF4B4 /* ErrorNode.h in Headers */,
+				9B25DCB0291026DE00DF9703 /* ParserATNSimulatorOptions.h in Headers */,
 				276E5EB71CDB57AA003FF4B4 /* StarLoopbackState.h in Headers */,
 				276E5E5D1CDB57AA003FF4B4 /* PlusLoopbackState.h in Headers */,
 				276E5E061CDB57AA003FF4B4 /* LexerModeAction.h in Headers */,
@@ -2102,10 +2136,12 @@
 				276E5F501CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
 				27DB44AE1D045537007E790B /* XPathWildcardElement.h in Headers */,
 				276E5F2F1CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
+				9B25DCA42910249100DF9703 /* FlatHashMap.h in Headers */,
 				276E5E301CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0B1CDB57AA003FF4B4 /* DFA.h in Headers */,
 				276E606D1CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E60521CDB57AA003FF4B4 /* Trees.h in Headers */,
+				9B25DCAC291025B700DF9703 /* ATNStateType.h in Headers */,
 				276E5FB31CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				27DB44AA1D045537007E790B /* XPathTokenElement.h in Headers */,
 				276E5F981CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
@@ -2139,6 +2175,7 @@
 				276E600D1CDB57AA003FF4B4 /* Chunk.h in Headers */,
 				276E5FB91CDB57AA003FF4B4 /* CPPUtils.h in Headers */,
 				276E5EE11CDB57AA003FF4B4 /* BufferedTokenStream.h in Headers */,
+				9B25DCC52910278000DF9703 /* PredictionContextMergeCacheOptions.h in Headers */,
 				276E5DAF1CDB57AA003FF4B4 /* ContextSensitivityInfo.h in Headers */,
 				276E5E001CDB57AA003FF4B4 /* LexerIndexedCustomAction.h in Headers */,
 				27DB44A81D045537007E790B /* XPathTokenAnywhereElement.h in Headers */,
@@ -2149,6 +2186,7 @@
 				276E5F6E1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E601F1CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
 				276E5D611CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
+				9B25DCE5291028BC00DF9703 /* Casts.h in Headers */,
 				27DB44A21D045537007E790B /* XPathLexerErrorListener.h in Headers */,
 				276E5E4B1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F861CDB57AA003FF4B4 /* Parser.h in Headers */,
@@ -2157,6 +2195,7 @@
 				276E5DC11CDB57AA003FF4B4 /* DecisionState.h in Headers */,
 				276E5E691CDB57AA003FF4B4 /* PredicateEvalInfo.h in Headers */,
 				276E5EED1CDB57AA003FF4B4 /* CommonToken.h in Headers */,
+				9B25DCD82910282B00DF9703 /* TransitionType.h in Headers */,
 				276E60371CDB57AA003FF4B4 /* TokenTagToken.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2275,18 +2314,16 @@
 				276E5D541CDB57AA003FF4B4 /* ArrayPredictionContext.cpp in Sources */,
 				276E5F0A1CDB57AA003FF4B4 /* DFA.cpp in Sources */,
 				276E5E231CDB57AA003FF4B4 /* LexerTypeAction.cpp in Sources */,
-				276E5EC21CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */,
 				276E5DB41CDB57AA003FF4B4 /* DecisionEventInfo.cpp in Sources */,
 				276E60451CDB57AA003FF4B4 /* TerminalNodeImpl.cpp in Sources */,
 				276E5DD21CDB57AA003FF4B4 /* ErrorInfo.cpp in Sources */,
 				276E5F551CDB57AA003FF4B4 /* LexerNoViableAltException.cpp in Sources */,
 				2793DCB81F08099C00A84290 /* LexerAction.cpp in Sources */,
-				276E5E561CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */,
 				27C375861EA1059C00B5883C /* InterpreterDataReader.cpp in Sources */,
 				276E5E1D1CDB57AA003FF4B4 /* LexerSkipAction.cpp in Sources */,
-				276E5EBC1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */,
 				276E5D721CDB57AA003FF4B4 /* ATNDeserializer.cpp in Sources */,
 				2793DC8B1F08087500A84290 /* Chunk.cpp in Sources */,
+				9B25DCE02910287000DF9703 /* Synchronization.cpp in Sources */,
 				276E5E2F1CDB57AA003FF4B4 /* LookaheadEventInfo.cpp in Sources */,
 				276E5DFF1CDB57AA003FF4B4 /* LexerIndexedCustomAction.cpp in Sources */,
 				276E60511CDB57AA003FF4B4 /* Trees.cpp in Sources */,
@@ -2308,20 +2345,16 @@
 				276E5E741CDB57AA003FF4B4 /* PredictionContext.cpp in Sources */,
 				27DB44CB1D0463DB007E790B /* XPathElement.cpp in Sources */,
 				276E5E171CDB57AA003FF4B4 /* LexerPushModeAction.cpp in Sources */,
-				276E5DA21CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */,
 				276E5EF21CDB57AA003FF4B4 /* CommonTokenFactory.cpp in Sources */,
 				276E5DF31CDB57AA003FF4B4 /* LexerChannelAction.cpp in Sources */,
-				276E5E921CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */,
 				276E60631CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp in Sources */,
 				276E5DDB1CDB57AA003FF4B4 /* LexerActionExecutor.cpp in Sources */,
-				2793DC981F0808E100A84290 /* ErrorNode.cpp in Sources */,
 				2793DCAF1F08095F00A84290 /* WritableToken.cpp in Sources */,
 				276E5E9E1CDB57AA003FF4B4 /* SemanticContext.cpp in Sources */,
 				276E5EC81CDB57AA003FF4B4 /* Transition.cpp in Sources */,
 				276E601E1CDB57AA003FF4B4 /* ParseTreePatternMatcher.cpp in Sources */,
 				276E5F221CDB57AA003FF4B4 /* DiagnosticErrorListener.cpp in Sources */,
 				276E5D481CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */,
-				276E5DC61CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */,
 				276E5ED41CDB57AA003FF4B4 /* BailErrorStrategy.cpp in Sources */,
 				2793DC9B1F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */,
 				2793DCAC1F08095F00A84290 /* Token.cpp in Sources */,
@@ -2331,12 +2364,12 @@
 				27DB44D51D0463DB007E790B /* XPathTokenElement.cpp in Sources */,
 				27DB44D11D0463DB007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DED1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				2793DCB51F08099C00A84290 /* BlockStartState.cpp in Sources */,
 				276E606C1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1C1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60181CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE71CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
 				27B36AC81DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
+				9B25DCC42910278000DF9703 /* PredictionContextCache.cpp in Sources */,
 				276E5F101CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2E1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
 				27D414541DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
@@ -2346,14 +2379,12 @@
 				276E60091CDB57AA003FF4B4 /* ParseTreeWalker.cpp in Sources */,
 				27DB44CD1D0463DB007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5F9D1CDB57AA003FF4B4 /* RecognitionException.cpp in Sources */,
-				276E5E8C1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA41CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D841CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
 				276E60241CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E501CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E602A1CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
 				276E5F7F1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */,
-				276E5D781CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */,
 				27745F051CE49C000067C6A3 /* RuntimeMetaData.cpp in Sources */,
 				276E5DAE1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */,
 				2793DCA61F08095F00A84290 /* ANTLRErrorListener.cpp in Sources */,
@@ -2363,8 +2394,6 @@
 				276E5ECE1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E861CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7E1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5D9C1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E801CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA91F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F401CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2373,7 +2402,6 @@
 				276E5FDF1CDB57AA003FF4B4 /* TokenStream.cpp in Sources */,
 				276E5FF11CDB57AA003FF4B4 /* ErrorNodeImpl.cpp in Sources */,
 				27DB44D71D0463DB007E790B /* XPathWildcardAnywhereElement.cpp in Sources */,
-				276E5D961CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */,
 				276E5E4A1CDB57AA003FF4B4 /* ParseInfo.cpp in Sources */,
 				276E5E3E1CDB57AA003FF4B4 /* NotSetTransition.cpp in Sources */,
 				27DB44B31D0463CC007E790B /* XPathLexer.cpp in Sources */,
@@ -2385,15 +2413,15 @@
 				276E5D5A1CDB57AA003FF4B4 /* ATN.cpp in Sources */,
 				276E5EE61CDB57AA003FF4B4 /* CharStream.cpp in Sources */,
 				276E5EE01CDB57AA003FF4B4 /* BufferedTokenStream.cpp in Sources */,
+				9B25DCCA2910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */,
 				276E5F041CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp in Sources */,
-				276E5D421CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */,
-				276E5E5C1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */,
-				276E5E351CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */,
 				276E5FE51CDB57AA003FF4B4 /* TokenStreamRewriter.cpp in Sources */,
+				9B25DCD72910282B00DF9703 /* TransitionType.cpp in Sources */,
 				276E5FA91CDB57AA003FF4B4 /* RuleContext.cpp in Sources */,
 				276E5D601CDB57AA003FF4B4 /* ATNConfig.cpp in Sources */,
 				276E5EFE1CDB57AA003FF4B4 /* ConsoleErrorListener.cpp in Sources */,
 				276E5EAA1CDB57AA003FF4B4 /* SingletonPredictionContext.cpp in Sources */,
+				9B25DCF3291028D000DF9703 /* Utf8.cpp in Sources */,
 				276E5E681CDB57AA003FF4B4 /* PredicateEvalInfo.cpp in Sources */,
 				276E5F281CDB57AA003FF4B4 /* Exceptions.cpp in Sources */,
 				276E5F851CDB57AA003FF4B4 /* Parser.cpp in Sources */,
@@ -2401,7 +2429,6 @@
 				276E5E981CDB57AA003FF4B4 /* RuleTransition.cpp in Sources */,
 				276E5EF81CDB57AA003FF4B4 /* CommonTokenStream.cpp in Sources */,
 				2793DC871F08083F00A84290 /* TokenSource.cpp in Sources */,
-				2793DC931F0808A200A84290 /* TerminalNode.cpp in Sources */,
 				276E60121CDB57AA003FF4B4 /* ParseTreeMatch.cpp in Sources */,
 				276566E21DA93BFB000869BE /* ParseTree.cpp in Sources */,
 				276E5EEC1CDB57AA003FF4B4 /* CommonToken.cpp in Sources */,
@@ -2412,7 +2439,6 @@
 				276E5DF91CDB57AA003FF4B4 /* LexerCustomAction.cpp in Sources */,
 				276E5F4F1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E291CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
-				276E5EB01CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
 				27DB44D31D0463DB007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5FB81CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);
@@ -2429,18 +2455,16 @@
 				276E5D531CDB57AA003FF4B4 /* ArrayPredictionContext.cpp in Sources */,
 				276E5F091CDB57AA003FF4B4 /* DFA.cpp in Sources */,
 				276E5E221CDB57AA003FF4B4 /* LexerTypeAction.cpp in Sources */,
-				276E5EC11CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */,
 				276E5DB31CDB57AA003FF4B4 /* DecisionEventInfo.cpp in Sources */,
 				276E60441CDB57AA003FF4B4 /* TerminalNodeImpl.cpp in Sources */,
 				276E5DD11CDB57AA003FF4B4 /* ErrorInfo.cpp in Sources */,
 				276E5F541CDB57AA003FF4B4 /* LexerNoViableAltException.cpp in Sources */,
 				2793DCB71F08099C00A84290 /* LexerAction.cpp in Sources */,
-				276E5E551CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */,
 				27C375851EA1059C00B5883C /* InterpreterDataReader.cpp in Sources */,
 				276E5E1C1CDB57AA003FF4B4 /* LexerSkipAction.cpp in Sources */,
-				276E5EBB1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */,
 				276E5D711CDB57AA003FF4B4 /* ATNDeserializer.cpp in Sources */,
 				2793DC8A1F08087500A84290 /* Chunk.cpp in Sources */,
+				9B25DCDF2910287000DF9703 /* Synchronization.cpp in Sources */,
 				276E5E2E1CDB57AA003FF4B4 /* LookaheadEventInfo.cpp in Sources */,
 				276E5DFE1CDB57AA003FF4B4 /* LexerIndexedCustomAction.cpp in Sources */,
 				276E60501CDB57AA003FF4B4 /* Trees.cpp in Sources */,
@@ -2462,20 +2486,16 @@
 				276E5E731CDB57AA003FF4B4 /* PredictionContext.cpp in Sources */,
 				27DB44B91D0463DA007E790B /* XPathElement.cpp in Sources */,
 				276E5E161CDB57AA003FF4B4 /* LexerPushModeAction.cpp in Sources */,
-				276E5DA11CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */,
 				276E5EF11CDB57AA003FF4B4 /* CommonTokenFactory.cpp in Sources */,
 				276E5DF21CDB57AA003FF4B4 /* LexerChannelAction.cpp in Sources */,
-				276E5E911CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */,
 				276E60621CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp in Sources */,
 				276E5DDA1CDB57AA003FF4B4 /* LexerActionExecutor.cpp in Sources */,
-				2793DC971F0808E100A84290 /* ErrorNode.cpp in Sources */,
 				2793DCAE1F08095F00A84290 /* WritableToken.cpp in Sources */,
 				276E5E9D1CDB57AA003FF4B4 /* SemanticContext.cpp in Sources */,
 				276E5EC71CDB57AA003FF4B4 /* Transition.cpp in Sources */,
 				276E601D1CDB57AA003FF4B4 /* ParseTreePatternMatcher.cpp in Sources */,
 				276E5F211CDB57AA003FF4B4 /* DiagnosticErrorListener.cpp in Sources */,
 				276E5D471CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */,
-				276E5DC51CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */,
 				276E5ED31CDB57AA003FF4B4 /* BailErrorStrategy.cpp in Sources */,
 				2793DC9A1F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */,
 				2793DCAB1F08095F00A84290 /* Token.cpp in Sources */,
@@ -2485,12 +2505,12 @@
 				27DB44C31D0463DA007E790B /* XPathTokenElement.cpp in Sources */,
 				27DB44BF1D0463DA007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DEC1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				2793DCB41F08099C00A84290 /* BlockStartState.cpp in Sources */,
 				276E606B1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1B1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60171CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE61CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
 				27B36AC71DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
+				9B25DCC32910278000DF9703 /* PredictionContextCache.cpp in Sources */,
 				276E5F0F1CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2D1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
 				27D414531DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
@@ -2500,14 +2520,12 @@
 				276E60081CDB57AA003FF4B4 /* ParseTreeWalker.cpp in Sources */,
 				27DB44BB1D0463DA007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5F9C1CDB57AA003FF4B4 /* RecognitionException.cpp in Sources */,
-				276E5E8B1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA31CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D831CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
 				276E60231CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E4F1CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E60291CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
 				276E5F7E1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */,
-				276E5D771CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */,
 				27745F041CE49C000067C6A3 /* RuntimeMetaData.cpp in Sources */,
 				276E5DAD1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */,
 				2793DCA51F08095F00A84290 /* ANTLRErrorListener.cpp in Sources */,
@@ -2517,8 +2535,6 @@
 				276E5ECD1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E851CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7D1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5D9B1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7F1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA81F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3F1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2527,7 +2543,6 @@
 				276E5FDE1CDB57AA003FF4B4 /* TokenStream.cpp in Sources */,
 				276E5FF01CDB57AA003FF4B4 /* ErrorNodeImpl.cpp in Sources */,
 				27DB44C51D0463DA007E790B /* XPathWildcardAnywhereElement.cpp in Sources */,
-				276E5D951CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */,
 				276E5E491CDB57AA003FF4B4 /* ParseInfo.cpp in Sources */,
 				276E5E3D1CDB57AA003FF4B4 /* NotSetTransition.cpp in Sources */,
 				27DB44B21D0463CC007E790B /* XPathLexer.cpp in Sources */,
@@ -2539,15 +2554,15 @@
 				276E5D591CDB57AA003FF4B4 /* ATN.cpp in Sources */,
 				276E5EE51CDB57AA003FF4B4 /* CharStream.cpp in Sources */,
 				276E5EDF1CDB57AA003FF4B4 /* BufferedTokenStream.cpp in Sources */,
+				9B25DCC92910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */,
 				276E5F031CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp in Sources */,
-				276E5D411CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */,
-				276E5E5B1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */,
-				276E5E341CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */,
 				276E5FE41CDB57AA003FF4B4 /* TokenStreamRewriter.cpp in Sources */,
+				9B25DCD62910282B00DF9703 /* TransitionType.cpp in Sources */,
 				276E5FA81CDB57AA003FF4B4 /* RuleContext.cpp in Sources */,
 				276E5D5F1CDB57AA003FF4B4 /* ATNConfig.cpp in Sources */,
 				276E5EFD1CDB57AA003FF4B4 /* ConsoleErrorListener.cpp in Sources */,
 				276E5EA91CDB57AA003FF4B4 /* SingletonPredictionContext.cpp in Sources */,
+				9B25DCF2291028D000DF9703 /* Utf8.cpp in Sources */,
 				276E5E671CDB57AA003FF4B4 /* PredicateEvalInfo.cpp in Sources */,
 				276E5F271CDB57AA003FF4B4 /* Exceptions.cpp in Sources */,
 				276E5F841CDB57AA003FF4B4 /* Parser.cpp in Sources */,
@@ -2555,7 +2570,6 @@
 				276E5E971CDB57AA003FF4B4 /* RuleTransition.cpp in Sources */,
 				276E5EF71CDB57AA003FF4B4 /* CommonTokenStream.cpp in Sources */,
 				2793DC861F08083F00A84290 /* TokenSource.cpp in Sources */,
-				2793DC921F0808A200A84290 /* TerminalNode.cpp in Sources */,
 				276E60111CDB57AA003FF4B4 /* ParseTreeMatch.cpp in Sources */,
 				276566E11DA93BFB000869BE /* ParseTree.cpp in Sources */,
 				276E5EEB1CDB57AA003FF4B4 /* CommonToken.cpp in Sources */,
@@ -2566,7 +2580,6 @@
 				276E5DF81CDB57AA003FF4B4 /* LexerCustomAction.cpp in Sources */,
 				276E5F4E1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E281CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
-				276E5EAF1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
 				27DB44C11D0463DA007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5FB71CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);
@@ -2584,17 +2597,15 @@
 				276E5F081CDB57AA003FF4B4 /* DFA.cpp in Sources */,
 				276E5E211CDB57AA003FF4B4 /* LexerTypeAction.cpp in Sources */,
 				27DB449F1D045537007E790B /* XPathElement.cpp in Sources */,
-				276E5EC01CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */,
 				276E5DB21CDB57AA003FF4B4 /* DecisionEventInfo.cpp in Sources */,
 				276E60431CDB57AA003FF4B4 /* TerminalNodeImpl.cpp in Sources */,
 				276E5DD01CDB57AA003FF4B4 /* ErrorInfo.cpp in Sources */,
 				2793DCB61F08099C00A84290 /* LexerAction.cpp in Sources */,
 				276E5F531CDB57AA003FF4B4 /* LexerNoViableAltException.cpp in Sources */,
 				27C375841EA1059C00B5883C /* InterpreterDataReader.cpp in Sources */,
-				276E5E541CDB57AA003FF4B4 /* PlusBlockStartState.cpp in Sources */,
 				276E5E1B1CDB57AA003FF4B4 /* LexerSkipAction.cpp in Sources */,
-				276E5EBA1CDB57AA003FF4B4 /* StarLoopEntryState.cpp in Sources */,
 				2793DC891F08087500A84290 /* Chunk.cpp in Sources */,
+				9B25DCDE2910287000DF9703 /* Synchronization.cpp in Sources */,
 				276E5D701CDB57AA003FF4B4 /* ATNDeserializer.cpp in Sources */,
 				276E5E2D1CDB57AA003FF4B4 /* LookaheadEventInfo.cpp in Sources */,
 				276E5DFD1CDB57AA003FF4B4 /* LexerIndexedCustomAction.cpp in Sources */,
@@ -2615,14 +2626,11 @@
 				276E5F321CDB57AA003FF4B4 /* InputMismatchException.cpp in Sources */,
 				276E5E721CDB57AA003FF4B4 /* PredictionContext.cpp in Sources */,
 				276E5E151CDB57AA003FF4B4 /* LexerPushModeAction.cpp in Sources */,
-				276E5DA01CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */,
 				276E5EF01CDB57AA003FF4B4 /* CommonTokenFactory.cpp in Sources */,
 				276E5DF11CDB57AA003FF4B4 /* LexerChannelAction.cpp in Sources */,
-				276E5E901CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */,
 				276E60611CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp in Sources */,
 				276E5DD91CDB57AA003FF4B4 /* LexerActionExecutor.cpp in Sources */,
 				27DB449D1D045537007E790B /* XPath.cpp in Sources */,
-				2793DC961F0808E100A84290 /* ErrorNode.cpp in Sources */,
 				2793DCAD1F08095F00A84290 /* WritableToken.cpp in Sources */,
 				276E5E9C1CDB57AA003FF4B4 /* SemanticContext.cpp in Sources */,
 				27DB44AD1D045537007E790B /* XPathWildcardElement.cpp in Sources */,
@@ -2633,18 +2641,17 @@
 				276E5D461CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */,
 				2793DC991F0808E100A84290 /* ParseTreeVisitor.cpp in Sources */,
 				2793DCAA1F08095F00A84290 /* Token.cpp in Sources */,
-				276E5DC41CDB57AA003FF4B4 /* EmptyPredictionContext.cpp in Sources */,
 				276E5ED21CDB57AA003FF4B4 /* BailErrorStrategy.cpp in Sources */,
 				276E5FA11CDB57AA003FF4B4 /* Recognizer.cpp in Sources */,
 				276E5D6A1CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp in Sources */,
 				276E60341CDB57AA003FF4B4 /* TokenTagToken.cpp in Sources */,
 				276E5DEB1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				2793DCB31F08099C00A84290 /* BlockStartState.cpp in Sources */,
 				276E606A1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1A1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60161CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE51CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
 				27B36AC61DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
+				9B25DCC22910278000DF9703 /* PredictionContextCache.cpp in Sources */,
 				276E5F0E1CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2C1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
 				27D414521DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
@@ -2654,14 +2661,12 @@
 				276E5F141CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
 				276E60071CDB57AA003FF4B4 /* ParseTreeWalker.cpp in Sources */,
 				276E5F9B1CDB57AA003FF4B4 /* RecognitionException.cpp in Sources */,
-				276E5E8A1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA21CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D821CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
 				276E60221CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E4E1CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E60281CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
 				276E5F7D1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */,
-				276E5D761CDB57AA003FF4B4 /* ATNSerializer.cpp in Sources */,
 				27745F031CE49C000067C6A3 /* RuntimeMetaData.cpp in Sources */,
 				276E5DAC1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */,
 				2793DCA41F08095F00A84290 /* ANTLRErrorListener.cpp in Sources */,
@@ -2671,8 +2676,6 @@
 				276E5ECC1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E841CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7C1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5D9A1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA71F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3E1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2680,7 +2683,6 @@
 				276E5F6B1CDB57AA003FF4B4 /* MurmurHash.cpp in Sources */,
 				276E5FDD1CDB57AA003FF4B4 /* TokenStream.cpp in Sources */,
 				276E5FEF1CDB57AA003FF4B4 /* ErrorNodeImpl.cpp in Sources */,
-				276E5D941CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */,
 				276E5E481CDB57AA003FF4B4 /* ParseInfo.cpp in Sources */,
 				276E5E3C1CDB57AA003FF4B4 /* NotSetTransition.cpp in Sources */,
 				276E602E1CDB57AA003FF4B4 /* TextChunk.cpp in Sources */,
@@ -2692,16 +2694,16 @@
 				2793DC8D1F08088F00A84290 /* ParseTreeListener.cpp in Sources */,
 				276E5EDE1CDB57AA003FF4B4 /* BufferedTokenStream.cpp in Sources */,
 				276E5F021CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp in Sources */,
-				276E5D401CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */,
-				276E5E5A1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */,
-				276E5E331CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */,
 				276E5FE31CDB57AA003FF4B4 /* TokenStreamRewriter.cpp in Sources */,
+				9B25DCC82910278000DF9703 /* PredictionContextMergeCache.cpp in Sources */,
 				27DB44A11D045537007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5FA71CDB57AA003FF4B4 /* RuleContext.cpp in Sources */,
+				9B25DCD52910282B00DF9703 /* TransitionType.cpp in Sources */,
 				27DB44B11D0463CC007E790B /* XPathLexer.cpp in Sources */,
 				276E5D5E1CDB57AA003FF4B4 /* ATNConfig.cpp in Sources */,
 				276E5EFC1CDB57AA003FF4B4 /* ConsoleErrorListener.cpp in Sources */,
 				276E5EA81CDB57AA003FF4B4 /* SingletonPredictionContext.cpp in Sources */,
+				9B25DCF1291028D000DF9703 /* Utf8.cpp in Sources */,
 				276E5E661CDB57AA003FF4B4 /* PredicateEvalInfo.cpp in Sources */,
 				276E5F261CDB57AA003FF4B4 /* Exceptions.cpp in Sources */,
 				276E5F831CDB57AA003FF4B4 /* Parser.cpp in Sources */,
@@ -2709,7 +2711,6 @@
 				276E5E961CDB57AA003FF4B4 /* RuleTransition.cpp in Sources */,
 				276E5EF61CDB57AA003FF4B4 /* CommonTokenStream.cpp in Sources */,
 				2793DC851F08083F00A84290 /* TokenSource.cpp in Sources */,
-				2793DC911F0808A200A84290 /* TerminalNode.cpp in Sources */,
 				276E60101CDB57AA003FF4B4 /* ParseTreeMatch.cpp in Sources */,
 				276566E01DA93BFB000869BE /* ParseTree.cpp in Sources */,
 				276E5EEA1CDB57AA003FF4B4 /* CommonToken.cpp in Sources */,
@@ -2720,7 +2721,6 @@
 				276E5DF71CDB57AA003FF4B4 /* LexerCustomAction.cpp in Sources */,
 				276E5F4D1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E271CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
-				276E5EAE1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
 				27DB44A91D045537007E790B /* XPathTokenElement.cpp in Sources */,
 				276E5FB61CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);

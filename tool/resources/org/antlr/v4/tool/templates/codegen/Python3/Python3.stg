@@ -65,7 +65,7 @@ else:
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<file.parserName> import <file.parserName>
 else:
     from <file.parserName> import <file.parserName>
@@ -92,7 +92,7 @@ del <file.parserName>
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<file.parserName> import <file.parserName>
 else:
     from <file.parserName> import <file.parserName>
@@ -123,7 +123,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<superClass> import <superClass>
 else:
     from <superClass> import <superClass>
@@ -465,7 +465,7 @@ testShiftInRange(shiftAmount) ::= <<
 >>
 
 bitsetBitfieldComparison(s, bits) ::= <%
-<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> and ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) != 0
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> and ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & <bits.calculated>) != 0)
 %>
 
 isZero ::= [
@@ -650,7 +650,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
     __slots__ = 'parser'
 
@@ -773,7 +773,7 @@ else:
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .<superClass> import <superClass>
 else:
     from <superClass> import <superClass>

@@ -19,7 +19,6 @@ public class TestUnicodeEscapes {
 
 	@Test
 	public void latinPythonEscape() {
-		checkUnicodeEscape("\\u0061", 0x0061, "Python2");
 		checkUnicodeEscape("\\u0061", 0x0061, "Python3");
 	}
 
@@ -35,7 +34,6 @@ public class TestUnicodeEscapes {
 
 	@Test
 	public void bmpPythonEscape() {
-		checkUnicodeEscape("\\uABCD", 0xABCD, "Python2");
 		checkUnicodeEscape("\\uABCD", 0xABCD, "Python3");
 	}
 
@@ -51,7 +49,6 @@ public class TestUnicodeEscapes {
 
 	@Test
 	public void smpPythonEscape() {
-		checkUnicodeEscape("\\U0001F4A9", 0x1F4A9, "Python2");
 		checkUnicodeEscape("\\U0001F4A9", 0x1F4A9, "Python3");
 	}
 

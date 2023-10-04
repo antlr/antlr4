@@ -24,8 +24,12 @@
 
 #include "atn/LexerATNSimulator.h"
 
-#define DEBUG_ATN 0
-#define DEBUG_DFA 0
+#ifndef LEXER_DEBUG_ATN
+#define LEXER_DEBUG_ATN 0
+#endif
+#ifndef LEXER_DEBUG_DFA
+#define LEXER_DEBUG_DFA 0
+#endif
 
 using namespace antlr4;
 using namespace antlr4::atn;
@@ -172,7 +176,7 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_
   SharedLock<SharedMutex> edgeLock(atn._edgeMutex);
   if (t <= MAX_DFA_EDGE) {
     auto iterator = s->edges.find(t - MIN_DFA_EDGE);
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
     if (iterator != s->edges.end()) {
       std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
     }
@@ -232,7 +236,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
       continue;
     }
 
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
       std::cout << "testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
 #endif
 
@@ -263,7 +267,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
 
 void LexerATNSimulator::accept(CharStream *input, const Ref<const LexerActionExecutor> &lexerActionExecutor, size_t /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
     std::cout << "ACTION ";
     std::cout << toString(lexerActionExecutor) << std::endl;
 #endif
@@ -300,12 +304,12 @@ std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *i
 
 bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
 #endif
 
   if (config->state != nullptr && config->state->getStateType() == ATNStateType::RULE_STOP) {
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
       if (_recog != nullptr) {
         std::cout << "closure at " << _recog->getRuleNames()[config->state->ruleIndex] << " rule stop " << config << std::endl;
       } else {
@@ -392,7 +396,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
        */
       const PredicateTransition *pt = static_cast<const PredicateTransition*>(t);
 
-#if DEBUG_ATN == 1
+#if LEXER_DEBUG_ATN == 1
         std::cout << "EVAL rule " << pt->getRuleIndex() << ":" << pt->getPredIndex() << std::endl;
 #endif
 

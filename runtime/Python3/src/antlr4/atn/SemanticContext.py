@@ -153,6 +153,10 @@ class PrecedencePredicate(SemanticContext):
         else:
             return self.precedence == other.precedence
 
+    def __str__(self):
+        return "{" + str(self.precedence) + ">=prec}?"
+
+
 # A semantic context which is true whenever none of the contained contexts
 # is false.
 del AND

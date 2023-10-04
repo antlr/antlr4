@@ -28,22 +28,24 @@ type CommonTokenStream struct {
 	// trivial with bt field.
 	fetchedEOF bool
 
-	// index indexs into tokens of the current token (next token to consume).
+	// index into [tokens] of the current token (next token to consume).
 	// tokens[p] should be LT(1). It is set to -1 when the stream is first
 	// constructed or when SetTokenSource is called, indicating that the first token
 	// has not yet been fetched from the token source. For additional information,
-	// see the documentation of IntStream for a description of initializing methods.
+	// see the documentation of [IntStream] for a description of initializing methods.
 	index int
 
-	// tokenSource is the TokenSource from which tokens for the bt stream are
+	// tokenSource is the [TokenSource] from which tokens for the bt stream are
 	// fetched.
 	tokenSource TokenSource
 
-	// tokens is all tokens fetched from the token source. The list is considered a
+	// tokens contains all tokens fetched from the token source. The list is considered a
 	// complete view of the input once fetchedEOF is set to true.
 	tokens []Token
 }
 
+// NewCommonTokenStream creates a new CommonTokenStream instance using the supplied lexer to produce
+// tokens and will pull tokens from the given lexer channel.
 func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	return &CommonTokenStream{
 		channel:     channel,
@@ -53,6 +55,7 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	}
 }
 
+// GetAllTokens returns all tokens currently pulled from the token source.
 func (c *CommonTokenStream) GetAllTokens() []Token {
 	return c.tokens
 }
@@ -61,9 +64,11 @@ func (c *CommonTokenStream) Mark() int {
 	return 0
 }
 
-func (c *CommonTokenStream) Release(marker int) {}
+func (c *CommonTokenStream) Release(_ int) {}
 
-func (c *CommonTokenStream) reset() {
+func (c *CommonTokenStream) Reset() {
+	c.fetchedEOF = false
+	c.tokens = make([]Token, 0)
 	c.Seek(0)
 }
 
@@ -107,7 +112,7 @@ func (c *CommonTokenStream) Consume() {
 // Sync makes sure index i in tokens has a token and returns true if a token is
 // located at index i and otherwise false.
 func (c *CommonTokenStream) Sync(i int) bool {
-	n := i - len(c.tokens) + 1 // TODO: How many more elements do we need?
+	n := i - len(c.tokens) + 1 // How many more elements do we need?
 
 	if n > 0 {
 		fetched := c.fetch(n)
@@ -193,12 +198,13 @@ func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 	c.tokenSource = tokenSource
 	c.tokens = make([]Token, 0)
 	c.index = -1
+	c.fetchedEOF = false
 }
 
 // NextTokenOnChannel returns the index of the next token on channel given a
 // starting index. Returns i if tokens[i] is on channel. Returns -1 if there are
-// no tokens on channel between i and EOF.
-func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
+// no tokens on channel between 'i' and [TokenEOF].
+func (c *CommonTokenStream) NextTokenOnChannel(i, _ int) int {
 	c.Sync(i)
 
 	if i >= len(c.tokens) {
@@ -244,7 +250,7 @@ func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []To
 	nextOnChannel := c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	from := tokenIndex + 1
 
-	// If no onchannel to the right, then nextOnChannel == -1, so set to to last token
+	// If no onChannel to the right, then nextOnChannel == -1, so set 'to' to the last token
 	var to int
 
 	if nextOnChannel == -1 {
@@ -314,7 +320,8 @@ func (c *CommonTokenStream) Index() int {
 }
 
 func (c *CommonTokenStream) GetAllText() string {
-	return c.GetTextFromInterval(nil)
+	c.Fill()
+	return c.GetTextFromInterval(NewInterval(0, len(c.tokens)-1))
 }
 
 func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
@@ -329,15 +336,9 @@ func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string 
 	return c.GetTextFromInterval(interval.GetSourceInterval())
 }
 
-func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
+func (c *CommonTokenStream) GetTextFromInterval(interval Interval) string {
 	c.lazyInit()
-
-	if interval == nil {
-		c.Fill()
-		interval = NewInterval(0, len(c.tokens)-1)
-	} else {
-		c.Sync(interval.Stop)
-	}
+	c.Sync(interval.Stop)
 
 	start := interval.Start
 	stop := interval.Stop

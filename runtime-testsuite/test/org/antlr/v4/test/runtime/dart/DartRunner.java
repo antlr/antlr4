@@ -25,7 +25,7 @@ public class DartRunner extends RuntimeRunner {
 	private static String cacheDartPackageConfig;
 
 	@Override
-	protected void initRuntime() throws Exception {
+	protected void initRuntime(RunOptions runOptions) throws Exception {
 		String cachePath = getCachePath();
 		mkdir(cachePath);
 

@@ -15,7 +15,7 @@ export default class Recognizer {
     }
 
     checkVersion(toolVersion) {
-        const runtimeVersion = "4.11.1";
+        const runtimeVersion = "4.13.1";
         if (runtimeVersion!==toolVersion) {
             console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
         }
@@ -140,6 +140,10 @@ export default class Recognizer {
 
     precpred(localctx , precedence) {
         return true;
+    }
+
+    get atn() {
+        return this._interp.atn;
     }
 
     get state(){

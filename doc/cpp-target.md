@@ -78,7 +78,7 @@ This example assumes your grammar contains a parser rule named `key` for which t
 
 There are a couple of things that only the C++ ANTLR target has to deal with. They are described here.
 
-### Build Aspects
+### Code Generation Aspects
 The code generation (by running the ANTLR4 jar) allows to specify 2 values you might find useful for better integration of the generated files into your application (both are optional):
 
 * A **namespace**: use the **`-package`** parameter to specify the namespace you want.
@@ -101,6 +101,16 @@ grammar option `options {exportMacro='...';}` in your grammar file.
 In order to create a static lib in Visual Studio define the `ANTLR4CPP_STATIC` macro in addition to the project settings that must be set for a static library (if you compile the runtime yourself).
 
 For gcc and clang it is possible to use the `-fvisibility=hidden` setting to hide all symbols except those that are made default-visible (which has been defined for all public classes in the runtime).
+
+### Compile Aspects
+
+When compiling generated files, you can configure a compile option according to your needs (also optional):
+
+* A **thread local DFA macro**: Add `-DANTLR4_USE_THREAD_LOCAL_CACHE=1` to the compilation options
+will enable using thread local DFA cache (disabled by default), after that, each thread uses its own DFA.
+This will increase memory usage to store thread local DFAs and redundant computation to build thread local DFAs (not too much).
+The benefit is that it can improve the concurrent performance running with multiple threads.
+In other words, when you find your concurent throughput is not high enough, you should consider turning on this option.
 
 ### Memory Management
 Since C++ has no built-in memory management we need to take extra care. For that we rely mostly on smart pointers, which however might cause time penalties or memory side effects (like cyclic references) if not used with care. Currently however the memory household looks very stable. Generally, when you see a raw pointer in code consider this as being managed elsewhere. You should never try to manage such a pointer (delete, assign to smart pointer etc.).

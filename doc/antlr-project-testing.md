@@ -56,7 +56,6 @@ In order to perform the tests on all target languages, the following tools shoul
 
 * dotnet
 * Node.js
-* Python 2
 * Python 3
 * Go
 * Swift
@@ -98,7 +97,7 @@ From the `runtime-testsuite` dir
 ```bash
 $ cd runtime-testsuite
 $ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
-$ mvn -Dtest=java.** test
+$ mvn -Dtest='java.**' test
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------

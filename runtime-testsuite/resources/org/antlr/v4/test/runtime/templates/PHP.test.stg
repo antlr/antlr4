@@ -52,6 +52,8 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "\$this->getExpectedTokens()->toStringVocabulary(\$this->getVocabulary())"
 
+ImportRuleInvocationStack() ::= ""
+
 RuleInvocationStack() ::= "'[' . \implode(', ', \$this->getRuleInvocationStack()) . ']'"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<\$this->interp->setPredictionMode(Antlr\\Antlr4\\Runtime\\Atn\\PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
@@ -268,5 +270,8 @@ Invoke_pred(v) ::= "\$this->pred(<v>)"
 
 ParserTokenType(t) ::= "Parser::<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
+ContextListFunction(ctx, rule) ::= "<ctx>-><rule>()"
 StringType() ::= ""
-ContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
+ContextMember(ctx, member) ::= "<ctx>-><member>"
+SubContextLocal(ctx, subctx, local) ::= "<ctx>-><subctx>-><local>"
+SubContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
