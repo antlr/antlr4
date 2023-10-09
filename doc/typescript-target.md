@@ -39,14 +39,14 @@ Let's suppose that your grammar is named, as above, "MyLanguage". Let's suppose 
    
 There is no listener or visitor interface generated, instead the generated listener and visitor class methods are implemented using lambdas.
 
-A function to parse code according to the grammar in MyLangauge.g4 would be written like this:
+A function to parse code according to the grammar in MyLanguage.g4 would be written like this:
 
 ```typescript
 import { CharStream, CommonTokenStream } from "antlr4";
 import MyLanguageParser, { MyStartRuleContext } from"./MyLanguageParser";
 import MyLanguageLexer from "./MyLanguageLexer";
 
-export function parseMyLangauge(codeToParse: string): MyStartRuleContext {
+export function parseMyLanguage(codeToParse: string): MyStartRuleContext {
     const chars = new CharStream(codeToParse);
     const lexer = new MyLanguageLexer(chars);
     const tokens = new CommonTokenStream(lexer);
@@ -70,7 +70,7 @@ You need to create an instance of custom visitor class and use it to visit the p
 import { ParseTreeVisitor } from "antlr4";
 import { MyStartRuleContext} from "./MyLanguageParser";
 import MyLanguageVisitor from "./MyLanguageVisitor";
-import { parseMyLangauge } from "./typescript-parse";
+import { parseMyLanguage } from "./typescript-parse";
 
 type MyVisitResult = void;
 
@@ -86,7 +86,7 @@ class CustomVisitor
 }
 
 function parseAndVisit(codeToParse: string) {
-    const parseResult = parseMyLangauge(codeToParse);
+    const parseResult = parseMyLanguage(codeToParse);
     const visitor = new CustomVisitor();
     visitor.visit(parseResult);
 }
@@ -100,7 +100,7 @@ You need to create an instance of a custom listener class and use it to visit th
 import { ParseTreeWalker, ParseTreeListener } from "antlr4";
 import { MyStartRuleContext } from "./MyLanguageParser";
 import MyLanguageListener from "./MyLanguageListener";
-import { parseMyLangauge } from "./typescript-parse";
+import { parseMyLanguage } from "./typescript-parse";
 
 class CustomListener
     extends ParseTreeListener
@@ -116,7 +116,7 @@ class CustomListener
 }
 
 function parseAndRunListener(codeToParse: string) {
-    const parseResult = parseMyLangauge(codeToParse);
+    const parseResult = parseMyLanguage(codeToParse);
     ParseTreeWalker.DEFAULT.walk(new CustomListener(), parseResult);
 }
 ```
