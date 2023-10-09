@@ -36,8 +36,6 @@ Let's suppose that your grammar is named, as above, "MyLanguage". Let's suppose 
 *   MyLanguageParser.ts
 *   MyLanguageListener.ts (if you have not activated the -no-listener option)
 *   MyLanguageVisitor.ts (if you have activated the -visitor option)
-   
-There is no listener or visitor interface generated, instead the generated listener and visitor class methods are implemented using lambdas.
 
 A function to parse code according to the grammar in MyLanguage.g4 would be written like this:
 
