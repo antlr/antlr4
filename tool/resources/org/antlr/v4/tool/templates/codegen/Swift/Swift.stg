@@ -816,6 +816,7 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
            superClass={ParserRuleContext}) ::= <<
 
 <accessLevelNotOpen(parser)> class <struct.escapedName>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+	<ctorAttrs:{a | <accessLevelOpenOK(parser)> var <a>}; separator="\n">
 	<attrs:{a | <accessLevelOpenOK(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<! <if(ctorAttrs)> <accessLevelNotOpen(parser)> init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
@@ -835,6 +836,7 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 	override func copyFrom(_ ctx_: ParserRuleContext) {
 		super.copyFrom(ctx_)
 		let ctx = ctx_ as! <struct.escapedName>
+		<struct.ctorAttrs:{a | self.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 		<struct.attrs:{a | self.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
 <endif>

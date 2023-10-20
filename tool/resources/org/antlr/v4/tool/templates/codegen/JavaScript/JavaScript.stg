@@ -675,6 +675,7 @@ class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><el
 	<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	copyFrom(ctx) {
 		super.copyFrom(ctx);
+		<struct.ctorAttrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 		<struct.attrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
 	<endif>
