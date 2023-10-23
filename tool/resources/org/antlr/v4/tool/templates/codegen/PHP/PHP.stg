@@ -97,7 +97,7 @@ use Antlr\\Antlr4\\Runtime\\Tree\\TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-class <file.grammarName>BaseListener implements <file.grammarName>Listener
+abstract class <file.grammarName>BaseListener implements <file.grammarName>Listener
 {
 	<file.listenerNames:{lname |
 /**
