@@ -10,7 +10,7 @@ Your driver code etc. should now be importing from the new release only repo for
 
 ```go
 import (
- github.com/antlr4-go/antlr
+	"github.com/antlr4-go/antlr"
 )
 ```
 
