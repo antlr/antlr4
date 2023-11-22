@@ -146,11 +146,8 @@ struct <lexer.name; format = "cap">StaticData final {
 ::antlr4::internal::OnceFlag <lexer.grammarName; format = "lower">LexerOnceFlag;
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
-std::unique_ptr\<<lexer.name; format = "cap">StaticData> staticData = nullptr;
-
-static thread_local
 #endif
-<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+std::unique_ptr\<<lexer.name; format = "cap">StaticData> <lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -159,10 +156,8 @@ void <lexer.grammarName; format = "lower">LexerInitialize() {
   }
 #else
   assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
-
-  auto
 #endif
-  staticData = std::make_unique\<<lexer.name; format = "cap">StaticData>(
+  auto staticData = std::make_unique\<<lexer.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
     },
@@ -180,11 +175,7 @@ void <lexer.grammarName; format = "lower">LexerInitialize() {
     }
   );
   <atn>
-#if ANTLR4_USE_THREAD_LOCAL_CACHE
-  <lexer.grammarName; format = "lower">LexerStaticData = staticData.get();
-#else
-  <lexer.grammarName; format = "lower">LexerStaticData = staticData.release();
-#endif
+  <lexer.grammarName; format = "lower">LexerStaticData = std::move(staticData);
 }
 
 }
@@ -388,11 +379,8 @@ struct <parser.name; format = "cap">StaticData final {
 ::antlr4::internal::OnceFlag <parser.grammarName; format = "lower">ParserOnceFlag;
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
-std::unique_ptr\<<parser.name; format = "cap">StaticData> staticData = nullptr;
-
-static thread_local
 #endif
-<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+std::unique_ptr\<<parser.name; format = "cap">StaticData> <parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -401,10 +389,8 @@ void <parser.grammarName; format = "lower">ParserInitialize() {
   }
 #else
   assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
-
-  auto
 #endif
-  staticData = std::make_unique\<<parser.name; format = "cap">StaticData>(
+  auto staticData = std::make_unique\<<parser.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
     },
@@ -416,11 +402,7 @@ void <parser.grammarName; format = "lower">ParserInitialize() {
     }
   );
   <atn>
-#if ANTLR4_USE_THREAD_LOCAL_CACHE
-  <parser.grammarName; format = "lower">ParserStaticData = staticData.get();
-#else
-  <parser.grammarName; format = "lower">ParserStaticData = staticData.release();
-#endif
+  <parser.grammarName; format = "lower">ParserStaticData = std::move(staticData);
 }
 
 }
