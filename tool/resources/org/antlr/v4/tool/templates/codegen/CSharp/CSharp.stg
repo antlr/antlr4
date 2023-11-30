@@ -404,7 +404,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|int _dp=0}]; separator=", ">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.escapedName>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -708,7 +708,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 State = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchToken(m) ::= <<

@@ -11,6 +11,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -34,9 +35,16 @@ import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.OptionalBlockAST;
+import org.antlr.v4.tool.ast.PlusBlockAST;
 import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.RuleRefAST;
+import org.antlr.v4.tool.ast.StarBlockAST;
+import org.antlr.v4.tool.ast.TerminalAST;
+
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,6 +55,7 @@ import java.util.List;
  */
 public class LeftRecursiveRuleTransformer {
 	public static final String PRECEDENCE_OPTION_NAME = "p";
+	public static final String DELEGATEDPRECEDENCE_OPTION_NAME = "dp";
 	public static final String TOKENINDEX_OPTION_NAME = "tokenIndex";
 
 	public GrammarRootAST ast;
@@ -79,15 +88,105 @@ public class LeftRecursiveRuleTransformer {
 			}
 		}
 
+		// Find all direct left recursive, and (binary or prefix) references to these references
+		// this includes chained binary/prefix references
+		List<String> indirectLeftRecursiveRuleNames = new ArrayList<String>(leftRecursiveRuleNames);
+		boolean changed = true;
+		while (changed) {
+			changed = false;
+			for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
+				if (indirectLeftRecursiveRuleNames.contains(r.getText())) continue;
+				Rule refr = rules.stream().filter(x -> x.name.equals(r.getText())).findAny().get();
+
+				// find the occurrence of a reference to a known left recursive element in the AST
+				// to determine if the alt (with the reference) would be a prefix, suffix, binary, ternary, or "other" operation
+				// (This is an imitation of the LeftRecursiveRuleWalker, which
+				// performs a similar check for productions (without the references being used)
+				if (isBinaryOrPrefix(refr.ast, indirectLeftRecursiveRuleNames)) {
+					// Mark the referenced rule as (indirect) left recursive, requiring a delegated precedence
+					// if a referenced production is binary or prefix (cf. the LeftRecursiveRuleWalker)
+					indirectLeftRecursiveRuleNames.add(r.getText());
+					changed = true; // repeat this check, as new leftrec rules have been found
+				}
+
+			}
+		}
 		// update all refs to recursive rules to have [0] argument
 		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
 			if ( r.getParent().getType()==ANTLRParser.RULE ) continue; // must be rule def
-			if ( ((GrammarASTWithOptions)r).getOptionString(PRECEDENCE_OPTION_NAME) != null ) continue; // already has arg; must be in rewritten rule
-			if ( leftRecursiveRuleNames.contains(r.getText()) ) {
-				// found ref to recursive rule not already rewritten with arg
-				((GrammarASTWithOptions)r).setOption(PRECEDENCE_OPTION_NAME, (GrammarAST)new GrammarASTAdaptor().create(ANTLRParser.INT, "0"));
+			if ( ((GrammarASTWithOptions)r).getOptionString(PRECEDENCE_OPTION_NAME) != null ) {
+				continue; // already has arg; must be in rewritten rule
+			}
+
+			if (((GrammarASTWithOptions) r).getOptionString(DELEGATEDPRECEDENCE_OPTION_NAME) != null && !r.getText().equals(getParentRuleName(r.getParent()))) {
+				// remove (delegated) operator precedence for references
+				if (!indirectLeftRecursiveRuleNames.contains(r.getText())) {
+					// remove the delegated precedence, if a referenced production is neither binary nor prefix (cf. the LeftRecursiveRuleWalker)
+					((GrammarASTWithOptions) r).getOptions().remove(DELEGATEDPRECEDENCE_OPTION_NAME);
+				}
+				continue;
+			}
+			if (indirectLeftRecursiveRuleNames.contains(r.getText())) {
+				// found ref to recursive rule
+				if (getParentRuleName(r.getParent()).equals(r.getText())) {
+					// use [0] precedence on direct recursion
+					((GrammarASTWithOptions) r).setOption(PRECEDENCE_OPTION_NAME, (GrammarAST) new GrammarASTAdaptor().create(ANTLRParser.INT, "0"));
+					// and do not use the delegated precedence option
+					((GrammarASTWithOptions) r).getOptions().remove(DELEGATEDPRECEDENCE_OPTION_NAME);
+				} else if (!leftRecursiveRuleNames.contains(getParentRuleName(r))) {
+					// mark the parent rule as being called with "delegated operator precedence", passed via a parameter "_dp"
+					// and set the operator precedence as being this parameter
+					// (cf. the LeftRecursiveRuleWalker and LeftRecursiveRuleAnalyzer#binaryAlt / LeftRecursiveRuleAnalyzer#prefixAlt)
+					for (Rule rule : rules) {
+						if (rule.name.equals(getParentRuleName(r))) {
+							rule.hasDelegatedPrecedence = true;
+						}
+					}
+					((GrammarASTWithOptions) r).setOption(PRECEDENCE_OPTION_NAME, (GrammarAST) new GrammarASTAdaptor().create(ANTLRParser.STRING_LITERAL, "_dp"));
+				}
+				// direct recursive references should not pass the indirect operator precedence
 			}
 		}
+	}
+
+
+	protected boolean isBinaryOrPrefix(Tree ast, Collection<String> indirectLeftRecursiveRuleNames) {
+		for (int i = ast.getChildCount() - 1; i >= 0; i--) {
+			Tree child = ast.getChild(i);
+			if (child instanceof RuleRefAST) {
+				// either found recurse or any other element => return true iff recurse is last
+				return (indirectLeftRecursiveRuleNames.contains(child.getText()));
+			} else if (child instanceof TerminalAST) {
+				return false; //recurse may no longer be at the end
+			} else if (child instanceof AltAST) {
+				if (isBinaryOrPrefix(child, indirectLeftRecursiveRuleNames))
+					return true;
+				// continue otherwise
+			} else if (child instanceof BlockAST || child instanceof PlusBlockAST) {
+				// walk into (required) block
+				return isBinaryOrPrefix(child, indirectLeftRecursiveRuleNames);
+			} else if (child instanceof StarBlockAST || child instanceof OptionalBlockAST) {
+				// walk into star block, but continue otherwise
+				if (isBinaryOrPrefix(child, indirectLeftRecursiveRuleNames))
+					return true;
+			} else if (child instanceof GrammarAST && child.getText().equals("=") && child.getChildCount() == 2) {
+				// RuleReferences, but in the form of tmp0=expr
+				// either found recurse or any other element => return true iff recurse is last
+				return indirectLeftRecursiveRuleNames.contains(child.getChild(1).getText());
+			}else if (child instanceof GrammarAST && Arrays.asList("SET", "RANGE", "~", "=", "+=", "EPSILON").contains(child.getText())) {
+				return false; // some other element or EPSILON found
+			}
+			// ignore Actions, etc.
+		}
+		return false;
+	}
+
+	/** Return the ruleName of the parent RuleAST */
+	public String getParentRuleName(Tree g) {
+		while (!(g instanceof RuleAST)) {
+			g = g.getParent();
+		}
+		return ((RuleAST) g).getRuleName();
 	}
 
 	/** Return true if successful */

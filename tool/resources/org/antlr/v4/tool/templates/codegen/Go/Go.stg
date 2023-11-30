@@ -391,7 +391,14 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 
 
 <endif>
+<if(currentRule.hasDelegatedPrecedence)>
 func (p *<parser.name>) <currentRule.escapedName; format="cap">(<currentRule.args:{a | <a.escapedName> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+	return p.<currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>)
+}
+func (p *<parser.name>) <currentRule.escapedName>(_dp int<currentRule.args:{a | , <a.escapedName> <a.type>}>) (localctx I<currentRule.ctxType>) {
+<else>
+func (p *<parser.name>) <currentRule.escapedName; format="cap">(<currentRule.args:{a | <a.escapedName> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+<endif>
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.escapedName>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
 	<if(namedActions.init)>
@@ -796,6 +803,8 @@ InvokeRule(r, argExprsChunks) ::= <<
 
 	<if(r.ast.options.p)>
 	var _x = p.<r.escapedName>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<elseif(r.ast.options.dp)>
+	var _x = p.<r.escapedName>(<r.ast.options.dp><if(argExprsChunks)>, <endif><argExprsChunks>)
 	<else>
 	var _x = p.<r.escapedName; format="cap">(<argExprsChunks>)
 	<endif>
@@ -805,6 +814,8 @@ InvokeRule(r, argExprsChunks) ::= <<
 	<else>
 	<if(r.ast.options.p)>
 	p.<r.escapedName>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<elseif(r.ast.options.dp)>
+	p.<r.escapedName>(<r.ast.options.dp><if(argExprsChunks)>, <endif><argExprsChunks>)
 	<else>
 	p.<r.escapedName; format="cap">(<argExprsChunks>)
 	<endif>

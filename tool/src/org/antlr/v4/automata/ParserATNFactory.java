@@ -302,7 +302,10 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(node);
 		int precedence = 0;
 		if (((GrammarASTWithOptions)node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME) != null) {
-			precedence = Integer.parseInt(((GrammarASTWithOptions)node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME));
+			if (!((GrammarASTWithOptions)node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME).equals("_" + LeftRecursiveRuleTransformer.DELEGATEDPRECEDENCE_OPTION_NAME)) {
+				// skip "delegated operator precedence" - passed via a "_dp" parameter
+				precedence = Integer.parseInt(((GrammarASTWithOptions) node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME));
+			}
 		}
 		RuleTransition call = new RuleTransition(start, r.index, precedence, right);
 		left.addTransition(call);
