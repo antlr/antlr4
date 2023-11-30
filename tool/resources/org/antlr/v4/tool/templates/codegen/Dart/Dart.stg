@@ -317,7 +317,7 @@ bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|{int dp=0\}}]; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|[int dp=0]}]; separator=", ">) {
   dynamic _localctx = <currentRule.ctxType>(context, state<currentRule.args:{a | , <a.escapedName>}>);
   enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
   <namedActions.init>
@@ -541,7 +541,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::=<<
 state = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[{<if(r.ast.options.pv)>dp<else><r.ast.options.p><endif>}, argExprsChunks, r.ast.options.dp:{v|dp:<v>}]; separator=",">);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[{<if(r.ast.options.pv)>dp<else><r.ast.options.p><endif>}, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchToken(m) ::= <<
