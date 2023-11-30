@@ -317,7 +317,7 @@ bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|\{int _dp=0\}}]; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|{int _dp=0\}}]; separator=", ">) {
   dynamic _localctx = <currentRule.ctxType>(context, state<currentRule.args:{a | , <a.escapedName>}>);
   enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
   <namedActions.init>

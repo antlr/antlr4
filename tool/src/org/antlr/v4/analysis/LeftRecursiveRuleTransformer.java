@@ -46,6 +46,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.List;
 
 /** Remove left-recursive rule refs, add precedence args to recursive rule refs.
@@ -55,6 +56,8 @@ import java.util.List;
  */
 public class LeftRecursiveRuleTransformer {
 	public static final String PRECEDENCE_OPTION_NAME = "p";
+	// To let PHP know it should use a variable here
+	public static final String PRECEDENCE_VAR_OPTION_NAME = "pv";
 	public static final String DELEGATEDPRECEDENCE_OPTION_NAME = "dp";
 	public static final String TOKENINDEX_OPTION_NAME = "tokenIndex";
 
@@ -96,7 +99,9 @@ public class LeftRecursiveRuleTransformer {
 			changed = false;
 			for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
 				if (indirectLeftRecursiveRuleNames.contains(r.getText())) continue;
-				Rule refr = rules.stream().filter(x -> x.name.equals(r.getText())).findAny().get();
+				Optional<Rule> refrOpt = rules.stream().filter(x -> x.name.equals(r.getText())).findAny();
+				if (refrOpt.isEmpty()) continue; // should throw an "internal error: Rule <name> undefined" elsewhere
+				Rule refr = refrOpt.get();
 
 				// find the occurrence of a reference to a known left recursive element in the AST
 				// to determine if the alt (with the reference) would be a prefix, suffix, binary, ternary, or "other" operation
@@ -143,6 +148,7 @@ public class LeftRecursiveRuleTransformer {
 						}
 					}
 					((GrammarASTWithOptions) r).setOption(PRECEDENCE_OPTION_NAME, (GrammarAST) new GrammarASTAdaptor().create(ANTLRParser.STRING_LITERAL, "_dp"));
+					((GrammarASTWithOptions) r).setOption(PRECEDENCE_VAR_OPTION_NAME, (GrammarAST) new GrammarASTAdaptor().create(ANTLRParser.STRING_LITERAL, "true"));
 				}
 				// direct recursive references should not pass the indirect operator precedence
 			}

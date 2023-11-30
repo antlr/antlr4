@@ -701,7 +701,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 $this->setState(<r.stateNumber>);
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<[{<if(r.ast.options.pv)>$<endif><r.ast.options.p>}, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchToken(m) ::= <<
