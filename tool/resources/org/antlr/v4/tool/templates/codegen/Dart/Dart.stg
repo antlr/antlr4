@@ -541,7 +541,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::=<<
 state = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[{<if(r.ast.options.pv)>dp<else><r.ast.options.p><endif>}, argExprsChunks, r.ast.options.dp]; separator=",">);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[{<if(r.ast.options.pv)>dp<else><r.ast.options.p><endif>}, argExprsChunks, r.ast.options.dp:{v|dp:<v>}]; separator=",">);
 >>
 
 MatchToken(m) ::= <<
