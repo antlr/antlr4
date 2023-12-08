@@ -220,7 +220,8 @@ The mode commands alter the mode stack and hence the mode of the lexer. The 'mor
 ```
 // Default "mode": Everything OUTSIDE of a tag
 COMMENT : '<!--' .*? '-->' ;
-CDATA   : '<![CDATA[' .*? ']]>' ;OPEN : '<' -> pushMode(INSIDE) ;
+CDATA   : '<![CDATA[' .*? ']]>' ;
+OPEN : '<' -> pushMode(INSIDE) ;
  ...
 XMLDeclOpen : '<?xml' S -> pushMode(INSIDE) ;
 SPECIAL_OPEN: '<?' Name -> more, pushMode(PROC_INSTR) ;
