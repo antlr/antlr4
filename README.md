@@ -74,6 +74,8 @@ ANTLR project lead and supreme dictator for life
 
 * [Release notes](https://github.com/antlr/antlr4/releases)
 * [Getting started with v4](https://github.com/antlr/antlr4/blob/master/doc/getting-started.md)
+  <!-- TODO:: change it when you deploy the pages to the new link-->
+* [More Comfort Docs](https://khaldounalhalabi.github.io/antlr4/#/) 
 * [Official site](http://www.antlr.org/)
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
