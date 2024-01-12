@@ -148,7 +148,7 @@ public class GoRunner extends RuntimeRunner {
 				ex = e;
 			}
 			cachedGoMod = readFile(getTempDirPath() + FileSeparator, "go.mod");
-			cachedGoSum = readFile(getTempDirPath() + FileSeparator, "go.sum");
+			cachedGoSum = readFileIfExists(getTempDirPath() + FileSeparator, "go.sum").orElse("");
 		}
 
 		// We can now write the go.sum file, which will allow the go compiler to build the module
