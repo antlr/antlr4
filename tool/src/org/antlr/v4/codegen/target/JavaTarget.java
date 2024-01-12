@@ -9,9 +9,10 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class JavaTarget extends Target {
 	/**
@@ -30,7 +31,7 @@ public class JavaTarget extends Target {
 		"void", "volatile", "while",
 
 		// misc
-		"rule", "parserRule"
+		"rule", "parserRule", "reset"
 	));
 
 	public JavaTarget(CodeGenerator gen) {

@@ -39,7 +39,8 @@ public class Python3Target extends Target {
 		"True", "False", "None",
 
 		// misc
-		"rule", "parserRule"
+		"rule", "parserRule",
+		"state", "reset"
 	));
 
 	protected static final Map<Character, String> targetCharValueEscape;

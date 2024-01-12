@@ -38,7 +38,8 @@ public class PHPTarget extends Target {
 		"__LINE__", "__METHOD__", "__NAMESPACE__", "__TRAIT__",
 
 		// misc
-		"rule", "parserRule"
+		"rule", "parserRule",
+		"state", "reset", "action", "sempred", "addErrorListener"
 	));
 
 	protected static final Map<Character, String> targetCharValueEscape;

@@ -1,0 +1,19 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+program : ruleIndexMap*{<writeln("$text")>} EOF ;
+ruleIndexMap: 'break;' | 'continue;' | 'return;' ;
+
+[start]
+program
+
+[input]
+break;continue;return;
+
+[output]
+"""break;continue;return;
+"""
+

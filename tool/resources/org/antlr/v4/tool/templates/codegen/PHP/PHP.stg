@@ -449,7 +449,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 /**
  * @throws RecognitionException
  */
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=",">): Context\\<currentRule.ctxType>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.escapedName>(<args; separator=",">): Context\\<currentRule.ctxType>
 {
     $localContext = new Context\\<currentRule.ctxType>($this->ctx, $this->getState()<currentRule.args:{a | , $<a.name>}>);
 
@@ -701,7 +701,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 $this->setState(<r.stateNumber>);
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.escapedName><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<

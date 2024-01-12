@@ -1,0 +1,19 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+program : sempred*{<writeln("$text")>} EOF ;
+sempred: 'break;' | 'continue;' | 'return;' ;
+
+[start]
+program
+
+[input]
+break;continue;return;
+
+[output]
+"""break;continue;return;
+"""
+

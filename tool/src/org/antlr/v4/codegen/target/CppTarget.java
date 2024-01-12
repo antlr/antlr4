@@ -48,7 +48,7 @@ public class CppTarget extends Target {
 		"using", "virtual", "void", "volatile", "wchar_t", "while",
 		"xor", "xor_eq", 
 
-		"rule", "parserRule"
+		"rule", "parserRule", "reset"
 	));
 
 	public CppTarget(CodeGenerator gen) {

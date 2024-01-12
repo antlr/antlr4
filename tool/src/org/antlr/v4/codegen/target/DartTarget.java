@@ -36,7 +36,15 @@ public class DartTarget extends Target {
 		"deferred", "hide", "return", "with",
 		"do", "if", "set", "yield",
 
-		"rule", "parserRule"
+		"rule", "parserRule",
+		"interpreter", "state", "ruleNames", "vocabulary", "ruleIndexMap", "getTokenType", "grammarFileName", "getATN",
+		"parseInfo", "getErrorHeader", "addErrorListener", "removeErrorListener",  "removeErrorListeners","errorListeners",
+		"errorListenerDispatch", "sempred", "precpred", "action", "inputStream", "tokenFactory",
+
+		"errorHandler", "context", "buildParseTree", "matchedEOF", "reset", "match", "matchWildcard", "trimParseTree",
+		"addParseListener", "removeParseListener", "removeParseListeners", "triggerEnterRuleEvent", "triggerExitRuleEvent",
+		"numberOfSyntaxErrors", "currentToken", "notifyErrorListeners", "consume", "createTerminalNode", "createErrorNode",
+		"addContextToParseTree", "enterRule", "exitRule", "enterOuterAlt", "precedence", "enterRecursionRule"
 	));
 
 	public DartTarget(CodeGenerator gen) {
