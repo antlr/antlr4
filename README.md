@@ -22,7 +22,7 @@
 ## Versioning
 
 ANTLR 4 supports 10 target languages
-(Cpp, CSharp, Dart, Java, JavaScript, PHP, Python3, Swift, TypeScript),
+(Cpp, CSharp, Dart, Java, JavaScript, PHP, Python3, Swift, TypeScript, Go),
 and ensuring consistency across these targets is a unique and highly valuable feature.
 To ensure proper support of this feature, each release of ANTLR is a complete release of the tool and the 10 runtimes, all with the same version.
 As such, ANTLR versioning does not strictly follow semver semantics:
