@@ -3,6 +3,7 @@ import {CharStream} from "./CharStream";
 export declare class Token {
 
     static EOF: number;
+    
     static DEFAULT_CHANNEL: number;
     static HIDDEN_CHANNEL: number;
 
