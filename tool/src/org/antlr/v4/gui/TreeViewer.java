@@ -273,7 +273,7 @@ public class TreeViewer extends JComponent {
 			"fill:orange; stroke:rgb(0,0,0);", "rx=\"1\""));
 
 		// draw the text on top of the box (possibly multiple lines)
-		String line = getText(parent).replace("<","&lt;").replace(">","&gt;");
+		String line = getText(parent).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;").replace("'","&apos;");
 		int fontSize = 10;
 		int x = (int) box.x + 2;
 		int y = (int) box.y + fontSize - 1;
@@ -586,6 +586,14 @@ public class TreeViewer extends JComponent {
 				JOptionPane.ERROR_MESSAGE);
 			ex.printStackTrace();
 		}
+	}
+
+	public void toSVG(Writer writer) throws IOException {
+		writer.write("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">");
+		paintSVG(writer);
+		writer.write("</svg>");
+		writer.flush();
+		writer.close();
 	}
 
 	private static File generateNonExistingFile(String extension) {
