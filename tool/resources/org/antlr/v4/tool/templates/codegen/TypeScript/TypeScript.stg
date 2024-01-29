@@ -47,7 +47,7 @@ import {ParseTreeListener} from "antlr4";
 
 <header>
 
-<file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+<file.listenerNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>.js";}; separator="\n">
 
 <namedActions.beforeListener>
 
@@ -89,7 +89,7 @@ import {ParseTreeVisitor} from 'antlr4';
 
 <header>
 
-<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>";}; separator="\n">
+<file.visitorNames:{lname | import { <lname; format="cap">Context \} from "./<file.parserName>.js";}; separator="\n">
 
 <namedActions.beforeVisitor>
 
@@ -128,14 +128,14 @@ Parser(parser, funcs, atn, sempredFuncs, superClass, isLexer=false) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-import <superClass> from './<superClass>';
+import <superClass> from './<superClass>.js';
 <endif>
 
 export default class <parser.name> extends <superClass; null="Parser"> {
 	<if(parser.tokens)>
 	<parser.tokens:{k | public static readonly <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 	<endif>
-	public static readonly EOF = Token.EOF;
+	public static override readonly EOF = Token.EOF;
 	<parser.rules:{r | public static readonly RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 	public static readonly literalNames: (string | null)[] = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 	public static readonly symbolicNames: (string | null)[] = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
@@ -864,7 +864,7 @@ import {
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass, isLexer=true) ::= <<
 <if(superClass)>
-import <superClass> from './<superClass>';
+import <superClass> from './<superClass>.js';
 
 <endif>
 export default class <lexer.name> extends <superClass; null="Lexer"> {
