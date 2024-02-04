@@ -16,6 +16,8 @@ export declare class Lexer extends Recognizer<number> {
     _tokenStartLine: number;
     _tokenStartColumn: number;
     _type: number;
+    _modeStack: number[];
+    _mode: number;
 
     constructor(input: CharStream);
     reset(): void;
@@ -23,6 +25,7 @@ export declare class Lexer extends Recognizer<number> {
     skip(): void;
     more(): void;
     more(m: number): void;
+    mode(m: number): void;
     pushMode(m: number): void;
     popMode(): number;
     emitToken(token: Token): void;

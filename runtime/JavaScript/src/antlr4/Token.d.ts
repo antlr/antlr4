@@ -1,4 +1,6 @@
 import {CharStream} from "./CharStream";
+import {TokenSource} from "./TokenSource";
+import {InputStream} from "./InputStream";
 
 export declare class Token {
 
@@ -7,6 +9,7 @@ export declare class Token {
     static DEFAULT_CHANNEL: number;
     static HIDDEN_CHANNEL: number;
 
+    source: [ TokenSource, InputStream ];
     tokenIndex: number;
     line: number;
     column: number;
