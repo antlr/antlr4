@@ -40,39 +40,39 @@ import java.util.Locale;
  *
  * <h3>Rule</h3>
  *
- * <embed src="images/Rule.svg" type="image/svg+xml"/>
+ * <img src="images/Rule.svg" alt="Basic Blocks: Rule." />
  *
  * <h3>Block of 1 or more alternatives</h3>
  *
- * <embed src="images/Block.svg" type="image/svg+xml"/>
+ * <img src="images/Block.svg" alt="Block of 1 or more alternatives." />
  *
  * <h2>Greedy Loops</h2>
  *
  * <h3>Greedy Closure: {@code (...)*}</h3>
  *
- * <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/ClosureGreedy.svg" alt="Greedy closure." />
  *
  * <h3>Greedy Positive Closure: {@code (...)+}</h3>
  *
- * <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/PositiveClosureGreedy.svg" alt="Greedy positive closure." />
  *
  * <h3>Greedy Optional: {@code (...)?}</h3>
  *
- * <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/OptionalGreedy.svg" alt="Greedy optional." />
  *
  * <h2>Non-Greedy Loops</h2>
  *
  * <h3>Non-Greedy Closure: {@code (...)*?}</h3>
  *
- * <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/ClosureNonGreedy.svg" alt="Non-greedy closure." />
  *
  * <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
  *
- * <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/PositiveClosureNonGreedy.svg" alt="Non-greedy positive closure." />
  *
  * <h3>Non-Greedy Optional: {@code (...)??}</h3>
  *
- * <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
+ * <img src="images/OptionalNonGreedy.svg" alt="Non-greedy optional." />
  */
 public abstract class ATNState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;

@@ -30,8 +30,13 @@ public class InterpreterDataReader {
 	};
 
 	/**
-	 * The structure of the data file is very simple. Everything is line based with empty lines
-	 * separating the different parts. For lexers the layout is:
+	 * Parse the file given by {@code fileName}.
+	 *
+	 * The structure of the data file is very simple. 
+	 * Everything is line based with empty lines separating the different parts. 
+	 * For lexers the layout is:
+	 *
+	 * <pre>
 	 * token literal names:
 	 * ...
 	 *
@@ -48,9 +53,13 @@ public class InterpreterDataReader {
 	 * ...
 	 *
 	 * atn:
-	 * <a single line with comma separated int values> enclosed in a pair of squared brackets.
+	 * a single line with comma separated int values enclosed in a pair of square brackets.
+	 * </pre>
 	 *
 	 * Data for a parser does not contain channel and mode names.
+	 *
+	 * @param fileName File to read with a {@link java.io.FileReader}, so we assume that the
+	 *                 default character encoding and the default byte-buffer size are appropriate.
 	 */
 	public static InterpreterData parseFile(String fileName) {
 		InterpreterData result = new InterpreterData();
