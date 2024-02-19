@@ -86,11 +86,18 @@ class ListTokenSource implements TokenSource {
   /// The index into {@link #tokens} of token to return by the next call to
   /// {@link #nextToken}. The end of the input is indicated by this value
   /// being greater than or equal to the number of items in {@link #tokens}.
-  late int i; // todo: uncertain
+  int i = -1; // < 0 means parsing has not started yet
 
   /// This field caches the EOF token for the token source.
   Token? eofToken;
 
+  /// Resets the [ListTokenSource]. Enabling reusing the instance with the same [tokens] list.
+  /// Callers may update the contents of [tokens], enabling reusing this instance.
+  void reset() {
+    i = -1;
+    eofToken = null;
+  }
+  
   /// This is the backing field for {@link #getTokenFactory} and
   /// [setTokenFactory].
   @override
@@ -122,7 +129,10 @@ class ListTokenSource implements TokenSource {
 
   @override
   int get charPositionInLine {
-    if (i < tokens.length) {
+    if (i < 0) {
+      // parsing has not started
+      return 0;
+    } else if (i < tokens.length) {
       return tokens[i].charPositionInLine;
     } else if (eofToken != null) {
       return eofToken!.charPositionInLine;
@@ -153,6 +163,11 @@ class ListTokenSource implements TokenSource {
 
   @override
   Token nextToken() {
+    if (i < 0) {
+      // start parsing
+      i = 0;
+    }
+
     if (i >= tokens.length) {
       if (eofToken == null) {
         var start = -1;
@@ -192,7 +207,10 @@ class ListTokenSource implements TokenSource {
 
   @override
   int? get line {
-    if (i < tokens.length) {
+    if (i < 0) {
+      // parsing has not started
+      return null;
+    } else if (i < tokens.length) {
       return tokens[i].line;
     } else if (eofToken != null) {
       return eofToken!.line;
@@ -224,7 +242,10 @@ class ListTokenSource implements TokenSource {
 
   @override
   CharStream? get inputStream {
-    if (i < tokens.length) {
+    if (i < 0) {
+      // parsing has not started
+      return null;
+    } else if (i < tokens.length) {
       return tokens[i].inputStream;
     } else if (eofToken != null) {
       return eofToken!.inputStream;
