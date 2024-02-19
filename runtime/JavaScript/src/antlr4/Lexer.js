@@ -121,7 +121,9 @@ export default class Lexer extends Recognizer {
 							this.notifyListeners(e); // report error
 							this.recover(e);
 						} else {
-							console.log(e.stack);
+                            if (this._interp.debug) {
+                                console.log(e.stack);
+                            }
 							throw e;
 						}
 					}
