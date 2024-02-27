@@ -36,10 +36,8 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A;");
 		String expecting =
-			"RuleStart_a_0->s2\n" +
-			"s2-A->s3\n" +
-			"s3->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s4\n";
+			"RuleStart_a_0-A->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s2\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAB() throws Exception {
@@ -47,11 +45,9 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A B ;");
 		String expecting =
-			"RuleStart_a_0->s2\n" +
-				"s2-A->s3\n" +
-				"s3-B->s4\n" +
-				"s4->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s5\n";
+			"RuleStart_a_0-A->s2\n" +
+			"s2-B->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s3\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorB() throws Exception {
@@ -74,10 +70,8 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A | B ;");
 		String expecting =
-			"RuleStart_a_0->s2\n" +
-				"s2-{A, B}->s3\n" +
-				"s3->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s4\n";
+			"RuleStart_a_0-{A, B}->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s2\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testLexerIsntSetMultiCharString() throws Exception {
@@ -103,9 +97,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-'a'..'c'->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-'a'..'c'->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSet() throws Exception {
@@ -115,9 +107,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{97..99}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{97..99}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetRange() throws Exception {
@@ -127,9 +117,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{97..99}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{97..99}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodeBMPEscape() throws Exception {
@@ -139,9 +127,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-43981->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-43981->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodeBMPEscapeRange() throws Exception {
@@ -151,9 +137,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{97..99, 43981..44031}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{97..99, 43981..44031}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodeSMPEscape() throws Exception {
@@ -163,9 +147,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-1092557->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-1092557->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodeSMPEscapeRange() throws Exception {
@@ -175,9 +157,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{97..99, 1092557..1092607}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{97..99, 1092557..1092607}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodePropertyEscape() throws Exception {
@@ -189,9 +169,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{66352..66378}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{66352..66378}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodePropertyInvertEscape() throws Exception {
@@ -201,9 +179,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{0..66351, 66379..1114111}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{0..66351, 66379..1114111}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodeMultiplePropertyEscape() throws Exception {
@@ -214,9 +190,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{66352..66378, 69968..70006}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{66352..66378, 69968..70006}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testCharSetUnicodePropertyOverlap() throws Exception {
@@ -226,9 +200,7 @@ public class TestATNConstruction {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->s3\n" +
-				"s3-{48..57, 65..70, 97..102, 65296..65305, 65313..65318, 65345..65350}->s4\n" +
-				"s4->RuleStop_A_2\n";
+			"RuleStart_A_1-{48..57, 65..70, 97..102, 65296..65305, 65313..65318, 65345..65350}->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testRangeOrRange() throws Exception {
@@ -254,10 +226,8 @@ public class TestATNConstruction {
 			"a : A|'b' ;"
 		);
 		String expecting =
-			"RuleStart_a_0->s2\n" +
-				"s2-{'b', A}->s3\n" +
-				"s3->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s4\n";
+			"RuleStart_a_0-{'b', A}->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s2\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testABorCD() throws Exception {
@@ -282,17 +252,13 @@ public class TestATNConstruction {
 			"a : b A ;\n"+
 			"b : B ;");
 		String expecting =
-			"RuleStart_a_0->s4\n" +
-				"s4-b->RuleStart_b_2\n" +
-				"s5-A->s6\n" +
-				"s6->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s9\n";
+			"RuleStart_a_0-b->RuleStart_b_2\n" +
+			"s4-A->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s5\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 		expecting =
-			"RuleStart_b_2->s7\n" +
-				"s7-B->s8\n" +
-				"s8->RuleStop_b_3\n" +
-				"RuleStop_b_3->s5\n";
+			"RuleStart_b_2-B->RuleStop_b_3\n" +
+			"RuleStop_b_3->s4\n";
 		RuntimeTestUtils.checkRuleATN(g, "b", expecting);
 	}
 	@Test public void testFollow() throws Exception {
@@ -302,11 +268,9 @@ public class TestATNConstruction {
 			"b : B ;\n"+
 			"c : b C;");
 		String expecting =
-			"RuleStart_b_2->s9\n" +
-				"s9-B->s10\n" +
-				"s10->RuleStop_b_3\n" +
-				"RuleStop_b_3->s7\n" +
-				"RuleStop_b_3->s12\n";
+			"RuleStart_b_2-B->RuleStop_b_3\n" +
+			"RuleStop_b_3->s6\n" +
+			"RuleStop_b_3->s7\n";
 		RuntimeTestUtils.checkRuleATN(g, "b", expecting);
 	}
 	@Test public void testAorEpsilon() throws Exception {
@@ -314,13 +278,12 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A | ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_4\n" +
-				"BlockStart_4->s2\n" +
-				"BlockStart_4->s3\n" +
-				"s2-A->BlockEnd_5\n" +
-				"s3->BlockEnd_5\n" +
-				"BlockEnd_5->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s6\n";
+			"RuleStart_a_0->BlockStart_3\n" +
+			"BlockStart_3->s2\n" +
+			"BlockStart_3->BlockEnd_4\n" +
+			"s2-A->BlockEnd_4\n" +
+			"BlockEnd_4->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s5\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAOptional() throws Exception {
@@ -370,11 +333,9 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : (A | B) C;");
 		String expecting =
-			"RuleStart_a_0->s2\n" +
-				"s2-{A, B}->s3\n" +
-				"s3-C->s4\n" +
-				"s4->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s5\n";
+			"RuleStart_a_0-{A, B}->s2\n" +
+			"s2-C->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s3\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAplus() throws Exception {
@@ -382,14 +343,13 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A+;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_3\n" +
-				"PlusBlockStart_3->s2\n" +
-				"s2-A->BlockEnd_4\n" +
-				"BlockEnd_4->PlusLoopBack_5\n" +
-				"PlusLoopBack_5->PlusBlockStart_3\n" +
-				"PlusLoopBack_5->s6\n" +
-				"s6->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s7\n";
+			"RuleStart_a_0->PlusBlockStart_2\n" +
+			"PlusBlockStart_2-A->BlockEnd_3\n" +
+			"BlockEnd_3->PlusLoopBack_4\n" +
+			"PlusLoopBack_4->PlusBlockStart_2\n" +
+			"PlusLoopBack_4->s5\n" +
+			"s5->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s6\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAplusSingleAltHasPlusASTPointingAtLoopBackState() throws Exception {
@@ -398,14 +358,13 @@ public class TestATNConstruction {
 			"s : a B ;\n" +			// (RULE a (BLOCK (ALT (+ (BLOCK (ALT A))))))
 			"a : A+;");
 		String expecting =
-			"RuleStart_a_2->PlusBlockStart_8\n" +
-			"PlusBlockStart_8->s7\n" +
-			"s7-A->BlockEnd_9\n" +
-			"BlockEnd_9->PlusLoopBack_10\n" +
-			"PlusLoopBack_10->PlusBlockStart_8\n" +
-			"PlusLoopBack_10->s11\n" +
-			"s11->RuleStop_a_3\n" +
-			"RuleStop_a_3->s5\n";
+			"RuleStart_a_2->PlusBlockStart_5\n" +
+			"PlusBlockStart_5-A->BlockEnd_6\n" +
+			"BlockEnd_6->PlusLoopBack_7\n" +
+			"PlusLoopBack_7->PlusBlockStart_5\n" +
+			"PlusLoopBack_7->s8\n" +
+			"s8->RuleStop_a_3\n" +
+			"RuleStop_a_3->s4\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 		// Get all AST -> ATNState relationships. Make sure loopback is covered when no loop entry decision
 		List<GrammarAST> ruleNodes = g.ast.getNodesWithType(ANTLRParser.RULE);
@@ -417,7 +376,7 @@ public class TestATNConstruction {
 				covered.put(node, node.atnState);
 			}
 		}
-		assertEquals("{RULE=2, BLOCK=8, +=10, BLOCK=8, A=7}", covered.toString());
+		assertEquals("{RULE=2, BLOCK=5, +=7, BLOCK=5, A=5}", covered.toString());
 	}
 	@Test public void testAorBplus() throws Exception {
 		Grammar g = new Grammar(
@@ -442,18 +401,17 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : (A | B | )+ ;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_5\n" +
-				"PlusBlockStart_5->s2\n" +
-				"PlusBlockStart_5->s3\n" +
-				"PlusBlockStart_5->s4\n" +
-				"s2-A->BlockEnd_6\n" +
-				"s3-B->BlockEnd_6\n" +
-				"s4->BlockEnd_6\n" +
-				"BlockEnd_6->PlusLoopBack_7\n" +
-				"PlusLoopBack_7->PlusBlockStart_5\n" +
-				"PlusLoopBack_7->s8\n" +
-				"s8->RuleStop_a_1\n" +
-				"RuleStop_a_1-EOF->s9\n";
+			"RuleStart_a_0->PlusBlockStart_4\n" +
+			"PlusBlockStart_4->s2\n" +
+			"PlusBlockStart_4->s3\n" +
+			"PlusBlockStart_4->BlockEnd_5\n" +
+			"s2-A->BlockEnd_5\n" +
+			"s3-B->BlockEnd_5\n" +
+			"BlockEnd_5->PlusLoopBack_6\n" +
+			"PlusLoopBack_6->PlusBlockStart_4\n" +
+			"PlusLoopBack_6->s7\n" +
+			"s7->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s8\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testEmptyOrEmpty() throws Exception {
@@ -461,13 +419,11 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : | ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_4\n"+
-			"BlockStart_4->s2\n"+
-			"BlockStart_4->s3\n"+
-			"s2->BlockEnd_5\n"+
-			"s3->BlockEnd_5\n"+
-			"BlockEnd_5->RuleStop_a_1\n"+
-			"RuleStop_a_1-EOF->s6\n";
+			"RuleStart_a_0->BlockStart_2\n" +
+			"BlockStart_2->BlockEnd_3\n" +
+			"BlockStart_2->BlockEnd_3\n" +
+			"BlockEnd_3->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s4\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAStar() throws Exception {
@@ -475,15 +431,14 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : A*;");
 		String expecting =
-			"RuleStart_a_0->StarLoopEntry_5\n" +
-				"StarLoopEntry_5->StarBlockStart_3\n" +
-				"StarLoopEntry_5->s6\n" +
-				"StarBlockStart_3->s2\n" +
-				"s6->RuleStop_a_1\n" +
-				"s2-A->BlockEnd_4\n" +
-				"RuleStop_a_1-EOF->s8\n" +
-				"BlockEnd_4->StarLoopBack_7\n" +
-				"StarLoopBack_7->StarLoopEntry_5\n";
+			"RuleStart_a_0->StarLoopEntry_4\n" +
+			"StarLoopEntry_4->StarBlockStart_2\n" +
+			"StarLoopEntry_4->s5\n" +
+			"StarBlockStart_2-A->BlockEnd_3\n" +
+			"s5->RuleStop_a_1\n" +
+			"BlockEnd_3->StarLoopBack_6\n" +
+			"RuleStop_a_1-EOF->s7\n" +
+			"StarLoopBack_6->StarLoopEntry_4\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testNestedAstar() throws Exception {
@@ -491,22 +446,20 @@ public class TestATNConstruction {
 			"parser grammar P;\n"+
 			"a : (COMMA ID*)*;");
 		String expecting =
-			"RuleStart_a_0->StarLoopEntry_11\n" +
-				"StarLoopEntry_11->StarBlockStart_9\n" +
-				"StarLoopEntry_11->s12\n" +
-				"StarBlockStart_9->s2\n" +
-				"s12->RuleStop_a_1\n" +
-				"s2-COMMA->StarLoopEntry_6\n" +
-				"RuleStop_a_1-EOF->s14\n" +
-				"StarLoopEntry_6->StarBlockStart_4\n" +
-				"StarLoopEntry_6->s7\n" +
-				"StarBlockStart_4->s3\n" +
-				"s7->BlockEnd_10\n" +
-				"s3-ID->BlockEnd_5\n" +
-				"BlockEnd_10->StarLoopBack_13\n" +
-				"BlockEnd_5->StarLoopBack_8\n" +
-				"StarLoopBack_13->StarLoopEntry_11\n" +
-				"StarLoopBack_8->StarLoopEntry_6\n";
+			"RuleStart_a_0->StarLoopEntry_9\n" +
+			"StarLoopEntry_9->StarBlockStart_7\n" +
+			"StarLoopEntry_9->s10\n" +
+			"StarBlockStart_7-COMMA->StarLoopEntry_4\n" +
+			"s10->RuleStop_a_1\n" +
+			"StarLoopEntry_4->StarBlockStart_2\n" +
+			"StarLoopEntry_4->s5\n" +
+			"RuleStop_a_1-EOF->s12\n" +
+			"StarBlockStart_2-ID->BlockEnd_3\n" +
+			"s5->BlockEnd_8\n" +
+			"BlockEnd_3->StarLoopBack_6\n" +
+			"BlockEnd_8->StarLoopBack_11\n" +
+			"StarLoopBack_6->StarLoopEntry_4\n" +
+			"StarLoopBack_11->StarLoopEntry_9\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", expecting);
 	}
 	@Test public void testAorBstar() throws Exception {
@@ -599,38 +552,37 @@ public class TestATNConstruction {
 			"\t WS : (' '|'\\n') -> skip ;";
 		Grammar g = new Grammar(gstr);
 		String expecting =
-			"RuleStart_e_2->s7\n"+
-			"s7-action_1:-1->s8\n"+
-			"s8-ID->s9\n"+
-			"s9->StarLoopEntry_27\n"+
-			"StarLoopEntry_27->StarBlockStart_25\n"+
-			"StarLoopEntry_27->s28\n"+
-			"StarBlockStart_25->s10\n"+
-			"StarBlockStart_25->s13\n"+
-			"StarBlockStart_25->s16\n"+
-			"StarBlockStart_25->s22\n"+
-			"s28->RuleStop_e_3\n"+
-			"s10-5 >= _p->s11\n"+
-			"s13-4 >= _p->s14\n"+
-			"s16-3 >= _p->s17\n"+
-			"s22-2 >= _p->s23\n"+
-			"RuleStop_e_3->s5\n"+
-			"RuleStop_e_3->BlockEnd_26\n"+
-			"RuleStop_e_3->s19\n"+
-			"RuleStop_e_3->s21\n"+
-			"s11-'*'->s12\n"+
-			"s14-'+'->s15\n"+
-			"s17-'?'->s18\n"+
-			"s23-'='->s24\n"+
-			"s12-e->RuleStart_e_2\n"+
-			"s15-e->RuleStart_e_2\n"+
-			"s18-e->RuleStart_e_2\n"+
-			"s24-e->RuleStart_e_2\n"+
-			"BlockEnd_26->StarLoopBack_29\n"+
-			"s19-':'->s20\n"+
-			"StarLoopBack_29->StarLoopEntry_27\n"+
-			"s20-e->RuleStart_e_2\n"+
-			"s21->BlockEnd_26\n";
+			"RuleStart_e_2-action_1:-1->s5\n" +
+			"s5-ID->StarLoopEntry_22\n" +
+			"StarLoopEntry_22->StarBlockStart_20\n" +
+			"StarLoopEntry_22->s23\n" +
+			"StarBlockStart_20->s6\n" +
+			"StarBlockStart_20->s9\n" +
+			"StarBlockStart_20->s12\n" +
+			"StarBlockStart_20->s17\n" +
+			"s23->RuleStop_e_3\n" +
+			"s6-5 >= _p->s7\n" +
+			"s9-4 >= _p->s10\n" +
+			"s12-3 >= _p->s13\n" +
+			"s17-2 >= _p->s18\n" +
+			"RuleStop_e_3->s4\n" +
+			"RuleStop_e_3->BlockEnd_21\n" +
+			"RuleStop_e_3->BlockEnd_21\n" +
+			"RuleStop_e_3->s15\n" +
+			"RuleStop_e_3->BlockEnd_21\n" +
+			"RuleStop_e_3->BlockEnd_21\n" +
+			"s7-'*'->s8\n" +
+			"s10-'+'->s11\n" +
+			"s13-'?'->s14\n" +
+			"s18-'='->s19\n" +
+			"s8-e->RuleStart_e_2\n" +
+			"s11-e->RuleStart_e_2\n" +
+			"s14-e->RuleStart_e_2\n" +
+			"s19-e->RuleStart_e_2\n" +
+			"BlockEnd_21->StarLoopBack_24\n" +
+			"s15-':'->s16\n" +
+			"StarLoopBack_24->StarLoopEntry_22\n" +
+			"s16-e->RuleStart_e_2\n";
 		RuntimeTestUtils.checkRuleATN(g, "e", expecting);
 	}
 
@@ -793,13 +745,9 @@ public class TestATNConstruction {
 			"C : 'c' ;\n");
 		String expecting =
 			"s0->RuleStart_A_2\n" +
-				"s0->RuleStart_X_4\n" +
-				"RuleStart_A_2->s10\n" +
-				"RuleStart_X_4->s12\n" +
-				"s10-'a'->s11\n" +
-				"s12-'x'->s13\n" +
-				"s11->RuleStop_A_3\n" +
-				"s13->RuleStop_X_5\n";
+			"s0->RuleStart_X_4\n" +
+			"RuleStart_A_2-'a'->RuleStop_A_3\n" +
+			"RuleStart_X_4-'x'->RuleStop_X_5\n";
 		checkTokensRule(g, "DEFAULT_MODE", expecting);
 	}
 
@@ -813,13 +761,9 @@ public class TestATNConstruction {
 			"C : 'c' ;\n");
 		String expecting =
 			"s1->RuleStart_B_6\n" +
-				"s1->RuleStart_C_8\n" +
-				"RuleStart_B_6->s14\n" +
-				"RuleStart_C_8->s16\n" +
-				"s14-'b'->s15\n" +
-				"s16-'c'->s17\n" +
-				"s15->RuleStop_B_7\n" +
-				"s17->RuleStop_C_9\n";
+			"s1->RuleStart_C_8\n" +
+			"RuleStart_B_6-'b'->RuleStop_B_7\n" +
+			"RuleStart_C_8-'c'->RuleStop_C_9\n";
 		checkTokensRule(g, "FOO", expecting);
 	}
 	void checkTokensRule(LexerGrammar g, String modeName, String expecting) {
