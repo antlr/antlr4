@@ -72,6 +72,8 @@ $ mvn install -DskipTests     # make sure all artifacts are visible on this mach
 
 ## Running the runtime tests
 
+IMPORTANT: The process that runs tests (IntelliJ or mvn) should be run with admin privileges to make possible to create symlinks.
+
 A single test rig is sufficient to test all targets against all descriptors using the [junit dynamic tests](https://junit.org/junit5/docs/current/user-guide/#writing-tests-dynamic-tests) mechanism.
 But it's often convenient to test just a single target or perhaps even just a single test within a single group of a single target.
 IntelliJ automatically generates a bunch of

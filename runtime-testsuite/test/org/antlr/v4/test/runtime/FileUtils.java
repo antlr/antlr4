@@ -12,11 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
+import java.util.EnumSet;
 
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.FileSeparator;
 
@@ -58,6 +57,25 @@ public class FileUtils {
 		File f = new File(dir);
 		//noinspection ResultOfMethodCallIgnored
 		f.mkdirs();
+	}
+
+	public static void copyDirectory(final Path source, final Path target, final CopyOption... options)
+		throws IOException {
+		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 2147483647, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+				throws IOException {
+				Files.createDirectories(target.resolve(source.relativize(dir)));
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+				throws IOException {
+				Files.copy(file, target.resolve(source.relativize(file)), options);
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 
 	public static void deleteDirectory(File f) throws IOException {
