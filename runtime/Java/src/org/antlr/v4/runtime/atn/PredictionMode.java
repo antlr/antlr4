@@ -103,7 +103,7 @@ public enum PredictionMode {
 		public int hashCode(ATNConfig o) {
 			int hashCode = MurmurHash.initialize(7);
 			hashCode = MurmurHash.update(hashCode, o.state.stateNumber);
-			hashCode = MurmurHash.update(hashCode, o.context);
+			hashCode = MurmurHash.update(hashCode, o.getContext());
 			hashCode = MurmurHash.finish(hashCode, 2);
 	        return hashCode;
 		}
@@ -113,7 +113,7 @@ public enum PredictionMode {
 			if ( a==b ) return true;
 			if ( a==null || b==null ) return false;
 			return a.state.stateNumber==b.state.stateNumber
-				&& a.context.equals(b.context);
+				&& a.getContext().equals(b.getContext());
 		}
 	}
 
@@ -299,7 +299,7 @@ public enum PredictionMode {
 	 * <p>The basic idea is to split the set of configurations {@code C}, into
 	 * conflicting subsets {@code (s, _, ctx, _)} and singleton subsets with
 	 * non-conflicting configurations. Two configurations conflict if they have
-	 * identical {@link ATNConfig#state} and {@link ATNConfig#context} values
+	 * identical {@link ATNConfig#state} and {@link ATNConfig#getContext} values
 	 * but different {@link ATNConfig#alt} value, e.g. {@code (s, i, ctx, _)}
 	 * and {@code (s, j, ctx, _)} for {@code i!=j}.</p>
 	 *

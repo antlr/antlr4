@@ -773,7 +773,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 
 			if (c.state instanceof RuleStopState) {
-				assert c.context.isEmpty();
+				assert c.getContext().isEmpty();
 				if (fullCtx || t == IntStream.EOF) {
 					if (skippedStopStates == null) {
 						skippedStopStates = new ArrayList<ATNConfig>();
@@ -1124,7 +1124,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			statesFromAlt1.put(config.state.stateNumber, config.context);
+			statesFromAlt1.put(config.state.stateNumber, config.getContext());
 			if (updatedContext != config.semanticContext) {
 				configSet.add(new ATNConfig(config, updatedContext), mergeCache);
 			}
@@ -1145,7 +1145,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				 * (basically a graph subtraction algorithm).
 				 */
 				PredictionContext context = statesFromAlt1.get(config.state.stateNumber);
-				if (context != null && context.equals(config.context)) {
+				if (context != null && context.equals(config.getContext())) {
 					// eliminated
 					continue;
 				}
@@ -1304,7 +1304,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
-			if ( c.getOuterContextDepth()>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
+			if ( c.getOuterContextDepth()>0 || (c.state instanceof RuleStopState && c.getContext().hasEmptyPath()) ) {
 				alts.add(c.alt);
 			}
 		}
@@ -1450,9 +1450,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
-			if ( !config.context.isEmpty() ) {
-				for (int i = 0; i < config.context.size(); i++) {
-					if ( config.context.getReturnState(i)==PredictionContext.EMPTY_RETURN_STATE ) {
+			PredictionContext context = config.getContext();
+			if ( !context.isEmpty() ) {
+				for (int i = 0; i < context.size(); i++) {
+					if ( context.getReturnState(i)==PredictionContext.EMPTY_RETURN_STATE ) {
 						if (fullCtx) {
 							configs.add(new ATNConfig(config, config.state, EmptyPredictionContext.Instance), mergeCache);
 							continue;
@@ -1466,8 +1467,8 @@ public class ParserATNSimulator extends ATNSimulator {
 						}
 						continue;
 					}
-					ATNState returnState = atn.states.get(config.context.getReturnState(i));
-					PredictionContext newContext = config.context.getParent(i); // "pop" return state
+					ATNState returnState = atn.states.get(context.getReturnState(i));
+					PredictionContext newContext = context.getParent(i); // "pop" return state
 					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have
@@ -1666,23 +1667,24 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected boolean canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig config) {
 		if ( TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT ) return false;
 		ATNState p = config.state;
+		PredictionContext context = config.getContext();
 		// First check to see if we are in StarLoopEntryState generated during
 		// left-recursion elimination. For efficiency, also check if
 		// the context has an empty stack case. If so, it would mean
 		// global FOLLOW so we can't perform optimization
 		if ( p.getStateType() != ATNState.STAR_LOOP_ENTRY ||
 			 !((StarLoopEntryState)p).isPrecedenceDecision || // Are we the special loop entry/exit state?
-			 config.context.isEmpty() ||                      // If SLL wildcard
-			 config.context.hasEmptyPath())
+			 context.isEmpty() ||                      // If SLL wildcard
+			 context.hasEmptyPath())
 		{
 			return false;
 		}
 
 		// Require all return states to return back to the same rule
 		// that p is in.
-		int numCtxs = config.context.size();
+		int numCtxs = context.size();
 		for (int i = 0; i < numCtxs; i++) { // for each stack context
-			ATNState returnState = atn.states.get(config.context.getReturnState(i));
+			ATNState returnState = atn.states.get(context.getReturnState(i));
 			if ( returnState.ruleIndex != p.ruleIndex ) return false;
 		}
 
@@ -1693,7 +1695,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// Verify that the top of each stack context leads to loop entry/exit
 		// state through epsilon edges and w/o leaving rule.
 		for (int i = 0; i < numCtxs; i++) {                           // for each stack context
-			int returnStateNumber = config.context.getReturnState(i);
+			int returnStateNumber = context.getReturnState(i);
 			ATNState returnState = atn.states.get(returnStateNumber);
 			// all states must have single outgoing epsilon edge
 			if ( returnState.getNumberOfTransitions()!=1 ||
@@ -1889,12 +1891,12 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfig ruleTransition(ATNConfig config, RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
-							   ", ctx="+config.context);
+							   ", ctx="+ config.getContext());
 		}
 
 		ATNState returnState = t.followState;
 		PredictionContext newContext =
-			SingletonPredictionContext.create(config.context, returnState.stateNumber);
+			SingletonPredictionContext.create(config.getContext(), returnState.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 

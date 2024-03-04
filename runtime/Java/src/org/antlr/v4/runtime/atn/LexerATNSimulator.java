@@ -415,8 +415,10 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( config.context == null || config.context.hasEmptyPath() ) {
-				if (config.context == null || config.context.isEmpty()) {
+			PredictionContext context = config.getContext();
+
+			if ( context == null || context.hasEmptyPath() ) {
+				if (context == null || context.isEmpty()) {
 					configs.add(config);
 					return true;
 				}
@@ -426,11 +428,11 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( config.context!=null && !config.context.isEmpty() ) {
-				for (int i = 0; i < config.context.size(); i++) {
-					if (config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
-						PredictionContext newContext = config.context.getParent(i); // "pop" return state
-						ATNState returnState = atn.states.get(config.context.getReturnState(i));
+			if ( !context.isEmpty() ) {
+				for (int i = 0; i < context.size(); i++) {
+					if (context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
+						PredictionContext newContext = context.getParent(i); // "pop" return state
+						ATNState returnState = atn.states.get(context.getReturnState(i));
 						LexerATNConfig c = new LexerATNConfig(config, returnState, newContext);
 						currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
 					}
@@ -473,7 +475,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			case Transition.RULE:
 				RuleTransition ruleTransition = (RuleTransition)t;
 				PredictionContext newContext =
-					SingletonPredictionContext.create(config.context, ruleTransition.followState.stateNumber);
+					SingletonPredictionContext.create(config.getContext(), ruleTransition.followState.stateNumber);
 				c = new LexerATNConfig(config, t.target, newContext);
 				break;
 
@@ -510,7 +512,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 
 			case Transition.ACTION:
-				if (config.context == null || config.context.hasEmptyPath()) {
+				if (config.getContext() == null || config.getContext().hasEmptyPath()) {
 					// execute actions anywhere in the start rule for a token.
 					//
 					// TODO: if the entry rule is invoked recursively, some

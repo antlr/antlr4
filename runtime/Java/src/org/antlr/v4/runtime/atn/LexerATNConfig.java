@@ -37,7 +37,7 @@ public class LexerATNConfig extends ATNConfig {
 	}
 
 	public LexerATNConfig(LexerATNConfig c, ATNState state) {
-		super(c, state, c.context, c.semanticContext);
+		super(c, state, c.getContext(), c.semanticContext);
 		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
@@ -45,7 +45,7 @@ public class LexerATNConfig extends ATNConfig {
 	public LexerATNConfig(LexerATNConfig c, ATNState state,
 						  LexerActionExecutor lexerActionExecutor)
 	{
-		super(c, state, c.context, c.semanticContext);
+		super(c, state, c.getContext(), c.semanticContext);
 		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}

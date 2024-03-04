@@ -152,7 +152,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// a previous (s,i,pi,_), merge with it and save result
 		boolean rootIsWildcard = !fullCtx;
 		PredictionContext merged =
-			PredictionContext.merge(existing.context, config.context, rootIsWildcard, mergeCache);
+			PredictionContext.merge(existing.getContext(), config.getContext(), rootIsWildcard, mergeCache);
 		// no need to check for existing.context, config.context in cache
 		// since only way to create new graphs is "call rule" and here. We
 		// cache at both places.
@@ -164,7 +164,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			existing.setPrecedenceFilterSuppressed(true);
 		}
 
-		existing.context = merged; // replace context; no need to alt mapping
+		existing.setContext(merged); // replace context; no need to alt mapping
 		return true;
 	}
 
@@ -214,7 +214,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		for (ATNConfig config : configs) {
 //			int before = PredictionContext.getAllContextNodes(config.context).size();
-			config.context = interpreter.getCachedContext(config.context);
+			config.setContext(interpreter.getCachedContext(config.getContext()));
 //			int after = PredictionContext.getAllContextNodes(config.context).size();
 //			System.out.println("configs "+before+"->"+after);
 		}

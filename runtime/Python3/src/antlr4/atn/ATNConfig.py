@@ -22,8 +22,8 @@ ATNConfig = None
 
 class ATNConfig(object):
     __slots__ = (
-        'state', 'alt', 'context', 'semanticContext', 'reachesIntoOuterContext',
-        'precedenceFilterSuppressed'
+        'state', 'alt', '_context', 'semanticContext', 'reachesIntoOuterContext',
+        'precedenceFilterSuppressed', 'cachedHashCode'
     )
 
     def __init__(self, state:ATNState=None, alt:int=None, context:PredictionContext=None, semantic:SemanticContext=None, config:ATNConfig=None):
@@ -45,7 +45,7 @@ class ATNConfig(object):
         # The stack of invoking states leading to the rule/states associated
         #  with this config.  We track only those contexts pushed during
         #  execution of the ATN simulator.
-        self.context = context
+        self._context = context
         self.semanticContext = semantic
         # We cannot execute predicates dependent upon local context unless
         # we know for sure we are in the correct context. Because there is
@@ -58,6 +58,16 @@ class ATNConfig(object):
         # accurate depth since I don't ever decrement. TODO: make it a boolean then
         self.reachesIntoOuterContext = 0 if config is None else config.reachesIntoOuterContext
         self.precedenceFilterSuppressed = False if config is None else config.precedenceFilterSuppressed
+        self.cachedHashCode = -1
+
+    @property
+    def context(self):
+        return self._context
+
+    @context.setter
+    def context(self, value):
+        self._context = value
+        self.cachedHashCode = -1
 
     # An ATN configuration is equal to another if both have
     #  the same state, they predict the same alternative, and
@@ -76,7 +86,9 @@ class ATNConfig(object):
                 and self.precedenceFilterSuppressed==other.precedenceFilterSuppressed
 
     def __hash__(self):
-        return hash((self.state.stateNumber, self.alt, self.context, self.semanticContext))
+        if self.cachedHashCode == -1:
+            self.cachedHashCode = hash((self.state.stateNumber, self.alt, self.context, self.semanticContext))
+        return self.cachedHashCode
 
     def hashCodeForConfigSet(self):
         return hash((self.state.stateNumber, self.alt, hash(self.semanticContext)))

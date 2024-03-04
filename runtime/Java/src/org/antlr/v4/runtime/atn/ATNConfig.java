@@ -20,6 +20,7 @@ import java.util.Objects;
  *  an ATN state.
  */
 public class ATNConfig {
+
 	/**
 	 * This field stores the bit mask for implementing the
 	 * {@link #isPrecedenceFilterSuppressed} property as a bit within the
@@ -37,7 +38,7 @@ public class ATNConfig {
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
-	public PredictionContext context;
+	protected PredictionContext context;
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless
@@ -126,6 +127,15 @@ public class ATNConfig {
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
 	}
 
+	public void setContext(PredictionContext context) {
+		this.context = context;
+		this.cachedHashCode = -1;
+	}
+
+	public PredictionContext getContext() {
+		return context;
+	}
+
 	/**
 	 * This method gets the value of the {@link #reachesIntoOuterContext} field
 	 * as it existed prior to the introduction of the
@@ -176,8 +186,16 @@ public class ATNConfig {
 			&& this.isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 	}
 
+	int cachedHashCode = -1;
 	@Override
 	public int hashCode() {
+		if (cachedHashCode == -1) {
+			cachedHashCode = computeHashCode();
+		}
+		return cachedHashCode;
+	}
+
+	private int computeHashCode() {
 		int hashCode = MurmurHash.initialize(7);
 		hashCode = MurmurHash.update(hashCode, state.stateNumber);
 		hashCode = MurmurHash.update(hashCode, alt);

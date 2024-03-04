@@ -35,11 +35,23 @@ namespace Antlr4.Runtime.Atn
 		/** What alt (or lexer rule) is predicted by this configuration */
 		public readonly int alt;
 
-		/** The stack of invoking states leading to the rule/states associated
+        /** The stack of invoking states leading to the rule/states associated
 		 *  with this config.  We track only those contexts pushed during
 		 *  execution of the ATN simulator.
 		 */
-		public PredictionContext context;
+#pragma warning disable CS3008 // Identifier is not CLS-compliant
+        protected PredictionContext _context;
+#pragma warning restore CS3008 // Identifier is not CLS-compliant
+
+        public PredictionContext context {
+			get {
+				return _context;
+			}
+		    set {
+                _context = value;
+		        cachedHashCode = -1;
+		    }
+		}
 
 		/**
 		 * We cannot execute predicates dependent upon local context unless
@@ -193,8 +205,17 @@ namespace Antlr4.Runtime.Atn
 				&& this.IsPrecedenceFilterSuppressed == other.IsPrecedenceFilterSuppressed;
 		}
 
+        int cachedHashCode = -1;
+
 		public override int GetHashCode()
 		{
+		    if(cachedHashCode == -1) {
+		        cachedHashCode = this.ComputeHashCode();
+		    }
+		    return cachedHashCode;
+        }
+
+		int ComputeHashCode() {
 			int hashCode = MurmurHash.Initialize(7);
 			hashCode = MurmurHash.Update(hashCode, state.stateNumber);
 			hashCode = MurmurHash.Update(hashCode, alt);

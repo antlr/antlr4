@@ -49,7 +49,7 @@ export default class ATNConfig {
          * with this config.  We track only those contexts pushed during
          * execution of the ATN simulator
          */
-        this.context = params.context!==null ? params.context : config.context;
+        this._context = params.context!==null ? params.context : config.context;
         this.semanticContext = params.semanticContext!==null ? params.semanticContext :
             (config.semanticContext!==null ? config.semanticContext : SemanticContext.NONE);
         // TODO: make it a boolean then
@@ -65,6 +65,16 @@ export default class ATNConfig {
          */
         this.reachesIntoOuterContext = config.reachesIntoOuterContext;
         this.precedenceFilterSuppressed = config.precedenceFilterSuppressed;
+        this.cachedHashCode = -1;
+    }
+
+    get context() {
+        return this._context;
+    }
+
+    set context(value) {
+        this._context = value;
+        this.cachedHashCode = -1;
     }
 
     checkContext(params, config) {
@@ -75,9 +85,12 @@ export default class ATNConfig {
     }
 
     hashCode() {
-        const hash = new HashCode();
-        this.updateHashCode(hash);
-        return hash.finish();
+        if(this.cachedHashCode == -1) {
+            const hash = new HashCode();
+            this.updateHashCode(hash);
+            this.cachedHashCode = hash.finish();
+        }
+        return this.cachedHashCode;
     }
 
     updateHashCode(hash) {
