@@ -14,7 +14,7 @@ import { default as Utils } from './utils/index.js';
 import Token from './Token.js';
 import CommonToken from './CommonToken.js';
 import InputStream from './InputStream.js';
-import CharStream from './InputStream.js';
+import CharStream from './CharStream.js';
 import CommonTokenStream from './CommonTokenStream.js';
 import Lexer from './Lexer.js';
 import Parser from './Parser.js';
@@ -56,5 +56,5 @@ export {
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
-    arrayToString
+    arrayToString, TokenStreamRewriter
 }

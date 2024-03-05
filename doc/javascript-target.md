@@ -40,8 +40,6 @@ Once you've generated the lexer and/or parser code, you need to download the run
 
 The JavaScript runtime is [available from npm](https://www.npmjs.com/package/antlr4).
 
-If you can't use npm, the JavaScript runtime is also available from the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
-
 We will not document here how to refer to the runtime from your project, since this would differ a lot depending on your project type and IDE. 
 
 ## How do I get the runtime in my browser?
