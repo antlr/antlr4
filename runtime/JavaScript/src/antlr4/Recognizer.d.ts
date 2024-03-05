@@ -6,6 +6,7 @@ export declare class Recognizer<TSymbol> {
 
     removeErrorListeners(): void;
     addErrorListener(listener: ErrorListener<TSymbol>): void;
-    getSymbolicNames(): string[];
     getErrorListenerDispatch(): ErrorListener<TSymbol>;
+    getLiteralNames(): string[] | [];
+    getSymbolicNames(): string[] | [];
 }

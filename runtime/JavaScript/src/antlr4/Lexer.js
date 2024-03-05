@@ -121,7 +121,7 @@ export default class Lexer extends Recognizer {
 							this.notifyListeners(e); // report error
 							this.recover(e);
 						} else {
-                            console.log(e.stack);
+							console.log(e.stack);
 							throw e;
 						}
 					}
@@ -171,6 +171,18 @@ export default class Lexer extends Recognizer {
 
 	mode(m) {
 		this._mode = m;
+	}
+
+	getMode() {
+		return this._mode;
+	}
+
+	setMode(m) {
+		this._mode = m;
+	}
+
+	getModeStack() {
+		return this._modeStack;
 	}
 
 	pushMode(m) {
