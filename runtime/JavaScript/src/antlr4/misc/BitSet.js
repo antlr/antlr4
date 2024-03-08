@@ -11,13 +11,13 @@ export default class BitSet {
         this.data = new Uint32Array(1);
     }
 
-    add(index) {
+    set(index) {
         this._checkIndex(index)
         this._resize(index);
         this.data[index >>> 5] |= 1 << index % 32;
     }
 
-    has(index) {
+    get(index) {
         this._checkIndex(index)
         const slot = index >>> 5;
         if (slot >= this.data.length) {
@@ -26,7 +26,7 @@ export default class BitSet {
         return (this.data[slot] & 1 << index % 32) !== 0;
     }
 
-    remove(index) {
+    clear(index) {
         this._checkIndex(index)
         const slot = index >>> 5;
         if (slot < this.data.length) {
