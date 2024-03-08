@@ -1010,7 +1010,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         let altToPred = [];
         for(let i=0;i<configs.items.length;i++) {
             const c = configs.items[i];
-            if(ambigAlts.has( c.alt )) {
+            if(ambigAlts.get( c.alt )) {
                 altToPred[c.alt] = SemanticContext.orContext(altToPred[c.alt] || null, c.semanticContext);
             }
         }
@@ -1039,7 +1039,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         for (let i=1; i<altToPred.length;i++) {
             const pred = altToPred[i];
             // unpredicated is indicated by SemanticContext.NONE
-            if( ambigAlts!==null && ambigAlts.has( i )) {
+            if( ambigAlts!==null && ambigAlts.get( i )) {
                 pairs.push(new PredPrediction(pred, i));
             }
             if (pred !== SemanticContext.NONE) {
@@ -1173,7 +1173,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         for(let i=0;i<predPredictions.length;i++) {
             const pair = predPredictions[i];
             if (pair.pred === SemanticContext.NONE) {
-                predictions.add(pair.alt);
+                predictions.set(pair.alt);
                 if (! complete) {
                     break;
                 }
@@ -1187,7 +1187,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                 if (this.debug || this.dfa_debug) {
                     console.log("PREDICT " + pair.alt);
                 }
-                predictions.add(pair.alt);
+                predictions.set(pair.alt);
                 if (! complete) {
                     break;
                 }
@@ -1544,7 +1544,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         let conflictingAlts = null;
         if (configs.uniqueAlt!== ATN.INVALID_ALT_NUMBER) {
             conflictingAlts = new BitSet();
-            conflictingAlts.add(configs.uniqueAlt);
+            conflictingAlts.set(configs.uniqueAlt);
         } else {
             conflictingAlts = configs.conflictingAlts;
         }
