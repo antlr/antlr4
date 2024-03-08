@@ -1287,7 +1287,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                     }
 
                     c.reachesIntoOuterContext += 1;
-                    if (closureBusy.add(c)!==c) {
+                    if (closureBusy.getOrAdd(c)!==c) {
                         // avoid infinite recursion for right-recursive rules
                         continue;
                     }
@@ -1297,7 +1297,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                         console.log("dips into outer ctx: " + c);
                     }
                 } else {
-                    if (!t.isEpsilon && closureBusy.add(c)!==c){
+                    if (!t.isEpsilon && closureBusy.getOrAdd(c)!==c){
                         // avoid infinite recursion for EOF* and EOF+
                         continue;
                     }
