@@ -64,7 +64,7 @@ export default class BitSet {
     }
 
     minValue() {
-         for (let k = 0; k < length; ++k) {
+         for (let k = 0; k < this.data.length; ++k) {
             let l = this.data[k];
             if (l !== 0) {
                 let result = 0;
