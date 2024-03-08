@@ -89,6 +89,6 @@ describe('test BitSet', () => {
         bs.add(67);
         bs.add(69);
         const values = bs.values();
-        expect(values).toEqual(['67', '69']);
+        expect(values).toEqual([67, 69]);
     })
 })
