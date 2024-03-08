@@ -28,7 +28,7 @@ export default class BitSet {
     }
 
     values() {
-        return Object.keys(this.data);
+        return Object.keys(this.data); // .map(s => parseInt(s))
     }
 
     minValue() {
