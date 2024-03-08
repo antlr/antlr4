@@ -8,31 +8,74 @@ import equalArrays from "../utils/equalArrays.js";
 export default class BitSet {
 
     constructor() {
-        this.data = [];
+        this.data = new Uint32Array(1);
     }
 
-    add(value) {
-        this.data[value] = true;
+    add(index) {
+        this._checkIndex(index)
+        this._resize(index);
+        this.data[index >>> 5] |= 1 << index % 32;
+    }
+
+    has(index) {
+        this._checkIndex(index)
+        const slot = index >>> 5;
+        if (slot >= this.data.length) {
+            return false;
+        }
+        return (this.data[slot] & 1 << index % 32) !== 0;
+    }
+
+    remove(index) {
+        this._checkIndex(index)
+        const slot = index >>> 5;
+        if (slot < this.data.length) {
+            this.data[index >>> 5] &= ~(1 << index);
+        }
     }
 
     or(set) {
-        Object.keys(set.data).map(alt => this.add(alt), this);
-    }
-
-    remove(value) {
-        delete this.data[value];
-    }
-
-    has(value) {
-        return this.data[value] === true;
+        const minCount = Math.min(this.data.length, set.data.length);
+        for (let k = 0; k < minCount; ++k) {
+            this.data[k] |= set.data[k];
+        }
+        if (this.data.length < set.data.length) {
+            this._resize((set.data.length << 5) - 1);
+            const c = set.data.length;
+            for (let k = minCount; k < c; ++k) {
+                this.data[k] = set.data[k];
+            }
+        }
     }
 
     values() {
-        return Object.keys(this.data); // .map(s => parseInt(s))
+        const result = new Array(this.length);
+        let pos = 0;
+        const length = this.data.length;
+        for (let k = 0; k < length; ++k) {
+            let l = this.data[k];
+            while (l !== 0) {
+                const t = l & -l;
+                result[pos++] = (k << 5) + this._bitCount(t - 1);
+                l ^= t;
+            }
+        }
+        return result;
     }
 
     minValue() {
-        return Math.min.apply(null, this.values());
+         for (let k = 0; k < length; ++k) {
+            let l = this.data[k];
+            if (l !== 0) {
+                let result = 0;
+                while ((l & 1) === 0) {
+                    result++;
+                    l >>= 1;
+                }
+                return result + (32 * k);
+            }
+        }
+        return 0;
     }
 
     hashCode() {
@@ -48,6 +91,32 @@ export default class BitSet {
     }
 
     get length(){
-        return this.values().length;
+        return this.data.map(l => this._bitCount(l)).reduce((s,v) => s + v, 0);
+    }
+
+    _resize(index) {
+        const count = index + 32 >>> 5;
+        if (count <= this.data.length) {
+            return;
+        }
+        const data = new Uint32Array(count);
+        data.set(this.data);
+        data.fill(0, this.data.length);
+        this.data = data;
+    }
+
+    _checkIndex(index) {
+        if(index < 0)
+            throw new RangeError("index cannot be negative");
+    }
+
+    _bitCount(l) {
+        let count = 0;
+        l = l - ((l >> 1) & 0x55555555);
+        l = (l & 0x33333333) + ((l >> 2) & 0x33333333);
+        l = (l + (l >> 4)) & 0x0f0f0f0f;
+        l = l + (l >> 8);
+        l = l + (l >> 16);
+        return count + l & 0x3f;
     }
 }
