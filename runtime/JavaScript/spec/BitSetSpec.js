@@ -91,4 +91,20 @@ describe('test BitSet', () => {
         const values = bs.values();
         expect(values).toEqual([67, 69]);
     })
+
+    it("counts bits", () => {
+        for(let i= 0; i <= 0xFF; i++) {
+            // count bits the slow but easy to understand way (Kernighan method)
+            let count1 = 0;
+            let value = i;
+            while(value) {
+                if(value & 1)
+                    count1++;
+                value >>= 1;
+            }
+            // count bits the fast way
+            const count2 = BitSet._bitCount(i);
+            expect(count2).toEqual(count1);
+        }
+    })
 })

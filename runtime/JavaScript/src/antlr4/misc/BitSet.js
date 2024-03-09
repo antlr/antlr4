@@ -12,13 +12,13 @@ export default class BitSet {
     }
 
     set(index) {
-        this._checkIndex(index)
+        BitSet._checkIndex(index)
         this._resize(index);
         this.data[index >>> 5] |= 1 << index % 32;
     }
 
     get(index) {
-        this._checkIndex(index)
+        BitSet._checkIndex(index)
         const slot = index >>> 5;
         if (slot >= this.data.length) {
             return false;
@@ -27,7 +27,7 @@ export default class BitSet {
     }
 
     clear(index) {
-        this._checkIndex(index)
+        BitSet._checkIndex(index)
         const slot = index >>> 5;
         if (slot < this.data.length) {
             this.data[index >>> 5] &= ~(1 << index);
@@ -56,7 +56,7 @@ export default class BitSet {
             let l = this.data[k];
             while (l !== 0) {
                 const t = l & -l;
-                result[pos++] = (k << 5) + this._bitCount(t - 1);
+                result[pos++] = (k << 5) + BitSet._bitCount(t - 1);
                 l ^= t;
             }
         }
@@ -91,7 +91,7 @@ export default class BitSet {
     }
 
     get length(){
-        return this.data.map(l => this._bitCount(l)).reduce((s,v) => s + v, 0);
+        return this.data.map(l => BitSet._bitCount(l)).reduce((s,v) => s + v, 0);
     }
 
     _resize(index) {
@@ -105,12 +105,12 @@ export default class BitSet {
         this.data = data;
     }
 
-    _checkIndex(index) {
+    static _checkIndex(index) {
         if(index < 0)
             throw new RangeError("index cannot be negative");
     }
 
-    _bitCount(l) {
+    static _bitCount(l) {
         // see https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
         let count = 0;
         l = l - ((l >> 1) & 0x55555555);
