@@ -111,6 +111,7 @@ export default class BitSet {
     }
 
     _bitCount(l) {
+        // see https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
         let count = 0;
         l = l - ((l >> 1) & 0x55555555);
         l = (l & 0x33333333) + ((l >> 2) & 0x33333333);
