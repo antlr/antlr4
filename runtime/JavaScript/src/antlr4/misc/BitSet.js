@@ -64,7 +64,7 @@ export default class BitSet {
     }
 
     minValue() {
-         for (let k = 0; k < this.data.length; ++k) {
+        for (let k = 0; k < this.data.length; ++k) {
             let l = this.data[k];
             if (l !== 0) {
                 let result = 0;
@@ -90,8 +90,8 @@ export default class BitSet {
         return "{" + this.values().join(", ") + "}";
     }
 
-    get length(){
-        return this.data.map(l => BitSet._bitCount(l)).reduce((s,v) => s + v, 0);
+    get length() {
+        return this.data.map(l => BitSet._bitCount(l)).reduce((s, v) => s + v, 0);
     }
 
     _resize(index) {
@@ -106,7 +106,7 @@ export default class BitSet {
     }
 
     static _checkIndex(index) {
-        if(index < 0)
+        if (index < 0)
             throw new RangeError("index cannot be negative");
     }
 
