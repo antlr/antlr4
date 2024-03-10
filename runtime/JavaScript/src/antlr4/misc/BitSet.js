@@ -30,7 +30,7 @@ export default class BitSet {
         BitSet._checkIndex(index)
         const slot = index >>> 5;
         if (slot < this.data.length) {
-            this.data[index >>> 5] &= ~(1 << index);
+            this.data[slot] &= ~(1 << index);
         }
     }
 
