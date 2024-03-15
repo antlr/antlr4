@@ -5,25 +5,13 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ParseInfo;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ErrorNodeImpl;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
@@ -31,8 +19,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -822,8 +808,45 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
+	public Pair<RuleContext, IntervalSet> getExpectedTokens(RuleContext startRuleContext, int line, int column) {
+		Token lastToken = this._input.locateTokenAtOrBefore(line, column);
+		if(!(lastToken instanceof TokenWithStates)) {
+			throw new IllegalStateException("Cannot getExpectedTokens. Configure Lexer with CommonTokenWithStateFactory and parser with TokenStateRecorder");
+		}
+		RuleContext context = locateContextWithToken(startRuleContext, lastToken);
+		TokenWithStates token = (TokenWithStates)lastToken;
+		int stateNumber = token.getFollowState();
+		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
+			stateNumber = token.getPreviousState();
+		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
+			stateNumber = startRuleContext.invokingState;
+		IntervalSet set = getATN().getExpectedTokens(stateNumber, context);
+		return new Pair<>(context, set);
+	}
 
-    public IntervalSet getExpectedTokensWithinCurrentRule() {
+	private RuleContext locateContextWithToken(ParseTree tree, Token token) {
+		for(int i=0; i<tree.getChildCount(); i++) {
+			ParseTree child = tree.getChild(i);
+			Interval tokens = child.getSourceInterval();
+			// skip empty interval
+			if(tokens.b < tokens.a)
+				continue;
+			// have we gone past token ?
+			if(tokens.a > token.getTokenIndex())
+				break;
+			if (tokens.b >= token.getTokenIndex()) {
+				RuleContext context = locateContextWithToken(child, token);
+				if(context!=null)
+					return context;
+			}
+		}
+		if(tree instanceof RuleNode)
+			return ((RuleNode) tree).getRuleContext();
+		else
+			return null;
+	}
+
+	public IntervalSet getExpectedTokensWithinCurrentRule() {
         ATN atn = getInterpreter().atn;
         ATNState s = atn.states.get(getState());
    		return atn.nextTokens(s);
