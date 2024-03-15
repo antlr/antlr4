@@ -56,7 +56,7 @@ public class TestSuggestionHelper {
 		JavaParser parser = new JavaParser(stream);
 		parser.setStateListener(new TokenStateRecorder(stream));
 		RuleContext context = parser.compilationUnit();
-		Pair<RuleContext, IntervalSet> contextsAndIntervals = parser.getExpectedTokens(context, expectation.line, expectation.column);
+		Pair<RuleContext, IntervalSet> contextsAndIntervals = parser.getExpectedTokensAt(context, expectation.line, expectation.column);
 		Set<String> actual = contextsAndIntervals.b.toSet().stream()
 			.map(t -> parser.getVocabulary().getDisplayName(t))
 			.map(s -> s.startsWith("'") ? s.substring(1, s.length() - 1) : s)

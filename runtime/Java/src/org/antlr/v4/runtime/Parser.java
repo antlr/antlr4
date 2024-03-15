@@ -808,12 +808,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
-	public Pair<RuleContext, IntervalSet> getExpectedTokens(RuleContext startRuleContext, int line, int column) {
-		Token lastToken = this._input.locateTokenAtOrBefore(line, column);
+	public Pair<RuleContext, IntervalSet> getExpectedTokensAt(RuleContext startRuleContext, int line, int column) {
+		Token lastToken = this._input.lastTokenAt(line, column);
 		if(!(lastToken instanceof TokenWithStates)) {
 			throw new IllegalStateException("Cannot getExpectedTokens. Configure Lexer with CommonTokenWithStateFactory and parser with TokenStateRecorder");
 		}
-		RuleContext context = locateContextWithToken(startRuleContext, lastToken);
+		RuleContext context = startRuleContext.leafContextWithToken(lastToken);
 		TokenWithStates token = (TokenWithStates)lastToken;
 		int stateNumber = token.getFollowState();
 		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
@@ -822,28 +822,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			stateNumber = startRuleContext.invokingState;
 		IntervalSet set = getATN().getExpectedTokens(stateNumber, context);
 		return new Pair<>(context, set);
-	}
-
-	private RuleContext locateContextWithToken(ParseTree tree, Token token) {
-		for(int i=0; i<tree.getChildCount(); i++) {
-			ParseTree child = tree.getChild(i);
-			Interval tokens = child.getSourceInterval();
-			// skip empty interval
-			if(tokens.b < tokens.a)
-				continue;
-			// have we gone past token ?
-			if(tokens.a > token.getTokenIndex())
-				break;
-			if (tokens.b >= token.getTokenIndex()) {
-				RuleContext context = locateContextWithToken(child, token);
-				if(context!=null)
-					return context;
-			}
-		}
-		if(tree instanceof RuleNode)
-			return ((RuleNode) tree).getRuleContext();
-		else
-			return null;
 	}
 
 	public IntervalSet getExpectedTokensWithinCurrentRule() {

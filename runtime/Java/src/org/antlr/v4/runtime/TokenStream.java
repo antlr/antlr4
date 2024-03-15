@@ -138,7 +138,7 @@ public interface TokenStream extends IntStream {
 	 */
 	public String getText(Token start, Token stop);
 
-    public default Token locateTokenAtOrBefore(int line, int column) {
+    public default Token lastTokenAt(int line, int column) {
 		Token last = get(0);
 		for(int i=1; i<index(); i++) {
 			Token token = get(i);
