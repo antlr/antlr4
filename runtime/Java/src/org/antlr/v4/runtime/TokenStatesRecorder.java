@@ -6,10 +6,10 @@ import org.antlr.v4.runtime.atn.ATNState;
 /* we take advantage of the fact that each successful match is followed by a setState(int state) */
 /* however there may be numerous setState following a match, so we only register the first state change */
 
-public class TokenStateRecorder implements StateListener {
+public class TokenStatesRecorder implements StateListener {
 
 	final TokenStream _tokenStream;
-	public TokenStateRecorder(TokenStream tokenStream) {
+	public TokenStatesRecorder(TokenStream tokenStream) {
 		this._tokenStream = tokenStream;
 	}
 

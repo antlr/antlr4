@@ -54,7 +54,7 @@ public class TestSuggestionHelper {
 		lexer.setTokenFactory(CommonTokenWithStatesFactory.DEFAULT);
 		TokenStream stream = new CommonTokenStream(lexer);
 		JavaParser parser = new JavaParser(stream);
-		parser.setStateListener(new TokenStateRecorder(stream));
+		parser.setStateListener(new TokenStatesRecorder(stream));
 		RuleContext context = parser.compilationUnit();
 		Pair<RuleContext, IntervalSet> contextsAndIntervals = parser.getExpectedTokensAt(context, expectation.line, expectation.column);
 		Set<String> actual = contextsAndIntervals.b.toSet().stream()
