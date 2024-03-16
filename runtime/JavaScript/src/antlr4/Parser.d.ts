@@ -6,6 +6,7 @@ import {ParserATNSimulator} from "./atn";
 import {Token} from "./Token";
 import {ParserRuleContext} from "./context";
 import {Printer} from "./utils";
+import {ParseTreeListener} from "./tree";
 
 export declare class Parser extends Recognizer<Token> {
 
@@ -24,6 +25,10 @@ export declare class Parser extends Recognizer<Token> {
     constructor(input: TokenStream);
     match(ttype: number): Token;
     matchWildcard(): Token;
+    getParseListeners(): ParseTreeListener[];
+    addParseListener(listener: ParseTreeListener): void;
+    removeParseListener(listener: ParseTreeListener): void;
+    removeParseListeners(): void;
     consume(): Token;
     enterRule(localctx: ParserRuleContext, state: number, ruleIndex: number): void;
     exitRule() : void;
