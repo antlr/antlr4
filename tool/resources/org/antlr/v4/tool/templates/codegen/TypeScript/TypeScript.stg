@@ -749,7 +749,7 @@ export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperCl
     	return <parser.name>.RULE_<struct.derivedFromName>;
 	}
 <if(struct.provideCopyFrom)><! don't need copy unless we have subclasses !>
-	public copyFrom(ctx: <struct.name>): void {
+	public override copyFrom(ctx: <struct.name>): void {
 		super.copyFrom(ctx);
 		<struct.attrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
