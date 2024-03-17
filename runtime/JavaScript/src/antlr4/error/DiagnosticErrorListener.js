@@ -96,7 +96,7 @@ export default class DiagnosticErrorListener extends ErrorListener {
 		}
 		const result = new BitSet()
 		for (let i = 0; i < configs.items.length; i++) {
-			result.add(configs.items[i].alt);
+			result.set(configs.items[i].alt);
 		}
 		return `{${result.values().join(", ")}}`;
 	}

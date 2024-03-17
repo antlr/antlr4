@@ -101,7 +101,7 @@ export default class ATNConfigSet {
 		if (config.reachesIntoOuterContext > 0) {
 			this.dipsIntoOuterContext = true;
 		}
-		const existing = this.configLookup.add(config);
+		const existing = this.configLookup.getOrAdd(config);
 		if (existing === config) {
 			this.cachedHashCode = -1;
 			this.configs.push(config); // track order here
