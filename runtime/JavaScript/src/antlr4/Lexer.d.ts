@@ -22,7 +22,9 @@ export declare class Lexer extends Recognizer<number> {
     nextToken(): Token;
     skip(): void;
     more(): void;
-    more(m: number): void;
+    setMode(m: number): void;
+    getMode(): number;
+    getModeStack(): number[];
     pushMode(m: number): void;
     popMode(): number;
     emitToken(token: Token): void;

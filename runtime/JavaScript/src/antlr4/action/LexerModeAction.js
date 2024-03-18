@@ -20,7 +20,7 @@ export default class LexerModeAction extends LexerAction {
      * value provided by {@link //getMode}.</p>
      */
     execute(lexer) {
-        lexer.mode(this.mode);
+        lexer.setMode(this.mode);
     }
 
     updateHashCode(hash) {

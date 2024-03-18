@@ -1702,7 +1702,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportAttemptingFullContext(this.parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
+            this.parser.getErrorListener().reportAttemptingFullContext(this.parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
         }
     }
 
@@ -1713,7 +1713,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
+            this.parser.getErrorListener().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
         }
     }
 
@@ -1726,7 +1726,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+            this.parser.getErrorListener().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
         }
     }
 }
