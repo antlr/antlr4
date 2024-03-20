@@ -808,13 +808,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
-	public Pair<RuleContext, IntervalSet> getExpectedTokensAt(RuleContext startRuleContext, int line, int column) {
-		Token lastToken = this._input.lastTokenAt(line, column);
-		if(!(lastToken instanceof TokenWithStates)) {
-			throw new IllegalStateException("Cannot getExpectedTokens. Configure Lexer with CommonTokenWithStateFactory and parser with TokenStateRecorder");
-		}
-		RuleContext context = startRuleContext.leafContextWithToken(lastToken);
-		TokenWithStates token = (TokenWithStates)lastToken;
+	public Pair<RuleContext, IntervalSet> getExpectedTokensAt(RuleContext startRuleContext, TokenWithStates token) {
+		RuleContext context = startRuleContext.leafContextWithToken(token);
 		int stateNumber = token.getFollowState();
 		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
 			stateNumber = token.getPreviousState();

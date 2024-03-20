@@ -36,16 +36,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	private int _stateNumber = -1;
 
-	private StateListener _stateListener = null;
-
-	public void setStateListener(StateListener listener) {
-		this._stateListener = listener;
-	}
-
-	public StateListener getStateListener() {
-		return this._stateListener;
-	}
-
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
@@ -271,8 +261,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 */
 	public final void setState(int atnState) {
 //		System.err.println("setState "+atnState);
-		if(_stateListener != null)
-			_stateListener.stateChanged(_stateNumber, atnState);
 		_stateNumber = atnState;
 //		if ( traceATNStates ) _ctx.trace(atnState);
 	}

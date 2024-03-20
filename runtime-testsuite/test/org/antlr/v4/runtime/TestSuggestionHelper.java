@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
@@ -36,8 +37,18 @@ public class TestSuggestionHelper {
 			}
 		}
 		// fail the test if required
-		if(!errors.isEmpty())
+		if(!errors.isEmpty()) {
+			errors.forEach(p -> System.err.println("Failed: " + p.a.toString()));
 			throw errors.get(0).b;
+		}
+	}
+
+	@Test
+	public void matchesOneExpectation() throws Exception {
+		URL url = this.getClass().getResource("/org/antlr/v4/test/runtime/expected-tokens/");
+		Path parent = Paths.get(url.toURI());
+		File file = new File(parent.toFile(), "java-start.yml");
+		matchesExpectation(file.toPath());
 	}
 
 	static class Expectation {
@@ -54,9 +65,10 @@ public class TestSuggestionHelper {
 		lexer.setTokenFactory(CommonTokenWithStatesFactory.DEFAULT);
 		TokenStream stream = new CommonTokenStream(lexer);
 		JavaParser parser = new JavaParser(stream);
-		parser.setStateListener(new TokenStatesRecorder(stream));
+		parser.setErrorHandler(new RecordingErrorStrategy());
 		RuleContext context = parser.compilationUnit();
-		Pair<RuleContext, IntervalSet> contextsAndIntervals = parser.getExpectedTokensAt(context, expectation.line, expectation.column);
+		Token token = stream.lastTokenAt(expectation.line, expectation.column);
+		Pair<RuleContext, IntervalSet> contextsAndIntervals = parser.getExpectedTokensAt(context, (TokenWithStates)token);
 		Set<String> actual = contextsAndIntervals.b.toSet().stream()
 			.map(t -> parser.getVocabulary().getDisplayName(t))
 			.map(s -> s.startsWith("'") ? s.substring(1, s.length() - 1) : s)
