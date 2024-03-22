@@ -174,7 +174,7 @@ export default class Lexer extends Recognizer {
      */
 	mode(m) {
 		console.warn("Calling deprecated method in Lexer class: mode(...)");
-		setMode(m);
+		this.setMode(m);
 	}
 
 	setMode(m) {
