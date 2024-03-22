@@ -314,7 +314,7 @@ export default class Parser extends Recognizer {
         this._syntaxErrors += 1;
         const line = offendingToken.line;
         const column = offendingToken.column;
-        const listener = this.getErrorListenerDispatch();
+        const listener = this.getErrorListener();
         listener.syntaxError(this, offendingToken, line, column, msg, err);
     }
 
