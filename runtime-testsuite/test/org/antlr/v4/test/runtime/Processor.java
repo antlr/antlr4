@@ -20,7 +20,7 @@ public class Processor {
 	 *  RUNNING ln -s /Users/parrt/antlr/code/antlr4/runtime/Cpp/dist/libantlr4-runtime.dylib in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
 	 *  RUNNING clang++ -std=c++17 -I /Users/parrt/antlr/code/antlr4/runtime/Cpp/runtime/src -L. -lantlr4-runtime -pthread -o Test.out Test.cpp TLexer.cpp TParser.cpp TListener.cpp TBaseListener.cpp TVisitor.cpp TBaseVisitor.cpp in /var/folders/w1/_nr4stn13lq0rvjdkwh7q8cc0000gn/T/CppRunner-ForkJoinPool-1-worker-23-1668284191961
 	 */
-	public static final boolean WATCH_COMMANDS_EXEC = true;
+	public static final boolean WATCH_COMMANDS_EXEC = false;
 	public final String[] arguments;
 	public final String workingDirectory;
 	public final Map<String, String> environmentVariables;
