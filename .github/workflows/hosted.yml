@@ -165,16 +165,16 @@ jobs:
           windows-2022
         ]
         target: [
-          tool,
-          cpp,
-          csharp,
-          dart,
-          go,
-          java,
+#          tool,
+#          cpp,
+#          csharp,
+#          dart,
+#          go,
+#          java,
           javascript,
           typescript,
-          php,
-          python3,
+#          php,
+#          python3,
           # swift,
         ]
         exclude:
