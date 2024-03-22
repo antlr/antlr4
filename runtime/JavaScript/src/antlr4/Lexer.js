@@ -352,6 +352,10 @@ export default class Lexer extends Recognizer {
 	set text(text) {
 		this._text = text;
 	}
+
+	set tokenFactory(factory) {
+		this._factory = factory;
+	}
 }
 
 
