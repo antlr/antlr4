@@ -11,7 +11,6 @@ import DefaultErrorStrategy from './error/DefaultErrorStrategy.js';
 import ATNDeserializer from './atn/ATNDeserializer.js';
 import ATNDeserializationOptions from './atn/ATNDeserializationOptions.js';
 import TraceListener from "./TraceListener.js";
-import ATNState from "./state/ATNState.js";
 
 export default class Parser extends Recognizer {
     /**
@@ -291,7 +290,7 @@ export default class Parser extends Recognizer {
 
     /**
 	 * Gets the number of syntax errors reported during parsing. This value is
-	 * incremented each time {@link //notifyErrorListeners} is called.
+	 * incremented each time {@link //notifyErrorListeners} is called.	 
 	 */
     get syntaxErrorsCount() {
         return this._syntaxErrors;
@@ -538,18 +537,6 @@ export default class Parser extends Recognizer {
      */
     getExpectedTokens() {
         return this._interp.atn.getExpectedTokens(this.state, this._ctx);
-    }
-
-    getExpectedTokensAt(startRuleContext, token) {
-        const context = startRuleContext.leafContextWithToken(token);
-        let stateNumber = token.followState;
-        if(stateNumber === ATNState.INVALID_STATE_NUMBER)
-            stateNumber = token.previousState;
-        if(stateNumber === ATNState.INVALID_STATE_NUMBER)
-            stateNumber = startRuleContext.invokingState;
-        const set = this._interp.atn.getExpectedTokens(stateNumber, context);
-        return { ruleContext: context, intervalSet: set };
-
     }
 
     getExpectedTokensWithinCurrentRule() {

@@ -95,18 +95,4 @@ export default class CommonTokenStream extends BufferedTokenStream {
         }
         return n;
     }
-
-    lastTokenAt(line, column) {
-        let last = this.tokens[0];
-        for(let i=1; i < this.index; i++) {
-            const token = this.tokens[i];
-            if(token.line > line)
-                break;
-            else if(token.line === line && token.column > column)
-                break;
-            last = token;
-        }
-        return last;
-    }
-
 }
