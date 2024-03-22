@@ -4,7 +4,7 @@ import {ErrorStrategy, RecognitionException} from "./error";
 import {IntervalSet} from "./misc";
 import {ParserATNSimulator} from "./atn";
 import {Token} from "./Token";
-import {ParserRuleContext} from "./context";
+import {ParserRuleContext, RuleContext} from "./context";
 import {Printer} from "./utils";
 
 export declare class Parser extends Recognizer<Token> {
@@ -41,5 +41,6 @@ export declare class Parser extends Recognizer<Token> {
     setTokenStream(input: TokenStream): void;
     notifyErrorListeners(msg: string, offendingToken: Token, err: RecognitionException | undefined): void;
     getCurrentToken(): Token;
-    
+    getExpectedTokensAt(startRuleContext: RuleContext, tokenWithStates: Token): { ruleContext: RuleContext, intervalSet: IntervalSet };
+
 }

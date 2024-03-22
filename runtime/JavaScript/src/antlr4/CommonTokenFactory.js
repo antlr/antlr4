@@ -4,8 +4,8 @@
  */
 
 import CommonToken from './CommonToken.js';
+import TokenFactory from "./TokenFactory.js";
 
-class TokenFactory {}
 
 /**
  * This default implementation of {@link TokenFactory} creates
