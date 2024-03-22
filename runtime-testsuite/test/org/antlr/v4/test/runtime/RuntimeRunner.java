@@ -191,9 +191,9 @@ public abstract class RuntimeRunner implements AutoCloseable {
 
 		InitializationStatus initStatus = initAntlrRuntimeIfRequired(runOptions);
 
-		if (initStatus.isInitialized) {
+		if (!initStatus.isInitialized) {
 			// Do not repeat ANTLR runtime initialization error
-			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized: " + initStatus.exception.toString()));
+			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized", initStatus.exception));
 		}
 
 		writeRecognizerFile(runOptions);
