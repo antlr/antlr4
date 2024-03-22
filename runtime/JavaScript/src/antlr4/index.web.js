@@ -34,6 +34,7 @@ import FailedPredicateException from "./error/FailedPredicateException.js";
 import NoViableAltException from "./error/NoViableAltException.js";
 import BailErrorStrategy from "./error/BailErrorStrategy.js";
 import DefaultErrorStrategy from "./error/DefaultErrorStrategy.js";
+import RecordingErrorStrategy from "./error/RecordingErrorStrategy.js";
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import ParseTreeListener from "./tree/ParseTreeListener.js";
@@ -45,6 +46,8 @@ import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
 import TokenStreamRewriter from './TokenStreamRewriter.js';
+import CommonTokenFactory from "./CommonTokenFactory.js";
+import CommonTokenWithStatesFactory from "./CommonTokenWithStatesFactory.js";
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
@@ -55,6 +58,6 @@ export {
     Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
-    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
-    arrayToString, TokenStreamRewriter
+    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy, RecordingErrorStrategy,
+    arrayToString, CommonTokenFactory, CommonTokenWithStatesFactory, TokenStreamRewriter
 }
