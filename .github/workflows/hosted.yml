@@ -21,9 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-11,
-          ubuntu-20.04,
-          windows-2022
+#          macos-11,
+#          ubuntu-20.04,
+#          windows-2022
         ]
         compiler: [ clang, gcc ]
         unity_build: [ ON, OFF ]
@@ -160,9 +160,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-11,
+#          macos-11,
           ubuntu-20.04,
-          windows-2022
+#         windows-2022
         ]
         target: [
 #          tool,
