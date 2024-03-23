@@ -2,7 +2,7 @@
 
 Antlr4 TypeScript runtime uses the JavaScript runtime and adds type files to it.
 This guarantees the same behaviour and performance across both target languages.
-Generated lexers, parsers, listeners and visitors are generated in TypeScript.
+The target lexers, parsers, listeners, and visitors which are generated from your grammar will be TypeScript.
 
 The runtime is built using TypeScript v4.8.3, node 16.17 and webpack 5.66.
 It may work with older versions but they have not been tested and they will not be supported.
@@ -13,7 +13,7 @@ It may work with older versions but they have not been tested and they will not 
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
 
 ```bash
-$ antlr4 -Dlanguage=TypeScript MyGrammar.g4
+$ antlr4 -Dlanguage=TypeScript MyLanguage.g4
 ```
 
 For a full list of antlr4 tool options, please visit the [tool documentation page](tool-options.md).
@@ -30,88 +30,93 @@ The runtime is webpacked and sits in the dist folder. A .map file is also provid
 
 ## How do I run the generated lexer and/or parser?
 
-Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "MyStartRule". The tool will have generated for you the following files:
+Let's suppose that your grammar is named, as above, "MyLanguage". Let's suppose this parser comprises a rule named "myStartRule". The tool will have generated for you the following files:
 
-*   MyGrammarLexer.ts
-*   MyGrammarParser.ts
-*   MyGrammarListener.ts (if you have not activated the -no-listener option)
-*   MyGrammarVisitor.ts (if you have activated the -visitor option)
-   
-There is no listener or visitor interface generated, instead the generated listener and visitor class methods are implemented using lambdas.
+*   MyLanguageLexer.ts
+*   MyLanguageParser.ts
+*   MyLanguageListener.ts (if you have not activated the -no-listener option)
+*   MyLanguageVisitor.ts (if you have activated the -visitor option)
 
-Now a fully functioning script might look like the following:
+A function to parse code according to the grammar in MyLanguage.g4 would be written like this:
 
 ```typescript
-import { CharStream, CommonTokenStream }  from 'antlr4';
-import MyGrammarLexer from './MyGrammarLexer';
-import MyGrammarParser from './MyGrammarParser';
+import { CharStream, CommonTokenStream } from "antlr4";
+import MyLanguageParser, { MyStartRuleContext } from"./MyLanguageParser";
+import MyLanguageLexer from "./MyLanguageLexer";
 
-const input = "your text to parse here"
-const chars = new CharStream(input); // replace this with a FileStream as required
-const lexer = new MyGrammarLexer(chars);
-const tokens = new CommonTokenStream(lexer);
-const parser = new MyGrammarParser(tokens);
-const tree = parser.MyStartRule();
-
+export function parseMyLanguage(codeToParse: string): MyStartRuleContext {
+    const chars = new CharStream(codeToParse);
+    const lexer = new MyLanguageLexer(chars);
+    const tokens = new CommonTokenStream(lexer);
+    const parser = new MyLanguageParser(tokens);
+    return parser.myStartRule();
+}
 ```
 
-Tha above program will work. But it won't be useful unless you do one of the following:
+Tha above function will execute. But it won't be useful unless you do one of the following:
 
-* you visit the parse tree using a custom listener
-* you visit the parse tree using a custom visitor
-* your grammar contains production code (like AntLR3)
- 
-(please note that production code is target specific, so you can't have multi target grammars that include production code)
+* visit the parse tree using a custom listener
+* visit the parse tree using a custom visitor
+* populate the grammar with production code (like AntLR3)
+  * _This approach is discouraged in Antlr4, Production code is target specific, which would prevent a grammar being used by multiple target languages_
  
 ## How do I create and run a visitor?
 
-You need to create a custom visitor and use it to visit the parse tree, as follows:
+You need to create an instance of custom visitor class and use it to visit the parse tree, as follows:
+
 ```typescript
+import { ParseTreeVisitor } from "antlr4";
+import { MyStartRuleContext} from "./MyLanguageParser";
+import MyLanguageVisitor from "./MyLanguageVisitor";
+import { parseMyLanguage } from "./typescript-parse";
 
-import { ParserRuleContext } from 'antlr4';
-import MyGrammarVisitor from './MyGrammarVisitor';
+type MyVisitResult = void;
 
-class CustomVisitor extends MyGrammarVisitor {
+class CustomVisitor
+    extends ParseTreeVisitor<MyVisitResult>
+    implements MyLanguageVisitor<MyVisitResult>
+{
 
-  visitChildren(ctx: ParserRuleContext) {
-    if (!ctx) {
-      return;
+    visitMyStartRule(ctx: MyStartRuleContext): MyVisitResult {
+        return this.visitChildren(ctx);
     }
-    if (ctx.children) {
-      return ctx.children.map(child => {
-        if (child.children && child.children.length != 0) {
-          return child.accept(this);
-        } else {
-          return child.getText();
-        }
-      });
-    }
-  }
+
 }
 
-tree.accept(new CustomVisitor());
+function parseAndVisit(codeToParse: string) {
+    const parseResult = parseMyLanguage(codeToParse);
+    const visitor = new CustomVisitor();
+    visitor.visit(parseResult);
+}
 ````
 
 ## How do I create and run a custom listener?
 
-You need to create a custom listener and use it to visit the parse tree, as follows:
+You need to create an instance of a custom listener class and use it to visit the parse tree, as follows:
 
 ```typescript
+import { ParseTreeWalker, ParseTreeListener } from "antlr4";
+import { MyStartRuleContext } from "./MyLanguageParser";
+import MyLanguageListener from "./MyLanguageListener";
+import { parseMyLanguage } from "./typescript-parse";
 
-import { ParseTreeWalker } from 'antlr4';
-import MyGrammarListener from './MyGrammarListener';
+class CustomListener
+    extends ParseTreeListener
+    implements MyLanguageListener
+{
+    enterMyStartRule(ctx: MyStartRuleContext) {
+        console.log("Enter Node 'myStartRule'");
+    }
+    exitMyStartRule(ctx: MyStartRuleContext) {
+        console.log("Exit Node 'myStartRule'");
+    }
 
-class MyTreeWalker extends MyGrammarListener {
-
-    exitMyStartRule = (ctx: MyStartRuleContext) => {
-        console.log("In MyStartRule");
-    };
-    
 }
 
-const walker = new MyTreeWalker();
-ParseTreeWalker.DEFAULT.walk(walker, tree);
-
+function parseAndRunListener(codeToParse: string) {
+    const parseResult = parseMyLanguage(codeToParse);
+    ParseTreeWalker.DEFAULT.walk(new CustomListener(), parseResult);
+}
 ```
 
 ## How do I integrate my parser with ACE editor?
