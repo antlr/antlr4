@@ -201,7 +201,7 @@ public class TestXPath {
 	) throws Exception {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRuleName, input,
-				false, false, Stage.Execute);
+				false, false, Stage.Execute, null);
 		try (JavaRunner runner = new JavaRunner()) {
 			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
 			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
