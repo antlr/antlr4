@@ -6,7 +6,7 @@
   "browser": "dist/antlr4.web.mjs",
   "main": "dist/antlr4.node.cjs",
   "module": "dist/antlr4.node.mjs",
-  "types": "src/antlr4/index.d.ts",
+  "types": "src/antlr4/index.d.cts",
   "repository": "antlr/antlr4.git",
   "keywords": [
     "lexer",
@@ -14,6 +14,11 @@
     "antlr",
     "antlr4",
     "grammar"
+  ],
+  "files": [
+    "dist",
+    "src/**/*.d.cts",
+    "src/**/*.d.ts"
   ],
   "license": "BSD-3-Clause",
   "bugs": {
@@ -51,14 +56,18 @@
   },
   "exports": {
     ".": {
+      "types": "./src/antlr4/index.d.cts",
+      "import": "./dist/antlr4.node.mjs",
+      "require": "./dist/antlr4.node.cjs",
+      "default": "./dist/antlr4.node.mjs",
       "node": {
-        "types": "./src/antlr4/index.d.ts",
+        "types": "./src/antlr4/index.d.cts",
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
         "default": "./dist/antlr4.node.mjs"
       },
       "browser": {
-        "types": "./src/antlr4/index.d.ts",
+        "types": "./src/antlr4/index.d.cts",
         "import": "./dist/antlr4.web.mjs",
         "require": "./dist/antlr4.web.cjs",
         "default": "./dist/antlr4.web.mjs"
