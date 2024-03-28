@@ -1,0 +1,31 @@
+input: "public class Foo { public static    "
+caret:
+  line: 1
+  column: 34
+expected:
+  - final
+  - protected
+  - static
+  - "@"
+  - enum
+  - public
+  - class
+  - abstract
+  - interface
+  - private
+  - strictfp
+  - boolean
+  - byte
+  - char
+  - double
+  - float
+  - int
+  - long
+  - native
+  - short
+  - synchronized
+  - transient
+  - void
+  - volatile
+  - <
+  - Identifier

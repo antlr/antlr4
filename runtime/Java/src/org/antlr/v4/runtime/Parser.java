@@ -5,25 +5,13 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ParseInfo;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ErrorNodeImpl;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
@@ -31,8 +19,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -822,8 +808,18 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
+	public Pair<RuleContext, IntervalSet> getExpectedTokensAt(RuleContext startRuleContext, TokenWithStates token) {
+		RuleContext context = startRuleContext.leafContextWithToken(token);
+		int stateNumber = token.getFollowState();
+		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
+			stateNumber = token.getPreviousState();
+		if(stateNumber == ATNState.INVALID_STATE_NUMBER)
+			stateNumber = startRuleContext.invokingState;
+		IntervalSet set = getATN().getExpectedTokens(stateNumber, context);
+		return new Pair<>(context, set);
+	}
 
-    public IntervalSet getExpectedTokensWithinCurrentRule() {
+	public IntervalSet getExpectedTokensWithinCurrentRule() {
         ATN atn = getInterpreter().atn;
         ATNState s = atn.states.get(getState());
    		return atn.nextTokens(s);

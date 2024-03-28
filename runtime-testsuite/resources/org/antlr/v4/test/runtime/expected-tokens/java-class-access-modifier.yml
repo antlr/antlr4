@@ -1,0 +1,17 @@
+input: "abstract "
+caret:
+  line: 1
+  column: 9
+expected:
+  - final
+  - protected
+  - static
+  - "@"
+  - enum
+  - public
+  - ;
+  - class
+  - abstract
+  - interface
+  - private
+  - strictfp

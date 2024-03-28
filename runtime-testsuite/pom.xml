@@ -68,6 +68,12 @@
 		    <artifactId>jol-core</artifactId>
 		    <version>0.16</version>
 		</dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

@@ -1,0 +1,19 @@
+caret:
+  line: 1
+  column: 0
+expected:
+  - import
+  - final
+  - package
+  - protected
+  - static
+  - "@"
+  - enum
+  - public
+  - ;
+  - class
+  - abstract
+  - interface
+  - private
+  - EOF
+  - strictfp

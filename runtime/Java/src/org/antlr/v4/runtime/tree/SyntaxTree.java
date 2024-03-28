@@ -6,6 +6,8 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -31,4 +33,27 @@ public interface SyntaxTree extends Tree {
 	 * EOF is unspecified.</p>
 	 */
 	Interval getSourceInterval();
+
+	default RuleContext leafContextWithToken(Token token) {
+		for(int i=0; i<getChildCount(); i++) {
+			SyntaxTree child = (SyntaxTree)getChild(i);
+			Interval tokens = child.getSourceInterval();
+			// skip empty interval
+			if(tokens.b < tokens.a)
+				continue;
+			// have we gone past token ?
+			if(tokens.a > token.getTokenIndex())
+				break;
+			if (tokens.b >= token.getTokenIndex()) {
+				RuleContext context = child.leafContextWithToken(token);
+				if(context!=null)
+					return context;
+			}
+		}
+		if(this instanceof RuleNode)
+			return ((RuleNode) this).getRuleContext();
+		else
+			return null;
+
+	}
 }
