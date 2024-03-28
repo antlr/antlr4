@@ -550,7 +550,7 @@ public class TestSymbolIssues {
 				"a: 'a';\n" +
 				"b: 'b';",
 
-				"error(" + ErrorType.INTERNAL_ERROR.code + "): Test.g4:2:30: internal error: Rule error undefined \n"
+				"error(" + ErrorType.INTERNAL_ERROR.code + "): Test.g4:2:35: internal error: Rule error undefined \n"
 		};
 
 		testErrors(test, false);

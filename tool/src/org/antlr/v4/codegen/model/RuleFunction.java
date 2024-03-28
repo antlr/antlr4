@@ -61,6 +61,7 @@ public class RuleFunction extends OutputModelObject {
 	public final Rule rule;
 	public final AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
+	public boolean hasDelegatedPrecedence;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -115,6 +116,7 @@ public class RuleFunction extends OutputModelObject {
 		}
 
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+		hasDelegatedPrecedence = r.hasDelegatedPrecedence;
 	}
 
 	public void addContextGetters(OutputModelFactory factory, Rule r) {

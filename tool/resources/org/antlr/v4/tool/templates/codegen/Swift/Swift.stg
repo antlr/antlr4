@@ -393,7 +393,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 @discardableResult
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.escapedName>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.escapedName>(<[args:{a | _ <a>}, currentRule.hasDelegatedPrecedence:{_ | _ _dp : Int = 0 }]; separator=", ">) throws -> <currentRule.ctxType> {
 	var _localctx: <currentRule.ctxType>
 	_localctx = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>)
 	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>)
@@ -645,10 +645,10 @@ InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>)
 <if(r.labels)>
 try {
-		let assignmentValue = try <r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+		let assignmentValue = try <r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">)
 		<r.labels:{l | <labelref(l)> = assignmentValue} ; separator="\n">
      }()
-<else>try <r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)<endif>
+<else>try <r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">)<endif>
 >>
 
 MatchToken(m) ::= <<

@@ -1,0 +1,24 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow
+e : namee | bracke | minusprefixe | e '+' e  ;
+namee : ID;
+bracke : '(' e ')';
+minusprefixe: ('-' tmp0=e) | 'unrelatedThing';
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+-a+b
+
+[output]
+"""(s (e (e (minusprefixe - (e (namee a)))) + (e (namee b))) <EOF>)
+"""
+

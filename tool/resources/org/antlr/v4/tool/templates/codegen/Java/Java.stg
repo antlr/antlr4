@@ -394,8 +394,12 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
-
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) throws RecognitionException {
+<if(currentRule.hasDelegatedPrecedence)>
+	return <currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>, }> 0);
+}
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args:{a | <a>, }> int _dp ) throws RecognitionException {
+<endif>
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -636,7 +640,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>);
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchToken(m) ::= <<

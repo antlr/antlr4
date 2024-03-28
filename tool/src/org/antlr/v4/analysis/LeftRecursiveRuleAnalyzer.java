@@ -194,6 +194,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	@Override
 	public void otherAlt(AltAST originalAltTree, int alt) {
 		AltAST altTree = (AltAST)originalAltTree.dupTree();
+		// indirect operator [prec]
+		int prec = precedence(alt);
+		altTree = addPrecedenceArgToIndirectRules(altTree, prec);
 		stripAltLabel(altTree);
 		String altText = text(altTree);
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
@@ -252,6 +255,18 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 				GrammarAST dummyValueNode = new GrammarAST(new CommonToken(ANTLRParser.INT, ""+prec));
 				rref.setOption(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME, dummyValueNode);
 			}
+		}
+		return t;
+	}
+
+	public AltAST addPrecedenceArgToIndirectRules(AltAST t, int prec) {
+		if (t == null) return null;
+		// get all top-level rule refs from ALT
+		List<GrammarAST> outerAltRuleRefs = t.getNodesWithTypePreorderDFS(IntervalSet.of(RULE_REF));
+		for (GrammarAST x : outerAltRuleRefs) {
+			RuleRefAST rref = (RuleRefAST) x;
+			GrammarAST dummyValueNode = new GrammarAST(new CommonToken(ANTLRParser.INT, "" + prec));
+			rref.setOption(LeftRecursiveRuleTransformer.DELEGATEDPRECEDENCE_OPTION_NAME, dummyValueNode);
 		}
 		return t;
 	}

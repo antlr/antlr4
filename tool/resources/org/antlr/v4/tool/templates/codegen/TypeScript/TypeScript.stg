@@ -250,7 +250,12 @@ case <index>:
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 // @RuleVersion(<namedActions.version; null="0">)
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>: <a.type>}; separator=", ">): <currentRule.ctxType> {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.escapedName>(<[currentRule.args:{a | <a.escapedName>: <a.type>}, currentRule.hasDelegatedPrecedence:{_|_dp?: number}]; separator=", ">): <currentRule.ctxType> {
+<if(currentRule.hasDelegatedPrecedence)>
+	if (_dp === undefined) {
+		_dp = 0;
+	}
+<endif>
 	let localctx: <currentRule.ctxType> = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
 	this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
 	<namedActions.init>
@@ -576,7 +581,7 @@ cases(tokens) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 this.state = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchToken(m) ::= <<

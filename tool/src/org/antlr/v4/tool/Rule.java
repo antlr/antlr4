@@ -105,6 +105,8 @@ public class Rule implements AttributeResolver {
 
 	public int actionIndex = -1; // if lexer; 0..n-1 for n actions in a rule
 
+	public boolean hasDelegatedPrecedence;
+
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
 		this(g, name, ast, numberOfAlts, null, false);
 	}

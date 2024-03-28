@@ -102,6 +102,8 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_VAR_OPTION_NAME);
+		ruleRefOptions.add(LeftRecursiveRuleTransformer.DELEGATEDPRECEDENCE_OPTION_NAME);
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 

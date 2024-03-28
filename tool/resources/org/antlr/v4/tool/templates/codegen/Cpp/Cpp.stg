@@ -487,14 +487,14 @@ for (size_t i = 0; i \< count; i++) { <! Rework class ATN to allow standard iter
 RuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><if (altLabelCtxs)><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n"><endif>
-<currentRule.ctxType>* <currentRule.escapedName>(<args; separator=",">);
+<currentRule.ctxType>* <currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|int _dp=0}]; separator=",">);
 
 >>
 
 RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
-<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.escapedName>(<args; separator=",">) {
+<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.escapedName>(<[args, currentRule.hasDelegatedPrecedence:{_|int _dp}]; separator=",">) {
   <currentRule.ctxType> *_localctx = _tracker.createInstance\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>);
   enterRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
@@ -852,7 +852,7 @@ cases(tokens) ::= <<
 InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"
 InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>);
-<if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.escapedName>(<[r.ast.options.p, argExprsChunks, r.ast.options.dp]; separator=",">);
 >>
 
 MatchTokenHeader(m) ::= "<! Required but unused. !>"
