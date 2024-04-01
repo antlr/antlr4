@@ -115,6 +115,9 @@ func (p *PredictionContext) Hash() int {
 }
 
 func (p *PredictionContext) Equals(other Collectable[*PredictionContext]) bool {
+	if p == other {
+		return true
+	}
 	switch p.pcType {
 	case PredictionContextEmpty:
 		otherP := other.(*PredictionContext)
@@ -152,7 +155,7 @@ func (p *PredictionContext) SingletonEquals(other Collectable[*PredictionContext
 		return false
 	}
 	otherP := other.(*PredictionContext)
-	if otherP == nil {
+	if otherP == nil || otherP.pcType != PredictionContextSingleton {
 		return false
 	}
 
