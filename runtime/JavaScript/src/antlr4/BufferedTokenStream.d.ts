@@ -6,6 +6,7 @@ export declare class BufferedTokenStream extends TokenStream {
 
     tokenSource: TokenSource;
     tokens: Token[];
+    index: number;
     fetchedEof: boolean;
 
     constructor(source: TokenSource);
