@@ -603,14 +603,8 @@ export default class Parser extends Recognizer {
         }
     }
 
-    /*
-        "			printer = function() {\r\n" +
-        "				this.println = function(s) { document.getElementById('output') += s + '\\n'; }\r\n" +
-        "				this.print = function(s) { document.getElementById('output') += s; }\r\n" +
-        "			};\r\n" +
-        */
     getSourceName() {
-        return this._input.sourceName;
+        return this._input.getSourceName();
     }
 
     /**
