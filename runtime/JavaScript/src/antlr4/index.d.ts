@@ -6,6 +6,8 @@ export * from "./TokenStream";
 export * from "./BufferedTokenStream";
 export * from "./CommonToken";
 export * from "./CommonTokenStream";
+export * from "./CommonTokenWithStates";
+export * from "./CommonTokenWithStatesFactory";
 export * from "./Recognizer";
 export * from "./Lexer";
 export * from "./Parser";

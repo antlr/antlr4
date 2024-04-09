@@ -9,4 +9,5 @@ export declare class CommonTokenStream extends BufferedTokenStream {
     constructor(lexer: Lexer);
     constructor(lexer: Lexer, channel: number);
     fill(): void;
+    lastTokenAt(line: number, column: number): Token;
 }

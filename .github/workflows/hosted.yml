@@ -175,7 +175,7 @@ jobs:
           typescript,
           php,
           python3,
-          # swift,
+#         swift,
         ]
         exclude:
           - os: windows-2022

@@ -35,7 +35,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	protected Pair<TokenSource, CharStream> _tokenFactorySourcePair;
 
 	/** How to create token objects */
-	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
+	protected TokenFactory<? extends Token> _factory = CommonTokenFactory.DEFAULT;
 
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to

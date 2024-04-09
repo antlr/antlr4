@@ -189,9 +189,11 @@ public abstract class RuntimeRunner implements AutoCloseable {
 			return generatedState;
 		}
 
-		if (!initAntlrRuntimeIfRequired(runOptions)) {
+		InitializationStatus initStatus = initAntlrRuntimeIfRequired(runOptions);
+
+		if (!initStatus.isInitialized) {
 			// Do not repeat ANTLR runtime initialization error
-			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized"));
+			return new CompiledState(generatedState, new Exception(getTitleName() + " ANTLR runtime is not initialized", initStatus.exception));
 		}
 
 		writeRecognizerFile(runOptions);
@@ -261,7 +263,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 	protected void addExtraRecognizerParameters(ST template) {
 	}
 
-	private boolean initAntlrRuntimeIfRequired(RunOptions runOptions) {
+	private InitializationStatus initAntlrRuntimeIfRequired(RunOptions runOptions) {
 		String language = getLanguage();
 		InitializationStatus status;
 
@@ -275,7 +277,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 		}
 
 		if (status.isInitialized != null) {
-			return status.isInitialized;
+			return status;
 		}
 
 		// Locking per runtime, several runtimes can be being initialized simultaneously
@@ -292,7 +294,7 @@ public abstract class RuntimeRunner implements AutoCloseable {
 				status.exception = exception;
 			}
 		}
-		return status.isInitialized;
+		return status;
 	}
 
 	protected void initRuntime(RunOptions runOptions) throws Exception {

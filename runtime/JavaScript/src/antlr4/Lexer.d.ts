@@ -2,6 +2,7 @@ import {Recognizer} from "./Recognizer";
 import {LexerATNSimulator} from "./atn";
 import {CharStream} from "./CharStream";
 import {Token} from "./Token";
+import {TokenFactory} from "./TokenFactory";
 
 export declare class Lexer extends Recognizer<number> {
 
@@ -31,4 +32,5 @@ export declare class Lexer extends Recognizer<number> {
     emit(): Token;
     emitEOF(): Token;
     getAllTokens(): Token[];
+    set tokenFactory(factory: TokenFactory);
 }
