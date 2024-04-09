@@ -45,6 +45,7 @@ import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
 import TokenStreamRewriter from './TokenStreamRewriter.js';
+import InputMismatchException from "./error/InputMismatchException.js"
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
@@ -56,5 +57,5 @@ export {
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
-    arrayToString, TokenStreamRewriter
+    arrayToString, TokenStreamRewriter, InputMismatchException
 }
