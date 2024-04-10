@@ -24,17 +24,6 @@ using namespace antlrcpp;
 
 namespace {
 
-  void combineCommonParents(std::vector<Ref<const PredictionContext>> &parents) {
-    std::unordered_set<Ref<const PredictionContext>> uniqueParents;
-    uniqueParents.reserve(parents.size());
-    for (const auto &parent : parents) {
-      uniqueParents.insert(parent);
-    }
-    for (auto &parent : parents) {
-      parent = *uniqueParents.find(parent);
-    }
-  }
-
   Ref<const PredictionContext> getCachedContextImpl(const Ref<const PredictionContext> &context,
                                                     PredictionContextCache &contextCache,
                                                     std::unordered_map<Ref<const PredictionContext>,
@@ -438,7 +427,6 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
     return b;
   }
 
-  combineCommonParents(m.parents);
   auto c = std::make_shared<ArrayPredictionContext>(std::move(m));
 
 #if TRACE_ATN_SIM == 1
