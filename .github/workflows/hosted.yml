@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-11,
+          macos-12,
           ubuntu-20.04,
           windows-2022
         ]
@@ -160,7 +160,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-11,
+          macos-12,
           ubuntu-20.04,
           windows-2022
         ]
@@ -198,9 +198,9 @@ jobs:
 
     - name: Setup PHP 8.2
       if: matrix.target == 'php'
-      uses: shivammathur/setup-php@2.22.0
+      uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'
+        php-version: '8.3'
         extensions: mbstring
         tools: composer
 
