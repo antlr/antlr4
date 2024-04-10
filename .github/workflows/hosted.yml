@@ -196,6 +196,14 @@ jobs:
         repository: antlr/antlr-php-runtime
         path: runtime/PHP
 
+    - name: Setup PHP 8.2
+      if: matrix.target == 'php'
+      uses: shivammathur/setup-php@2.22.0
+      with:
+        php-version: '8.2'
+        extensions: mbstring
+        tools: composer
+
     - name: Install dependencies
       env:
         COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
@@ -262,14 +270,6 @@ jobs:
       uses: actions/setup-go@v3.3.1
       with:
         go-version: '^1.19'
-
-    - name: Setup PHP 8.2
-      if: matrix.target == 'php'
-      uses: shivammathur/setup-php@2.22.0
-      with:
-        php-version: '8.2'
-        extensions: mbstring
-        tools: composer
 
     - name: Setup Swift
       if: matrix.target == 'swift'
