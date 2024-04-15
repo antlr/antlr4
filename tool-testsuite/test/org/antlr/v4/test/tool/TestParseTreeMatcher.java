@@ -392,7 +392,7 @@ public class TestParseTreeMatcher {
 		String lexerName = grammarName+"Lexer";
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, input,
-				false, false, Stage.Execute, null);
+				false, false, Stage.Execute, null, null);
 		try (JavaRunner runner = new JavaRunner()) {
 			JavaExecutedState executedState = (JavaExecutedState)runner.run(runOptions);
 			JavaCompiledState compiledState = (JavaCompiledState)executedState.previousState;
@@ -413,7 +413,7 @@ public class TestParseTreeMatcher {
 	) throws Exception {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammar, parserName, lexerName,
 				false, false, startRule, null,
-				false, false, Stage.Compile, null);
+				false, false, Stage.Compile, null, null);
 		try (JavaRunner runner = new JavaRunner()) {
 			JavaCompiledState compiledState = (JavaCompiledState) runner.run(runOptions);
 

@@ -24,6 +24,7 @@ public class RunOptions {
 	public final boolean showDFA;
 	public final Stage endStage;
 	public final String superClass;
+	public final String libDir;
 	public final String actionTemplates;
 	public final PredictionMode predictionMode;
 	public final boolean buildParseTree;
@@ -32,7 +33,7 @@ public class RunOptions {
 					  boolean useListener, boolean useVisitor, String startRuleName,
 					  String input, boolean profile, boolean showDiagnosticErrors,
 					  boolean traceATN, boolean showDFA, Stage endStage,
-					  String language, String superClass, String actionTemplates, PredictionMode predictionMode, boolean buildParseTree) {
+					  String language, String superClass, String libDir, String actionTemplates, PredictionMode predictionMode, boolean buildParseTree) {
 		this.grammarFileName = grammarFileName;
 		this.grammarStr = grammarStr;
 		this.parserName = parserName;
@@ -70,6 +71,7 @@ public class RunOptions {
 		this.showDFA = showDFA;
 		this.endStage = endStage;
 		this.superClass = superClass;
+		this.libDir = libDir;
 		this.actionTemplates = actionTemplates;
 		this.predictionMode = predictionMode;
 		this.buildParseTree = buildParseTree;

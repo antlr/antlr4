@@ -23,12 +23,12 @@ public class TestActionTemplates {
 		String actionTemplates = tempDir + FileSeparator + "Java.st";
 
 		String grammar =
-			"lexer grammar L;"+
+			"lexer grammar L;" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
-		assertInstanceOf(GeneratedState.class, state);
+		assertInstanceOf(GeneratedState.class, state, state.getErrorMessage());
 
 		GeneratedState generated = (GeneratedState) state;
 
@@ -45,12 +45,12 @@ public class TestActionTemplates {
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
-			"lexer grammar L;"+
+			"lexer grammar L;" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
-		assertInstanceOf(GeneratedState.class, state);
+		assertInstanceOf(GeneratedState.class, state, state.getErrorMessage());
 
 		GeneratedState generated = (GeneratedState) state;
 
@@ -69,13 +69,13 @@ public class TestActionTemplates {
 		String grammarFile = tempDir + FileSeparator + "L.g4";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {<¢>} ;\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {<¢>} ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
-		assertInstanceOf(GeneratedState.class, state);
+		assertInstanceOf(GeneratedState.class, state, state.getErrorMessage());
 
 		GeneratedState generated = (GeneratedState) state;
 
@@ -95,15 +95,15 @@ public class TestActionTemplates {
 		String grammarFile = tempDir + FileSeparator + "L.g4";
 
 		String grammar =
-			"lexer grammar L;\n"+
+			"lexer grammar L;\n" +
 			"I : '0'..'9'+ {\n" +
 			"  <¢>\n" +
-			"};\n"+
+			"};\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
 
-		assertInstanceOf(GeneratedState.class, state);
+		assertInstanceOf(GeneratedState.class, state, state.getErrorMessage());
 
 		GeneratedState generated = (GeneratedState) state;
 
@@ -123,8 +123,8 @@ public class TestActionTemplates {
 		String grammarFile = tempDir + FileSeparator + "L.g4";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
@@ -147,8 +147,8 @@ public class TestActionTemplates {
 		String grammarFile = tempDir + FileSeparator + "L.g4";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {<writeln(\"I\")} ;\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {<writeln(\"I\")} ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
@@ -163,17 +163,18 @@ public class TestActionTemplates {
 			generated.getErrorMessage());
 	}
 
-	@Test void testInvalidMultilineActionTemplate(@TempDir Path tempDir) {
+	@Test
+	void testInvalidMultilineActionTemplate(@TempDir Path tempDir) {
 		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
 
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
 		String grammarFile = tempDir + FileSeparator + "L.g4";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {\n"+
-			"  <writeln(\"I\")\n"+
-			"};\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {\n" +
+			"  <writeln(\"I\")\n" +
+			"};\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
@@ -188,14 +189,15 @@ public class TestActionTemplates {
 			generated.getErrorMessage());
 	}
 
-	@Test void testValidActionTemplate(@TempDir Path tempDir) {
+	@Test
+	void testValidActionTemplate(@TempDir Path tempDir) {
 		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
 
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
@@ -208,21 +210,22 @@ public class TestActionTemplates {
 			"[@1,3:4='34',<1>,1:3]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
 
-		assertInstanceOf(ExecutedState.class, state);
+		assertInstanceOf(ExecutedState.class, state, state.getErrorMessage());
 
 		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
-	@Test void testValidMultilineActionTemplate(@TempDir Path tempDir) {
+	@Test
+	void testValidMultilineActionTemplate(@TempDir Path tempDir) {
 		writeActionTemplatesFile(tempDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
 
 		String actionTemplates = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {\n"+
-			"  <writeln(\"I\")>\n"+
-			"};\n"+
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {\n" +
+			"  <writeln(\"I\")>\n" +
+			"};\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "34 34", tempDir, actionTemplates);
@@ -235,12 +238,13 @@ public class TestActionTemplates {
 			"[@1,3:4='34',<1>,1:3]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
 
-		assertInstanceOf(ExecutedState.class, state);
+		assertInstanceOf(ExecutedState.class, state, state.getErrorMessage());
 
 		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
-	@Test void testActionTemplateHeader(@TempDir Path tempDir) {
+	@Test
+	void testActionTemplateHeader(@TempDir Path tempDir) {
 		String actionTemplates =
 			"normalizerImports() ::= <<\n" +
 			"import java.text.Normalizer;\n" +
@@ -255,29 +259,30 @@ public class TestActionTemplates {
 		String actionTemplatesFile = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
-			"lexer grammar L;\n"+
-			"@lexer::header {\n"+
-			"<normalizerImports()>\n"+
-			"}\n"+
-			"ID : (ID_START ID_CONTINUE* | '_' ID_CONTINUE+) { <setText(normalize(getText()))> } ;\n"+
-			"ID_START : [\\p{XID_Start}] ;\n"+
-			"ID_CONTINUE: [\\p{XID_Continue}] ;\n"+
+			"lexer grammar L;\n" +
+			"@lexer::header {\n" +
+			"<normalizerImports()>\n" +
+			"}\n" +
+			"ID : (ID_START ID_CONTINUE* | '_' ID_CONTINUE+) { <setText(normalize(getText()))> } ;\n" +
+			"ID_START : [\\p{XID_Start}] ;\n" +
+			"ID_CONTINUE: [\\p{XID_Continue}] ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execLexer(grammar, "This _is \ufb01ne", tempDir, actionTemplatesFile);
 
 		String expecting =
-			"[@0,0:3='This',<1>,1:0]\n"+
-			"[@1,5:7='_is',<1>,1:5]\n"+
-			"[@2,9:11='fine',<1>,1:9]\n"+
+			"[@0,0:3='This',<1>,1:0]\n" +
+			"[@1,5:7='_is',<1>,1:5]\n" +
+			"[@2,9:11='fine',<1>,1:9]\n" +
 			"[@3,12:11='<EOF>',<-1>,1:12]\n";
 
-		assertInstanceOf(ExecutedState.class, state);
+		assertInstanceOf(ExecutedState.class, state, state.getErrorMessage());
 
 		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
-	@Test void testActionTemplateSemanticPredicate(@TempDir Path tempDir) {
+	@Test
+	void testActionTemplateSemanticPredicate(@TempDir Path tempDir) {
 		String actionTemplates = "pred() ::= <<true>>";
 
 		writeActionTemplatesFile(tempDir, actionTemplates);
@@ -285,30 +290,56 @@ public class TestActionTemplates {
 		String actionTemplatesFile = tempDir + FileSeparator + "Java.stg";
 
 		String grammar =
-			"grammar P;\n"+
-			"file : atom EOF ;\n"+
-			"atom : scientific | { <pred()> }? variable ;\n"+
-			"variable: VARIABLE ;\n"+
-			"scientific: SCIENTIFIC_NUMBER ;\n"+
+			"grammar P;\n" +
+			"file : atom EOF ;\n" +
+			"atom : scientific | { <pred()> }? variable ;\n" +
+			"variable: VARIABLE ;\n" +
+			"scientific: SCIENTIFIC_NUMBER ;\n" +
 			"VARIABLE : VALID_ID_START VALID_ID_CHAR* ;\n" +
-			"SCIENTIFIC_NUMBER : NUMBER (E SIGN? UNSIGNED_INTEGER)? ;\n"+
-			"fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_' ;\n"+
-			"fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;\n"+
-			"fragment NUMBER : ('0' .. '9') + ('.' ('0' .. '9') +)? ;\n"+
-			"fragment UNSIGNED_INTEGER : ('0' .. '9')+ ;\n"+
-			"fragment E : 'E' | 'e' ;\n"+
-			"fragment SIGN : ('+' | '-') ;\n"+
+			"SCIENTIFIC_NUMBER : NUMBER (E SIGN? UNSIGNED_INTEGER)? ;\n" +
+			"fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_' ;\n" +
+			"fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;\n" +
+			"fragment NUMBER : ('0' .. '9') + ('.' ('0' .. '9') +)? ;\n" +
+			"fragment UNSIGNED_INTEGER : ('0' .. '9')+ ;\n" +
+			"fragment E : 'E' | 'e' ;\n" +
+			"fragment SIGN : ('+' | '-') ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 
 		State state = execParser(grammar, "Bla", tempDir, "file", actionTemplatesFile);
 
-		assertInstanceOf(ExecutedState.class, state);
+		assertInstanceOf(ExecutedState.class, state, state.getErrorMessage());
 
 		ExecutedState executedState = (ExecutedState) state;
 
 		// We can never match the input unless pred() expands to true
 		assertEquals("", executedState.output);
 		assertEquals("", executedState.errors);
+	}
+
+	@Test
+	void testValidActionTemplateInLibDir(@TempDir Path tempDir, @TempDir Path libDir) {
+		writeActionTemplatesFile(libDir, "writeln(s) ::= <<outStream.println(\"<s>\");>>");
+
+		String actionTemplates = "Java.stg";
+
+		String grammar =
+			"lexer grammar L;\n" +
+			"I : '0'..'9'+ {<writeln(\"I\")>} ;\n" +
+			"WS : (' '|'\\n') -> skip ;";
+
+		State state = execLexer(grammar, "34 34", tempDir, libDir, actionTemplates);
+
+		// Should have identical output to TestLexerActions.testActionExecutedInDFA
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<1>,1:0]\n" +
+			"[@1,3:4='34',<1>,1:3]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+
+		assertInstanceOf(ExecutedState.class, state, state.getErrorMessage());
+
+		assertEquals(expecting, ((ExecutedState) state).output);
 	}
 
 	void writeActionTemplatesFile(Path tempDir, String template) {
@@ -318,7 +349,7 @@ public class TestActionTemplates {
 	State execParser(String grammarStr, String input, Path tempDir, String startRule, String actionTemplates) {
 		RunOptions runOptions = createOptionsForJavaToolTests("P.g4", grammarStr, "PParser", "PLexer",
 			false, true, startRule, input,
-			false, false, Stage.Execute, actionTemplates);
+			false, false, Stage.Execute, null, actionTemplates);
 		try (JavaRunner runner = new JavaRunner(tempDir, false)) {
 			return runner.run(runOptions);
 		}
@@ -327,7 +358,16 @@ public class TestActionTemplates {
 	State execLexer(String grammarStr, String input, Path tempDir, String actionTemplates) {
 		RunOptions runOptions = createOptionsForJavaToolTests("L.g4", grammarStr, null, "L",
 			false, true, null, input,
-			false, false, Stage.Execute, actionTemplates);
+			false, false, Stage.Execute, null, actionTemplates);
+		try (JavaRunner runner = new JavaRunner(tempDir, false)) {
+			return runner.run(runOptions);
+		}
+	}
+
+	State execLexer(String grammarStr, String input, Path tempDir, Path libDir, String actionTemplates) {
+		RunOptions runOptions = createOptionsForJavaToolTests("L.g4", grammarStr, null, "L",
+			false, true, null, input,
+			false, false, Stage.Execute, libDir.toString(), actionTemplates);
 		try (JavaRunner runner = new JavaRunner(tempDir, false)) {
 			return runner.run(runOptions);
 		}

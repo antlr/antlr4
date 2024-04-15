@@ -223,7 +223,7 @@ public class TestParserProfiler {
 
 		RunOptions runOptions = createOptionsForJavaToolTests("T.g4", grammar, "TParser", "TLexer",
 				false, false, "s", "xyz;abc;z.q",
-				true, false, Stage.Execute, null);
+				true, false, Stage.Execute, null, null);
 		try (JavaRunner runner = new JavaRunner()) {
 			ExecutedState state = (ExecutedState) runner.run(runOptions);
 			String expecting =

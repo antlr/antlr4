@@ -159,6 +159,7 @@ public class TraceATN {
 				targetName,
 				superClass,
 				null,
+				null,
 				PredictionMode.LL,
 				true
 		);

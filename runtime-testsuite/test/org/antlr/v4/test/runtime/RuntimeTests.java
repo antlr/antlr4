@@ -168,6 +168,7 @@ public abstract class RuntimeTests {
 				targetName,
 				superClass,
 				null,
+				null,
 				descriptor.predictionMode,
 				descriptor.buildParseTree
 		);

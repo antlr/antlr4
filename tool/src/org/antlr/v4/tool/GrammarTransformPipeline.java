@@ -770,7 +770,7 @@ public class GrammarTransformPipeline {
 		}
 
 		try {
-			STGroupFile actionTemplates = new STGroupFile(actionTemplatesFile);
+			STGroupFile actionTemplates = new STGroupFile(actionTemplatesGroupFile.getAbsolutePath());
 			STErrorListener errorListener = createActionTemplateErrorListener(root, actionTemplates);
 
 			// Force load the action templates group file
