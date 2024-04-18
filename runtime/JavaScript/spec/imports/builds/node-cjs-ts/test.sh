@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 tsconfigFiles=(
-  "tsconfig.node16.json"
-  "tsconfig.bundler.es2022.json"
+  "tsconfig.node.commonjs.json"
 )
 
 failure=0
@@ -13,7 +12,7 @@ for tsconfig in "${tsconfigFiles[@]}"; do
   ./node_modules/.bin/tsc -p $tsconfig || { failure=1 ; echo "FAIL tsc: $tsconfig"; }
   result=$(node ./tsOutput/index.js)
   [[ $result == "OK" ]] && echo "OK"
-  [[ $result != "OK" ]] && { failure=1 ; echo "FAIL runtime: $tsconfig"; }
+  [[ $result != "OK" ]] && { failure=1 ; echo "FAIL loading runtime with config: $tsconfig"; }
   rm -rf ./tsOutput
 done
 
