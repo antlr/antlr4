@@ -6,7 +6,7 @@
   "browser": "dist/antlr4.web.mjs",
   "main": "dist/antlr4.node.cjs",
   "module": "dist/antlr4.node.mjs",
-  "types": "src/antlr4/index.d.ts",
+  "types": "src/antlr4/index.d.cts",
   "repository": "antlr/antlr4.git",
   "keywords": [
     "lexer",
@@ -42,8 +42,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "jasmine && npm run test:projects",
-    "test:projects": "bash test-projects.sh",
+    "test": "jasmine && npm run test:builds",
+    "test:builds": "bash test-builds.sh",
     "coverage": "c8 jasmine",
     "lint": "eslint src/antlr4/"
   },
