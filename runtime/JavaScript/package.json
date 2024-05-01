@@ -6,7 +6,7 @@
   "browser": "dist/antlr4.web.mjs",
   "main": "dist/antlr4.node.cjs",
   "module": "dist/antlr4.node.mjs",
-  "types": "src/antlr4/index.d.cts",
+  "types": "src/antlr4/index.d.ts",
   "repository": "antlr/antlr4.git",
   "keywords": [
     "lexer",
@@ -45,14 +45,15 @@
     "test": "jasmine && npm run test:builds",
     "test:builds": "bash test-builds.sh",
     "coverage": "c8 jasmine",
-    "lint": "eslint src/antlr4/"
+    "lint": "eslint src/antlr4/",
+    "prepack": "npm run build"
   },
   "engines": {
     "node": ">=16"
   },
   "exports": {
     ".": {
-      "types": "./src/antlr4/index.d.cts",
+      "types": "./src/antlr4/index.d.ts",
       "node": {
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
