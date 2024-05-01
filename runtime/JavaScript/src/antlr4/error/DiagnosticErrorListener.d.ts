@@ -1,6 +1,6 @@
-import {ErrorListener} from "./ErrorListener";
-import {Recognizer} from "../Recognizer";
-import {RecognitionException} from "./RecognitionException";
+import {ErrorListener} from './ErrorListener.js';
+import {Recognizer} from '../Recognizer.js';
+import {RecognitionException} from './RecognitionException.js';
 
 export declare class DiagnosticErrorListener<TSymbol> implements ErrorListener<TSymbol> {
 
