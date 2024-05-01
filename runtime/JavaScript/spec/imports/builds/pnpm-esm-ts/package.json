@@ -1,0 +1,20 @@
+{
+  "name": "test-import-pnpm-esm-ts",
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.0.6",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "test": "bash test.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "antlr4": "file:../../../.."
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

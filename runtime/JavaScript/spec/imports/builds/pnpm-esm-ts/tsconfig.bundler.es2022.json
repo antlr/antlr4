@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "outDir": "./tsOutput",
+    "module": "es2022",
+    "moduleResolution": "bundler"
+  },
+  "include": ["index.ts"],
+}
