@@ -14,7 +14,7 @@ ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *
       _generateRuleBypassTransitions(options->_generateRuleBypassTransitions) {}
 
 const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {
-  static const ATNDeserializationOptions* const defaultOptions = new ATNDeserializationOptions();
+  static const std::unique_ptr<const ATNDeserializationOptions> defaultOptions = std::make_unique<const ATNDeserializationOptions>();
   return *defaultOptions;
 }
 
