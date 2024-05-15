@@ -1,4 +1,4 @@
-// +build nomutex
+// +build antlr.nomutex
 
 package antlr
 
