@@ -29,7 +29,7 @@ type goRunStats struct {
 	// within this package.
 	//
 	jStats            []*JStatRec
-	jStatsLock        `RWMutex
+	jStatsLock        RWMutex
 	topN              int
 	topNByMax         []*JStatRec
 	topNByUsed        []*JStatRec
