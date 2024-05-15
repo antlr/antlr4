@@ -147,7 +147,7 @@ struct <lexer.name; format = "cap">StaticData final {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
 #endif
-<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+std::unique_ptr\<<lexer.name; format = "cap">StaticData> <lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -175,7 +175,7 @@ void <lexer.grammarName; format = "lower">LexerInitialize() {
     }
   );
   <atn>
-  <lexer.grammarName; format = "lower">LexerStaticData = staticData.release();
+  <lexer.grammarName; format = "lower">LexerStaticData = std::move(staticData);
 }
 
 }
@@ -380,7 +380,7 @@ struct <parser.name; format = "cap">StaticData final {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
 #endif
-<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+std::unique_ptr\<<parser.name; format = "cap">StaticData> <parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -402,7 +402,7 @@ void <parser.grammarName; format = "lower">ParserInitialize() {
     }
   );
   <atn>
-  <parser.grammarName; format = "lower">ParserStaticData = staticData.release();
+  <parser.grammarName; format = "lower">ParserStaticData = std::move(staticData);
 }
 
 }
