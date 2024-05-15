@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"golang.org/x/exp/slices"
 	"strconv"
 )
 
@@ -144,10 +143,8 @@ func (p *PredictionContext) ArrayEquals(o Collectable[*PredictionContext]) bool 
 
 	// Must compare the actual array elements and not just the array address
 	//
-	return slices.Equal(p.returnStates, other.returnStates) &&
-		slices.EqualFunc(p.parents, other.parents, func(x, y *PredictionContext) bool {
-			return x.Equals(y)
-		})
+	return intSlicesEqual(p.returnStates, other.returnStates) &&
+		pcSliceEqual(p.parents, other.parents)
 }
 
 func (p *PredictionContext) SingletonEquals(other Collectable[*PredictionContext]) bool {
