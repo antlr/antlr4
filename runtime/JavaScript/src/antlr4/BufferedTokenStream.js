@@ -253,7 +253,7 @@ export default class BufferedTokenStream extends TokenStream {
 			return -1;
 		}
 		let token = this.tokens[i];
-		while (token.channel !== this.channel) {
+		while (token.channel !== channel) {
 			if (token.type === Token.EOF) {
 				return -1;
 			}

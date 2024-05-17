@@ -1010,7 +1010,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         let altToPred = [];
         for(let i=0;i<configs.items.length;i++) {
             const c = configs.items[i];
-            if(ambigAlts.has( c.alt )) {
+            if(ambigAlts.get( c.alt )) {
                 altToPred[c.alt] = SemanticContext.orContext(altToPred[c.alt] || null, c.semanticContext);
             }
         }
@@ -1039,7 +1039,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         for (let i=1; i<altToPred.length;i++) {
             const pred = altToPred[i];
             // unpredicated is indicated by SemanticContext.NONE
-            if( ambigAlts!==null && ambigAlts.has( i )) {
+            if( ambigAlts!==null && ambigAlts.get( i )) {
                 pairs.push(new PredPrediction(pred, i));
             }
             if (pred !== SemanticContext.NONE) {
@@ -1173,7 +1173,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         for(let i=0;i<predPredictions.length;i++) {
             const pair = predPredictions[i];
             if (pair.pred === SemanticContext.NONE) {
-                predictions.add(pair.alt);
+                predictions.set(pair.alt);
                 if (! complete) {
                     break;
                 }
@@ -1187,7 +1187,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                 if (this.debug || this.dfa_debug) {
                     console.log("PREDICT " + pair.alt);
                 }
-                predictions.add(pair.alt);
+                predictions.set(pair.alt);
                 if (! complete) {
                     break;
                 }
@@ -1287,7 +1287,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                     }
 
                     c.reachesIntoOuterContext += 1;
-                    if (closureBusy.add(c)!==c) {
+                    if (closureBusy.getOrAdd(c)!==c) {
                         // avoid infinite recursion for right-recursive rules
                         continue;
                     }
@@ -1297,7 +1297,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                         console.log("dips into outer ctx: " + c);
                     }
                 } else {
-                    if (!t.isEpsilon && closureBusy.add(c)!==c){
+                    if (!t.isEpsilon && closureBusy.getOrAdd(c)!==c){
                         // avoid infinite recursion for EOF* and EOF+
                         continue;
                     }
@@ -1544,7 +1544,7 @@ export default class ParserATNSimulator extends ATNSimulator {
         let conflictingAlts = null;
         if (configs.uniqueAlt!== ATN.INVALID_ALT_NUMBER) {
             conflictingAlts = new BitSet();
-            conflictingAlts.add(configs.uniqueAlt);
+            conflictingAlts.set(configs.uniqueAlt);
         } else {
             conflictingAlts = configs.conflictingAlts;
         }
@@ -1702,7 +1702,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportAttemptingFullContext(this.parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
+            this.parser.getErrorListener().reportAttemptingFullContext(this.parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
         }
     }
 
@@ -1713,7 +1713,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
+            this.parser.getErrorListener().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
         }
     }
 
@@ -1726,7 +1726,7 @@ export default class ParserATNSimulator extends ATNSimulator {
                                ", input=" + this.parser.getTokenStream().getText(interval));
         }
         if (this.parser!==null) {
-            this.parser.getErrorListenerDispatch().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+            this.parser.getErrorListener().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
         }
     }
 }

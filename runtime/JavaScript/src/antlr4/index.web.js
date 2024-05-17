@@ -14,7 +14,7 @@ import { default as Utils } from './utils/index.js';
 import Token from './Token.js';
 import CommonToken from './CommonToken.js';
 import InputStream from './InputStream.js';
-import CharStream from './InputStream.js';
+import CharStream from './CharStream.js';
 import CommonTokenStream from './CommonTokenStream.js';
 import Lexer from './Lexer.js';
 import Parser from './Parser.js';
@@ -33,6 +33,7 @@ import RecognitionException from "./error/RecognitionException.js";
 import FailedPredicateException from "./error/FailedPredicateException.js";
 import NoViableAltException from "./error/NoViableAltException.js";
 import BailErrorStrategy from "./error/BailErrorStrategy.js";
+import DefaultErrorStrategy from "./error/DefaultErrorStrategy.js";
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import ParseTreeListener from "./tree/ParseTreeListener.js";
@@ -44,6 +45,7 @@ import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
 import TokenStreamRewriter from './TokenStreamRewriter.js';
+import InputMismatchException from "./error/InputMismatchException.js"
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
@@ -54,6 +56,6 @@ export {
     Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
-    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy,
-    arrayToString
+    RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
+    arrayToString, TokenStreamRewriter, InputMismatchException
 }

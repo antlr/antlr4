@@ -34,7 +34,7 @@ set(ANTLR4_WITH_STATIC_CRT OFF)
 
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
-# add antrl4cpp artifacts to project environment
+# add antlr4cpp artifacts to project environment
 include_directories(${ANTLR4_INCLUDE_DIRS})
 
 # set variable pointing to the antlr tool that supports C++

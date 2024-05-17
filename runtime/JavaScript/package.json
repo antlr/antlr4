@@ -3,8 +3,9 @@
   "version": "4.13.1",
   "type": "module",
   "description": "JavaScript runtime for ANTLR4",
-  "browser": "dist/antlr4.web.js",
-  "main": "dist/antlr4.node.mjs",
+  "browser": "dist/antlr4.web.mjs",
+  "main": "dist/antlr4.node.cjs",
+  "module": "dist/antlr4.node.mjs",
   "types": "src/antlr4/index.d.ts",
   "repository": "antlr/antlr4.git",
   "keywords": [

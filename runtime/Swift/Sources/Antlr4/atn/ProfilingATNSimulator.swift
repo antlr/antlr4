@@ -60,7 +60,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         let start = ProcessInfo.processInfo.systemUptime //System.nanoTime(); // expensive but useful info
         let alt: Int = try  super.adaptivePredict(input, decision, outerContext)
         let stop = ProcessInfo.processInfo.systemUptime  //System.nanoTime();
-        decisions[decision].timeInPrediction += Int64((stop - start) * TimeInterval(NSEC_PER_SEC))
+        decisions[decision].timeInPrediction += Int64((stop - start) * TimeInterval(1_000_000_000)) // Nanoseconds per 1 Second
         decisions[decision].invocations += 1
 
         let SLL_k: Int64 = Int64(_sllStopIndex - _startIndex + 1)

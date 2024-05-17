@@ -126,7 +126,15 @@ export default class Recognizer {
         return "'" + s + "'";
     }
 
+    /**
+     * @deprecated since ANTLR 4.13.2; use getErrorListener instead
+     */
     getErrorListenerDispatch() {
+        console.warn("Calling deprecated method in Recognizer class: getErrorListenerDispatch()");
+        return this.getErrorListener();
+    }
+
+    getErrorListener() {
         return new ProxyErrorListener(this._listeners);
     }
 
