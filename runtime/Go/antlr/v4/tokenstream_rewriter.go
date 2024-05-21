@@ -641,22 +641,3 @@ func reduceToSingleOperationPerIndex(rewrites []RewriteOperation) map[int]Rewrit
 	}
 	return m
 }
-
-/*
-	Quick fixing Go lack of overloads
-*/
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	} else {
-		return b
-	}
-}
-func min(a, b int) int {
-	if a < b {
-		return a
-	} else {
-		return b
-	}
-}
