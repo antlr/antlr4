@@ -305,5 +305,5 @@ Invoke_pred(v) ::= <<self.pred(<v>)>>
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 ContextListFunction(ctx, rule) ::= "<ctx>.<rule>()"
 ContextMember(ctx, member) ::= "<ctx>!.<member>"
-SubContextLocal(ctx, subctx, local) ::= "<ctx>.<subctx>!.<local>"
-SubContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>"
+SubContextLocal(ctx, subctx, local, arg) ::= "<ctx>.<subctx>(<arg>)!.<local>"
+SubContextMember(ctx, subctx, member, arg) ::= "<ctx>.<subctx>(<arg>)!.<member>"
