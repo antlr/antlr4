@@ -860,6 +860,8 @@ CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures,
            superClass={ParserRuleContext}) ::= <<
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.CLSCompliant(false)]
 public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -883,6 +885,8 @@ public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuper
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.CLSCompliant(false)]
 public partial class <struct.escapedName> : <currentRule.name; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
