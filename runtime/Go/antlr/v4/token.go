@@ -203,11 +203,22 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // {@link Token//GetInputStream}.</p>
 //
 // @param oldToken The token to copy.
-func (c *CommonToken) clone() *CommonToken {
-	t := NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
-	t.tokenIndex = c.GetTokenIndex()
-	t.line = c.GetLine()
-	t.column = c.GetColumn()
-	t.text = c.GetText()
-	return t
+func (c *CommonToken) Clone() *CommonToken {
+	return &CommonToken{c.BaseToken}
+}
+
+func (c *CommonToken) SetChannel(channel int) {
+	c.channel = channel
+}
+
+func (c *CommonToken) SetStop(stop int) {
+	c.stop = stop
+}
+
+func (c *CommonToken) SetText(text string) {
+	c.text = text
+}
+
+func (c *CommonToken) SetTokenType(ttype int) {
+	c.tokenType = ttype
 }

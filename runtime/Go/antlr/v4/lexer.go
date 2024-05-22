@@ -25,6 +25,10 @@ type Lexer interface {
 	PushMode(int)
 	PopMode() int
 	SetType(int)
+
+	GetModeStack() IntStack
+
+	GetMode() int
 	SetMode(int)
 }
 
@@ -245,6 +249,14 @@ func (b *BaseLexer) Skip() {
 
 func (b *BaseLexer) More() {
 	b.thetype = LexerMore
+}
+
+func (b *BaseLexer) GetModeStack() IntStack {
+	return b.modeStack
+}
+
+func (b *BaseLexer) GetMode() int {
+	return b.mode
 }
 
 // SetMode changes the lexer to a new mode. The lexer will use this mode from hereon in and the rules for that mode
