@@ -159,7 +159,7 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 type <parser.name> struct {
-	<superClass; null="*antlr.BaseParser">
+	*<superClass; null="antlr.BaseParser">
 	<if(namedActions.structmembers)>
 	// Grammar author supplied members of the instance struct
 	<namedActions.structmembers>
@@ -219,7 +219,7 @@ func <parser.name; format="cap">Init() {
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	<parser.name; format="cap">Init()
 	this := new(<parser.name>)
-	this.BaseParser = antlr.NewBaseParser(input)
+	<if(superClass)>this.<superClass> = New<superClass>(input)<else>this.BaseParser = antlr.NewBaseParser(input)<endif>
   staticData := &<parser.grammarName; format="cap">ParserStaticData
 	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
 	this.RuleNames = staticData.RuleNames
@@ -1484,7 +1484,7 @@ var _ = unicode.IsLetter
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 type <lexer.name> struct {
-	<if(superClass)><superClass><else>*antlr.BaseLexer<endif>
+	<if(superClass)>*<superClass><else>*antlr.BaseLexer<endif>
 	channelNames []string
 	modeNames []string
 	<if(namedActions.structmembers)>
@@ -1555,7 +1555,7 @@ func <lexer.name; format="cap">Init() {
 func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
   <lexer.name; format="cap">Init()
 	l := new(<lexer.name>)
-	l.BaseLexer = antlr.NewBaseLexer(input)
+	<if(superClass)>l.<superClass> = New<superClass>(input)<else>l.BaseLexer = antlr.NewBaseLexer(input)<endif>
   staticData := &<lexer.grammarName; format="cap">LexerStaticData
 	l.Interpreter = antlr.NewLexerATNSimulator(l, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
 	l.channelNames = staticData.ChannelNames
