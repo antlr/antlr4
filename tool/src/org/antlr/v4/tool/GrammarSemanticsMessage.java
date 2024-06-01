@@ -17,12 +17,7 @@ public class GrammarSemanticsMessage extends ANTLRMessage {
                                    Token offendingToken,
                                    Object... args)
     {
-        super(etype,offendingToken,args);
-        this.fileName = fileName;
-		if ( offendingToken!=null ) {
-            line = offendingToken.getLine();
-            charPosition = offendingToken.getCharPositionInLine();
-        }
+        super(etype, fileName, offendingToken, args);
     }
 }
 
