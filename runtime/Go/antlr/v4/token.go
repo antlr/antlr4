@@ -192,22 +192,27 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 
 //CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
-// Constructs a New{@link CommonToken} as a copy of another {@link Token}.
-//
-// <p>
-// If {@code oldToken} is also a {@link CommonToken} instance, the newly
-// constructed token will share a reference to the {@link //text} field and
-// the {@link Pair} stored in {@link //source}. Otherwise, {@link //text} will
-// be assigned the result of calling {@link //GetText}, and {@link //source}
-// will be constructed from the result of {@link Token//GetTokenSource} and
-// {@link Token//GetInputStream}.</p>
-//
-// @param oldToken The token to copy.
-func (c *CommonToken) clone() *CommonToken {
-	t := NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
-	t.tokenIndex = c.GetTokenIndex()
-	t.line = c.GetLine()
-	t.column = c.GetColumn()
-	t.text = c.GetText()
+func NewCommonTokenFromToken(oldToken Token) *CommonToken {
+	t := NewCommonToken(oldToken.GetSource(), oldToken.GetTokenType(), oldToken.GetChannel(), oldToken.GetStart(), oldToken.GetStop())
+	t.tokenIndex = oldToken.GetTokenIndex()
+	t.line = oldToken.GetLine()
+	t.column = oldToken.GetColumn()
+	t.text = oldToken.GetText()
 	return t
+}
+
+func (c *CommonToken) SetChannel(channel int) {
+	c.channel = channel
+}
+
+func (c *CommonToken) SetStop(stop int) {
+	c.stop = stop
+}
+
+func (c *CommonToken) SetText(text string) {
+	c.text = text
+}
+
+func (c *CommonToken) SetTokenType(ttype int) {
+	c.tokenType = ttype
 }
