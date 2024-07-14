@@ -6,7 +6,8 @@
 
 package org.antlr.v4.test.runtime.swift;
 
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.RunOptions;
+import org.antlr.v4.test.runtime.RuntimeRunner;
 import org.antlr.v4.test.runtime.states.CompiledState;
 import org.antlr.v4.test.runtime.states.GeneratedState;
 import org.stringtemplate.v4.ST;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.antlr.v4.test.runtime.FileUtils.*;
+import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTextFromResource;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
@@ -39,21 +40,21 @@ public class SwiftRunner extends RuntimeRunner {
 	private static final String buildSuffix;
 	private static final Map<String, String> environment;
 
-	private static final String includePath;
+//	private static final String includePath;
 	private static final String libraryPath;
 
 	static {
 		swiftRuntimePath = getRuntimePath("Swift");
 		buildSuffix = isWindows() ? "x86_64-unknown-windows-msvc" : "";
-		includePath = Paths.get(swiftRuntimePath, ".build", buildSuffix, "release").toString();
+		String buildDir = Paths.get(swiftRuntimePath, "..", "..", ".build", buildSuffix, "release").normalize().toString();
 		environment = new HashMap<>();
 		if (isWindows()) {
-			libraryPath = Paths.get(includePath, "Antlr4.lib").toString();
+			libraryPath = Paths.get(buildDir, "Antlr4.lib").toString();
 			String path = System.getenv("PATH");
-			environment.put("PATH", path == null ? includePath : path + ";" + includePath);
+			environment.put("PATH", path == null ? buildDir : path + ";" + buildDir);
 		}
 		else {
-			libraryPath = includePath;
+			libraryPath = buildDir;
 		}
 	}
 
@@ -73,6 +74,7 @@ public class SwiftRunner extends RuntimeRunner {
 		try {
 			String tempDirPath = getTempDirPath();
 			File tempDirFile = new File(tempDirPath);
+			String projectPath = Paths.get(swiftRuntimePath, "../..").normalize().toString();
 
 			File[] ignoredFiles = tempDirFile.listFiles(NoSwiftFileFilter.Instance);
 			assert ignoredFiles != null;
@@ -81,6 +83,7 @@ public class SwiftRunner extends RuntimeRunner {
 			String text = getTextFromResource("org/antlr/v4/test/runtime/helpers/Package.swift.stg");
 			ST outputFileST = new ST(text);
 			outputFileST.add("excludedFiles", excludedFiles);
+			outputFileST.add("libraryPath", projectPath);
 			writeFile(tempDirPath, "Package.swift", outputFileST.render());
 
 			String[] buildProjectArgs = new String[]{
@@ -88,19 +91,14 @@ public class SwiftRunner extends RuntimeRunner {
 					"build",
 					"-c",
 					"release",
-					"-Xswiftc",
-					"-I" + includePath,
 					"-Xlinker",
-					"-L" + includePath,
+					"-L"+libraryPath,
 					"-Xlinker",
-					"-lAntlr4",
-					"-Xlinker",
-					"-rpath",
-					"-Xlinker",
-					libraryPath
+					"-lAntlr4Static"
 			};
 			runCommand(buildProjectArgs, tempDirPath);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			exception = e;
 		}
 
