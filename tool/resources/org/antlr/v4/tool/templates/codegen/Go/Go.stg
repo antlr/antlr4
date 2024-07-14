@@ -432,8 +432,10 @@ errorExit:
 	<finallyAction>
 	<endif>
 	p.ExitRule()
+	if false {
+		goto errorExit // Trick to prevent compiler error if the label is not used
+	}
 	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 >>
 
@@ -500,8 +502,10 @@ func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedN
 	<finallyAction>
 	<endif>
 	p.UnrollRecursionContexts(_parentctx)
+	if false {
+		goto errorExit // Trick to prevent compiler error if the label is not used
+	}
 	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 >>
 
