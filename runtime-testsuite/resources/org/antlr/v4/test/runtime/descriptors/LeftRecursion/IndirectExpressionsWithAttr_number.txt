@@ -1,0 +1,41 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow
+e : e '.' ID
+  | b[0]
+  | m[0]
+  | e '*' e
+  | e ('+'|'-') e
+  | INT
+  | ID
+  ;
+b [number x]: '(' e ')';
+m [number y] : '-' e;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+-(-a+b)+c
+
+[output]
+"""(s (e (e (m - (e (b ( (e (e (m - (e a))) + (e b)) ))))) + (e c)) <EOF>)
+"""
+
+[skip]
+Cpp
+CSharp
+Dart
+Go
+Java
+JavaScript
+PHP
+Python3
+Swift
+##TypeScript

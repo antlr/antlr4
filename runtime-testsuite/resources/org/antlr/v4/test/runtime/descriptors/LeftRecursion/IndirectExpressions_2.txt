@@ -1,0 +1,32 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow
+e : e '.' ID
+  | b1
+  | m1
+  | e '*' e
+  | e ('+'|'-') e
+  | INT
+  | ID
+  ;
+b1 : b;
+b : '(' e ')';
+m1 : m;
+m : '-' e;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+-(-a+b)+c
+
+[output]
+"""(s (e (e (m1 (m - (e (b1 (b ( (e (e (m1 (m - (e a)))) + (e b)) ))))))) + (e c)) <EOF>)
+"""
+
