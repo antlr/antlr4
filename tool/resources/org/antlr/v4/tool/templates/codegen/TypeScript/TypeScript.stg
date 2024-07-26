@@ -749,7 +749,7 @@ export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperCl
     	return <parser.name>.RULE_<struct.derivedFromName>;
 	}
 <if(struct.provideCopyFrom)><! don't need copy unless we have subclasses !>
-	public copyFrom(ctx: <struct.name>): void {
+	public override copyFrom(ctx: <struct.name>): void {
 		super.copyFrom(ctx);
 		<struct.attrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
@@ -870,6 +870,9 @@ import <superClass> from './<superClass>.js';
 export default class <lexer.name> extends <superClass; null="Lexer"> {
 	<lexer.tokens:{k | public static readonly <k> = <lexer.tokens.(k)>;}; separator="\n">
 	public static readonly EOF = Token.EOF;
+	<if(lexer.escapedChannels)>
+	<lexer.escapedChannels:{c| public static readonly <c> = <lexer.escapedChannels.(c)>;}; separator="\n">
+	<endif>
 	<rest(lexer.modes):{m | public static readonly <m> = <i>;}; separator="\n">
 
 	public static readonly channelNames: string[] = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];

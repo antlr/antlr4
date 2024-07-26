@@ -121,7 +121,7 @@ export default class Lexer extends Recognizer {
 							this.notifyListeners(e); // report error
 							this.recover(e);
 						} else {
-							console.log(e.stack);
+                            console.log(e.stack);
 							throw e;
 						}
 					}
@@ -169,8 +169,24 @@ export default class Lexer extends Recognizer {
 		this._type = Lexer.MORE;
 	}
 
+    /**
+     * @deprecated since ANTLR 4.13.2; use setMode instead
+     */
 	mode(m) {
+		console.warn("Calling deprecated method in Lexer class: mode(...)");
+		this.setMode(m);
+	}
+
+	setMode(m) {
 		this._mode = m;
+	}
+
+	getMode() {
+		return this._mode;
+	}
+
+	getModeStack() {
+		return this._modeStack;
 	}
 
 	pushMode(m) {
@@ -178,7 +194,7 @@ export default class Lexer extends Recognizer {
 			console.log("pushMode " + m);
 		}
 		this._modeStack.push(this._mode);
-		this.mode(m);
+		this.setMode(m);
 	}
 
 	popMode() {
@@ -188,7 +204,7 @@ export default class Lexer extends Recognizer {
 		if (this._interp.debug) {
 			console.log("popMode back to " + this._modeStack.slice(0, -1));
 		}
-		this.mode(this._modeStack.pop());
+		this.setMode(this._modeStack.pop());
 		return this._mode;
 	}
 
@@ -252,7 +268,7 @@ export default class Lexer extends Recognizer {
 		const stop = this._input.index;
 		const text = this._input.getText(start, stop);
 		const msg = "token recognition error at: '" + this.getErrorDisplay(text) + "'";
-		const listener = this.getErrorListenerDispatch();
+		const listener = this.getErrorListener();
 		listener.syntaxError(this, null, this._tokenStartLine,
 				this._tokenStartColumn, msg, e);
 	}

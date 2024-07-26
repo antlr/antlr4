@@ -3,5 +3,5 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 export default function standardEqualsFunction(a, b) {
-    return a ? a.equals(b) : a===b;
+    return a && a.equals ? a.equals(b) : a===b;
 }

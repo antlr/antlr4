@@ -7,7 +7,9 @@ if (NOT ANTLR_BUILD_SHARED AND NOT ANTLR_BUILD_STATIC)
   message(FATAL_ERROR "Options ANTLR_BUILD_SHARED and ANTLR_BUILD_STATIC can't both be OFF")
 endif()
 
-include_directories(
+set(libantlrcpp_INCLUDE_INSTALL_DIR "include/antlr4-runtime")
+
+set(libantlrcpp_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/runtime/src
   ${PROJECT_SOURCE_DIR}/runtime/src/atn
   ${PROJECT_SOURCE_DIR}/runtime/src/dfa
@@ -34,9 +36,15 @@ file(GLOB libantlrcpp_SRC
 
 if (ANTLR_BUILD_SHARED)
   add_library(antlr4_shared SHARED ${libantlrcpp_SRC})
+  target_include_directories(antlr4_shared PUBLIC 
+    "$<BUILD_INTERFACE:${libantlrcpp_INCLUDE_DIRS}>" 
+    "$<INSTALL_INTERFACE:${libantlrcpp_INCLUDE_INSTALL_DIR}>")
 endif()
 if (ANTLR_BUILD_STATIC)
   add_library(antlr4_static STATIC ${libantlrcpp_SRC})
+  target_include_directories(antlr4_static PUBLIC 
+    "$<BUILD_INTERFACE:${libantlrcpp_INCLUDE_DIRS}>" 
+    "$<INSTALL_INTERFACE:${libantlrcpp_INCLUDE_INSTALL_DIR}>")
 endif()
 
 if (CMAKE_HOST_UNIX)
@@ -185,7 +193,7 @@ if (TARGET antlr4_static)
 endif()
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
-        DESTINATION "include/antlr4-runtime"
+        DESTINATION "${libantlrcpp_INCLUDE_INSTALL_DIR}"
         COMPONENT dev
         FILES_MATCHING PATTERN "*.h"
         )

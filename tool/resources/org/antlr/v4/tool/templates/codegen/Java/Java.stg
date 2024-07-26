@@ -225,7 +225,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
 public class <parser.name> extends <superClass; null="Parser"> {
 	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 

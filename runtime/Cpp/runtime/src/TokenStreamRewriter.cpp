@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -313,6 +313,10 @@ std::string TokenStreamRewriter::getText(const std::string &programName, const I
 std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::reduceToSingleOperationPerIndex(
   std::vector<TokenStreamRewriter::RewriteOperation*> &rewrites) {
 
+  // Reset the instructionIndex
+  for (size_t i = 0; i < rewrites.size(); ++i) {
+    rewrites[i]->instructionIndex = i;
+  }
 
   // WALK REPLACES
   for (size_t i = 0; i < rewrites.size(); ++i) {
@@ -327,14 +331,14 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       if (iop->index == rop->index) {
         // E.g., insert before 2, delete 2..2; update replace
         // text to include insert before, kill insert
-        delete rewrites[iop->instructionIndex];
-        rewrites[iop->instructionIndex] = nullptr;
         rop->text = iop->text + (!rop->text.empty() ? rop->text : "");
+        rewrites[iop->instructionIndex] = nullptr;
+        delete iop;
       }
       else if (iop->index > rop->index && iop->index <= rop->lastIndex) {
         // delete insert as it's a no-op.
-        delete rewrites[iop->instructionIndex];
         rewrites[iop->instructionIndex] = nullptr;
+        delete iop;
       }
     }
     // Drop any prior replaces contained within
@@ -342,8 +346,8 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     for (auto *prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
         // delete replace as it's a no-op.
-        delete rewrites[prevRop->instructionIndex];
         rewrites[prevRop->instructionIndex] = nullptr;
+        delete prevRop;
         continue;
       }
       // throw exception unless disjoint or identical
@@ -351,11 +355,10 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       // Delete special case of replace (text==null):
       // D.i-j.u D.x-y.v    | boundaries overlap    combine to max(min)..max(right)
       if (prevRop->text.empty() && rop->text.empty() && !disjoint) {
-        delete rewrites[prevRop->instructionIndex];
-        rewrites[prevRop->instructionIndex] = nullptr; // kill first delete
         rop->index = std::min(prevRop->index, rop->index);
         rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
-        std::cout << "new rop " << rop << std::endl;
+        rewrites[prevRop->instructionIndex] = nullptr; // kill first delete
+        delete prevRop;
       }
       else if (!disjoint) {
         throw IllegalArgumentException("replace op boundaries of " + rop->toString() +
@@ -379,8 +382,8 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
                                           // whole token buffer so no lazy eval issue with any templates
         iop->text = catOpText(&iop->text, &prevIop->text);
         // delete redundant prior insert
-        delete rewrites[prevIop->instructionIndex];
         rewrites[prevIop->instructionIndex] = nullptr;
+        delete prevIop;
       }
     }
     // look for replaces where iop.index is in range; error

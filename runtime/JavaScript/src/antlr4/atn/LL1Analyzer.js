@@ -134,9 +134,9 @@ export default class LL1Analyzer {
                 return;
             }
             if (ctx !== PredictionContext.EMPTY) {
-                const removed = calledRuleStack.has(s.ruleIndex);
+                const removed = calledRuleStack.get(s.ruleIndex);
                 try {
-                    calledRuleStack.remove(s.ruleIndex);
+                    calledRuleStack.clear(s.ruleIndex);
                     // run thru all possible stack tops in ctx
                     for (let i = 0; i < ctx.length; i++) {
                         const returnState = this.atn.states[ctx.getReturnState(i)];
@@ -144,7 +144,7 @@ export default class LL1Analyzer {
                     }
                 }finally {
                     if (removed) {
-                        calledRuleStack.add(s.ruleIndex);
+                        calledRuleStack.set(s.ruleIndex);
                     }
                 }
                 return;
@@ -153,15 +153,15 @@ export default class LL1Analyzer {
         for(let j=0; j<s.transitions.length; j++) {
             const t = s.transitions[j];
             if (t.constructor === RuleTransition) {
-                if (calledRuleStack.has(t.target.ruleIndex)) {
+                if (calledRuleStack.get(t.target.ruleIndex)) {
                     continue;
                 }
                 const newContext = SingletonPredictionContext.create(ctx, t.followState.stateNumber);
                 try {
-                    calledRuleStack.add(t.target.ruleIndex);
+                    calledRuleStack.set(t.target.ruleIndex);
                     this._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                 } finally {
-                    calledRuleStack.remove(t.target.ruleIndex);
+                    calledRuleStack.clear(t.target.ruleIndex);
                 }
             } else if (t instanceof AbstractPredicateTransition ) {
                 if (seeThruPreds) {

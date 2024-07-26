@@ -61,13 +61,11 @@
       "require": "./dist/antlr4.node.cjs",
       "default": "./dist/antlr4.node.mjs",
       "node": {
-        "types": "./src/antlr4/index.d.cts",
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
         "default": "./dist/antlr4.node.mjs"
       },
       "browser": {
-        "types": "./src/antlr4/index.d.cts",
         "import": "./dist/antlr4.web.mjs",
         "require": "./dist/antlr4.web.cjs",
         "default": "./dist/antlr4.web.mjs"

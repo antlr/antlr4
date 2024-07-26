@@ -8,7 +8,7 @@ import calc from "./generatedCode/calc.js";
  * @param {string} input 
  */
 function getRewriter(lexerClass, input) {
-    const chars = new antlr4.InputStream(input);
+    const chars = antlr4.CharStreams.fromString(input);
     const lexer = new lexerClass(chars);
     const tokens = new antlr4.CommonTokenStream(lexer);
     tokens.fill();
@@ -385,7 +385,7 @@ describe("TokenStreamRewriter", () => {
     
     it("throws an error if second replace operation overlaps the first one on the left", () => {
         // Arrange
-        const chars = new antlr4.InputStream("abcccba");
+        const chars = antlr4.CharStreams.fromString("abcccba");
         const lexer = new abc(chars);
         const tokens = new antlr4.CommonTokenStream(lexer);
         tokens.fill();

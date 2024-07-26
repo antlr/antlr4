@@ -1,7 +1,6 @@
-import antlr4 from "../src/antlr4/index.node.js";
-const IntervalSet = antlr4.IntervalSet;
+import IntervalSet from "../src/antlr4/misc/IntervalSet.js";
 
-describe('IntervalSet', () => {
+describe('test IntervalSet', () => {
   it("computes interval set length", () => {
       const s1 = new IntervalSet();
       s1.addOne(20);
