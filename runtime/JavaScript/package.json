@@ -57,9 +57,6 @@
   "exports": {
     ".": {
       "types": "./src/antlr4/index.d.cts",
-      "import": "./dist/antlr4.node.mjs",
-      "require": "./dist/antlr4.node.cjs",
-      "default": "./dist/antlr4.node.mjs",
       "node": {
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
