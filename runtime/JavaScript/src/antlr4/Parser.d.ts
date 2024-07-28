@@ -1,12 +1,12 @@
-import {TokenStream} from "./TokenStream";
-import {Recognizer} from "./Recognizer";
-import {ErrorStrategy, RecognitionException} from "./error";
-import {IntervalSet} from "./misc";
-import {ParserATNSimulator} from "./atn";
-import {Token} from "./Token";
-import {ParserRuleContext} from "./context";
-import {Printer} from "./utils";
-import {ParseTreeListener} from "./tree";
+import {TokenStream} from "./TokenStream.js";
+import {Recognizer} from "./Recognizer.js";
+import {ErrorStrategy, RecognitionException} from "./error/index.js";
+import {IntervalSet} from "./misc/index.js";
+import {ParserATNSimulator} from "./atn/index.js";
+import {Token} from "./Token.js";
+import {ParserRuleContext} from "./context/index.js";
+import {Printer} from "./utils/index.js";
+import {ParseTreeListener} from "./tree/index.js";
 
 export declare class Parser extends Recognizer<Token> {
 

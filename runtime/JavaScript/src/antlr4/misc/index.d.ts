@@ -1,3 +1,3 @@
-export * from './Interval'
-export * from './IntervalSet';
+export * from './Interval.js';
+export * from './IntervalSet.js';
 

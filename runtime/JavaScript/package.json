@@ -42,15 +42,18 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "jasmine",
+    "test": "jasmine && npm run test:builds",
+    "test:builds": "bash test-builds.sh",
     "coverage": "c8 jasmine",
-    "lint": "eslint src/antlr4/"
+    "lint": "eslint src/antlr4/",
+    "prepack": "npm run build"
   },
   "engines": {
     "node": ">=16"
   },
   "exports": {
     ".": {
+      "types": "./src/antlr4/index.d.ts",
       "node": {
         "import": "./dist/antlr4.node.mjs",
         "require": "./dist/antlr4.node.cjs",
