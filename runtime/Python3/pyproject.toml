@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "antlr4-python3-runtime"
-version = "4.13.1"
+version = "4.13.2"
 authors = [{name = "Eric Vergnaud", email = "eric.vergnaud@wanadoo.fr"}, {name = "Terence Parr"}, {name = "Sam Harwell"}]
 license = {text = "BSD"}
-description = "ANTLR 4.13.1 runtime for Python 3"
+description = "ANTLR 4.13.2 runtime for Python 3"
 urls = {Homepage = "http://www.antlr.org"}
 dependencies = ["typing ; python_version<'3.5'"]
 

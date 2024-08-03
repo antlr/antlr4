@@ -1,4 +1,4 @@
-ANTLR_VERSION = 4.13.1
+ANTLR_VERSION = 4.13.2
 ANTLR_JAR = .antlr/antlr-$(ANTLR_VERSION)-complete.jar
 
 .antlr:

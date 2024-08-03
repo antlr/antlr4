@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Company>The ANTLR Organization</Company>
-    <Version>4.13.1</Version>
+    <Version>4.13.2</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
     <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFramework>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>

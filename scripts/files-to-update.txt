@@ -38,6 +38,7 @@ runtime-testsuite/resources/org/antlr/v4/test/runtime/helpers/package_ts.json
 * doc/getting-started.md
 * doc/swift-target.md
 * doc/getting-started.md
+* doc/go-target.md 
 
 # runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
 

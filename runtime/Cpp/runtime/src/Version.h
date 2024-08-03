@@ -29,7 +29,7 @@
 
 #define ANTLRCPP_VERSION_MAJOR 4
 #define ANTLRCPP_VERSION_MINOR 13
-#define ANTLRCPP_VERSION_PATCH 1
+#define ANTLRCPP_VERSION_PATCH 2
 
 #define ANTLRCPP_MAKE_VERSION(major, minor, patch) ((major) * 100000 + (minor) * 1000 + (patch))
 

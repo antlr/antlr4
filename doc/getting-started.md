@@ -14,10 +14,10 @@ That command creates `antlr4` and `antlr4-parse` executables that, if necessary,
 
 ```bash
 $ antlr4 
-Downloading antlr4-4.13.1-complete.jar
+Downloading antlr4-4.13.2-complete.jar
 ANTLR tool needs Java to run; install Java JRE 11 yes/no (default yes)? y
 Installed Java in /Users/parrt/.jre/jdk-11.0.15+10-jre; remove that dir to uninstall
-ANTLR Parser Generator  Version 4.13.1
+ANTLR Parser Generator  Version 4.13.2
  -o ___              specify output directory where all output is generated
  -lib ___            specify location of grammars, tokens files
 ...
@@ -130,7 +130,7 @@ ExprBaseListener.h    ExprLexer.h           ExprListener.h        ExprParser.h
 
 ANTLR is really two things: a tool written in Java that translates your grammar to a parser/lexer in Java (or other target language) and the runtime library needed by the generated parsers/lexers. Even if you are using the ANTLR Intellij plug-in or ANTLRWorks to run the ANTLR tool, the generated code will still need the runtime library. 
 
-The first thing you should do is probably download and install a development tool plug-in. Even if you only use such tools for editing, they are great. Then, follow the instructions below to get the runtime environment available to your system to run generated parsers/lexers.  In what follows, I talk about antlr-4.13.1-complete.jar, which has the tool and the runtime and any other support libraries (e.g., ANTLR v4 is written in v3).
+The first thing you should do is probably download and install a development tool plug-in. Even if you only use such tools for editing, they are great. Then, follow the instructions below to get the runtime environment available to your system to run generated parsers/lexers.  In what follows, I talk about antlr-4.13.2-complete.jar, which has the tool and the runtime and any other support libraries (e.g., ANTLR v4 is written in v3).
 
 If you are going to integrate ANTLR into your existing build system using mvn, ant, or want to get ANTLR into your IDE such as eclipse or intellij, see [Integrating ANTLR into Development Systems](https://github.com/antlr/antlr4/blob/master/doc/IDEs.md).
 
@@ -140,24 +140,24 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 1. Download
 ```
 $ cd /usr/local/lib
-$ curl -O https://www.antlr.org/download/antlr-4.13.1-complete.jar
+$ curl -O https://www.antlr.org/download/antlr-4.13.2-complete.jar
 ```
 Or just download in browser from website:
     [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
 and put it somewhere rational like `/usr/local/lib`.
 
-if you are using lower version jdk, just download from [website download](https://github.com/antlr/website-antlr4/tree/gh-pages/download) for previous version, and antlr version before 4.13.1 support jdk 1.8  
+if you are using lower version jdk, just download from [website download](https://github.com/antlr/website-antlr4/tree/gh-pages/download) for previous version, and antlr version before 4.13.2 support jdk 1.8  
 
-2. Add `antlr-4.13.1-complete.jar` to your `CLASSPATH`:
+2. Add `antlr-4.13.2-complete.jar` to your `CLASSPATH`:
 ```
-$ export CLASSPATH=".:/usr/local/lib/antlr-4.13.1-complete.jar:$CLASSPATH"
+$ export CLASSPATH=".:/usr/local/lib/antlr-4.13.2-complete.jar:$CLASSPATH"
 ```
 It's also a good idea to put this in your `.bash_profile` or whatever your startup script is.
 
 3. Create aliases for the ANTLR Tool, and `TestRig`.
 ```
-$ alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.13.1-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-$ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.13.1-complete.jar:$CLASSPATH" org.antlr.v4.gui.TestRig'
+$ alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.13.2-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+$ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.13.2-complete.jar:$CLASSPATH" org.antlr.v4.gui.TestRig'
 ```
 
 ### WINDOWS
@@ -165,13 +165,13 @@ $ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.13.1-complete.jar:$CLASS
 (*Thanks to Graham Wideman*)
 
 0. Install Java (version 1.7 or higher)
-1. Download antlr-4.13.1-complete.jar (or whatever version) from [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
+1. Download antlr-4.13.2-complete.jar (or whatever version) from [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
 Save to your directory for 3rd party Java libraries, say `C:\Javalib`
-2. Add `antlr-4.13.1-complete.jar` to CLASSPATH, either:
+2. Add `antlr-4.13.2-complete.jar` to CLASSPATH, either:
   * Permanently: Using System Properties dialog > Environment variables > Create or append to `CLASSPATH` variable
   * Temporarily, at command line:
 ```
-SET CLASSPATH=.;C:\Javalib\antlr-4.13.1-complete.jar;%CLASSPATH%
+SET CLASSPATH=.;C:\Javalib\antlr-4.13.2-complete.jar;%CLASSPATH%
 ```
 3. Create short convenient commands for the ANTLR Tool, and TestRig, using batch files or doskey commands:
   * Batch files (in directory in system PATH) antlr4.bat and grun.bat
@@ -197,7 +197,7 @@ Either launch org.antlr.v4.Tool directly:
 
 ```
 $ java org.antlr.v4.Tool
-ANTLR Parser Generator Version 4.13.1
+ANTLR Parser Generator Version 4.13.2
 -o ___ specify output directory where all output is generated
 -lib ___ specify location of .tokens files
 ...
@@ -206,8 +206,8 @@ ANTLR Parser Generator Version 4.13.1
 or use -jar option on java:
 
 ```
-$ java -jar /usr/local/lib/antlr-4.13.1-complete.jar
-ANTLR Parser Generator Version 4.13.1
+$ java -jar /usr/local/lib/antlr-4.13.2-complete.jar
+ANTLR Parser Generator Version 4.13.2
 -o ___ specify output directory where all output is generated
 -lib ___ specify location of .tokens files
 ...
