@@ -368,6 +368,7 @@ On a Mac (with XCode 7+ installed):
 
 ```bash
 cd ~/antlr/code/antlr4/runtime/Cpp
+rm CMakeCache.txt  # otherwise can't find some include files
 ./deploy-macos.sh
 cp antlr4-cpp-runtime-macos.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.13.2-macos.zip
 ```
