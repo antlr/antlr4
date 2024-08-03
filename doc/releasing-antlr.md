@@ -346,7 +346,7 @@ Then run the python build and upload:
 cd ~/antlr/code/antlr4/runtime/Python3
 python -m build
 # assume you have ~/.pypirc set up
-twine upload dist/antlr4-python3-runtime-<version>.tar.gz dist/antlr4_python3_runtime-<version>-py3-none-any.whl
+twine upload dist/antlr4_python3_runtime-4.13.2.tar.gz dist/antlr4_python3_runtime-4.13.2-py3-none-any.whl
 ```
 
 There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.
