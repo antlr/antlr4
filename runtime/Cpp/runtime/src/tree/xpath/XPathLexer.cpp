@@ -1,5 +1,5 @@
 
-// Generated from XPathLexer.g4 by ANTLR 4.13.0
+// Generated from XPathLexer.g4 by ANTLR 4.13.1
 
 
 #include "XPathLexer.h"
@@ -45,7 +45,7 @@ struct XPathLexerStaticData final {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
 #endif
-XPathLexerStaticData *xpathlexerLexerStaticData = nullptr;
+std::unique_ptr<XPathLexerStaticData> xpathlexerLexerStaticData = nullptr;
 
 void xpathlexerLexerInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -103,7 +103,7 @@ void xpathlexerLexerInitialize() {
   for (size_t i = 0; i < count; i++) { 
     staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
   }
-  xpathlexerLexerStaticData = staticData.release();
+  xpathlexerLexerStaticData = std::move(staticData);
 }
 
 }
