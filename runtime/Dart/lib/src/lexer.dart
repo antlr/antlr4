@@ -19,14 +19,14 @@ import 'util/utils.dart';
 
 abstract class Lexer extends Recognizer<LexerATNSimulator>
     implements TokenSource {
-  static final DEFAULT_MODE = 0;
-  static final MORE = -2;
-  static final SKIP = -3;
+  static const int DEFAULT_MODE = 0;
+  static const int MORE = -2;
+  static const int SKIP = -3;
 
-  static final DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
-  static final HIDDEN = Token.HIDDEN_CHANNEL;
-  static final MIN_CHAR_VALUE = 0x0000;
-  static final MAX_CHAR_VALUE = 0x10FFFF;
+  static const int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
+  static const int HIDDEN = Token.HIDDEN_CHANNEL;
+  static const int MIN_CHAR_VALUE = 0x0000;
+  static const int MAX_CHAR_VALUE = 0x10FFFF;
 
   CharStream _input;
 
@@ -173,6 +173,10 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     mode_ = m;
   }
 
+  int getMode() {
+    return mode_;
+  }
+
   void pushMode(int m) {
     if (LexerATNSimulator.debug) {
       log('pushMode $m');
@@ -186,6 +190,10 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     if (LexerATNSimulator.debug) log('popMode back to ${_modeStack.last}');
     mode(_modeStack.removeLast());
     return mode_;
+  }
+
+  List<int> get modeStack {
+    return _modeStack;
   }
 
   /// Set the char stream and reset the lexer
