@@ -186,7 +186,7 @@ func (i *IntervalSet) removeRange(v Interval) {
 				//                i.intervals.splice(k, 1)
 				i.intervals = append(i.intervals[0:k], i.intervals[k+1:]...)
 				k = k - 1 // need another pass
-			} else if v.Start < ni.Stop {
+			} else if v.Start < ni.Stop && v.Start > ni.Start {
 				i.intervals[k] = NewInterval(ni.Start, v.Start)
 			} else if v.Stop < ni.Stop {
 				i.intervals[k] = NewInterval(v.Stop, ni.Stop)
