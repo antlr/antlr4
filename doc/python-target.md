@@ -26,14 +26,14 @@ and parser, then calls the parser.
     from antlr4 import *
     from ExprLexer import ExprLexer
     from ExprParser import ExprParser
-    from VisitorInterp import VisitorInterp
 
     def main(argv):
         input_stream = FileStream(argv[1])
         lexer = ExprLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = ExprParser(stream)
-        tree = parser.start_()
+        tree = parser.root()
+        print(tree.toStringTree(recog=parser))
 
     if __name__ == '__main__':
         main(sys.argv)
@@ -114,7 +114,8 @@ For example, the following code implements an expression evaluator for the Expr.
         lexer = ExprLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = ExprParser(stream)
-        tree = parser.start_()
+        tree = parser.root()
+    
         if parser.getNumberOfSyntaxErrors() > 0:
             print("syntax errors")
         else:
@@ -193,7 +194,7 @@ The following example implements an expression evaluator using a listener.
         lexer = ExprLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = ExprParser(stream)
-        tree = parser.start_()
+        tree = parser.root()
         if parser.getNumberOfSyntaxErrors() > 0:
             print("syntax errors")
         else:
