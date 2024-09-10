@@ -16,14 +16,25 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Predicate;
 import org.antlr.v4.runtime.misc.Utils;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 public class Trees {
+	/** A reflection cache tracking constructor methods for various tree nodes
+	 *  so we can clone nodes. If this starts to get too big,
+	 *  call {@see resetCtorCache}.
+	 */
+	protected static final Map<Class<? extends ParserRuleContext>,
+		                       Constructor<? extends ParserRuleContext>> ctorCache
+		                   = new ConcurrentHashMap<>();
+
 	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
@@ -189,6 +200,76 @@ public class Trees {
 	public static List<ParseTree> descendants(ParseTree t) {
 		return getDescendants(t);
 	}
+
+	/** Return a new TerminalNode with a copy of all relevant fields
+	 *  from t and with null parent.
+	 *
+	 *  @since 4.6.1
+	 */
+	public static TerminalNodeImpl shallowCopy(TerminalNode t) {
+		return new TerminalNodeImpl(t.getSymbol());
+	}
+
+	/** Create a shallow copy of node t; the copy has same type as t. Copy
+	 *  all relevant fields to make a proper clone of t except
+	 *  the children list. The only caveat is that the error nodes from t
+	 *  are in fact copied into the clone.
+	 *
+	 *  t is not altered.
+	 *
+	 *  Because this uses reflection, it might be slower than using
+	 *  "new X()" directly.  It uses {@see ctorCache} to speed things up a lot.
+	 *
+	 *  @since 4.6.1
+	 */
+	public static ParserRuleContext shallowCopy(ParserRuleContext t) {
+		try {
+			Class<? extends ParserRuleContext> cl = t.getClass();
+			Class<?> sup = cl.getSuperclass();
+			Class<?> supSup = sup.getSuperclass();
+			boolean
+				isAltLabelNode = sup!=ParserRuleContext.class && // usual case
+				supSup!=ParserRuleContext.class;                 // if we use contextSuperClass option we are 2 below ParserRuleContext
+			if ( isAltLabelNode ) {
+				// AltLabel: nodes public UnarySuffixContext(StuffContext ctx) { copyFrom(ctx); }
+				Constructor<? extends ParserRuleContext> ctor = ctorCache.get(cl);
+				if ( ctor==null ) {
+					ctor = cl.getConstructor(sup); // no need for explicit copyFrom
+				}
+				return ctor.newInstance(t);
+			}
+			else {
+				// RuleNodes: public StatContext(ParserRuleContext parent, int invokingState) {
+				Constructor<? extends ParserRuleContext> ctor = ctorCache.get(cl);
+				if ( ctor==null ) {
+					ctor = cl.getConstructor(ParserRuleContext.class, int.class);
+					ctorCache.put(cl, ctor);
+				}
+				ParserRuleContext copy = ctor.newInstance(t.getParent(), t.invokingState);
+				copy.copyFrom(t); // make sure we copy all necessary fields (and possibly error node children)
+				return copy;
+			}
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/** Make a shallow copy of a generic parse tree node t
+	 *
+	 *  @since 4.6.1
+	 */
+	public static ParseTree shallowCopy(ParseTree t) {
+		if ( t instanceof TerminalNode ) return shallowCopy((TerminalNode)t);
+		return shallowCopy((ParserRuleContext)t);
+	}
+
+	/** Just in case the constructor cache gets too big, you can clear
+	 *  with this method.
+	 *
+	 *  @since 4.6.1
+	 */
+	public static void resetCtorCache() { ctorCache.clear(); }
 
 	/** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
 	 *  inclusively using postorder traversal.  Recursive depth-first-search.
