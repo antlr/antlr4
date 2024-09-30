@@ -48,14 +48,12 @@ pythonTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-# encoding: utf-8
-from antlr4 import *
-from io import StringIO
+from __future__ import annotations
+
 import sys
-if sys.version_info >= (3, 6):
-	from typing import TextIO
-else:
-	from typing.io import TextIO
+import typing
+
+from antlr4 import *
 
 <namedActions.header>
 <parser>
@@ -76,11 +74,11 @@ class <file.grammarName>Listener(ParseTreeListener):
 
     <file.listenerNames:{lname |
 # Enter a parse tree produced by <file.parserName>#<lname>.
-def enter<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
+def enter<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context) -> None:
     pass
 
 # Exit a parse tree produced by <file.parserName>#<lname>.
-def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
+def exit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context) -> None:
     pass
 
 }; separator="\n">
@@ -104,7 +102,7 @@ class <file.grammarName>Visitor(ParseTreeVisitor):
 
     <file.visitorNames:{lname |
 # Visit a parse tree produced by <file.parserName>#<lname>.
-def visit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
+def visit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context):
     return self.visitChildren(ctx)
 
 }; separator="\n">
@@ -131,29 +129,36 @@ else:
 <endif>
 <atn>
 
-class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
+
+class <parser.name>(<if(superClass)><superClass><else>Parser<endif>):
 
     grammarFileName = "<parser.grammarFileName>"
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
-    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
+    decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ <parser.literalNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ]
+    literalNames = [
+        <parser.literalNames:{t | <t>}; null="\"\<INVALID>\"", separator=",\n", anchor>,
+    ]
 
-    symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ]
+    symbolicNames = [
+        <parser.symbolicNames:{t | <t>}; null="\"\<INVALID>\"", separator=",\n", anchor>,
+    ]
 
     <if(parser.rules)>
     <parser.rules:{r | RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
     <endif>
 
-    ruleNames =  [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ]
+    ruleNames = [
+        <parser.ruleNames:{r | "<r>"}; separator=",\n", wrap, anchor>,
+    ]
 
     EOF = <TokenLabelType()>.EOF
     <if(parser.tokens)>
-    <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
+    <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
 
     <parser:(ctor)()>
@@ -164,14 +169,14 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
 
 <if(sempredFuncs)>
-    def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
-        if self._predicates == None:
-            self._predicates = dict()
+    def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
+        if self._predicates is None:
+            self._predicates = {}
 <parser.sempredFuncs.values:{f |
         self._predicates[<f.ruleIndex>] = self.<f.name>_sempred}; separator="\n        ">
         pred = self._predicates.get(ruleIndex, None)
         if pred is None:
-            raise Exception("No predicate with index:" + str(ruleIndex))
+            raise Exception(f"No predicate with index: {ruleIndex}")
         else:
             return pred(localctx, predIndex)
 
@@ -184,25 +189,25 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
+def action(self, localctx: RuleContext, ruleIndex: int, actionIndex: int) -> None:
     if self._actions is None:
-        actions = dict()
+        actions = {}
 <recog.actionFuncs.values:{f|
-        actions[<f.ruleIndex>] = self.<f.name>_action }; separator="\n">
+        actions[<f.ruleIndex>] = self.<f.name>_action}; separator="\n">
         self._actions = actions
     action = self._actions.get(ruleIndex, None)
     if action is not None:
         action(localctx, actionIndex)
     else:
-        raise Exception("No registered action for:" + str(ruleIndex))
+        raise Exception(f"No registered action for: {ruleIndex}")
 
 <actionFuncs.values; separator="\n">
 
 <endif>
 <if(sempredFuncs)>
-def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
+def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
     if self._predicates is None:
-        preds = dict()
+        preds = {}
 <recog.sempredFuncs.values:{f|
         preds[<f.ruleIndex>] = self.<f.name>_sempred}; separator="\n">
         self._predicates = preds
@@ -210,27 +215,34 @@ def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
     if pred is not None:
         return pred(localctx, predIndex)
     else:
-        raise Exception("No registered predicate for:" + str(ruleIndex))
+        raise Exception(f"No registered predicate for: {ruleIndex}")
 
 <sempredFuncs.values; separator="\n">
 <endif>
 >>
 
 parser_ctor(p) ::= <<
-def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
+def __init__(
+    self,
+    input: TokenStream,
+    output: typing.TextIO = sys.stdout,
+) -> None:
     super().__init__(input, output)
     self.checkVersion("<file.ANTLRVersion>")
-    self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
-    self._predicates = None
-
+    self._interp = ParserATNSimulator(
+        self,
+        self.atn,
+        self.decisionsToDFA,
+        self.sharedContextCache,
+    )
+    self._predicates: typing.Optional[typing.Dict[int, typing.Callable]] = None
 >>
 
 /* This generates a private method since the actionIndex is generated, making an
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-
-def <r.name>_action(self, localctx:<r.ctxType> , actionIndex:int):
+def <r.name>_action(self, localctx: <r.ctxType>, actionIndex: int) -> None:
 <actions:{index|
 <if(first(actions))>
     if actionIndex == <index>:
@@ -238,14 +250,14 @@ def <r.name>_action(self, localctx:<r.ctxType> , actionIndex:int):
 <elseif(rest(actions))>
     elif actionIndex == <index>:
         <actions.(index)>
-<endif> }; separator="\n">
+<endif> }; separator="\n\n">
 >>
 
 /* This generates a private method since the predIndex is generated, making an
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-def <r.name>_sempred(self, localctx:<r.ctxType>, predIndex:int):
+def <r.name>_sempred(self, localctx: <r.ctxType>, predIndex: int) -> int:
     <actions:{index|
 <if(first(actions))>
     if predIndex == <index>:
@@ -263,9 +275,13 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>:<a.type><endif>}>):
+def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>: <a.type><endif>}>):
 
-    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.escapedName>}>)
+    localctx = <parser.name>.<currentRule.ctxType>(
+        self,
+        self._ctx,
+        self.state<currentRule.args:{a | , <a.escapedName>}>,
+    )
     self.enterRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>)
     <namedActions.init>
     <locals; separator="\n">
@@ -295,7 +311,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.escapedName>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
+def <currentRule.escapedName>(self, _p: int = 0<if(currentRule.args)>, <args:{a | , <a>}><endif>) -> <parser.name>.<currentRule.ctxType>:
     _parentctx = self._ctx
     _parentState = self.state
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.escapedName>}>)
@@ -400,7 +416,7 @@ self.state = <choice.stateNumber>
 self._errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
-la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
+la_ = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
 <alts:{alt |
 if la_ == <i>:
     <alt>
@@ -412,7 +428,7 @@ if la_ == <i>:
 OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
 self._errHandler.sync(self)
-la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
+la_ = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
 <alts:{alt |
 if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
     <alt>
@@ -423,31 +439,31 @@ if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
 StarBlock(choice, alts, sync, iteration) ::= <<
 self.state = <choice.stateNumber>
 self._errHandler.sync(self)
-_alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
-while _alt!=<choice.exitAlt> and _alt!=ATN.INVALID_ALT_NUMBER:
-    if _alt==1<if(!choice.ast.greedy)>+1<endif>:
+_alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
+while _alt!=<choice.exitAlt> and _alt != ATN.INVALID_ALT_NUMBER:
+    if _alt == 1<if(!choice.ast.greedy)> + 1<endif>:
         <iteration>
         <alts> <! should only be one !>
     self.state = <choice.loopBackStateNumber>
     self._errHandler.sync(self)
-    _alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
+    _alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
 
 >>
 
 PlusBlock(choice, alts, error) ::= <<
 self.state = <choice.blockStartStateNumber> <! alt block decision !>
 self._errHandler.sync(self)
-_alt = 1<if(!choice.ast.greedy)>+1<endif>
-while _alt!=<choice.exitAlt> and _alt!=ATN.INVALID_ALT_NUMBER:
+_alt = 1<if(!choice.ast.greedy)> + 1<endif>
+while _alt != <choice.exitAlt> and _alt != ATN.INVALID_ALT_NUMBER:
     <alts:{alt|
-if _alt == <i><if(!choice.ast.greedy)>+1<endif>:
+if _alt == <i><if(!choice.ast.greedy)> + 1<endif>:
     <alt>
 }; separator="\nel">
     else:
         <error>
     self.state = <choice.loopBackStateNumber> <! loopback/exit decision !>
     self._errHandler.sync(self)
-    _alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
+    _alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
 
 >>
 
@@ -482,7 +498,7 @@ offsetShiftType(shiftAmount, offset) ::= <%
 %>
 
 bitsetInlineComparison(s, bits) ::= <%
-<bits.tokens:{t | <s.varName>==<t.type>}; separator=" or ">
+<bits.tokens:{t | <s.varName> == <t.type>}; separator=" or ">
 %>
 
 cases(tokens) ::= <<
@@ -606,7 +622,7 @@ def <t.name>_list(self):
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-def <t.escapedName>(self, i:int=None):
+def <t.escapedName>(self, i: typing.Optional[int] = None):
     if i is None:
         return self.getTokens(<parser.name>.<t.name>)
     else:
@@ -615,7 +631,7 @@ def <t.escapedName>(self, i:int=None):
 
 ContextRuleGetterDecl(r)       ::= <<
 def <r.escapedName>(self):
-    return self.getTypedRuleContext(<parser.name>.<r.ctxName>,0)
+    return self.getTypedRuleContext(<parser.name>.<r.ctxName>, 0)
 
 >>
 
@@ -627,11 +643,11 @@ def <r.name>_list(self):
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-def <r.escapedName>(self, i:int=None):
+def <r.escapedName>(self, i: typing.Optional[int] = None):
     if i is None:
         return self.getTypedRuleContexts(<parser.name>.<r.ctxName>)
     else:
-        return self.getTypedRuleContext(<parser.name>.<r.ctxName>,i)
+        return self.getTypedRuleContext(<parser.name>.<r.ctxName>, i)
 
 >>
 
@@ -652,9 +668,14 @@ CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
 class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
-    __slots__ = 'parser'
+    __slots__ = "parser"
 
-    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.escapedName><if(a.type)>:<a.type><endif>=None}>):
+    def __init__(
+        self,
+        parser,
+        parent: typing.Optional[ParserRuleContext] = None,
+        invokingState: int = -1<struct.ctorAttrs:{a | , <a.escapedName><if(a.type)>: <a.type><endif> = None}>,
+    ) -> None:
         super().__init__(parent, invokingState)
         self.parser = parser
         <attrs:{a | <a>}; separator="\n">
@@ -666,7 +687,7 @@ class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>Parse
         return <parser.name>.RULE_<struct.derivedFromName>
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-    def copyFrom(self, ctx:ParserRuleContext):
+    def copyFrom(self, ctx: ParserRuleContext):
         super().copyFrom(ctx)
         <struct.attrs:{a | self.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 
@@ -679,7 +700,11 @@ class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>Parse
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 class <struct.escapedName>(<currentRule.name; format="cap">Context):
 
-    def __init__(self, parser, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context
+    def __init__(
+        self,
+        parser,
+        ctx: ParserRuleContext,
+    ) -> None:
         super().__init__(parser)
         <attrs:{a | <a>}; separator="\n">
         self.copyFrom(ctx)
@@ -691,15 +716,15 @@ class <struct.escapedName>(<currentRule.name; format="cap">Context):
 >>
 
 ListenerDispatchMethod(method) ::= <<
-def <if(method.isEnter)>enter<else>exit<endif>Rule(self, listener:ParseTreeListener):
+def <if(method.isEnter)>enter<else>exit<endif>Rule(self, listener: ParseTreeListener):
     if hasattr( listener, "<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">" ):
         listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 
 >>
 
 VisitorDispatchMethod(method) ::= <<
-def accept(self, visitor:ParseTreeVisitor):
-    if hasattr( visitor, "visit<struct.derivedFromName; format="cap">" ):
+def accept(self, visitor: ParseTreeVisitor):
+    if hasattr(visitor, "visit<struct.derivedFromName; format="cap">"):
         return visitor.visit<struct.derivedFromName; format="cap">(self)
     else:
         return visitor.visitChildren(self)
@@ -758,13 +783,10 @@ _prevctx = localctx
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-from antlr4 import *
-from io import StringIO
 import sys
-if sys.version_info >= (3, 6):
-    from typing import TextIO
-else:
-    from typing.io import TextIO
+import typing
+
+from antlr4 import *
 
 <namedActions.header>
 
@@ -781,11 +803,12 @@ else:
 <endif>
 <atn>
 
+
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
-    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
+    decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
 
 <if(lexer.escapedChannels)>
     <lexer.escapedChannels:{c| <c> = <lexer.escapedChannels.(c)>}; separator="\n">
@@ -799,24 +822,46 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
+    channelNames = [
+        "DEFAULT_TOKEN_CHANNEL",
+        "HIDDEN"<if (lexer.channelNames)>,
+        <lexer.channelNames:{c| "<c>"}; separator=",\n", anchor>
+        <endif>,
+    ]
 
-    modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ]
+    modeNames = [
+        <lexer.modes:{m| "<m>"}; separator=",\n", anchor>,
+    ]
 
-    literalNames = [ "\<INVALID>",
-            <lexer.literalNames:{t | <t>}; separator=", ", wrap, anchor> ]
+    literalNames = [
+        "\<INVALID>",
+        <lexer.literalNames:{t | <t>}; separator=",\n", anchor>,
+    ]
 
-    symbolicNames = [ "\<INVALID>",
-            <lexer.symbolicNames:{t | <t>}; separator=", ", wrap, anchor> ]
+    symbolicNames = [
+        "\<INVALID>",
+        <lexer.symbolicNames:{t | <t>}; separator=",\n", anchor>,
+    ]
 
-    ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ]
+    ruleNames = [
+        <lexer.ruleNames:{r | "<r>"}; separator=",\n", anchor>,
+    ]
 
     grammarFileName = "<lexer.grammarFileName>"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
+    def __init__(
+        self,
+        input = None,
+        output: typing.TextIO = sys.stdout,
+    ) -> None:
         super().__init__(input, output)
         self.checkVersion("<lexerFile.ANTLRVersion>")
-        self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
+        self._interp = LexerATNSimulator(
+            self,
+            self.atn,
+            self.decisionsToDFA,
+            PredictionContextCache(),
+        )
         self._actions = None
         self._predicates = None
 
@@ -829,7 +874,7 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 SerializedATN(model) ::= <<
 def serializedATN():
     return [
-        <model.serialized: {s | <s>}; separator=",", wrap>
+        <model.serialized: {s | <s>}; separator=", ", wrap>
     ]
 >>
 
