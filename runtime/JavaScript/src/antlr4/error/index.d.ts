@@ -1,4 +1,5 @@
 export * from './RecognitionException';
+export * from './LexerNoViableAltException';
 export * from './NoViableAltException';
 export * from './FailedPredicateException';
 export * from './InputMismatchException';
