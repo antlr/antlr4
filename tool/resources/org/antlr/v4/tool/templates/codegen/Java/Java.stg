@@ -356,6 +356,7 @@ case <f.ruleIndex>:
 >>
 
 parser_ctor(p) ::= <<
+@SuppressWarnings("this-escape")
 public <p.name>(TokenStream input) {
 	super(input);
 	_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
