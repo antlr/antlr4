@@ -30,7 +30,7 @@ public class AnalysisPipeline {
 		// LEFT-RECURSION CHECK
 		LeftRecursionDetector lr = new LeftRecursionDetector(g, g.atn);
 		lr.check();
-		if ( !lr.listOfRecursiveCycles.isEmpty() ) return; // bail out
+		if ( lr.containsErrors() ) return; // bail out
 
 		if (g.isLexer()) {
 			processLexer();
