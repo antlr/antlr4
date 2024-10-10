@@ -62,7 +62,7 @@ public class BufferedTokenStream implements TokenStream {
 	 * {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
 	 * <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
 	 * {@link #tokens} is trivial with this field.</li>
-	 * <ul>
+	 * </ul>
 	 */
 	protected boolean fetchedEOF;
 
