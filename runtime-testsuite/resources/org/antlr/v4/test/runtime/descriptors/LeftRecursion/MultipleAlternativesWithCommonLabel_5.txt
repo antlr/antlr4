@@ -10,8 +10,8 @@ Parser
 grammar T;
 s : e {<writeln("$e.v")>};
 e returns [int v]
-  : e '*' e     {$v = <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>(0)}, {<Result("v")>})> * <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>(1)}, {<Result("v")>})>;}  # binary
-  | e '+' e     {$v = <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>(0)}, {<Result("v")>})> + <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>(1)}, {<Result("v")>})>;}  # binary
+  : e '*' e     {$v = <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>}, {<Result("v")>}, {0})> * <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>}, {<Result("v")>}, {1})>;}  # binary
+  | e '+' e     {$v = <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>}, {<Result("v")>}, {0})> + <Cast("BinaryContext","$ctx"):SubContextLocal({<Production("e")>}, {<Result("v")>}, {1})>;}  # binary
   | INT{$v = $INT.int;} # anInt
   | '(' e ')'   {$v = $e.v;}     # parens
   | left=e INC  {<ContextRuleFunction(Cast("UnaryContext","$ctx"), "INC()"):Concat(" != null"):Assert()>$v = $left.v + 1;}      # unary
