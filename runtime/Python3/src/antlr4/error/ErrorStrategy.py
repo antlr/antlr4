@@ -4,11 +4,11 @@
 # can be found in the LICENSE.txt file in the project root.
 #
 import sys
-from antlr4.IntervalSet import IntervalSet
+from ..IntervalSet import IntervalSet
 
-from antlr4.Token import Token
-from antlr4.atn.ATNState import ATNState
-from antlr4.error.Errors import RecognitionException, NoViableAltException, InputMismatchException, \
+from ..Token import Token
+from ..atn.ATNState import ATNState
+from ..error.Errors import RecognitionException, NoViableAltException, InputMismatchException, \
     FailedPredicateException, ParseCancellationException
 
 # need forward declaration

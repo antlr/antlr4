@@ -12,10 +12,10 @@
 #  an ATN state.
 #/
 from io import StringIO
-from antlr4.PredictionContext import PredictionContext
-from antlr4.atn.ATNState import ATNState, DecisionState
-from antlr4.atn.LexerActionExecutor import LexerActionExecutor
-from antlr4.atn.SemanticContext import SemanticContext
+from ..PredictionContext import PredictionContext
+from ..atn.ATNState import ATNState, DecisionState
+from ..atn.LexerActionExecutor import LexerActionExecutor
+from ..atn.SemanticContext import SemanticContext
 
 # need a forward declaration
 ATNConfig = None

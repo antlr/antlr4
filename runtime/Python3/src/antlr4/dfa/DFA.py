@@ -2,12 +2,12 @@
 # Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
-from antlr4.atn.ATNState import StarLoopEntryState
+from ..atn.ATNState import StarLoopEntryState
 
-from antlr4.atn.ATNConfigSet import ATNConfigSet
-from antlr4.atn.ATNState import DecisionState
-from antlr4.dfa.DFAState import DFAState
-from antlr4.error.Errors import IllegalStateException
+from ..atn.ATNConfigSet import ATNConfigSet
+from ..atn.ATNState import DecisionState
+from ..dfa.DFAState import DFAState
+from ..error.Errors import IllegalStateException
 
 
 class DFA(object):
@@ -121,13 +121,13 @@ class DFA(object):
     def toString(self, literalNames:list=None, symbolicNames:list=None):
         if self.s0 is None:
             return ""
-        from antlr4.dfa.DFASerializer import DFASerializer
+        from ..dfa.DFASerializer import DFASerializer
         serializer = DFASerializer(self,literalNames,symbolicNames)
         return str(serializer)
 
     def toLexerString(self):
         if self.s0 is None:
             return ""
-        from antlr4.dfa.DFASerializer import LexerDFASerializer
+        from ..dfa.DFASerializer import LexerDFASerializer
         serializer = LexerDFASerializer(self)
         return str(serializer)

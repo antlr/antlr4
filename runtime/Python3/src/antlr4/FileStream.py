@@ -10,7 +10,7 @@
 #
 
 import codecs
-from antlr4.InputStream import InputStream
+from .InputStream import InputStream
 
 
 class FileStream(InputStream):

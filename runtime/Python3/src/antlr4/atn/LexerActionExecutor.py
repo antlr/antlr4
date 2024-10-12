@@ -12,8 +12,8 @@
 # not cause bloating of the {@link DFA} created for the lexer.</p>
 
 
-from antlr4.InputStream import InputStream
-from antlr4.atn.LexerAction import LexerAction, LexerIndexedCustomAction
+from ..InputStream import InputStream
+from ..atn.LexerAction import LexerAction, LexerIndexedCustomAction
 
 # need a forward declaration
 Lexer = None

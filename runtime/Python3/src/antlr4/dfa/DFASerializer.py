@@ -6,9 +6,9 @@
 
 # A DFA walker that knows how to dump them to serialized strings.#/
 from io import StringIO
-from antlr4 import DFA
-from antlr4.Utils import str_list
-from antlr4.dfa.DFAState import DFAState
+from ..dfa.DFA import DFA
+from ..Utils import str_list
+from ..dfa.DFAState import DFAState
 
 
 class DFASerializer(object):

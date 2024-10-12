@@ -3,12 +3,12 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 
-from antlr4.PredictionContext import merge
-from antlr4.Utils import str_list
-from antlr4.atn.ATN import ATN
-from antlr4.atn.ATNConfig import ATNConfig
-from antlr4.atn.SemanticContext import SemanticContext
-from antlr4.error.Errors import UnsupportedOperationException, IllegalStateException
+from ..PredictionContext import merge
+from ..Utils import str_list
+from ..atn.ATN import ATN
+from ..atn.ATNConfig import ATNConfig
+from ..atn.SemanticContext import SemanticContext
+from ..error.Errors import UnsupportedOperationException, IllegalStateException
 from functools import reduce
 #
 # Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track

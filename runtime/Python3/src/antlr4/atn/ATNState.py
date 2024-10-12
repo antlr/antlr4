@@ -64,7 +64,7 @@
 # <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
 #
 
-from antlr4.atn.Transition import Transition
+from ..atn.Transition import Transition
 
 INITIAL_NUM_TRANSITIONS = 4
 

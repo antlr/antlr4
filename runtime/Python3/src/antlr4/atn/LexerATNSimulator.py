@@ -20,18 +20,18 @@
 #  can simply return the predicted token type.</p>
 #/
 
-from antlr4.PredictionContext import PredictionContextCache, SingletonPredictionContext, PredictionContext
-from antlr4.InputStream import InputStream
-from antlr4.Token import Token
-from antlr4.atn.ATN import ATN
-from antlr4.atn.ATNConfig import LexerATNConfig
-from antlr4.atn.ATNSimulator import ATNSimulator
-from antlr4.atn.ATNConfigSet import ATNConfigSet, OrderedATNConfigSet
-from antlr4.atn.ATNState import RuleStopState, ATNState
-from antlr4.atn.LexerActionExecutor import LexerActionExecutor
-from antlr4.atn.Transition import Transition
-from antlr4.dfa.DFAState import DFAState
-from antlr4.error.Errors import LexerNoViableAltException, UnsupportedOperationException
+from ..PredictionContext import PredictionContextCache, SingletonPredictionContext, PredictionContext
+from ..InputStream import InputStream
+from ..Token import Token
+from ..atn.ATN import ATN
+from ..atn.ATNConfig import LexerATNConfig
+from ..atn.ATNSimulator import ATNSimulator
+from ..atn.ATNConfigSet import ATNConfigSet, OrderedATNConfigSet
+from ..atn.ATNState import RuleStopState, ATNState
+from ..atn.LexerActionExecutor import LexerActionExecutor
+from ..atn.Transition import Transition
+from ..dfa.DFAState import DFAState
+from ..error.Errors import LexerNoViableAltException, UnsupportedOperationException
 
 class SimState(object):
     __slots__ = ('index', 'line', 'column', 'dfaState')
@@ -76,7 +76,7 @@ class LexerATNSimulator(ATNSimulator):
         self.line = 1
         # The index of the character relative to the beginning of the line 0..n-1#/
         self.column = 0
-        from antlr4.Lexer import Lexer
+        from ..Lexer import Lexer
         self.mode = Lexer.DEFAULT_MODE
         # Cache Lexer properties to avoid further imports
         self.DEFAULT_MODE = Lexer.DEFAULT_MODE

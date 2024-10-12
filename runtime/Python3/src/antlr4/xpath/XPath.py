@@ -47,18 +47,24 @@
 # <p>
 # Whitespace is not allowed.</p>
 #
-from antlr4 import CommonTokenStream, DFA, PredictionContextCache, Lexer, LexerATNSimulator, ParserRuleContext, TerminalNode
-from antlr4.InputStream import InputStream
-from antlr4.Parser import Parser
-from antlr4.RuleContext import RuleContext
-from antlr4.Token import Token
-from antlr4.atn.ATNDeserializer import ATNDeserializer
-from antlr4.error.ErrorListener import ErrorListener
-from antlr4.error.Errors import LexerNoViableAltException
-from antlr4.tree.Tree import ParseTree
-from antlr4.tree.Trees import Trees
+from ..Lexer import Lexer
+from ..CommonTokenStream import CommonTokenStream
+from ..ParserRuleContext import ParserRuleContext
+from ..tree.Tree import TerminalNode
+from ..atn.LexerATNSimulator import LexerATNSimulator
+from ..PredictionContext import PredictionContextCache
+from ..dfa.DFA import DFA
+from ..InputStream import InputStream
+from ..Parser import Parser
+from ..RuleContext import RuleContext
+from ..Token import Token
+from ..atn.ATNDeserializer import ATNDeserializer
+from ..error.ErrorListener import ErrorListener
+from ..error.Errors import LexerNoViableAltException
+from ..tree.Tree import ParseTree
+from ..tree.Trees import Trees
 from io import StringIO
-from antlr4.xpath.XPathLexer import XPathLexer
+from ..xpath.XPathLexer import XPathLexer
 
 
 class XPath(object):

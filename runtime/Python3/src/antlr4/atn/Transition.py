@@ -16,11 +16,11 @@
 #  the states. We'll use the term Edge for the DFA to distinguish them from
 #  ATN transitions.</p>
 #
-from antlr4.IntervalSet import IntervalSet
-from antlr4.Token import Token
+from ..IntervalSet import IntervalSet
+from ..Token import Token
 
 # need forward declarations
-from antlr4.atn.SemanticContext import Predicate, PrecedencePredicate
+from ..atn.SemanticContext import Predicate, PrecedencePredicate
 
 ATNState = None
 RuleStartState = None
@@ -265,4 +265,4 @@ Transition.serializationTypes = {
 del ATNState
 del RuleStartState
 
-from antlr4.atn.ATNState import *
+from ..atn.ATNState import *

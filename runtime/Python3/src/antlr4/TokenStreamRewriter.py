@@ -5,9 +5,9 @@
 #
 
 from io import StringIO
-from antlr4.Token import Token
+from .Token import Token
 
-from antlr4.CommonTokenStream import CommonTokenStream
+from .CommonTokenStream import CommonTokenStream
 
 
 class TokenStreamRewriter(object):
