@@ -28,7 +28,7 @@ public static void main(String[] args) {
 # Unicode Code Points in Lexer Grammars
 
 To refer to Unicode [code points](https://en.wikipedia.org/wiki/Code_point)
-in lexer grammars, use the `\u` string escape plus up to 4 hex digits. For example, to create
+in lexer grammars, use the `\u` string escape plus 4 hex digits. For example, to create
 a lexer rule for a single Cyrillic character by creating a range from
 `U+0400` to `U+04FF`:
 
