@@ -6,8 +6,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
-import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
 import java.util.BitSet;
@@ -81,41 +79,6 @@ public enum PredictionMode {
 	 * behavior for syntactically-incorrect inputs.</p>
 	 */
 	LL_EXACT_AMBIG_DETECTION;
-
-	/** A Map that uses just the state and the stack context as the key. */
-	static class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
-		public AltAndContextMap() {
-			super(AltAndContextConfigEqualityComparator.INSTANCE);
-		}
-	}
-
-	private static final class AltAndContextConfigEqualityComparator extends AbstractEqualityComparator<ATNConfig> {
-		public static final AltAndContextConfigEqualityComparator INSTANCE = new AltAndContextConfigEqualityComparator();
-
-		private AltAndContextConfigEqualityComparator() {
-		}
-
-		/**
-		 * The hash code is only a function of the {@link ATNState#stateNumber}
-		 * and {@link ATNConfig#context}.
-		 */
-		@Override
-		public int hashCode(ATNConfig o) {
-			int hashCode = MurmurHash.initialize(7);
-			hashCode = MurmurHash.update(hashCode, o.state.stateNumber);
-			hashCode = MurmurHash.update(hashCode, o.context);
-			hashCode = MurmurHash.finish(hashCode, 2);
-	        return hashCode;
-		}
-
-		@Override
-		public boolean equals(ATNConfig a, ATNConfig b) {
-			if ( a==b ) return true;
-			if ( a==null || b==null ) return false;
-			return a.state.stateNumber==b.state.stateNumber
-				&& a.context.equals(b.context);
-		}
-	}
 
 	/**
 	 * Computes the SLL prediction termination condition.
@@ -544,12 +507,14 @@ public enum PredictionMode {
 	 * </pre>
 	 */
 	public static Collection<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
-		AltAndContextMap configToAlts = new AltAndContextMap();
+		int initialCapacity = Math.max((int) (configs.size() / 0.75f) + 1, 16);
+		Map<WrappedATNConfig, BitSet> configToAlts = new HashMap<>(initialCapacity);
 		for (ATNConfig c : configs) {
-			BitSet alts = configToAlts.get(c);
+			WrappedATNConfig key = new WrappedATNConfig(c);
+			BitSet alts = configToAlts.get(key);
 			if ( alts==null ) {
 				alts = new BitSet();
-				configToAlts.put(c, alts);
+				configToAlts.put(key, alts);
 			}
 			alts.set(c.alt);
 		}
@@ -595,6 +560,49 @@ public enum PredictionMode {
 			}
 		}
 		return viableAlts.nextSetBit(0);
+	}
+
+	/**
+	 * A wrapper around {@link ATNConfig} with a custom {@link #hashCode}
+	 * that only uses state number and context of the config.
+	 * @see #getConflictingAltSubsets(ATNConfigSet)
+	 */
+	private static class WrappedATNConfig {
+
+		private final ATNConfig config;
+
+		private WrappedATNConfig(ATNConfig config) {
+			this.config = config;
+		}
+
+		/**
+		 * The hash code is only a function of the {@link ATNState#stateNumber}
+		 * and {@link ATNConfig#context}.
+		 */
+		@Override
+		public int hashCode() {
+			int hashCode = MurmurHash.initialize(7);
+			hashCode = MurmurHash.update(hashCode, config.state.stateNumber);
+			hashCode = MurmurHash.update(hashCode, config.context);
+			hashCode = MurmurHash.finish(hashCode, 2);
+			return hashCode;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			WrappedATNConfig that = (WrappedATNConfig) o;
+			return equals(config, that.config);
+		}
+
+		private boolean equals(ATNConfig a, ATNConfig b) {
+			if ( a==b ) return true;
+			if ( a==null || b==null ) return false;
+			return a.state.stateNumber==b.state.stateNumber
+					&& a.context.equals(b.context);
+		}
 	}
 
 }
