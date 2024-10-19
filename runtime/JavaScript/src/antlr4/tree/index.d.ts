@@ -5,4 +5,4 @@ export * from './ParseTree';
 export * from './ParseTreeListener';
 export * from './ParseTreeVisitor';
 export * from './ParseTreeWalker';
-
+export * as Trees from './Trees';
