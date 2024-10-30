@@ -84,6 +84,7 @@ def exit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">
 }; separator="\n">
 
 del <file.parserName>
+
 >>
 
 
@@ -108,6 +109,7 @@ def visit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap"
 }; separator="\n">
 
 del <file.parserName>
+
 >>
 
 
@@ -141,11 +143,11 @@ class <parser.name>(<if(superClass)><superClass><else>Parser<endif>):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [
-        <parser.literalNames:{t | <t>}; null="\"\<INVALID>\"", separator=",\n", anchor>,
+        <parser.literalNames:{t | <t>};  null="\"\<INVALID>\"", separator=",\n", anchor><if(parser.literalNames)>,<endif>
     ]
 
     symbolicNames = [
-        <parser.symbolicNames:{t | <t>}; null="\"\<INVALID>\"", separator=",\n", anchor>,
+        <parser.symbolicNames:{t | <t>};  null="\"\<INVALID>\"", separator=",\n", anchor><if(parser.symbolicNames)>,<endif>
     ]
 
     <if(parser.rules)>
@@ -153,7 +155,7 @@ class <parser.name>(<if(superClass)><superClass><else>Parser<endif>):
     <endif>
 
     ruleNames = [
-        <parser.ruleNames:{r | "<r>"}; separator=",\n", wrap, anchor>,
+        <parser.ruleNames:{r | "<r>"}; separator=",\n", wrap, anchor><if(parser.ruleNames)>,<endif>
     ]
 
     EOF = <TokenLabelType()>.EOF
@@ -825,8 +827,7 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     channelNames = [
         "DEFAULT_TOKEN_CHANNEL",
         "HIDDEN"<if (lexer.channelNames)>,
-        <lexer.channelNames:{c| "<c>"}; separator=",\n", anchor>
-        <endif>,
+        <lexer.channelNames:{c| "<c>"}; separator=",\n", anchor><endif>,
     ]
 
     modeNames = [
@@ -834,13 +835,13 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     ]
 
     literalNames = [
-        "\<INVALID>",
-        <lexer.literalNames:{t | <t>}; separator=",\n", anchor>,
+        "\<INVALID>"<if (lexer.literalNames)>,
+        <lexer.literalNames:{t | <t>}; separator=",\n", anchor><endif>,
     ]
 
     symbolicNames = [
-        "\<INVALID>",
-        <lexer.symbolicNames:{t | <t>}; separator=",\n", anchor>,
+        "\<INVALID>"<if (lexer.symbolicNames)>,
+        <lexer.symbolicNames:{t | <t>}; separator=",\n", anchor><endif>,
     ]
 
     ruleNames = [
