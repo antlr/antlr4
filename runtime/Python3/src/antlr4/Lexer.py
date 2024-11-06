@@ -11,7 +11,7 @@
 from io import StringIO
 
 import sys
-if sys.version_info[1] > 5:
+if sys.version_info >= (3, 6):
     from typing import TextIO
 else:
     from typing.io import TextIO
