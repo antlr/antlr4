@@ -1,16 +1,8 @@
 export declare class BitSet {
-    private data: Uint32Array;
+    // write methods are not exposed based on this conversation https://github.com/antlr/antlr4/pull/4731#discussion_r1847139040
     readonly length: number;
-    
-    constructor();
-
-    set(index: number): void;
 
     get(index: number): number;
-
-    clear(index: number): void;
-
-    or(set: BitSet): void;
 
     values(): Array<number>;
 
@@ -21,10 +13,6 @@ export declare class BitSet {
     equals(): boolean;
 
     toString(): string;
-
-    _resize(index: number): void;
-
-    static _checkIndex(index: number): void;
 
     static _bitCount(l: number): number; 
 }
