@@ -55,6 +55,7 @@ import typing
 
 from antlr4 import *
 
+
 <namedActions.header>
 <parser>
 
@@ -69,16 +70,17 @@ else:
     from <file.parserName> import <file.parserName>
 <header>
 
-# This class defines a complete listener for a parse tree produced by <file.parserName>.
+
 class <file.grammarName>Listener(ParseTreeListener):
+	# This class defines a complete listener for a parse tree produced by <file.parserName>.
 
     <file.listenerNames:{lname |
-# Enter a parse tree produced by <file.parserName>#<lname>.
 def enter<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context) -> None:
+	# Enter a parse tree produced by <file.parserName>#<lname>.
     pass
 
-# Exit a parse tree produced by <file.parserName>#<lname>.
 def exit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context) -> None:
+	# Exit a parse tree produced by <file.parserName>#<lname>.
     pass
 
 }; separator="\n">
@@ -97,15 +99,14 @@ else:
     from <file.parserName> import <file.parserName>
 <header>
 
-# This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
 class <file.grammarName>Visitor(ParseTreeVisitor):
+    # This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
     <file.visitorNames:{lname |
-# Visit a parse tree produced by <file.parserName>#<lname>.
 def visit<lname; format="cap">(self, ctx: <file.parserName>.<lname; format="cap">Context):
+    # Visit a parse tree produced by <file.parserName>#<lname>.
     return self.visitChildren(ctx)
-
 }; separator="\n">
 
 del <file.parserName>
@@ -169,7 +170,6 @@ class <parser.name>(<if(superClass)><superClass><else>Parser<endif>):
 
     <funcs; separator="\n">
 
-
 <if(sempredFuncs)>
     def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
         if self._predicates is None:
@@ -184,8 +184,6 @@ class <parser.name>(<if(superClass)><superClass><else>Parser<endif>):
 
     <sempredFuncs.values; separator="\n">
 <endif>
-
-
 
 >>
 
@@ -252,7 +250,7 @@ def <r.name>_action(self, localctx: <r.ctxType>, actionIndex: int) -> None:
 <elseif(rest(actions))>
     elif actionIndex == <index>:
         <actions.(index)>
-<endif> }; separator="\n\n">
+<endif> }; separator="\n">
 >>
 
 /* This generates a private method since the predIndex is generated, making an
@@ -262,23 +260,19 @@ RuleSempredFunction(r, actions) ::= <<
 def <r.name>_sempred(self, localctx: <r.ctxType>, predIndex: int) -> int:
     <actions:{index|
 <if(first(actions))>
-    if predIndex == <index>:
-        return <actions.(index)>
+if predIndex == <index>:
+    return <actions.(index)>
 <elseif(rest(actions))>
-    elif predIndex == <index>:
-        return <actions.(index)>
-<endif> }; separator="\n">
+elif predIndex == <index>:
+    return <actions.(index)>
+<endif> }; separator="">
 
 >>
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
-
 <ruleCtx>
-
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
-
 def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.type)>: <a.type><endif>}>):
-
     localctx = <parser.name>.<currentRule.ctxType>(
         self,
         self._ctx,
@@ -309,10 +303,8 @@ def <currentRule.escapedName>(self<currentRule.args:{a | , <a.escapedName><if(a.
 LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
-
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
-
 def <currentRule.escapedName>(self, _p: int = 0<if(currentRule.args)>, <args:{a | , <a>}><endif>) -> <parser.name>.<currentRule.ctxType>:
     _parentctx = self._ctx
     _parentState = self.state
@@ -360,7 +352,6 @@ token = self._input.LA(1)
     pass}; separator="\nel">
 else:
     <error>
-
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
@@ -380,7 +371,6 @@ self._errHandler.sync(self)
 <preamble; separator="\n">
 if <expr>:
     <alts; separator="\n">
-
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
@@ -394,7 +384,6 @@ while <loopExpr>:
     self.state = <choice.loopBackStateNumber>
     self._errHandler.sync(self)
     <iteration>
-
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
@@ -408,7 +397,6 @@ while True:
     <iteration>
     if not (<loopExpr>):
         break
-
 >>
 
 // LL(*) stuff
@@ -424,7 +412,6 @@ if la_ == <i>:
     <alt>
     pass
 }; separator="\nel">
-
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
@@ -435,21 +422,19 @@ la_ = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
 if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
     <alt>
 }; separator="\nel">
-
 >>
 
 StarBlock(choice, alts, sync, iteration) ::= <<
 self.state = <choice.stateNumber>
 self._errHandler.sync(self)
 _alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
-while _alt!=<choice.exitAlt> and _alt != ATN.INVALID_ALT_NUMBER:
+while _alt != <choice.exitAlt> and _alt != ATN.INVALID_ALT_NUMBER:
     if _alt == 1<if(!choice.ast.greedy)> + 1<endif>:
         <iteration>
         <alts> <! should only be one !>
     self.state = <choice.loopBackStateNumber>
     self._errHandler.sync(self)
     _alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
-
 >>
 
 PlusBlock(choice, alts, error) ::= <<
@@ -466,7 +451,6 @@ if _alt == <i><if(!choice.ast.greedy)> + 1<endif>:
     self.state = <choice.loopBackStateNumber> <! loopback/exit decision !>
     self._errHandler.sync(self)
     _alt = self._interp.adaptivePredict(self._input, <choice.decision>, self._ctx)
-
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>)"
@@ -525,7 +509,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 self.state = <m.stateNumber>
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>self._input.LT(1)<endif>
 <capture>
-<if(invert)>if <m.varName> \<= 0 or <expr><else>if not(<expr>)<endif>:
+<if(invert)>if <m.varName> \<= 0 or <expr><else>if not (<expr>)<endif>:
 <if(m.labels)><m.labels:{l |     <labelref(l)> = }><else>    <endif>self._errHandler.recoverInline(self)
 else:
     self._errHandler.reportMatch(self)
@@ -606,21 +590,23 @@ SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.es
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
-TokenDecl(t) ::= "self.<t.escapedName> = None # <TokenLabelType()>"
-TokenTypeDecl(t) ::= "self.<t.escapedName> = 0 # <TokenLabelType()> type"
-TokenListDecl(t) ::= "self.<t.escapedName> = list() # of <TokenLabelType()>s"
-RuleContextDecl(r) ::= "self.<r.escapedName> = None # <r.ctxName>"
-RuleContextListDecl(rdecl) ::= "self.<rdecl.escapedName> = list() # of <rdecl.ctxName>s"
+TokenDecl(t) ::= "self.<t.escapedName> = None  # <TokenLabelType()>"
+TokenTypeDecl(t) ::= "self.<t.escapedName> = 0  # <TokenLabelType()> type"
+TokenListDecl(t) ::= "self.<t.escapedName> = list()  # of <TokenLabelType()>s"
+RuleContextDecl(r) ::= "self.<r.escapedName> = None  # <r.ctxName>"
+RuleContextListDecl(rdecl) ::= "self.<rdecl.escapedName> = list()  # of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
 def <t.escapedName>(self):
     return self.getToken(<parser.name>.<t.name>, 0)
+
 >>
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
 def <t.name>_list(self):
     return self.getTokens(<parser.name>.<t.name>)
+
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
@@ -629,6 +615,7 @@ def <t.escapedName>(self, i: typing.Optional[int] = None):
         return self.getTokens(<parser.name>.<t.name>)
     else:
         return self.getToken(<parser.name>.<t.name>, i)
+
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
@@ -683,8 +670,7 @@ class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>Parse
         <attrs:{a | <a>}; separator="\n">
         <struct.ctorAttrs:{a | self.<a.escapedName> = <a.escapedName>}; separator="\n">
 
-    <getters:{g | <g>}; separator="\n\n">
-
+    <getters:{g | <g>}; separator="\n">
     def getRuleIndex(self):
         return <parser.name>.RULE_<struct.derivedFromName>
 
@@ -695,6 +681,7 @@ class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>Parse
 
 <endif>
     <dispatchMethods; separator="\n">
+
     <extensionMembers; separator="\n">
 
 >>
@@ -719,7 +706,7 @@ class <struct.escapedName>(<currentRule.name; format="cap">Context):
 
 ListenerDispatchMethod(method) ::= <<
 def <if(method.isEnter)>enter<else>exit<endif>Rule(self, listener: ParseTreeListener):
-    if hasattr( listener, "<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">" ):
+    if hasattr(listener, "<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">"):
         listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 
 >>
@@ -730,7 +717,6 @@ def accept(self, visitor: ParseTreeVisitor):
         return visitor.visit<struct.derivedFromName; format="cap">(self)
     else:
         return visitor.visitChildren(self)
-
 >>
 
 AttributeDecl(d) ::= "self.<d.escapedName> = <if(d.initValue)><d.initValue><else>None<endif>"
@@ -807,7 +793,6 @@ else:
 
 
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
-
     atn = ATNDeserializer().deserialize(serializedATN())
 
     decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
@@ -852,7 +837,7 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     def __init__(
         self,
-        input = None,
+        input=None,
         output: typing.TextIO = sys.stdout,
     ) -> None:
         super().__init__(input, output)
@@ -875,8 +860,8 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 SerializedATN(model) ::= <<
 def serializedATN():
     return [
-        <model.serialized: {s | <s>}; separator=", ", wrap>
-    ]
+        <model.serialized: {s | <s>}; separator=",", wrap>
+    ]  # fmt: skip
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
