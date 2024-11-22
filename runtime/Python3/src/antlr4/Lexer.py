@@ -15,12 +15,12 @@ if sys.version_info >= (3, 6):
     from typing import TextIO
 else:
     from typing.io import TextIO
-from antlr4.CommonTokenFactory import CommonTokenFactory
-from antlr4.atn.LexerATNSimulator import LexerATNSimulator
-from antlr4.InputStream import InputStream
-from antlr4.Recognizer import Recognizer
-from antlr4.Token import Token
-from antlr4.error.Errors import IllegalStateException, LexerNoViableAltException, RecognitionException
+from .CommonTokenFactory import CommonTokenFactory
+from .atn.LexerATNSimulator import LexerATNSimulator
+from .InputStream import InputStream
+from .Recognizer import Recognizer
+from .Token import Token
+from .error.Errors import IllegalStateException, LexerNoViableAltException, RecognitionException
 
 class TokenSource(object):
 

@@ -8,7 +8,7 @@
 #
 #  Vacuum all input from a string and then treat it like a buffer.
 #
-from antlr4.Token import Token
+from .Token import Token
 
 
 class InputStream (object):

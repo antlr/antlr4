@@ -29,9 +29,9 @@
 # channel.</p>
 #/
 
-from antlr4.BufferedTokenStream import BufferedTokenStream
-from antlr4.Lexer import Lexer
-from antlr4.Token import Token
+from .BufferedTokenStream import BufferedTokenStream
+from .Lexer import Lexer
+from .Token import Token
 
 
 class CommonTokenStream(BufferedTokenStream):

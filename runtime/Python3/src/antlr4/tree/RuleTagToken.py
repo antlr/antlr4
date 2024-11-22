@@ -9,7 +9,7 @@
 # rule; e.g., {@code <expr>}. These tokens are created for {@link TagChunk}
 # chunks where the tag corresponds to a parser rule.
 #
-from antlr4.Token import Token
+from ..Token import Token
 
 
 class RuleTagToken(Token):
