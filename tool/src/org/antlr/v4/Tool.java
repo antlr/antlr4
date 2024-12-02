@@ -58,6 +58,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 public class Tool {
 	public static final String VERSION;
@@ -72,6 +73,8 @@ public class Tool {
 
 	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
 		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
+
+	public static final Pattern ENCODING_PATTERN = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9_-]*)\\w+");
 
 	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
@@ -213,6 +216,12 @@ public class Tool {
 					if ( o.argType==OptionArgType.STRING ) {
 						argValue = args[i];
 						i++;
+					}
+					if ( "grammarEncoding".equals(o.fieldName) ) {
+						if ( !ENCODING_PATTERN.matcher(argValue).matches() ) {
+							errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG_INPUT, o.name, argValue);
+							return;
+						}
 					}
 					// use reflection to set field
 					Class<? extends Tool> c = this.getClass();
