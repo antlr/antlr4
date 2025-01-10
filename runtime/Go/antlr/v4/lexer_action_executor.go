@@ -4,8 +4,6 @@
 
 package antlr
 
-import "golang.org/x/exp/slices"
-
 // Represents an executor for a sequence of lexer actions which traversed during
 // the Matching operation of a lexer rule (token).
 //
@@ -167,7 +165,10 @@ func (l *LexerActionExecutor) Equals(other interface{}) bool {
 	if len(l.lexerActions) != len(othert.lexerActions) {
 		return false
 	}
-	return slices.EqualFunc(l.lexerActions, othert.lexerActions, func(i, j LexerAction) bool {
-		return i.Equals(j)
-	})
+	for i, v := range l.lexerActions {
+		if !v.Equals(othert.lexerActions[i]) {
+			return false
+		}
+	}
+	return true
 }

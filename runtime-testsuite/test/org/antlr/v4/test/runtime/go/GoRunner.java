@@ -142,6 +142,11 @@ public class GoRunner extends RuntimeRunner {
 		//
 		Exception ex = null;
 		if (cachedGoSum == null) {
+			// We need to write an empty go.sum file because `go mod tidy` may not generate it if there is no dependency.
+			// Or it will casue `java.io.FileNotFoundException` when readFile below
+			//
+			writeFile(getTempDirPath(), "go.sum", "");
+
 			try {
 				Processor.run(new String[]{getRuntimeToolPath(), "mod", "tidy"}, getTempDirPath(), environment);
 			} catch (InterruptedException | IOException e) {

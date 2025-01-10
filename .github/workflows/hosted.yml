@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-12,
+          macos-13,
           ubuntu-20.04,
           windows-2022
         ]
@@ -160,7 +160,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          macos-12,
+          macos-13,
           ubuntu-20.04,
           windows-2022
         ]
