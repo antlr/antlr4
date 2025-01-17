@@ -91,7 +91,7 @@ try {
     parser.stat();  // STAGE 1
 }
 catch (Exception ex) {
-    tokens.reset(); // rewind input stream
+    tokens.seek(0); // rewind input stream
     parser.reset();
     parser.getInterpreter().setPredictionMode(PredictionMode.LL);
     parser.stat();  // STAGE 2
