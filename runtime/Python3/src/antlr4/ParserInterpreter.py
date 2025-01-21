@@ -108,7 +108,7 @@ class ParserInterpreter(Parser):
         tt = transition.serializationType
         if tt==Transition.EPSILON:
 
-            if self.pushRecursionContextStates[p.stateNumber] and not isinstance(transition.target, LoopEndState):
+            if p.stateNumber in self.pushRecursionContextStates and not isinstance(transition.target, LoopEndState):
                 t = self._parentContextStack[-1]
                 ctx = InterpreterRuleContext(t[0], t[1], self._ctx.ruleIndex)
                 self.pushNewRecursionContext(ctx, self.atn.ruleToStartState[p.ruleIndex].stateNumber, self._ctx.ruleIndex)
