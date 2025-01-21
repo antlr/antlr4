@@ -58,7 +58,7 @@ class ParserInterpreter(Parser):
         self._interp = ParserATNSimulator(self, atn, self.decisionToDFA, self.sharedContextCache)
 
     # Begin parsing at startRuleIndex#
-    def parse(self, startRuleIndex:int):
+        def parse(self, startRuleIndex:int):
         startRuleStartState = self.atn.ruleToStartState[startRuleIndex]
         rootContext = InterpreterRuleContext(None, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
         if startRuleStartState.isPrecedenceRule:
