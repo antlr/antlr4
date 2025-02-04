@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class TestSplitParser {
 
 	@Test
-	public void testDefault() throws Exception {
+	public void testGeneratesDefaultFiles() throws Exception {
 		Set<String> created = generate();
 		assert created.size() == 4;
 		assert created.contains("JavaLexer.java");
@@ -27,7 +27,7 @@ public class TestSplitParser {
 	}
 
 	@Test
-	public void testNoListener() throws Exception {
+	public void testGeneratesNoListenerFiles() throws Exception {
 		Set<String> created = generate("-no-listener");
 		assert created.size() == 2;
 		assert created.contains("JavaLexer.java");
@@ -35,7 +35,7 @@ public class TestSplitParser {
 	}
 
 	@Test
-	public void testVisitor() throws Exception {
+	public void testGeneratesVisitorFiles() throws Exception {
 		Set<String> created = generate("-visitor");
 		assert created.size() == 6;
 		assert created.contains("JavaLexer.java");
@@ -47,7 +47,7 @@ public class TestSplitParser {
 	}
 
 	@Test
-	public void testSplit() throws Exception {
+	public void testGeneratesSplitFiles() throws Exception {
 		Set<String> created = generate("-split-context", "-no-listener");
 		assert created.size() == 3;
 		assert created.contains("JavaLexer.java");
