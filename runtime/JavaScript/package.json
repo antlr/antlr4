@@ -47,7 +47,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "jasmine",
+    "test": "jasmine && npm run test:builds",
+    "test:builds": "bash test-builds.sh",
     "coverage": "c8 jasmine",
     "lint": "eslint src/antlr4/"
   },

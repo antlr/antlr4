@@ -52,7 +52,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 from antlr4 import *
 from io import StringIO
 import sys
-if sys.version_info[1] > 5:
+if sys.version_info >= (3, 6):
 	from typing import TextIO
 else:
 	from typing.io import TextIO
@@ -761,7 +761,7 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 from antlr4 import *
 from io import StringIO
 import sys
-if sys.version_info[1] > 5:
+if sys.version_info >= (3, 6):
     from typing import TextIO
 else:
     from typing.io import TextIO

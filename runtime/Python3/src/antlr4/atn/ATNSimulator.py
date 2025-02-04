@@ -3,10 +3,10 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
-from antlr4.PredictionContext import PredictionContextCache, PredictionContext, getCachedPredictionContext
-from antlr4.atn.ATN import ATN
-from antlr4.atn.ATNConfigSet import ATNConfigSet
-from antlr4.dfa.DFAState import DFAState
+from ..PredictionContext import PredictionContextCache, PredictionContext, getCachedPredictionContext
+from ..atn.ATN import ATN
+from ..atn.ATNConfigSet import ATNConfigSet
+from ..dfa.DFAState import DFAState
 
 
 class ATNSimulator(object):

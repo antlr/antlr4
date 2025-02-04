@@ -1,10 +1,9 @@
-#!python
 __author__ = 'jszheng'
 import optparse
 import sys
 import os
-import importlib
-from antlr4 import *
+
+from . import *
 
 
 # this is a python version of TestRig
@@ -165,7 +164,3 @@ def main():
             process(input_stream, class_lexer, class_parser)
         else:
             print("[ERROR] file {} not exist".format(os.path.normpath(file_name)))
-
-
-if __name__ == '__main__':
-    main()
