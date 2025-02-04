@@ -8,6 +8,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.GenFileType;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -79,10 +80,15 @@ public class BuildDependencyGenerator {
 
         // add generated recognizer; e.g., TParser.java
         if (generator.getTarget().needsHeader()) {
-          files.add(getOutputFile(generator.getRecognizerFileName(true)));
+          files.add(getOutputFile(generator.getRecognizerFileName(GenFileType.HEADER)));
         }
-        files.add(getOutputFile(generator.getRecognizerFileName(false)));
-        // add output vocab file; e.g., T.tokens. This is always generated to
+		if (generator.getTarget().supportsSplitContext()) {
+			files.add(getOutputFile(generator.getRecognizerFileName(GenFileType.SOURCE_PARSER)));
+			files.add(getOutputFile(generator.getRecognizerFileName(GenFileType.SOURCE_CONTEXTS)));
+		} else {
+			files.add(getOutputFile(generator.getRecognizerFileName(GenFileType.SOURCE)));
+		}
+		// add output vocab file; e.g., T.tokens. This is always generated to
         // the base output directory, which will be just . if there is no -o option
         //
 		files.add(getOutputFile(generator.getVocabFileName()));
@@ -114,29 +120,29 @@ public class BuildDependencyGenerator {
         if ( g.tool.gen_listener ) {
           // add generated listener; e.g., TListener.java
           if (generator.getTarget().needsHeader()) {
-            files.add(getOutputFile(generator.getListenerFileName(true)));
+            files.add(getOutputFile(generator.getListenerFileName(GenFileType.HEADER)));
           }
-          files.add(getOutputFile(generator.getListenerFileName(false)));
+          files.add(getOutputFile(generator.getListenerFileName(GenFileType.SOURCE)));
 
           // add generated base listener; e.g., TBaseListener.java
           if (generator.getTarget().needsHeader()) {
-            files.add(getOutputFile(generator.getBaseListenerFileName(true)));
+            files.add(getOutputFile(generator.getBaseListenerFileName(GenFileType.HEADER)));
           }
-          files.add(getOutputFile(generator.getBaseListenerFileName(false)));
+          files.add(getOutputFile(generator.getBaseListenerFileName(GenFileType.SOURCE)));
         }
 
         if ( g.tool.gen_visitor ) {
           // add generated visitor; e.g., TVisitor.java
           if (generator.getTarget().needsHeader()) {
-            files.add(getOutputFile(generator.getVisitorFileName(true)));
+            files.add(getOutputFile(generator.getVisitorFileName(GenFileType.HEADER)));
           }
-          files.add(getOutputFile(generator.getVisitorFileName(false)));
+          files.add(getOutputFile(generator.getVisitorFileName(GenFileType.SOURCE)));
 
           // add generated base visitor; e.g., TBaseVisitor.java
           if (generator.getTarget().needsHeader()) {
-            files.add(getOutputFile(generator.getBaseVisitorFileName(true)));
+            files.add(getOutputFile(generator.getBaseVisitorFileName(GenFileType.HEADER)));
           }
-          files.add(getOutputFile(generator.getBaseVisitorFileName(false)));
+          files.add(getOutputFile(generator.getBaseVisitorFileName(GenFileType.SOURCE)));
         }
 
 

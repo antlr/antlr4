@@ -7,7 +7,6 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.gui.STViz;
 
@@ -28,75 +27,87 @@ public class CodeGenPipeline {
 
 		if ( g.isLexer() ) {
 			if (gen.getTarget().needsHeader()) {
-				ST lexer = gen.generateLexer(true); // Header file if needed.
+				ST lexer = gen.generateLexer(GenFileType.HEADER); // Header file if needed.
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					writeRecognizer(lexer, gen, true);
+					writeRecognizer(lexer, gen, GenFileType.HEADER);
 				}
 			}
-			ST lexer = gen.generateLexer(false);
+			ST lexer = gen.generateLexer(GenFileType.SOURCE);
 			if (g.tool.errMgr.getNumErrors() == errorCount) {
-				writeRecognizer(lexer, gen, false);
+				writeRecognizer(lexer, gen, GenFileType.SOURCE);
 			}
 		}
 		else {
 			if (gen.getTarget().needsHeader()) {
-				ST parser = gen.generateParser(true);
+				ST parser = gen.generateParser(GenFileType.HEADER);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					writeRecognizer(parser, gen, true);
+					writeRecognizer(parser, gen, GenFileType.HEADER);
 				}
 			}
-			ST parser = gen.generateParser(false);
-			if (g.tool.errMgr.getNumErrors() == errorCount) {
-				writeRecognizer(parser, gen, false);
+			if ( gen.getTarget().supportsSplitContext() && g.tool.gen_split_context ) {
+				ST parser = gen.generateParser(GenFileType.SOURCE_PARSER);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					writeRecognizer(parser, gen, GenFileType.SOURCE_PARSER);
+				}
+				parser = gen.generateParser(GenFileType.SOURCE_CONTEXTS);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					writeRecognizer(parser, gen, GenFileType.SOURCE_CONTEXTS);
+				}
+			} else {
+				ST parser = gen.generateParser(GenFileType.SOURCE);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					writeRecognizer(parser, gen, GenFileType.SOURCE);
+				}
+
 			}
 
 			if ( g.tool.gen_listener ) {
 				if (gen.getTarget().needsHeader()) {
-					ST listener = gen.generateListener(true);
+					ST listener = gen.generateListener(GenFileType.HEADER);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeListener(listener, true);
+						gen.writeListener(listener, GenFileType.HEADER);
 					}
 				}
-				ST listener = gen.generateListener(false);
+				ST listener = gen.generateListener(GenFileType.SOURCE);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeListener(listener, false);
+					gen.writeListener(listener, GenFileType.SOURCE);
 				}
 
 				if (gen.getTarget().needsHeader()) {
-					ST baseListener = gen.generateBaseListener(true);
+					ST baseListener = gen.generateBaseListener(GenFileType.HEADER);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseListener(baseListener, true);
+						gen.writeBaseListener(baseListener, GenFileType.HEADER);
 					}
 				}
 				if (gen.getTarget().wantsBaseListener()) {
-					ST baseListener = gen.generateBaseListener(false);
+					ST baseListener = gen.generateBaseListener(GenFileType.SOURCE);
 					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseListener(baseListener, false);
+						gen.writeBaseListener(baseListener, GenFileType.SOURCE);
 					}
 				}
 			}
 			if ( g.tool.gen_visitor ) {
 				if (gen.getTarget().needsHeader()) {
-					ST visitor = gen.generateVisitor(true);
+					ST visitor = gen.generateVisitor(GenFileType.HEADER);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeVisitor(visitor, true);
+						gen.writeVisitor(visitor, GenFileType.HEADER);
 					}
 				}
-				ST visitor = gen.generateVisitor(false);
+				ST visitor = gen.generateVisitor(GenFileType.SOURCE);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeVisitor(visitor, false);
+					gen.writeVisitor(visitor, GenFileType.SOURCE);
 				}
 
 				if (gen.getTarget().needsHeader()) {
-					ST baseVisitor = gen.generateBaseVisitor(true);
+					ST baseVisitor = gen.generateBaseVisitor(GenFileType.HEADER);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseVisitor(baseVisitor, true);
+						gen.writeBaseVisitor(baseVisitor, GenFileType.HEADER);
 					}
 				}
 				if (gen.getTarget().wantsBaseVisitor()) {
-					ST baseVisitor = gen.generateBaseVisitor(false);
+					ST baseVisitor = gen.generateBaseVisitor(GenFileType.SOURCE);
 					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseVisitor(baseVisitor, false);
+						gen.writeBaseVisitor(baseVisitor, GenFileType.SOURCE);
 					}
 				}
 			}
@@ -104,7 +115,7 @@ public class CodeGenPipeline {
 		gen.writeVocabFile();
 	}
 
-	protected void writeRecognizer(ST template, CodeGenerator gen, boolean header) {
+	protected void writeRecognizer(ST template, CodeGenerator gen, GenFileType fileType) {
 		if ( g.tool.launch_ST_inspector ) {
 			STViz viz = template.inspect();
 			if (g.tool.ST_inspector_wait_for_close) {
@@ -117,6 +128,6 @@ public class CodeGenPipeline {
 			}
 		}
 
-		gen.writeRecognizer(template, header);
+		gen.writeRecognizer(template, fileType);
 	}
 }

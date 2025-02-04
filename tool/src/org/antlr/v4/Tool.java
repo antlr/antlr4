@@ -106,6 +106,7 @@ public class Tool {
     public boolean log = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
+	public boolean gen_split_context = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
@@ -126,6 +127,8 @@ public class Tool {
 		new Option("gen_visitor",                 "-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",                  "-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
 		new Option("gen_dependencies",            "-depend", "generate file dependencies"),
+		new Option("gen_split_context",           "-split-context", "generate separate file for parser context class"),
+		new Option("gen_split_context",           "-no-split-context", "generate parser context class as child classes (default)"),
 		new Option("",                            "-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors",         "-Werror", "treat warnings as errors"),
 		new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),

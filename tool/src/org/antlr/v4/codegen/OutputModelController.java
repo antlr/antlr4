@@ -83,9 +83,9 @@ public class OutputModelController {
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
 	 */
-	public OutputModelObject buildParserOutputModel(boolean header) {
+	public OutputModelObject buildParserOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		ParserFile file = parserFile(gen.getRecognizerFileName(header));
+		ParserFile file = parserFile(gen.getRecognizerFileName(fileType));
 		setRoot(file);
 		file.parser = parser(file);
 
@@ -97,9 +97,9 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildLexerOutputModel(boolean header) {
+	public OutputModelObject buildLexerOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		LexerFile file = lexerFile(gen.getRecognizerFileName(header));
+		LexerFile file = lexerFile(gen.getRecognizerFileName(fileType));
 		setRoot(file);
 		file.lexer = lexer(file);
 
@@ -111,24 +111,24 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildListenerOutputModel(boolean header) {
+	public OutputModelObject buildListenerOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new ListenerFile(delegate, gen.getListenerFileName(header));
+		return new ListenerFile(delegate, gen.getListenerFileName(fileType));
 	}
 
-	public OutputModelObject buildBaseListenerOutputModel(boolean header) {
+	public OutputModelObject buildBaseListenerOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBaseListenerFileName(header));
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName(fileType));
 	}
 
-	public OutputModelObject buildVisitorOutputModel(boolean header) {
+	public OutputModelObject buildVisitorOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new VisitorFile(delegate, gen.getVisitorFileName(header));
+		return new VisitorFile(delegate, gen.getVisitorFileName(fileType));
 	}
 
-	public OutputModelObject buildBaseVisitorOutputModel(boolean header) {
+	public OutputModelObject buildBaseVisitorOutputModel(GenFileType fileType) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName(header));
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName(fileType));
 	}
 
 	public ParserFile parserFile(String fileName) {

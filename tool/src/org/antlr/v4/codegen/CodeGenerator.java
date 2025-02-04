@@ -83,28 +83,28 @@ public class CodeGenerator {
 		return controller;
 	}
 
-	private ST walk(OutputModelObject outputModel, boolean header) {
+	private ST walk(OutputModelObject outputModel, GenFileType fileType) {
 		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
-		return walker.walk(outputModel, header);
+		return walker.walk(outputModel, fileType);
 	}
 
-	public ST generateLexer() { return generateLexer(false); }
-	public ST generateLexer(boolean header) { return walk(createController().buildLexerOutputModel(header), header); }
+	public ST generateLexer() { return generateLexer(GenFileType.SOURCE); }
+	public ST generateLexer(GenFileType fileType) { return walk(createController().buildLexerOutputModel(fileType), fileType); }
 
-	public ST generateParser() { return generateParser(false); }
-	public ST generateParser(boolean header) { return walk(createController().buildParserOutputModel(header), header); }
+	public ST generateParser() { return generateParser(GenFileType.SOURCE); }
+	public ST generateParser(GenFileType fileType) { return walk(createController().buildParserOutputModel(fileType), fileType); }
 
-	public ST generateListener() { return generateListener(false); }
-	public ST generateListener(boolean header) { return walk(createController().buildListenerOutputModel(header), header); }
+	public ST generateListener() { return generateListener(GenFileType.SOURCE); }
+	public ST generateListener(GenFileType fileType) { return walk(createController().buildListenerOutputModel(fileType), fileType); }
 
-	public ST generateBaseListener() { return generateBaseListener(false); }
-	public ST generateBaseListener(boolean header) { return walk(createController().buildBaseListenerOutputModel(header), header); }
+	public ST generateBaseListener() { return generateBaseListener(GenFileType.SOURCE); }
+	public ST generateBaseListener(GenFileType fileType) { return walk(createController().buildBaseListenerOutputModel(fileType), fileType); }
 
-	public ST generateVisitor() { return generateVisitor(false); }
-	public ST generateVisitor(boolean header) { return walk(createController().buildVisitorOutputModel(header), header); }
+	public ST generateVisitor() { return generateVisitor(GenFileType.SOURCE); }
+	public ST generateVisitor(GenFileType fileType) { return walk(createController().buildVisitorOutputModel(fileType), fileType); }
 
-	public ST generateBaseVisitor() { return generateBaseVisitor(false); }
-	public ST generateBaseVisitor(boolean header) { return walk(createController().buildBaseVisitorOutputModel(header), header); }
+	public ST generateBaseVisitor() { return generateBaseVisitor(GenFileType.SOURCE); }
+	public ST generateBaseVisitor(GenFileType fileType) { return walk(createController().buildBaseVisitorOutputModel(fileType), fileType); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -138,24 +138,24 @@ public class CodeGenerator {
 		return vocabFileST;
 	}
 
-	public void writeRecognizer(ST outputFileST, boolean header) {
-		target.genFile(g, outputFileST, getRecognizerFileName(header));
+	public void writeRecognizer(ST outputFileST, GenFileType fileType) {
+		target.genFile(g, outputFileST, getRecognizerFileName(fileType));
 	}
 
-	public void writeListener(ST outputFileST, boolean header) {
-		target.genFile(g, outputFileST, getListenerFileName(header));
+	public void writeListener(ST outputFileST, GenFileType fileType) {
+		target.genFile(g, outputFileST, getListenerFileName(fileType));
 	}
 
-	public void writeBaseListener(ST outputFileST, boolean header) {
-		target.genFile(g, outputFileST, getBaseListenerFileName(header));
+	public void writeBaseListener(ST outputFileST, GenFileType fileType) {
+		target.genFile(g, outputFileST, getBaseListenerFileName(fileType));
 	}
 
-	public void writeVisitor(ST outputFileST, boolean header) {
-		target.genFile(g, outputFileST, getVisitorFileName(header));
+	public void writeVisitor(ST outputFileST, GenFileType fileType) {
+		target.genFile(g, outputFileST, getVisitorFileName(fileType));
 	}
 
-	public void writeBaseVisitor(ST outputFileST, boolean header) {
-		target.genFile(g, outputFileST, getBaseVisitorFileName(header));
+	public void writeBaseVisitor(ST outputFileST, GenFileType fileType) {
+		target.genFile(g, outputFileST, getBaseVisitorFileName(fileType));
 	}
 
 	public void writeVocabFile() {
@@ -185,17 +185,17 @@ public class CodeGenerator {
 		}
 	}
 
-	public String getRecognizerFileName() { return getRecognizerFileName(false); }
-	public String getListenerFileName() { return getListenerFileName(false); }
-	public String getVisitorFileName() { return getVisitorFileName(false); }
-	public String getBaseListenerFileName() { return getBaseListenerFileName(false); }
-	public String getBaseVisitorFileName() { return getBaseVisitorFileName(false); }
+	public String getRecognizerFileName() { return getRecognizerFileName(GenFileType.SOURCE); }
+	public String getListenerFileName() { return getListenerFileName(GenFileType.SOURCE); }
+	public String getVisitorFileName() { return getVisitorFileName(GenFileType.SOURCE); }
+	public String getBaseListenerFileName() { return getBaseListenerFileName(GenFileType.SOURCE); }
+	public String getBaseVisitorFileName() { return getBaseVisitorFileName(GenFileType.SOURCE); }
 
-	public String getRecognizerFileName(boolean header) { return target.getRecognizerFileName(header); }
-	public String getListenerFileName(boolean header) { return target.getListenerFileName(header); }
-	public String getVisitorFileName(boolean header) { return target.getVisitorFileName(header); }
-	public String getBaseListenerFileName(boolean header) { return target.getBaseListenerFileName(header); }
-	public String getBaseVisitorFileName(boolean header) { return target.getBaseVisitorFileName(header); }
+	public String getRecognizerFileName(GenFileType fileType) { return target.getRecognizerFileName(fileType); }
+	public String getListenerFileName(GenFileType fileType) { return target.getListenerFileName(fileType); }
+	public String getVisitorFileName(GenFileType fileType) { return target.getVisitorFileName(fileType); }
+	public String getBaseListenerFileName(GenFileType fileType) { return target.getBaseListenerFileName(fileType); }
+	public String getBaseVisitorFileName(GenFileType fileType) { return target.getBaseVisitorFileName(fileType); }
 
 	/** What is the name of the vocab file generated for this grammar?
 	 *  Returns null if no .tokens file should be generated.
