@@ -653,5 +653,5 @@ public abstract class Target {
 	public boolean needsHeader() { return false; } // Override in targets that need header files.
 
 	/** @since 4.14 */
-    public boolean supportsSplitContext() { return false; }
+    public boolean supportsSplitParser() { return false; }
 }

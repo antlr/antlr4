@@ -44,7 +44,7 @@ public class CodeGenPipeline {
 					writeRecognizer(parser, gen, SourceType.HEADER);
 				}
 			}
-			if ( gen.getTarget().supportsSplitContext() && g.tool.gen_split_context ) {
+			if ( gen.getTarget().supportsSplitParser() && g.tool.gen_split_parser) {
 				ST parser = gen.generateParser(SourceType.SOURCE_LEAN);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
 					writeRecognizer(parser, gen, SourceType.SOURCE_LEAN);

@@ -68,7 +68,7 @@ public class TestSplitParser {
 
 	@Test
 	public void testGeneratesSplitFiles() throws Exception {
-		Set<String> created = generate("-split-context", "-no-listener");
+		Set<String> created = generate("-split-parser", "-no-listener");
 		assert created.size() == 4;
 		assert created.contains("JavaLexer.java");
 		assert created.contains("JavaParser.java");

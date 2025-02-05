@@ -82,7 +82,7 @@ public class BuildDependencyGenerator {
         if (generator.getTarget().needsHeader()) {
           files.add(getOutputFile(generator.getRecognizerFileName(SourceType.HEADER)));
         }
-		if (generator.getTarget().supportsSplitContext()) {
+		if (generator.getTarget().supportsSplitParser()) {
 			files.add(getOutputFile(generator.getRecognizerFileName(SourceType.SOURCE_LEAN)));
 			files.add(getOutputFile(generator.getRecognizerFileName(SourceType.SOURCE_CONTEXTS)));
 			files.add(getOutputFile(generator.getRecognizerFileName(SourceType.SOURCE_DFA)));

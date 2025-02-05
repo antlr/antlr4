@@ -58,7 +58,7 @@ public class JavaTarget extends Target {
 	}
 
 	@Override
-	public boolean supportsSplitContext() { return true; }
+	public boolean supportsSplitParser() { return true; }
 
 	@Override
 	public String getRecognizerFileName(SourceType sourceType) {
