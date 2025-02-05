@@ -56,6 +56,11 @@ import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
+<if(file.genLean)>
+import static <file.genPackage>.<file.parser.name>Contexts.*;
+<elseif(file.genContexts)>
+import static <file.genPackage>.<file.parser.name>.*;
+<endif>
 
 <parser>
 >>
@@ -232,7 +237,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_Contexts(parser, funcs) ::= <<
 public abstract class <parser.name>Contexts {
-
+	<funcs; separator="\n">
 }
 >>
 
@@ -419,10 +424,12 @@ case <index>:
 >>
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
-
+<if(!parser.file.genLean)>
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+<endif>
 
+<if(!parser.file.genContexts)>
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
@@ -451,6 +458,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	}
 	return _localctx;
 }
+<endif>
 >>
 
 LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
