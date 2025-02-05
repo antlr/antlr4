@@ -336,7 +336,7 @@ jobs:
     - name: Archive artifacts
       if: always()
       continue-on-error: true
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: antlr_${{ matrix.os }}_${{ matrix.target }}
         path: antlr_${{ matrix.os }}_${{ matrix.target }}.tgz
