@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -286,7 +287,7 @@ namespace Antlr4.Runtime
 
         public virtual void RemoveErrorListeners()
         {
-            _listeners = new IAntlrErrorListener<Symbol>[0];
+            _listeners = Collections.EmptyList<IAntlrErrorListener<Symbol>>();
         }
 
         [NotNull]

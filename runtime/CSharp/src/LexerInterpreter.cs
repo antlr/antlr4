@@ -33,7 +33,7 @@ namespace Antlr4.Runtime
 
         [Obsolete("Use constructor with channelNames argument")]
         public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
-            : this(grammarFileName, vocabulary, ruleNames, new string[0], modeNames, atn, input)
+            : this(grammarFileName, vocabulary, ruleNames, Collections.EmptyList<string>(), modeNames, atn, input)
         {
         }
 

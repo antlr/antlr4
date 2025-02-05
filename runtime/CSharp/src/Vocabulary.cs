@@ -16,7 +16,7 @@ namespace Antlr4.Runtime
     /// <author>Sam Harwell</author>
     public class Vocabulary : IVocabulary
     {
-        private static readonly string[] EmptyNames = new string[0];
+        private static readonly string[] EmptyNames = Collections.EmptyList<string>();
 
         /// <summary>
         /// Gets an empty
