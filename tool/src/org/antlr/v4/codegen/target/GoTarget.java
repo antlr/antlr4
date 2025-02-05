@@ -7,7 +7,7 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.GenFileType;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
@@ -104,7 +104,7 @@ public class GoTarget extends Target {
 	}
 
 	@Override
-	public String getRecognizerFileName(GenFileType fileType) {
+	public String getRecognizerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g!=null;
@@ -127,7 +127,7 @@ public class GoTarget extends Target {
 	 *  TListener.java, if we're using the Java target.
  	 */
 	@Override
-	public String getListenerFileName(GenFileType fileType) {
+	public String getListenerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -138,7 +138,7 @@ public class GoTarget extends Target {
 	 *  TVisitor.java, if we're using the Java target.
  	 */
 	@Override
-	public String getVisitorFileName(GenFileType fileType) {
+	public String getVisitorFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -149,7 +149,7 @@ public class GoTarget extends Target {
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
 	@Override
-	public String getBaseListenerFileName(GenFileType fileType) {
+	public String getBaseListenerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -160,7 +160,7 @@ public class GoTarget extends Target {
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
 	@Override
-	public String getBaseVisitorFileName(GenFileType fileType) {
+	public String getBaseVisitorFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;

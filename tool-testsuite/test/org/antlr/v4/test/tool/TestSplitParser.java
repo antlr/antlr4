@@ -1,6 +1,8 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,6 +17,13 @@ import java.util.stream.Collectors;
 
 
 public class TestSplitParser {
+
+	Path outDir = null;
+
+	@BeforeEach
+	public void beforeEach() throws IOException {
+		outDir = Files.createTempDirectory("antlr4-tool-test-").toAbsolutePath();
+	}
 
 	@Test
 	public void testGeneratesDefaultFiles() throws Exception {
@@ -49,15 +58,22 @@ public class TestSplitParser {
 	@Test
 	public void testGeneratesSplitFiles() throws Exception {
 		Set<String> created = generate("-split-context", "-no-listener");
-		assert created.size() == 3;
+		assert created.size() == 4;
 		assert created.contains("JavaLexer.java");
 		assert created.contains("JavaParser.java");
 		assert created.contains("JavaParserContexts.java");
+		assert created.contains("JavaParserDFA.java");
+		String content = Files.readString(Path.of(outDir.toString(), "JavaParser.java"));
+		assert !content.contains("ATNDeserializer()");
+		// assert !content.contains("extends ParserRuleContext");
+		content = Files.readString(Path.of(outDir.toString(), "JavaParserContexts.java"));
+		// assert content.contains("extends ParserRuleContext");
+		content = Files.readString(Path.of(outDir.toString(), "JavaParserDFA.java"));
+		assert content.contains("ATNDeserializer()");
 	}
 
 	Set<String> generate(String ... args) throws IOException {
 		List<String> options = new ArrayList<>(Arrays.asList(args));
-		Path outDir = Files.createTempDirectory("antlr4-tool-test-").toAbsolutePath();
 		String grammar = getClass().getPackageName().replace(".", "/") + "/Java.g4";
 		URL url = Thread.currentThread().getContextClassLoader().getResource(grammar);
 		assert url!=null;

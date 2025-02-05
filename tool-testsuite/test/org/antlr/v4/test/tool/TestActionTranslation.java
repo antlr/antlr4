@@ -11,7 +11,7 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.GenFileType;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
@@ -245,7 +245,7 @@ public class TestActionTranslation {
 			anal.process();
 
 			CodeGenerator gen = CodeGenerator.create(g);
-			ST outputFileST = gen.generateParser(GenFileType.SOURCE);
+			ST outputFileST = gen.generateParser(SourceType.SOURCE);
 			String output = outputFileST.render();
 			//System.out.println(output);
 			String b = "#" + actionName + "#";

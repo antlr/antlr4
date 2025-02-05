@@ -453,7 +453,7 @@ public abstract class Target {
 	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
 	 *  just use T.java as output regardless of type.
 	 */
-	public String getRecognizerFileName(GenFileType fileType) {
+	public String getRecognizerFileName(SourceType sourceType) {
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String recognizerName = gen.g.getRecognizerName();
 		return recognizerName+extST.render();
@@ -462,7 +462,7 @@ public abstract class Target {
 	/** A given grammar T, return the listener name such as
 	 *  TListener.java, if we're using the Java target.
  	 */
-	public String getListenerFileName(GenFileType fileType) {
+	public String getListenerFileName(SourceType sourceType) {
 		assert gen.g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = gen.g.name + "Listener";
@@ -472,7 +472,7 @@ public abstract class Target {
 	/** A given grammar T, return the visitor name such as
 	 *  TVisitor.java, if we're using the Java target.
  	 */
-	public String getVisitorFileName(GenFileType fileType) {
+	public String getVisitorFileName(SourceType sourceType) {
 		assert gen.g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = gen.g.name + "Visitor";
@@ -482,7 +482,7 @@ public abstract class Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseListenerFileName(GenFileType fileType) {
+	public String getBaseListenerFileName(SourceType sourceType) {
 		assert gen.g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = gen.g.name + "BaseListener";
@@ -492,7 +492,7 @@ public abstract class Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseVisitorFileName(GenFileType fileType) {
+	public String getBaseVisitorFileName(SourceType sourceType) {
 		assert gen.g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = gen.g.name + "BaseVisitor";

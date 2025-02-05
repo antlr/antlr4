@@ -1,9 +1,10 @@
 package org.antlr.v4.codegen;
 
-public enum GenFileType {
+public enum SourceType {
 	HEADER,
 	SOURCE,
-	SOURCE_PARSER,
+	SOURCE_LEAN,
+	SOURCE_DFA,
 	SOURCE_CONTEXTS
 
 }

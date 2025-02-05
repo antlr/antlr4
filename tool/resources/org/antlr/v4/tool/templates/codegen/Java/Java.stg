@@ -221,7 +221,27 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+<if(parser.file.genContexts)>
+<Parser_Contexts(...)>
+<elseif(parser.file.genDFA)>
+<Parser_DFA(...)>
+<else>
 <Parser_(ctor="parser_ctor", ...)>
+<endif>
+>>
+
+Parser_Contexts(parser, funcs) ::= <<
+public abstract class <parser.name>Contexts {
+
+}
+>>
+
+Parser_DFA(parser, atn) ::= <<
+@SuppressWarnings({"UnnecessaryUnicodeEscape", "UnnecessaryStringEscape"})
+class <parser.name>DFA {
+	static final DFA[] _decisionToDFA;
+	<atn>
+}
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
@@ -229,7 +249,11 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 public class <parser.name> extends <superClass; null="Parser"> {
 	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
+<if(parser.file.genLean)>
+	protected static final DFA[] _decisionToDFA = <parser.name>DFA._decisionToDFA;
+<else>
 	protected static final DFA[] _decisionToDFA;
+<endif>
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	<if(parser.tokens)>
@@ -276,8 +300,12 @@ case <f.ruleIndex>:
 	}
 	<sempredFuncs.values; separator="\n">
 <endif>
-
+<if(parser.file.genLean)>
+	public static final String _serializedATN = <parser.name>DFA._serializedATN;
+	public static final ATN _ATN = <parser.name>DFA._ATN;
+<else>
 	<atn>
+<endif>
 }
 >>
 

@@ -7,7 +7,7 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.GenFileType;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -61,11 +61,13 @@ public class JavaTarget extends Target {
 	public boolean supportsSplitContext() { return true; }
 
 	@Override
-	public String getRecognizerFileName(GenFileType fileType) {
+	public String getRecognizerFileName(SourceType sourceType) {
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String recognizerName = gen.g.getRecognizerName();
-		if (fileType == GenFileType.SOURCE_CONTEXTS)
+		if (sourceType == SourceType.SOURCE_CONTEXTS)
 			recognizerName += "Contexts";
+		else if (sourceType == SourceType.SOURCE_DFA)
+			recognizerName += "DFA";
 		return recognizerName + extST.render();
 	}
 }

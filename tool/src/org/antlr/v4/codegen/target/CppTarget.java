@@ -7,7 +7,7 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.GenFileType;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.ST;
 import java.util.*;
@@ -81,40 +81,40 @@ public class CppTarget extends Target {
 	}
 
 	@Override
-	public String getRecognizerFileName(GenFileType fileType) {
-		ST extST = getTemplates().getInstanceOf(fileType==GenFileType.HEADER ? "headerFileExtension" : "codeFileExtension");
+	public String getRecognizerFileName(SourceType sourceType) {
+		ST extST = getTemplates().getInstanceOf(sourceType== SourceType.HEADER ? "headerFileExtension" : "codeFileExtension");
 		String recognizerName = gen.g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
 
 	@Override
-	public String getListenerFileName(GenFileType fileType) {
+	public String getListenerFileName(SourceType sourceType) {
 		assert gen.g.name != null;
-		ST extST = getTemplates().getInstanceOf(fileType==GenFileType.HEADER ? "headerFileExtension" : "codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(sourceType== SourceType.HEADER ? "headerFileExtension" : "codeFileExtension");
 		String listenerName = gen.g.name + "Listener";
 		return listenerName+extST.render();
 	}
 
 	@Override
-	public String getVisitorFileName(GenFileType fileType) {
+	public String getVisitorFileName(SourceType sourceType) {
 		assert gen.g.name != null;
-		ST extST = getTemplates().getInstanceOf(fileType==GenFileType.HEADER ? "headerFileExtension" : "codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(sourceType== SourceType.HEADER ? "headerFileExtension" : "codeFileExtension");
 		String listenerName = gen.g.name + "Visitor";
 		return listenerName+extST.render();
 	}
 
 	@Override
-	public String getBaseListenerFileName(GenFileType fileType) {
+	public String getBaseListenerFileName(SourceType sourceType) {
 		assert gen.g.name != null;
-		ST extST = getTemplates().getInstanceOf(fileType==GenFileType.HEADER ? "headerFileExtension" : "codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(sourceType== SourceType.HEADER ? "headerFileExtension" : "codeFileExtension");
 		String listenerName = gen.g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
 
 	@Override
-	public String getBaseVisitorFileName(GenFileType fileType) {
+	public String getBaseVisitorFileName(SourceType sourceType) {
 		assert gen.g.name != null;
-		ST extST = getTemplates().getInstanceOf(fileType==GenFileType.HEADER ? "headerFileExtension" : "codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(sourceType== SourceType.HEADER ? "headerFileExtension" : "codeFileExtension");
 		String listenerName = gen.g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
