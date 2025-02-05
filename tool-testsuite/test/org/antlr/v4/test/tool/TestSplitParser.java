@@ -37,10 +37,10 @@ public class TestSplitParser {
 	public void testGeneratesDefaultFiles() throws Exception {
 		Set<String> created = generate();
 		assert created.size() == 4;
-		assert created.contains("JavaLexer.java");
-		assert created.contains("JavaParser.java");
-		assert created.contains("JavaBaseListener.java");
-		assert created.contains("JavaListener.java");
+		assert created.contains("JavaLRLexer.java");
+		assert created.contains("JavaLRParser.java");
+		assert created.contains("JavaLRBaseListener.java");
+		assert created.contains("JavaLRListener.java");
 		checkCompiles(created);
 	}
 
@@ -48,8 +48,8 @@ public class TestSplitParser {
 	public void testGeneratesNoListenerFiles() throws Exception {
 		Set<String> created = generate("-no-listener");
 		assert created.size() == 2;
-		assert created.contains("JavaLexer.java");
-		assert created.contains("JavaParser.java");
+		assert created.contains("JavaLRLexer.java");
+		assert created.contains("JavaLRParser.java");
 		checkCompiles(created);
 	}
 
@@ -57,12 +57,12 @@ public class TestSplitParser {
 	public void testGeneratesVisitorFiles() throws Exception {
 		Set<String> created = generate("-visitor");
 		assert created.size() == 6;
-		assert created.contains("JavaLexer.java");
-		assert created.contains("JavaParser.java");
-		assert created.contains("JavaBaseListener.java");
-		assert created.contains("JavaListener.java");
-		assert created.contains("JavaBaseVisitor.java");
-		assert created.contains("JavaVisitor.java");
+		assert created.contains("JavaLRLexer.java");
+		assert created.contains("JavaLRParser.java");
+		assert created.contains("JavaLRBaseListener.java");
+		assert created.contains("JavaLRListener.java");
+		assert created.contains("JavaLRBaseVisitor.java");
+		assert created.contains("JavaLRVisitor.java");
 		checkCompiles(created);
 	}
 
@@ -70,17 +70,17 @@ public class TestSplitParser {
 	public void testGeneratesSplitFiles() throws Exception {
 		Set<String> created = generate("-split-parser", "-no-listener");
 		assert created.size() == 4;
-		assert created.contains("JavaLexer.java");
-		assert created.contains("JavaParser.java");
-		assert created.contains("JavaParserContexts.java");
-		assert created.contains("JavaParserDFA.java");
-		String content = Files.readString(Path.of(outDir.toString(), "JavaParser.java"));
+		assert created.contains("JavaLRLexer.java");
+		assert created.contains("JavaLRParser.java");
+		assert created.contains("JavaLRParserContexts.java");
+		assert created.contains("JavaLRParserDFA.java");
+		String content = Files.readString(Path.of(outDir.toString(), "JavaLRParser.java"));
 		assert !content.contains("ATNDeserializer()");
 		assert !content.contains("extends ParserRuleContext");
-		content = Files.readString(Path.of(outDir.toString(), "JavaParserContexts.java"));
+		content = Files.readString(Path.of(outDir.toString(), "JavaLRParserContexts.java"));
 		assert !content.contains("ATNDeserializer()");
 		assert content.contains("extends ParserRuleContext");
-		content = Files.readString(Path.of(outDir.toString(), "JavaParserDFA.java"));
+		content = Files.readString(Path.of(outDir.toString(), "JavaLRParserDFA.java"));
 		assert content.contains("ATNDeserializer()");
 		assert !content.contains("extends ParserRuleContext");
 		checkCompiles(created);
@@ -88,7 +88,7 @@ public class TestSplitParser {
 
 	Set<String> generate(String ... args) throws IOException {
 		List<String> options = new ArrayList<>(Arrays.asList(args));
-		String grammar = getClass().getPackageName().replace(".", "/") + "/Java.g4";
+		String grammar = getClass().getPackageName().replace(".", "/") + "/JavaLR.g4";
 		URL url = Thread.currentThread().getContextClassLoader().getResource(grammar);
 		assert url!=null;
 		String path = url.getPath();

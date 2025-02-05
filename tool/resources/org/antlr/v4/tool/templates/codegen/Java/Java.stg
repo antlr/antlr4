@@ -72,6 +72,7 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This interface defines a complete listener for a parse tree produced by
@@ -88,7 +89,7 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 <endif>
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+void enter<lname; format="cap">(<lname; format="cap">Context ctx);
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the {@code <lname>\}
@@ -98,7 +99,7 @@ void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context c
 <endif>
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -112,6 +113,7 @@ package <file.genPackage>;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Listener},
@@ -126,13 +128,13 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+@Override public void enter<lname; format="cap">(<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
@@ -168,6 +170,7 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced
@@ -188,7 +191,7 @@ public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -199,6 +202,7 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Visitor},
@@ -217,7 +221,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
@@ -457,9 +461,12 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
 
+<if(!parser.file.genLean)>
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+<endif>
 
+<if(!parser.file.genContexts)>
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) throws RecognitionException {
 	return <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
 }
@@ -492,6 +499,7 @@ private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>
 	}
 	return _localctx;
 }
+<endif>
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
