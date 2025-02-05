@@ -341,7 +341,6 @@ static {
 		if (tokenNames[i] == null) {
 			tokenNames[i] = VOCABULARY.getSymbolicName(i);
 		}
-
 		if (tokenNames[i] == null) {
 			tokenNames[i] = "\<INVALID>";
 		}
@@ -350,15 +349,10 @@ static {
 
 @Override
 @Deprecated
-public String[] getTokenNames() {
-	return tokenNames;
-}
+public String[] getTokenNames() { return tokenNames; }
 
 @Override
-
-public Vocabulary getVocabulary() {
-	return VOCABULARY;
-}
+public Vocabulary getVocabulary() { return VOCABULARY; }
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -442,17 +436,15 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 		<code>
 		<postamble; separator="\n">
 		<namedActions.after>
-	}
 	<if(exceptions)>
-	<exceptions; separator="\n">
+	} <exceptions; separator="\n"> finally {
 	<else>
-	catch (RecognitionException re) {
+	} catch (RecognitionException re) {
 		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
-	}
+	} finally {
 	<endif>
-	finally {
 		<finallyAction>
 		exitRule();
 	}
