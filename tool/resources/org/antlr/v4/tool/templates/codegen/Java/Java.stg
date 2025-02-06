@@ -244,7 +244,7 @@ public abstract class <parser.name>Contexts {
 
 Parser_DFA(parser, atn) ::= <<
 @SuppressWarnings({"UnnecessaryUnicodeEscape", "UnnecessaryStringEscape"})
-class <parser.name>DFA {
+abstract class <parser.name>DFA {
 	static final DFA[] _decisionToDFA;
 	<atn>
 }
