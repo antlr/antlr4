@@ -416,7 +416,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private boolean <r.name>_sempred(<if(r. && parser.file.genLean)><parser.name>Contexts.<endif><r.ctxType> _localctx, int predIndex) {
+private boolean <r.name>_sempred(<if(parser.file.genLean)><parser.name>Contexts.<endif><r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
 case <index>:

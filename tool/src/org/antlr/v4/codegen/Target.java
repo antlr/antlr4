@@ -607,6 +607,10 @@ public abstract class Target {
 			}
 
 			private void reportError(STMessage msg) {
+				// TODO check how to avoid this with Ter
+				if("/RuleSempredFunction()".equals(String.valueOf(msg.self)) && "Java".equals(String.valueOf(msg.self.groupThatCreatedThisInstance))) {
+					return;
+				}
 				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
 			}
 		});
