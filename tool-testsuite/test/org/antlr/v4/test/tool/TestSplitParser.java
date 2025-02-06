@@ -68,12 +68,16 @@ public class TestSplitParser {
 
 	@Test
 	public void testGeneratesSplitFiles() throws Exception {
-		Set<String> created = generate("-split-parser", "-no-listener");
-		assert created.size() == 4;
+		Set<String> created = generate("-split-parser", "-visitor");
+		assert created.size() == 8;
 		assert created.contains("JavaLRLexer.java");
 		assert created.contains("JavaLRParser.java");
 		assert created.contains("JavaLRParserContexts.java");
 		assert created.contains("JavaLRParserDFA.java");
+		assert created.contains("JavaLRBaseListener.java");
+		assert created.contains("JavaLRListener.java");
+		assert created.contains("JavaLRBaseVisitor.java");
+		assert created.contains("JavaLRVisitor.java");
 		String content = Files.readString(Path.of(outDir.toString(), "JavaLRParser.java"));
 		assert !content.contains("ATNDeserializer()");
 		assert !content.contains("extends ParserRuleContext");

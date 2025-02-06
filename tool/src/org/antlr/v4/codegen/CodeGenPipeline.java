@@ -65,6 +65,8 @@ public class CodeGenPipeline {
 
 			}
 
+			SourceType sourceType = gen.getTarget().supportsSplitParser() && g.tool.gen_split_parser ? SourceType.SOURCE_LEAN : SourceType.SOURCE;
+
 			if ( g.tool.gen_listener ) {
 				if (gen.getTarget().needsHeader()) {
 					ST listener = gen.generateListener(SourceType.HEADER);
@@ -72,9 +74,9 @@ public class CodeGenPipeline {
 						gen.writeListener(listener, SourceType.HEADER);
 					}
 				}
-				ST listener = gen.generateListener(SourceType.SOURCE);
+				ST listener = gen.generateListener(sourceType);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeListener(listener, SourceType.SOURCE);
+					gen.writeListener(listener, sourceType);
 				}
 
 				if (gen.getTarget().needsHeader()) {
@@ -84,9 +86,9 @@ public class CodeGenPipeline {
 					}
 				}
 				if (gen.getTarget().wantsBaseListener()) {
-					ST baseListener = gen.generateBaseListener(SourceType.SOURCE);
+					ST baseListener = gen.generateBaseListener(sourceType);
 					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseListener(baseListener, SourceType.SOURCE);
+						gen.writeBaseListener(baseListener, sourceType);
 					}
 				}
 			}
@@ -97,9 +99,9 @@ public class CodeGenPipeline {
 						gen.writeVisitor(visitor, SourceType.HEADER);
 					}
 				}
-				ST visitor = gen.generateVisitor(SourceType.SOURCE);
+				ST visitor = gen.generateVisitor(sourceType);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeVisitor(visitor, SourceType.SOURCE);
+					gen.writeVisitor(visitor, sourceType);
 				}
 
 				if (gen.getTarget().needsHeader()) {
@@ -109,9 +111,9 @@ public class CodeGenPipeline {
 					}
 				}
 				if (gen.getTarget().wantsBaseVisitor()) {
-					ST baseVisitor = gen.generateBaseVisitor(SourceType.SOURCE);
+					ST baseVisitor = gen.generateBaseVisitor(sourceType);
 					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseVisitor(baseVisitor, SourceType.SOURCE);
+						gen.writeBaseVisitor(baseVisitor, sourceType);
 					}
 				}
 			}

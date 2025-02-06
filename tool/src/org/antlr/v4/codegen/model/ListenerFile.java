@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public boolean genContexts; // from -split-parser cmd-line
+	public boolean genLean; // from -split-parser cmd-line
 	public String accessLevel; // from -DaccessLevel cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
@@ -62,7 +62,7 @@ public class ListenerFile extends OutputFile {
 			header = new Action(factory, ast);
 		}
 		genPackage = g.tool.genPackage;
-		genContexts = g.tool.gen_split_parser;
+		genLean = g.tool.gen_split_parser;
 		accessLevel = g.getOptionString("accessLevel");
 		exportMacro = g.getOptionString("exportMacro");
 	}
