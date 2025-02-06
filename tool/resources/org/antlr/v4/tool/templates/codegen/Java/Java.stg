@@ -57,9 +57,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 <if(file.genLean)>
-import static <file.genPackage>.<file.parser.name>Contexts.*;
+import static <if(file.genPackage)><file.genPackage>.<endif><file.parser.name>Contexts.*;
 <elseif(file.genContexts)>
-import static <file.genPackage>.<file.parser.name>.*;
+import static <if(file.genPackage)><file.genPackage>.<endif><file.parser.name>.*;
 <endif>
 
 <parser>
@@ -72,7 +72,6 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This interface defines a complete listener for a parse tree produced by
@@ -83,23 +82,24 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Enter a parse tree produced by the {@code <lname>\}
- * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+ * labeled alternative in {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<file.listenerLabelRuleNames.(lname)>\}.
 <else>
- * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * Enter a parse tree produced by {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<lname>\}.
 <endif>
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(<lname; format="cap">Context ctx);
+
+void enter<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx);
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the {@code <lname>\}
- * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+ * labeled alternative in {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<file.listenerLabelRuleNames.(lname)>\}.
 <else>
- * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * Exit a parse tree produced by {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<lname>\}.
 <endif>
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -113,7 +113,6 @@ package <file.genPackage>;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Listener},
@@ -128,13 +127,13 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void enter<lname; format="cap">(<lname; format="cap">Context ctx) { \}
+@Override public void enter<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void exit<lname; format="cap">(<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
@@ -170,7 +169,6 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced
@@ -184,14 +182,14 @@ public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 /**
 <if(file.visitorLabelRuleNames.(lname))>
  * Visit a parse tree produced by the {@code <lname>\}
- * labeled alternative in {@link <file.parserName>#<file.visitorLabelRuleNames.(lname)>\}.
+ * labeled alternative in {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<file.visitorLabelRuleNames.(lname)>\}.
 <else>
- * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * Visit a parse tree produced by {@link <file.parserName><if(file.genContexts)>Contexts<endif>#<lname>\}.
 <endif>
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -202,7 +200,6 @@ package <file.genPackage>;
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
-import static <file.genPackage>.<file.parserName><if(file.genContexts)>Contexts<endif>.*;
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Visitor},
@@ -221,7 +218,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-@Override public T visit<lname; format="cap">(<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<file.parserName><if(file.genContexts)>Contexts<endif>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
