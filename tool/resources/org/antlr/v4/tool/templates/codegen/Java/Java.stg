@@ -56,9 +56,11 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.ArrayList;
 <elseif(file.genDFA)>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Utils;
 <else>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -875,10 +877,10 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 AttributeDecl(d) ::= "<d.type> <d.escapedName><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.escapedName>"
+labelref(x) ::= "<if(!x.isLocal)>((<if(parser.file.genLean)><parser.name>Contexts.<endif><x.ctx.name>)_localctx).<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "((<if(parser.file.genLean)><parser.name>Contexts.<endif><actionChunk.ctx.name>)_localctx)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
@@ -898,7 +900,7 @@ pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
+_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentAltLabel; format="cap">Context(new <if(parser.file.genLean)><parser.name>Contexts.<endif><ruleName; format="cap">Context(_parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
 ((<currentAltLabel; format="cap">Context)_localctx).<label>.add(_prevctx);
