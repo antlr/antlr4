@@ -622,7 +622,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (this.Count > 1)
             {
-                buf.Append("{");
+                buf.Append('{');
             }
 
             bool first = true;
@@ -644,7 +644,7 @@ namespace Antlr4.Runtime.Misc
                     {
                         if (elemAreChar)
                         {
-                            buf.Append("'").Append((char)a).Append("'");
+                            buf.Append('\'').Append((char)a).Append('\'');
                         }
                         else
                         {
@@ -656,7 +656,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     if (elemAreChar)
                     {
-                        buf.Append("'").Append((char)a).Append("'..'").Append((char)b).Append("'");
+                        buf.Append('\'').Append((char)a).Append("'..'").Append((char)b).Append('\'');
                     }
                     else
                     {
@@ -666,7 +666,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (this.Count > 1)
             {
-                buf.Append("}");
+                buf.Append('}');
             }
             return buf.ToString();
         }
@@ -680,7 +680,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (this.Count > 1)
             {
-                buf.Append("{");
+                buf.Append('{');
             }
 
             bool first = true;
@@ -710,7 +710,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (this.Count > 1)
             {
-                buf.Append("}");
+                buf.Append('}');
             }
             return buf.ToString();
         }

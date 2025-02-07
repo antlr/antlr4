@@ -1101,7 +1101,7 @@ namespace Antlr4.Runtime
 				sb.Append (", ");
 			}
 			sb.Length = sb.Length - 2;
-			sb.Append ("]");
+			sb.Append (']');
 			return sb.ToString ();
 		}
 

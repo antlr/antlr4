@@ -57,7 +57,7 @@ namespace Antlr4.Runtime.Tree
                 return s;
             }
             StringBuilder buf = new StringBuilder();
-            buf.Append("(");
+            buf.Append('(');
             s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
             buf.Append(s);
             buf.Append(' ');
@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Tree
                 }
                 buf.Append(ToStringTree(t.GetChild(i), ruleNames));
             }
-            buf.Append(")");
+            buf.Append(')');
             return buf.ToString();
         }
 
