@@ -51,7 +51,7 @@ public class OutputModelWalker {
 		this.templates = templates;
 	}
 
-	public ST walk(OutputModelObject omo, boolean header) {
+	public ST walk(OutputModelObject omo, SourceType sourceType) {
 		// CREATE TEMPLATE FOR THIS OUTPUT OBJECT
 		Class<? extends OutputModelObject> cl = omo.getClass();
 		String templateName = cl.getSimpleName();
@@ -60,7 +60,7 @@ public class OutputModelWalker {
 			return new ST("["+templateName+" invalid]");
 		}
 
-		if (header) templateName += "Header";
+		if (sourceType == SourceType.HEADER) templateName += "Header";
 
 		ST st = templates.getInstanceOf(templateName);
 		if ( st == null ) {
@@ -103,7 +103,7 @@ public class OutputModelWalker {
 				Object o = fi.get(omo);
 				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?
 					OutputModelObject nestedOmo = (OutputModelObject)o;
-					ST nestedST = walk(nestedOmo, header);
+					ST nestedST = walk(nestedOmo, sourceType);
 //					System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 					st.add(fieldName, nestedST);
 				}
@@ -115,7 +115,7 @@ public class OutputModelWalker {
 					Collection<?> nestedOmos = (Collection<?>)o;
 					for (Object nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
-						ST nestedST = walk((OutputModelObject)nestedOmo, header);
+						ST nestedST = walk((OutputModelObject)nestedOmo, sourceType);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						st.add(fieldName, nestedST);
 					}
@@ -124,7 +124,7 @@ public class OutputModelWalker {
 					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
 					Map<Object, ST> m = new LinkedHashMap<Object, ST>();
 					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
-						ST nestedST = walk((OutputModelObject)entry.getValue(), header);
+						ST nestedST = walk((OutputModelObject)entry.getValue(), sourceType);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						m.put(entry.getKey(), nestedST);
 					}
