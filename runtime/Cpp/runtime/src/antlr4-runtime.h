@@ -7,6 +7,8 @@
 
 // This is the umbrella header for all ANTLR4 C++ runtime headers.
 
+// IWYU pragma: begin_exports
+
 #include "antlr4-common.h"
 
 #include "ANTLRErrorListener.h"
@@ -166,3 +168,5 @@
 #include "tree/xpath/XPathWildcardAnywhereElement.h"
 #include "tree/xpath/XPathWildcardElement.h"
 #include "internal/Synchronization.h"
+
+// IWYU pragma: end_exports
