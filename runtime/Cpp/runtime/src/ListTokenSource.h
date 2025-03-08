@@ -68,18 +68,18 @@ namespace antlr4 {
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
     ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_);
 
-    virtual size_t getCharPositionInLine() override;
-    virtual std::unique_ptr<Token> nextToken() override;
-    virtual size_t getLine() const override;
-    virtual CharStream* getInputStream() override;
-    virtual std::string getSourceName() override;
+    size_t getCharPositionInLine() override;
+    std::unique_ptr<Token> nextToken() override;
+    size_t getLine() const override;
+    CharStream* getInputStream() override;
+    std::string getSourceName() override;
 
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *factory) {
       this->_factory = factory;
     }
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() override;
+    TokenFactory<CommonToken>* getTokenFactory() override;
 
   private:
     void InitializeInstanceFields();

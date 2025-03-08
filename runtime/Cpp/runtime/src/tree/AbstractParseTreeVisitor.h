@@ -15,7 +15,7 @@ namespace tree {
   public:
     /// The default implementation calls <seealso cref="ParseTree#accept"/> on the
     /// specified tree.
-    virtual std::any visit(ParseTree *tree) override {
+    std::any visit(ParseTree *tree) override {
       return tree->accept(this);
     }
 
@@ -32,7 +32,7 @@ namespace tree {
      * the tree structure. Visitors that modify the tree should override this
      * method to behave properly in respect to the specific algorithm in use.</p>
      */
-    virtual std::any visitChildren(ParseTree *node) override {
+    std::any visitChildren(ParseTree *node) override {
       std::any result = defaultResult();
       size_t n = node->children.size();
       for (size_t i = 0; i < n; i++) {
@@ -49,13 +49,13 @@ namespace tree {
 
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
-    virtual std::any visitTerminal(TerminalNode * /*node*/) override {
+    std::any visitTerminal(TerminalNode * /*node*/) override {
       return defaultResult();
     }
 
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
-    virtual std::any visitErrorNode(ErrorNode * /*node*/) override {
+    std::any visitErrorNode(ErrorNode * /*node*/) override {
       return defaultResult();
     }
 

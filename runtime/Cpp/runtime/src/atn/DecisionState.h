@@ -24,7 +24,7 @@ namespace atn {
     int decision = -1;
     bool nonGreedy = false;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
 
   protected:
     using ATNState::ATNState;

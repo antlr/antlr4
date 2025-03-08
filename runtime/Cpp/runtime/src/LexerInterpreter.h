@@ -18,15 +18,15 @@ namespace antlr4 {
                      const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames,
                      const std::vector<std::string> &modeNames, const atn::ATN &atn, CharStream *input);
 
-    ~LexerInterpreter();
+    ~LexerInterpreter() override;
 
-    virtual const atn::ATN& getATN() const override;
-    virtual std::string getGrammarFileName() const override;
-    virtual const std::vector<std::string>& getRuleNames() const override;
-    virtual const std::vector<std::string>& getChannelNames() const override;
-    virtual const std::vector<std::string>& getModeNames() const override;
+    const atn::ATN& getATN() const override;
+    std::string getGrammarFileName() const override;
+    const std::vector<std::string>& getRuleNames() const override;
+    const std::vector<std::string>& getChannelNames() const override;
+    const std::vector<std::string>& getModeNames() const override;
 
-    virtual const dfa::Vocabulary& getVocabulary() const override;
+    const dfa::Vocabulary& getVocabulary() const override;
 
   protected:
     const std::string _grammarFileName;

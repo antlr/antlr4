@@ -22,7 +22,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= IntStream#LA </seealso>
   public:
-    virtual ~TokenStream();
+    ~TokenStream() override;
 
     virtual Token* LT(ssize_t k) = 0;
 

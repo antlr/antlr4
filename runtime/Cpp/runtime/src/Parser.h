@@ -21,12 +21,12 @@ namespace antlr4 {
     class TraceListener : public tree::ParseTreeListener {
     public:
       TraceListener(Parser *outerInstance);
-      virtual ~TraceListener();
+      ~TraceListener() override;
 
-      virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(tree::TerminalNode *node) override;
-      virtual void visitErrorNode(tree::ErrorNode *node) override;
-      virtual void exitEveryRule(ParserRuleContext *ctx) override;
+      void enterEveryRule(ParserRuleContext *ctx) override;
+      void visitTerminal(tree::TerminalNode *node) override;
+      void visitErrorNode(tree::ErrorNode *node) override;
+      void exitEveryRule(ParserRuleContext *ctx) override;
 
     private:
       Parser *const outerInstance;
@@ -36,16 +36,16 @@ namespace antlr4 {
     public:
       static TrimToSizeListener INSTANCE;
 
-      virtual ~TrimToSizeListener();
+      ~TrimToSizeListener() override;
 
-      virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(tree::TerminalNode *node) override;
-      virtual void visitErrorNode(tree::ErrorNode *node) override;
-      virtual void exitEveryRule(ParserRuleContext *ctx) override;
+      void enterEveryRule(ParserRuleContext *ctx) override;
+      void visitTerminal(tree::TerminalNode *node) override;
+      void visitErrorNode(tree::ErrorNode *node) override;
+      void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
     Parser(TokenStream *input);
-    virtual ~Parser();
+    ~Parser() override;
 
     /// reset the parser's state
     virtual void reset();
@@ -193,7 +193,7 @@ namespace antlr4 {
     /// <seealso cref= #notifyErrorListeners </seealso>
     virtual size_t getNumberOfSyntaxErrors();
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() override;
+    TokenFactory<CommonToken>* getTokenFactory() override;
 
     /// <summary>
     /// Tell our token source and error strategy about a new way to create tokens. </summary>
@@ -229,7 +229,7 @@ namespace antlr4 {
     virtual Ref<ANTLRErrorStrategy> getErrorHandler();
     virtual void setErrorHandler(Ref<ANTLRErrorStrategy> const& handler);
 
-    virtual IntStream* getInputStream() override;
+    IntStream* getInputStream() override;
     void setInputStream(IntStream *input) override;
 
     virtual TokenStream* getTokenStream();
@@ -297,7 +297,7 @@ namespace antlr4 {
     virtual ParserRuleContext* getInvokingContext(size_t ruleIndex);
     virtual ParserRuleContext* getContext();
     virtual void setContext(ParserRuleContext *ctx);
-    virtual bool precpred(RuleContext *localctx, int precedence) override;
+    bool precpred(RuleContext *localctx, int precedence) override;
     virtual bool inContext(const std::string &context);
 
     /// <summary>

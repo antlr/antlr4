@@ -80,9 +80,9 @@ namespace antlr4 {
 
     // satisfy the ParseTree / SyntaxTree interface
 
-    virtual misc::Interval getSourceInterval() override;
+    misc::Interval getSourceInterval() override;
 
-    virtual std::string getText() override;
+    std::string getText() override;
 
     virtual size_t getRuleIndex() const;
 
@@ -107,14 +107,14 @@ namespace antlr4 {
      */
     virtual void setAltNumber(size_t altNumber);
 
-    virtual std::any accept(tree::ParseTreeVisitor *visitor) override;
+    std::any accept(tree::ParseTreeVisitor *visitor) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     ///  We have to know the recognizer so we can get rule names.
     /// </summary>
-    virtual std::string toStringTree(Parser *recog, bool pretty = false) override;
+    std::string toStringTree(Parser *recog, bool pretty = false) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
@@ -122,8 +122,8 @@ namespace antlr4 {
     /// </summary>
     virtual std::string toStringTree(std::vector<std::string> &ruleNames, bool pretty = false);
 
-    virtual std::string toStringTree(bool pretty = false) override;
-    virtual std::string toString() override;
+    std::string toStringTree(bool pretty = false) override;
+    std::string toString() override;
     std::string toString(Recognizer *recog);
     std::string toString(const std::vector<std::string> &ruleNames);
 

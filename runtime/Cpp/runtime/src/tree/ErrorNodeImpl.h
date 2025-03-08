@@ -27,16 +27,16 @@ namespace tree {
 
     explicit ErrorNodeImpl(Token *symbol) : ErrorNode(ParseTreeType::ERROR), symbol(symbol) {}
 
-    virtual Token* getSymbol() const override;
-    virtual void setParent(RuleContext *parent) override;
-    virtual misc::Interval getSourceInterval() override;
+    Token* getSymbol() const override;
+    void setParent(RuleContext *parent) override;
+    misc::Interval getSourceInterval() override;
 
-    virtual std::any accept(ParseTreeVisitor *visitor) override;
+    std::any accept(ParseTreeVisitor *visitor) override;
 
-    virtual std::string getText() override;
-    virtual std::string toStringTree(Parser *parser, bool pretty = false) override;
-    virtual std::string toString() override;
-    virtual std::string toStringTree(bool pretty = false) override;
+    std::string getText() override;
+    std::string toStringTree(Parser *parser, bool pretty = false) override;
+    std::string toString() override;
+    std::string toStringTree(bool pretty = false) override;
   };
 
 } // namespace tree

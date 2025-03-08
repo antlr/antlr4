@@ -123,7 +123,7 @@ namespace antlr4 {
       return contexts;
     }
 
-    virtual misc::Interval getSourceInterval() override;
+    misc::Interval getSourceInterval() override;
 
     /**
      * Get the initial token in this context.

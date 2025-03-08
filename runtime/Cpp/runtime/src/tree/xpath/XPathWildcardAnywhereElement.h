@@ -15,7 +15,7 @@ namespace xpath {
   public:
     XPathWildcardAnywhereElement();
 
-    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
+    std::vector<ParseTree *> evaluate(ParseTree *t) override;
   };
 
 } // namespace xpath
