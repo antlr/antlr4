@@ -648,37 +648,35 @@ public class IntervalSet implements IntSet {
 
 	@Override
 	public void remove(int el) {
-        if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
-        int n = intervals.size();
-        for (int i = 0; i < n; i++) {
-            Interval I = intervals.get(i);
-            int a = I.a;
-            int b = I.b;
-            if ( el<a ) {
-                break; // list is sorted and el is before this interval; not here
-            }
-            // if whole interval x..x, rm
-            if ( el==a && el==b ) {
-                intervals.remove(i);
-                break;
-            }
-            // if on left edge x..b, adjust left
-            if ( el==a ) {
-                I.a++;
-                break;
-            }
-            // if on right edge a..x, adjust right
-            if ( el==b ) {
-                I.b--;
-                break;
-            }
-            // if in middle a..x..b, split interval
-            if ( el>a && el<b ) { // found in this interval
-                int oldb = I.b;
-                I.b = el-1;      // [a..x-1]
-                add(el+1, oldb); // add [x+1..b]
-            }
-        }
+		if (readonly) {
+			throw new IllegalStateException(
+				"can't alter readonly IntervalSet"
+			);
+		}
+		int left = 0;
+		int right = intervals.size() - 1;
+		while (left <= right) {
+			int middle = (left + right) / 2;
+			Interval interval = intervals.get(middle);
+			if (el < interval.a) {
+				right = middle - 1;
+			} else if (interval.b < el) {
+				left = middle + 1;
+			} else { // el in [a..b]
+				if (interval.length() == 1) {
+					intervals.remove(middle);
+				} else if (el == interval.a) {
+					interval.a += 1;
+				} else if (el == interval.b) {
+					interval.b -= 1;
+				} else {
+					int oldB = interval.b;
+					interval.b = el - 1;
+					add(el + 1, oldB);
+				}
+				return;
+			}
+		}
     }
 
     public boolean isReadonly() {
