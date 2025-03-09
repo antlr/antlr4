@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
 #include <string>
 #include "antlr4-common.h"
