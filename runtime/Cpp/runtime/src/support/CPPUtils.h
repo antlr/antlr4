@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <sstream>
 #include <map>
 #include <vector>
 #include <string>

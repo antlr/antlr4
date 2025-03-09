@@ -5,6 +5,7 @@
 
 #include "atn/ArrayPredictionContext.h"
 
+#include <sstream>
 #include <cassert>
 #include <utility>
 #include <vector>
