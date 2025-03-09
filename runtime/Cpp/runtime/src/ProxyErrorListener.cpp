@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstddef>
+#include "Token.h"
 #include "ProxyErrorListener.h"
 
 using namespace antlr4;

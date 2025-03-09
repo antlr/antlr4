@@ -11,6 +11,7 @@
 #include <string>
 #include <cstddef>
 #include "dfa/DFA.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "NoViableAltException.h"
 #include "atn/DecisionState.h"

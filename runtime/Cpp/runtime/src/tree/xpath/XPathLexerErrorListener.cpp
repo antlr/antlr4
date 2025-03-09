@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstddef>
+#include "Token.h"
 #include "XPathLexerErrorListener.h"
 
 using namespace antlr4;

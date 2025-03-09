@@ -5,6 +5,7 @@
 
 #include "Parser.h"
 
+#include "Token.h"
 #include "antlr4-common.h"
 #include "NoViableAltException.h"
 

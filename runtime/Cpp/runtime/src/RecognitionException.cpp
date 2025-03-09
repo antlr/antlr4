@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include "atn/ATN.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "Recognizer.h"
 #include "ParserRuleContext.h"

@@ -11,6 +11,7 @@
 #include <string>
 #include <cstddef>
 #include "ProxyErrorListener.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "support/Casts.h"
 #include "atn/SerializedATNView.h"

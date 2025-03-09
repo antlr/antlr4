@@ -6,6 +6,7 @@
 #include <string>
 #include <cstddef>
 #include "NoViableAltException.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "misc/IntervalSet.h"
 #include "atn/ParserATNSimulator.h"

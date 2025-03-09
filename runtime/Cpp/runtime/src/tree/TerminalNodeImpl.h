@@ -7,6 +7,7 @@
 
 #include <string>
 #include "antlr4-common.h"
+#include "Token.h"
 #include "tree/TerminalNode.h"
 
 namespace antlr4 {

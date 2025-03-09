@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <cstddef>
+#include "Token.h"
 #include "antlr4-common.h"
 
 namespace antlr4 {
