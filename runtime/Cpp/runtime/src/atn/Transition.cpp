@@ -4,6 +4,7 @@
  */
 
 #include "Exceptions.h"
+#include "atn/TransitionType.h"
 #include "atn/ATNState.h"
 #include "support/Arrays.h"
 
