@@ -54,6 +54,7 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <string_view>
 #include <memory>
 #include <utility>
 #include <cstddef>
