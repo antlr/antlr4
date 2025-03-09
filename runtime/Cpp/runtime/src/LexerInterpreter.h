@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include "Lexer.h"
+#include "antlr4-common.h"
 #include "atn/PredictionContext.h"
 #include "atn/PredictionContextCache.h"
 #include "Vocabulary.h"

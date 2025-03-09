@@ -11,6 +11,7 @@
 #include <string>
 #include <cstddef>
 #include "Recognizer.h"
+#include "antlr4-common.h"
 #include "TokenSource.h"
 #include "CharStream.h"
 #include "Token.h"

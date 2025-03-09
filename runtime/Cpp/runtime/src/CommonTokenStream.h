@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstddef>
+#include "antlr4-common.h"
 #include "BufferedTokenStream.h"
 
 namespace antlr4 {

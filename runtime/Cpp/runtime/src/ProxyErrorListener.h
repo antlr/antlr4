@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "ANTLRErrorListener.h"
+#include "antlr4-common.h"
 #include "Exceptions.h"
 
 namespace antlr4 {

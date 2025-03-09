@@ -26,6 +26,7 @@
 #pragma once
 
 #include <utility>
+#include "antlr4-common.h"
 #include "atn/PredictionContextMergeCacheOptions.h"
 
 namespace antlr4 {

@@ -7,6 +7,7 @@
 #include <cstddef>
 #include "SemanticContext.h"
 
+#include "antlr4-common.h"
 #include "atn/PredicateEvalInfo.h"
 
 using namespace antlr4;

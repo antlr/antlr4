@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/PredictionContext.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfig.h"
 #include "atn/ATNSimulator.h"
 #include "Exceptions.h"

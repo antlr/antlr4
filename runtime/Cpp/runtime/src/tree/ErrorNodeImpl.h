@@ -7,6 +7,7 @@
 
 #include <string>
 #include "tree/ErrorNode.h"
+#include "antlr4-common.h"
 #include "tree/TerminalNodeImpl.h"
 #include "misc/Interval.h"
 

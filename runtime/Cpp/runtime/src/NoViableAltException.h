@@ -6,6 +6,7 @@
 #pragma once
 
 #include "RecognitionException.h"
+#include "antlr4-common.h"
 #include "Token.h"
 #include "atn/ATNConfigSet.h"
 

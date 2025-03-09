@@ -7,6 +7,7 @@
 #include <string>
 #include <cstddef>
 #include "Exceptions.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 #include "Token.h"
 #include "TokenStream.h"

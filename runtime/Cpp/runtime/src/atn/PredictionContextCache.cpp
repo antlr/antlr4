@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include "antlr4-common.h"
 #include "atn/PredictionContextCache.h"
 
 using namespace antlr4::atn;

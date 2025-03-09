@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <string_view>
 
+#include "antlr4-common.h"
 #include "CharStream.h"
 
 namespace antlr4 {

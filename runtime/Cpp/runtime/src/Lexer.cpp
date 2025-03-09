@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/LexerATNSimulator.h"
+#include "antlr4-common.h"
 #include "Exceptions.h"
 #include "misc/Interval.h"
 #include "CommonTokenFactory.h"

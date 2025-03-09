@@ -7,6 +7,7 @@
 #include <string>
 #include <cstddef>
 #include "TokenSource.h"
+#include "antlr4-common.h"
 #include "CharStream.h"
 #include "Recognizer.h"
 #include "Vocabulary.h"

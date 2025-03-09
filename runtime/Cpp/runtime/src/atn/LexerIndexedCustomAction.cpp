@@ -7,6 +7,7 @@
 #include <string>
 #include <cstddef>
 #include "atn/HashUtils.h"
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 #include "Lexer.h"
 #include "support/CPPUtils.h"

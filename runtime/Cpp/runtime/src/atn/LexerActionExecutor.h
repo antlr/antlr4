@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include "CharStream.h"
+#include "antlr4-common.h"
 #include "atn/LexerAction.h"
 
 namespace antlr4 {

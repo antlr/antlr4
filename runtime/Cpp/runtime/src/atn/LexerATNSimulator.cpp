@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "IntStream.h"
+#include "antlr4-common.h"
 #include "atn/OrderedATNConfigSet.h"
 #include "Token.h"
 #include "LexerNoViableAltException.h"

@@ -8,6 +8,7 @@
 #include <memory>
 #include <cstddef>
 #include "atn/ATNDeserializationOptions.h"
+#include "antlr4-common.h"
 #include "atn/SerializedATNView.h"
 #include "atn/LexerAction.h"
 #include "atn/Transition.h"

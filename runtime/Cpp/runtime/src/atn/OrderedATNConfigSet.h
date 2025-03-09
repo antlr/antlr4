@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include "atn/ATNConfigSet.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfig.h"
 
 namespace antlr4 {

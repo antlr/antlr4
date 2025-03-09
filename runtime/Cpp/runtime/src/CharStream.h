@@ -7,6 +7,7 @@
 
 #include <string>
 #include "IntStream.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 
 namespace antlr4 {

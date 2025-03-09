@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "antlr4-common.h"
 #include "support/Any.h"
 
 namespace antlr4 {

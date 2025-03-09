@@ -30,6 +30,7 @@
 #include <utility>
 
 #include "atn/PredictionContext.h"
+#include "antlr4-common.h"
 #include "atn/PredictionContextMergeCacheOptions.h"
 #include "FlatHashMap.h"
 

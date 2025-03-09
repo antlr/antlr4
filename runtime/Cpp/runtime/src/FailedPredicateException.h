@@ -7,6 +7,7 @@
 
 #include <string>
 #include <cstddef>
+#include "antlr4-common.h"
 #include "RecognitionException.h"
 
 namespace antlr4 {

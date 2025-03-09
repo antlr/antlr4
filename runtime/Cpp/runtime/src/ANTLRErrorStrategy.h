@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "antlr4-common.h"
 #include "Token.h"
 
 namespace antlr4 {

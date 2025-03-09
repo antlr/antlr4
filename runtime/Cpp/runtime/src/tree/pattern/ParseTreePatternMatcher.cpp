@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "tree/pattern/ParseTreePattern.h"
+#include "antlr4-common.h"
 #include "tree/pattern/ParseTreeMatch.h"
 #include "tree/TerminalNode.h"
 #include "CommonTokenStream.h"

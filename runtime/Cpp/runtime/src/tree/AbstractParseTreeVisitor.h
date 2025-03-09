@@ -8,6 +8,7 @@
 #include <utility>
 #include <cstddef>
 #include "tree/ParseTree.h"
+#include "antlr4-common.h"
 #include "tree/ParseTreeVisitor.h"
 
 namespace antlr4 {
