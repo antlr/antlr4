@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "atn/LexerActionType.h"
 #include "atn/LexerAction.h"

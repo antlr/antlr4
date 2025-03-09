@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "Parser.h"
 #include "atn/ATN.h"

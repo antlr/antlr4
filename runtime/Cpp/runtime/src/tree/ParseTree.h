@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "support/Any.h"
 #include "tree/ParseTreeType.h"
 

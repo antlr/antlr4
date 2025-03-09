@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "misc/IntervalSet.h"
 #include "atn/TransitionType.h"

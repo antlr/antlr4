@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "Recognizer.h"
 #include "support/CPPUtils.h"

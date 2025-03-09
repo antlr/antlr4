@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "tree/TerminalNode.h"
 #include "ParserRuleContext.h"

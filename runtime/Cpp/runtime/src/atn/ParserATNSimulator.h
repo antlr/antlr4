@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "PredictionMode.h"
 #include "dfa/DFAState.h"

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "tree/ErrorNode.h"
 #include "tree/TerminalNodeImpl.h"
 #include "misc/Interval.h"

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "atn/ContextSensitivityInfo.h"
 #include "atn/AmbiguityInfo.h"

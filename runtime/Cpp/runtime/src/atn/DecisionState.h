@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "atn/ATNState.h"
 
 namespace antlr4 {

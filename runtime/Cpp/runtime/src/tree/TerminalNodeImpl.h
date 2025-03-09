@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "tree/TerminalNode.h"
 
 namespace antlr4 {

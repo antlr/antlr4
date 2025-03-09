@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "Exceptions.h"
 
 namespace antlr4 {

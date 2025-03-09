@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "ANTLRErrorStrategy.h"
 #include "misc/IntervalSet.h"

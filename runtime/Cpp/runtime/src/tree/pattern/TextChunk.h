@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "Chunk.h"
 
 namespace antlr4 {

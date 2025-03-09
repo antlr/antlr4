@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include <cstddef>
 #include "atn/Transition.h"
 #include "atn/SemanticContext.h"

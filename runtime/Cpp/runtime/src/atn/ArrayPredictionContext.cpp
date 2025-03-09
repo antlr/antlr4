@@ -5,6 +5,7 @@
 
 #include "atn/ArrayPredictionContext.h"
 
+#include <string>
 #include <cstring>
 
 #include "atn/SingletonPredictionContext.h"
