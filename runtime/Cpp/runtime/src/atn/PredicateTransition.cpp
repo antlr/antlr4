@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <cstddef>
+#include "atn/ATNState.h"
 #include "atn/PredicateTransition.h"
 
 using namespace antlr4::atn;

@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "dfa/DFA.h"
+#include "atn/ATNState.h"
 #include "antlr4-common.h"
 #include "atn/RuleStartState.h"
 #include "InterpreterRuleContext.h"

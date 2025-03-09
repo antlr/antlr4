@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "ConsoleErrorListener.h"
+#include "atn/ATNState.h"
 #include "RecognitionException.h"
 #include "support/CPPUtils.h"
 #include "Token.h"

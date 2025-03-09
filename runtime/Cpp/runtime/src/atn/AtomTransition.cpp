@@ -6,6 +6,7 @@
 #include <string>
 #include <cstddef>
 #include "misc/IntervalSet.h"
+#include "atn/ATNState.h"
 #include "atn/Transition.h"
 
 #include "atn/AtomTransition.h"

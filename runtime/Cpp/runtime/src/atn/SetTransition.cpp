@@ -7,6 +7,7 @@
 #include <string>
 #include <cstddef>
 #include "Token.h"
+#include "atn/ATNState.h"
 #include "misc/IntervalSet.h"
 
 #include "atn/SetTransition.h"

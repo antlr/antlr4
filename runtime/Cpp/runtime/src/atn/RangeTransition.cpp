@@ -7,6 +7,7 @@
 #include <cstddef>
 #include "misc/IntervalSet.h"
 
+#include "atn/ATNState.h"
 #include "atn/RangeTransition.h"
 
 using namespace antlr4;
