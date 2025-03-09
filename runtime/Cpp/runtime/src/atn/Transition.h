@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <cstddef>
 #include "misc/IntervalSet.h"

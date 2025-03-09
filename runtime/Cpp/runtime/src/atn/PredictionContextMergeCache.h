@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <memory>
 #include <cstddef>
 #include <utility>
 
