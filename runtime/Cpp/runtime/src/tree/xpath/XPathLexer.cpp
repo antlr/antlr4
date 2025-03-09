@@ -2,6 +2,7 @@
 // Generated from XPathLexer.g4 by ANTLR 4.13.1
 
 
+#include <cassert>
 #include <memory>
 #include <utility>
 #include <vector>

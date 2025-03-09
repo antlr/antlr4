@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
 #include <memory>
 #include <utility>
 #include <string>
