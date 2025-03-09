@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "Recognizer.h"
 #include "support/CPPUtils.h"
 #include "atn/SemanticContextType.h"

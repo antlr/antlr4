@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cstddef>
 #include "atn/ATNType.h"
 #include "atn/LexerATNSimulator.h"
 #include "dfa/DFA.h"

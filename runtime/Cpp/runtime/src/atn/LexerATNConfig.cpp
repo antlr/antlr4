@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cstddef>
 #include "misc/MurmurHash.h"
 #include "atn/DecisionState.h"
 #include "atn/PredictionContext.h"

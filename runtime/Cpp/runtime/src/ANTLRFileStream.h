@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "ANTLRInputStream.h"
 
 namespace antlr4 {

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "tree/ParseTree.h"
 #include "tree/ParseTreeVisitor.h"
 

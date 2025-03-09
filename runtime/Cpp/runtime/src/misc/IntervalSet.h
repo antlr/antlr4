@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "misc/Interval.h"
 #include "Exceptions.h"
 

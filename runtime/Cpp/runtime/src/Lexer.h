@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "Recognizer.h"
 #include "TokenSource.h"
 #include "CharStream.h"

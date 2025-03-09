@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "dfa/DFAState.h"
 
 namespace antlr4 {

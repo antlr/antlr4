@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "Exceptions.h"
 
 namespace antlr4 {

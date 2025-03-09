@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "tree/ParseTree.h"
 
 namespace antlr4 {

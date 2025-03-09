@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "atn/PredictionContext.h"
 #include "FlatHashSet.h"
 

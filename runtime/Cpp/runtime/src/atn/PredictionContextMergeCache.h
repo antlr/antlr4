@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <utility>
 
 #include "atn/PredictionContext.h"

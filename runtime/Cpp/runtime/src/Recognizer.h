@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
 #include "atn/SerializedATNView.h"

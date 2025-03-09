@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "Parser.h"
 #include "atn/ATN.h"
 #include "support/BitSet.h"

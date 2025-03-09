@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "antlr4-common.h"
 
 #include "atn/ATNConfigSet.h"

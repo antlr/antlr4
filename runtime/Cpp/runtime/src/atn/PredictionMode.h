@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "support/BitSet.h"
 
 namespace antlr4 {

@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cstddef>
 #include "dfa/DFA.h"
 #include "atn/RuleStartState.h"
 #include "InterpreterRuleContext.h"

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "ANTLRErrorListener.h"
 
 namespace antlrcpp {

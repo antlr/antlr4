@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "BaseErrorListener.h"
 
 namespace antlr4 {

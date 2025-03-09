@@ -52,6 +52,7 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <cstddef>
 #include <cassert>
 #include <string>
 #include <vector>

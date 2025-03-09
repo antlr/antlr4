@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "atn/Transition.h"
 
 namespace antlr4 {

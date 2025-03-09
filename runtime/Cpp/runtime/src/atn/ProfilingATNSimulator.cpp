@@ -10,6 +10,7 @@
 #include "support/CPPUtils.h"
 
 #include "atn/ProfilingATNSimulator.h"
+#include <cstddef>
 #include <chrono>
 
 using namespace antlr4;

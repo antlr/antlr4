@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "LexerAction.h"
 
 using namespace antlr4::atn;

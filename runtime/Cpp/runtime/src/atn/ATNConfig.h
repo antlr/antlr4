@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cassert>
 
 #include "antlr4-common.h"

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "Recognizer.h"
 #include "tree/ParseTreeListener.h"
 #include "tree/ParseTree.h"

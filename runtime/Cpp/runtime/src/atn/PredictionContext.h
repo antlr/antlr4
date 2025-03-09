@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <atomic>
 
 #include "Recognizer.h"

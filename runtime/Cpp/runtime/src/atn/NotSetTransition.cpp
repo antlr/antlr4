@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cstddef>
 #include "atn/NotSetTransition.h"
 #include "atn/ATNState.h"
 #include "misc/IntervalSet.h"

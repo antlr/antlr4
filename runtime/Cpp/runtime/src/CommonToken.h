@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "WritableToken.h"
 
 namespace antlr4 {

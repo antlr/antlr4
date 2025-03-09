@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "TokenStream.h"
 
 namespace antlr4 {

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "CharStream.h"
 #include "atn/LexerAction.h"
 

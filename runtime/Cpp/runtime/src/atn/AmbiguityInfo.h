@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "atn/DecisionEventInfo.h"
 #include "support/BitSet.h"
 

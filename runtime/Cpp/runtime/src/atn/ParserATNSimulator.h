@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "PredictionMode.h"
 #include "dfa/DFAState.h"
 #include "atn/ATNSimulator.h"

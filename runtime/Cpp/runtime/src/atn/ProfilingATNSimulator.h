@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "atn/ParserATNSimulator.h"
 #include "atn/DecisionInfo.h"
 
