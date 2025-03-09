@@ -15,7 +15,7 @@ namespace xpath {
   public:
     XPathTokenElement(const std::string &tokenName, size_t tokenType);
 
-    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
+    std::vector<ParseTree *> evaluate(ParseTree *t) override;
 
   protected:
     size_t _tokenType = 0;

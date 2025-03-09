@@ -20,7 +20,7 @@ namespace antlr4 {
     NoViableAltException(Parser *recognizer); // LL(1) error
     NoViableAltException(Parser *recognizer, TokenStream *input,Token *startToken,
       Token *offendingToken, atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx, bool deleteConfigs);
-    ~NoViableAltException();
+    ~NoViableAltException() override;
     
     virtual Token* getStartToken() const;
     virtual atn::ATNConfigSet* getDeadEndConfigs() const;

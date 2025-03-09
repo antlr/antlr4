@@ -46,7 +46,7 @@ namespace tree {
    */
   class ANTLR4CPP_PUBLIC IterativeParseTreeWalker : public ParseTreeWalker {
   public:
-    virtual void walk(ParseTreeListener *listener, ParseTree *t) const override;
+    void walk(ParseTreeListener *listener, ParseTree *t) const override;
   };
 
 } // namespace tree

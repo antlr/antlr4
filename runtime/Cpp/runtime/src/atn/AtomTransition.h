@@ -23,10 +23,10 @@ namespace atn {
 
     AtomTransition(ATNState *target, size_t label);
 
-    virtual misc::IntervalSet label() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    misc::IntervalSet label() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
   };
 
 } // namespace atn

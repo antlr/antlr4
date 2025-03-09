@@ -35,7 +35,7 @@ namespace antlr4 {
      */
     InterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber, size_t ruleIndex);
 
-    virtual size_t getRuleIndex() const override;
+    size_t getRuleIndex() const override;
 
   protected:
     /** This is the backing field for {@link #getRuleIndex}. */

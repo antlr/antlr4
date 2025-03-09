@@ -29,10 +29,10 @@ namespace atn {
      */
     size_t outermostPrecedenceReturn() const;
 
-    virtual bool isEpsilon() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    bool isEpsilon() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
 
   private:
     const size_t _outermostPrecedenceReturn; // A rule index.

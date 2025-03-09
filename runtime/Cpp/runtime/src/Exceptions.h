@@ -16,14 +16,14 @@ namespace antlr4 {
   public:
     RuntimeException(const std::string &msg = "");
 
-    virtual const char* what() const noexcept override;
+    const char* what() const noexcept override;
   };
 
   class ANTLR4CPP_PUBLIC IllegalStateException : public RuntimeException {
   public:
     IllegalStateException(const std::string &msg = "") : RuntimeException(msg) {}
     IllegalStateException(IllegalStateException const&) = default;
-    ~IllegalStateException();
+    ~IllegalStateException() override;
     IllegalStateException& operator=(IllegalStateException const&) = default;
   };
 
@@ -31,7 +31,7 @@ namespace antlr4 {
   public:
     IllegalArgumentException(IllegalArgumentException const&) = default;
     IllegalArgumentException(const std::string &msg = "") : RuntimeException(msg) {}
-    ~IllegalArgumentException();
+    ~IllegalArgumentException() override;
     IllegalArgumentException& operator=(IllegalArgumentException const&) = default;
   };
 
@@ -39,7 +39,7 @@ namespace antlr4 {
   public:
     NullPointerException(const std::string &msg = "") : RuntimeException(msg) {}
     NullPointerException(NullPointerException const&) = default;
-    ~NullPointerException();
+    ~NullPointerException() override;
     NullPointerException& operator=(NullPointerException const&) = default;
   };
 
@@ -47,7 +47,7 @@ namespace antlr4 {
   public:
     IndexOutOfBoundsException(const std::string &msg = "") : RuntimeException(msg) {}
     IndexOutOfBoundsException(IndexOutOfBoundsException const&) = default;
-    ~IndexOutOfBoundsException();
+    ~IndexOutOfBoundsException() override;
     IndexOutOfBoundsException& operator=(IndexOutOfBoundsException const&) = default;
   };
 
@@ -55,7 +55,7 @@ namespace antlr4 {
   public:
     UnsupportedOperationException(const std::string &msg = "") : RuntimeException(msg) {}
     UnsupportedOperationException(UnsupportedOperationException const&) = default;
-    ~UnsupportedOperationException();
+    ~UnsupportedOperationException() override;
     UnsupportedOperationException& operator=(UnsupportedOperationException const&) = default;
 
   };
@@ -64,7 +64,7 @@ namespace antlr4 {
   public:
     EmptyStackException(const std::string &msg = "") : RuntimeException(msg) {}
     EmptyStackException(EmptyStackException const&) = default;
-    ~EmptyStackException();
+    ~EmptyStackException() override;
     EmptyStackException& operator=(EmptyStackException const&) = default;
   };
 
@@ -77,14 +77,14 @@ namespace antlr4 {
   public:
     IOException(const std::string &msg = "");
 
-    virtual const char* what() const noexcept override;
+    const char* what() const noexcept override;
   };
 
   class ANTLR4CPP_PUBLIC CancellationException : public IllegalStateException {
   public:
     CancellationException(const std::string &msg = "") : IllegalStateException(msg) {}
     CancellationException(CancellationException const&) = default;
-    ~CancellationException();
+    ~CancellationException() override;
     CancellationException& operator=(CancellationException const&) = default;
   };
 
@@ -92,7 +92,7 @@ namespace antlr4 {
   public:
     ParseCancellationException(const std::string &msg = "") : CancellationException(msg) {}
     ParseCancellationException(ParseCancellationException const&) = default;
-    ~ParseCancellationException();
+    ~ParseCancellationException() override;
     ParseCancellationException& operator=(ParseCancellationException const&) = default;
   };
 

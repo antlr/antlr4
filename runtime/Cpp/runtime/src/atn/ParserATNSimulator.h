@@ -257,8 +257,8 @@ namespace atn {
                        PredictionContextCache &sharedContextCache,
                        const ParserATNSimulatorOptions &options);
 
-    virtual void reset() override;
-    virtual void clearDFA() override;
+    void reset() override;
+    void clearDFA() override;
     virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext);
 
     static const bool TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT;

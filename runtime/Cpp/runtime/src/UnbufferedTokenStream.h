@@ -14,22 +14,22 @@ namespace antlr4 {
     UnbufferedTokenStream(TokenSource *tokenSource);
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
     UnbufferedTokenStream(const UnbufferedTokenStream& other) = delete;
-    virtual ~UnbufferedTokenStream();
+    ~UnbufferedTokenStream() override;
 
     UnbufferedTokenStream& operator = (const UnbufferedTokenStream& other) = delete;
 
-    virtual Token* get(size_t i) const override;
-    virtual Token* LT(ssize_t i) override;
-    virtual size_t LA(ssize_t i) override;
+    Token* get(size_t i) const override;
+    Token* LT(ssize_t i) override;
+    size_t LA(ssize_t i) override;
 
-    virtual TokenSource* getTokenSource() const override;
+    TokenSource* getTokenSource() const override;
 
-    virtual std::string getText(const misc::Interval &interval) override;
-    virtual std::string getText() override;
-    virtual std::string getText(RuleContext *ctx) override;
-    virtual std::string getText(Token *start, Token *stop) override;
+    std::string getText(const misc::Interval &interval) override;
+    std::string getText() override;
+    std::string getText(RuleContext *ctx) override;
+    std::string getText(Token *start, Token *stop) override;
 
-    virtual void consume() override;
+    void consume() override;
 
     /// <summary>
     /// Return a marker that we can release later.
@@ -38,12 +38,12 @@ namespace antlr4 {
     /// protection against misuse where {@code seek()} is called on a mark or
     /// {@code release()} is called in the wrong order.
     /// </summary>
-    virtual ssize_t mark() override;
-    virtual void release(ssize_t marker) override;
-    virtual size_t index() override;
-    virtual void seek(size_t index) override;
-    virtual size_t size() override;
-    virtual std::string getSourceName() const override;
+    ssize_t mark() override;
+    void release(ssize_t marker) override;
+    size_t index() override;
+    void seek(size_t index) override;
+    size_t size() override;
+    std::string getSourceName() const override;
 
   protected:
     /// Make sure we have 'need' elements from current position p. Last valid
