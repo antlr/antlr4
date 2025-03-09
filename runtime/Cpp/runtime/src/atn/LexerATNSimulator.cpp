@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "IntStream.h"
+#include "atn/ATNStateType.h"
 #include "atn/TransitionType.h"
 #include "atn/ATNState.h"
 #include "antlr4-common.h"
