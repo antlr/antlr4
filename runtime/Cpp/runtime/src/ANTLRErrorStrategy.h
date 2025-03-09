@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <exception>
 #include "antlr4-common.h"
 #include "Token.h"
 

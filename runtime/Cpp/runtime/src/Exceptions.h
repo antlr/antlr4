@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <exception>
 #include <string>
 #include "antlr4-common.h"
 

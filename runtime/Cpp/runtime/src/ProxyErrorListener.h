@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <exception>
 #include <string>
 #include <cstddef>
 #include "ANTLRErrorListener.h"
