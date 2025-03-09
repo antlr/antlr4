@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include <string>
 #include "Exceptions.h"
 

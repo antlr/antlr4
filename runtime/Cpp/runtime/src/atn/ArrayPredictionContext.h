@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <vector>
 #include <string>
 #include <cstddef>
 #include "atn/PredictionContext.h"

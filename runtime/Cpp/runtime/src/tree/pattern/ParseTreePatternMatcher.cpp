@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <vector>
 #include <cstddef>
 #include "tree/pattern/ParseTreePattern.h"
 #include "tree/pattern/ParseTreeMatch.h"

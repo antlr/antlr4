@@ -5,6 +5,7 @@
 
 #include "atn/ArrayPredictionContext.h"
 
+#include <vector>
 #include <string>
 #include <cstring>
 

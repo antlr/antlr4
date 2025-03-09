@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include <string>
 #include "Lexer.h"
 #include "atn/PredictionContext.h"
