@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include "antlr4-common.h"
+#include "misc/Interval.h"
 #include "CharStream.h"
 
 namespace antlr4 {

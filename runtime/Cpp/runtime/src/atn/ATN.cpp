@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include "atn/LL1Analyzer.h"
+#include "atn/ATNState.h"
 #include "Token.h"
 #include "atn/RuleTransition.h"
 #include "misc/IntervalSet.h"

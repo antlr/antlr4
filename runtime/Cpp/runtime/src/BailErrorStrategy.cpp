@@ -4,6 +4,7 @@
  */
 
 #include "Exceptions.h"
+#include "Token.h"
 #include "ParserRuleContext.h"
 #include "InputMismatchException.h"
 #include "Parser.h"

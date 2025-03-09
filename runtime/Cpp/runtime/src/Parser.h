@@ -9,6 +9,9 @@
 #include <string>
 #include <cstddef>
 #include "Recognizer.h"
+#include "misc/IntervalSet.h"
+#include "ANTLRErrorStrategy.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "tree/ParseTreeListener.h"
 #include "tree/ParseTree.h"

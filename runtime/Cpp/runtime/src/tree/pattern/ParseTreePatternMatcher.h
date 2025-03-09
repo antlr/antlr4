@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include "antlr4-common.h"
+#include "Token.h"
 #include "Exceptions.h"
 
 namespace antlr4 {

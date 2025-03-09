@@ -9,6 +9,8 @@
 #include <string>
 #include <cstddef>
 #include "RuleContext.h"
+#include "misc/Interval.h"
+#include "Token.h"
 #include "antlr4-common.h"
 #include "support/CPPUtils.h"
 

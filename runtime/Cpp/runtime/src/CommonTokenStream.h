@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include "antlr4-common.h"
+#include "Token.h"
 #include "BufferedTokenStream.h"
 
 namespace antlr4 {

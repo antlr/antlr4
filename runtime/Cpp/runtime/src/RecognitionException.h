@@ -8,6 +8,8 @@
 #include <string>
 #include <cstddef>
 #include "antlr4-common.h"
+#include "misc/IntervalSet.h"
+#include "Token.h"
 #include "Exceptions.h"
 
 namespace antlr4 {

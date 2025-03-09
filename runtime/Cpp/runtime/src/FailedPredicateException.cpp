@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include "atn/ParserATNSimulator.h"
+#include "atn/TransitionType.h"
 #include "Parser.h"
 #include "atn/PredicateTransition.h"
 #include "atn/ATN.h"

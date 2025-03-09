@@ -6,6 +6,8 @@
 #include <string>
 #include <cstddef>
 #include "atn/RuleStartState.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "atn/RuleTransition.h"
 
 using namespace antlr4::atn;

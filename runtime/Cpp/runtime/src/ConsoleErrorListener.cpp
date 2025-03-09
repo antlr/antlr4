@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstddef>
+#include "Token.h"
 #include "ConsoleErrorListener.h"
 
 using namespace antlr4;

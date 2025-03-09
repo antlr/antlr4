@@ -7,6 +7,9 @@
 
 #include <string>
 #include "antlr4-common.h"
+#include "tree/ParseTreeType.h"
+#include "misc/Interval.h"
+#include "Token.h"
 #include "tree/TerminalNode.h"
 
 namespace antlr4 {

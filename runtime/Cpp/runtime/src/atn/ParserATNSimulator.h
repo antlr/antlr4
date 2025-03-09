@@ -11,6 +11,7 @@
 #include <string>
 #include <cstddef>
 #include "PredictionMode.h"
+#include "atn/ATNState.h"
 #include "antlr4-common.h"
 #include "dfa/DFAState.h"
 #include "atn/ATNSimulator.h"
