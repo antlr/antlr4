@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "Recognizer.h"
+#include "misc/IntervalSet.h"
 #include "ANTLRErrorStrategy.h"
 #include "Token.h"
 #include "antlr4-common.h"

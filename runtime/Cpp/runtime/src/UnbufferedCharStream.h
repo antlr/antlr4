@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "antlr4-common.h"
+#include "misc/Interval.h"
 #include "CharStream.h"
 
 namespace antlr4 {

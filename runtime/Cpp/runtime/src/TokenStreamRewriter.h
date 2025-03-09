@@ -10,6 +10,7 @@
 #include <string>
 #include <cstddef>
 #include "Token.h"
+#include "misc/Interval.h"
 #include "antlr4-common.h"
 
 namespace antlr4 {
