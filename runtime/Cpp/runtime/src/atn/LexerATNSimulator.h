@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <atomic>
 
 #include "atn/ATNSimulator.h"

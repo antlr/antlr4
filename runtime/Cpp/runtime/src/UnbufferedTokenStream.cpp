@@ -3,6 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <string>
+#include <cstddef>
 #include "Token.h"
 #include "Exceptions.h"
 #include "assert.h"

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include <string_view>
 
 #include "CharStream.h"

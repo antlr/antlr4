@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <limits>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "misc/IntervalSet.h"
 #include "atn/Transition.h"
 #include "atn/ATNStateType.h"

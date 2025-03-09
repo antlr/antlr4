@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "NoViableAltException.h"
 #include "misc/IntervalSet.h"
 #include "atn/ParserATNSimulator.h"

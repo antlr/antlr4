@@ -3,6 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <cstddef>
 #include "IntStream.h"
 #include "atn/OrderedATNConfigSet.h"
 #include "Token.h"

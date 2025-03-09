@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <limits>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
 #include "atn/SerializedATNView.h"

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "dfa/DFASerializer.h"
 
 namespace antlr4 {

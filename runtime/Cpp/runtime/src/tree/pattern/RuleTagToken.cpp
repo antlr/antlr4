@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "Exceptions.h"
 
 #include "tree/pattern/RuleTagToken.h"

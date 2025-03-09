@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <vector>
+#include <cstddef>
 #include "Token.h"
 #include "atn/ATNConfig.h"
 #include "atn/PredictionContext.h"

@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <utility>
+#include <cstddef>
 #include "misc/Interval.h"
 #include "Exceptions.h"
 #include "support/Utf8.h"

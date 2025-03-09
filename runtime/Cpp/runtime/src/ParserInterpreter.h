@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <utility>
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "Parser.h"
 #include "atn/ATN.h"
 #include "support/BitSet.h"

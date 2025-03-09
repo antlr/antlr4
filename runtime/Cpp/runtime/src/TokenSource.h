@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "TokenFactory.h"
 
 namespace antlr4 {

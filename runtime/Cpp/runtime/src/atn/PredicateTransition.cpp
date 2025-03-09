@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "atn/PredicateTransition.h"
 
 using namespace antlr4::atn;

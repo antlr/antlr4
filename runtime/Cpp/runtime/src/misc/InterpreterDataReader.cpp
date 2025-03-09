@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <vector>
+#include <string>
 #include "atn/ATN.h"
 #include "atn/ATNDeserializer.h"
 #include "Vocabulary.h"

@@ -3,6 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <map>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "ConsoleErrorListener.h"
 #include "RecognitionException.h"
 #include "support/CPPUtils.h"

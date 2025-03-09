@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "RecognitionException.h"
 
 namespace antlrcpp {

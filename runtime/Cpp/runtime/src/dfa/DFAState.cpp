@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "atn/ATNConfigSet.h"
 #include "atn/SemanticContext.h"
 #include "atn/ATNConfig.h"

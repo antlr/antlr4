@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <vector>
+#include <cstddef>
 #include "support/BitSet.h"
 
 namespace antlr4 {

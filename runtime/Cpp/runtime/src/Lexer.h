@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <limits>
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "Recognizer.h"
 #include "TokenSource.h"
 #include "CharStream.h"

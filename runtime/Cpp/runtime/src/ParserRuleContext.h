@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "RuleContext.h"
 #include "support/CPPUtils.h"
 

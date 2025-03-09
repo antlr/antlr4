@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <limits>
+#include <string>
+#include <cstddef>
 #include "IntStream.h"
 
 namespace antlr4 {

@@ -3,6 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <cstddef>
 #include "atn/LexerATNSimulator.h"
 #include "Exceptions.h"
 #include "misc/Interval.h"

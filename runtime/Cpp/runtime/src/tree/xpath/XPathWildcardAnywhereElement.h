@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include "XPathElement.h"
 
 namespace antlr4 {

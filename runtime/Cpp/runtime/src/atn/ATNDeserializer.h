@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+#include <cstddef>
 #include "atn/ATNDeserializationOptions.h"
 #include "atn/SerializedATNView.h"
 #include "atn/LexerAction.h"

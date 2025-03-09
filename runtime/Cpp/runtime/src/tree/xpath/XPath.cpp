@@ -3,6 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "XPathLexer.h"
 #include "XPathLexerErrorListener.h"
 #include "XPathElement.h"

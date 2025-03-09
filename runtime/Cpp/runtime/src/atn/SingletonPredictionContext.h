@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "atn/PredictionContext.h"
 
 namespace antlr4 {

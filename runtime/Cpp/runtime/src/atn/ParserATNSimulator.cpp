@@ -3,6 +3,13 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <map>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "dfa/DFA.h"
 #include "NoViableAltException.h"
 #include "atn/DecisionState.h"

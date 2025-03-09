@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <limits>
+#include <memory>
 #include "atn/ATNSimulator.h"
 
 #include "atn/ATNConfigSet.h"

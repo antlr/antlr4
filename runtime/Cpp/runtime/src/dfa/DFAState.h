@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "antlr4-common.h"
 
 #include "atn/ATNConfigSet.h"

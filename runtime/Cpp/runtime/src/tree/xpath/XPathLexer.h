@@ -4,6 +4,9 @@
 #pragma once
 
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "antlr4-runtime.h"
 
 

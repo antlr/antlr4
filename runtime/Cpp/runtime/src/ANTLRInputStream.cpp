@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <utility>
+#include <string>
 #include <string.h>
 
 #include "Exceptions.h"

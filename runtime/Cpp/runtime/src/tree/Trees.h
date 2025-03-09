@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "tree/TerminalNode.h"
 #include "ParserRuleContext.h"
 #include "Recognizer.h"

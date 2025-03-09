@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <utility>
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "antlr4-common.h"
 
 namespace antlr4 {

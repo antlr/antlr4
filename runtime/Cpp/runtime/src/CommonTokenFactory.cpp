@@ -3,6 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <utility>
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "misc/Interval.h"
 #include "CommonToken.h"
 #include "CharStream.h"

@@ -5,6 +5,10 @@
 
 #include "atn/ArrayPredictionContext.h"
 
+#include <cassert>
+#include <utility>
+#include <vector>
+#include <string>
 #include <cstring>
 
 #include "atn/SingletonPredictionContext.h"

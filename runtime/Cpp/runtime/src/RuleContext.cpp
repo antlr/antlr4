@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "tree/Trees.h"
 #include "misc/Interval.h"
 #include "Parser.h"

@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <utility>
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "PredictionMode.h"
 #include "dfa/DFAState.h"
 #include "atn/ATNSimulator.h"

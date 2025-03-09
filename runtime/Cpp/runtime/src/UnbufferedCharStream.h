@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "CharStream.h"
 
 namespace antlr4 {

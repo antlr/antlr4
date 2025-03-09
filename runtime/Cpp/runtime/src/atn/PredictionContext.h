@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <limits>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <atomic>
 
 #include "Recognizer.h"

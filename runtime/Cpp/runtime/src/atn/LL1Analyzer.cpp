@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <vector>
+#include <cstddef>
 #include "atn/RuleStopState.h"
 #include "atn/Transition.h"
 #include "atn/RuleTransition.h"

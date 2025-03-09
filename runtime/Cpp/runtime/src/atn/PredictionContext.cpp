@@ -3,6 +3,13 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "atn/SingletonPredictionContext.h"
 #include "misc/MurmurHash.h"
 #include "atn/ArrayPredictionContext.h"

@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "antlr4-common.h"
 
 namespace antlrcpp {

@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <map>
+#include <memory>
+#include <vector>
+#include <string>
 #include "Exceptions.h"
 
 namespace antlr4 {

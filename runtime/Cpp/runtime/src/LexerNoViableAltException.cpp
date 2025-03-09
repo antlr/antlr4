@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "misc/Interval.h"
 #include "support/CPPUtils.h"
 #include "CharStream.h"

@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "dfa/DFAState.h"
 
 namespace antlr4 {
