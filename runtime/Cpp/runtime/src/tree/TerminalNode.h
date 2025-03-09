@@ -6,6 +6,7 @@
 #pragma once
 
 #include "antlr4-common.h"
+#include "tree/ParseTreeType.h"
 #include "Token.h"
 #include "tree/ParseTree.h"
 

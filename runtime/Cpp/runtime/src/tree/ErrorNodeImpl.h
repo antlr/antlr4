@@ -7,6 +7,7 @@
 
 #include <string>
 #include "tree/ErrorNode.h"
+#include "tree/ParseTreeType.h"
 #include "Token.h"
 #include "antlr4-common.h"
 #include "tree/TerminalNodeImpl.h"

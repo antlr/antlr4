@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "antlr4-common.h"
+#include "tree/ParseTreeType.h"
 #include "misc/Interval.h"
 #include "tree/ParseTree.h"
 
