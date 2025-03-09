@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <utility>
 #include <memory>
 #include <string>
 #include <cstddef>

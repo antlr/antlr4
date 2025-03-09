@@ -30,6 +30,7 @@
 #if ANTLR4CPP_USING_ABSEIL
 #include "absl/container/flat_hash_map.h"
 #else
+#include <utility>
 #include <unordered_map>
 #endif
 
