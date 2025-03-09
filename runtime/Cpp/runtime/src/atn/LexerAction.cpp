@@ -1,3 +1,4 @@
+#include <limits>
 #include <cstddef>
 #include "LexerAction.h"
 

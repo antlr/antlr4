@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <limits>
 #include <map>
 #include <vector>
 #include <string>
