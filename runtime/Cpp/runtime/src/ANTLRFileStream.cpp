@@ -4,6 +4,7 @@
  */
 
 #include <string>
+#include "ANTLRInputStream.h"
 #include "ANTLRFileStream.h"
 
 using namespace antlr4;

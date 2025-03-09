@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "XPathLexer.h"
+#include "ANTLRInputStream.h"
 #include "Token.h"
 #include "antlr4-common.h"
 #include "XPathLexerErrorListener.h"
