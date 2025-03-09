@@ -11,6 +11,7 @@
 #include <string>
 #include <cstddef>
 #include "atn/SingletonPredictionContext.h"
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 #include "atn/ArrayPredictionContext.h"
 #include "atn/PredictionContextCache.h"

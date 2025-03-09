@@ -6,6 +6,7 @@
 #pragma once
 
 #include <string>
+#include "antlr4-common.h"
 #include "atn/ATNState.h"
 
 namespace antlr4 {

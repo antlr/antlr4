@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include "Token.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfig.h"
 #include "atn/PredictionContext.h"
 #include "support/BitSet.h"

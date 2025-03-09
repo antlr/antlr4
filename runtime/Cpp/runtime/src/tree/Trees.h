@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "tree/TerminalNode.h"
+#include "antlr4-common.h"
 #include "ParserRuleContext.h"
 #include "Recognizer.h"
 

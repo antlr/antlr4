@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstddef>
+#include "antlr4-common.h"
 #include "ParserRuleContext.h"
 
 namespace antlr4 {

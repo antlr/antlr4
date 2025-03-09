@@ -12,6 +12,7 @@
 #include <unordered_set>
 
 #include "misc/MurmurHash.h"
+#include "antlr4-common.h"
 #include "support/Casts.h"
 #include "support/CPPUtils.h"
 #include "support/Arrays.h"

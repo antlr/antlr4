@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "misc/Interval.h"
+#include "antlr4-common.h"
 #include "Exceptions.h"
 
 namespace antlr4 {

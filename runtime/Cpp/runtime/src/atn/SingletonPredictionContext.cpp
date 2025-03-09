@@ -10,6 +10,7 @@
 #include <cstddef>
 #include "atn/SingletonPredictionContext.h"
 
+#include "antlr4-common.h"
 #include "support/Casts.h"
 #include "misc/MurmurHash.h"
 #include "atn/HashUtils.h"

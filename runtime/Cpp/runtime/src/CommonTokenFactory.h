@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <cstddef>
+#include "antlr4-common.h"
 #include "TokenFactory.h"
 
 namespace antlr4 {

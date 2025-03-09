@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "RuleContext.h"
+#include "antlr4-common.h"
 #include "support/CPPUtils.h"
 
 namespace antlr4 {

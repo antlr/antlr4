@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "Exceptions.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 #include "IntStream.h"
 

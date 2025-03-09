@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include "antlr4-common.h"
 #include "XPathElement.h"
 
 namespace antlr4 {

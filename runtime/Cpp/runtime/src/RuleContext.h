@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <cstddef>
+#include "antlr4-common.h"
 #include "tree/ParseTree.h"
 
 namespace antlr4 {

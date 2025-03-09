@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "WritableToken.h"
+#include "antlr4-common.h"
 #include "Lexer.h"
 #include "RuleContext.h"
 #include "misc/Interval.h"

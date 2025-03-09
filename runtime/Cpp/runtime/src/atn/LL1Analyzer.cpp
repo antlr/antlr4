@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/RuleStopState.h"
+#include "antlr4-common.h"
 #include "atn/Transition.h"
 #include "atn/RuleTransition.h"
 #include "atn/SingletonPredictionContext.h"

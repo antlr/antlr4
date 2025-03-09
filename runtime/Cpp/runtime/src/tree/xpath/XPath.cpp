@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "XPathLexer.h"
+#include "antlr4-common.h"
 #include "XPathLexerErrorListener.h"
 #include "XPathElement.h"
 #include "XPathWildcardAnywhereElement.h"

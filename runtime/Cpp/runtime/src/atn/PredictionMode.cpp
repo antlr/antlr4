@@ -7,6 +7,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/RuleStopState.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
 #include "misc/MurmurHash.h"

@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/ParserATNSimulator.h"
+#include "antlr4-common.h"
 #include "atn/DecisionInfo.h"
 
 namespace antlr4 {

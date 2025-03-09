@@ -10,6 +10,7 @@
 #include <string>
 #include <cstddef>
 #include "TokenSource.h"
+#include "antlr4-common.h"
 #include "CommonTokenFactory.h"
 
 namespace antlr4 {

@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "misc/MurmurHash.h"
+#include "antlr4-common.h"
 #include "Lexer.h"
 #include "Exceptions.h"
 #include "Vocabulary.h"

@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/ATNDeserializationOptions.h"
+#include "antlr4-common.h"
 #include "tree/pattern/ParseTreePatternMatcher.h"
 #include "dfa/DFA.h"
 #include "ParserRuleContext.h"

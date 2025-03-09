@@ -6,6 +6,7 @@
 #pragma once
 
 #include "atn/ATN.h"
+#include "antlr4-common.h"
 #include "atn/PredictionContext.h"
 #include "atn/PredictionContextCache.h"
 #include "misc/IntervalSet.h"

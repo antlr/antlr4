@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include "atn/PredictionContext.h"
+#include "antlr4-common.h"
 #include "FlatHashSet.h"
 
 namespace antlr4 {

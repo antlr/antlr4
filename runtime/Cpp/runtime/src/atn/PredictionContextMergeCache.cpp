@@ -28,6 +28,7 @@
 #include <cstddef>
 #include "atn/PredictionContextMergeCache.h"
 
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 
 using namespace antlr4::atn;

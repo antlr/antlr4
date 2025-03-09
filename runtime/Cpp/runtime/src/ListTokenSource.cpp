@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include "Token.h"
+#include "antlr4-common.h"
 #include "CommonToken.h"
 #include "CharStream.h"
 

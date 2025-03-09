@@ -12,6 +12,7 @@
 #include <atomic>
 
 #include "atn/ATNSimulator.h"
+#include "antlr4-common.h"
 #include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
 

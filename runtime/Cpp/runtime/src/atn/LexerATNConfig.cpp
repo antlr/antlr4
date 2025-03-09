@@ -6,6 +6,7 @@
 #include <utility>
 #include <cstddef>
 #include "misc/MurmurHash.h"
+#include "antlr4-common.h"
 #include "atn/DecisionState.h"
 #include "atn/PredictionContext.h"
 #include "SemanticContext.h"

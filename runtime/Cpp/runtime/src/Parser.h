@@ -9,6 +9,7 @@
 #include <string>
 #include <cstddef>
 #include "Recognizer.h"
+#include "antlr4-common.h"
 #include "tree/ParseTreeListener.h"
 #include "tree/ParseTree.h"
 #include "TokenStream.h"

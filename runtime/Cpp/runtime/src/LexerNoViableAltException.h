@@ -8,6 +8,7 @@
 #include <string>
 #include <cstddef>
 #include "RecognitionException.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfigSet.h"
 
 namespace antlr4 {
