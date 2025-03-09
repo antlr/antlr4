@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstddef>
 #include "atn/ATNDeserializationOptions.h"
+#include "ANTLRErrorStrategy.h"
 #include "atn/ATNState.h"
 #include "antlr4-common.h"
 #include "tree/pattern/ParseTreePatternMatcher.h"
