@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <unordered_set>
 #include <vector>
 #include <cstddef>
 #include "atn/RuleStopState.h"

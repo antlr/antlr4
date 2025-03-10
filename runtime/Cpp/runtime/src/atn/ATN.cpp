@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
 #include <cstddef>
 #include "atn/LL1Analyzer.h"
 #include "atn/ATNState.h"
