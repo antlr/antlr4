@@ -3,6 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string_view>
+#include <utility>
+#include <string>
+#include <cstddef>
 #include <cassert>
 #include <cstdint>
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include "antlr4-common.h"
 #include "Chunk.h"
 
 namespace antlr4 {
@@ -29,7 +31,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
   public:
     TextChunk(const std::string &text);
-    virtual ~TextChunk();
+    ~TextChunk() override;
 
     /// <summary>
     /// Gets the raw text of this chunk.
@@ -43,7 +45,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TextChunk"/> returns the result of
     /// <seealso cref="#getText()"/> in single quotes.
     /// </summary>
-    virtual std::string toString() override;
+    std::string toString() override;
   };
 
 } // namespace pattern

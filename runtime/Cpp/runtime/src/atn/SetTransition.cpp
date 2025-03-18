@@ -3,7 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <utility>
+#include <string>
+#include <cstddef>
 #include "Token.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "misc/IntervalSet.h"
 
 #include "atn/SetTransition.h"

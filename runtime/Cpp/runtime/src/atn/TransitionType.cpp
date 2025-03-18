@@ -1,3 +1,4 @@
+#include <string>
 #include "atn/TransitionType.h"
 
 std::string antlr4::atn::transitionTypeName(TransitionType transitionType) {

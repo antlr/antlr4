@@ -3,7 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <cstddef>
 #include "Token.h"
+#include "antlr4-common.h"
 #include "CommonToken.h"
 #include "CharStream.h"
 

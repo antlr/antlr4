@@ -3,8 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "Exceptions.h"
 
+#include "antlr4-common.h"
 #include "tree/pattern/RuleTagToken.h"
 
 using namespace antlr4::tree::pattern;

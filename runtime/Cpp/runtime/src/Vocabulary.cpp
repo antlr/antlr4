@@ -3,6 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string_view>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "Token.h"
 
 #include "Vocabulary.h"

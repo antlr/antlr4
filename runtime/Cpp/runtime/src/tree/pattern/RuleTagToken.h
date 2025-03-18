@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "Token.h"
 
 namespace antlr4 {
@@ -73,7 +76,7 @@ namespace pattern {
     /// <p/>
     /// Rule tag tokens are always placed on the <seealso cref="#DEFAULT_CHANNE"/>.
     /// </summary>
-    virtual size_t getChannel() const override;
+    size_t getChannel() const override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -81,35 +84,35 @@ namespace pattern {
     /// This method returns the rule tag formatted with {@code <} and {@code >}
     /// delimiters.
     /// </summary>
-    virtual std::string getText() const override;
+    std::string getText() const override;
 
     /// Rule tag tokens have types assigned according to the rule bypass
     /// transitions created during ATN deserialization.
-    virtual size_t getType() const override;
+    size_t getType() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns 0.
-    virtual size_t getLine() const override;
+    size_t getLine() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
-    virtual size_t getCharPositionInLine() const override;
+    size_t getCharPositionInLine() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
-    virtual size_t getTokenIndex() const override;
+    size_t getTokenIndex() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
-    virtual size_t getStartIndex() const override;
+    size_t getStartIndex() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
-    virtual size_t getStopIndex() const override;
+    size_t getStopIndex() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-    virtual TokenSource *getTokenSource() const override;
+    TokenSource *getTokenSource() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-    virtual CharStream *getInputStream() const override;
+    CharStream *getInputStream() const override;
 
     /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form {@code ruleName:bypassTokenType}.
-    virtual std::string toString() const override;
+    std::string toString() const override;
   };
 
 } // namespace pattern

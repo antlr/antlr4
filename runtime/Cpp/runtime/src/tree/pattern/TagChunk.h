@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include "antlr4-common.h"
 #include "Chunk.h"
 
 namespace antlr4 {
@@ -37,7 +39,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
     TagChunk(const std::string &tag);
-    virtual ~TagChunk();
+    ~TagChunk() override;
 
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified label
@@ -70,7 +72,7 @@ namespace pattern {
     /// are returned in the form {@code label:tag}, and unlabeled tags are
     /// returned as just the tag name.
     /// </summary>
-    virtual std::string toString() override;
+    std::string toString() override;
 
   private:
     /// This is the backing field for <seealso cref="#getTag"/>.

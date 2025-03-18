@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include "antlr4-common.h"
 #include "XPathElement.h"
 
 namespace antlr4 {
@@ -16,7 +19,7 @@ namespace xpath {
   public:
     XPathRuleAnywhereElement(const std::string &ruleName, int ruleIndex);
 
-    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
+    std::vector<ParseTree *> evaluate(ParseTree *t) override;
 
   protected:
     int _ruleIndex = 0;

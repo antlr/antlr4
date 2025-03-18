@@ -3,8 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <string>
+#include <cstddef>
 #include "atn/SingletonPredictionContext.h"
 
+#include "antlr4-common.h"
 #include "support/Casts.h"
 #include "misc/MurmurHash.h"
 #include "atn/HashUtils.h"

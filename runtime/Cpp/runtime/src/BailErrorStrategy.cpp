@@ -3,7 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <exception>
 #include "Exceptions.h"
+#include "Token.h"
 #include "ParserRuleContext.h"
 #include "InputMismatchException.h"
 #include "Parser.h"

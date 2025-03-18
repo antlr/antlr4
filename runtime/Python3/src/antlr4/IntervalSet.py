@@ -5,7 +5,7 @@
 #
 
 from io import StringIO
-from antlr4.Token import Token
+from .Token import Token
 
 # need forward declarations
 IntervalSet = None

@@ -19,6 +19,9 @@ public class ParserFile extends OutputFile {
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
+	public boolean genLean; // from -split-parser cmd-line
+	public boolean genContexts; // from -split-parser cmd-line
+	public boolean genDFA; // from -split-parser cmd-line
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public ActionChunk contextSuperClass;

@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "Vocabulary.h"
 
 namespace antlr4 {

@@ -6,6 +6,8 @@
 #pragma once
 
 #include "antlr4-common.h"
+#include "atn/ATNStateType.h"
+#include "atn/ATNState.h"
 #include "atn/BlockStartState.h"
 
 namespace antlr4 {

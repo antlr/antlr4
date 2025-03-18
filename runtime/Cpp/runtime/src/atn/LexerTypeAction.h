@@ -5,7 +5,10 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "atn/LexerActionType.h"
+#include "antlr4-common.h"
 #include "atn/LexerAction.h"
 
 namespace antlr4 {

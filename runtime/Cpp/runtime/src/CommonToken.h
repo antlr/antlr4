@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <utility>
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "Token.h"
 #include "WritableToken.h"
 
 namespace antlr4 {
@@ -111,7 +116,7 @@ namespace antlr4 {
      */
     CommonToken(Token *oldToken);
 
-    virtual size_t getType() const override;
+    size_t getType() const override;
 
     /**
      * Explicitly set the text for this token. If {code text} is not
@@ -122,33 +127,33 @@ namespace antlr4 {
      * should be obtained from the input along with the start and stop indexes
      * of the token.
      */
-    virtual void setText(const std::string &text) override;
-    virtual std::string getText() const override;
+    void setText(const std::string &text) override;
+    std::string getText() const override;
 
-    virtual void setLine(size_t line) override;
-    virtual size_t getLine() const override;
+    void setLine(size_t line) override;
+    size_t getLine() const override;
 
-    virtual size_t getCharPositionInLine() const override;
-    virtual void setCharPositionInLine(size_t charPositionInLine) override;
+    size_t getCharPositionInLine() const override;
+    void setCharPositionInLine(size_t charPositionInLine) override;
 
-    virtual size_t getChannel() const override;
-    virtual void setChannel(size_t channel) override;
+    size_t getChannel() const override;
+    void setChannel(size_t channel) override;
 
-    virtual void setType(size_t type) override;
+    void setType(size_t type) override;
 
-    virtual size_t getStartIndex() const override;
+    size_t getStartIndex() const override;
     virtual void setStartIndex(size_t start);
 
-    virtual size_t getStopIndex() const override;
+    size_t getStopIndex() const override;
     virtual void setStopIndex(size_t stop);
 
-    virtual size_t getTokenIndex() const override;
-    virtual void setTokenIndex(size_t index) override;
+    size_t getTokenIndex() const override;
+    void setTokenIndex(size_t index) override;
 
-    virtual TokenSource *getTokenSource() const override;
-    virtual CharStream *getInputStream() const override;
+    TokenSource *getTokenSource() const override;
+    CharStream *getInputStream() const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
 
     virtual std::string toString(Recognizer *r) const;
   private:

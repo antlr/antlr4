@@ -5,9 +5,15 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <atomic>
 
 #include "atn/ATNSimulator.h"
+#include "atn/ATNState.h"
+#include "antlr4-common.h"
 #include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
 
@@ -73,13 +79,13 @@ namespace atn {
   public:
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    virtual ~LexerATNSimulator() = default;
+    ~LexerATNSimulator() override = default;
 
     virtual void copyState(LexerATNSimulator *simulator);
     virtual size_t match(CharStream *input, size_t mode);
-    virtual void reset() override;
+    void reset() override;
 
-    virtual void clearDFA() override;
+    void clearDFA() override;
 
   protected:
     virtual size_t matchATN(CharStream *input);

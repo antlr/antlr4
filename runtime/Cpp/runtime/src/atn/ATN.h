@@ -5,7 +5,13 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "RuleContext.h"
+#include "misc/IntervalSet.h"
+#include "atn/ATNState.h"
+#include "antlr4-common.h"
 #include "internal/Synchronization.h"
 
 // GCC generates a warning when forward-declaring ATN if ATN has already been

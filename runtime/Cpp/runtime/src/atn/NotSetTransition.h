@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "misc/IntervalSet.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "atn/SetTransition.h"
 
 namespace antlr4 {
@@ -18,9 +24,9 @@ namespace atn {
 
     NotSetTransition(ATNState *target, misc::IntervalSet set);
 
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
   };
 
 } // namespace atn

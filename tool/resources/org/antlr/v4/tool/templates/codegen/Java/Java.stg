@@ -48,6 +48,20 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 package <file.genPackage>;
 <endif>
 <namedActions.header>
+<if(file.genLean)>
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.*;
+<elseif(file.genContexts)>
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+import java.util.List;
+import java.util.ArrayList;
+<elseif(file.genDFA)>
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Utils;
+<else>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -56,6 +70,7 @@ import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
+<endif>
 
 <parser>
 >>
@@ -77,13 +92,14 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Enter a parse tree produced by the {@code <lname>\}
- * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+ * labeled alternative in {@link <file.parserName><if(file.genLean)>Contexts<endif>#<file.listenerLabelRuleNames.(lname)>\}.
 <else>
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
 <endif>
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+
+void enter<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx);
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the {@code <lname>\}
@@ -93,7 +109,7 @@ void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context c
 <endif>
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -121,13 +137,13 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+@Override public void enter<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
@@ -183,7 +199,7 @@ public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -212,7 +228,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<file.parserName><if(file.genLean)>Contexts<endif>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
@@ -221,7 +237,27 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+<if(parser.file.genContexts)>
+<Parser_Contexts(...)>
+<elseif(parser.file.genDFA)>
+<Parser_DFA(...)>
+<else>
 <Parser_(ctor="parser_ctor", ...)>
+<endif>
+>>
+
+Parser_Contexts(parser, funcs) ::= <<
+public abstract class <parser.name>Contexts {
+	<funcs; separator="\n">
+}
+>>
+
+Parser_DFA(parser, atn) ::= <<
+@SuppressWarnings({"UnnecessaryUnicodeEscape", "UnnecessaryStringEscape"})
+abstract class <parser.name>DFA {
+	static final DFA[] _decisionToDFA;
+	<atn>
+}
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
@@ -229,7 +265,11 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 public class <parser.name> extends <superClass; null="Parser"> {
 	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
+<if(parser.file.genLean)>
+	protected static final DFA[] _decisionToDFA = <parser.name>DFA._decisionToDFA;
+<else>
 	protected static final DFA[] _decisionToDFA;
+<endif>
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	<if(parser.tokens)>
@@ -270,14 +310,18 @@ public class <parser.name> extends <superClass; null="Parser"> {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+	return <f.name>_sempred((<if(parser.file.genLean)><parser.name>Contexts.<endif><f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
 	<sempredFuncs.values; separator="\n">
 <endif>
-
+<if(parser.file.genLean)>
+	public static final String _serializedATN = <parser.name>DFA._serializedATN;
+	public static final ATN _ATN = <parser.name>DFA._ATN;
+<else>
 	<atn>
+<endif>
 }
 >>
 
@@ -308,7 +352,6 @@ static {
 		if (tokenNames[i] == null) {
 			tokenNames[i] = VOCABULARY.getSymbolicName(i);
 		}
-
 		if (tokenNames[i] == null) {
 			tokenNames[i] = "\<INVALID>";
 		}
@@ -317,15 +360,10 @@ static {
 
 @Override
 @Deprecated
-public String[] getTokenNames() {
-	return tokenNames;
-}
+public String[] getTokenNames() { return tokenNames; }
 
 @Override
-
-public Vocabulary getVocabulary() {
-	return VOCABULARY;
-}
+public Vocabulary getVocabulary() { return VOCABULARY; }
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -380,7 +418,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
+private boolean <r.name>_sempred(<if(parser.file.genLean)><parser.name>Contexts.<endif><r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
 case <index>:
@@ -391,12 +429,14 @@ case <index>:
 >>
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
-
+<if(!parser.file.genLean)>
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+<endif>
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>);
+<if(!parser.file.genContexts)>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=",">) throws RecognitionException {
+	<if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> _localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.escapedName>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -407,40 +447,42 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 		<code>
 		<postamble; separator="\n">
 		<namedActions.after>
-	}
 	<if(exceptions)>
-	<exceptions; separator="\n">
+	} <exceptions; separator="\n"> finally {
 	<else>
-	catch (RecognitionException re) {
+	} catch (RecognitionException re) {
 		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
-	}
+	} finally {
 	<endif>
-	finally {
 		<finallyAction>
 		exitRule();
 	}
 	return _localctx;
 }
+<endif>
 >>
 
 LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
 
+<if(!parser.file.genLean)>
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+<endif>
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) throws RecognitionException {
+<if(!parser.file.genContexts)>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) throws RecognitionException {
 	return <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
 }
 
-private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>) throws RecognitionException {
+private <if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
-	<currentRule.ctxType> _prevctx = _localctx;
+	<if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> _localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.escapedName>}>);
+	<if(parser.file.genLean)><parser.name>Contexts.<endif><currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
 	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
 	<namedActions.init>
@@ -464,10 +506,11 @@ private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>
 	}
 	return _localctx;
 }
+<endif>
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
 enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -793,7 +836,7 @@ public static class <struct.escapedName> extends <if(contextSuperClass)><context
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
-	@Override public int getRuleIndex() { return RULE_<struct.derivedFromName>; }
+	@Override public int getRuleIndex() { return <if(parser.file.genContexts)><parser.name>.<endif>RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.escapedName>() { }
 	public void copyFrom(<struct.escapedName> ctx) {
@@ -834,10 +877,10 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 AttributeDecl(d) ::= "<d.type> <d.escapedName><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.escapedName>"
+labelref(x) ::= "<if(!x.isLocal)>((<if(parser.file.genLean)><parser.name>Contexts.<endif><x.ctx.name>)_localctx).<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "((<if(parser.file.genLean)><parser.name>Contexts.<endif><actionChunk.ctx.name>)_localctx)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
@@ -845,7 +888,7 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _parentState);
+_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><ctxName>Context(_parentctx, _parentState);
 <if(label)>
 <if(isListLabel)>
 _localctx.<label>.add(_prevctx);
@@ -857,7 +900,7 @@ pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
+_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><currentAltLabel; format="cap">Context(new <if(parser.file.genLean)><parser.name>Contexts.<endif><ruleName; format="cap">Context(_parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
 ((<currentAltLabel; format="cap">Context)_localctx).<label>.add(_prevctx);
@@ -869,7 +912,7 @@ pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-_localctx = new <ctxName>Context(_localctx);
+_localctx = new <if(parser.file.genLean)><parser.name>Contexts.<endif><ctxName>Context(_localctx);
 _ctx = _localctx;
 _prevctx = _localctx;
 >>

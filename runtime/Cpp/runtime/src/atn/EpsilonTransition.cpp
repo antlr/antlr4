@@ -3,6 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "atn/EpsilonTransition.h"
 
 using namespace antlr4::atn;

@@ -5,7 +5,11 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "Recognizer.h"
+#include "antlr4-common.h"
 #include "support/CPPUtils.h"
 #include "atn/SemanticContextType.h"
 

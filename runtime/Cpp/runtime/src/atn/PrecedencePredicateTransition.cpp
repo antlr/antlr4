@@ -3,6 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <string>
+#include <cstddef>
+#include "atn/ATNState.h"
+#include "atn/TransitionType.h"
 #include "atn/PrecedencePredicateTransition.h"
 
 using namespace antlr4::atn;

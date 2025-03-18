@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "ANTLRInputStream.h"
 
 namespace antlr4 {
@@ -21,7 +24,7 @@ namespace antlr4 {
 
     // Assumes a file name encoded in UTF-8 and file content in the same encoding (with or w/o BOM).
     virtual void loadFromFile(const std::string &fileName);
-    virtual std::string getSourceName() const override;
+    std::string getSourceName() const override;
 
   private:
     std::string _fileName; // UTF-8 encoded file name.

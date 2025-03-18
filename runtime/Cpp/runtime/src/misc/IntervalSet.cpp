@@ -3,7 +3,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "misc/MurmurHash.h"
+#include "misc/Interval.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "Lexer.h"
 #include "Exceptions.h"
 #include "Vocabulary.h"

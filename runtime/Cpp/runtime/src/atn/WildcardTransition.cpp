@@ -3,8 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string>
+#include <cstddef>
 #include "atn/ATNState.h"
 
+#include "atn/TransitionType.h"
 #include "atn/WildcardTransition.h"
 
 using namespace antlr4::atn;

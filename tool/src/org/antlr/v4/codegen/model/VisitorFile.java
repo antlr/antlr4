@@ -16,6 +16,7 @@ import java.util.*;
 
 public class VisitorFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public boolean genLean; // from -split-parser cmd-line
 	public String accessLevel; // from -DaccessLevel cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
@@ -57,6 +58,7 @@ public class VisitorFile extends OutputFile {
 		if ( ast!=null && ast.getScope()==null)
 			header = new Action(factory, ast);
 		genPackage = g.tool.genPackage;
+		genLean = g.tool.gen_split_parser;
 		accessLevel = g.getOptionString("accessLevel");
 		exportMacro = g.getOptionString("exportMacro");
 	}

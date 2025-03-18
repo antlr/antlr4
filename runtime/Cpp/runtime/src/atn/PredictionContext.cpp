@@ -3,7 +3,18 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <unordered_set>
+#include <unordered_map>
+#include <sstream>
+#include <cassert>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "atn/SingletonPredictionContext.h"
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 #include "atn/ArrayPredictionContext.h"
 #include "atn/PredictionContextCache.h"

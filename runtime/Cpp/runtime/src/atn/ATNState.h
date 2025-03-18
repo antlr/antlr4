@@ -5,7 +5,12 @@
 
 #pragma once
 
+#include <limits>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "misc/IntervalSet.h"
+#include "antlr4-common.h"
 #include "atn/Transition.h"
 #include "atn/ATNStateType.h"
 

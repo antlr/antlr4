@@ -1,7 +1,7 @@
 import codecs
 import sys
 
-from antlr4.InputStream import InputStream
+from .InputStream import InputStream
 
 
 class StdinStream(InputStream):

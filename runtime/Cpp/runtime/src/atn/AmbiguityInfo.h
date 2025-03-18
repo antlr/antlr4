@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <cstddef>
 #include "atn/DecisionEventInfo.h"
+#include "antlr4-common.h"
 #include "support/BitSet.h"
 
 namespace antlr4 {

@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Dfa
 			{
 				this.precedenceDfa = true;
 				DFAState precedenceState = new DFAState(new ATNConfigSet());
-				precedenceState.edges = new DFAState[0];
+				precedenceState.edges = Collections.EmptyList<DFAState>();
 				precedenceState.isAcceptState = false;
 				precedenceState.requiresFullContext = false;
 				this.s0 = precedenceState;

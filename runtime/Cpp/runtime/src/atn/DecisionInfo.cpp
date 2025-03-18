@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <string>
+#include <cstddef>
 #include "atn/ErrorInfo.h"
 #include "atn/LookaheadEventInfo.h"
 

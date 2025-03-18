@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include "antlr4-common.h"
+#include "Token.h"
 #include "BufferedTokenStream.h"
 
 namespace antlr4 {
@@ -55,7 +58,7 @@ namespace antlr4 {
      */
     CommonTokenStream(TokenSource *tokenSource, size_t channel);
 
-    virtual Token* LT(ssize_t k) override;
+    Token* LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();
@@ -70,9 +73,9 @@ namespace antlr4 {
      */
     size_t channel;
 
-    virtual ssize_t adjustSeekIndex(size_t i) override;
+    ssize_t adjustSeekIndex(size_t i) override;
 
-    virtual Token* LB(size_t k) override;
+    Token* LB(size_t k) override;
 
   };
 

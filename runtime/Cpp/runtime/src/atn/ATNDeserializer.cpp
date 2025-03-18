@@ -5,6 +5,8 @@
 
 #include "atn/ATNDeserializationOptions.h"
 
+#include "atn/ATNStateType.h"
+#include "antlr4-common.h"
 #include "atn/ATNType.h"
 #include "atn/ATNState.h"
 #include "atn/ATN.h"
@@ -52,6 +54,10 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <string_view>
+#include <memory>
+#include <utility>
+#include <cstddef>
 #include <cassert>
 #include <string>
 #include <vector>

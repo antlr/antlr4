@@ -5,7 +5,16 @@
 
 #pragma once
 
+#include <string_view>
+#include <limits>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "ProxyErrorListener.h"
+#include "ANTLRErrorListener.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "support/Casts.h"
 #include "atn/SerializedATNView.h"
 #include "internal/Synchronization.h"

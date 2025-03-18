@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "atn/ATNState.h"
 #include "support/BitSet.h"
 
 namespace antlr4 {

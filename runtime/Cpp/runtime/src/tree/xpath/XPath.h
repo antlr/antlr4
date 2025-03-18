@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
+#include "Token.h"
 #include "antlr4-common.h"
 
 namespace antlr4 {

@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <map>
+#include <memory>
+#include <vector>
+#include <string>
+#include "antlr4-common.h"
+#include "Token.h"
 #include "Exceptions.h"
 
 namespace antlr4 {
@@ -73,7 +79,7 @@ namespace pattern {
     class CannotInvokeStartRule : public RuntimeException {
     public:
       CannotInvokeStartRule(const RuntimeException &e);
-      ~CannotInvokeStartRule();
+      ~CannotInvokeStartRule() override;
     };
 
     // Fixes https://github.com/antlr/antlr4/issues/413
@@ -82,7 +88,7 @@ namespace pattern {
     public:
       StartRuleDoesNotConsumeFullPattern() = default;
       StartRuleDoesNotConsumeFullPattern(StartRuleDoesNotConsumeFullPattern const&) = default;
-      ~StartRuleDoesNotConsumeFullPattern();
+      ~StartRuleDoesNotConsumeFullPattern() override;
 
       StartRuleDoesNotConsumeFullPattern& operator=(StartRuleDoesNotConsumeFullPattern const&) = default;
     };

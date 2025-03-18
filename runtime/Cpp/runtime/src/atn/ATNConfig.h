@@ -5,9 +5,14 @@
 
 #pragma once
 
+#include <unordered_set>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <cassert>
 
 #include "antlr4-common.h"
+#include "atn/ATNState.h"
 #include "atn/SemanticContext.h"
 
 namespace antlr4 {

@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <string>
 #include "IntStream.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 
 namespace antlr4 {
@@ -13,7 +15,7 @@ namespace antlr4 {
   /// A source of characters for an ANTLR lexer.
   class ANTLR4CPP_PUBLIC CharStream : public IntStream {
   public:
-    virtual ~CharStream();
+    ~CharStream() override;
 
     /// This method returns the text for a range of characters within this input
     /// stream. This method is guaranteed to not throw an exception if the

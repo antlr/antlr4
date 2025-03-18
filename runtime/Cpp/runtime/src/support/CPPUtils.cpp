@@ -3,6 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <exception>
+#include <sstream>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "support/CPPUtils.h"
 
 namespace antlrcpp {

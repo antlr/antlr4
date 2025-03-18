@@ -3,7 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <exception>
+#include <string>
+#include <cstddef>
 #include "BaseErrorListener.h"
+#include "Token.h"
 #include "RecognitionException.h"
 
 using namespace antlr4;

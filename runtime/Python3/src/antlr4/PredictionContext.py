@@ -3,9 +3,9 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
-from antlr4.RuleContext import RuleContext
-from antlr4.atn.ATN import ATN
-from antlr4.error.Errors import IllegalStateException
+from .RuleContext import RuleContext
+from .atn.ATN import ATN
+from .error.Errors import IllegalStateException
 from io import StringIO
 
 # dup ParserATNSimulator class var here to avoid circular import; no idea why this can't be in PredictionContext

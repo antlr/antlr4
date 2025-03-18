@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "misc/IntervalSet.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "atn/Transition.h"
 
 namespace antlr4 {
@@ -23,10 +29,10 @@ namespace atn {
 
     AtomTransition(ATNState *target, size_t label);
 
-    virtual misc::IntervalSet label() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    misc::IntervalSet label() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
   };
 
 } // namespace atn

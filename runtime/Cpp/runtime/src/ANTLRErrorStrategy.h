@@ -5,9 +5,12 @@
 
 #pragma once
 
+#include <exception>
+#include "antlr4-common.h"
 #include "Token.h"
 
 namespace antlr4 {
+  class Parser;
 
   /// <summary>
   /// The interface for defining strategies to deal with syntax errors encountered

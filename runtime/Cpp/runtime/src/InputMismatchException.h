@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "antlr4-common.h"
 #include "RecognitionException.h"
 
 namespace antlr4 {
@@ -17,7 +18,7 @@ namespace antlr4 {
   public:
     InputMismatchException(Parser *recognizer);
     InputMismatchException(InputMismatchException const&) = default;
-    ~InputMismatchException();
+    ~InputMismatchException() override;
     InputMismatchException& operator=(InputMismatchException const&) = default;
   };
 

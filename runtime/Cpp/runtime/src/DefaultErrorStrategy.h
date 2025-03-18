@@ -5,7 +5,14 @@
 
 #pragma once
 
+#include <exception>
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "ANTLRErrorStrategy.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "misc/IntervalSet.h"
 
 namespace antlr4 {
@@ -18,7 +25,7 @@ namespace antlr4 {
   public:
     DefaultErrorStrategy();
     DefaultErrorStrategy(DefaultErrorStrategy const& other) = delete;
-    virtual ~DefaultErrorStrategy();
+    ~DefaultErrorStrategy() override;
 
     DefaultErrorStrategy& operator = (DefaultErrorStrategy const& other) = delete;
 
@@ -49,7 +56,7 @@ namespace antlr4 {
     /// ensure that the handler is not in error recovery mode.
     /// </summary>
   public:
-    virtual void reset(Parser *recognizer) override;
+    void reset(Parser *recognizer) override;
 
     /// <summary>
     /// This method is called to enter error recovery mode when a recognition
@@ -63,7 +70,7 @@ namespace antlr4 {
     /// {@inheritDoc}
     /// </summary>
   public:
-    virtual bool inErrorRecoveryMode(Parser *recognizer) override;
+    bool inErrorRecoveryMode(Parser *recognizer) override;
 
     /// <summary>
     /// This method is called to leave error recovery mode after recovering from
@@ -79,7 +86,7 @@ namespace antlr4 {
     /// The default implementation simply calls <seealso cref="#endErrorCondition"/>.
     /// </summary>
   public:
-    virtual void reportMatch(Parser *recognizer) override;
+    void reportMatch(Parser *recognizer) override;
 
     /// {@inheritDoc}
     /// <p/>
@@ -98,7 +105,7 @@ namespace antlr4 {
     /// <li>All other types: calls <seealso cref="Parser#notifyErrorListeners"/> to report
     /// the exception</li>
     /// </ul>
-    virtual void reportError(Parser *recognizer, const RecognitionException &e) override;
+    void reportError(Parser *recognizer, const RecognitionException &e) override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -107,7 +114,7 @@ namespace antlr4 {
     /// until we find one in the resynchronization set--loosely the set of tokens
     /// that can follow the current rule.
     /// </summary>
-    virtual void recover(Parser *recognizer, std::exception_ptr e) override;
+    void recover(Parser *recognizer, std::exception_ptr e) override;
 
     /**
      * The default implementation of {@link ANTLRErrorStrategy#sync} makes sure
@@ -155,7 +162,7 @@ namespace antlr4 {
      * some reason speed is suffering for you, you can turn off this
      * functionality by simply overriding this method as a blank { }.</p>
      */
-    virtual void sync(Parser *recognizer) override;
+    void sync(Parser *recognizer) override;
 
     /// <summary>
     /// This is called by <seealso cref="#reportError"/> when the exception is a
@@ -278,7 +285,7 @@ namespace antlr4 {
      * is in the set of tokens that can follow the {@code ')'} token reference
      * in rule {@code atom}. It can assume that you forgot the {@code ')'}.
      */
-    virtual Token* recoverInline(Parser *recognizer) override;
+    Token* recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// This method implements the single-token insertion inline error recovery

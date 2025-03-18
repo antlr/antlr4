@@ -3,7 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <cstddef>
 #include "atn/ParserATNSimulator.h"
+#include "atn/TransitionType.h"
 #include "Parser.h"
 #include "atn/PredicateTransition.h"
 #include "atn/ATN.h"

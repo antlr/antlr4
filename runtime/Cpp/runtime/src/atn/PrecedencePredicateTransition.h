@@ -5,7 +5,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "atn/Transition.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
+#include "antlr4-common.h"
 #include "atn/SemanticContext.h"
 
 namespace antlr4 {

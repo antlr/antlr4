@@ -33,7 +33,8 @@ import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
-// eslint-disable-next-line no-unused-vars
+// @ts-ignore
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 type int = number;
 
 <namedActions.header>

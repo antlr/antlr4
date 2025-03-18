@@ -3,7 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "tree/ErrorNode.h"
+#include "antlr4-common.h"
 #include "Parser.h"
 #include "ParserRuleContext.h"
 #include "support/CPPUtils.h"

@@ -9,7 +9,7 @@ namespace Antlr4.Runtime.Sharpen
 
     public class BitSet
     {
-        private static readonly ulong[] EmptyBits = new ulong[0];
+        private static readonly ulong[] EmptyBits = Collections.EmptyList<ulong>();
         private const int BitsPerElement = 8 * sizeof(ulong);
 
         private ulong[] _data = EmptyBits;

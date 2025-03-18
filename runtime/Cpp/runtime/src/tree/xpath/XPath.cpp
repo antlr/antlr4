@@ -3,7 +3,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "XPathLexer.h"
+#include "ANTLRInputStream.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "XPathLexerErrorListener.h"
 #include "XPathElement.h"
 #include "XPathWildcardAnywhereElement.h"
