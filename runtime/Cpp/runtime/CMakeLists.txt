@@ -3,11 +3,13 @@ option(TRACE_ATN "Trace ATN simulation" OFF)
 option(ANTLR_BUILD_SHARED "Build the shared library of the ANTLR runtime" ON)
 option(ANTLR_BUILD_STATIC "Build the static library of the ANTLR runtime" ON)
 
+include(GNUInstallDirs)
+
 if (NOT ANTLR_BUILD_SHARED AND NOT ANTLR_BUILD_STATIC)
   message(FATAL_ERROR "Options ANTLR_BUILD_SHARED and ANTLR_BUILD_STATIC can't both be OFF")
 endif()
 
-set(libantlrcpp_INCLUDE_INSTALL_DIR "include/antlr4-runtime")
+set(libantlrcpp_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/antlr4-runtime")
 
 set(libantlrcpp_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/runtime/src
