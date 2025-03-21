@@ -9,6 +9,12 @@
 
 // IWYU pragma: begin_exports
 
+// antlr4-common.h undef EOF, so we need to save it and recover later.
+#ifdef EOF
+#pragma push_macro("EOF")
+#define ANTLR_SAVED_EOF
+#endif
+
 #include "antlr4-common.h"
 
 #include "ANTLRErrorListener.h"
@@ -168,5 +174,9 @@
 #include "tree/xpath/XPathWildcardAnywhereElement.h"
 #include "tree/xpath/XPathWildcardElement.h"
 #include "internal/Synchronization.h"
+
+#ifdef ANTLR_SAVED_EOF
+#pragma pop_macro("EOF")
+#endif
 
 // IWYU pragma: end_exports
