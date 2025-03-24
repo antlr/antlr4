@@ -1,7 +1,4 @@
-import type { ParserRuleContext } from '../context/ParserRuleContext.js';
 import type { HashCode } from '../misc/HashCode';
-import type { Recognizer } from '../Recognizer.js';
-import type { Token } from '../Token.js';
 import type { SemanticContext } from './SemanticContext';
 
 export declare class PrecedencePredicate extends SemanticContext {

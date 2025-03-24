@@ -1,4 +1,3 @@
-
 export declare class HashCode {
 	count: number;
 	hash: number;

@@ -1,6 +1,7 @@
 import type { IntervalSet } from '../misc/IntervalSet';
 import type { ATNState } from '../state/ATNState';
 import type { Transition } from './Transition';
+
 export declare class SetTransition extends Transition {
 	serializationType: number
 
