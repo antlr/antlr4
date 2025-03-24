@@ -57,6 +57,9 @@ import RangeTransition from './transition/RangeTransition.js';
 import RuleTransition from './transition/RuleTransition.js';
 import SetTransition from './transition/SetTransition.js';
 import WildcardTransition from './transition/WildcardTransition.js';
+import RuleStartState from './state/RuleStartState.js';
+import RuleStopState from './state/RuleStopState.js';
+
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
@@ -68,5 +71,6 @@ export {
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
-    arrayToString, TokenStreamRewriter, InputMismatchException, Transition, ActionTransition, AtomTransition, EpsilonTransition, NotSetTransition, PrecedencePredicateTransition, PredicateTransition, RangeTransition, RuleTransition, SetTransition, WildcardTransition
+    arrayToString, TokenStreamRewriter, InputMismatchException, Transition, ActionTransition, AtomTransition, EpsilonTransition, NotSetTransition, 
+    PrecedencePredicateTransition, PredicateTransition, RangeTransition, RuleTransition, SetTransition, WildcardTransition, RuleStartState, RuleStopState
 }

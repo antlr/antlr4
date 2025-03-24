@@ -47,6 +47,18 @@ import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
 import TokenStreamRewriter from './TokenStreamRewriter.js';
 import InputMismatchException from "./error/InputMismatchException.js"
+import Transition from "./transition/Transition.js"
+import ActionTransition from './transition/ActionTransition.js';
+import AtomTransition from './transition/AtomTransition.js';
+import EpsilonTransition from './transition/EpsilonTransition.js';
+import NotSetTransition from './transition/NotSetTransition.js';
+import PrecedencePredicateTransition from './transition/PrecedencePredicateTransition.js';
+import PredicateTransition from './transition/PredicateTransition.js'; 
+import RangeTransition from './transition/RangeTransition.js';
+import RuleTransition from './transition/RuleTransition.js';
+import SetTransition from './transition/SetTransition.js';
+import WildcardTransition from './transition/WildcardTransition.js';
+
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
@@ -58,5 +70,6 @@ export {
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
     PredictionMode, LL1Analyzer, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
-    arrayToString, TokenStreamRewriter, InputMismatchException
+    arrayToString, TokenStreamRewriter, InputMismatchException, Transition, ActionTransition, AtomTransition, EpsilonTransition, NotSetTransition, 
+    PrecedencePredicateTransition, PredicateTransition, RangeTransition, RuleTransition, SetTransition, WildcardTransition, RuleStartState, RuleStopState
 }
