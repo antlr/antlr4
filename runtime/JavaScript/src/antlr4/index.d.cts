@@ -19,3 +19,4 @@ export * from "./state";
 export * from "./error";
 export * from "./utils";
 export * from "./TokenStreamRewriter";
+export * from "./transition"
