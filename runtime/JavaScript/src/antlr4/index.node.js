@@ -58,6 +58,8 @@ import RangeTransition from './transition/RangeTransition.js';
 import RuleTransition from './transition/RuleTransition.js';
 import SetTransition from './transition/SetTransition.js';
 import WildcardTransition from './transition/WildcardTransition.js';
+import RuleStartState from './state/RuleStartState.js';
+import RuleStopState from './state/RuleStopState.js';
 
 
 export default {
