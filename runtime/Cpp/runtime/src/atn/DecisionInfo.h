@@ -5,7 +5,11 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "atn/ContextSensitivityInfo.h"
+#include "antlr4-common.h"
 #include "atn/AmbiguityInfo.h"
 #include "atn/PredicateEvalInfo.h"
 #include "atn/ErrorInfo.h"

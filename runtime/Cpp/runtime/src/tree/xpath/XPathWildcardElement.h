@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <vector>
+#include "antlr4-common.h"
 #include "XPathElement.h"
 
 namespace antlr4 {
@@ -15,7 +17,7 @@ namespace xpath {
   public:
     XPathWildcardElement();
 
-    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
+    std::vector<ParseTree *> evaluate(ParseTree *t) override;
   };
 
 } // namespace xpath

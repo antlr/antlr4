@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <vector>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "atn/DecisionInfo.h"
 
 namespace antlr4 {

@@ -23,8 +23,12 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 // WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cassert>
+#include <utility>
+#include <cstddef>
 #include "atn/PredictionContextMergeCache.h"
 
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 
 using namespace antlr4::atn;

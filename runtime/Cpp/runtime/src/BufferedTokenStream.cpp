@@ -3,7 +3,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <cstddef>
 #include "WritableToken.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "Lexer.h"
 #include "RuleContext.h"
 #include "misc/Interval.h"

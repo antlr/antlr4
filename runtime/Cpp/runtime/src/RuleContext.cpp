@@ -3,7 +3,13 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "tree/Trees.h"
+#include "tree/ParseTreeType.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 #include "Parser.h"
 #include "atn/ATN.h"

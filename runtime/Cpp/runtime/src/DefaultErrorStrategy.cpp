@@ -3,7 +3,13 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <exception>
+#include <string>
+#include <cstddef>
 #include "NoViableAltException.h"
+#include "atn/ATNStateType.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "misc/IntervalSet.h"
 #include "atn/ParserATNSimulator.h"
 #include "InputMismatchException.h"

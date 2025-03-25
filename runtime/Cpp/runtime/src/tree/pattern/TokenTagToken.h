@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include "antlr4-common.h"
 #include "CommonToken.h"
 
 namespace antlr4 {
@@ -64,7 +66,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns the token tag
     /// formatted with {@code <} and {@code >} delimiters.
     /// </summary>
-    virtual std::string getText() const override;
+    std::string getText() const override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -72,7 +74,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns a string of the form
     /// {@code tokenName:type}.
     /// </summary>
-    virtual std::string toString() const override;
+    std::string toString() const override;
   };
 
 } // namespace pattern

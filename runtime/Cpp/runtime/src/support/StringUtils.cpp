@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string_view>
+#include <string>
 #include "support/StringUtils.h"
 
 namespace antlrcpp {

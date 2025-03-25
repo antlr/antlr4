@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "tree/TerminalNode.h"
 #include "tree/ErrorNode.h"
 #include "misc/Interval.h"

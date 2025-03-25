@@ -5,13 +5,16 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "Token.h"
 
 namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC WritableToken : public Token {
   public:
-    virtual ~WritableToken();
+    ~WritableToken() override;
     virtual void setText(const std::string &text) = 0;
     virtual void setType(size_t ttype) = 0;
     virtual void setLine(size_t line) = 0;

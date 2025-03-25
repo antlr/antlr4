@@ -7,6 +7,7 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
@@ -102,7 +103,8 @@ public class GoTarget extends Target {
 		}
 	}
 
-	public String getRecognizerFileName(boolean header) {
+	@Override
+	public String getRecognizerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g!=null;
@@ -124,7 +126,8 @@ public class GoTarget extends Target {
 	/** A given grammar T, return the listener name such as
 	 *  TListener.java, if we're using the Java target.
  	 */
-	public String getListenerFileName(boolean header) {
+	@Override
+	public String getListenerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -134,7 +137,8 @@ public class GoTarget extends Target {
 	/** A given grammar T, return the visitor name such as
 	 *  TVisitor.java, if we're using the Java target.
  	 */
-	public String getVisitorFileName(boolean header) {
+	@Override
+	public String getVisitorFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -144,7 +148,8 @@ public class GoTarget extends Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseListenerFileName(boolean header) {
+	@Override
+	public String getBaseListenerFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
@@ -154,7 +159,8 @@ public class GoTarget extends Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseVisitorFileName(boolean header) {
+	@Override
+	public String getBaseVisitorFileName(SourceType sourceType) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;

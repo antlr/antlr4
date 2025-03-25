@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+#include "tree/ParseTreeType.h"
 #include "tree/TerminalNode.h"
 
 namespace antlr4 {

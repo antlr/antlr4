@@ -3,7 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
+#include <cassert>
+#include <utility>
+#include <vector>
+#include <cstddef>
 #include "atn/PredictionContext.h"
+#include "atn/ATNState.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfig.h"
 #include "atn/ATNSimulator.h"
 #include "Exceptions.h"

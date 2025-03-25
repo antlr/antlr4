@@ -3,8 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <utility>
+#include <cstddef>
 #include "SemanticContext.h"
 
+#include "antlr4-common.h"
 #include "atn/PredicateEvalInfo.h"
 
 using namespace antlr4;

@@ -25,9 +25,12 @@
 
 #pragma once
 
+#include <memory>
+#include <cstddef>
 #include <utility>
 
 #include "atn/PredictionContext.h"
+#include "antlr4-common.h"
 #include "atn/PredictionContextMergeCacheOptions.h"
 #include "FlatHashMap.h"
 

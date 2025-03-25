@@ -5,7 +5,13 @@
 
 #pragma once
 
+#include <limits>
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "Recognizer.h"
+#include "antlr4-common.h"
 #include "TokenSource.h"
 #include "CharStream.h"
 #include "Token.h"
@@ -77,12 +83,12 @@ namespace antlr4 {
 
     Lexer();
     Lexer(CharStream *input);
-    virtual ~Lexer() {}
+    ~Lexer() override {}
 
     virtual void reset();
 
     /// Return a token from this source; i.e., match a token on the char stream.
-    virtual std::unique_ptr<Token> nextToken() override;
+    std::unique_ptr<Token> nextToken() override;
 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
@@ -100,14 +106,14 @@ namespace antlr4 {
       this->_factory = factory;
     }
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() override;
+    TokenFactory<CommonToken>* getTokenFactory() override;
 
     /// Set the char stream and reset the lexer
-    virtual void setInputStream(IntStream *input) override;
+    void setInputStream(IntStream *input) override;
 
-    virtual std::string getSourceName() override;
+    std::string getSourceName() override;
 
-    virtual CharStream* getInputStream() override;
+    CharStream* getInputStream() override;
 
     /// By default does not support multiple emits per nextToken invocation
     /// for efficiency reasons. Subclasses can override this method, nextToken,
@@ -124,9 +130,9 @@ namespace antlr4 {
 
     virtual Token* emitEOF();
 
-    virtual size_t getLine() const override;
+    size_t getLine() const override;
 
-    virtual size_t getCharPositionInLine() override;
+    size_t getCharPositionInLine() override;
 
     virtual void setLine(size_t line);
 

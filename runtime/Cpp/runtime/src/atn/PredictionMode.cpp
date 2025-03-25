@@ -3,7 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <unordered_map>
+#include <memory>
+#include <vector>
+#include <cstddef>
 #include "atn/RuleStopState.h"
+#include "antlr4-common.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
 #include "misc/MurmurHash.h"

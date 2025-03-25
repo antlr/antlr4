@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <utility>
+#include <memory>
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
 #include "TokenFactory.h"
 
 namespace antlr4 {
@@ -65,10 +70,10 @@ namespace antlr4 {
      */
     CommonTokenFactory();
 
-    virtual std::unique_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, size_t type,
+    std::unique_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, size_t type,
       const std::string &text, size_t channel, size_t start, size_t stop, size_t line, size_t charPositionInLine) override;
 
-    virtual std::unique_ptr<CommonToken> create(size_t type, const std::string &text) override;
+    std::unique_ptr<CommonToken> create(size_t type, const std::string &text) override;
   };
 
 } // namespace antlr4

@@ -5,9 +5,14 @@
 
 #pragma once
 
+#include <limits>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <atomic>
 
 #include "Recognizer.h"
+#include "antlr4-common.h"
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
 #include "atn/PredictionContextType.h"

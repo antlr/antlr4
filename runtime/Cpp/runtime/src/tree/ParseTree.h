@@ -5,7 +5,11 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
 #include "support/Any.h"
+#include "misc/Interval.h"
+#include "antlr4-common.h"
 #include "tree/ParseTreeType.h"
 
 namespace antlr4 {

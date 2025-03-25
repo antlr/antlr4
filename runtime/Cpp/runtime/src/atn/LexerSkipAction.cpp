@@ -3,7 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <string>
+#include <cstddef>
 #include "misc/MurmurHash.h"
+#include "antlr4-common.h"
 #include "Lexer.h"
 
 #include "atn/LexerSkipAction.h"

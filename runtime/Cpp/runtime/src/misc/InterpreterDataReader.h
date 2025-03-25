@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
 #include "antlr4-common.h"
 #include "atn/ATN.h"
 #include "Vocabulary.h"

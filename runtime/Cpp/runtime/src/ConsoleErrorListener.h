@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <exception>
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "Token.h"
 #include "BaseErrorListener.h"
 
 namespace antlr4 {
@@ -28,7 +33,7 @@ namespace antlr4 {
      * line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
      * </pre>
      */
-    virtual void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
+    void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
                              const std::string &msg, std::exception_ptr e) override;
   };
 

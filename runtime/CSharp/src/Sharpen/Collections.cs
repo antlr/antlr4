@@ -9,7 +9,11 @@ namespace Antlr4.Runtime.Sharpen
 
     internal static class Collections
     {
-        public static T[] EmptyList<T>()
+		/// <remarks>
+		/// Available in .NET as Array.Empty but not to the net45 target.
+		/// See: https://learn.microsoft.com/dotnet/api/system.array.empty.
+		/// </remarks>
+		public static T[] EmptyList<T>()
         {
             return EmptyListImpl<T>.Instance;
         }
@@ -31,10 +35,13 @@ namespace Antlr4.Runtime.Sharpen
 
         private static class EmptyListImpl<T>
         {
-            public static readonly T[] Instance = new T[0];
-        }
+#pragma warning disable CA1825
+            // Provides a solution for CA1825.
+			public static readonly T[] Instance = new T[0];
+#pragma warning restore CA1825
+		}
 
-        private static class EmptyMapImpl<TKey, TValue>
+		private static class EmptyMapImpl<TKey, TValue>
         {
             public static readonly ReadOnlyDictionary<TKey, TValue> Instance =
                 new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());

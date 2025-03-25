@@ -5,8 +5,15 @@
 
 #include "atn/ArrayPredictionContext.h"
 
+#include <memory>
+#include <sstream>
+#include <cassert>
+#include <utility>
+#include <vector>
+#include <string>
 #include <cstring>
 
+#include "antlr4-common.h"
 #include "atn/SingletonPredictionContext.h"
 #include "atn/HashUtils.h"
 #include "misc/MurmurHash.h"

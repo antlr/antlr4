@@ -3,10 +3,16 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include <functional>
 #include <unordered_set>
 
 #include "misc/MurmurHash.h"
+#include "antlr4-common.h"
 #include "support/Casts.h"
 #include "support/CPPUtils.h"
 #include "support/Arrays.h"

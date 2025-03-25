@@ -1,3 +1,4 @@
+#include <string>
 #include "atn/ATNStateType.h"
 
 std::string antlr4::atn::atnStateTypeName(ATNStateType atnStateType) {

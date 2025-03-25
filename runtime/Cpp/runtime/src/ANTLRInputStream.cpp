@@ -3,9 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string_view>
+#include <cassert>
+#include <utility>
+#include <string>
 #include <string.h>
 
 #include "Exceptions.h"
+#include "antlr4-common.h"
 #include "misc/Interval.h"
 #include "IntStream.h"
 

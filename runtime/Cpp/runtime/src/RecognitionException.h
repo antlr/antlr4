@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "misc/IntervalSet.h"
+#include "Token.h"
 #include "Exceptions.h"
 
 namespace antlr4 {
@@ -34,7 +39,7 @@ namespace antlr4 {
     RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                          ParserRuleContext *ctx, Token *offendingToken = nullptr);
     RecognitionException(RecognitionException const&) = default;
-    ~RecognitionException();
+    ~RecognitionException() override;
     RecognitionException& operator=(RecognitionException const&) = default;
 
     /// Get the ATN state number the parser was in at the time the error

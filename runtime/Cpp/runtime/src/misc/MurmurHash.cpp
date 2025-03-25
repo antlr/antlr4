@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstring>
 
+#include "antlr4-common.h"
 #include "misc/MurmurHash.h"
 
 using namespace antlr4::misc;

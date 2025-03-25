@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "misc/Interval.h"
+#include "Token.h"
 #include "IntStream.h"
 
 namespace antlr4 {
@@ -22,7 +27,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= IntStream#LA </seealso>
   public:
-    virtual ~TokenStream();
+    ~TokenStream() override;
 
     virtual Token* LT(ssize_t k) = 0;
 

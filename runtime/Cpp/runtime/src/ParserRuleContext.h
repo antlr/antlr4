@@ -5,7 +5,14 @@
 
 #pragma once
 
+#include <exception>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "RuleContext.h"
+#include "misc/Interval.h"
+#include "Token.h"
+#include "antlr4-common.h"
 #include "support/CPPUtils.h"
 
 namespace antlr4 {
@@ -123,7 +130,7 @@ namespace antlr4 {
       return contexts;
     }
 
-    virtual misc::Interval getSourceInterval() override;
+    misc::Interval getSourceInterval() override;
 
     /**
      * Get the initial token in this context.

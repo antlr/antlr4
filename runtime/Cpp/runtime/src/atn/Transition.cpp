@@ -3,7 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <sstream>
 #include "Exceptions.h"
+#include "misc/IntervalSet.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "support/Arrays.h"
 
 #include "atn/Transition.h"

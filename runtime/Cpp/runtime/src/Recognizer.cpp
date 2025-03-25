@@ -3,7 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string_view>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstddef>
 #include "ConsoleErrorListener.h"
+#include "ANTLRErrorListener.h"
+#include "atn/ATNState.h"
 #include "RecognitionException.h"
 #include "support/CPPUtils.h"
 #include "Token.h"

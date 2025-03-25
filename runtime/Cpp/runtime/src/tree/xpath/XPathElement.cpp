@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <vector>
+#include <string>
 #include "support/CPPUtils.h"
 
 #include "XPathElement.h"

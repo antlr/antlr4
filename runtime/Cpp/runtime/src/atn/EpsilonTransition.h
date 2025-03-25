@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "atn/TransitionType.h"
+#include "atn/ATNState.h"
 #include "atn/Transition.h"
 
 namespace antlr4 {
@@ -29,10 +34,10 @@ namespace atn {
      */
     size_t outermostPrecedenceReturn() const;
 
-    virtual bool isEpsilon() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    bool isEpsilon() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::string toString() const override;
+    std::string toString() const override;
 
   private:
     const size_t _outermostPrecedenceReturn; // A rule index.

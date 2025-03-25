@@ -5,6 +5,13 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+#include <string>
+#include <cstddef>
+#include "antlr4-common.h"
+#include "misc/Interval.h"
+#include "Token.h"
 #include "TokenStream.h"
 
 namespace antlr4 {
@@ -28,24 +35,24 @@ namespace antlr4 {
 
     BufferedTokenStream& operator = (const BufferedTokenStream& other) = delete;
 
-    virtual TokenSource* getTokenSource() const override;
-    virtual size_t index() override;
-    virtual ssize_t mark() override;
+    TokenSource* getTokenSource() const override;
+    size_t index() override;
+    ssize_t mark() override;
 
-    virtual void release(ssize_t marker) override;
+    void release(ssize_t marker) override;
     virtual void reset();
-    virtual void seek(size_t index) override;
+    void seek(size_t index) override;
 
-    virtual size_t size() override;
-    virtual void consume() override;
+    size_t size() override;
+    void consume() override;
 
-    virtual Token* get(size_t i) const override;
+    Token* get(size_t i) const override;
 
     /// Get all tokens from start..stop inclusively.
     virtual std::vector<Token *> get(size_t start, size_t stop);
 
-    virtual size_t LA(ssize_t i) override;
-    virtual Token* LT(ssize_t k) override;
+    size_t LA(ssize_t i) override;
+    Token* LT(ssize_t k) override;
 
     /// Reset this token stream by setting its token source.
     virtual void setTokenSource(TokenSource *tokenSource);
@@ -85,11 +92,11 @@ namespace antlr4 {
     /// </summary>
     virtual std::vector<Token *> getHiddenTokensToLeft(size_t tokenIndex);
 
-    virtual std::string getSourceName() const override;
-    virtual std::string getText() override;
-    virtual std::string getText(const misc::Interval &interval) override;
-    virtual std::string getText(RuleContext *ctx) override;
-    virtual std::string getText(Token *start, Token *stop) override;
+    std::string getSourceName() const override;
+    std::string getText() override;
+    std::string getText(const misc::Interval &interval) override;
+    std::string getText(RuleContext *ctx) override;
+    std::string getText(Token *start, Token *stop) override;
 
     /// Get all tokens from lexer until EOF.
     virtual void fill();

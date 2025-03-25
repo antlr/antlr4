@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <cstddef>
 #include "antlr4-common.h"
 
 namespace antlr4 {

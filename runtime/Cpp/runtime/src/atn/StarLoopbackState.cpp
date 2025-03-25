@@ -4,6 +4,7 @@
  */
 
 #include "atn/StarLoopEntryState.h"
+#include "atn/ATNStateType.h"
 #include "atn/Transition.h"
 #include "support/Casts.h"
 

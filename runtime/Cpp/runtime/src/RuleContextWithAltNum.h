@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstddef>
+#include "antlr4-common.h"
 #include "ParserRuleContext.h"
 
 namespace antlr4 {
@@ -25,8 +27,8 @@ namespace antlr4 {
     RuleContextWithAltNum();
     RuleContextWithAltNum(ParserRuleContext *parent, int invokingStateNumber);
 
-    virtual size_t getAltNumber() const override;
-    virtual void setAltNumber(size_t altNum) override;
+    size_t getAltNumber() const override;
+    void setAltNumber(size_t altNum) override;
   };
 
 } // namespace antlr4
