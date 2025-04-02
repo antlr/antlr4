@@ -6,7 +6,8 @@
 4. Install and configure [EditorConfig](http://editorconfig.org/) so your text editor or IDE uses the ANTLR 4 coding style
 5. [Build ANTLR 4](doc/building-antlr.md)
 6. [Run the ANTLR project unit tests](doc/antlr-project-testing.md)
-7. Create a [pull request](https://help.github.com/articles/using-pull-requests/) with your changes and make sure you're comparing your `dev`-derived branch in your fork to the `dev` branch from the `antlr/antlr4` repo:
+7.   إنشاء أ.   [طلب السحب.](https://help.github.com/articles/[بدء التشغيل.MD](https://github.com/user-attachments/files/19559938/getting-started.md)
+     استخدام-سحب-طلبات/) مع التغييرات الخاصة بك وتأكد من أنك تقارن الخاص بك. 'dev'-الفرع المشتقة في شوكتك إلى    'ديف.  '    فرع من...    `ANTLR/ANTLR4'ANTLR/ANTLR4.' الريبو:  
 
 <img src="doc/images/PR-on-dev.png" width="600">
 
