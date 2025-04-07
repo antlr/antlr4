@@ -45,13 +45,18 @@ public class CodeGenerator {
 		return create(g.tool, g, g.getLanguage());
 	}
 
-	public static CodeGenerator create(Tool tool, Grammar g, String language) {
+	// Don't inline: used in https://github.com/antlr/antlr4/issues/3874
+	public void initializeTarget() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException {
 		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
+		Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
+		Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
+		this.target = ctor.newInstance(this);
+	}
+
+	public static CodeGenerator create(Tool tool, Grammar g, String language) {
 		try {
-			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
-			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
 			CodeGenerator codeGenerator = new CodeGenerator(tool, g, language);
-			codeGenerator.target = ctor.newInstance(codeGenerator);
+			codeGenerator.initializeTarget();
 			return codeGenerator;
 		}
 		catch (Exception e) {
