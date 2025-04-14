@@ -369,9 +369,9 @@ Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredi
       // same payload (stack tops are equal), must yield merged singleton
       size_t payload = a->returnStates[i];
       // $+$ = $
-      bool both$ = payload == EMPTY_RETURN_STATE && !parentA && !parentB;
+      bool both_dollar = payload == EMPTY_RETURN_STATE && !parentA && !parentB;
       bool ax_ax = (parentA && parentB) && *parentA == *parentB; // ax+ax -> ax
-      if (both$ || ax_ax) {
+      if (both_dollar || ax_ax) {
         mergedParents[k] = parentA; // choose left
         mergedReturnStates[k] = payload;
       } else { // ax+ay -> a'[x,y]
