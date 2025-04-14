@@ -56,7 +56,6 @@ public abstract class RuntimeTests {
 			}
 
 			List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
-
 			File[] descriptorFiles = directory.listFiles();
 			assert descriptorFiles != null;
 			for (File descriptorFile : descriptorFiles) {

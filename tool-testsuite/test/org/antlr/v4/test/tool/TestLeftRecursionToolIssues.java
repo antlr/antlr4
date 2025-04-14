@@ -108,4 +108,30 @@ public class TestLeftRecursionToolIssues {
 		String expected = ""; // dval[1] should not be error
 		testErrors(new String[]{grammar, expected}, false);
 	}
+
+	@Test public void testMutuallyLeftRecursiveRules() {
+		String grammar =
+				"grammar T;\n" +
+				"\n" +
+				"a: e;\n" +
+				"e: a;\n" +
+				"\n" +
+				"b: c;\n" +
+				"c: d;\n" +
+				"d: c;\n" +
+				"\n" +
+				"A: A 'B';\n" +
+				"C: D;\n" +
+				"D: E;\n" +
+				"E: D;";
+
+		String expected = "error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:10:0: The following set of rules are mutually left-recursive [A]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:12:0: The following set of rules are mutually left-recursive [D, E]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:13:0: The following set of rules are mutually left-recursive [D, E]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:3:0: The following set of rules are mutually left-recursive [a, e]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:4:0: The following set of rules are mutually left-recursive [a, e]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:7:0: The following set of rules are mutually left-recursive [c, d]\n" +
+				"error(" + ErrorType.LEFT_RECURSION_CYCLES.code + "): T.g4:8:0: The following set of rules are mutually left-recursive [c, d]\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
 }
