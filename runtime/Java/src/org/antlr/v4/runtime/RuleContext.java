@@ -30,13 +30,15 @@ import java.util.List;
  *  SContext) and makes it the root of a parse tree, recorded by field
  *  Parser._ctx.
  *
+ *  <pre>
  *  public final SContext s() throws RecognitionException {
- *      SContext _localctx = new SContext(_ctx, getState()); <-- create new node
- *      enterRule(_localctx, 0, RULE_s);                     <-- push it
+ *      SContext _localctx = new SContext(_ctx, getState()); &lt;-- create new node
+ *      enterRule(_localctx, 0, RULE_s);                     &lt;-- push it
  *      ...
- *      exitRule();                                          <-- pop back to _localctx
+ *      exitRule();                                          &lt;-- pop back to _localctx
  *      return _localctx;
  *  }
+ *  </pre>
  *
  *  A subsequent rule invocation of r from the start rule s pushes a
  *  new context object for r whose parent points at s and use invoking
@@ -48,9 +50,11 @@ import java.util.List;
  *  symbol s then call r1, which calls r2, the  would look like
  *  this:
  *
- *     SContext[-1]   <- root node (bottom of the stack)
- *     R1Context[p]   <- p in rule s called r1
- *     R2Context[q]   <- q in rule r1 called r2
+ *  <pre>
+ *     SContext[-1]   &lt;- root node (bottom of the stack)
+ *     R1Context[p]   &lt;- p in rule s called r1
+ *     R2Context[q]   &lt;- q in rule r1 called r2
+ *  </pre>
  *
  *  So the top of the stack, _ctx, represents a call to the current
  *  rule and it holds the return address from another rule that invoke
@@ -65,6 +69,7 @@ import java.util.List;
  *
  *  @see ParserRuleContext
  */
+
 public class RuleContext implements RuleNode {
 	/** What context invoked this rule? */
 	public RuleContext parent;

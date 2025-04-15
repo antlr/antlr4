@@ -519,8 +519,6 @@ public abstract class Target {
 	 * This is primarily needed by Java target to limit size of any single ATN string
 	 * to 65k length.
 	 *
-	 * @see SerializedATN#getSegments
-	 *
 	 * @return the serialized ATN segment limit
 	 */
 	public int getSerializedATNSegmentLimit() {
