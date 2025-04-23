@@ -1,5 +1,5 @@
-import {Interval} from "./misc";
-import {Token} from "./Token";
+import {Interval} from "./misc/index.js";
+import {Token} from "./Token.js";
 
 export declare class TokenStream {
 
