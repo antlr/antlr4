@@ -1,4 +1,4 @@
-import {CharStream} from "./CharStream";
+import {CharStream} from "./CharStream.js";
 
 export declare class FileStream extends CharStream {
 

@@ -1,12 +1,12 @@
-import {ATNSimulator} from "./ATNSimulator";
-import {ParserRuleContext} from "../context";
-import {TokenStream} from "../TokenStream";
-import {Recognizer} from "../Recognizer";
-import {ATN} from "./ATN";
-import {PredictionContextCache} from "./PredictionContextCache";
-import {DFA} from "../dfa";
-import {PredictionMode} from "./PredictionMode";
-import {Token} from "../Token";
+import {ATNSimulator} from "./ATNSimulator.js";
+import {ParserRuleContext} from "../context/index.js";
+import {TokenStream} from "../TokenStream.js";
+import {Recognizer} from "../Recognizer.js";
+import {ATN} from "./ATN.js";
+import {PredictionContextCache} from "./PredictionContextCache.js";
+import {DFA} from "../dfa/index.js";
+import {PredictionMode} from "./PredictionMode.js";
+import {Token} from "../Token.js";
 
 export declare class ParserATNSimulator extends ATNSimulator {
 

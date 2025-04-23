@@ -1,4 +1,4 @@
-export * from './BitSet'
-export * from './Interval'
-export * from './IntervalSet';
+export * from "./BitSet.js"
+export * from "./Interval.js"
+export * from "./IntervalSet.js";
 

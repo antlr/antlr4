@@ -1,5 +1,5 @@
-import {RecognitionException} from "./RecognitionException";
-import {Parser} from "../Parser";
+import {RecognitionException} from "./RecognitionException.js";
+import {Parser} from "../Parser.js";
 
 export declare class FailedPredicateException extends RecognitionException {
 

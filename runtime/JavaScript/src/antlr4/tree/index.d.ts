@@ -1,8 +1,8 @@
-export * from './RuleNode';
-export * from './ErrorNode';
-export * from './TerminalNode';
-export * from './ParseTree';
-export * from './ParseTreeListener';
-export * from './ParseTreeVisitor';
-export * from './ParseTreeWalker';
-export * as Trees from './Trees';
+export * from "./RuleNode.js";
+export * from "./ErrorNode.js";
+export * from "./TerminalNode.js";
+export * from "./ParseTree.js";
+export * from "./ParseTreeListener.js";
+export * from "./ParseTreeVisitor.js";
+export * from "./ParseTreeWalker.js";
+export * as Trees from "./Trees.js";

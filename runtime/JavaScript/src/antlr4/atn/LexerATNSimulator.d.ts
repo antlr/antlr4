@@ -1,9 +1,9 @@
-import {Recognizer} from "../Recognizer";
-import {ATNSimulator} from "./ATNSimulator";
-import {ATN} from "./ATN";
-import {PredictionContextCache} from "./PredictionContextCache";
-import {DFA} from "../dfa";
-import {CharStream} from "../CharStream";
+import {Recognizer} from "../Recognizer.js";
+import {ATNSimulator} from "./ATNSimulator.js";
+import {ATN} from "./ATN.js";
+import {PredictionContextCache} from "./PredictionContextCache.js";
+import {DFA} from "../dfa/index.js";
+import {CharStream} from "../CharStream.js";
 
 export declare class LexerATNSimulator implements ATNSimulator {
 

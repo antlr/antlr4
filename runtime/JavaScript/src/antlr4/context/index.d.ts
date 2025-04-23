@@ -1,3 +1,3 @@
-export * from './RuleContext';
-export * from './ParserRuleContext';
+export * from "./RuleContext.js";
+export * from "./ParserRuleContext.js";
 

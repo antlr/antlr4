@@ -1,5 +1,5 @@
-import { TokenStream } from './TokenStream';
-import { Lexer } from "./Lexer";
+import { TokenStream } from "./TokenStream.js";
+import { Lexer } from "./Lexer.js";
 
 export declare class BufferedTokenStream extends TokenStream {
 

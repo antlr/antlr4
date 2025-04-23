@@ -1,5 +1,5 @@
-import { TokenSource } from "./TokenSource";
-import { CharStream } from "./CharStream";
+import { TokenSource } from "./TokenSource.js";
+import { CharStream } from "./CharStream.js";
 
 export declare class Token {
 

@@ -1,7 +1,7 @@
-import {RuleNode} from "./RuleNode";
-import {ErrorNode} from "./ErrorNode";
-import {TerminalNode} from "./TerminalNode";
-import {ParseTree} from "./ParseTree";
+import {RuleNode} from "./RuleNode.js";
+import {ErrorNode} from "./ErrorNode.js";
+import {TerminalNode} from "./TerminalNode.js";
+import {ParseTree} from "./ParseTree.js";
 
 export declare class ParseTreeVisitor<Result> {
 

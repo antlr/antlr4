@@ -1,4 +1,4 @@
-import {ErrorListener} from "./error";
+import {ErrorListener} from "./error/index.js";
 
 export declare class Recognizer<TSymbol> {
 

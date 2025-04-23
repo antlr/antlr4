@@ -1,9 +1,9 @@
-export * from './ATN';
-export * from './ATNConfig';
-export * from './ATNConfigSet';
-export * from './ATNDeserializer';
-export * from './LexerATNSimulator';
-export * from './ParserATNSimulator';
-export * from './PredictionMode';
-export * from './PredictionContextCache';
+export * from "./ATN.js";
+export * from "./ATNConfig.js";
+export * from "./ATNConfigSet.js";
+export * from "./ATNDeserializer.js";
+export * from "./LexerATNSimulator.js";
+export * from "./ParserATNSimulator.js";
+export * from "./PredictionMode.js";
+export * from "./PredictionContextCache.js";
 

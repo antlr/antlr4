@@ -1,6 +1,6 @@
-import {Lexer} from "./Lexer";
-import {BufferedTokenStream} from "./BufferedTokenStream";
-import {Token} from "./Token";
+import {Lexer} from "./Lexer.js";
+import {BufferedTokenStream} from "./BufferedTokenStream.js";
+import {Token} from "./Token.js";
 
 export declare class CommonTokenStream extends BufferedTokenStream {
     // properties

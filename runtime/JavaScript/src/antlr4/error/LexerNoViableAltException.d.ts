@@ -1,7 +1,7 @@
-import {ATNConfigSet} from "../atn";
-import {Recognizer} from "../Recognizer";
-import { Token } from "../Token";
-import {RecognitionException} from "./RecognitionException";
+import {ATNConfigSet} from "../atn/index.js";
+import {Recognizer} from "../Recognizer.js";
+import { Token } from "../Token.js";
+import {RecognitionException} from "./RecognitionException.js";
 
 export declare class LexerNoViableAltException extends RecognitionException {
 

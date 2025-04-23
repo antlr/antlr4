@@ -1,6 +1,6 @@
-import {ParserRuleContext} from "../context";
-import {ParseTree} from "./ParseTree";
-import {Token} from "../Token";
+import {ParserRuleContext} from "../context/index.js";
+import {ParseTree} from "./ParseTree.js";
+import {Token} from "../Token.js";
 
 export declare class TerminalNode extends ParseTree {
     symbol: Token;

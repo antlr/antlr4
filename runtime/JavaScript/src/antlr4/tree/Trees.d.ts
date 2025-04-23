@@ -1,6 +1,6 @@
-import { Parser } from "../Parser";
-import { ParseTree } from "./ParseTree";
-import { Tree } from "./Tree";
+import { Parser } from "../Parser.js";
+import { ParseTree } from "./ParseTree.js";
+import { Tree } from "./Tree.js";
 
 export default Trees;
 declare namespace Trees {
