@@ -979,7 +979,7 @@ RulePropertyRef_stopHeader(r)  ::= "<! Required but unused. !>"
 RulePropertyRef_stop(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? (<ctx(r)>-><r.label>->stop) : nullptr)"
 
 RulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
-RulePropertyRef_text(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? _input->getText(<ctx(r)>-><r.label>->start, <ctx(r)>-><r.label>->stop) : nullptr)"
+RulePropertyRef_text(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? _input->getText(<ctx(r)>-><r.label>->start, <ctx(r)>-><r.label>->stop) : \"\")"
 
 RulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
 RulePropertyRef_ctx(r)   ::= "<ctx(r)>-><r.label>"
