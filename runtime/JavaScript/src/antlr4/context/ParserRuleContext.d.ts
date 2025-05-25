@@ -1,8 +1,8 @@
-import {RuleContext} from "./RuleContext";
-import {ParseTree, TerminalNode} from "../tree";
-import {RecognitionException} from "../error";
-import {Token} from "../Token";
-import {Parser} from "../Parser";
+import {RuleContext} from "./RuleContext.js";
+import {ParseTree, TerminalNode} from "../tree/index.js";
+import {RecognitionException} from "../error/index.js";
+import {Token} from "../Token.js";
+import {Parser} from "../Parser.js";
 
 export declare class ParserRuleContext extends RuleContext {
     start: Token;

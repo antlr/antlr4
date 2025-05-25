@@ -1,4 +1,4 @@
-import {DefaultErrorStrategy} from "./DefaultErrorStrategy";
+import {DefaultErrorStrategy} from "./DefaultErrorStrategy.js";
 
 export declare class BailErrorStrategy extends DefaultErrorStrategy {
 

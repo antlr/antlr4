@@ -1,5 +1,5 @@
-import {ATNDeserializationOptions} from "./ATNDeserializationOptions";
-import {ATN} from "./ATN";
+import {ATNDeserializationOptions} from "./ATNDeserializationOptions.js";
+import {ATN} from "./ATN.js";
 
 export declare class ATNDeserializer {
     constructor(options?: ATNDeserializationOptions);

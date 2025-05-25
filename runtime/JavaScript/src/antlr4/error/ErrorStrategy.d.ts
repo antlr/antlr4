@@ -1,6 +1,6 @@
-import {RecognitionException} from "./RecognitionException";
-import {Parser} from "../Parser";
-import {Token} from "../Token";
+import {RecognitionException} from "./RecognitionException.js";
+import {Parser} from "../Parser.js";
+import {Token} from "../Token.js";
 
 export declare class ErrorStrategy {
     reset(recognizer: Parser): void;

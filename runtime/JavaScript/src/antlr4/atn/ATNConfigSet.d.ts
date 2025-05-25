@@ -1,4 +1,4 @@
-import {ATNConfig} from "./ATNConfig";
+import {ATNConfig} from "./ATNConfig.js";
 
 export declare class ATNConfigSet {
     configs: ATNConfig[];

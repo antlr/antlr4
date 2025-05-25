@@ -1,6 +1,6 @@
-import { CommonTokenStream } from "./CommonTokenStream";
-import { Token } from "./Token";
-import { Interval } from "./misc/Interval";
+import { CommonTokenStream } from "./CommonTokenStream.js";
+import { Token } from "./Token.js";
+import { Interval } from "./misc/Interval.js";
 
 type Rewrites = Array<RewriteOperation | undefined>;
 type Text = unknown;
