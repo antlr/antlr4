@@ -6,4 +6,7 @@ export * from './LexerATNSimulator';
 export * from './ParserATNSimulator';
 export * from './PredictionMode';
 export * from './PredictionContextCache';
-
+export * from './PrecedencePredicate'
+export * from './Predicate'
+export * from './SemanticContext'
+export * from './AbstractPredicateTransition'
