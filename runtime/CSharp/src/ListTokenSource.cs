@@ -134,7 +134,7 @@ namespace Antlr4.Runtime
         {
             if (tokens == null)
             {
-                throw new ArgumentNullException("tokens cannot be null");
+                throw new ArgumentNullException(nameof(tokens), "tokens cannot be null");
             }
             this.tokens = tokens;
             this.sourceName = sourceName;
