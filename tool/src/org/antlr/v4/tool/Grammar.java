@@ -80,6 +80,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
+		parserOptions.add("actionTemplates");
 		parserOptions.add("accessLevel");
 		parserOptions.add("exportMacro");
 		parserOptions.add(caseInsensitiveOptionName);
@@ -1176,6 +1177,10 @@ public class Grammar implements AttributeResolver {
 
 	public String getLanguage() {
 		return getOptionString("language");
+	}
+
+	public String getActionTemplates() {
+		return getOptionString("actionTemplates");
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }
