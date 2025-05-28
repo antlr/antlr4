@@ -111,8 +111,6 @@ private:
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
 
-using namespace antlr4;
-
 namespace {
 
 struct <lexer.name; format = "cap">StaticData final {
