@@ -133,7 +133,7 @@ ANTLR4_TAG - branch/tag used for building antlr4 library
 
 `ANTLR4_TAG` is set to master branch by default to keep the antlr4 library up to date. However, this will require a rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically updating to latest commit.
 
-By defualt the ANTLR C++ runtime source is cloned from GitHub. However, users may specify `ANTLR4_ZIP_REPOSITORY` in order to download source as a zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*) or other locations. For example, this variable could list a zip file included in your the project directory.  This is useful for maintaining a canonical source tree for each new build.
+By default the ANTLR C++ runtime source is cloned from GitHub. However, users may specify `ANTLR4_ZIP_REPOSITORY` in order to download source as a zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*) or other locations. For example, this variable could list a zip file included in your the project directory.  This is useful for maintaining a canonical source tree for each new build.
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 
