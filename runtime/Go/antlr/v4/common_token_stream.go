@@ -6,6 +6,7 @@ package antlr
 
 import (
 	"strconv"
+	"strings"
 )
 
 // CommonTokenStream is an implementation of TokenStream that loads tokens from
@@ -351,7 +352,7 @@ func (c *CommonTokenStream) GetTextFromInterval(interval Interval) string {
 		stop = len(c.tokens) - 1
 	}
 
-	s := ""
+	var sb strings.Builder
 
 	for i := start; i < stop+1; i++ {
 		t := c.tokens[i]
@@ -360,10 +361,10 @@ func (c *CommonTokenStream) GetTextFromInterval(interval Interval) string {
 			break
 		}
 
-		s += t.GetText()
+		sb.WriteString(t.GetText())
 	}
 
-	return s
+	return sb.String()
 }
 
 // Fill gets all tokens from the lexer until EOF.
