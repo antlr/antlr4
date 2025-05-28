@@ -1212,8 +1212,7 @@ Ref<ATNConfig> ParserATNSimulator::ruleTransition(Ref<ATNConfig> const& config, 
 }
 
 BitSet ParserATNSimulator::getConflictingAlts(ATNConfigSet *configs) {
-  std::vector<BitSet> altsets = PredictionModeClass::getConflictingAltSubsets(configs);
-  return PredictionModeClass::getAlts(altsets);
+  return PredictionModeClass::getAlts(configs);
 }
 
 BitSet ParserATNSimulator::getConflictingAltsOrUniqueAlt(ATNConfigSet *configs) {
