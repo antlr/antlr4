@@ -16,17 +16,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DFA {
 	/** A set of all DFA states. Use {@link Map} so we can get old state back
 	 *  ({@link Set} only allows you to see if it's there).
      */
 
-	public final Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
+	public final Map<DFAState, DFAState> states = new ConcurrentHashMap<>();
 
 	public volatile DFAState s0;
 
