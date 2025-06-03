@@ -687,18 +687,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		DFA dfa = decisionToDFA[mode];
-		synchronized (dfa.states) {
-			DFAState existing = dfa.states.get(proposed);
-			if ( existing!=null ) return existing;
 
-			DFAState newState = proposed;
+		DFAState existing = dfa.states.get(proposed);
+		if ( existing!=null ) return existing;
 
-			newState.stateNumber = dfa.states.size();
-			configs.setReadonly(true);
-			newState.configs = configs;
-			dfa.states.put(newState, newState);
-			return newState;
-		}
+		DFAState newState = proposed;
+
+		newState.stateNumber = dfa.states.size();
+		configs.setReadonly(true);
+		newState.configs = configs;
+		dfa.states.put(newState, newState);
+		return newState;
 	}
 
 
