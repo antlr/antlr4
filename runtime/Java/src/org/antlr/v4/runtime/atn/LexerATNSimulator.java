@@ -687,17 +687,16 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		DFA dfa = decisionToDFA[mode];
+		configs.setReadonly(true);
+		configs.hashCode(); // compute and cache outside of the synchronized block.
+
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(proposed);
 			if ( existing!=null ) return existing;
 
-			DFAState newState = proposed;
-
-			newState.stateNumber = dfa.states.size();
-			configs.setReadonly(true);
-			newState.configs = configs;
-			dfa.states.put(newState, newState);
-			return newState;
+			proposed.stateNumber = dfa.states.size();
+			dfa.states.put(proposed, proposed);
+			return proposed;
 		}
 	}
 
