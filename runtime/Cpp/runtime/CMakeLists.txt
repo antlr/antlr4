@@ -128,7 +128,7 @@ set(static_lib_suffix "")
 if (WIN32)
   set(static_lib_suffix "-static")
   if (TARGET antlr4_shared)
-    target_compile_definitions(antlr4_shared PUBLIC ANTLR4CPP_EXPORTS)
+    target_compile_definitions(antlr4_shared PRIVATE ANTLR4CPP_EXPORTS)
   endif()
   if (TARGET antlr4_static)
     target_compile_definitions(antlr4_static PUBLIC ANTLR4CPP_STATIC)
@@ -166,7 +166,7 @@ if (ANTLR_BUILD_CPP_TESTS)
       COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist
       COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_LINKER_FILE:antlr4_shared> ${CMAKE_HOME_DIRECTORY}/dist)
   endif()
-  
+
   if (TARGET antlr4_static)
     add_custom_command(
       TARGET antlr4_static
