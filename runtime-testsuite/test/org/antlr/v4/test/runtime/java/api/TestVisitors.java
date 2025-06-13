@@ -21,8 +21,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestVisitors {
+import java.util.ArrayList;
+import java.util.List;
 
+public class TestVisitors {
 	/**
 	 * This test verifies the basic behavior of visitors, with an emphasis on
 	 * {@link AbstractParseTreeVisitor#visitTerminal}.

@@ -132,7 +132,8 @@ public class RuleContext implements RuleNode {
 
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < getChildCount(); i++) {
-			builder.append(getChild(i).getText());
+			ParseTree child = getChild(i);
+			builder.append(child.getText());
 		}
 
 		return builder.toString();
