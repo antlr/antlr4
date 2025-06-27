@@ -1,4 +1,4 @@
-import {CharStream} from "./CharStream";
+import {CharStream} from "./CharStream.js";
 
 export declare class CharStreams {
     static fromString(data: string, decodeToUnicodeCodePoints?: boolean): CharStream;

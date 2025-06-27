@@ -1,8 +1,8 @@
-import { ATNConfigSet } from "../atn";
-import { BitSet } from '../misc/BitSet';
-import { DFA } from "../dfa";
-import { Recognizer } from "../Recognizer";
-import { RecognitionException } from "./RecognitionException";
+import { ATNConfigSet } from "../atn/index.js";
+import { BitSet } from "../misc/BitSet.js";
+import { DFA } from "../dfa/index.js";
+import { Recognizer } from "../Recognizer.js";
+import { RecognitionException } from "./RecognitionException.js";
 
 export declare class ErrorListener<TSymbol> {
     reportAmbiguity(recognizer: Recognizer<TSymbol>, dfa: DFA, startIndex: number, stopIndex: number, exact: boolean, ambigAlts: BitSet, configs: ATNConfigSet): void;

@@ -1,8 +1,8 @@
-import {ParserRuleContext, RuleContext} from "../context";
-import {TokenStream} from "../TokenStream";
-import {Recognizer} from "../Recognizer";
-import {CharStream} from "../CharStream";
-import {Token} from "../Token";
+import {ParserRuleContext, RuleContext} from "../context/index.js";
+import {TokenStream} from "../TokenStream.js";
+import {Recognizer} from "../Recognizer.js";
+import {CharStream} from "../CharStream.js";
+import {Token} from "../Token.js";
 
 export interface ExceptionParams {
     message: string;

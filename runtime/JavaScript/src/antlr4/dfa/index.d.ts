@@ -1,2 +1,2 @@
-export * from './DFA';
+export * from "./DFA.js";
 
