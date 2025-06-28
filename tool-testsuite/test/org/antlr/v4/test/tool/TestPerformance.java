@@ -1103,7 +1103,7 @@ public class TestPerformance {
 
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, body, parserName, lexerName,
 				false, true, null, null,
-				false, false, Stage.Compile);
+				false, false, Stage.Compile, null, null);
 		try (RuntimeRunner runner = new JavaRunner()) {
 			return (JavaCompiledState) runner.run(runOptions);
 		}

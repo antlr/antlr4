@@ -69,7 +69,7 @@ public class ToolTestUtils {
 										 Path workingDir, boolean saveTestDir) {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, lexerName,
 				false, true, startRuleName, input,
-				false, showDiagnosticErrors, Stage.Execute);
+				false, showDiagnosticErrors, Stage.Execute, null, null);
 		try (JavaRunner runner = new JavaRunner(workingDir, saveTestDir)) {
 			State result = runner.run(runOptions);
 			if (!(result instanceof ExecutedState)) {
@@ -83,11 +83,11 @@ public class ToolTestUtils {
 			String grammarFileName, String grammarStr, String parserName, String lexerName,
 			boolean useListener, boolean useVisitor, String startRuleName,
 			String input, boolean profile, boolean showDiagnosticErrors,
-			Stage endStage
+			Stage endStage, String libDir, String actionTemplates
 	) {
 		return new RunOptions(grammarFileName, grammarStr, parserName, lexerName, useListener, useVisitor, startRuleName,
 				input, profile, showDiagnosticErrors, false, false, endStage, "Java",
-				JavaRunner.runtimeTestParserName, PredictionMode.LL, true);
+				JavaRunner.runtimeTestParserName, libDir, actionTemplates, PredictionMode.LL, true);
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {

@@ -727,7 +727,7 @@ public class TestCompositeGrammars {
 	) {
 		RunOptions runOptions = createOptionsForJavaToolTests(grammarFileName, grammarStr, parserName, null,
 				false, false, startRuleName, null,
-				false, false, Stage.Compile);
+				false, false, Stage.Compile, null, null);
 		try (JavaRunner runner = new JavaRunner(tempDirPath, false)) {
 			JavaCompiledState compiledState = (JavaCompiledState) runner.run(runOptions);
 			return !compiledState.containsErrors();
