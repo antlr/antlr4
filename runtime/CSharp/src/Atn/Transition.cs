@@ -34,7 +34,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (target == null)
             {
-                throw new ArgumentNullException("target cannot be null.");
+                throw new ArgumentNullException(nameof(target), "target cannot be null.");
             }
             this.target = target;
         }
