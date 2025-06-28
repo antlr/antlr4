@@ -291,7 +291,7 @@ namespace Antlr4.Runtime
         {
             StringBuilder buf = new StringBuilder();
             Antlr4.Runtime.RuleContext p = this;
-            buf.Append("[");
+            buf.Append('[');
             while (p != null && p != stop)
             {
                 if (ruleNames == null)
@@ -309,11 +309,11 @@ namespace Antlr4.Runtime
                 }
                 if (p.Parent != null && (ruleNames != null || !p.Parent.IsEmpty))
                 {
-                    buf.Append(" ");
+                    buf.Append(' ');
                 }
                 p = p.Parent;
             }
-            buf.Append("]");
+            buf.Append(']');
             return buf.ToString();
         }
     }

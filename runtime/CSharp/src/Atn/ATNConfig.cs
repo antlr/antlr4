@@ -220,18 +220,18 @@ namespace Antlr4.Runtime.Atn
 			buf.Append(state);
 			if (showAlt)
 			{
-				buf.Append(",");
+				buf.Append(',');
 				buf.Append(alt);
 			}
 			if (context != null)
 			{
 				buf.Append(",[");
 				buf.Append(context.ToString());
-				buf.Append("]");
+				buf.Append(']');
 			}
 			if (semanticContext != null && semanticContext != SemanticContext.Empty.Instance)
 			{
-				buf.Append(",");
+				buf.Append(',');
 				buf.Append(semanticContext);
 			}
 			if (OuterContextDepth > 0)
