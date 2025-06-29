@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.antlr.v4.test.runtime.FileUtils.deleteDirectory;
 import static org.antlr.v4.test.runtime.Generator.antlrOnString;
@@ -91,33 +92,40 @@ public class ToolTestUtils {
 	}
 
 	public static void testErrors(String[] pairs, boolean printTree) {
+		testErrors(pairs, $ -> {});
+	}
+
+	public static void testErrors(String[] pairs, Consumer<ErrorQueue> errorQueueAssertionsConsumer) {
 		for (int i = 0; i < pairs.length; i += 2) {
 			String grammarStr = pairs[i];
 			String expect = pairs[i + 1];
+			testErrors(grammarStr, expect, errorQueueAssertionsConsumer);
+		}
+	}
 
-			String[] lines = grammarStr.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
+	private static void testErrors(String grammarStr, String expect, Consumer<ErrorQueue> additionalAssertions) {
+		String[] lines = grammarStr.split("\n");
+		String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
 
-			String tempDirName = "AntlrTestErrors-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
-			String tempTestDir = Paths.get(TempDirectory, tempDirName).toString();
+		String tempDirName = "AntlrTestErrors-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
+		String tempTestDir = Paths.get(TempDirectory, tempDirName).toString();
 
+		try {
+			ErrorQueue equeue = antlrOnString(tempTestDir, null, fileName, grammarStr, false);
+			String actual = equeue.toString(true);
+			actual = actual.replace(tempTestDir + File.separator, "");
+			String msg = grammarStr;
+			msg = msg.replace("\n", "\\n");
+			msg = msg.replace("\r", "\\r");
+			msg = msg.replace("\t", "\\t");
+
+			assertEquals(expect, actual, "error in: " + msg);
+			additionalAssertions.accept(equeue);
+		}
+		finally {
 			try {
-				ErrorQueue equeue = antlrOnString(tempTestDir, null, fileName, grammarStr, false);
-
-				String actual = equeue.toString(true);
-				actual = actual.replace(tempTestDir + File.separator, "");
-				String msg = grammarStr;
-				msg = msg.replace("\n", "\\n");
-				msg = msg.replace("\r", "\\r");
-				msg = msg.replace("\t", "\\t");
-
-				assertEquals(expect, actual, "error in: " + msg);
-			}
-			finally {
-				try {
-					deleteDirectory(new File(tempTestDir));
-				} catch (IOException ignored) {
-				}
+				deleteDirectory(new File(tempTestDir));
+			} catch (IOException ignored) {
 			}
 		}
 	}

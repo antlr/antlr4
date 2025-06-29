@@ -6,9 +6,15 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +24,7 @@ import org.stringtemplate.v4.misc.ErrorBuffer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.antlr.v4.test.tool.ToolTestUtils.testErrors;
@@ -235,6 +242,28 @@ public class TestAttributeChecks {
 		testAction("inline", attributeTemplate, input, expected);
 	}
 
+	@Test
+	@EnabledOnOs({OS.WINDOWS})
+	public void shouldDetectOffendingTokenAbsolutePositionInWindows(){
+		String expectedError = "error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference lab in $lab\n";
+		testAction("inline", attributeTemplate, "$lab", expectedError, q -> assertOffendingToken(q, 131, 133));
+	}
+
+	@Test
+	@EnabledOnOs({OS.LINUX, OS.MAC})
+	public void shouldDetectOffendingTokenAbsolutePositionInLinux(){
+		String expectedError = "error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference lab in $lab\n";
+		testAction("inline", attributeTemplate, "$lab", expectedError, q -> assertOffendingToken(q, 125, 127));
+	}
+
+	private static void assertOffendingToken(ErrorQueue q, int expected, int expected1) {
+		Assertions.assertEquals(1, q.errors.size());
+		ANTLRMessage antlrMessage = q.errors.get(0);
+		CommonToken token = (CommonToken) antlrMessage.offendingToken;
+		Assertions.assertEquals(expected, token.getStartIndex(), "Offending Token start index assertion");
+		Assertions.assertEquals(expected1, token.getStopIndex(), "Offending Token stop index assertion");
+	}
+
 	@Test public void testBadInlineActions() throws RecognitionException {
 		testActions("inline", bad_inlineChecks, attributeTemplate);
 	}
@@ -266,11 +295,16 @@ public class TestAttributeChecks {
 	}
 
 	private static void testAction(String location, String template, String action, String expected) {
+		testAction(location, template, action, expected, $ -> {});
+	}
+
+	private static void testAction(String location, String template, String action, String expected, Consumer<ErrorQueue> errorQueueConsumer) {
 		STGroup g = new STGroup('<', '>');
-		g.setListener(new ErrorBuffer()); // hush warnings
+		ErrorBuffer listener = new ErrorBuffer();
+		g.setListener(listener); // hush warnings
 		ST st = new ST(g, template);
 		st.add(location, action);
 		String grammar = st.render();
-		testErrors(new String[]{grammar, expected}, false);
+		testErrors(new String[]{grammar, expected}, errorQueueConsumer);
 	}
 }
