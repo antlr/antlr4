@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run --rm -u $(id -u ${USER}):$(id -g ${USER}) -v "$(pwd):/work" antlr/antlr4 $@
