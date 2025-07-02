@@ -399,13 +399,13 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
         delete previous;
     previous = nullptr;
 
-    std::vector<BitSet> altSubSets = PredictionModeClass::getConflictingAltSubsets(reach.get());
     reach->uniqueAlt = getUniqueAlt(reach.get());
     // unique prediction?
     if (reach->uniqueAlt != ATN::INVALID_ALT_NUMBER) {
       predictedAlt = reach->uniqueAlt;
       break;
     }
+    std::vector<BitSet> altSubSets = PredictionModeClass::getConflictingAltSubsets(reach.get());
     if (_mode != PredictionMode::LL_EXACT_AMBIG_DETECTION) {
       predictedAlt = PredictionModeClass::resolvesToJustOneViableAlt(altSubSets);
       if (predictedAlt != ATN::INVALID_ALT_NUMBER) {
