@@ -17,6 +17,8 @@ ANTLR Parser Generator  Version 4.7.1
  -no-visitor         don't generate parse tree visitor (default)
  -package ___        specify a package/namespace for the generated code
  -depend             generate file dependencies
+ -split-parser       generate separate files for parser serialized DFA and context classes
+ -no-split-parser    generate parser serialized DFA and context classes locally (default)
  -D<option>=value    set/override a grammar-level option
  -Werror             treat warnings as errors
  -XdbgST             launch StringTemplate visualizer on generated code
@@ -124,6 +126,32 @@ TBaseListener.java : T.g
 ```
 
 If you use -lib libdir with -depend and grammar option tokenVocab=A, then the dependencies include the library path as well: T.g: libdir/A.tokens. The output is also sensitive to the -o outdir option: outdir/TParser.java : T.g.
+
+## `-split-parser`
+
+This is a Java-only option. By default, ANTLR serializes the ATN within the generated Parser class, and parse tree RuleContexts as static child classes of the generated Parser class. This works well in all situations, but with very large and/or complex grammars, this may lead to generated parsers holding more than 64k lines, which is te maximum a JVM debugger can support. This option tells ANTLR to generate the serialized ATN and the RuleContext classes in dedicated files, thus drastically reducing the size of the generated parser source code.
+
+```bash
+$ antlr4 -split-parser T.g	
+TLexer.java
+TParser.java
+TParserAST.java
+TParserContexts.java
+TListener.java
+TBaseListener.java
+```
+
+## `-no-split-parser`
+
+Tell ANTLR not to place the serialized ATN and the RuleContext classes within the generated parser; this is the default.
+
+```bash
+$ antlr4 -no-split-parser T.g	
+TLexer.java
+TParser.java
+TListener.java
+TBaseListener.java
+```
 
 ## `-D<option>=value`
 
