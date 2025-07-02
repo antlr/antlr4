@@ -58,12 +58,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>1.1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 		    <groupId>org.openjdk.jol</groupId>
 		    <artifactId>jol-core</artifactId>
 		    <version>0.16</version>
