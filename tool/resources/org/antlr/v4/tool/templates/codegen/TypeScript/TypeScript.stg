@@ -732,6 +732,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures)
 	::= <<
 export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+	<ctorAttrs:{a | public <a>;}; separator="\n">
 	<attrs:{a | public <a>;}; separator="\n">
 	<if(struct.ctorAttrs)>
 	constructor(parser: <parser.name>, parent: ParserRuleContext, invokingState: number<struct.ctorAttrs:{a |, <a.escapedName>: <a.type>}>) {
@@ -752,6 +753,7 @@ export class <struct.escapedName> extends <if(contextSuperClass)><contextSuperCl
 <if(struct.provideCopyFrom)><! don't need copy unless we have subclasses !>
 	public override copyFrom(ctx: <struct.name>): void {
 		super.copyFrom(ctx);
+		<struct.ctorAttrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 		<struct.attrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
 <endif>
