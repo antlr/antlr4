@@ -6,32 +6,29 @@
 
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.RuleStartState;
-import org.antlr.v4.runtime.atn.RuleStopState;
-import org.antlr.v4.runtime.atn.RuleTransition;
-import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class LeftRecursionDetector {
-	Grammar g;
-	public ATN atn;
+	private final Grammar g;
+	private final ATN atn;
 
 	/** Holds a list of cycles (sets of rule names). */
-	public List<Set<Rule>> listOfRecursiveCycles = new ArrayList<Set<Rule>>();
+	private final List<Set<Rule>> listOfRecursiveCycles = new ArrayList<>();
 
 	/** Which rule start states have we visited while looking for a single
 	 * 	left-recursion check?
 	 */
-	Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
+	private final Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<>();
+
+	public boolean containsErrors() {
+		return !listOfRecursiveCycles.isEmpty();
+	}
 
 	public LeftRecursionDetector(Grammar g, ATN atn) {
 		this.g = g;
@@ -40,17 +37,15 @@ public class LeftRecursionDetector {
 
 	public void check() {
 		for (RuleStartState start : atn.ruleToStartState) {
-			//System.out.print("check "+start.rule.name);
 			rulesVisitedPerRuleCheck.clear();
 			rulesVisitedPerRuleCheck.add(start);
-			//FASerializer ser = new FASerializer(atn.g, start);
-			//System.out.print(":\n"+ser+"\n");
-
-			check(g.getRule(start.ruleIndex), start, new HashSet<ATNState>());
+			check(g.getRule(start.ruleIndex), start, new HashSet<>());
 		}
-		//System.out.println("cycles="+listOfRecursiveCycles);
-		if ( !listOfRecursiveCycles.isEmpty() ) {
-			g.tool.errMgr.leftRecursionCycles(g.fileName, listOfRecursiveCycles);
+
+		for (Collection<Rule> cycle : listOfRecursiveCycles) {
+			for (Rule rule : cycle) {
+				g.tool.errMgr.grammarError(ErrorType.LEFT_RECURSION_CYCLES, g.fileName, rule.ast.token, cycle);
+			}
 		}
 	}
 
@@ -67,8 +62,7 @@ public class LeftRecursionDetector {
 	 */
 	public boolean check(Rule enclosingRule, ATNState s, Set<ATNState> visitedStates) {
 		if ( s instanceof RuleStopState) return true;
-		if ( visitedStates.contains(s) ) return false;
-		visitedStates.add(s);
+		if ( !visitedStates.add(s) ) return false;
 
 		//System.out.println("visit "+s);
 		int n = s.getNumberOfTransitions();

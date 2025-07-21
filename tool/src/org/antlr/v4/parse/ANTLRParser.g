@@ -375,7 +375,7 @@ parserRule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> RULE_REF ARG_ACTION<ActionAST>?
+      -> ^( RULE<RuleAST>[$RULE_REF,"RULE"] RULE_REF ARG_ACTION<ActionAST>?
       		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -491,7 +491,7 @@ lexerRule
 	  optionsSpec?
 
 	  COLON lexerRuleBlock SEMI
-      -> ^( RULE<RuleAST> TOKEN_REF
+      -> ^( RULE<RuleAST>[$TOKEN_REF,"RULE"] TOKEN_REF
       		^(RULEMODIFIERS FRAGMENT)? optionsSpec? lexerRuleBlock
       	  )
 	;
