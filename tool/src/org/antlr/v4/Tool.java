@@ -42,7 +42,6 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
@@ -73,7 +72,7 @@ public class Tool {
 	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
 		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
 
-	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
+	public enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
 		String fieldName;
 		String name;
@@ -142,12 +141,12 @@ public class Tool {
 
 	public final String[] args;
 
-	protected List<String> grammarFiles = new ArrayList<String>();
+	protected List<String> grammarFiles = new ArrayList<>();
 
 	public ErrorManager errMgr;
     public LogManager logMgr = new LogManager();
 
-	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
+	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<>();
 
 	/** Track separately so if someone adds a listener, it's the only one
 	 *  instead of it and the default stderr listener.
@@ -281,7 +280,7 @@ public class Tool {
 			if ( Grammar.parserOptions.contains(option) ||
 				 Grammar.lexerOptions.contains(option) )
 			{
-				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
+				if ( grammarOptions==null ) grammarOptions = new HashMap<>();
 				grammarOptions.put(option, value);
 			}
 			else {
@@ -420,13 +419,13 @@ public class Tool {
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
 		GrammarAST RULES = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
-		List<GrammarAST> rules = new ArrayList<GrammarAST>(RULES.getAllChildrenWithType(ANTLRParser.RULE));
+		List<GrammarAST> rules = new ArrayList<>(RULES.getAllChildrenWithType(ANTLRParser.RULE));
 		for (GrammarAST mode : g.ast.getAllChildrenWithType(ANTLRParser.MODE)) {
 			rules.addAll(mode.getAllChildrenWithType(ANTLRParser.RULE));
 		}
 
 		boolean redefinition = false;
-		final Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
+		final Map<String, RuleAST> ruleToAST = new HashMap<>();
 		for (GrammarAST r : rules) {
 			RuleAST ruleAST = (RuleAST)r;
 			GrammarAST ID = (GrammarAST)ruleAST.getChild(0);
@@ -487,13 +486,12 @@ public class Tool {
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
 //		System.out.println(fileNames);
-		Graph<String> g = new Graph<String>();
-		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
+		Graph<String> g = new Graph<>();
+		List<GrammarRootAST> roots = new ArrayList<>();
 		for (String fileName : fileNames) {
-			GrammarAST t = parseGrammar(fileName);
-			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
-			if ( ((GrammarRootAST)t).hasErrors ) continue;
-			GrammarRootAST root = (GrammarRootAST)t;
+			GrammarRootAST root = parseGrammar(fileName);
+			if (root == null || root.hasErrors) continue;
+
 			roots.add(root);
 			root.fileName = fileName;
 			String grammarName = root.getChild(0).getText();
@@ -525,7 +523,7 @@ public class Tool {
 		List<String> sortedGrammarNames = g.sort();
 //		System.out.println("sortedGrammarNames="+sortedGrammarNames);
 
-		List<GrammarRootAST> sortedRoots = new ArrayList<GrammarRootAST>();
+		List<GrammarRootAST> sortedRoots = new ArrayList<>();
 		for (String grammarName : sortedGrammarNames) {
 			for (GrammarRootAST root : roots) {
 				if ( root.getGrammarName().equals(grammarName) ) {
@@ -538,7 +536,7 @@ public class Tool {
 		return sortedRoots;
 	}
 
-	/** Manually get option node from tree; return null if no defined. */
+	/** Manually get option node from tree; return null if not defined. */
 	public static GrammarAST findOptionValueAST(GrammarRootAST root, String option) {
 		GrammarAST options = (GrammarAST)root.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( options!=null && options.getChildCount() > 0 ) {
@@ -601,7 +599,7 @@ public class Tool {
 		return g;
 	}
 
-	private final Map<String, Grammar> importedGrammars = new HashMap<String, Grammar>();
+	private final Map<String, Grammar> importedGrammars = new HashMap<>();
 
 	/**
 	 * Try current dir then dir of g then lib dir
@@ -674,7 +672,7 @@ public class Tool {
 
 	public void generateATNs(Grammar g) {
 		DOTGenerator dotGenerator = new DOTGenerator(g);
-		List<Grammar> grammars = new ArrayList<Grammar>();
+		List<Grammar> grammars = new ArrayList<>();
 		grammars.add(g);
 		List<Grammar> imported = g.getAllImportedGrammars();
 		if ( imported!=null ) grammars.addAll(imported);
@@ -836,20 +834,14 @@ public class Tool {
 			// -o /tmp /var/lib/t.g4 => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
 			// -o . /usr/lib/t.g4 => ./T.java
-			if (fileDirectory != null &&
-				(new File(fileDirectory).isAbsolute() ||
+			if ((new File(fileDirectory).isAbsolute() ||
 					fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
 				// somebody set the dir, it takes precendence; write new file there
 				outputDir = new File(outputDirectory);
 			}
 			else {
 				// -o /tmp subdir/t.g4 => /tmp/subdir/T.java
-				if (fileDirectory != null) {
-					outputDir = new File(outputDirectory, fileDirectory);
-				}
-				else {
-					outputDir = new File(outputDirectory);
-				}
+				outputDir = new File(outputDirectory, fileDirectory);
 			}
 		}
 		else {
