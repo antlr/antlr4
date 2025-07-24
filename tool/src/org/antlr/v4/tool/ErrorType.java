@@ -1137,6 +1137,36 @@ public enum ErrorType {
 			ErrorSeverity.WARNING
 	),
 
+	/**
+	 * <p>Action is always performed after semantics predicate execution</p>
+	 *
+	 * <pre>
+	 * ACTION_BEFORE_PREDICATE: {action();} 'value' {predicate()}? // warning
+	 * ACTION_AFTER_PREDICATE: {predicate()}? 'value' {action();} // ok
+	 * <pre>
+	 */
+	ACTION_SHOULD_BE_PLACED_AFTER_PREDICATES(
+			188,
+			"Action <arg> should be placed after all predicates because it's always executed after them",
+			ErrorSeverity.WARNING
+	),
+
+	/**
+	 * <p>Predicate at the beginning of lexer rule significantly degrades performance</p>
+	 *
+	 * <p>See docs and https://tomassetti.me/improving-the-performance-of-an-antlr-parser/ for more details</p>
+	 *
+	 * <pre>
+	 * TOKEN: {predicate()}? 'TOKEN'; // warning
+	 * TOKEN: 'TOKEN' {predicate()}?; // ok
+	 * </pre>
+	 */
+	PREDICATE_AT_THE_BEGINNING_OF_LEXER_RULE_DEGRADES_PERFORMANCE(
+			189,
+			"Predicate <arg> at the beginning of lexer rule significantly degrades performance",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */
