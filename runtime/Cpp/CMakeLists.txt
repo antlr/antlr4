@@ -138,10 +138,11 @@ if(WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
 
+include(GNUInstallDirs)
+
 # Generate CMake Package Files only if install is active
 if (ANTLR4_INSTALL)
 
-  include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
 
   if(NOT ANTLR4_CMAKE_DIR)
@@ -202,14 +203,14 @@ endif(ANTLR4_INSTALL)
 
 if(EXISTS LICENSE.txt)
 install(FILES LICENSE.txt
-        DESTINATION "share/doc/libantlr4")
+        DESTINATION ${CMAKE_INSTALL_DOCDIR})
 elseif(EXISTS ../../LICENSE.txt)
 install(FILES ../../LICENSE.txt
-    DESTINATION "share/doc/libantlr4")
+    DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 install(FILES README.md VERSION
-    DESTINATION "share/doc/libantlr4")
+    DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 set(CPACK_PACKAGE_CONTACT "antlr-discussion@googlegroups.com")
 set(CPACK_PACKAGE_VERSION ${ANTLR_VERSION})
