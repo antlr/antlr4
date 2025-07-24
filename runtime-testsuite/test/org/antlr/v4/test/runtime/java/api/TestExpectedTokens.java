@@ -24,20 +24,16 @@ public class TestExpectedTokens extends JavaRunner {
 			"a : A (B | ) C ;\n";
 		Grammar g = new Grammar(gtext);
 		String atnText =
-			"RuleStart_a_0->s2\n"+
-			"s2-A->BlockStart_5\n"+
-			"BlockStart_5->s3\n"+
-			"BlockStart_5->s4\n"+
-			"s3-B->BlockEnd_6\n"+
-			"s4->BlockEnd_6\n"+
-			"BlockEnd_6->s7\n"+
-			"s7-C->s8\n"+
-			"s8->RuleStop_a_1\n"+
-			"RuleStop_a_1-EOF->s9\n";
+			"RuleStart_a_0-A->BlockStart_3\n" +
+			"BlockStart_3->s2\n" +
+			"BlockStart_3->BlockEnd_4\n" +
+			"s2-B->BlockEnd_4\n" +
+			"BlockEnd_4-C->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s5\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 
 		ATN atn = g.getATN();
-		int blkStartStateNumber = 5;
+		int blkStartStateNumber = 3;
 		IntervalSet tokens = atn.getExpectedTokens(blkStartStateNumber, null);
 		assertEquals("{B, C}", tokens.toString(g.getTokenNames()));
 	}
@@ -48,19 +44,16 @@ public class TestExpectedTokens extends JavaRunner {
 			"a : A B? C ;\n";
 		Grammar g = new Grammar(gtext);
 		String atnText =
-			"RuleStart_a_0->s2\n"+
-			"s2-A->BlockStart_4\n"+
-			"BlockStart_4->s3\n"+
-			"BlockStart_4->BlockEnd_5\n"+
-			"s3-B->BlockEnd_5\n"+
-			"BlockEnd_5->s6\n"+
-			"s6-C->s7\n"+
-			"s7->RuleStop_a_1\n"+
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0-A->BlockStart_3\n" +
+			"BlockStart_3->s2\n" +
+			"BlockStart_3->BlockEnd_4\n" +
+			"s2-B->BlockEnd_4\n" +
+			"BlockEnd_4-C->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s5\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 
 		ATN atn = g.getATN();
-		int blkStartStateNumber = 4;
+		int blkStartStateNumber = 3;
 		IntervalSet tokens = atn.getExpectedTokens(blkStartStateNumber, null);
 		assertEquals("{B, C}", tokens.toString(g.getTokenNames()));
 	}
@@ -72,31 +65,28 @@ public class TestExpectedTokens extends JavaRunner {
 				"b : B | ;";
 		Grammar g = new Grammar(gtext);
 		String atnText =
-			"RuleStart_a_0->s4\n"+
-			"s4-b->RuleStart_b_2\n"+
-			"s5-A->s6\n"+
-			"s6->RuleStop_a_1\n"+
-			"RuleStop_a_1-EOF->s11\n";
+			"RuleStart_a_0-b->RuleStart_b_2\n" +
+			"s4-A->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s8\n";
 		RuntimeTestUtils.checkRuleATN(g, "a", atnText);
 		atnText =
-			"RuleStart_b_2->BlockStart_9\n"+
-			"BlockStart_9->s7\n"+
-			"BlockStart_9->s8\n"+
-			"s7-B->BlockEnd_10\n"+
-			"s8->BlockEnd_10\n"+
-			"BlockEnd_10->RuleStop_b_3\n"+
-			"RuleStop_b_3->s5\n";
+			"RuleStart_b_2->BlockStart_6\n" +
+			"BlockStart_6->s5\n" +
+			"BlockStart_6->BlockEnd_7\n" +
+			"s5-B->BlockEnd_7\n" +
+			"BlockEnd_7->RuleStop_b_3\n" +
+			"RuleStop_b_3->s4\n";
 		RuntimeTestUtils.checkRuleATN(g, "b", atnText);
 
 		ATN atn = g.getATN();
 
 		// From the start of 'b' with empty stack, can only see B and EOF
-		int blkStartStateNumber = 9;
+		int blkStartStateNumber = 6;
 		IntervalSet tokens = atn.getExpectedTokens(blkStartStateNumber, ParserRuleContext.EMPTY);
 		assertEquals("{<EOF>, B}", tokens.toString(g.getTokenNames()));
 
 		// Now call from 'a'
-		tokens = atn.getExpectedTokens(blkStartStateNumber, new ParserRuleContext(ParserRuleContext.EMPTY, 4));
+		tokens = atn.getExpectedTokens(blkStartStateNumber, new ParserRuleContext(ParserRuleContext.EMPTY, 0));
 		assertEquals("{A, B}", tokens.toString(g.getTokenNames()));
 	}
 
@@ -112,28 +102,26 @@ public class TestExpectedTokens extends JavaRunner {
 			"     ;\n";
 		Grammar g = new Grammar(gtext);
 		String atnText =
-			"RuleStart_expr_2->BlockStart_13\n"+
-			"BlockStart_13->s7\n"+
-			"BlockStart_13->s12\n"+
-			"s7-action_1:-1->s8\n"+
-			"s12-ID->BlockEnd_14\n"+
-			"s8-L->s9\n"+
-			"BlockEnd_14->StarLoopEntry_20\n"+
-			"s9-expr->RuleStart_expr_2\n"+
-			"StarLoopEntry_20->StarBlockStart_18\n"+
-			"StarLoopEntry_20->s21\n"+
-			"s10-R->s11\n"+
-			"StarBlockStart_18->s15\n"+
-			"s21->RuleStop_expr_3\n"+
-			"s11->BlockEnd_14\n"+
-			"s15-2 >= _p->s16\n"+
-			"RuleStop_expr_3->s5\n"+
-			"RuleStop_expr_3->s10\n"+
-			"RuleStop_expr_3->BlockEnd_19\n"+
-			"s16-PLUS->s17\n"+
-			"s17-expr->RuleStart_expr_2\n"+
-			"BlockEnd_19->StarLoopBack_22\n"+
-			"StarLoopBack_22->StarLoopEntry_20\n";
+			"RuleStart_expr_2->BlockStart_10\n" +
+			"BlockStart_10->s5\n" +
+			"BlockStart_10->s9\n" +
+			"s5-action_1:-1->s6\n" +
+			"s9-ID->BlockEnd_11\n" +
+			"s6-L->s7\n" +
+			"BlockEnd_11->StarLoopEntry_16\n" +
+			"s7-expr->RuleStart_expr_2\n" +
+			"StarLoopEntry_16->StarBlockStart_14\n" +
+			"StarLoopEntry_16->s17\n" +
+			"s8-R->BlockEnd_11\n" +
+			"StarBlockStart_14-2 >= _p->s12\n" +
+			"s17->RuleStop_expr_3\n" +
+			"s12-PLUS->s13\n" +
+			"RuleStop_expr_3->s4\n" +
+			"RuleStop_expr_3->s8\n" +
+			"RuleStop_expr_3->BlockEnd_15\n" +
+			"s13-expr->RuleStart_expr_2\n" +
+			"BlockEnd_15->StarLoopBack_18\n" +
+			"StarLoopBack_18->StarLoopEntry_16\n";
 		RuntimeTestUtils.checkRuleATN(g, "expr", atnText);
 
 		ATN atn = g.getATN();
@@ -143,14 +131,14 @@ public class TestExpectedTokens extends JavaRunner {
 //		System.out.println(dot);
 
 		// Simulate call stack after input '(x' from rule s
-		ParserRuleContext callStackFrom_s = new ParserRuleContext(null, 4);
-		ParserRuleContext callStackFrom_expr = new ParserRuleContext(callStackFrom_s, 9);
-		int afterID = 14;
+		ParserRuleContext callStackFrom_s = new ParserRuleContext(null, 0);
+		ParserRuleContext callStackFrom_expr = new ParserRuleContext(callStackFrom_s, 7);
+		int afterID = 11;
 		IntervalSet tokens = atn.getExpectedTokens(afterID, callStackFrom_expr);
 		assertEquals("{R, PLUS}", tokens.toString(g.getTokenNames()));
 
 		// Simulate call stack after input '(x' from within rule expr
-		callStackFrom_expr = new ParserRuleContext(null, 9);
+		callStackFrom_expr = new ParserRuleContext(null, 7);
 		tokens = atn.getExpectedTokens(afterID, callStackFrom_expr);
 		assertEquals("{R, PLUS}", tokens.toString(g.getTokenNames()));
 	}
