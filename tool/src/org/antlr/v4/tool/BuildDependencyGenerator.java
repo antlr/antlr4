@@ -198,12 +198,22 @@ public class BuildDependencyGenerator {
         // Handle imported grammars
         List<Grammar> imports = g.getAllImportedGrammars();
         if ( imports!=null ) {
-			for (Grammar g : imports) {
-				String libdir = tool.libDirectory;
-				String fileName = groomQualifiedFileName(libdir, g.fileName);
-				files.add(new File(fileName));
-			}
-		}
+          for (Grammar g : imports) {
+            for (String libDirectory : g.tool.libDirectories) {
+              File file;
+              if ( libDirectory.equals(".") ) {
+                file = new File(g.fileName);
+              }
+              else {
+                file = new File(libDirectory, g.fileName);
+              }
+              if (file.exists()) {
+                files.add(file);
+                break;
+              }
+            }
+          }
+        }
 
         if (files.isEmpty()) {
             return null;
@@ -224,17 +234,22 @@ public class BuildDependencyGenerator {
         // handle token vocabulary loads
         String tokenVocab = g.getOptionString("tokenVocab");
         if (tokenVocab != null) {
-			String fileName =
-				tokenVocab + CodeGenerator.VOCAB_FILE_EXTENSION;
-			File vocabFile;
-			if ( tool.libDirectory.equals(".") ) {
-				vocabFile = new File(fileName);
-			}
-			else {
-				vocabFile = new File(tool.libDirectory, fileName);
-			}
-			files.add(vocabFile);
-		}
+          String fileName =
+            tokenVocab + CodeGenerator.VOCAB_FILE_EXTENSION;
+          for (String libDirectory : g.tool.libDirectories) {
+            File vocabFile;
+            if ( libDirectory.equals(".") ) {
+              vocabFile = new File(fileName);
+            }
+            else {
+              vocabFile = new File(libDirectory, fileName);
+            }
+            if (vocabFile.exists()) {
+              files.add(vocabFile);
+              break;
+            }
+          }
+        }
 
         return files;
     }
