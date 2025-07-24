@@ -11,9 +11,10 @@ package org.antlr.v4.runtime.atn;
  * and {@link SetTransition} appropriately based on the range of the input.
  *
  * Previously, we distinguished between atom and range transitions for
- * Unicode code points <= U+FFFF and those above. We used a set
- * transition for a Unicode code point > U+FFFF. Now that we can serialize
- * 32-bit int/chars in the ATN serialization, this is no longer necessary.
+ * Unicode code points &le; @code{U+FFFF} and those above. We used a set
+ * transition for a Unicode code point &gt; @code{U+FFFF}. Now that we can 
+ * serialize 32-bit int/chars in the ATN serialization, this is no longer 
+ * necessary.
  */
 public abstract class CodePointTransitions {
 	/** Return new {@link AtomTransition} */

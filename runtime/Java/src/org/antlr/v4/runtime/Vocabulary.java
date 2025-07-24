@@ -27,29 +27,14 @@ public interface Vocabulary {
 	 *
 	 * <p>The following table shows examples of lexer rules and the literal
 	 * names assigned to the corresponding token types.</p>
-	 *
-	 * <table>
-	 *  <tr>
-	 *   <th>Rule</th>
-	 *   <th>Literal Name</th>
-	 *   <th>Java String Literal</th>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code THIS : 'this';}</td>
-	 *   <td>{@code 'this'}</td>
-	 *   <td>{@code "'this'"}</td>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code SQUOTE : '\'';}</td>
-	 *   <td>{@code '\''}</td>
-	 *   <td>{@code "'\\''"}</td>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code ID : [A-Z]+;}</td>
-	 *   <td>n/a</td>
-	 *   <td>{@code null}</td>
-	 *  </tr>
-	 * </table>
+         * 
+         * <pre>
+         * Rule                 Literal Name    Java String Literal
+         * --------------------+---------------+-----------------------------
+         * {@code THIS   : 'this';}     {@code 'this'}          {@code "'this'"}
+         * {@code SQUOTE : '\'';}       {@code '\''}            {@code "'\\''"}
+         * {@code ID     : [A-Z]+;}     {@code n/a}             {@code null} 
+         * </pre>
 	 *
 	 * @param tokenType The token type.
 	 *
@@ -77,25 +62,14 @@ public interface Vocabulary {
 	 * <p>The following table shows examples of lexer rules and the literal
 	 * names assigned to the corresponding token types.</p>
 	 *
-	 * <table>
-	 *  <tr>
-	 *   <th>Rule</th>
-	 *   <th>Symbolic Name</th>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code THIS : 'this';}</td>
-	 *   <td>{@code THIS}</td>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code SQUOTE : '\'';}</td>
-	 *   <td>{@code SQUOTE}</td>
-	 *  </tr>
-	 *  <tr>
-	 *   <td>{@code ID : [A-Z]+;}</td>
-	 *   <td>{@code ID}</td>
-	 *  </tr>
-	 * </table>
-	 *
+         * <pre>
+         * Rule                 Symbolic Name
+         * --------------------+--------------------------
+	 * {@code THIS   : 'this';}     {@code THIS}
+	 * {@code SQUOTE : '\'';}       {@code SQUOTE}
+	 * {@code ID     : [A-Z]+;}     {@code ID} 
+	 * </pre>
+         *
 	 * @param tokenType The token type.
 	 *
 	 * @return The symbolic name associated with the specified token type, or
