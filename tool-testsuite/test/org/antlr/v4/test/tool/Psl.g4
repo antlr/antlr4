@@ -206,7 +206,7 @@ integer_constant
  */
 
 fragment A: [Aa] ;
-fragment B: [BB] ;
+fragment B: [Bb] ;
 fragment C: [Cc] ;
 fragment D: [Dd] ;
 fragment E: [Ee] ;
