@@ -83,7 +83,6 @@
 						<phase>process-classes</phase>
 						<configuration>
 							<instructions>
-								<Automatic-Module-Name>org.antlr.antlr4.runtime</Automatic-Module-Name>
 								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
 								<Import-Package>org.antlr.v4.gui;resolution:=optional, *</Import-Package>
 							</instructions>
@@ -102,6 +101,9 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
+                        <manifestEntries>
+                            <Multi-Release>true</Multi-Release>
+                        </manifestEntries>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
 				</configuration>
@@ -110,10 +112,34 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>8</release>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>module-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>9</release>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src9</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
+                </executions>
 				<configuration>
-					<release>8</release>
-					<source>1.8</source>
-					<target>1.8</target>
+
 				</configuration>
 			</plugin>
 		</plugins>
