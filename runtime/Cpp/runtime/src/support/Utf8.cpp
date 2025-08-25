@@ -217,7 +217,9 @@ namespace {
 
   std::optional<std::string> Utf8::strictEncode(std::u32string_view input) {
     std::string output;
-    output.reserve(input.size() * 4);  // Worst case is each Unicode code point encodes to 4 bytes.
+    // output.reserve(input.size() * 4);  // Worst case is each Unicode code point encodes to 4 bytes.
+    output.reserve(input.size() * 2);  // almost string only include alphabet
+
     for (size_t index = 0; index < input.size(); index++) {
       char32_t codePoint = input[index];
       if (!Unicode::isValid(codePoint)) {
@@ -225,7 +227,7 @@ namespace {
       }
       Utf8::encode(&output, codePoint);
     }
-    output.shrink_to_fit();
+    // output.shrink_to_fit(); //shrink is too heavy
     return output;
   }
 
