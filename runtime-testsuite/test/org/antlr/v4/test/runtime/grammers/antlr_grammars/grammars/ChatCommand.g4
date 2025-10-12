@@ -1,5 +1,12 @@
 grammar ChatCommand;
-command: '/' name (arg+)? EOF ;
-name: [a-zA-Z]+ ;
-arg: WS+ [a-zA-Z0-9@._-]+ ;
-WS: [ \t\r\n]+ -> skip ;
+
+// Entry rule
+command
+    : SLASH CMD (WS ARG)* EOF
+    ;
+
+// Lexer rules
+SLASH   : '/' ;
+CMD     : [a-zA-Z]+ ;
+ARG     : [a-zA-Z0-9@._-]+ ;
+WS      : [ \t\r\n]+ -> skip ;
