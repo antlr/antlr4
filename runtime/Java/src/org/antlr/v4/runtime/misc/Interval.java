@@ -7,11 +7,7 @@ package org.antlr.v4.runtime.misc;
 
 /** An immutable inclusive interval a..b */
 public class Interval {
-	public static final int INTERVAL_POOL_MAX_VALUE = 1000;
-
 	public static final Interval INVALID = new Interval(-1,-2);
-
-	static final Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
 	public int a;
 	public int b;
@@ -25,14 +21,7 @@ public class Interval {
 	 *  have a..a (set with 1 element).
 	 */
 	public static Interval of(int a, int b) {
-		// cache just a..a
-		if ( a!=b || a<0 || a>INTERVAL_POOL_MAX_VALUE ) {
-			return new Interval(a,b);
-		}
-		if ( cache[a]==null ) {
-			cache[a] = new Interval(a,a);
-		}
-		return cache[a];
+		return new Interval(a,b);
 	}
 
 	/** return number of elements between a and b inclusively. x..x is length 1.
