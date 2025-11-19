@@ -9,8 +9,8 @@ package org.antlr.v4.runtime.misc;
 public class Interval {
 	public static final Interval INVALID = new Interval(-1,-2);
 
-	public int a;
-	public int b;
+	public final int a;
+	public final int b;
 
 	public Interval(int a, int b) { this.a=a; this.b=b; }
 

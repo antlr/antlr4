@@ -699,7 +699,7 @@ UNICODE_ESC
 				Interval badRange = Interval.of(getCharIndex()-2-hCount, getCharIndex());
 				String lastChar = input.substring(badRange.b, badRange.b);
 				if ( lastChar.codePointAt(0)=='\'' ) {
-					badRange.b--;
+					badRange = Interval.of(badRange.a, badRange.b-1);
 				}
 				String bad = input.substring(badRange.a, badRange.b);
 				Token t = new CommonToken(input, state.type, state.channel, badRange.a, badRange.b);
