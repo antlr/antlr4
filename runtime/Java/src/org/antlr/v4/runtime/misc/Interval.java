@@ -6,7 +6,7 @@
 package org.antlr.v4.runtime.misc;
 
 /** An immutable inclusive interval a..b */
-public class Interval {
+public final class Interval {
 	public static final Interval INVALID = new Interval(-1,-2);
 
 	public final int a;
