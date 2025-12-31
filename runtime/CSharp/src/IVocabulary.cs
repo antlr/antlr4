@@ -20,61 +20,68 @@ namespace Antlr4.Runtime
     /// <author>Sam Harwell</author>
     public interface IVocabulary
     {
-        /// <summary>Gets the string literal associated with a token type.</summary>
-        /// <remarks>
-        /// Gets the string literal associated with a token type. The string returned
-        /// by this method, when not
-        /// <see langword="null"/>
-        /// , can be used unaltered in a parser
-        /// grammar to represent this token type.
-        /// <p>The following table shows examples of lexer rules and the literal
-        /// names assigned to the corresponding token types.</p>
-        /// <table>
-        /// <tr>
-        /// <th>Rule</th>
-        /// <th>Literal Name</th>
-        /// <th>Java String Literal</th>
-        /// </tr>
-        /// <tr>
-        /// <td>
-        /// <c>THIS : 'this';</c>
-        /// </td>
-        /// <td>
-        /// <c>'this'</c>
-        /// </td>
-        /// <td>
-        /// <c>"'this'"</c>
-        /// </td>
-        /// </tr>
-        /// <tr>
-        /// <td>
-        /// <c>SQUOTE : '\'';</c>
-        /// </td>
-        /// <td>
-        /// <c>'\''</c>
-        /// </td>
-        /// <td>
-        /// <c>"'\\''"</c>
-        /// </td>
-        /// </tr>
-        /// <tr>
-        /// <td>
-        /// <c>ID : [A-Z]+;</c>
-        /// </td>
-        /// <td>n/a</td>
-        /// <td>
-        /// <see langword="null"/>
-        /// </td>
-        /// </tr>
-        /// </table>
-        /// </remarks>
-        /// <param name="tokenType">The token type.</param>
-        /// <returns>
-        /// The string literal associated with the specified token type, or
-        /// <see langword="null"/>
-        /// if no string literal is associated with the type.
-        /// </returns>
-        [return: Nullable]
+
+		/// <summary>
+		/// Returns the highest token type value. It can be used to iterate from
+		/// zero to that number, inclusively, thus querying all stored entries.
+		/// </summary>
+		int getMaxTokenType();
+
+		/// <summary>Gets the string literal associated with a token type.</summary>
+		/// <remarks>
+		/// Gets the string literal associated with a token type. The string returned
+		/// by this method, when not
+		/// <see langword="null"/>
+		/// , can be used unaltered in a parser
+		/// grammar to represent this token type.
+		/// <p>The following table shows examples of lexer rules and the literal
+		/// names assigned to the corresponding token types.</p>
+		/// <table>
+		/// <tr>
+		/// <th>Rule</th>
+		/// <th>Literal Name</th>
+		/// <th>Java String Literal</th>
+		/// </tr>
+		/// <tr>
+		/// <td>
+		/// <c>THIS : 'this';</c>
+		/// </td>
+		/// <td>
+		/// <c>'this'</c>
+		/// </td>
+		/// <td>
+		/// <c>"'this'"</c>
+		/// </td>
+		/// </tr>
+		/// <tr>
+		/// <td>
+		/// <c>SQUOTE : '\'';</c>
+		/// </td>
+		/// <td>
+		/// <c>'\''</c>
+		/// </td>
+		/// <td>
+		/// <c>"'\\''"</c>
+		/// </td>
+		/// </tr>
+		/// <tr>
+		/// <td>
+		/// <c>ID : [A-Z]+;</c>
+		/// </td>
+		/// <td>n/a</td>
+		/// <td>
+		/// <see langword="null"/>
+		/// </td>
+		/// </tr>
+		/// </table>
+		/// </remarks>
+		/// <param name="tokenType">The token type.</param>
+		/// <returns>
+		/// The string literal associated with the specified token type, or
+		/// <see langword="null"/>
+		/// if no string literal is associated with the type.
+		/// </returns>
+		[return: Nullable]
         string GetLiteralName(int tokenType);
 
         /// <summary>Gets the symbolic name associated with a token type.</summary>
