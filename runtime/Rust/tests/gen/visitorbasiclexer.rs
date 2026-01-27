@@ -21,8 +21,9 @@ use antlr4rust::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyConte
 use antlr4rust::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
 use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
 
-use antlr4rust::{lazy_static,Tid,TidAble,TidExt};
+use antlr4rust::{Tid,TidAble,TidExt};
 
+use std::sync::LazyLock;
 use std::sync::Arc;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -50,10 +51,10 @@ use std::ops::{Deref, DerefMut};
 	pub const _SYMBOLIC_NAMES: [Option<&'static str>;2]  = [
 		None, Some("A")
 	];
-	lazy_static!{
-	    static ref _shared_context_cache: Arc<PredictionContextCache> = Arc::new(PredictionContextCache::new());
-		static ref VOCABULARY: Box<dyn Vocabulary> = Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None));
-	}
+
+	static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|| PredictionContextCache::new());
+	static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
+
 
 
 pub type LexerContext<'input> = BaseRuleContext<'input,EmptyCustomRuleContext<'input,LocalTokenFactory<'input> >>;
@@ -104,9 +105,9 @@ impl<'input, Input:CharStream<From<'input> >> VisitorBasicLexer<'input,Input>{
 			base: BaseLexer::new_base_lexer(
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
-					_ATN.clone(),
-					_decision_to_DFA.clone(),
-					_shared_context_cache.clone(),
+					&_ATN,
+					&_decision_to_DFA,
+					&_shared_context_cache,
 				),
 				VisitorBasicLexerActions{},
 				tf
@@ -173,24 +174,22 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for VisitorBas
 }
 
 
-	lazy_static!{
-	    static ref _ATN: Arc<ATN> =
-	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-	    static ref _decision_to_DFA: Arc<Vec<DFA>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ))
-	        }
-	        Arc::new(dfa)
-	    };
-		static ref _serializedATN: Vec<i32> = vec![
-			4, 0, 1, 5, 6, -1, 2, 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 4, 
-			0, 1, 1, 0, 0, 0, 1, 3, 1, 0, 0, 0, 3, 4, 5, 65, 0, 0, 4, 2, 1, 0, 0, 
-			0, 1, 0, 0
-		];
-	}
+	static _ATN: LazyLock<ATN> =
+	    LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
+	static _decision_to_DFA: LazyLock<Vec<DFA>> = LazyLock::new(|| {
+	    let mut dfa = Vec::new();
+	    let size = _ATN.decision_to_state.len() as i32;
+	    for i in 0..size {
+	        dfa.push(DFA::new(
+	            &_ATN,
+	            _ATN.get_decision_state(i),
+	            i,
+	        ))
+	    }
+	    dfa
+	});
+	static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![
+	    4, 0, 1, 5, 6, -1, 2, 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 
+	    4, 0, 1, 1, 0, 0, 0, 1, 3, 1, 0, 0, 0, 3, 4, 5, 65, 0, 0, 4, 2, 1, 
+	    0, 0, 0, 1, 0, 0
+	]);

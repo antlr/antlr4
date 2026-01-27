@@ -121,7 +121,7 @@ impl DFAState {
             .configs
             .swap(Box::into_raw(configs), std::sync::atomic::Ordering::SeqCst);
         unsafe {
-            Box::from_raw(old);
+            drop(Box::from_raw(old));
         }
     }
 

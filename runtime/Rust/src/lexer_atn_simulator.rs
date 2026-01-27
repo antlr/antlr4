@@ -2,7 +2,6 @@
 use std::cell::Cell;
 
 use std::rc::Rc;
-use std::sync::Arc;
 use std::usize;
 
 use crate::atn::ATN;
@@ -84,8 +83,9 @@ impl ILexerATNSimulator for LexerATNSimulator {
         let result = (|| {
             self.start_index = lexer.input().index();
             self.prev_accept.reset();
-            let temp = self.base.decision_to_dfa.clone();
-            let dfa = temp
+            let dfa = self
+                .base
+                .decision_to_dfa
                 .get(mode)
                 .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
 
@@ -155,9 +155,9 @@ impl LexerATNSimulator {
     ///
     /// Called from generated parser.
     pub fn new_lexer_atnsimulator(
-        atn: Arc<ATN>,
-        decision_to_dfa: Arc<Vec<DFA>>,
-        shared_context_cache: Arc<PredictionContextCache>,
+        atn: &'static ATN,
+        decision_to_dfa: &'static Vec<DFA>,
+        shared_context_cache: &'static PredictionContextCache,
     ) -> LexerATNSimulator {
         LexerATNSimulator {
             base: BaseATNSimulator::new_base_atnsimulator(

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::convert::TryFrom;
 
 use std::sync::atomic::AtomicUsize;
-use std::sync::{Arc, RwLock};
+use std::sync::RwLock;
 
 use crate::atn::ATN;
 use crate::atn_config_set::ATNConfigSet;
@@ -93,13 +93,6 @@ impl StateStore {
         StateStore {
             inner: RwLock::new(inner),
         }
-    }
-
-    fn push_state(&self, state: DFAState) -> DFAStateRef {
-        let mut inner = self.inner.write().expect("unhandled lock poisoning");
-        let state_ref = inner.states.len();
-        inner.states.push(Box::new(state));
-        state_ref
     }
 
     pub fn len(&self) -> usize {
@@ -233,7 +226,7 @@ pub struct DFA {
 }
 
 impl DFA {
-    pub fn new(atn: Arc<ATN>, atn_start_state: ATNStateRef, decision: i32) -> DFA {
+    pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA {
         if let ATNStateType::DecisionState {
             state:
                 ATNDecisionState::StarLoopEntry {

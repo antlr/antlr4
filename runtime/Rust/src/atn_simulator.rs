@@ -1,6 +1,4 @@
 use std::fmt::{Debug, Error, Formatter};
-use std::ops::Deref;
-use std::sync::Arc;
 
 use crate::atn::ATN;
 use crate::dfa::DFA;
@@ -13,9 +11,9 @@ pub trait IATNSimulator {
 }
 
 pub struct BaseATNSimulator {
-    pub atn: Arc<ATN>,
-    pub shared_context_cache: Arc<PredictionContextCache>,
-    pub decision_to_dfa: Arc<Vec<DFA>>,
+    pub atn: &'static ATN,
+    pub shared_context_cache: &'static PredictionContextCache,
+    pub decision_to_dfa: &'static Vec<DFA>,
 }
 
 impl Debug for BaseATNSimulator {
@@ -26,9 +24,9 @@ impl Debug for BaseATNSimulator {
 
 impl BaseATNSimulator {
     pub fn new_base_atnsimulator(
-        atn: Arc<ATN>,
-        decision_to_dfa: Arc<Vec<DFA>>,
-        shared_context_cache: Arc<PredictionContextCache>,
+        atn: &'static ATN,
+        decision_to_dfa: &'static Vec<DFA>,
+        shared_context_cache: &'static PredictionContextCache,
     ) -> BaseATNSimulator {
         BaseATNSimulator {
             atn,
@@ -39,15 +37,15 @@ impl BaseATNSimulator {
 }
 
 impl IATNSimulator for BaseATNSimulator {
-    fn shared_context_cache(&self) -> &PredictionContextCache {
-        self.shared_context_cache.deref()
+    fn shared_context_cache(&self) -> &'static PredictionContextCache {
+        self.shared_context_cache
     }
 
-    fn atn(&self) -> &ATN {
-        self.atn.as_ref()
+    fn atn(&self) -> &'static ATN {
+        self.atn
     }
 
-    fn decision_to_dfa(&self) -> &Vec<DFA> {
-        self.decision_to_dfa.as_ref()
+    fn decision_to_dfa(&self) -> &'static Vec<DFA> {
+        self.decision_to_dfa
     }
 }

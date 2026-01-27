@@ -21,8 +21,9 @@ use antlr4rust::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyConte
 use antlr4rust::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
 use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
 
-use antlr4rust::{lazy_static,Tid,TidAble,TidExt};
+use antlr4rust::{Tid,TidAble,TidExt};
 
+use std::sync::LazyLock;
 use std::sync::Arc;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -56,10 +57,10 @@ use std::ops::{Deref, DerefMut};
 		None, Some("INT"), Some("MUL"), Some("DIV"), Some("ADD"), Some("SUB"), 
 		Some("WS")
 	];
-	lazy_static!{
-	    static ref _shared_context_cache: Arc<PredictionContextCache> = Arc::new(PredictionContextCache::new());
-		static ref VOCABULARY: Box<dyn Vocabulary> = Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None));
-	}
+
+	static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|| PredictionContextCache::new());
+	static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
+
 
 
 pub type LexerContext<'input> = BaseRuleContext<'input,EmptyCustomRuleContext<'input,LocalTokenFactory<'input> >>;
@@ -110,9 +111,9 @@ impl<'input, Input:CharStream<From<'input> >> VisitorCalcLexer<'input,Input>{
 			base: BaseLexer::new_base_lexer(
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
-					_ATN.clone(),
-					_decision_to_DFA.clone(),
-					_shared_context_cache.clone(),
+					&_ATN,
+					&_decision_to_DFA,
+					&_shared_context_cache,
 				),
 				VisitorCalcLexerActions{},
 				tf
@@ -179,36 +180,34 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for VisitorCal
 }
 
 
-	lazy_static!{
-	    static ref _ATN: Arc<ATN> =
-	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-	    static ref _decision_to_DFA: Arc<Vec<DFA>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ))
-	        }
-	        Arc::new(dfa)
-	    };
-		static ref _serializedATN: Vec<i32> = vec![
-			4, 0, 6, 33, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 
-			4, 7, 4, 2, 5, 7, 5, 1, 0, 4, 0, 15, 8, 0, 11, 0, 12, 0, 16, 1, 1, 1, 
-			1, 1, 2, 1, 2, 1, 3, 1, 3, 1, 4, 1, 4, 1, 5, 4, 5, 28, 8, 5, 11, 5, 12, 
-			5, 29, 1, 5, 1, 5, 0, 0, 6, 1, 1, 3, 2, 5, 3, 7, 4, 9, 5, 11, 6, 1, 0, 
-			2, 1, 0, 48, 57, 2, 0, 9, 9, 32, 32, 34, 0, 1, 1, 0, 0, 0, 0, 3, 1, 0, 
-			0, 0, 0, 5, 1, 0, 0, 0, 0, 7, 1, 0, 0, 0, 0, 9, 1, 0, 0, 0, 0, 11, 1, 
-			0, 0, 0, 1, 14, 1, 0, 0, 0, 3, 18, 1, 0, 0, 0, 5, 20, 1, 0, 0, 0, 7, 
-			22, 1, 0, 0, 0, 9, 24, 1, 0, 0, 0, 11, 27, 1, 0, 0, 0, 13, 15, 7, 0, 
-			0, 0, 14, 13, 1, 0, 0, 0, 15, 16, 1, 0, 0, 0, 16, 14, 1, 0, 0, 0, 16, 
-			17, 1, 0, 0, 0, 17, 2, 1, 0, 0, 0, 18, 19, 5, 42, 0, 0, 19, 4, 1, 0, 
-			0, 0, 20, 21, 5, 47, 0, 0, 21, 6, 1, 0, 0, 0, 22, 23, 5, 43, 0, 0, 23, 
-			8, 1, 0, 0, 0, 24, 25, 5, 45, 0, 0, 25, 10, 1, 0, 0, 0, 26, 28, 7, 1, 
-			0, 0, 27, 26, 1, 0, 0, 0, 28, 29, 1, 0, 0, 0, 29, 27, 1, 0, 0, 0, 29, 
-			30, 1, 0, 0, 0, 30, 31, 1, 0, 0, 0, 31, 32, 6, 5, 0, 0, 32, 12, 1, 0, 
-			0, 0, 3, 0, 16, 29, 1, 0, 1, 0
-		];
-	}
+	static _ATN: LazyLock<ATN> =
+	    LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
+	static _decision_to_DFA: LazyLock<Vec<DFA>> = LazyLock::new(|| {
+	    let mut dfa = Vec::new();
+	    let size = _ATN.decision_to_state.len() as i32;
+	    for i in 0..size {
+	        dfa.push(DFA::new(
+	            &_ATN,
+	            _ATN.get_decision_state(i),
+	            i,
+	        ))
+	    }
+	    dfa
+	});
+	static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![
+	    4, 0, 6, 33, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 
+	    2, 4, 7, 4, 2, 5, 7, 5, 1, 0, 4, 0, 15, 8, 0, 11, 0, 12, 0, 16, 1, 
+	    1, 1, 1, 1, 2, 1, 2, 1, 3, 1, 3, 1, 4, 1, 4, 1, 5, 4, 5, 28, 8, 5, 
+	    11, 5, 12, 5, 29, 1, 5, 1, 5, 0, 0, 6, 1, 1, 3, 2, 5, 3, 7, 4, 9, 5, 
+	    11, 6, 1, 0, 2, 1, 0, 48, 57, 2, 0, 9, 9, 32, 32, 34, 0, 1, 1, 0, 0, 
+	    0, 0, 3, 1, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 7, 1, 0, 0, 0, 0, 9, 1, 0, 
+	    0, 0, 0, 11, 1, 0, 0, 0, 1, 14, 1, 0, 0, 0, 3, 18, 1, 0, 0, 0, 5, 20, 
+	    1, 0, 0, 0, 7, 22, 1, 0, 0, 0, 9, 24, 1, 0, 0, 0, 11, 27, 1, 0, 0, 
+	    0, 13, 15, 7, 0, 0, 0, 14, 13, 1, 0, 0, 0, 15, 16, 1, 0, 0, 0, 16, 
+	    14, 1, 0, 0, 0, 16, 17, 1, 0, 0, 0, 17, 2, 1, 0, 0, 0, 18, 19, 5, 42, 
+	    0, 0, 19, 4, 1, 0, 0, 0, 20, 21, 5, 47, 0, 0, 21, 6, 1, 0, 0, 0, 22, 
+	    23, 5, 43, 0, 0, 23, 8, 1, 0, 0, 0, 24, 25, 5, 45, 0, 0, 25, 10, 1, 
+	    0, 0, 0, 26, 28, 7, 1, 0, 0, 27, 26, 1, 0, 0, 0, 28, 29, 1, 0, 0, 0, 
+	    29, 27, 1, 0, 0, 0, 29, 30, 1, 0, 0, 0, 30, 31, 1, 0, 0, 0, 31, 32, 
+	    6, 5, 0, 0, 32, 12, 1, 0, 0, 0, 3, 0, 16, 29, 1, 0, 1, 0
+	]);

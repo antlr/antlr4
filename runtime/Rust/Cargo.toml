@@ -17,11 +17,9 @@ exclude = ["/build.rs","/grammars","/templates"]
 debug = []
 
 [dependencies]
-lazy_static = "^1.4"
 uuid = "1.16.0"
 byteorder = "^1"
 murmur3 = "=0.4" # 0.5 is incompatible currently
 bit-set = "0.8.0"
 typed-arena = "^2.0"
 better_any = "0.2.0"
-scc = "3.1.2"

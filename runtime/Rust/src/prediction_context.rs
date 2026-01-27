@@ -4,7 +4,7 @@ use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
 use std::ops::Deref;
 
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, LazyLock, RwLock};
 
 use murmur3::murmur3_32::MurmurHasher;
 
@@ -140,10 +140,8 @@ impl Hash for PredictionContext {
     }
 }
 
-lazy_static! {
-    pub static ref EMPTY_PREDICTION_CONTEXT: Arc<PredictionContext> =
-        Arc::new(PredictionContext::new_empty());
-}
+pub static EMPTY_PREDICTION_CONTEXT: LazyLock<Arc<PredictionContext>> =
+    LazyLock::new(|| PredictionContext::new_empty().into());
 
 impl PredictionContext {
     pub fn new_array(

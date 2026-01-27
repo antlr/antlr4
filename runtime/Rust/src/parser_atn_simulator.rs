@@ -115,9 +115,9 @@ pub(crate) type MergeCache = HashMap<
 impl ParserATNSimulator {
     /// creates new `ParserATNSimulator`
     pub fn new(
-        atn: Arc<ATN>,
-        decision_to_dfa: Arc<Vec<DFA>>,
-        shared_context_cache: Arc<PredictionContextCache>,
+        atn: &'static ATN,
+        decision_to_dfa: &'static Vec<DFA>,
+        shared_context_cache: &'static PredictionContextCache,
     ) -> ParserATNSimulator {
         ParserATNSimulator {
             base: BaseATNSimulator::new_base_atnsimulator(

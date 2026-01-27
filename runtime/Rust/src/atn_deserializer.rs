@@ -1,5 +1,6 @@
 use std::slice::Iter;
 use std::str::FromStr;
+use std::sync::LazyLock;
 
 use uuid::Uuid;
 
@@ -19,22 +20,24 @@ use crate::lexer_action::*;
 use crate::transition::Transition;
 use crate::transition::*;
 
-lazy_static! {
-    static ref BASE_SERIALIZED_UUID: Uuid =
-        Uuid::from_str("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3").unwrap();
-    static ref ADDED_PRECEDENCE_TRANSITIONS: Uuid =
-        Uuid::from_str("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61").unwrap();
-    static ref ADDED_LEXER_ACTIONS: Uuid =
-        Uuid::from_str("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E").unwrap();
-    static ref ADDED_UNICODE_SMP: Uuid =
-        Uuid::from_str("59627784-3BE5-417A-B9EB-8131A7286089").unwrap();
-    static ref SUPPORTED_UUIDS: Vec<Uuid> = vec![
+/*
+static BASE_SERIALIZED_UUID: LazyLock<Uuid> =
+    LazyLock::new(|| Uuid::from_str("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3").unwrap());
+static ADDED_PRECEDENCE_TRANSITIONS: LazyLock<Uuid> =
+    LazyLock::new(|| Uuid::from_str("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61").unwrap());
+static ADDED_LEXER_ACTIONS: LazyLock<Uuid> =
+    LazyLock::new(|| Uuid::from_str("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E").unwrap());
+static ADDED_UNICODE_SMP: LazyLock<Uuid> =
+    LazyLock::new(|| Uuid::from_str("59627784-3BE5-417A-B9EB-8131A7286089").unwrap());
+static SUPPORTED_UUIDS: LazyLock<Vec<Uuid>> = LazyLock::new(|| {
+    vec![
         *BASE_SERIALIZED_UUID,
         *ADDED_PRECEDENCE_TRANSITIONS,
         *ADDED_LEXER_ACTIONS,
         *ADDED_UNICODE_SMP,
-    ];
-}
+    ]
+});
+*/
 
 const SERIALIZED_VERSION: i32 = 4;
 
@@ -51,8 +54,6 @@ impl ATNDeserializer {
     }
 
     pub fn deserialize(&self, data: &mut Iter<i32>) -> ATN {
-
-
         self.check_version(*data.next().unwrap());
 
         let mut atn = self.read_atn(data);
@@ -125,9 +126,7 @@ impl ATNDeserializer {
                     state: ATNDecisionState::BlockStartState { end_state, .. },
                     ..
                 } => *end_state = *data.next().unwrap(),
-                ATNStateType::LoopEndState(loop_back) => {
-                    *loop_back = *data.next().unwrap()
-                }
+                ATNStateType::LoopEndState(loop_back) => *loop_back = *data.next().unwrap(),
                 _ => (),
             }
             atn.add_state(state);
@@ -206,11 +205,7 @@ impl ATNDeserializer {
         }
     }
 
-    fn read_sets(
-        &self,
-        _atn: &mut ATN,
-        data: &mut Iter<i32>,
-    ) -> Vec<IntervalSet> {
+    fn read_sets(&self, _atn: &mut ATN, data: &mut Iter<i32>) -> Vec<IntervalSet> {
         let nsets = *data.next().unwrap();
         let mut sets = Vec::new();
         for _i in 0..nsets {
@@ -232,12 +227,7 @@ impl ATNDeserializer {
         sets
     }
 
-    fn read_edges(
-        &self,
-        atn: &mut ATN,
-        data: &mut Iter<i32>,
-        sets: &Vec<IntervalSet>,
-    ) {
+    fn read_edges(&self, atn: &mut ATN, data: &mut Iter<i32>, sets: &Vec<IntervalSet>) {
         let nedges = *data.next().unwrap();
 
         for _i in 0..nedges {
@@ -250,7 +240,10 @@ impl ATNDeserializer {
 
             let transition = self.edge_factory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 
-            atn.states.get_mut(src as usize).unwrap().add_transition(transition);
+            atn.states
+                .get_mut(src as usize)
+                .unwrap()
+                .add_transition(transition);
         }
 
         let mut new_tr = Vec::new();
@@ -368,8 +361,9 @@ impl ATNDeserializer {
                 if let ATNStateType::RuleStartState {
                     is_left_recursive: true,
                     ..
-                } =
-                    _atn.states[_atn.rule_to_start_state[state.get_rule_index() as usize] as usize].get_state_type()
+                } = _atn.states
+                    [_atn.rule_to_start_state[state.get_rule_index() as usize] as usize]
+                    .get_state_type()
                 {
                     let maybe_loop_end =
                         state.get_transitions().iter().last().unwrap().get_target();
@@ -378,7 +372,7 @@ impl ATNDeserializer {
                         if maybe_loop_end.has_epsilon_only_transitions() {
                             if let ATNStateType::RuleStopState = _atn.states
                                 [maybe_loop_end.get_transitions()[0].get_target() as usize]
-                            .get_state_type()
+                                .get_state_type()
                             {
                                 precedence_states.push(state.get_state_number())
                             }

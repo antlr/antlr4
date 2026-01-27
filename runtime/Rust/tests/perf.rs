@@ -1,8 +1,6 @@
 // #![feature(try_blocks)]
 // #![feature(inner_deref)]
 // #![feature(test)]
-#[macro_use]
-extern crate lazy_static;
 // extern crate test;
 
 // mod gen {

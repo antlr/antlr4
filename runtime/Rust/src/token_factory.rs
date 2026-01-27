@@ -6,6 +6,7 @@ use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
 use std::sync::atomic::AtomicIsize;
+use std::sync::LazyLock;
 
 use typed_arena::Arena;
 
@@ -14,10 +15,10 @@ use crate::token::Token;
 use crate::token::{CommonToken, OwningToken, TOKEN_INVALID_TYPE};
 use better_any::TidAble;
 
-lazy_static! {
-    pub(crate) static ref COMMON_TOKEN_FACTORY_DEFAULT: Box<CommonTokenFactory> =
-        Box::new(CommonTokenFactory {});
-    pub(crate) static ref INVALID_OWNING: Box<OwningToken> = Box::new(OwningToken {
+pub(crate) static COMMON_TOKEN_FACTORY_DEFAULT: LazyLock<Box<CommonTokenFactory>> =
+    LazyLock::new(|| Box::new(CommonTokenFactory {}));
+pub(crate) static INVALID_OWNING: LazyLock<Box<OwningToken>> = LazyLock::new(|| {
+    Box::new(OwningToken {
         token_type: TOKEN_INVALID_TYPE,
         channel: 0,
         start: -1,
@@ -27,8 +28,10 @@ lazy_static! {
         column: -1,
         text: "<invalid>".to_owned(),
         read_only: true,
-    });
-    pub(crate) static ref INVALID_COMMON: Box<CommonToken<'static>> = Box::new(CommonToken {
+    })
+});
+pub(crate) static INVALID_COMMON: LazyLock<Box<CommonToken<'static>>> = LazyLock::new(|| {
+    Box::new(CommonToken {
         token_type: TOKEN_INVALID_TYPE,
         channel: 0,
         start: -1,
@@ -38,8 +41,8 @@ lazy_static! {
         column: -1,
         text: Borrowed("<invalid>"),
         read_only: true,
-    });
-}
+    })
+});
 
 /// Trait for creating tokens.
 pub trait TokenFactory<'a>: TidAble<'a> + Sized {
