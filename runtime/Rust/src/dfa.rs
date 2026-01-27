@@ -11,7 +11,7 @@ use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::ATNStateType::RuleStopState;
 use crate::atn_state::{ATNDecisionState, ATNStateRef, ATNStateType};
 use crate::dfa_serializer::DFASerializer;
-use crate::dfa_state::{DFAState, DFAStateRef};
+use crate::dfa_state::{DFAState, DFAStateRef, DFA_STATE_INVALID_REF};
 use crate::vocabulary::Vocabulary;
 
 ///Helper trait for scope management and temporary values not living long enough
@@ -51,13 +51,14 @@ pub struct StateStore {
 }
 
 impl StateStore {
-    fn new() -> StateStore {
+    fn new(atn: &ATN) -> StateStore {
         let mut inner = StateStoreInner {
             states: Vec::new(),
             states_map: HashMap::new(),
         };
         // to indicate null
         inner.states.push(Box::pin(DFAState::new_dfastate(
+            atn,
             usize::MAX,
             Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
         )));
@@ -66,17 +67,19 @@ impl StateStore {
         }
     }
 
-    fn new_with_precedence() -> StateStore {
+    fn new_with_precedence(atn: &ATN) -> StateStore {
         let mut inner = StateStoreInner {
             states: Vec::new(),
             states_map: HashMap::new(),
         };
         // to indicate null
         inner.states.push(Box::pin(DFAState::new_dfastate(
+            atn,
             usize::MAX,
             Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
         )));
         let mut precedence_state = DFAState::new_dfastate(
+            atn,
             inner.states.len(),
             Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
         );
@@ -138,23 +141,25 @@ impl StateStore {
             configs
         });
 
-        let mut inner = self.inner.write().expect("unhandled lock poisoning");
-        let state_ref = inner.states.len();
-        state.state_number = state_ref;
+        {
+            let mut inner = self.inner.write().expect("unhandled lock poisoning");
+            let state_ref = inner.states.len();
+            state.state_number = state_ref;
 
-        inner.states.push(Box::pin(state));
-        inner
-            .states_map
-            .entry(state_hash)
-            .or_default()
-            .push(state_ref);
-        state_ref
+            inner.states.push(Box::pin(state));
+            inner
+                .states_map
+                .entry(state_hash)
+                .or_default()
+                .push(state_ref);
+            state_ref
+        }
     }
 
     pub fn add_state_from_configs(&self, configs: Box<ATNConfigSet>, atn: &ATN) -> DFAStateRef {
         assert!(!configs.has_semantic_context());
 
-        let mut state = DFAState::new_dfastate(usize::MAX, configs);
+        let mut state = DFAState::new_dfastate(atn, usize::MAX, configs);
         let rule_index = state
             .configs() //_configs
             .get_items()
@@ -184,22 +189,24 @@ impl StateStore {
                 }
             }
         }
-
-        let mut inner = self.inner.write().expect("unhandled lock poisoning");
-        let state_ref = inner.states.len();
-        state.state_number = state_ref;
         state.transform_configs(|mut configs| {
             configs.set_read_only(true);
             configs
         });
 
-        inner.states.push(Box::pin(state));
-        inner
-            .states_map
-            .entry(state_hash)
-            .or_default()
-            .push(state_ref);
-        state_ref
+        {
+            let mut inner = self.inner.write().expect("unhandled lock poisoning");
+            let state_ref = inner.states.len();
+            state.state_number = state_ref;
+
+            inner.states.push(Box::pin(state));
+            inner
+                .states_map
+                .entry(state_hash)
+                .or_default()
+                .push(state_ref);
+            state_ref
+        }
     }
 }
 
@@ -234,7 +241,7 @@ impl DFA {
             DFA {
                 atn_start_state,
                 decision,
-                states: StateStore::new_with_precedence(),
+                states: StateStore::new_with_precedence(atn),
                 s0: AtomicUsize::new(1 /* precedence state */),
                 is_precedence_dfa: true,
             }
@@ -242,8 +249,8 @@ impl DFA {
             DFA {
                 atn_start_state,
                 decision,
-                states: StateStore::new(),
-                s0: AtomicUsize::new(usize::MAX),
+                states: StateStore::new(atn),
+                s0: AtomicUsize::new(DFA_STATE_INVALID_REF),
                 is_precedence_dfa: false,
             }
         }

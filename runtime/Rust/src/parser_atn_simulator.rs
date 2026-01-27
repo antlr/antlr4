@@ -198,7 +198,7 @@ impl ParserATNSimulator {
                             .set_configs(Box::new(s0_closure));
                         let new_s0 = self.add_dfastate(
                             dfa_ref,
-                            DFAState::new_dfastate(0, Box::new(s0_closure_updated)),
+                            DFAState::new_dfastate(self.atn(), 0, Box::new(s0_closure_updated)),
                         );
 
                         dfa_ref.set_precedence_start_state(local.precedence, new_s0);
@@ -207,8 +207,10 @@ impl ParserATNSimulator {
                 } else {
                     //let mut dfa_mut = local.dfa_ref.borrow_mut();
                     let dfa_ref = local.dfa_ref;
-                    let s0 =
-                        self.add_dfastate(dfa_ref, DFAState::new_dfastate(0, Box::new(s0_closure)));
+                    let s0 = self.add_dfastate(
+                        dfa_ref,
+                        DFAState::new_dfastate(self.atn(), 0, Box::new(s0_closure)),
+                    );
                     dfa_ref.set_s0(s0);
                     s0
                 }
@@ -358,10 +360,6 @@ impl ParserATNSimulator {
             .get_state(previousD)
             .expect("DFA state not found")
             .get_edge((t + 1) as usize)
-            .and_then(|x| match x {
-                0 => None,
-                x => Some(x),
-            })
     }
 
     #[allow(non_snake_case)]
@@ -402,7 +400,7 @@ impl ParserATNSimulator {
         let predicted_alt = self.get_unique_alt(&reach);
         //        println!("predicted_alt {}",predicted_alt);
 
-        let mut D = DFAState::new_dfastate(0, reach.into());
+        let mut D = DFAState::new_dfastate(self.atn(), 0, reach.into());
         let reach = D.configs();
 
         if predicted_alt != INVALID_ALT {
@@ -1437,11 +1435,7 @@ impl ParserATNSimulator {
         if t < -1 || t > self.atn().max_token_type {
             return to;
         }
-        from.set_edge_with_target_size(
-            (t + 1) as usize,
-            to,
-            self.atn().max_token_type as usize + 2,
-        );
+        from.set_edge((t + 1) as usize, to);
         // if from.edges.is_empty() {
         //     from.edges.resize(self.atn().max_token_type as usize + 2, 0);
         // }

@@ -21,7 +21,6 @@ pub struct ATNConfigSet {
     // so i think we can replace configs and lookup with indexhashset
     config_lookup: HashMap<Key, usize, MurmurHasherBuilder>,
 
-    //todo remove box?
     pub(crate) configs: Vec<ATNConfig>,
 
     pub(crate) conflicting_alts: BitSet,

@@ -1,12 +1,13 @@
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::sync::atomic::{AtomicPtr, Ordering};
-use std::sync::RwLock;
+use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 
 use murmur3::murmur3_32::MurmurHasher;
 
+use crate::atn::ATN;
 use crate::atn_config_set::ATNConfigSet;
 use crate::lexer_action_executor::LexerActionExecutor;
+use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
 
 #[derive(Eq, PartialEq, Debug)]
@@ -23,6 +24,7 @@ impl Display for PredPrediction {
 
 //index in DFA.states
 pub type DFAStateRef = usize;
+pub const DFA_STATE_INVALID_REF: DFAStateRef = usize::MAX;
 
 #[derive(Debug)]
 pub struct DFAState {
@@ -32,7 +34,7 @@ pub struct DFAState {
     /// - 0 => no edge
     /// - usize::MAX => error edge
     /// - _ => actual edge
-    edges: RwLock<Vec<DFAStateRef>>,
+    edges: Vec<AtomicUsize>,
     pub is_accept_state: bool,
 
     pub prediction: i32,
@@ -62,12 +64,15 @@ impl DFAState {
         hasher.finish()
     }
 
-    pub fn new_dfastate(state_number: usize, configs: Box<ATNConfigSet>) -> DFAState {
+    pub fn new_dfastate(atn: &ATN, state_number: usize, configs: Box<ATNConfigSet>) -> DFAState {
+        let mut edges = Vec::new();
+        edges.resize_with(calc_edge_set_size(atn), || AtomicUsize::new(0));
+
         DFAState {
             state_number,
             configs: AtomicPtr::new(Box::into_raw(configs)),
             //            edges: Vec::with_capacity((MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize),
-            edges: RwLock::new(Vec::new()),
+            edges,
             is_accept_state: false,
             prediction: 0,
             lexer_action_executor: None,
@@ -77,36 +82,24 @@ impl DFAState {
     }
 
     pub fn get_edge(&self, index: usize) -> Option<DFAStateRef> {
-        let edges = self.edges.read().expect("unhandled lock poisoning");
-        edges.get(index).copied()
+        self.edges.get(index).and_then(|e| {
+            let v = e.load(Ordering::Relaxed);
+            if v == 0 {
+                None
+            } else {
+                Some(v)
+            }
+        })
     }
 
     pub fn set_edge(&self, index: usize, state_ref: DFAStateRef) {
-        let mut edges = self.edges.write().expect("unhandled lock poisoning");
-        if index >= edges.len() {
-            edges.resize(index + 1, 0);
-        }
-        edges[index] = state_ref;
-    }
-
-    pub fn set_edge_with_target_size(
-        &self,
-        index: usize,
-        state_ref: DFAStateRef,
-        size_target: usize,
-    ) {
-        let mut edges = self.edges.write().expect("unhandled lock poisoning");
-        if edges.len() < size_target {
-            edges.resize(size_target, 0);
-        }
-        edges[index] = state_ref;
+        self.edges[index].store(state_ref, Ordering::Relaxed);
     }
 
     pub fn enumerate_edges(&self) -> Vec<(usize, DFAStateRef)> {
-        let edges = self.edges.read().expect("unhandled lock poisoning");
-        edges
+        self.edges
             .iter()
-            .copied()
+            .map(|e| e.load(Ordering::Relaxed))
             .enumerate()
             .filter(|(_, v)| *v != 0)
             .collect()
@@ -137,4 +130,8 @@ impl DFAState {
     //    fn get_alt_set(&self) -> &Set { unimplemented!() }
 
     // fn set_prediction(&self, _v: i32) { unimplemented!() }
+}
+
+fn calc_edge_set_size(atn: &ATN) -> usize {
+    std::cmp::max(atn.max_token_type as usize + 2, LEXER_DFA_EDGE_SET_SIZE)
 }

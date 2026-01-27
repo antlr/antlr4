@@ -146,6 +146,7 @@ impl IATNSimulator for LexerATNSimulator {
 pub const MIN_DFA_EDGE: i32 = 0;
 #[allow(missing_docs)]
 pub const MAX_DFA_EDGE: i32 = 127;
+pub const LEXER_DFA_EDGE_SET_SIZE: usize = (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize;
 
 impl LexerATNSimulator {
     /// Creates `LexerATNSimulator` instance which creates DFA over `atn`
@@ -254,10 +255,6 @@ impl LexerATNSimulator {
             .get_state(s)
             .expect("DFA state not found")
             .get_edge((t - MIN_DFA_EDGE) as usize)
-            .and_then(|x| match x {
-                0 => None,
-                x => Some(x),
-            })
     }
 
     #[cold]
@@ -651,11 +648,7 @@ impl LexerATNSimulator {
             return;
         }
 
-        _from.set_edge_with_target_size(
-            (t - MIN_DFA_EDGE) as usize,
-            _to,
-            (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize,
-        );
+        _from.set_edge((t - MIN_DFA_EDGE) as usize, _to);
 
         // if _from.edges.len() < (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize {
         //     _from
