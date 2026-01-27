@@ -1,6 +1,6 @@
 #![allow(nonstandard_style)]
 // Generated from Labels.g4 by ANTLR 4.13.2
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 use super::labelsparser::*;
 
 pub trait LabelsListener<'input> : ParseTreeListener<'input,LabelsParserContextType>{
@@ -101,6 +101,6 @@ fn exit_inc(&mut self, _ctx: &IncContext<'input>) { }
 
 }
 
-antlr4rust::coerce_from!{ 'input : LabelsListener<'input> }
+dbt_antlr4::coerce_from!{ 'input : LabelsListener<'input> }
 
 

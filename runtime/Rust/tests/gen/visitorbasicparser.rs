@@ -6,28 +6,28 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_braces)]
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::visitorbasiclistener::*;
 use super::visitorbasicvisitor::*;
 
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -88,7 +88,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -137,7 +137,7 @@ pub trait VisitorBasicParserContext<'input>:
 	ParserRuleContext<'input, TF=LocalTokenFactory<'input>, Ctx=VisitorBasicParserContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : VisitorBasicParserContext<'input> }
+dbt_antlr4::coerce_from!{ 'input : VisitorBasicParserContext<'input> }
 
 impl<'input, 'x, T> VisitableDyn<T> for dyn VisitorBasicParserContext<'input> + 'input
 where
@@ -151,12 +151,12 @@ where
 impl<'input> VisitorBasicParserContext<'input> for TerminalNode<'input,VisitorBasicParserContextType> {}
 impl<'input> VisitorBasicParserContext<'input> for ErrorNode<'input,VisitorBasicParserContextType> {}
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicParserContext<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicParserContext<'input> + 'input }
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicListener<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicListener<'input> + 'input }
 
 pub struct VisitorBasicParserContextType;
-antlr4rust::tid!{VisitorBasicParserContextType}
+dbt_antlr4::tid!{VisitorBasicParserContextType}
 
 impl<'input> ParserNodeType<'input> for VisitorBasicParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -189,7 +189,7 @@ pub struct VisitorBasicParserExt<'input>{
 
 impl<'input> VisitorBasicParserExt<'input>{
 }
-antlr4rust::tid! { VisitorBasicParserExt<'a> }
+dbt_antlr4::tid! { VisitorBasicParserExt<'a> }
 
 impl<'input> TokenAware<'input> for VisitorBasicParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
@@ -242,7 +242,7 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-antlr4rust::tid!{SContextExt<'a>}
+dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorBasicParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {

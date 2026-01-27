@@ -42,8 +42,8 @@ Pass() ::= "/* do nothing */"
 StringList() ::= "Vec\<String>"
 BuildParseTrees() ::= "recog.build_parse_trees = true;"
 BailErrorStrategy() ::=
-<<use antlr4rust::TidExt;
-recog.set_error_strategy(Box::new(antlr4rust::error_strategy::BailErrorStrategy::new()));
+<<use dbt_antlr4::TidExt;
+recog.set_error_strategy(Box::new(dbt_antlr4::error_strategy::BailErrorStrategy::new()));
 >>
 
 ToStringTree(s) ::= "<s>.to_string_tree(&recog.base)"
@@ -65,7 +65,7 @@ ImportRuleInvocationStack() ::= ""
 
 RuleInvocationStack() ::= "format!(\"[{}]\",recog.get_rule_invocation_stack().join(\", \"))"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<recog.get_interpreter().set_prediction_mode(antlr4rust::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
+LL_EXACT_AMBIG_DETECTION() ::= <<recog.get_interpreter().set_prediction_mode(dbt_antlr4::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
 
 //ParserToken(parser, token) ::= <%<parser>.<token>%>
 ParserToken(parser, token) ::= <%_<token>%>
@@ -109,7 +109,7 @@ impl\<T:CustomRuleContext> Deref for MyRuleNode\<T>{
 impl\<T:CustomRuleContext> DerefMut for MyRuleNode\<T>{
 	fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
-impl\<T:CustomRuleContext> antlr4rust::parser_rule_context::DerefSeal for MyRuleNode\<T>{}
+impl\<T:CustomRuleContext> dbt_antlr4::parser_rule_context::DerefSeal for MyRuleNode\<T>{}
 }
 >>
 
@@ -156,7 +156,7 @@ PositionAdjustingLexerDef() ::= <<
 trait PositionAdjustingLexerATNSim {
     fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: isize, charPositionInLine: isize);
   }
-impl PositionAdjustingLexerATNSim for antlr4rust::lexer_atn_simulator::LexerATNSimulator{
+impl PositionAdjustingLexerATNSim for dbt_antlr4::lexer_atn_simulator::LexerATNSimulator{
     fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: isize, charPositionInLine: isize) {
       input.seek(index);
       self.set_line(line);
@@ -198,7 +198,7 @@ TTreeWalker::walk(Box::new(TestListener), <s>.deref());
 
 TokenGetterListener(X) ::= <<
 @parser::definitions {
-use antlr4rust::tree::Tree;
+use dbt_antlr4::tree::Tree;
 struct TestListener;
 
 impl TListener\<'_> for TestListener{
@@ -217,7 +217,7 @@ impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
 RuleGetterListener(X) ::= <<
 @parser::definitions {
 
-use antlr4rust::tree::Tree;
+use dbt_antlr4::tree::Tree;
 struct TestListener;
 
 impl TListener\<'_> for TestListener{
@@ -240,7 +240,7 @@ impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
 
 LRListener(X) ::= <<
 @parser::definitions {
-use antlr4rust::tree::Tree;
+use dbt_antlr4::tree::Tree;
 struct TestListener;
 
 impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
@@ -259,8 +259,8 @@ impl TListener\<'_> for TestListener{
 LRWithLabelsListener(X) ::= <<
 @parser::definitions {
 
-use antlr4rust::tree::Tree;
-use antlr4rust::parser_rule_context::RuleContextExt;
+use dbt_antlr4::tree::Tree;
+use dbt_antlr4::parser_rule_context::RuleContextExt;
 struct TestListener;
 
 impl ParseTreeListener\<'_,TParserContextType> for TestListener{}

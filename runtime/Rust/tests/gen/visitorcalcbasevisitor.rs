@@ -1,7 +1,7 @@
 
 // Generated from VisitorCalc.g4 by ANTLR 4.13.2
 
-use antlr4rust::tree::ParseTreeVisitor;
+use dbt_antlr4::tree::ParseTreeVisitor;
 use super::visitorcalcparser::*;
 
 // A complete Visitor for a parse tree produced by VisitorCalcParser.

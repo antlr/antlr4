@@ -1,6 +1,6 @@
 #![allow(nonstandard_style)]
 // Generated from VisitorCalc.g4 by ANTLR 4.13.2
-use antlr4rust::tree::{ParseTreeVisitor,ParseTreeVisitorCompat};
+use dbt_antlr4::tree::{ParseTreeVisitor,ParseTreeVisitorCompat};
 use super::visitorcalcparser::*;
 
 /**

@@ -1,6 +1,6 @@
 #![allow(nonstandard_style)]
 // Generated from VisitorCalc.g4 by ANTLR 4.13.2
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 use super::visitorcalcparser::*;
 
 pub trait VisitorCalcListener<'input> : ParseTreeListener<'input,VisitorCalcParserContextType>{
@@ -53,6 +53,6 @@ fn exit_multiply(&mut self, _ctx: &MultiplyContext<'input>) { }
 
 }
 
-antlr4rust::coerce_from!{ 'input : VisitorCalcListener<'input> }
+dbt_antlr4::coerce_from!{ 'input : VisitorCalcListener<'input> }
 
 

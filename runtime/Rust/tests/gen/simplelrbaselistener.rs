@@ -1,7 +1,7 @@
 // Generated from SimpleLR.g4 by ANTLR 4.13.2
 
 use super::simplelrparser::*;
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 
 // A complete Visitor for a parse tree produced by SimpleLRParser.
 

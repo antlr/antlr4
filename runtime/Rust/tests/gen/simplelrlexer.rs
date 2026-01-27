@@ -3,25 +3,25 @@
 #![allow(nonstandard_style)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use antlr4rust::atn::ATN;
-use antlr4rust::char_stream::CharStream;
-use antlr4rust::int_stream::IntStream;
-use antlr4rust::tree::ParseTree;
-use antlr4rust::lexer::{BaseLexer, Lexer, LexerRecog};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
-use antlr4rust::PredictionContextCache;
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::error_listener::ErrorListener;
-use antlr4rust::TokenSource;
-use antlr4rust::token_factory::{TokenFactory,CommonTokenFactory,TokenAware};
-use antlr4rust::token::*;
-use antlr4rust::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyContext};
-use antlr4rust::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::atn::ATN;
+use dbt_antlr4::char_stream::CharStream;
+use dbt_antlr4::int_stream::IntStream;
+use dbt_antlr4::tree::ParseTree;
+use dbt_antlr4::lexer::{BaseLexer, Lexer, LexerRecog};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::error_listener::ErrorListener;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::token_factory::{TokenFactory,CommonTokenFactory,TokenAware};
+use dbt_antlr4::token::*;
+use dbt_antlr4::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyContext};
+use dbt_antlr4::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 
-use antlr4rust::{Tid,TidAble,TidExt};
+use dbt_antlr4::{Tid,TidAble,TidExt};
 
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -66,7 +66,7 @@ pub struct SimpleLRLexer<'input, Input:CharStream<From<'input> >> {
 	base: BaseLexer<'input,SimpleLRLexerActions,Input,LocalTokenFactory<'input>>,
 }
 
-antlr4rust::tid! { impl<'input,Input> TidAble<'input> for SimpleLRLexer<'input,Input> where Input:CharStream<From<'input> > }
+dbt_antlr4::tid! { impl<'input,Input> TidAble<'input> for SimpleLRLexer<'input,Input> where Input:CharStream<From<'input> > }
 
 impl<'input, Input:CharStream<From<'input> >> Deref for SimpleLRLexer<'input,Input>{
 	type Target = BaseLexer<'input,SimpleLRLexerActions,Input,LocalTokenFactory<'input>>;
@@ -100,7 +100,7 @@ impl<'input, Input:CharStream<From<'input> >> SimpleLRLexer<'input,Input>{
     }
 
 	pub fn new_with_token_factory(input: Input, tf: &'input LocalTokenFactory<'input>) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
     	Self {
 			base: BaseLexer::new_base_lexer(
 				input,

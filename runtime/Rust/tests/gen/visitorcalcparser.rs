@@ -6,28 +6,28 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_braces)]
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::visitorcalclistener::*;
 use super::visitorcalcvisitor::*;
 
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -95,7 +95,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -144,7 +144,7 @@ pub trait VisitorCalcParserContext<'input>:
 	ParserRuleContext<'input, TF=LocalTokenFactory<'input>, Ctx=VisitorCalcParserContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : VisitorCalcParserContext<'input> }
+dbt_antlr4::coerce_from!{ 'input : VisitorCalcParserContext<'input> }
 
 impl<'input, 'x, T> VisitableDyn<T> for dyn VisitorCalcParserContext<'input> + 'input
 where
@@ -158,12 +158,12 @@ where
 impl<'input> VisitorCalcParserContext<'input> for TerminalNode<'input,VisitorCalcParserContextType> {}
 impl<'input> VisitorCalcParserContext<'input> for ErrorNode<'input,VisitorCalcParserContextType> {}
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcParserContext<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcParserContext<'input> + 'input }
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcListener<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcListener<'input> + 'input }
 
 pub struct VisitorCalcParserContextType;
-antlr4rust::tid!{VisitorCalcParserContextType}
+dbt_antlr4::tid!{VisitorCalcParserContextType}
 
 impl<'input> ParserNodeType<'input> for VisitorCalcParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -196,7 +196,7 @@ pub struct VisitorCalcParserExt<'input>{
 
 impl<'input> VisitorCalcParserExt<'input>{
 }
-antlr4rust::tid! { VisitorCalcParserExt<'a> }
+dbt_antlr4::tid! { VisitorCalcParserExt<'a> }
 
 impl<'input> TokenAware<'input> for VisitorCalcParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
@@ -276,7 +276,7 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-antlr4rust::tid!{SContextExt<'a>}
+dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorCalcParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {
@@ -352,9 +352,9 @@ pub enum ExprContextAll<'input>{
 	MultiplyContext(MultiplyContext<'input>),
 Error(ExprContext<'input>)
 }
-antlr4rust::tid!{ExprContextAll<'a>}
+dbt_antlr4::tid!{ExprContextAll<'a>}
 
-impl<'input> antlr4rust::parser_rule_context::DerefSeal for ExprContextAll<'input>{}
+impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for ExprContextAll<'input>{}
 
 impl<'input> VisitorCalcParserContext<'input> for ExprContextAll<'input>{}
 
@@ -401,7 +401,7 @@ impl<'input> CustomRuleContext<'input> for ExprContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_expr }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_expr }
 }
-antlr4rust::tid!{ExprContextExt<'a>}
+dbt_antlr4::tid!{ExprContextExt<'a>}
 
 impl<'input> ExprContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorCalcParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<ExprContextAll<'input>> {
@@ -451,7 +451,7 @@ pub struct AddContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{AddContextExt<'a>}
+dbt_antlr4::tid!{AddContextExt<'a>}
 
 impl<'input> VisitorCalcParserContext<'input> for AddContext<'input>{}
 
@@ -520,7 +520,7 @@ pub struct NumberContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{NumberContextExt<'a>}
+dbt_antlr4::tid!{NumberContextExt<'a>}
 
 impl<'input> VisitorCalcParserContext<'input> for NumberContext<'input>{}
 
@@ -600,7 +600,7 @@ pub struct MultiplyContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{MultiplyContextExt<'a>}
+dbt_antlr4::tid!{MultiplyContextExt<'a>}
 
 impl<'input> VisitorCalcParserContext<'input> for MultiplyContext<'input>{}
 

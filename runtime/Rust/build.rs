@@ -22,7 +22,7 @@ fn main() {
         None,
         None,
     ];
-    let antlr_path = "../../../tool/target/antlr4-4.13.3-SNAPSHOT-complete.jar";
+    let antlr_path = "../../../tool/target/antlr4-4.13.3-DBT1-complete.jar";
 
     for (grammar, arg) in grammars.into_iter().zip(additional_args) {
         //ignoring error because we do not need to run anything when deploying to crates.io
@@ -31,7 +31,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed=build.rs");
 
-    println!("cargo:rerun-if-changed=../../../tool/target/antlr4-4.13.3-SNAPSHOT-complete.jar");
+    println!("cargo:rerun-if-changed=../../../tool/target/antlr4-4.13.3-DBT1-complete.jar");
 }
 
 fn gen_for_grammar(

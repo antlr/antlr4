@@ -112,7 +112,7 @@ public class RustRunner extends RuntimeRunner {
 				if (!file.isFile()) {
 					return false;
 				}
-				return name.startsWith("libantlr4rust-") && name.endsWith(".rlib");
+                return name.startsWith("libdbt_antlr4-") && name.endsWith(".rlib");
 			}
 		};
 
@@ -143,7 +143,7 @@ public class RustRunner extends RuntimeRunner {
 			String[] arguments = {"rustc",
 				"--crate-name", "Rust", "--edition=2024", "src" + File.separator + "main.rs", "--out-dir",
 				"target" + File.separator + "debug",
-				"-L", "dependency=" + depsPath, "--extern", "antlr4rust=" + depsPath + File.separator + libName};
+                    "-L", "dependency=" + depsPath, "--extern", "dbt_antlr4=" + depsPath + File.separator + libName };
 			Processor.run(arguments, getTempDirPath(), environment);
 		} catch (InterruptedException | IOException e) {
 			ex = e;

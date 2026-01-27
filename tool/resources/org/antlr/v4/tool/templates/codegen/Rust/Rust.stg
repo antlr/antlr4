@@ -58,24 +58,24 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 #![allow(unused_mut)]
 #![allow(unused_braces)]
 <namedActions.header>
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 <if(file.genListener)>
 use super::<file.grammarName; format="lower">listener::*;
 <endif>
@@ -83,7 +83,7 @@ use super::<file.grammarName; format="lower">listener::*;
 use super::<file.grammarName; format="lower">visitor::*;
 <endif>
 
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -102,7 +102,7 @@ ListenerFile(file, header, namedActions) ::= <<
 #![allow(nonstandard_style)]
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <header>
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 use super::<file.parserName; format="lower">::*;
 
 pub trait <file.grammarName>Listener\<'input> : ParseTreeListener\<'input,<file.parserName>ContextType>{
@@ -130,7 +130,7 @@ fn exit_<lname>(&mut self, _ctx: &<lname; format="cap">Context\<'input>) { \}}; 
 
 }
 
-antlr4rust::coerce_from!{ 'input : <file.grammarName>Listener\<'input> }
+dbt_antlr4::coerce_from!{ 'input : <file.grammarName>Listener\<'input> }
 
 
 
@@ -145,7 +145,7 @@ BaseListenerFile(file, header, namedActions) ::= <<
 <endif>
 
 use super::<file.parserName; format="lower">::*;
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 
 // A complete Visitor for a parse tree produced by <file.parserName>.
 
@@ -172,7 +172,7 @@ VisitorFile(file, header, namedActions) ::= <<
 #![allow(nonstandard_style)]
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <header>
-use antlr4rust::tree::{ParseTreeVisitor,ParseTreeVisitorCompat};
+use dbt_antlr4::tree::{ParseTreeVisitor,ParseTreeVisitorCompat};
 use super::<file.parserName; format="lower">::*;
 
 /**
@@ -229,7 +229,7 @@ BaseVisitorFile(file, header, namedActions) ::= <<
 
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-use antlr4rust::tree::ParseTreeVisitor;
+use dbt_antlr4::tree::ParseTreeVisitor;
 use super::<file.parserName; format="lower">::*;
 
 <if(header)>
@@ -305,7 +305,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box\<dyn ErrorStrategy\<'input,BaseParserType\<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -355,7 +355,7 @@ pub trait <parser.name>Context\<'input>:
 	ParserRuleContext\<'input, TF=<TokenFactory()>, Ctx=<parser.name>ContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : <parser.name>Context\<'input> }
+dbt_antlr4::coerce_from!{ 'input : <parser.name>Context\<'input> }
 
 <if(file.genVisitor)>
 impl\<'input, 'x, T> VisitableDyn\<T> for dyn <parser.name>Context\<'input> + 'input
@@ -371,12 +371,12 @@ where
 impl\<'input> <parser.name>Context\<'input> for TerminalNode\<'input,<parser.name>ContextType> {}
 impl\<'input> <parser.name>Context\<'input> for ErrorNode\<'input,<parser.name>ContextType> {}
 
-antlr4rust::tid! { impl\<'input> TidAble\<'input> for dyn <parser.name>Context\<'input> + 'input }
+dbt_antlr4::tid! { impl\<'input> TidAble\<'input> for dyn <parser.name>Context\<'input> + 'input }
 
-antlr4rust::tid! { impl\<'input> TidAble\<'input> for dyn <parser.grammarName>Listener\<'input> + 'input }
+dbt_antlr4::tid! { impl\<'input> TidAble\<'input> for dyn <parser.grammarName>Listener\<'input> + 'input }
 
 pub struct <parser.name>ContextType;
-antlr4rust::tid!{<parser.name>ContextType}
+dbt_antlr4::tid!{<parser.name>ContextType}
 
 impl\<'input> ParserNodeType\<'input> for <parser.name>ContextType{
 	type TF = <TokenFactory()>;
@@ -415,7 +415,7 @@ pub struct <parser.name>Ext\<'input>{
 impl\<'input> <parser.name>Ext\<'input>{
 	<namedActions.members>
 }
-antlr4rust::tid! { <parser.name>Ext\<'a> }
+dbt_antlr4::tid! { <parser.name>Ext\<'a> }
 
 impl\<'input> TokenAware\<'input> for <parser.name>Ext\<'input>{
 	type TF = <TokenFactory()>;
@@ -547,9 +547,9 @@ pub enum <currentRule.ctxType>All\<'input>{
 	<altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(<altLabelCtxs.(l).struct.escapedName>\<'input>),
 	}>Error(<ruleCtx.struct.escapedName>\<'input>)
 }
-antlr4rust::tid!{<currentRule.ctxType>All\<'a>}
+dbt_antlr4::tid!{<currentRule.ctxType>All\<'a>}
 
-impl\<'input> antlr4rust::parser_rule_context::DerefSeal for <currentRule.ctxType>All\<'input>{}
+impl\<'input> dbt_antlr4::parser_rule_context::DerefSeal for <currentRule.ctxType>All\<'input>{}
 
 impl\<'input> <parser.grammarName>ParserContext\<'input> for <currentRule.ctxType>All\<'input>{}
 
@@ -1095,7 +1095,7 @@ impl\<'input> CustomRuleContext\<'input> for <struct.escapedName>Ext\<'input>{
 	fn get_rule_index(&self) -> usize { RULE_<struct.derivedFromName> }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_<struct.derivedFromName> }
 }
-antlr4rust::tid!{<struct.escapedName>Ext\<'a>}
+dbt_antlr4::tid!{<struct.escapedName>Ext\<'a>}
 
 impl\<'input> <struct.escapedName>Ext\<'input>{
 	fn new(parent: Option\<Rc\<dyn <parser.name>Context\<'input> + 'input > >, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> Rc\<<struct.escapedName>All\<'input>\> {
@@ -1150,7 +1150,7 @@ pub struct <struct.escapedName>Ext\<'input>{
 }>	ph:PhantomData\<&'input str>
 }
 
-antlr4rust::tid!{<struct.escapedName>Ext\<'a>}
+dbt_antlr4::tid!{<struct.escapedName>Ext\<'a>}
 
 impl\<'input> <parser.name>Context\<'input> for <struct.escapedName>\<'input>{}
 
@@ -1298,25 +1298,25 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 <namedActions.header>
-use antlr4rust::atn::ATN;
-use antlr4rust::char_stream::CharStream;
-use antlr4rust::int_stream::IntStream;
-use antlr4rust::tree::ParseTree;
-use antlr4rust::lexer::{BaseLexer, Lexer, LexerRecog};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
-use antlr4rust::PredictionContextCache;
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::error_listener::ErrorListener;
-use antlr4rust::TokenSource;
-use antlr4rust::token_factory::{TokenFactory,CommonTokenFactory,TokenAware};
-use antlr4rust::token::*;
-use antlr4rust::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyContext};
-use antlr4rust::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::atn::ATN;
+use dbt_antlr4::char_stream::CharStream;
+use dbt_antlr4::int_stream::IntStream;
+use dbt_antlr4::tree::ParseTree;
+use dbt_antlr4::lexer::{BaseLexer, Lexer, LexerRecog};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::error_listener::ErrorListener;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::token_factory::{TokenFactory,CommonTokenFactory,TokenAware};
+use dbt_antlr4::token::*;
+use dbt_antlr4::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyContext};
+use dbt_antlr4::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 
-use antlr4rust::{Tid,TidAble,TidExt};
+use dbt_antlr4::{Tid,TidAble,TidExt};
 
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -1362,7 +1362,7 @@ pub struct <lexer.name>\<'input, Input:CharStream\<From\<'input> >\> {
 	base: BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>,
 }
 
-antlr4rust::tid! { impl\<'input,Input> TidAble\<'input> for <lexer.name>\<'input,Input> where Input:CharStream\<From\<'input> > }
+dbt_antlr4::tid! { impl\<'input,Input> TidAble\<'input> for <lexer.name>\<'input,Input> where Input:CharStream\<From\<'input> > }
 
 impl\<'input, Input:CharStream\<From\<'input> >\> Deref for <lexer.name>\<'input,Input>{
 	type Target = BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>;
@@ -1396,7 +1396,7 @@ impl\<'input, Input:CharStream\<From\<'input> >\> <lexer.name>\<'input,Input>{
     }
 
 	pub fn new_with_token_factory(input: Input, tf: &'input <TokenFactory()>) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
     	Self {
 			base: BaseLexer::new_base_lexer(
 				input,

@@ -1,6 +1,6 @@
 #![allow(nonstandard_style)]
 // Generated from CSV.g4 by ANTLR 4.13.2
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 use super::csvparser::*;
 
 pub trait CSVListener<'input> : ParseTreeListener<'input,CSVParserContextType>{
@@ -47,6 +47,6 @@ fn exit_field(&mut self, _ctx: &FieldContext<'input>) { }
 
 }
 
-antlr4rust::coerce_from!{ 'input : CSVListener<'input> }
+dbt_antlr4::coerce_from!{ 'input : CSVListener<'input> }
 
 

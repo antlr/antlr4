@@ -1,11 +1,11 @@
 [package]
-name = "antlr4rust"
-version = "0.5.2"
-authors = ["Konstantin Anisimov <rrevenantt@gmail.com>", "Alex Snaps <alex@wcgw.dev>"]
-homepage = "https://github.com/antlr4rust/antlr4"
-repository = "https://github.com/antlr4rust/antlr4"
-documentation = "https://docs.rs/antlr4rust"
-description = "ANTLR4 runtime for Rust"
+name = "dbt-antlr4"
+version = "0.50.2"
+authors = ["Konstantin Anisimov <rrevenantt@gmail.com>", "Alex Snaps <alex@wcgw.dev>", "Bo Lin <bo@dreamsphere.org>"]
+homepage = "https://github.com/sdf-labs/antlr4"
+repository = "https://github.com/sdf-labs/antlr4"
+documentation = "https://docs.rs/dbt-antlr4"
+description = "Dbt fork of ANTLR4 runtime for Rust"
 readme = "README.md"
 edition = "2021"
 license = "BSD-3-Clause"

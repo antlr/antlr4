@@ -6,28 +6,28 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_braces)]
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::csvlistener::*;
 use super::csvvisitor::*;
 
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -72,7 +72,7 @@ type BaseParserType<'input, I> =
 
 type TokenType<'input> = <LocalTokenFactory<'input> as TokenFactory<'input>>::Tok;
 
-pub type LocalTokenFactory<'input> = antlr4rust::token_factory::ArenaCommonFactory<'input>;
+pub type LocalTokenFactory<'input> = dbt_antlr4::token_factory::ArenaCommonFactory<'input>;
 
 pub type CSVTreeWalker<'input,'a> =
 	ParseTreeWalker<'input, 'a, CSVParserContextType , dyn CSVListener<'input> + 'a>;
@@ -97,7 +97,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -146,7 +146,7 @@ pub trait CSVParserContext<'input>:
 	ParserRuleContext<'input, TF=LocalTokenFactory<'input>, Ctx=CSVParserContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : CSVParserContext<'input> }
+dbt_antlr4::coerce_from!{ 'input : CSVParserContext<'input> }
 
 impl<'input, 'x, T> VisitableDyn<T> for dyn CSVParserContext<'input> + 'input
 where
@@ -160,12 +160,12 @@ where
 impl<'input> CSVParserContext<'input> for TerminalNode<'input,CSVParserContextType> {}
 impl<'input> CSVParserContext<'input> for ErrorNode<'input,CSVParserContextType> {}
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn CSVParserContext<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn CSVParserContext<'input> + 'input }
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn CSVListener<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn CSVListener<'input> + 'input }
 
 pub struct CSVParserContextType;
-antlr4rust::tid!{CSVParserContextType}
+dbt_antlr4::tid!{CSVParserContextType}
 
 impl<'input> ParserNodeType<'input> for CSVParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -198,7 +198,7 @@ pub struct CSVParserExt<'input>{
 
 impl<'input> CSVParserExt<'input>{
 }
-antlr4rust::tid! { CSVParserExt<'a> }
+dbt_antlr4::tid! { CSVParserExt<'a> }
 
 impl<'input> TokenAware<'input> for CSVParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
@@ -251,7 +251,7 @@ impl<'input> CustomRuleContext<'input> for CsvFileContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_csvFile }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_csvFile }
 }
-antlr4rust::tid!{CsvFileContextExt<'a>}
+dbt_antlr4::tid!{CsvFileContextExt<'a>}
 
 impl<'input> CsvFileContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<CsvFileContextAll<'input>> {
@@ -373,7 +373,7 @@ impl<'input> CustomRuleContext<'input> for HdrContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_hdr }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_hdr }
 }
-antlr4rust::tid!{HdrContextExt<'a>}
+dbt_antlr4::tid!{HdrContextExt<'a>}
 
 impl<'input> HdrContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<HdrContextAll<'input>> {
@@ -471,7 +471,7 @@ impl<'input> CustomRuleContext<'input> for RowContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_row }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_row }
 }
-antlr4rust::tid!{RowContextExt<'a>}
+dbt_antlr4::tid!{RowContextExt<'a>}
 
 impl<'input> RowContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<RowContextAll<'input>> {
@@ -606,7 +606,7 @@ impl<'input> CustomRuleContext<'input> for FieldContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_field }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_field }
 }
-antlr4rust::tid!{FieldContextExt<'a>}
+dbt_antlr4::tid!{FieldContextExt<'a>}
 
 impl<'input> FieldContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<FieldContextAll<'input>> {

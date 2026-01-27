@@ -1,7 +1,7 @@
 grammar ReferenceToATN;
 
 @tokenfactory{
-pub type LocalTokenFactory<'input> = antlr4rust::token_factory::OwningTokenFactory; // need single quote here '
+pub type LocalTokenFactory<'input> = dbt_antlr4::token_factory::OwningTokenFactory; // need single quote here '
 }
 
 a : (ID|ATN)* ATN? {println!("{}",$text);};

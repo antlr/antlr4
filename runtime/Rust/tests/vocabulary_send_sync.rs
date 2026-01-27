@@ -3,7 +3,7 @@
 //! This module verifies that the Vocabulary trait and its implementations
 //! properly implement Send and Sync traits for thread-safe usage.
 
-use antlr4rust::vocabulary::{Vocabulary, VocabularyImpl};
+use dbt_antlr4::vocabulary::{Vocabulary, VocabularyImpl};
 use std::sync::Arc;
 use std::thread;
 

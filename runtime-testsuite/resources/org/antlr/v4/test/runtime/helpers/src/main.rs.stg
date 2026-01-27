@@ -1,20 +1,20 @@
 use std::env;
-use antlr4rust::parser::ParserNodeType;
-use antlr4rust::{InputStream, Lexer, Parser};
-use antlr4rust::common_token_stream::CommonTokenStream;
-use antlr4rust::error_listener::DiagnosticErrorListener;
-use antlr4rust::int_stream::IntStream;
-use antlr4rust::lexer::LEXER_DEFAULT_MODE;
-use antlr4rust::PredictionMode;
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::tree::{IsError, LeafNode, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
+use dbt_antlr4::parser::ParserNodeType;
+use dbt_antlr4::{InputStream, Lexer, Parser};
+use dbt_antlr4::common_token_stream::CommonTokenStream;
+use dbt_antlr4::error_listener::DiagnosticErrorListener;
+use dbt_antlr4::int_stream::IntStream;
+use dbt_antlr4::lexer::LEXER_DEFAULT_MODE;
+use dbt_antlr4::PredictionMode;
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::tree::{IsError, LeafNode, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
 mod <lexerName; format="lower">;
 use <lexerName; format="lower">::<lexerName>;
 <if(parserName)>
 mod <parserName; format="lower">;
 use <parserName; format="lower">::<parserName>;
 use <parserName; format="lower">::<grammarName>ParserContextType;
-use antlr4rust::errors::ANTLRError;
+use dbt_antlr4::errors::ANTLRError;
 <endif>
 <if(useListener)>
 mod <grammarName; format="lower">baselistener;

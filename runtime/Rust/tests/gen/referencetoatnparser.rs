@@ -6,26 +6,26 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_braces)]
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::referencetoatnlistener::*;
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -63,7 +63,7 @@ type BaseParserType<'input, I> =
 
 type TokenType<'input> = <LocalTokenFactory<'input> as TokenFactory<'input>>::Tok;
 
-pub type LocalTokenFactory<'input> = antlr4rust::token_factory::OwningTokenFactory; // need single quote here '
+pub type LocalTokenFactory<'input> = dbt_antlr4::token_factory::OwningTokenFactory; // need single quote here '
 
 pub type ReferenceToATNTreeWalker<'input,'a> =
 	ParseTreeWalker<'input, 'a, ReferenceToATNParserContextType , dyn ReferenceToATNListener<'input> + 'a>;
@@ -88,7 +88,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -136,17 +136,17 @@ pub trait ReferenceToATNParserContext<'input>:
 	ParserRuleContext<'input, TF=LocalTokenFactory<'input>, Ctx=ReferenceToATNParserContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : ReferenceToATNParserContext<'input> }
+dbt_antlr4::coerce_from!{ 'input : ReferenceToATNParserContext<'input> }
 
 impl<'input> ReferenceToATNParserContext<'input> for TerminalNode<'input,ReferenceToATNParserContextType> {}
 impl<'input> ReferenceToATNParserContext<'input> for ErrorNode<'input,ReferenceToATNParserContextType> {}
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn ReferenceToATNParserContext<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn ReferenceToATNParserContext<'input> + 'input }
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn ReferenceToATNListener<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn ReferenceToATNListener<'input> + 'input }
 
 pub struct ReferenceToATNParserContextType;
-antlr4rust::tid!{ReferenceToATNParserContextType}
+dbt_antlr4::tid!{ReferenceToATNParserContextType}
 
 impl<'input> ParserNodeType<'input> for ReferenceToATNParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -179,7 +179,7 @@ pub struct ReferenceToATNParserExt<'input>{
 
 impl<'input> ReferenceToATNParserExt<'input>{
 }
-antlr4rust::tid! { ReferenceToATNParserExt<'a> }
+dbt_antlr4::tid! { ReferenceToATNParserExt<'a> }
 
 impl<'input> TokenAware<'input> for ReferenceToATNParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
@@ -225,7 +225,7 @@ impl<'input> CustomRuleContext<'input> for AContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_a }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_a }
 }
-antlr4rust::tid!{AContextExt<'a>}
+dbt_antlr4::tid!{AContextExt<'a>}
 
 impl<'input> AContextExt<'input>{
 	fn new(parent: Option<Rc<dyn ReferenceToATNParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<AContextAll<'input>> {

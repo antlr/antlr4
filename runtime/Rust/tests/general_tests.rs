@@ -11,19 +11,19 @@ mod gen {
     use std::fmt::Write;
     use std::iter::FromIterator;
 
-    use antlr4rust::common_token_stream::CommonTokenStream;
-    use antlr4rust::errors::ANTLRError;
-    use antlr4rust::int_stream::IntStream;
-    use antlr4rust::lexer::Lexer;
+    use dbt_antlr4::common_token_stream::CommonTokenStream;
+    use dbt_antlr4::errors::ANTLRError;
+    use dbt_antlr4::int_stream::IntStream;
+    use dbt_antlr4::lexer::Lexer;
 
-    use antlr4rust::token::{Token, TOKEN_EOF};
-    use antlr4rust::token_factory::{ArenaCommonFactory, OwningTokenFactory};
-    use antlr4rust::token_stream::{TokenStream, UnbufferedTokenStream};
-    use antlr4rust::tree::{ParseTree, ParseTreeListener, TerminalNode};
-    use antlr4rust::InputStream;
     use csvlexer::*;
     use csvlistener::*;
     use csvparser::CSVParser;
+    use dbt_antlr4::token::{Token, TOKEN_EOF};
+    use dbt_antlr4::token_factory::{ArenaCommonFactory, OwningTokenFactory};
+    use dbt_antlr4::token_stream::{TokenStream, UnbufferedTokenStream};
+    use dbt_antlr4::tree::{ParseTree, ParseTreeListener, TerminalNode};
+    use dbt_antlr4::InputStream;
     use referencetoatnlexer::ReferenceToATNLexer;
     use referencetoatnlistener::ReferenceToATNListener;
     use referencetoatnparser::ReferenceToATNParser;

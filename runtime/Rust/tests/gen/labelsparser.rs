@@ -6,26 +6,26 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_braces)]
-use antlr4rust::PredictionContextCache;
-use antlr4rust::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
-use antlr4rust::token_stream::TokenStream;
-use antlr4rust::TokenSource;
-use antlr4rust::parser_atn_simulator::ParserATNSimulator;
-use antlr4rust::errors::*;
-use antlr4rust::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
-use antlr4rust::recognizer::{Recognizer,Actions};
-use antlr4rust::atn_deserializer::ATNDeserializer;
-use antlr4rust::dfa::DFA;
-use antlr4rust::atn::{ATN, INVALID_ALT};
-use antlr4rust::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use antlr4rust::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
-use antlr4rust::tree::*;
-use antlr4rust::token::{TOKEN_EOF,OwningToken,Token};
-use antlr4rust::int_stream::EOF;
-use antlr4rust::vocabulary::{Vocabulary,VocabularyImpl};
-use antlr4rust::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
+use dbt_antlr4::PredictionContextCache;
+use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ParserNodeType};
+use dbt_antlr4::token_stream::TokenStream;
+use dbt_antlr4::TokenSource;
+use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
+use dbt_antlr4::errors::*;
+use dbt_antlr4::rule_context::{BaseRuleContext, CustomRuleContext, RuleContext};
+use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::atn::{ATN, INVALID_ALT};
+use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext,cast,cast_mut};
+use dbt_antlr4::tree::*;
+use dbt_antlr4::token::{TOKEN_EOF,OwningToken,Token};
+use dbt_antlr4::int_stream::EOF;
+use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
+use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::labelslistener::*;
-use antlr4rust::{TidAble,TidExt};
+use dbt_antlr4::{TidAble,TidExt};
 
 use std::marker::PhantomData;
 use std::sync::LazyLock;
@@ -96,7 +96,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
-		antlr4rust::recognizer::check_version("0","5");
+		dbt_antlr4::recognizer::check_version("0","50");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -144,17 +144,17 @@ pub trait LabelsParserContext<'input>:
 	ParserRuleContext<'input, TF=LocalTokenFactory<'input>, Ctx=LabelsParserContextType>
 {}
 
-antlr4rust::coerce_from!{ 'input : LabelsParserContext<'input> }
+dbt_antlr4::coerce_from!{ 'input : LabelsParserContext<'input> }
 
 impl<'input> LabelsParserContext<'input> for TerminalNode<'input,LabelsParserContextType> {}
 impl<'input> LabelsParserContext<'input> for ErrorNode<'input,LabelsParserContextType> {}
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn LabelsParserContext<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn LabelsParserContext<'input> + 'input }
 
-antlr4rust::tid! { impl<'input> TidAble<'input> for dyn LabelsListener<'input> + 'input }
+dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn LabelsListener<'input> + 'input }
 
 pub struct LabelsParserContextType;
-antlr4rust::tid!{LabelsParserContextType}
+dbt_antlr4::tid!{LabelsParserContextType}
 
 impl<'input> ParserNodeType<'input> for LabelsParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -187,7 +187,7 @@ pub struct LabelsParserExt<'input>{
 
 impl<'input> LabelsParserExt<'input>{
 }
-antlr4rust::tid! { LabelsParserExt<'a> }
+dbt_antlr4::tid! { LabelsParserExt<'a> }
 
 impl<'input> TokenAware<'input> for LabelsParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
@@ -267,7 +267,7 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-antlr4rust::tid!{SContextExt<'a>}
+dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn LabelsParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {
@@ -342,9 +342,9 @@ pub enum EContextAll<'input>{
 	IncContext(IncContext<'input>),
 Error(EContext<'input>)
 }
-antlr4rust::tid!{EContextAll<'a>}
+dbt_antlr4::tid!{EContextAll<'a>}
 
-impl<'input> antlr4rust::parser_rule_context::DerefSeal for EContextAll<'input>{}
+impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for EContextAll<'input>{}
 
 impl<'input> LabelsParserContext<'input> for EContextAll<'input>{}
 
@@ -390,7 +390,7 @@ impl<'input> CustomRuleContext<'input> for EContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_e }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_e }
 }
-antlr4rust::tid!{EContextExt<'a>}
+dbt_antlr4::tid!{EContextExt<'a>}
 
 impl<'input> EContextExt<'input>{
 	fn new(parent: Option<Rc<dyn LabelsParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<EContextAll<'input>> {
@@ -437,7 +437,7 @@ pub struct AddContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{AddContextExt<'a>}
+dbt_antlr4::tid!{AddContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for AddContext<'input>{}
 
@@ -495,7 +495,7 @@ pub struct ParensContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{ParensContextExt<'a>}
+dbt_antlr4::tid!{ParensContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for ParensContext<'input>{}
 
@@ -558,7 +558,7 @@ pub struct MultContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{MultContextExt<'a>}
+dbt_antlr4::tid!{MultContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for MultContext<'input>{}
 
@@ -617,7 +617,7 @@ pub struct DecContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{DecContextExt<'a>}
+dbt_antlr4::tid!{DecContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for DecContext<'input>{}
 
@@ -677,7 +677,7 @@ pub struct AnIDContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{AnIDContextExt<'a>}
+dbt_antlr4::tid!{AnIDContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for AnIDContext<'input>{}
 
@@ -737,7 +737,7 @@ pub struct AnIntContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{AnIntContextExt<'a>}
+dbt_antlr4::tid!{AnIntContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for AnIntContext<'input>{}
 
@@ -795,7 +795,7 @@ pub struct IncContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-antlr4rust::tid!{IncContextExt<'a>}
+dbt_antlr4::tid!{IncContextExt<'a>}
 
 impl<'input> LabelsParserContext<'input> for IncContext<'input>{}
 

@@ -1,6 +1,6 @@
 #![allow(nonstandard_style)]
 // Generated from VisitorBasic.g4 by ANTLR 4.13.2
-use antlr4rust::tree::ParseTreeListener;
+use dbt_antlr4::tree::ParseTreeListener;
 use super::visitorbasicparser::*;
 
 pub trait VisitorBasicListener<'input> : ParseTreeListener<'input,VisitorBasicParserContextType>{
@@ -17,6 +17,6 @@ fn exit_s(&mut self, _ctx: &SContext<'input>) { }
 
 }
 
-antlr4rust::coerce_from!{ 'input : VisitorBasicListener<'input> }
+dbt_antlr4::coerce_from!{ 'input : VisitorBasicListener<'input> }
 
 
