@@ -203,11 +203,15 @@ impl DFA {
     ) -> &'a DFAState<'a> {
         let mut state_store = self.states.lock().expect("unhandled lock poisoning");
 
-        if let Some(existing) = state_store.get(&DFAStateKey::from_proposed(&proposed)) {
-            return unsafe {
-                std::mem::transmute::<&DFAState<'static>, &DFAState<'a>>(&**existing)
-            };
-        }
+        let proposed = {
+            let mut proposed = proposed;
+            if let Some(existing) = state_store.get(&DFAStateKey::from_proposed(&mut proposed)) {
+                return unsafe {
+                    std::mem::transmute::<&DFAState<'static>, &DFAState<'a>>(&**existing)
+                };
+            }
+            proposed
+        };
 
         let state =
             Self::stored_state_from_proposed(proposed, state_store.len() as i32, interpreter);
@@ -272,7 +276,7 @@ impl DFAStateKey {
         DFAStateKey(entry.configs() as *const ATNConfigSet as *mut ATNConfigSet)
     }
 
-    pub fn from_proposed(state: &ProposedDFAState) -> Self {
+    pub fn from_proposed(state: &mut ProposedDFAState) -> Self {
         DFAStateKey(&state.configs as *const ATNConfigSet as *mut ATNConfigSet)
     }
 }
