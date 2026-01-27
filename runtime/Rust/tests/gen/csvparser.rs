@@ -323,7 +323,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -421,7 +421,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -556,7 +556,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -682,13 +682,13 @@ where
 					}
 				}
 
-				_ => Err(ANTLRError::NoAltError(NoViableAltError::new(&mut recog.base)))?
+				_ => Err(ANTLRError::no_alt(&mut recog.base))?
 			}
 			Ok(())
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);

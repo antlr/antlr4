@@ -332,7 +332,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -709,7 +709,7 @@ where
 							recog.base.set_state(10);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 2)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
 							}
 							recog.base.set_state(11);
 							_la = recog.base.input.la(1);
@@ -738,7 +738,7 @@ where
 							recog.base.set_state(13);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 1)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 1)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 1)".to_owned()), None))?;
 							}
 							recog.base.set_state(14);
 							_la = recog.base.input.la(1);
@@ -771,7 +771,7 @@ where
 		})();
 		match result {
 		Ok(_) => {},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re)=>{
 			//_localctx.exception = re;
 			recog.err_handler.report_error(&mut recog.base, re);

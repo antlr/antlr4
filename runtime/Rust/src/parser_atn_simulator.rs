@@ -19,7 +19,7 @@ use crate::atn_state::ATNStateType::RuleStopState;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, ATNStateType, ATNSTATE_BLOCK_END};
 use crate::dfa::{ScopeExt, DFA};
 use crate::dfa_state::{DFAState, DFAStateRef, PredPrediction};
-use crate::errors::{ANTLRError, NoViableAltError};
+use crate::errors::ANTLRError;
 use crate::int_stream::EOF;
 use crate::interval_set::IntervalSet;
 use crate::lexer_atn_simulator::ERROR_DFA_STATE_REF;
@@ -1417,11 +1417,7 @@ impl ParserATNSimulator {
         let start_token = Token::to_owned(start_token);
         let offending_token = local.input().lt(1).unwrap().borrow();
         let offending_token = Token::to_owned(offending_token);
-        ANTLRError::NoAltError(NoViableAltError::new_full(
-            local.parser,
-            start_token,
-            offending_token,
-        ))
+        ANTLRError::no_alt_full(local.parser, start_token, offending_token)
     }
 
     fn get_unique_alt(&self, configs: &ATNConfigSet) -> i32 {

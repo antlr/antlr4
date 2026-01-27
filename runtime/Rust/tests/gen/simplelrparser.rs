@@ -299,7 +299,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -417,7 +417,7 @@ where
 					recog.base.set_state(9);
 					if !({let _localctx = Some(_localctx.clone());
 					recog.precpred(None, 2)}) {
-						Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
+						Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
 					}
 					recog.base.set_state(10);
 					recog.base.match_token(SimpleLR_ID,&mut recog.err_handler)?;
@@ -434,7 +434,7 @@ where
 		})();
 		match result {
 		Ok(_) => {},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re)=>{
 			//_localctx.exception = re;
 			recog.err_handler.report_error(&mut recog.base, re);

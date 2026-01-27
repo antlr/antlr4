@@ -11,7 +11,9 @@ use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::*;
 use crate::char_stream::{CharStream, InputData};
 use crate::dfa::ScopeExt;
-use crate::errors::{ANTLRError, FailedPredicateError, InputMisMatchError, NoViableAltError};
+use crate::errors::{
+    ANTLRError, ANTLRErrorKind, FailedPredicateError, InputMisMatchError, NoViableAltError,
+};
 use crate::interval_set::IntervalSet;
 use crate::parser::{Parser, ParserNodeType};
 use crate::parser_rule_context::ParserRuleContext;
@@ -421,17 +423,13 @@ impl<'a, T: Parser<'a>> ErrorStrategy<'a, T> for DefaultErrorStrategy<'a, T::Nod
         }
 
         if let Some(next_tokens_ctx) = &self.next_tokens_ctx {
-            Err(ANTLRError::InputMismatchError(
-                InputMisMatchError::with_state(
-                    recognizer,
-                    self.next_tokens_state,
-                    next_tokens_ctx.clone(),
-                ),
+            Err(ANTLRError::input_mismatch_with_state(
+                recognizer,
+                self.next_tokens_state,
+                next_tokens_ctx.clone(),
             ))
         } else {
-            Err(ANTLRError::InputMismatchError(InputMisMatchError::new(
-                recognizer,
-            )))
+            Err(ANTLRError::input_mismatch(recognizer))
         }
         //        Err(ANTLRError::IllegalStateError("aaa".to_string()))
     }
@@ -488,9 +486,7 @@ impl<'a, T: Parser<'a>> ErrorStrategy<'a, T> for DefaultErrorStrategy<'a, T::Nod
             | ATNSTATE_STAR_BLOCK_START
             | ATNSTATE_STAR_LOOP_ENTRY => {
                 if self.single_token_deletion(recognizer).is_none() {
-                    return Err(ANTLRError::InputMismatchError(InputMisMatchError::new(
-                        recognizer,
-                    )));
+                    return Err(ANTLRError::input_mismatch(recognizer));
                 }
             }
             ATNSTATE_PLUS_LOOP_BACK | ATNSTATE_STAR_LOOP_BACK => {
@@ -515,10 +511,10 @@ impl<'a, T: Parser<'a>> ErrorStrategy<'a, T> for DefaultErrorStrategy<'a, T::Nod
         }
 
         self.begin_error_condition(recognizer);
-        let msg = match e {
-            ANTLRError::NoAltError(e) => self.report_no_viable_alternative(recognizer, e),
-            ANTLRError::InputMismatchError(e) => self.report_input_mismatch(recognizer, e),
-            ANTLRError::PredicateError(e) => self.report_failed_predicate(recognizer, e),
+        let msg = match e.as_ref() {
+            ANTLRErrorKind::NoAltError(e) => self.report_no_viable_alternative(recognizer, e),
+            ANTLRErrorKind::InputMismatchError(e) => self.report_input_mismatch(recognizer, e),
+            ANTLRErrorKind::PredicateError(e) => self.report_failed_predicate(recognizer, e),
             _ => e.to_string(),
         };
         let offending_token_index = e.get_offending_token().map(|it| it.get_token_index());
@@ -580,7 +576,7 @@ impl<'input, Ctx: ParserNodeType<'input>> BailErrorStrategy<'input, Ctx> {
             ctx.set_exception(e.clone());
             ctx = ctx.get_parent()?
         })();
-        ANTLRError::FallThrough(Arc::new(ParseCancelledError(e.clone())))
+        ANTLRError::fall_through(Arc::new(ParseCancelledError(e.clone())))
     }
 }
 
@@ -612,7 +608,7 @@ impl<'a, T: Parser<'a>> ErrorStrategy<'a, T> for BailErrorStrategy<'a, T::Node> 
         &mut self,
         recognizer: &mut T,
     ) -> Result<<T::TF as TokenFactory<'a>>::Tok, ANTLRError> {
-        let err = ANTLRError::InputMismatchError(InputMisMatchError::new(recognizer));
+        let err = ANTLRError::input_mismatch(recognizer);
 
         Err(self.process_error(recognizer, &err))
     }

@@ -318,7 +318,7 @@ where
 		})();
 		match result {
 		Ok(_)=>{},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				recog.err_handler.report_error(&mut recog.base, re);
@@ -929,7 +929,7 @@ where
 					}
 				}
 
-				_ => Err(ANTLRError::NoAltError(NoViableAltError::new(&mut recog.base)))?
+				_ => Err(ANTLRError::no_alt(&mut recog.base))?
 			}
 			let tmp = recog.input.lt(-1).cloned();
 			recog.ctx.as_ref().unwrap().set_stop(tmp);
@@ -956,7 +956,7 @@ where
 							recog.base.set_state(18);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 7)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 7)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 7)".to_owned()), None))?;
 							}
 							recog.base.set_state(19);
 							let tmp = recog.base.match_token(Labels_T__0,&mut recog.err_handler)?;
@@ -989,7 +989,7 @@ where
 							recog.base.set_state(23);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 6)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 6)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 6)".to_owned()), None))?;
 							}
 							recog.base.set_state(24);
 							recog.base.match_token(Labels_T__1,&mut recog.err_handler)?;
@@ -1020,7 +1020,7 @@ where
 							recog.base.set_state(28);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 3)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 3)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 3)".to_owned()), None))?;
 							}
 							recog.base.set_state(29);
 							recog.base.match_token(Labels_T__4,&mut recog.err_handler)?;
@@ -1044,7 +1044,7 @@ where
 							recog.base.set_state(31);
 							if !({let _localctx = Some(_localctx.clone());
 							recog.precpred(None, 2)}) {
-								Err(FailedPredicateError::new(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
+								Err(ANTLRError::failed_predicate(&mut recog.base, Some("recog.precpred(None, 2)".to_owned()), None))?;
 							}
 							recog.base.set_state(32);
 							recog.base.match_token(Labels_T__5,&mut recog.err_handler)?;
@@ -1069,7 +1069,7 @@ where
 		})();
 		match result {
 		Ok(_) => {},
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re)=>{
 			//_localctx.exception = re;
 			recog.err_handler.report_error(&mut recog.base, re);

@@ -11,7 +11,6 @@ use crate::atn_state::{ATNState, ATNStateType};
 use crate::dfa::DFA;
 use crate::dfa_state::{DFAState, DFAStateRef};
 use crate::errors::ANTLRError;
-use crate::errors::ANTLRError::LexerNoAltError;
 use crate::int_stream::{IntStream, EOF};
 use crate::lexer::{Lexer, LexerPosition, LEXER_MAX_CHAR_VALUE, LEXER_MIN_CHAR_VALUE};
 use crate::lexer_action_executor::LexerActionExecutor;
@@ -85,7 +84,7 @@ impl ILexerATNSimulator for LexerATNSimulator {
                 .base
                 .decision_to_dfa
                 .get(mode)
-                .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
+                .ok_or_else(|| ANTLRError::illegal_state("invalid mode".into()))?;
 
             match dfa.get_s0() {
                 None => self.match_atn(lexer, dfa),
@@ -189,7 +188,7 @@ impl LexerATNSimulator {
         let start_state = *atn
             .mode_to_start_state
             .get(self.mode)
-            .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
+            .ok_or_else(|| ANTLRError::illegal_state("invalid mode".into()))?;
 
         let _old_mode = self.mode;
         let mut s0_closure =
@@ -390,9 +389,7 @@ impl LexerATNSimulator {
             if _t == EOF && lexer.input().index() == self.start_index {
                 return Ok(TOKEN_EOF);
             }
-            Err(LexerNoAltError {
-                start_index: self.start_index,
-            })
+            Err(ANTLRError::lexer_no_alt(self.start_index))
         }
     }
 

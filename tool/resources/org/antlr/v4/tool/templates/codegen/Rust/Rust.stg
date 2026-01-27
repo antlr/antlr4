@@ -617,7 +617,7 @@ where
 		<if(exceptions)>
         <exceptions; separator="\n">
         <endif>
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re) => {
 				//_localctx.exception = re;
 				<self()>.err_handler.report_error(&mut <self()>.base, re);
@@ -675,7 +675,7 @@ where
 		<if(exceptions)>
         <exceptions; separator="\n">
         <endif>
-        Err(e @ ANTLRError::FallThrough(_)) => return Err(e),
+        Err(e) if !e.is_recoverable() => return Err(e),
 		Err(ref re)=>{
 			//_localctx.exception = re;
 			<self()>.err_handler.report_error(&mut <self()>.base, re);
@@ -838,7 +838,7 @@ loop {
 
 Sync(s) ::= "<self()>.err_handler.sync(<s.expecting.escapedName>)?;"
 
-ThrowNoViableAlt(t) ::= "ANTLRError::NoAltError(NoViableAltError::new(&mut <self()>.base))"
+ThrowNoViableAlt(t) ::= "ANTLRError::no_alt(&mut <self()>.base)"
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.tokens)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
@@ -935,7 +935,7 @@ SemPred(p, chunks, failChunks) ::= <<
 <! its a hack to handle chunks being same here and in *_sempred() !>
 if !({let _localctx = Some(_localctx.clone());
 <chunks>}) {
-	Err(FailedPredicateError::new(&mut <self()>.base, Some(<p.predicate>.to_owned())<if(failChunks)>, Some(<failChunks>.to_owned())<elseif(p.msg)>, Some(<p.msg>.to_owned())<else>, None<endif>))?;
+	Err(ANTLRError::failed_predicate(&mut <self()>.base, Some(<p.predicate>.to_owned())<if(failChunks)>, Some(<failChunks>.to_owned())<elseif(p.msg)>, Some(<p.msg>.to_owned())<else>, None<endif>))?;
 }
 >>
 
