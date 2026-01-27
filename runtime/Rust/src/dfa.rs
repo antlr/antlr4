@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
+use std::pin::Pin;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::RwLock;
 
@@ -38,8 +39,7 @@ impl<Any: Sized> ScopeExt for Any {}
 
 #[derive(Debug)]
 struct StateStoreInner {
-    #[allow(clippy::vec_box)] // Box for pinning in memory
-    states: Vec<Box<DFAState>>,
+    states: Vec<Pin<Box<DFAState>>>,
     // for faster duplicate search
     // TODO i think DFAState.edges can contain references to its elements
     states_map: HashMap</* DFAState hash*/ u64, Vec<DFAStateRef>>,
@@ -57,13 +57,10 @@ impl StateStore {
             states_map: HashMap::new(),
         };
         // to indicate null
-        inner.states.push(
-            DFAState::new_dfastate(
-                usize::MAX,
-                Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
-            )
-            .into(),
-        );
+        inner.states.push(Box::pin(DFAState::new_dfastate(
+            usize::MAX,
+            Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
+        )));
         StateStore {
             inner: RwLock::new(inner),
         }
@@ -75,13 +72,10 @@ impl StateStore {
             states_map: HashMap::new(),
         };
         // to indicate null
-        inner.states.push(
-            DFAState::new_dfastate(
-                usize::MAX,
-                Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
-            )
-            .into(),
-        );
+        inner.states.push(Box::pin(DFAState::new_dfastate(
+            usize::MAX,
+            Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
+        )));
         let mut precedence_state = DFAState::new_dfastate(
             inner.states.len(),
             Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
@@ -89,7 +83,7 @@ impl StateStore {
         //precedence_state.edges = vec![];
         precedence_state.is_accept_state = false;
         precedence_state.requires_full_context = false;
-        inner.states.push(precedence_state.into());
+        inner.states.push(Box::pin(precedence_state));
 
         StateStore {
             inner: RwLock::new(inner),
@@ -148,7 +142,7 @@ impl StateStore {
         let state_ref = inner.states.len();
         state.state_number = state_ref;
 
-        inner.states.push(Box::new(state));
+        inner.states.push(Box::pin(state));
         inner
             .states_map
             .entry(state_hash)
@@ -199,7 +193,7 @@ impl StateStore {
             configs
         });
 
-        inner.states.push(Box::new(state));
+        inner.states.push(Box::pin(state));
         inner
             .states_map
             .entry(state_hash)
