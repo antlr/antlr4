@@ -263,17 +263,17 @@ fn is_precedence_atn_state(atn: &ATN, atn_start_state: ATNStateRef) -> bool {
 }
 
 #[derive(Clone)]
-struct DFAStateKey(*const ATNConfigSet);
+struct DFAStateKey(*mut ATNConfigSet);
 
 unsafe impl Send for DFAStateKey {}
 
 impl DFAStateKey {
     pub fn from_state(entry: &StoredDFAState) -> Self {
-        DFAStateKey(entry.configs() as *const ATNConfigSet)
+        DFAStateKey(entry.configs() as *const ATNConfigSet as *mut ATNConfigSet)
     }
 
     pub fn from_proposed(state: &ProposedDFAState) -> Self {
-        DFAStateKey(&state.configs as *const ATNConfigSet)
+        DFAStateKey(&state.configs as *const ATNConfigSet as *mut ATNConfigSet)
     }
 }
 
@@ -287,7 +287,9 @@ impl Eq for DFAStateKey {}
 
 impl std::hash::Hash for DFAStateKey {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        unsafe { (&*self.0).hash(state) }
+        let configs = unsafe { &mut *self.0 };
+        let hash = configs.hash_code();
+        state.write_u64(hash);
     }
 }
 

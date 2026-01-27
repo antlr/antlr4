@@ -202,6 +202,21 @@ impl ATNConfigSet {
         }
     }
 
+    pub fn hash_code(&mut self) -> u64 {
+        if self.read_only {
+            if self.cached_hash == 0 {
+                let mut hasher = MurmurHasher::default();
+                self.hash(&mut hasher);
+                self.cached_hash = hasher.finish();
+            }
+            self.cached_hash
+        } else {
+            let mut hasher = MurmurHasher::default();
+            self.hash(&mut hasher);
+            hasher.finish()
+        }
+    }
+
     pub fn length(&self) -> usize {
         self.configs.len()
     }
