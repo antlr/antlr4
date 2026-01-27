@@ -430,8 +430,6 @@ impl<'input, Ctx: CustomRuleContext<'input>> Tree<'input> for BaseParserRuleCont
 impl<'input, Ctx: CustomRuleContext<'input> + TidAble<'input>> ParseTree<'input>
     for BaseParserRuleContext<'input, Ctx>
 {
-
-
     fn get_text(&self) -> String {
         let children = self.get_children();
         let mut result = String::new();
@@ -580,7 +578,6 @@ where
     T: DerefSeal<Target = I> + 'input + Debug + Tid<'input>,
     I: ParserRuleContext<'input> + 'input + ?Sized,
 {
-
     fn get_text(&self) -> String {
         self.deref().get_text()
     }

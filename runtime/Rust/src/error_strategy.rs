@@ -577,11 +577,9 @@ impl<'input, Ctx: ParserNodeType<'input>> BailErrorStrategy<'input, Ctx> {
         e: &ANTLRError,
     ) -> ANTLRError {
         let mut ctx = recognizer.get_parser_rule_context().clone();
-        let _: Option<()> = (|| {
-            loop {
-                ctx.set_exception(e.clone());
-                ctx = ctx.get_parent()?
-            }
+        let _: Option<()> = (|| loop {
+            ctx.set_exception(e.clone());
+            ctx = ctx.get_parent()?
         })();
         ANTLRError::FallThrough(Arc::new(ParseCancelledError(e.clone())))
     }

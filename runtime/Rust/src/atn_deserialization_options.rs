@@ -11,8 +11,6 @@ impl ATNDeserializationOptions {
 
 impl Default for ATNDeserializationOptions {
     fn default() -> Self {
-        ATNDeserializationOptions {
-            verify_atn: true,
-        }
+        ATNDeserializationOptions { verify_atn: true }
     }
 }

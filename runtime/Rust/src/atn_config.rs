@@ -110,11 +110,7 @@ impl ATNConfig {
         })
     }
 
-    pub fn new(
-        state: ATNStateRef,
-        alt: i32,
-        context: Option<Arc<PredictionContext>>,
-    ) -> ATNConfig {
+    pub fn new(state: ATNStateRef, alt: i32, context: Option<Arc<PredictionContext>>) -> ATNConfig {
         ATNConfig {
             precedence_filter_suppressed: false,
             state,

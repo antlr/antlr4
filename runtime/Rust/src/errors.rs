@@ -120,7 +120,7 @@ pub struct BaseRecognitionError {
     pub offending_token: OwningToken,
     pub offending_state: i32,
     states_stack: Vec<i32>, // ctx: Rc<dyn ParserRuleContext>
-                              //    input: Box<IntStream>
+                            //    input: Box<IntStream>
 }
 
 impl BaseRecognitionError {

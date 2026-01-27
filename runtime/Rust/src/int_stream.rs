@@ -1,6 +1,6 @@
 //! <ost generic stream of symbols
 
-use crate::token::{TOKEN_EOF};
+use crate::token::TOKEN_EOF;
 
 /// `IntStream::la` must return EOF in the end of stream
 pub const EOF: i32 = -1;
@@ -78,7 +78,7 @@ impl<T: IntStream> Iterator for IterWrapper<'_, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 {
-            return None
+            return None;
         }
         let token = self.0.la(1);
 
