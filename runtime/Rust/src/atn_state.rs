@@ -174,6 +174,7 @@ impl ATNState for BaseATNState {
         let mut already_present = false;
         for existing in self.transitions.iter() {
             if existing.get_target() == trans.get_target() {
+                #[allow(clippy::if_same_then_else)]
                 if existing.get_label().is_some()
                     && trans.get_label().is_some()
                     && existing.get_label() == trans.get_label()

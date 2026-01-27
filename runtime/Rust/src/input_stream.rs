@@ -141,7 +141,7 @@ where
         }
     }
 }
-impl<'a, Data: Deref> InputStream<Data>
+impl<Data: Deref> InputStream<Data>
 where
     Data::Target: InputData,
 {
@@ -152,7 +152,7 @@ where
     }
 }
 
-impl<'a, Data: Deref> IntStream for InputStream<Data>
+impl<Data: Deref> IntStream for InputStream<Data>
 where
     Data::Target: InputData,
 {

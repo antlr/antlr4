@@ -22,7 +22,7 @@ pub struct ATNConfigSet {
     config_lookup: HashMap<Key, usize, MurmurHasherBuilder>,
 
     //todo remove box?
-    pub(crate) configs: Vec<Box<ATNConfig>>,
+    pub(crate) configs: Vec<ATNConfig>,
 
     pub(crate) conflicting_alts: BitSet,
 
@@ -135,7 +135,7 @@ impl ATNConfigSet {
 
     pub fn add_cached(
         &mut self,
-        config: Box<ATNConfig>,
+        config: ATNConfig,
         mut merge_cache: Option<&mut MergeCache>,
     ) -> bool {
         assert!(!self.read_only);
@@ -149,10 +149,10 @@ impl ATNConfigSet {
         }
 
         let hasher = self.hasher;
-        let key = hasher(config.as_ref());
+        let key = hasher(&config);
 
         if let Some(existing) = self.config_lookup.get(&key) {
-            let existing = self.configs.get_mut(*existing).unwrap().as_mut();
+            let existing = self.configs.get_mut(*existing).unwrap();
             let root_is_wildcard = !self.full_ctx;
 
             let merged = PredictionContext::merge(
@@ -180,12 +180,12 @@ impl ATNConfigSet {
         true
     }
 
-    pub fn add(&mut self, config: Box<ATNConfig>) -> bool {
+    pub fn add(&mut self, config: ATNConfig) -> bool {
         self.add_cached(config, None)
     }
 
     pub fn get_items(&self) -> impl Iterator<Item = &ATNConfig> {
-        self.configs.iter().map(|c| c.as_ref())
+        self.configs.iter()
     }
 
     pub fn optimize_configs(&mut self, _interpreter: &dyn IATNSimulator) {

@@ -38,6 +38,7 @@ impl<Any: Sized> ScopeExt for Any {}
 
 #[derive(Debug)]
 struct StateStoreInner {
+    #[allow(clippy::vec_box)] // Box for pinning in memory
     states: Vec<Box<DFAState>>,
     // for faster duplicate search
     // TODO i think DFAState.edges can contain references to its elements
@@ -58,7 +59,7 @@ impl StateStore {
         // to indicate null
         inner.states.push(
             DFAState::new_dfastate(
-                usize::max_value(),
+                usize::MAX,
                 Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
             )
             .into(),
@@ -76,7 +77,7 @@ impl StateStore {
         // to indicate null
         inner.states.push(
             DFAState::new_dfastate(
-                usize::max_value(),
+                usize::MAX,
                 Box::new(ATNConfigSet::new_base_atnconfig_set(true)),
             )
             .into(),
@@ -248,7 +249,7 @@ impl DFA {
                 atn_start_state,
                 decision,
                 states: StateStore::new(),
-                s0: AtomicUsize::new(usize::max_value()),
+                s0: AtomicUsize::new(usize::MAX),
                 is_precedence_dfa: false,
             }
         }
@@ -285,7 +286,7 @@ impl DFA {
     pub fn get_s0(&self) -> Option<DFAStateRef> {
         let x = self.s0.load(Ordering::Relaxed);
 
-        if x == usize::max_value() {
+        if x == usize::MAX {
             None
         } else {
             Some(x)

@@ -78,7 +78,7 @@ impl<'a, TF: TokenFactory<'a> + 'a> CustomRuleContext<'a> for EmptyCustomRuleCon
     type Ctx = EmptyContextType<'a, TF>;
 
     fn get_rule_index(&self) -> usize {
-        usize::max_value()
+        usize::MAX
     }
 }
 

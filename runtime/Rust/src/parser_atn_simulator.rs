@@ -5,9 +5,9 @@ use std::collections::{HashMap, HashSet};
 
 use std::marker::PhantomData;
 use std::ops::Deref;
+use std::ptr;
 use std::rc::Rc;
 use std::sync::Arc;
-use std::{ptr, usize};
 
 use bit_set::BitSet;
 
@@ -197,7 +197,7 @@ impl ParserATNSimulator {
                             .expect("DFA state not found")
                             .set_configs(Box::new(s0_closure));
                         let new_s0 = self.add_dfastate(
-                            &dfa_ref,
+                            dfa_ref,
                             DFAState::new_dfastate(0, Box::new(s0_closure_updated)),
                         );
 
@@ -207,8 +207,8 @@ impl ParserATNSimulator {
                 } else {
                     //let mut dfa_mut = local.dfa_ref.borrow_mut();
                     let dfa_ref = local.dfa_ref;
-                    let s0 = self
-                        .add_dfastate(&dfa_ref, DFAState::new_dfastate(0, Box::new(s0_closure)));
+                    let s0 =
+                        self.add_dfastate(dfa_ref, DFAState::new_dfastate(0, Box::new(s0_closure)));
                     dfa_ref.set_s0(s0);
                     s0
                 }
@@ -237,7 +237,7 @@ impl ParserATNSimulator {
             //            println!("exec atn loop previous D {}",previousD as i32 -1);
             let D = if let Some(s) = {
                 let dfa = local.dfa_ref;
-                Self::get_existing_target_state(&dfa, previousD, token)
+                Self::get_existing_target_state(dfa, previousD, token)
             } {
                 s
             } else {
@@ -288,7 +288,7 @@ impl ParserATNSimulator {
                 }
 
                 self.report_attempting_full_context(
-                    &dfa,
+                    dfa,
                     &conflicting_alts,
                     Dstate.configs(),
                     self.start_index.get(),
@@ -331,7 +331,7 @@ impl ParserATNSimulator {
                     1 => return Ok(alts.iter().next().unwrap() as i32),
                     _ => {
                         self.report_ambiguity(
-                            &dfa,
+                            dfa,
                             self.start_index.get(),
                             stop_index,
                             false,
@@ -439,7 +439,7 @@ impl ParserATNSimulator {
         {
             //let mut dfa_mut = local.dfa_ref.borrow_mut();
             let dfa_ref = local.dfa_ref;
-            let D = self.add_dfastate(&dfa_ref, D);
+            let D = self.add_dfastate(dfa_ref, D);
             self.add_dfaedge(
                 dfa_ref
                     .states
@@ -531,7 +531,7 @@ impl ParserATNSimulator {
         let dfa = local.dfa_ref;
         if prev.get_unique_alt() != INVALID_ALT {
             self.report_context_sensitivity(
-                &dfa,
+                dfa,
                 predicted_alt,
                 &prev,
                 self.start_index.get(),
@@ -541,7 +541,7 @@ impl ParserATNSimulator {
             return Ok(predicted_alt);
         }
         self.report_ambiguity(
-            &dfa,
+            dfa,
             self.start_index.get(),
             local.input().index(),
             found_exact_ambig,
@@ -578,7 +578,7 @@ impl ParserATNSimulator {
 
             for tr in state.get_transitions() {
                 self.get_reachable_target(tr.as_ref(), t).map(|target| {
-                    let added = Box::new(c.cloned(self.atn().states[target as usize].as_ref()));
+                    let added = c.cloned(self.atn().states[target as usize].as_ref());
                     intermediate.add_cached(added, Some(local.merge_cache))
                 });
             }
@@ -600,7 +600,7 @@ impl ParserATNSimulator {
             for c in intermediate.configs {
                 let treat_eofas_epsilon = t == TOKEN_EOF;
                 self.closure(
-                    *c,
+                    c,
                     &mut reach,
                     &mut closure_busy,
                     false,
@@ -625,7 +625,7 @@ impl ParserATNSimulator {
             && (!full_ctx || !self.has_config_in_rule_stop_state(&reach))
         {
             for c in skipped_stop_states {
-                reach.add_cached(c.clone().into(), Some(local.merge_cache));
+                reach.add_cached(c.clone(), Some(local.merge_cache));
             }
         }
         //        println!("result?");
@@ -682,8 +682,7 @@ impl ParserATNSimulator {
                     let end_of_rule_state =
                         self.atn().rule_to_stop_state[state.get_rule_index() as usize];
                     result.add_cached(
-                        c.cloned(self.atn().states[end_of_rule_state as usize].as_ref())
-                            .into(),
+                        c.cloned(self.atn().states[end_of_rule_state as usize].as_ref()),
                         Some(merge_cache),
                     );
                 }
@@ -752,16 +751,16 @@ impl ParserATNSimulator {
 
                 if *updated_sem_ctx != *config.semantic_context {
                     config_set.add_cached(
-                        Box::new(ATNConfig::new_with_semantic(
+                        ATNConfig::new_with_semantic(
                             config.get_state(),
                             config.get_alt(),
                             config.get_context().cloned(),
                             Box::new(updated_sem_ctx.clone()),
-                        )),
+                        ),
                         Some(local.merge_cache),
                     );
                 } else {
-                    config_set.add_cached(Box::new(config.clone()), Some(local.merge_cache));
+                    config_set.add_cached(config.clone(), Some(local.merge_cache));
                 }
             }
         }
@@ -777,7 +776,7 @@ impl ParserATNSimulator {
                     }
                 }
             }
-            config_set.add(Box::new(config.clone()));
+            config_set.add(config.clone());
         }
 
         config_set
@@ -887,7 +886,7 @@ impl ParserATNSimulator {
         let mut succeeded = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
         let mut failed = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
         for c in configs.get_items() {
-            let clone = Box::new(c.clone());
+            let clone = c.clone();
             if *c.semantic_context != SemanticContext::NONE {
                 let predicate_eval_result = self.eval_predicate(
                     local,
@@ -918,7 +917,7 @@ impl ParserATNSimulator {
             }
         }
 
-        alts.get_min().unwrap_or(INVALID_ALT) as i32
+        alts.get_min().unwrap_or(INVALID_ALT)
     }
 
     fn eval_semantic_context<'a, T: Parser<'a>>(
@@ -962,6 +961,7 @@ impl ParserATNSimulator {
         pred.borrow().evaluate(local.parser, &*local.outer_context)
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn closure<'a, T: Parser<'a>>(
         &self,
         config: ATNConfig,
@@ -989,6 +989,7 @@ impl ParserATNSimulator {
         assert!(!full_ctx || !configs.get_dips_into_outer_context())
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn closure_checking_stop_state<'a, T: Parser<'a>>(
         &self,
         mut config: ATNConfig,
@@ -1012,7 +1013,7 @@ impl ParserATNSimulator {
                                 self.atn().states[config.get_state() as usize].as_ref(),
                                 Some(EMPTY_PREDICTION_CONTEXT.clone()),
                             );
-                            configs.add_cached(Box::new(new_config), Some(local.merge_cache));
+                            configs.add_cached(new_config, Some(local.merge_cache));
                         } else {
                             self.closure_work(
                                 config.clone(),
@@ -1045,7 +1046,7 @@ impl ParserATNSimulator {
                         config.semantic_context.clone(),
                     );
                     c.set_reaches_into_outer_context(config.get_reaches_into_outer_context());
-                    assert!(depth > i32::min_value());
+                    assert!(depth > i32::MIN);
                     self.closure_checking_stop_state(
                         c,
                         configs,
@@ -1059,7 +1060,7 @@ impl ParserATNSimulator {
                 }
                 return;
             } else if full_ctx {
-                configs.add_cached(Box::new(config), Some(local.merge_cache));
+                configs.add_cached(config, Some(local.merge_cache));
                 return;
             }
         }
@@ -1075,6 +1076,7 @@ impl ParserATNSimulator {
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn closure_work<'a, T: Parser<'a>>(
         &self,
         config: ATNConfig,
@@ -1090,7 +1092,7 @@ impl ParserATNSimulator {
         //        println!("closure_work started {:?}",config);
         let p = self.atn().states[config.get_state() as usize].as_ref();
         if !p.has_epsilon_only_transitions() {
-            configs.add_cached(Box::new(config.clone()), Some(local.merge_cache));
+            configs.add_cached(config.clone(), Some(local.merge_cache));
         }
 
         for (i, tr) in p.get_transitions().iter().enumerate() {
@@ -1125,7 +1127,7 @@ impl ParserATNSimulator {
                             .outermost_precedence_return;
                         let atn_start_state =
                             self.atn().states[dfa.atn_start_state as usize].as_ref();
-                        if outermost_precedence_return == atn_start_state.get_rule_index() as i32 {
+                        if outermost_precedence_return == atn_start_state.get_rule_index() {
                             c.set_precedence_filter_suppressed(true);
                         }
                     }
@@ -1135,7 +1137,7 @@ impl ParserATNSimulator {
                         continue;
                     }
                     configs.set_dips_into_outer_context(true);
-                    assert!(new_depth > i32::min_value());
+                    assert!(new_depth > i32::MIN);
                     new_depth -= 1;
                 } else {
                     if !tr.is_epsilon() && !closure_busy.insert(c.clone()) {
@@ -1246,6 +1248,7 @@ impl ParserATNSimulator {
     //
     //    fn get_rule_name(&self, index: i32) -> String { unimplemented!() }
 
+    #[allow(clippy::too_many_arguments)]
     fn get_epsilon_target<'a, T: Parser<'a>>(
         &self,
         config: &ATNConfig,
@@ -1344,6 +1347,7 @@ impl ParserATNSimulator {
         full_ctx: bool,
         local: &mut Local<'_, 'a, T>,
     ) -> Option<ATNConfig> {
+        #![allow(clippy::nonminimal_bool)]
         let target = self.atn().states[pt.target as usize].deref();
         if collect_predicates && (!pt.is_ctx_dependent || (pt.is_ctx_dependent && in_context)) {
             if full_ctx {
@@ -1374,7 +1378,7 @@ impl ParserATNSimulator {
     fn rule_transition(&self, config: &ATNConfig, t: &RuleTransition) -> ATNConfig {
         assert!(config.get_context().is_some());
         let new_ctx =
-            PredictionContext::new_singleton(config.get_context().cloned(), t.follow_state as i32);
+            PredictionContext::new_singleton(config.get_context().cloned(), t.follow_state);
         config.cloned_with_new_ctx(
             self.atn().states[t.target as usize].as_ref(),
             Some(new_ctx.into()),
@@ -1519,6 +1523,7 @@ impl ParserATNSimulator {
             .report_context_sensitivity(parser, dfa, start_index, stop_index, prediction, configs)
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn report_ambiguity<'a, T: Parser<'a>>(
         &self,
         dfa: &DFA,

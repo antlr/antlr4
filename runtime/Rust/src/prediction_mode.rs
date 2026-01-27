@@ -100,7 +100,7 @@ pub(crate) fn has_sll_conflict_terminating_prediction(
                 it.get_context().cloned(),
                 Box::new(SemanticContext::NONE),
             );
-            dup.add(Box::new(c));
+            dup.add(c);
         });
         configs = &dup;
     }
@@ -114,25 +114,25 @@ pub(crate) fn has_sll_conflict_terminating_prediction(
 //    for co
 //}
 
-pub(crate) fn resolves_to_just_one_viable_alt(altsets: &Vec<BitSet>) -> i32 {
+pub(crate) fn resolves_to_just_one_viable_alt(altsets: &[BitSet]) -> i32 {
     get_single_viable_alt(altsets)
 }
 
-pub(crate) fn all_subsets_conflict(altsets: &Vec<BitSet>) -> bool {
+pub(crate) fn all_subsets_conflict(altsets: &[BitSet]) -> bool {
     !has_non_conflicting_alt_set(altsets)
 }
 
-pub(crate) fn all_subsets_equal(altsets: &Vec<BitSet>) -> bool {
+pub(crate) fn all_subsets_equal(altsets: &[BitSet]) -> bool {
     let mut iter = altsets.iter();
     let first = iter.next();
     iter.all(|it| it == first.unwrap())
 }
 
-fn has_non_conflicting_alt_set(altsets: &Vec<BitSet>) -> bool {
+fn has_non_conflicting_alt_set(altsets: &[BitSet]) -> bool {
     altsets.iter().any(|it| it.len() == 1)
 }
 
-fn has_conflicting_alt_set(altsets: &Vec<BitSet>) -> bool {
+fn has_conflicting_alt_set(altsets: &[BitSet]) -> bool {
     for alts in altsets {
         if alts.len() > 1 {
             return true;
@@ -141,9 +141,9 @@ fn has_conflicting_alt_set(altsets: &Vec<BitSet>) -> bool {
     false
 }
 
-//fn get_unique_alt(altsets: &Vec<BitSet>) -> int { unimplemented!() }
+//fn get_unique_alt(altsets: &[BitSet]) -> int { unimplemented!() }
 //
-pub(crate) fn get_alts(altsets: &Vec<BitSet>) -> BitSet {
+pub(crate) fn get_alts(altsets: &[BitSet]) -> BitSet {
     altsets.iter().fold(BitSet::new(), |mut acc, it| {
         acc.extend(it);
         acc
@@ -182,7 +182,7 @@ fn has_state_associated_with_one_alt(configs: &ATNConfigSet) -> bool {
     false
 }
 
-pub(crate) fn get_single_viable_alt(altsets: &Vec<BitSet>) -> i32 {
+pub(crate) fn get_single_viable_alt(altsets: &[BitSet]) -> i32 {
     let mut viable_alts = BitSet::new();
     let mut min_alt = INVALID_ALT as usize;
     for alt in altsets {

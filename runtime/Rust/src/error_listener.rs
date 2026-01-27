@@ -35,6 +35,7 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
     ) {
     }
 
+    #[allow(clippy::too_many_arguments)]
     /// This method is called by the parser when a full-context prediction
     /// results in an ambiguity.
     fn report_ambiguity(
@@ -185,16 +186,16 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, 
 /// are made by calling `Parser::notify_error_listeners` with the appropriate
 /// message.
 ///
-///  - Ambiguities: These are cases where more than one path through the
-/// grammar can match the input.
-///  - Weak context sensitivity</b>: These are cases where full-context
-/// prediction resolved an SLL conflict to a unique alternative which equaled the
-/// minimum alternative of the SLL conflict.
-///  - Strong (forced) context sensitivity: These are cases where the
-/// full-context prediction resolved an SLL conflict to a unique alternative,
-/// *and* the minimum alternative of the SLL conflict was found to not be
-/// a truly viable alternative. Two-stage parsing cannot be used for inputs where
-/// this situation occurs.
+/// - Ambiguities: These are cases where more than one path through the grammar
+///   can match the input.
+/// - Weak context sensitivity</b>: These are cases where full-context
+///   prediction resolved an SLL conflict to a unique alternative which equaled
+///   the minimum alternative of the SLL conflict.
+/// - Strong (forced) context sensitivity: These are cases where the
+///   full-context prediction resolved an SLL conflict to a unique alternative,
+///   *and* the minimum alternative of the SLL conflict was found to not be a
+///   truly viable alternative. Two-stage parsing cannot be used for inputs
+///   where this situation occurs.
 #[derive(Debug)]
 pub struct DiagnosticErrorListener {
     exact_only: bool,

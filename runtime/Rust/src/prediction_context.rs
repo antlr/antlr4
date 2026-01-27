@@ -189,7 +189,7 @@ impl PredictionContext {
                     None => 0,
                     Some(x) => x.hash_code(),
                 });
-                hasher.write_i32(*return_state as i32);
+                hasher.write_i32(*return_state);
             }
             PredictionContext::Array(ArrayPredictionContext {
                 parents,
@@ -202,9 +202,7 @@ impl PredictionContext {
                         Some(x) => x.hash_code(),
                     })
                 });
-                return_states
-                    .iter()
-                    .for_each(|x| hasher.write_i32(*x as i32));
+                return_states.iter().for_each(|x| hasher.write_i32(*x));
             } //            PredictionContext::Empty { .. } => {}
         };
 
@@ -531,7 +529,7 @@ impl PredictionContext {
             .deref()
             .cast::<RuleTransition>();
 
-        PredictionContext::new_singleton(Some(parent), transition.follow_state as i32).alloc()
+        PredictionContext::new_singleton(Some(parent), transition.follow_state).alloc()
     }
 
     fn combine_common_parents(array: &mut ArrayPredictionContext) {

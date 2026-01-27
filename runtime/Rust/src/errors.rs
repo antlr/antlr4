@@ -227,6 +227,7 @@ pub struct FailedPredicateError {
 
 #[allow(missing_docs)]
 impl FailedPredicateError {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new<'a, T: Parser<'a>>(
         recog: &mut T,
         predicate: Option<String>,

@@ -49,6 +49,7 @@ impl LL1Analyzer<'_> {
         r
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn look_work(
         &self,
         //                 atn:&ATN,
@@ -126,7 +127,7 @@ impl LL1Analyzer<'_> {
 
                     let new_ctx = Arc::new(PredictionContext::new_singleton(
                         ctx.clone(),
-                        rule_tr.follow_state as i32,
+                        rule_tr.follow_state,
                     ));
 
                     called_rule_stack.insert(target.get_rule_index() as usize);

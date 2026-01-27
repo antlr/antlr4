@@ -42,8 +42,8 @@ impl PartialEq for ATNConfig {
 
 impl Hash for ATNConfig {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_i32(self.get_state() as i32);
-        state.write_i32(self.get_alt() as i32);
+        state.write_i32(self.get_state());
+        state.write_i32(self.get_alt());
         match self.get_context() {
             None => state.write_i32(0),
             Some(c) => c.hash(state),

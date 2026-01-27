@@ -186,7 +186,6 @@ where
     }
 }
 
-///
 pub trait ParserRecog<'a, P: Recognizer<'a>>: Actions<'a, P> {}
 
 impl<'input, Ext, I, Ctx, T> Recognizer<'input> for BaseParser<'input, Ext, I, Ctx, T>
@@ -710,6 +709,7 @@ pub struct ListenerId<T: ?Sized> {
 }
 
 impl<T: ?Sized> ListenerId<T> {
+    #[allow(clippy::borrowed_box)]
     fn new(listener: &Box<T>) -> ListenerId<T> {
         ListenerId {
             actual_id: listener.as_ref() as *const T as *const () as usize,

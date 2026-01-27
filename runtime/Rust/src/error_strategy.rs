@@ -27,7 +27,7 @@ use better_any::{Tid, TidAble};
 /// during a parse by ANTLR-generated parsers. We distinguish between three
 /// different kinds of errors:
 ///  - The parser could not figure out which path to take in the ATN (none of
-/// the available alternatives could possibly match)
+///    the available alternatives could possibly match)
 ///  - The current input does not match what we were looking for
 ///  - A predicate evaluated to false
 ///
@@ -314,7 +314,7 @@ impl<'input, Ctx: ParserNodeType<'input>> DefaultErrorStrategy<'input, Ctx> {
         recognizer: &mut T,
     ) -> <T::TF as TokenFactory<'input>>::Tok {
         let expected = self.get_expected_tokens(recognizer);
-        let expected_token_type = expected.get_min().unwrap_or(TOKEN_INVALID_TYPE) as i32;
+        let expected_token_type = expected.get_min().unwrap_or(TOKEN_INVALID_TYPE);
         let token_text = if expected_token_type == TOKEN_EOF {
             "<missing EOF>".to_owned()
         } else {
@@ -322,7 +322,7 @@ impl<'input, Ctx: ParserNodeType<'input>> DefaultErrorStrategy<'input, Ctx> {
                 "<missing {}>",
                 recognizer
                     .get_vocabulary()
-                    .get_display_name(expected_token_type as i32)
+                    .get_display_name(expected_token_type)
             )
         };
         let token_text = <T::TF as TokenFactory<'input>>::Data::from_text(&token_text);
@@ -539,16 +539,15 @@ impl<'a, T: Parser<'a>> ErrorStrategy<'a, T> for DefaultErrorStrategy<'a, T::Nod
 ///
 /// <p> This error strategy is useful in the following scenarios.</p>
 ///
-///  - Two-stage parsing: This error strategy allows the first
-/// stage of two-stage parsing to immediately terminate if an error is
-/// encountered, and immediately fall back to the second stage. In addition to
-/// avoiding wasted work by attempting to recover from errors here, the empty
-/// implementation of `sync` improves the performance of
-/// the first stage.
-///  - Silent validation: When syntax errors are not being
-/// reported or logged, and the parse result is simply ignored if errors occur,
-/// the `BailErrorStrategy` avoids wasting work on recovering from errors
-/// when the result will be ignored either way.
+///  - Two-stage parsing: This error strategy allows the first stage of
+///    two-stage parsing to immediately terminate if an error is encountered,
+///    and immediately fall back to the second stage. In addition to avoiding
+///    wasted work by attempting to recover from errors here, the empty
+///    implementation of `sync` improves the performance of the first stage.
+///  - Silent validation: When syntax errors are not being reported or logged,
+///    and the parse result is simply ignored if errors occur, the
+///    `BailErrorStrategy` avoids wasting work on recovering from errors when
+///    the result will be ignored either way.
 ///
 /// # Usage
 /// ```ignore

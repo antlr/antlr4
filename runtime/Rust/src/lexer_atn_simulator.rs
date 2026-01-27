@@ -1,8 +1,6 @@
 //! Implementation of lexer automata(DFA)
 use std::cell::Cell;
-
 use std::rc::Rc;
-use std::usize;
 
 use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType};
@@ -90,8 +88,8 @@ impl ILexerATNSimulator for LexerATNSimulator {
                 .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
 
             match dfa.get_s0() {
-                None => self.match_atn(lexer, &dfa),
-                Some(s0) => self.exec_atn(s0, lexer, &dfa),
+                None => self.match_atn(lexer, dfa),
+                Some(s0) => self.exec_atn(s0, lexer, dfa),
                 //                Err(_) => panic!("dfa rwlock error")
             }
         })();
@@ -215,7 +213,7 @@ impl LexerATNSimulator {
         dfa: &DFA,
     ) -> Result<i32, ANTLRError> {
         //        if self.get_dfa().states.read().unwrap().get(ds0).unwrap().is_accept_state{
-        self.capture_sim_state(&dfa, lexer.input(), ds0);
+        self.capture_sim_state(dfa, lexer.input(), ds0);
         //        }
 
         let mut symbol = lexer.input().la(1);
@@ -273,7 +271,7 @@ impl LexerATNSimulator {
     ) -> DFAStateRef {
         let mut reach = ATNConfigSet::new_ordered();
         self.get_reachable_config_set(
-            &dfa.states
+            dfa.states
                 .get_state(s)
                 .expect("DFA state not found")
                 .configs(),
@@ -398,7 +396,7 @@ impl LexerATNSimulator {
         }
     }
 
-    fn accept<'input>(&mut self, input: &mut impl IntStream) {
+    fn accept(&mut self, input: &mut impl IntStream) {
         input.seek(self.prev_accept.index);
         self.current_pos.line.set(self.prev_accept.line);
         self.current_pos
@@ -446,12 +444,12 @@ impl LexerATNSimulator {
             //            println!("reached rulestopstate {}",state.get_state_number());
             if config.get_context().map(|x| x.has_empty_path()) != Some(false) {
                 if config.get_context().map(|x| x.is_empty()) != Some(false) {
-                    _configs.add(Box::new(config));
+                    _configs.add(config);
                     return true;
                 } else {
-                    _configs.add(Box::new(
+                    _configs.add(
                         config.cloned_with_new_ctx(state, Some(EMPTY_PREDICTION_CONTEXT.clone())),
-                    ));
+                    );
                     _current_alt_reached_accept_state = true
                 }
             }
@@ -486,7 +484,7 @@ impl LexerATNSimulator {
             } = config.config_type
             {
                 if !_current_alt_reached_accept_state || !passed_through_non_greedy_decision {
-                    _configs.add(Box::new(config.clone()));
+                    _configs.add(config.clone());
                 }
             }
         }
@@ -545,7 +543,7 @@ impl LexerATNSimulator {
                 //println!("rule transition follow state{}", rt.follow_state);
                 let pred_ctx = PredictionContext::new_singleton(
                     Some(_config.get_context().unwrap().clone()),
-                    rt.follow_state as i32,
+                    rt.follow_state,
                 );
                 result = Some(_config.cloned_with_new_ctx(target, Some(pred_ctx.into())));
             }

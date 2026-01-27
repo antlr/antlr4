@@ -15,6 +15,7 @@ pub trait CharStream<Data>: IntStream {
     fn get_text(&self, a: isize, b: isize) -> Data;
 }
 
+#[allow(clippy::len_without_is_empty)]
 /// Trait for input that can be accepted by `InputStream` to be able to provide lexer with data.
 /// Public for implementation reasons.
 pub trait InputData:
