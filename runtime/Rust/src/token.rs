@@ -10,8 +10,6 @@ use crate::char_stream::InputData;
 use crate::int_stream::EOF;
 use crate::token_factory::{INVALID_COMMON, INVALID_OWNING};
 
-use better_any::type_id;
-
 /// Type of tokens that parser considers invalid
 pub const TOKEN_INVALID_TYPE: i32 = 0;
 /// Type of tokens that DFA can use to advance to next state without consuming actual input token.
@@ -83,9 +81,6 @@ pub type OwningToken = GenericToken<String>;
 /// Most versatile Token that uses Cow to save data
 /// Can be used seamlessly switch from owned to zero-copy parsing
 pub type CommonToken<'a> = GenericToken<Cow<'a, str>>;
-
-type_id!(OwningToken);
-type_id!(CommonToken<'a>);
 
 #[derive(Debug)]
 #[allow(missing_docs)]

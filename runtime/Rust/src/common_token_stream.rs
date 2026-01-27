@@ -20,8 +20,6 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
     }
 }
 
-better_any::tid! { impl<'input,T> TidAble<'input> for CommonTokenStream<'input, T> where T: TokenSource<'input>}
-
 impl<'input, T: TokenSource<'input>> IntStream for CommonTokenStream<'input, T> {
     #[inline]
     fn consume(&mut self) {

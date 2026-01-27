@@ -27,8 +27,6 @@ use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::visitorcalclistener::*;
 use super::visitorcalcvisitor::*;
 
-use dbt_antlr4::{TidAble,TidExt};
-
 use std::marker::PhantomData;
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -78,23 +76,23 @@ pub type VisitorCalcTreeWalker<'input,'a> =
 /// Parser for VisitorCalc grammar
 pub struct VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	base:BaseParserType<'input,I>,
 	interpreter:Arc<ParserATNSimulator>,
 	_shared_context_cache: Box<PredictionContextCache>,
-    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >,
+    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>,
 }
 
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) {
+    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) {
         self.err_handler = strategy
     }
 
-    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
+    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) -> Self {
 		dbt_antlr4::recognizer::check_version("0","51");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
@@ -117,11 +115,9 @@ where
 
 }
 
-type DynStrategy<'input,I> = Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>;
-
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn with_dyn_strategy(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -130,7 +126,7 @@ where
 
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn new(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -158,12 +154,7 @@ where
 impl<'input> VisitorCalcParserContext<'input> for TerminalNode<'input,VisitorCalcParserContextType> {}
 impl<'input> VisitorCalcParserContext<'input> for ErrorNode<'input,VisitorCalcParserContextType> {}
 
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcParserContext<'input> + 'input }
-
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorCalcListener<'input> + 'input }
-
 pub struct VisitorCalcParserContextType;
-dbt_antlr4::tid!{VisitorCalcParserContextType}
 
 impl<'input> ParserNodeType<'input> for VisitorCalcParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -172,7 +163,7 @@ impl<'input> ParserNodeType<'input> for VisitorCalcParserContextType{
 
 impl<'input, I> Deref for VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     type Target = BaseParserType<'input,I>;
 
@@ -183,7 +174,7 @@ where
 
 impl<'input, I> DerefMut for VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.base
@@ -196,15 +187,14 @@ pub struct VisitorCalcParserExt<'input>{
 
 impl<'input> VisitorCalcParserExt<'input>{
 }
-dbt_antlr4::tid! { VisitorCalcParserExt<'a> }
 
 impl<'input> TokenAware<'input> for VisitorCalcParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> ParserRecog<'input, BaseParserType<'input,I>> for VisitorCalcParserExt<'input>{}
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> ParserRecog<'input, BaseParserType<'input,I>> for VisitorCalcParserExt<'input>{}
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> Actions<'input, BaseParserType<'input,I>> for VisitorCalcParserExt<'input>{
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> Actions<'input, BaseParserType<'input,I>> for VisitorCalcParserExt<'input>{
 	fn get_grammar_file_name(&self) -> & str{ "VisitorCalc.g4"}
 
    	fn get_rule_names(&self) -> &[& str] {&ruleNames}
@@ -214,7 +204,7 @@ impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'i
 			   recog:&mut BaseParserType<'input,I>
 	)->bool{
 		match rule_index {
-					1 => VisitorCalcParser::<'input,I>::expr_sempred(_localctx.and_then(|x|x.downcast_ref()), pred_index, recog),
+					1 => VisitorCalcParser::<'input,I>::expr_sempred(_localctx.and_then(|x| unsafe {downcast_ref(x)}), pred_index, recog),
 			_ => true
 		}
 	}
@@ -222,9 +212,9 @@ impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'i
 
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-	fn expr_sempred(_localctx: Option<&ExprContext<'input>>, pred_index:i32,
+	fn expr_sempred(_localctx: Option<&'input ExprContext<'input>>, pred_index:i32,
 						recog:&mut <Self as Deref>::Target
 		) -> bool {
 		match pred_index {
@@ -247,6 +237,12 @@ pub type SContext<'input> = BaseParserRuleContext<'input,SContextExt<'input>>;
 #[derive(Clone)]
 pub struct SContextExt<'input>{
 ph:PhantomData<&'input str>
+}
+
+impl<'input> TypedTreeNode for SContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<SContextExt<'static>>()
+    }
 }
 
 impl<'input> VisitorCalcParserContext<'input> for SContext<'input>{}
@@ -276,7 +272,6 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorCalcParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {
@@ -306,7 +301,7 @@ impl<'input> SContextAttrs<'input> for SContext<'input>{}
 
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn s(&mut self,)
 	-> Result<Rc<SContextAll<'input>>,ANTLRError> {
@@ -352,9 +347,17 @@ pub enum ExprContextAll<'input>{
 	MultiplyContext(MultiplyContext<'input>),
 Error(ExprContext<'input>)
 }
-dbt_antlr4::tid!{ExprContextAll<'a>}
 
-impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for ExprContextAll<'input>{}
+pub struct ExprContextAllId;
+impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for ExprContextAll<'input>{
+    type Id = ExprContextAllId;
+}
+impl<'input> TypedTreeNode for ExprContextAll<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<ExprContextAllId>()
+    }
+}
+
 
 impl<'input> VisitorCalcParserContext<'input> for ExprContextAll<'input>{}
 
@@ -387,6 +390,12 @@ pub struct ExprContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for ExprContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<ExprContextExt<'static>>()
+    }
+}
+
 impl<'input> VisitorCalcParserContext<'input> for ExprContext<'input>{}
 
 impl<'input,'a> Listenable<dyn VisitorCalcListener<'input> + 'a> for ExprContext<'input>{
@@ -401,7 +410,6 @@ impl<'input> CustomRuleContext<'input> for ExprContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_expr }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_expr }
 }
-dbt_antlr4::tid!{ExprContextExt<'a>}
 
 impl<'input> ExprContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorCalcParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<ExprContextAll<'input>> {
@@ -451,7 +459,11 @@ pub struct AddContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{AddContextExt<'a>}
+impl<'input> TypedTreeNode for AddContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<AddContextExt<'static>>()
+    }
+}
 
 impl<'input> VisitorCalcParserContext<'input> for AddContext<'input>{}
 
@@ -520,7 +532,11 @@ pub struct NumberContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{NumberContextExt<'a>}
+impl<'input> TypedTreeNode for NumberContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<NumberContextExt<'static>>()
+    }
+}
 
 impl<'input> VisitorCalcParserContext<'input> for NumberContext<'input>{}
 
@@ -600,7 +616,11 @@ pub struct MultiplyContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{MultiplyContextExt<'a>}
+impl<'input> TypedTreeNode for MultiplyContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<MultiplyContextExt<'static>>()
+    }
+}
 
 impl<'input> VisitorCalcParserContext<'input> for MultiplyContext<'input>{}
 
@@ -654,7 +674,7 @@ impl<'input> MultiplyContextExt<'input>{
 
 impl<'input, I> VisitorCalcParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	pub fn  expr(&mut self,)
 	-> Result<Rc<ExprContextAll<'input>>,ANTLRError> {

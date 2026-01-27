@@ -71,9 +71,6 @@
 //! [`TokenStream`]: crate::token_stream::TokenStream
 //! [`ParserRuleContext`]: crate::parser_rule_context::ParserRuleContext
 
-#[doc(hidden)]
-pub use better_any::{tid, Tid, TidAble, TidExt};
-
 #[doc(inline)]
 pub use error_strategy::{BailErrorStrategy, DefaultErrorStrategy, ErrorStrategy};
 

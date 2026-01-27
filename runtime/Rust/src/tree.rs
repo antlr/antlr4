@@ -58,6 +58,41 @@ pub trait Tree<'input>: RuleContext<'input> {
         Box::new(iter)
     }
     // fn get_children_full(&self) -> &RefCell<Vec<Rc<<Self::Ctx as ParserNodeType<'input, Self::TF>>::Type>>> { unimplemented!() }
+
+    fn get_type_id(&self) -> std::any::TypeId;
+}
+
+pub trait TypedTreeNode {
+    fn type_id() -> std::any::TypeId;
+}
+
+/// Downcast tree node to specific type
+/// # Safety
+/// Downcasting ignores lifetime parameters, so caller must ensure that any
+/// original lifetimes attached to the source type S are accurately represented
+/// in the target type T.
+pub unsafe fn downcast_ref<'input, 'a, S, T>(node: &'a S) -> Option<&'input T>
+where
+    S: Tree<'input> + ?Sized,
+    T: TypedTreeNode,
+{
+    if node.get_type_id() == T::type_id() {
+        Some(unsafe { &*(node as *const _ as *const T) })
+    } else {
+        None
+    }
+}
+
+pub(crate) unsafe fn downcast_rc<'input, S, T>(node: Rc<S>) -> Option<Rc<T>>
+where
+    S: Tree<'input> + ?Sized,
+    T: TypedTreeNode,
+{
+    if node.get_type_id() == T::type_id() {
+        Some(unsafe { Rc::from_raw(Rc::into_raw(node) as *const T) })
+    } else {
+        None
+    }
 }
 
 /// Tree that knows about underlying text
@@ -128,7 +163,7 @@ pub struct LeafNode<'input, Node: ParserNodeType<'input>, T: 'static> {
     pub symbol: <Node::TF as TokenFactory<'input>>::Tok,
     iserror: PhantomData<T>,
 }
-better_any::tid! { impl <'input, Node, T:'static> TidAble<'input> for LeafNode<'input, Node, T> where Node:ParserNodeType<'input> }
+// tid! { impl <'input, Node, T:'static> TidAble<'input> for LeafNode<'input, Node, T> where Node:ParserNodeType<'input> }
 
 impl<'input, Node: ParserNodeType<'input>, T: 'static> CustomRuleContext<'input>
     for LeafNode<'input, Node, T>
@@ -150,7 +185,17 @@ impl<'input, Node: ParserNodeType<'input>, T: 'static> ParserRuleContext<'input>
 {
 }
 
-impl<'input, Node: ParserNodeType<'input>, T: 'static> Tree<'input> for LeafNode<'input, Node, T> {}
+impl<'input, Node: ParserNodeType<'input>, T: 'static> TypedTreeNode for LeafNode<'input, Node, T> {
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<T>()
+    }
+}
+
+impl<'input, Node: ParserNodeType<'input>, T: 'static> Tree<'input> for LeafNode<'input, Node, T> {
+    fn get_type_id(&self) -> std::any::TypeId {
+        <Self as TypedTreeNode>::type_id()
+    }
+}
 
 impl<'input, Node: ParserNodeType<'input>, T: 'static> RuleContext<'input>
     for LeafNode<'input, Node, T>

@@ -27,8 +27,6 @@ use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::csvlistener::*;
 use super::csvvisitor::*;
 
-use dbt_antlr4::{TidAble,TidExt};
-
 use std::marker::PhantomData;
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -80,23 +78,23 @@ pub type CSVTreeWalker<'input,'a> =
 /// Parser for CSV grammar
 pub struct CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	base:BaseParserType<'input,I>,
 	interpreter:Arc<ParserATNSimulator>,
 	_shared_context_cache: Box<PredictionContextCache>,
-    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >,
+    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>,
 }
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) {
+    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) {
         self.err_handler = strategy
     }
 
-    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
+    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) -> Self {
 		dbt_antlr4::recognizer::check_version("0","51");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
@@ -119,11 +117,9 @@ where
 
 }
 
-type DynStrategy<'input,I> = Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>;
-
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn with_dyn_strategy(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -132,7 +128,7 @@ where
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn new(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -160,12 +156,7 @@ where
 impl<'input> CSVParserContext<'input> for TerminalNode<'input,CSVParserContextType> {}
 impl<'input> CSVParserContext<'input> for ErrorNode<'input,CSVParserContextType> {}
 
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn CSVParserContext<'input> + 'input }
-
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn CSVListener<'input> + 'input }
-
 pub struct CSVParserContextType;
-dbt_antlr4::tid!{CSVParserContextType}
 
 impl<'input> ParserNodeType<'input> for CSVParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -174,7 +165,7 @@ impl<'input> ParserNodeType<'input> for CSVParserContextType{
 
 impl<'input, I> Deref for CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     type Target = BaseParserType<'input,I>;
 
@@ -185,7 +176,7 @@ where
 
 impl<'input, I> DerefMut for CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.base
@@ -198,15 +189,14 @@ pub struct CSVParserExt<'input>{
 
 impl<'input> CSVParserExt<'input>{
 }
-dbt_antlr4::tid! { CSVParserExt<'a> }
 
 impl<'input> TokenAware<'input> for CSVParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> ParserRecog<'input, BaseParserType<'input,I>> for CSVParserExt<'input>{}
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> ParserRecog<'input, BaseParserType<'input,I>> for CSVParserExt<'input>{}
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> Actions<'input, BaseParserType<'input,I>> for CSVParserExt<'input>{
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> Actions<'input, BaseParserType<'input,I>> for CSVParserExt<'input>{
 	fn get_grammar_file_name(&self) -> & str{ "CSV.g4"}
 
    	fn get_rule_names(&self) -> &[& str] {&ruleNames}
@@ -222,6 +212,12 @@ pub type CsvFileContext<'input> = BaseParserRuleContext<'input,CsvFileContextExt
 #[derive(Clone)]
 pub struct CsvFileContextExt<'input>{
 ph:PhantomData<&'input str>
+}
+
+impl<'input> TypedTreeNode for CsvFileContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<CsvFileContextExt<'static>>()
+    }
 }
 
 impl<'input> CSVParserContext<'input> for CsvFileContext<'input>{}
@@ -251,7 +247,6 @@ impl<'input> CustomRuleContext<'input> for CsvFileContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_csvFile }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_csvFile }
 }
-dbt_antlr4::tid!{CsvFileContextExt<'a>}
 
 impl<'input> CsvFileContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<CsvFileContextAll<'input>> {
@@ -282,7 +277,7 @@ impl<'input> CsvFileContextAttrs<'input> for CsvFileContext<'input>{}
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn csvFile(&mut self,)
 	-> Result<Rc<CsvFileContextAll<'input>>,ANTLRError> {
@@ -346,6 +341,12 @@ pub struct HdrContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for HdrContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<HdrContextExt<'static>>()
+    }
+}
+
 impl<'input> CSVParserContext<'input> for HdrContext<'input>{}
 
 impl<'input,'a> Listenable<dyn CSVListener<'input> + 'a> for HdrContext<'input>{
@@ -373,7 +374,6 @@ impl<'input> CustomRuleContext<'input> for HdrContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_hdr }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_hdr }
 }
-dbt_antlr4::tid!{HdrContextExt<'a>}
 
 impl<'input> HdrContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<HdrContextAll<'input>> {
@@ -398,7 +398,7 @@ impl<'input> HdrContextAttrs<'input> for HdrContext<'input>{}
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn hdr(&mut self,)
 	-> Result<Rc<HdrContextAll<'input>>,ANTLRError> {
@@ -444,6 +444,12 @@ pub struct RowContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for RowContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<RowContextExt<'static>>()
+    }
+}
+
 impl<'input> CSVParserContext<'input> for RowContext<'input>{}
 
 impl<'input,'a> Listenable<dyn CSVListener<'input> + 'a> for RowContext<'input>{
@@ -471,7 +477,6 @@ impl<'input> CustomRuleContext<'input> for RowContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_row }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_row }
 }
-dbt_antlr4::tid!{RowContextExt<'a>}
 
 impl<'input> RowContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<RowContextAll<'input>> {
@@ -499,7 +504,7 @@ impl<'input> RowContextAttrs<'input> for RowContext<'input>{}
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn row(&mut self,)
 	-> Result<Rc<RowContextAll<'input>>,ANTLRError> {
@@ -579,6 +584,12 @@ pub struct FieldContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for FieldContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<FieldContextExt<'static>>()
+    }
+}
+
 impl<'input> CSVParserContext<'input> for FieldContext<'input>{}
 
 impl<'input,'a> Listenable<dyn CSVListener<'input> + 'a> for FieldContext<'input>{
@@ -606,7 +617,6 @@ impl<'input> CustomRuleContext<'input> for FieldContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_field }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_field }
 }
-dbt_antlr4::tid!{FieldContextExt<'a>}
 
 impl<'input> FieldContextExt<'input>{
 	fn new(parent: Option<Rc<dyn CSVParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<FieldContextAll<'input>> {
@@ -638,7 +648,7 @@ impl<'input> FieldContextAttrs<'input> for FieldContext<'input>{}
 
 impl<'input, I> CSVParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn field(&mut self,)
 	-> Result<Rc<FieldContextAll<'input>>,ANTLRError> {

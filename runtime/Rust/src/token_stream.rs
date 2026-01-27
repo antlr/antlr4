@@ -78,7 +78,6 @@ pub struct UnbufferedTokenStream<'input, T: TokenSource<'input>> {
     pub(crate) p: isize,
     fetched_eof: bool,
 }
-better_any::tid! { impl<'input,T> TidAble<'input> for UnbufferedTokenStream<'input, T> where T: TokenSource<'input>}
 
 impl<'input, T: TokenSource<'input>> Debug for UnbufferedTokenStream<'input, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

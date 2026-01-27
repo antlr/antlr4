@@ -138,6 +138,7 @@ mod gen {
         let expected = "[@0,0:0='A',<1>,1:0]\n";
         assert_eq!(result, expected);
 
+        #[allow(dead_code)]
         struct TestVisitorUnit(String);
         impl ParseTreeVisitorCompat<'_> for TestVisitorUnit {
             type Node = VisitorBasicParserContextType;

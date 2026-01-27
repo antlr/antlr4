@@ -13,7 +13,6 @@ use typed_arena::Arena;
 use crate::char_stream::{CharStream, InputData};
 use crate::token::Token;
 use crate::token::{CommonToken, OwningToken, TOKEN_INVALID_TYPE};
-use better_any::TidAble;
 
 pub(crate) static COMMON_TOKEN_FACTORY_DEFAULT: LazyLock<Box<CommonTokenFactory>> =
     LazyLock::new(|| Box::new(CommonTokenFactory {}));
@@ -45,7 +44,7 @@ pub(crate) static INVALID_COMMON: LazyLock<Box<CommonToken<'static>>> = LazyLock
 });
 
 /// Trait for creating tokens.
-pub trait TokenFactory<'a>: TidAble<'a> + Sized {
+pub trait TokenFactory<'a>: Sized {
     /// Type of tokens emitted by this factory.
     type Inner: Token<Data = Self::Data> + ?Sized + 'a;
     /// Ownership of the emitted tokens
@@ -85,8 +84,6 @@ pub trait TokenFactory<'a>: TidAble<'a> + Sized {
 /// Default token factory
 #[derive(Default, Debug)]
 pub struct CommonTokenFactory;
-
-better_any::tid! {CommonTokenFactory}
 
 impl Default for &'_ CommonTokenFactory {
     fn default() -> Self {
@@ -152,8 +149,6 @@ impl<'a> TokenFactory<'a> for CommonTokenFactory {
 /// `OwningToken`s
 #[derive(Default, Debug)]
 pub struct OwningTokenFactory;
-
-better_any::tid! {OwningTokenFactory}
 
 impl<'a> TokenFactory<'a> for OwningTokenFactory {
     type Inner = OwningToken;
@@ -243,8 +238,6 @@ pub struct ArenaFactory<'input, TF, T> {
     pd: PhantomData<&'input str>,
 }
 
-better_any::tid! {impl<'input,TF,T> TidAble<'input> for ArenaFactory<'input,TF,T>}
-
 impl<TF: Debug, T> Debug for ArenaFactory<'_, TF, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ArenaFactory")
@@ -270,7 +263,7 @@ where
 impl<'input, TF, Tok> TokenFactory<'input> for ArenaFactory<'input, TF, Tok>
 where
     TF: TokenFactory<'input, Tok = Box<Tok>, Inner = Tok>,
-    Tok: Token<Data = TF::Data> + Clone + TidAble<'input>,
+    Tok: Token<Data = TF::Data> + Clone + 'input,
     for<'a> &'a Tok: Default,
 {
     type Inner = Tok;

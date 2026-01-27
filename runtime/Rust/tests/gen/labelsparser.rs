@@ -25,8 +25,6 @@ use dbt_antlr4::int_stream::EOF;
 use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::labelslistener::*;
-use dbt_antlr4::{TidAble,TidExt};
-
 use std::marker::PhantomData;
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -79,23 +77,23 @@ pub type LabelsTreeWalker<'input,'a> =
 /// Parser for Labels grammar
 pub struct LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	base:BaseParserType<'input,I>,
 	interpreter:Arc<ParserATNSimulator>,
 	_shared_context_cache: Box<PredictionContextCache>,
-    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >,
+    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>,
 }
 
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) {
+    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) {
         self.err_handler = strategy
     }
 
-    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
+    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) -> Self {
 		dbt_antlr4::recognizer::check_version("0","51");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
@@ -118,11 +116,9 @@ where
 
 }
 
-type DynStrategy<'input,I> = Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>;
-
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn with_dyn_strategy(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -131,7 +127,7 @@ where
 
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn new(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -149,12 +145,7 @@ dbt_antlr4::coerce_from!{ 'input : LabelsParserContext<'input> }
 impl<'input> LabelsParserContext<'input> for TerminalNode<'input,LabelsParserContextType> {}
 impl<'input> LabelsParserContext<'input> for ErrorNode<'input,LabelsParserContextType> {}
 
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn LabelsParserContext<'input> + 'input }
-
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn LabelsListener<'input> + 'input }
-
 pub struct LabelsParserContextType;
-dbt_antlr4::tid!{LabelsParserContextType}
 
 impl<'input> ParserNodeType<'input> for LabelsParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -163,7 +154,7 @@ impl<'input> ParserNodeType<'input> for LabelsParserContextType{
 
 impl<'input, I> Deref for LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     type Target = BaseParserType<'input,I>;
 
@@ -174,7 +165,7 @@ where
 
 impl<'input, I> DerefMut for LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.base
@@ -187,15 +178,14 @@ pub struct LabelsParserExt<'input>{
 
 impl<'input> LabelsParserExt<'input>{
 }
-dbt_antlr4::tid! { LabelsParserExt<'a> }
 
 impl<'input> TokenAware<'input> for LabelsParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> ParserRecog<'input, BaseParserType<'input,I>> for LabelsParserExt<'input>{}
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> ParserRecog<'input, BaseParserType<'input,I>> for LabelsParserExt<'input>{}
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> Actions<'input, BaseParserType<'input,I>> for LabelsParserExt<'input>{
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> Actions<'input, BaseParserType<'input,I>> for LabelsParserExt<'input>{
 	fn get_grammar_file_name(&self) -> & str{ "Labels.g4"}
 
    	fn get_rule_names(&self) -> &[& str] {&ruleNames}
@@ -205,7 +195,7 @@ impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'i
 			   recog:&mut BaseParserType<'input,I>
 	)->bool{
 		match rule_index {
-					1 => LabelsParser::<'input,I>::e_sempred(_localctx.and_then(|x|x.downcast_ref()), pred_index, recog),
+					1 => LabelsParser::<'input,I>::e_sempred(_localctx.and_then(|x| unsafe {downcast_ref(x)}), pred_index, recog),
 			_ => true
 		}
 	}
@@ -213,9 +203,9 @@ impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'i
 
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-	fn e_sempred(_localctx: Option<&EContext<'input>>, pred_index:i32,
+	fn e_sempred(_localctx: Option<&'input EContext<'input>>, pred_index:i32,
 						recog:&mut <Self as Deref>::Target
 		) -> bool {
 		match pred_index {
@@ -247,6 +237,12 @@ pub struct SContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for SContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<SContextExt<'static>>()
+    }
+}
+
 impl<'input> LabelsParserContext<'input> for SContext<'input>{}
 
 impl<'input,'a> Listenable<dyn LabelsListener<'input> + 'a> for SContext<'input>{
@@ -267,7 +263,6 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn LabelsParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {
@@ -293,7 +288,7 @@ impl<'input> SContextAttrs<'input> for SContext<'input>{}
 
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn s(&mut self,)
 	-> Result<Rc<SContextAll<'input>>,ANTLRError> {
@@ -342,9 +337,17 @@ pub enum EContextAll<'input>{
 	IncContext(IncContext<'input>),
 Error(EContext<'input>)
 }
-dbt_antlr4::tid!{EContextAll<'a>}
 
-impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for EContextAll<'input>{}
+pub struct EContextAllId;
+impl<'input> dbt_antlr4::parser_rule_context::DerefSeal for EContextAll<'input>{
+    type Id = EContextAllId;
+}
+impl<'input> TypedTreeNode for EContextAll<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<EContextAllId>()
+    }
+}
+
 
 impl<'input> LabelsParserContext<'input> for EContextAll<'input>{}
 
@@ -379,6 +382,12 @@ pub struct EContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
+impl<'input> TypedTreeNode for EContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<EContextExt<'static>>()
+    }
+}
+
 impl<'input> LabelsParserContext<'input> for EContext<'input>{}
 
 impl<'input,'a> Listenable<dyn LabelsListener<'input> + 'a> for EContext<'input>{
@@ -390,7 +399,6 @@ impl<'input> CustomRuleContext<'input> for EContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_e }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_e }
 }
-dbt_antlr4::tid!{EContextExt<'a>}
 
 impl<'input> EContextExt<'input>{
 	fn new(parent: Option<Rc<dyn LabelsParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<EContextAll<'input>> {
@@ -437,7 +445,11 @@ pub struct AddContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{AddContextExt<'a>}
+impl<'input> TypedTreeNode for AddContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<AddContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for AddContext<'input>{}
 
@@ -495,7 +507,11 @@ pub struct ParensContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{ParensContextExt<'a>}
+impl<'input> TypedTreeNode for ParensContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<ParensContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for ParensContext<'input>{}
 
@@ -558,7 +574,11 @@ pub struct MultContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{MultContextExt<'a>}
+impl<'input> TypedTreeNode for MultContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<MultContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for MultContext<'input>{}
 
@@ -617,7 +637,11 @@ pub struct DecContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{DecContextExt<'a>}
+impl<'input> TypedTreeNode for DecContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<DecContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for DecContext<'input>{}
 
@@ -677,7 +701,11 @@ pub struct AnIDContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{AnIDContextExt<'a>}
+impl<'input> TypedTreeNode for AnIDContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<AnIDContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for AnIDContext<'input>{}
 
@@ -737,7 +765,11 @@ pub struct AnIntContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{AnIntContextExt<'a>}
+impl<'input> TypedTreeNode for AnIntContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<AnIntContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for AnIntContext<'input>{}
 
@@ -795,7 +827,11 @@ pub struct IncContextExt<'input>{
 	ph:PhantomData<&'input str>
 }
 
-dbt_antlr4::tid!{IncContextExt<'a>}
+impl<'input> TypedTreeNode for IncContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<IncContextExt<'static>>()
+    }
+}
 
 impl<'input> LabelsParserContext<'input> for IncContext<'input>{}
 
@@ -839,7 +875,7 @@ impl<'input> IncContextExt<'input>{
 
 impl<'input, I> LabelsParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	pub fn  e(&mut self,)
 	-> Result<Rc<EContextAll<'input>>,ANTLRError> {

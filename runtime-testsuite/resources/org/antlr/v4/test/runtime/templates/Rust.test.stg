@@ -42,7 +42,7 @@ Pass() ::= "/* do nothing */"
 StringList() ::= "Vec\<String>"
 BuildParseTrees() ::= "recog.build_parse_trees = true;"
 BailErrorStrategy() ::=
-<<use dbt_antlr4::TidExt;
+<<
 recog.set_error_strategy(Box::new(dbt_antlr4::error_strategy::BailErrorStrategy::new()));
 >>
 
@@ -118,7 +118,7 @@ PositionAdjustingLexer() ::= <<
 
 PositionAdjustingLexerDef() ::= <<
 //@definitions
-   fn handleAcceptPositionForIdentifier\<'input, Input:CharStream\<From\<'input>\>>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >) {
+   fn handleAcceptPositionForIdentifier\<'input, Input:CharStream\<From\<'input>\>\>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >) {
      let tokenText = this.get_text();
      let identifierLength = tokenText.chars().position(|it| !isIdentifierChar(it)).unwrap() as isize;
 //     while (identifierLength \< tokenText.len() as i32 && isIdentifierChar(tokenText[identifierLength as usize])) {
@@ -136,7 +136,7 @@ PositionAdjustingLexerDef() ::= <<
 
    }
 
-   fn handleAcceptPositionForKeyword\<'input, Input:CharStream\<From\<'input>\>>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >, keyword: &str) {
+   fn handleAcceptPositionForKeyword\<'input, Input:CharStream\<From\<'input>\>\>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >, keyword: &str) {
    	let mut input = this.input.take().unwrap();
      if (input.index() > this.token_start_char_index + keyword.len() as isize) {
        let offset = keyword.len() as isize - 1;

@@ -23,7 +23,6 @@ use crate::tree::{ErrorNode, Listenable, ParseTreeListener, TerminalNode};
 use crate::utils::cell_update;
 use crate::vocabulary::Vocabulary;
 use crate::{CoerceFrom, CoerceTo};
-use better_any::TidAble;
 
 /// parser functionality required for `ParserATNSimulator` to work
 #[allow(missing_docs)] // todo rewrite it so downstream crates actually could meaningfully implement it
@@ -93,7 +92,7 @@ pub trait Parser<'input>: Recognizer<'input> {
 ///
 /// Implemented by generated parser for the type that is going to carry information about
 /// parse tree node.
-pub trait ParserNodeType<'input>: TidAble<'input> + Sized {
+pub trait ParserNodeType<'input>: Sized {
     /// Shortcut for `Type::TF`
     type TF: TokenFactory<'input> + 'input;
     /// Actual type of the parse tree node
@@ -149,13 +148,6 @@ pub struct BaseParser<
 
     ext: Ext,
     pd: PhantomData<fn() -> &'input str>,
-}
-
-better_any::tid! {
-    impl<'input, Ext, I, Ctx, T> TidAble<'input> for BaseParser<'input,Ext, I, Ctx, T>
-    where I: TokenStream<'input>,
-        Ctx: ParserNodeType<'input, TF = I::TF>,
-        T: ParseTreeListener<'input, Ctx> + ?Sized
 }
 
 impl<'input, Ext, I, Ctx, T> Deref for BaseParser<'input, Ext, I, Ctx, T>

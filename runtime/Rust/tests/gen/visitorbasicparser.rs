@@ -27,8 +27,6 @@ use dbt_antlr4::token_factory::{CommonTokenFactory,TokenFactory, TokenAware};
 use super::visitorbasiclistener::*;
 use super::visitorbasicvisitor::*;
 
-use dbt_antlr4::{TidAble,TidExt};
-
 use std::marker::PhantomData;
 use std::sync::LazyLock;
 use std::sync::Arc;
@@ -71,23 +69,23 @@ pub type VisitorBasicTreeWalker<'input,'a> =
 /// Parser for VisitorBasic grammar
 pub struct VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input>>,
 {
 	base:BaseParserType<'input,I>,
 	interpreter:Arc<ParserATNSimulator>,
 	_shared_context_cache: Box<PredictionContextCache>,
-    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >,
+    pub err_handler: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>,
 }
 
 impl<'input, I> VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
-    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) {
+    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) {
         self.err_handler = strategy
     }
 
-    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I> > >) -> Self {
+    pub fn with_strategy(input: I, strategy: Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>) -> Self {
 		dbt_antlr4::recognizer::check_version("0","51");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
@@ -110,11 +108,9 @@ where
 
 }
 
-type DynStrategy<'input,I> = Box<dyn ErrorStrategy<'input,BaseParserType<'input,I>> + 'input>;
-
 impl<'input, I> VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn with_dyn_strategy(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -123,7 +119,7 @@ where
 
 impl<'input, I> VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     pub fn new(input: I) -> Self{
     	Self::with_strategy(input,Box::new(DefaultErrorStrategy::new()))
@@ -151,12 +147,7 @@ where
 impl<'input> VisitorBasicParserContext<'input> for TerminalNode<'input,VisitorBasicParserContextType> {}
 impl<'input> VisitorBasicParserContext<'input> for ErrorNode<'input,VisitorBasicParserContextType> {}
 
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicParserContext<'input> + 'input }
-
-dbt_antlr4::tid! { impl<'input> TidAble<'input> for dyn VisitorBasicListener<'input> + 'input }
-
 pub struct VisitorBasicParserContextType;
-dbt_antlr4::tid!{VisitorBasicParserContextType}
 
 impl<'input> ParserNodeType<'input> for VisitorBasicParserContextType{
 	type TF = LocalTokenFactory<'input>;
@@ -165,7 +156,7 @@ impl<'input> ParserNodeType<'input> for VisitorBasicParserContextType{
 
 impl<'input, I> Deref for VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     type Target = BaseParserType<'input,I>;
 
@@ -176,7 +167,7 @@ where
 
 impl<'input, I> DerefMut for VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.base
@@ -189,15 +180,14 @@ pub struct VisitorBasicParserExt<'input>{
 
 impl<'input> VisitorBasicParserExt<'input>{
 }
-dbt_antlr4::tid! { VisitorBasicParserExt<'a> }
 
 impl<'input> TokenAware<'input> for VisitorBasicParserExt<'input>{
 	type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> ParserRecog<'input, BaseParserType<'input,I>> for VisitorBasicParserExt<'input>{}
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> ParserRecog<'input, BaseParserType<'input,I>> for VisitorBasicParserExt<'input>{}
 
-impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>> Actions<'input, BaseParserType<'input,I>> for VisitorBasicParserExt<'input>{
+impl<'input,I: TokenStream<'input, TF = LocalTokenFactory<'input> >> Actions<'input, BaseParserType<'input,I>> for VisitorBasicParserExt<'input>{
 	fn get_grammar_file_name(&self) -> & str{ "VisitorBasic.g4"}
 
    	fn get_rule_names(&self) -> &[& str] {&ruleNames}
@@ -213,6 +203,12 @@ pub type SContext<'input> = BaseParserRuleContext<'input,SContextExt<'input>>;
 #[derive(Clone)]
 pub struct SContextExt<'input>{
 ph:PhantomData<&'input str>
+}
+
+impl<'input> TypedTreeNode for SContextExt<'input>{
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<SContextExt<'static>>()
+    }
 }
 
 impl<'input> VisitorBasicParserContext<'input> for SContext<'input>{}
@@ -242,7 +238,6 @@ impl<'input> CustomRuleContext<'input> for SContextExt<'input>{
 	fn get_rule_index(&self) -> usize { RULE_s }
 	//fn type_rule_index() -> usize where Self: Sized { RULE_s }
 }
-dbt_antlr4::tid!{SContextExt<'a>}
 
 impl<'input> SContextExt<'input>{
 	fn new(parent: Option<Rc<dyn VisitorBasicParserContext<'input> + 'input > >, invoking_state: i32) -> Rc<SContextAll<'input>> {
@@ -274,7 +269,7 @@ impl<'input> SContextAttrs<'input> for SContext<'input>{}
 
 impl<'input, I> VisitorBasicParser<'input, I>
 where
-    I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
+    I: TokenStream<'input, TF = LocalTokenFactory<'input> >,
 {
 	pub fn s(&mut self,)
 	-> Result<Rc<SContextAll<'input>>,ANTLRError> {

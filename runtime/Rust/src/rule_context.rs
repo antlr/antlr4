@@ -9,9 +9,8 @@ use std::rc::{Rc, Weak};
 use crate::atn::INVALID_ALT;
 use crate::parser::ParserNodeType;
 use crate::parser_rule_context::ParserRuleContext;
-use crate::token_factory::TokenFactory;
-use crate::tree::{ParseTree, Tree};
-use better_any::TidAble;
+use crate::token_factory::{CommonTokenFactory, TokenFactory};
+use crate::tree::{ParseTree, Tree, TypedTreeNode};
 use std::any::type_name;
 
 //pub trait RuleContext:RuleNode {
@@ -71,8 +70,6 @@ pub struct EmptyCustomRuleContext<'a, TF: TokenFactory<'a> + 'a>(
     pub(crate) PhantomData<&'a TF::Tok>,
 );
 
-better_any::tid! { impl <'a,TF> TidAble<'a> for EmptyCustomRuleContext<'a,TF> where TF:TokenFactory<'a> + 'a}
-
 impl<'a, TF: TokenFactory<'a> + 'a> CustomRuleContext<'a> for EmptyCustomRuleContext<'a, TF> {
     type TF = TF;
     type Ctx = EmptyContextType<'a, TF>;
@@ -82,18 +79,12 @@ impl<'a, TF: TokenFactory<'a> + 'a> CustomRuleContext<'a> for EmptyCustomRuleCon
     }
 }
 
-// unsafe impl<'a, TF: TokenFactory<'a> + 'a> Tid for EmptyCustomRuleContext<'a, TF> {
-//     fn self_id(&self) -> TypeId {
-//         TypeId::of::<EmptyCustomRuleContext<'static, CommonTokenFactory>>()
-//     }
-//
-//     fn id() -> TypeId
-//     where
-//         Self: Sized,
-//     {
-//         TypeId::of::<EmptyCustomRuleContext<'static, CommonTokenFactory>>()
-//     }
-// }
+impl<'a, TF: TokenFactory<'a> + 'a> TypedTreeNode for EmptyCustomRuleContext<'a, TF> {
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<EmptyCustomRuleContext<'static, CommonTokenFactory>>()
+    }
+}
+
 #[doc(hidden)] // public for implementation reasons
 pub type EmptyContext<'a, TF> =
     dyn ParserRuleContext<'a, TF = TF, Ctx = EmptyContextType<'a, TF>> + 'a;
@@ -101,8 +92,6 @@ pub type EmptyContext<'a, TF> =
 #[derive(Debug)]
 #[doc(hidden)] // public for implementation reasons
 pub struct EmptyContextType<'a, TF: TokenFactory<'a>>(pub PhantomData<&'a TF>);
-
-better_any::tid! { impl <'a,TF> TidAble<'a> for EmptyContextType<'a,TF> where TF:TokenFactory<'a> }
 
 impl<'a, TF: TokenFactory<'a>> ParserNodeType<'a> for EmptyContextType<'a, TF> {
     type TF = TF;
@@ -141,16 +130,14 @@ pub trait CustomRuleContext<'input> {
 }
 
 /// Minimal parse tree node implementation, that stores only data required for correct parsing
-pub struct BaseRuleContext<'input, ExtCtx: CustomRuleContext<'input>> {
+pub struct BaseRuleContext<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> {
     pub(crate) parent_ctx: RefCell<Option<Weak<<ExtCtx::Ctx as ParserNodeType<'input>>::Type>>>,
     invoking_state: Cell<i32>,
     pub(crate) ext: ExtCtx,
 }
 
-better_any::tid! { impl <'input,Ctx> TidAble<'input> for BaseRuleContext<'input,Ctx> where Ctx:CustomRuleContext<'input>}
-
 #[allow(missing_docs)]
-impl<'input, ExtCtx: CustomRuleContext<'input>> BaseRuleContext<'input, ExtCtx> {
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> BaseRuleContext<'input, ExtCtx> {
     pub fn new_parser_ctx(
         parent_ctx: Option<Rc<<ExtCtx::Ctx as ParserNodeType<'input>>::Type>>,
         invoking_state: i32,
@@ -171,19 +158,23 @@ impl<'input, ExtCtx: CustomRuleContext<'input>> BaseRuleContext<'input, ExtCtx> 
     }
 }
 
-impl<'input, Ctx: CustomRuleContext<'input>> Borrow<Ctx> for BaseRuleContext<'input, Ctx> {
-    fn borrow(&self) -> &Ctx {
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> Borrow<ExtCtx>
+    for BaseRuleContext<'input, ExtCtx>
+{
+    fn borrow(&self) -> &ExtCtx {
         &self.ext
     }
 }
 
-impl<'input, Ctx: CustomRuleContext<'input>> BorrowMut<Ctx> for BaseRuleContext<'input, Ctx> {
-    fn borrow_mut(&mut self) -> &mut Ctx {
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> BorrowMut<ExtCtx>
+    for BaseRuleContext<'input, ExtCtx>
+{
+    fn borrow_mut(&mut self) -> &mut ExtCtx {
         &mut self.ext
     }
 }
 
-impl<'input, ExtCtx: CustomRuleContext<'input>> CustomRuleContext<'input>
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> CustomRuleContext<'input>
     for BaseRuleContext<'input, ExtCtx>
 {
     type TF = ExtCtx::TF;
@@ -205,7 +196,7 @@ impl<'input, ExtCtx: CustomRuleContext<'input>> CustomRuleContext<'input>
 //     }
 // }
 
-impl<'input, ExtCtx: CustomRuleContext<'input>> RuleContext<'input>
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> RuleContext<'input>
     for BaseRuleContext<'input, ExtCtx>
 {
     fn get_invoking_state(&self) -> i32 {
@@ -229,7 +220,9 @@ impl<'input, ExtCtx: CustomRuleContext<'input>> RuleContext<'input>
     }
 }
 
-impl<'input, ExtCtx: CustomRuleContext<'input>> Debug for BaseRuleContext<'input, ExtCtx> {
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> Debug
+    for BaseRuleContext<'input, ExtCtx>
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(type_name::<Self>())
             .field("invoking_state", &self.invoking_state)
@@ -238,14 +231,28 @@ impl<'input, ExtCtx: CustomRuleContext<'input>> Debug for BaseRuleContext<'input
     }
 }
 
-impl<'input, ExtCtx: CustomRuleContext<'input>> Tree<'input> for BaseRuleContext<'input, ExtCtx> {}
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> TypedTreeNode
+    for BaseRuleContext<'input, ExtCtx>
+{
+    fn type_id() -> std::any::TypeId {
+        <ExtCtx as TypedTreeNode>::type_id()
+    }
+}
 
-impl<'input, ExtCtx: CustomRuleContext<'input>> ParseTree<'input>
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> Tree<'input>
+    for BaseRuleContext<'input, ExtCtx>
+{
+    fn get_type_id(&self) -> std::any::TypeId {
+        <Self as TypedTreeNode>::type_id()
+    }
+}
+
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> ParseTree<'input>
     for BaseRuleContext<'input, ExtCtx>
 {
 }
 
-impl<'input, ExtCtx: CustomRuleContext<'input> + TidAble<'input>> ParserRuleContext<'input>
+impl<'input, ExtCtx: CustomRuleContext<'input> + TypedTreeNode> ParserRuleContext<'input>
     for BaseRuleContext<'input, ExtCtx>
 {
 }

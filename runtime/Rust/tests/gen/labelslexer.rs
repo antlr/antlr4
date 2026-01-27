@@ -21,8 +21,6 @@ use dbt_antlr4::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyConte
 use dbt_antlr4::parser_rule_context::{ParserRuleContext,BaseParserRuleContext,cast};
 use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 
-use dbt_antlr4::{Tid,TidAble,TidExt};
-
 use std::sync::LazyLock;
 use std::sync::Arc;
 use std::cell::RefCell;
@@ -74,8 +72,6 @@ type From<'a> = <LocalTokenFactory<'a> as TokenFactory<'a> >::From;
 pub struct LabelsLexer<'input, Input:CharStream<From<'input> >> {
 	base: BaseLexer<'input,LabelsLexerActions,Input,LocalTokenFactory<'input>>,
 }
-
-dbt_antlr4::tid! { impl<'input,Input> TidAble<'input> for LabelsLexer<'input,Input> where Input:CharStream<From<'input> > }
 
 impl<'input, Input:CharStream<From<'input> >> Deref for LabelsLexer<'input,Input>{
 	type Target = BaseLexer<'input,LabelsLexerActions,Input,LocalTokenFactory<'input>>;
