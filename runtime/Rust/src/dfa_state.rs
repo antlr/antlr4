@@ -1,6 +1,6 @@
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::sync::atomic::AtomicPtr;
+use std::sync::atomic::{AtomicPtr, Ordering};
 use std::sync::RwLock;
 
 use murmur3::murmur3_32::MurmurHasher;
@@ -113,13 +113,11 @@ impl DFAState {
     }
 
     pub fn configs(&self) -> &ATNConfigSet {
-        unsafe { &*self.configs.load(std::sync::atomic::Ordering::SeqCst) }
+        unsafe { &*self.configs.load(Ordering::Relaxed) }
     }
 
     pub fn set_configs(&self, configs: Box<ATNConfigSet>) {
-        let old = self
-            .configs
-            .swap(Box::into_raw(configs), std::sync::atomic::Ordering::SeqCst);
+        let old = self.configs.swap(Box::into_raw(configs), Ordering::Relaxed);
         unsafe {
             drop(Box::from_raw(old));
         }
@@ -129,12 +127,11 @@ impl DFAState {
     where
         F: FnOnce(Box<ATNConfigSet>) -> Box<ATNConfigSet>,
     {
-        let old_ptr = self.configs.load(std::sync::atomic::Ordering::SeqCst);
+        let old_ptr = self.configs.load(Ordering::Relaxed);
         let old_configs = unsafe { Box::from_raw(old_ptr) };
         let new_configs = f(old_configs);
         let new_ptr = Box::into_raw(new_configs);
-        self.configs
-            .store(new_ptr, std::sync::atomic::Ordering::SeqCst);
+        self.configs.store(new_ptr, Ordering::Relaxed);
     }
 
     //    fn get_alt_set(&self) -> &Set { unimplemented!() }

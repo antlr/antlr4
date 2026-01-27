@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::RwLock;
 
 use crate::atn::ATN;
@@ -283,7 +283,7 @@ impl DFA {
     }
 
     pub fn get_s0(&self) -> Option<DFAStateRef> {
-        let x = self.s0.load(std::sync::atomic::Ordering::SeqCst);
+        let x = self.s0.load(Ordering::Relaxed);
 
         if x == usize::max_value() {
             None
@@ -297,7 +297,7 @@ impl DFA {
     }
 
     pub fn set_s0(&self, s: DFAStateRef) {
-        self.s0.store(s, std::sync::atomic::Ordering::SeqCst);
+        self.s0.store(s, Ordering::Relaxed);
     }
 
     pub fn is_precedence_dfa(&self) -> bool {
