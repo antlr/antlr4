@@ -4,11 +4,7 @@ use std::borrow::{Borrow, Cow};
 use std::fmt::Formatter;
 use std::fmt::{Debug, Display};
 
-use std::sync::atomic::{AtomicIsize, Ordering};
-
-use crate::char_stream::InputData;
-use crate::int_stream::EOF;
-use crate::token_factory::{INVALID_COMMON, INVALID_OWNING};
+use crate::token_factory::INVALID_COMMON;
 
 /// Type of tokens that parser considers invalid
 pub const TOKEN_INVALID_TYPE: i32 = 0;
@@ -18,7 +14,7 @@ pub const TOKEN_EPSILON: i32 = -2;
 /// Min token type that can be assigned to tokens created by downstream implementations.
 pub const TOKEN_MIN_USER_TOKEN_TYPE: i32 = 1;
 /// Type of EOF token
-pub const TOKEN_EOF: i32 = EOF;
+pub const TOKEN_EOF: i32 = crate::int_stream::EOF;
 /// Default channel lexer emits tokens to
 pub const TOKEN_DEFAULT_CHANNEL: i32 = 0;
 /// Predefined additional channel for lexer to assign tokens to
@@ -29,94 +25,88 @@ pub const HIDDEN: i32 = TOKEN_HIDDEN_CHANNEL;
 /// Implemented by tokens that are produced by a `TokenFactory`
 #[allow(missing_docs)]
 pub trait Token: Debug + Display {
-    /// Type of the underlying data this token refers to
-    type Data: ?Sized + InputData;
-    // fn get_source(&self) -> Option<(Box<dyn TokenSource>, Box<dyn CharStream>)>;
+    /***
+     * Begin `Token` interface
+     */
+
+    /// Get the text of the token
+    fn get_text(&self) -> &str;
+
+    /// Get the token type of the token
     fn get_token_type(&self) -> i32;
-    fn get_channel(&self) -> i32 {
-        TOKEN_DEFAULT_CHANNEL
-    }
-    fn get_start(&self) -> isize {
-        0
-    }
-    fn get_stop(&self) -> isize {
-        0
-    }
-    fn get_line(&self) -> isize {
-        0
-    }
-    fn get_column(&self) -> isize {
-        0
-    }
 
-    fn get_text(&self) -> &Self::Data;
-    fn set_text(&mut self, _text: <Self::Data as ToOwned>::Owned) {}
+    /// The line number on which the first character of this token was
+    /// matched. The first line in the input is line 1.
+    fn get_line(&self) -> u32;
 
-    fn get_token_index(&self) -> isize {
-        0
-    }
-    fn set_token_index(&self, _v: isize) {}
+    /// The index of the first character of this token relative to the beginning
+    /// of the line at which it occurs. The first character on a line has
+    /// position 0.
+    fn get_char_position_in_line(&self) -> i32;
+
+    /// Returns the channel number this token was assigned to. Each token can
+    /// arrive on a different channel, but the parser only "tunes" to a single
+    /// channel. The parser ignores everything not on DEFAULT_CHANNEL.
+    fn get_channel(&self) -> i32;
+
+    /// An index from 0..n-1 of the token object in the token stream.
+    /// This must be valid in order to print token streams and use
+    /// token stream rewinding.
+    ///
+    /// Return -1 to indicate that the token was conjured up and does not
+    /// have a valid index.
+    fn get_token_index(&self) -> isize;
+
+    /// The starting character index of the token
+    ///
+    /// This method is optional; return -1 if not implemented.
+    fn get_start_index(&self) -> isize;
+
+    /// The last character index of the token
+    ///
+    /// This method is optional; return -1 if not implemented.
+    fn get_stop_index(&self) -> isize;
 
     // fn get_token_source(&self) -> &dyn TokenSource;
     // fn get_input_stream(&self) -> &dyn CharStream;
 
-    /// returns fully owned representation of this token
-    fn to_owned(&self) -> OwningToken {
-        OwningToken {
-            token_type: self.get_token_type(),
-            channel: self.get_channel(),
-            start: self.get_start(),
-            stop: self.get_stop(),
-            token_index: AtomicIsize::from(self.get_token_index()),
-            line: self.get_line(),
-            column: self.get_column(),
-            text: self.get_text().to_display(),
-            read_only: true,
-        }
-    }
+    /***
+     * Begin `WritableToken` interface
+     */
+
+    fn set_text(&mut self, _text: String);
+
+    fn set_type(&mut self, _ttype: i32);
+
+    fn set_line(&mut self, _line: u32);
+
+    fn set_char_position_in_line(&mut self, _pos: i32);
+
+    fn set_channel(&mut self, _channel: i32);
+
+    fn set_token_index(&mut self, _v: isize);
 }
 
 /// Token that owns its data
-pub type OwningToken = GenericToken<String>;
+pub type OwningToken = CommonToken<'static>;
 /// Most versatile Token that uses Cow to save data
 /// Can be used seamlessly switch from owned to zero-copy parsing
-pub type CommonToken<'a> = GenericToken<Cow<'a, str>>;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[allow(missing_docs)]
-pub struct GenericToken<T> {
+pub struct CommonToken<'input> {
     //    source: Option<(Box<TokenSource>,Box<CharStream>)>,
     pub token_type: i32,
     pub channel: i32,
     pub start: isize,
     pub stop: isize,
-    pub token_index: AtomicIsize,
-    pub line: isize,
-    pub column: isize,
-    pub text: T,
-    pub read_only: bool,
+    pub token_index: isize,
+    pub line: u32,
+    pub column: i32,
+    pub text: Cow<'input, str>,
 }
 
-impl<T: Clone> Clone for GenericToken<T>
-where
-    Self: Token,
-{
-    fn clone(&self) -> Self {
-        Self {
-            token_type: self.token_type,
-            channel: self.channel,
-            start: self.start,
-            stop: self.stop,
-            token_index: AtomicIsize::new(self.get_token_index()),
-            line: self.line,
-            column: self.column,
-            text: self.text.clone(),
-            read_only: false,
-        }
-    }
-}
-
-impl<T: Borrow<str> + Debug> Display for GenericToken<T> {
+impl Display for CommonToken<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let txt = if self.token_type == TOKEN_EOF {
             "<EOF>"
@@ -145,11 +135,7 @@ impl<T: Borrow<str> + Debug> Display for GenericToken<T> {
     }
 }
 
-// impl<T: Borrow<str> + Debug> TokenWrapper for GenericToken<T> { type Inner = Self; }
-
-impl<T: Borrow<str> + Debug> Token for GenericToken<T> {
-    type Data = str;
-
+impl<'input> Token for CommonToken<'input> {
     fn get_token_type(&self) -> i32 {
         self.token_type
     }
@@ -158,19 +144,19 @@ impl<T: Borrow<str> + Debug> Token for GenericToken<T> {
         self.channel
     }
 
-    fn get_start(&self) -> isize {
+    fn get_start_index(&self) -> isize {
         self.start
     }
 
-    fn get_stop(&self) -> isize {
+    fn get_stop_index(&self) -> isize {
         self.stop
     }
 
-    fn get_line(&self) -> isize {
+    fn get_line(&self) -> u32 {
         self.line
     }
 
-    fn get_column(&self) -> isize {
+    fn get_char_position_in_line(&self) -> i32 {
         self.column
     }
 
@@ -179,43 +165,39 @@ impl<T: Borrow<str> + Debug> Token for GenericToken<T> {
     // }
 
     fn get_text(&self) -> &str {
-        if self.token_type == EOF {
+        if self.token_type == TOKEN_EOF {
             "<EOF>"
         } else {
             self.text.borrow()
         }
     }
 
-    fn set_text(&mut self, _text: String) {
-        unimplemented!()
-    }
-
     fn get_token_index(&self) -> isize {
-        self.token_index.load(Ordering::Relaxed)
+        self.token_index
     }
 
-    fn set_token_index(&self, _v: isize) {
-        self.token_index.store(_v, Ordering::Relaxed)
+    fn set_token_index(&mut self, _v: isize) {
+        self.token_index = _v;
     }
 
-    fn to_owned(&self) -> OwningToken {
-        OwningToken {
-            token_type: self.token_type,
-            channel: self.channel,
-            start: self.start,
-            stop: self.stop,
-            token_index: AtomicIsize::new(self.get_token_index()),
-            line: self.line,
-            column: self.column,
-            text: self.text.borrow().to_owned(),
-            read_only: self.read_only,
-        }
+    fn set_text(&mut self, _text: String) {
+        self.text = Cow::from(_text);
     }
-}
 
-impl Default for &'_ OwningToken {
-    fn default() -> Self {
-        &INVALID_OWNING
+    fn set_type(&mut self, _ttype: i32) {
+        self.token_type = _ttype;
+    }
+
+    fn set_line(&mut self, _line: u32) {
+        self.line = _line;
+    }
+
+    fn set_char_position_in_line(&mut self, _pos: i32) {
+        self.column = _pos;
+    }
+
+    fn set_channel(&mut self, _channel: i32) {
+        self.channel = _channel;
     }
 }
 
@@ -225,19 +207,17 @@ impl Default for &'_ CommonToken<'_> {
     }
 }
 
-//
-// impl CommonToken {
-//     fn new_common_token(
-//         _source: Option<(Box<dyn TokenSource>, Box<dyn CharStream>)>,
-//         _token_type: i32,
-//         _channel: i32,
-//         _start: isize,
-//         _stop: isize,
-//     ) -> CommonToken {
-//         unimplemented!()
-//     }
-//
-//     fn clone(&self) -> CommonToken {
-//         unimplemented!()
-//     }
-// }
+impl From<&dyn Token> for CommonToken<'static> {
+    fn from(value: &dyn Token) -> Self {
+        CommonToken {
+            token_type: value.get_token_type(),
+            channel: value.get_channel(),
+            start: value.get_start_index(),
+            stop: value.get_stop_index(),
+            token_index: value.get_token_index(),
+            line: value.get_line(),
+            column: value.get_char_position_in_line(),
+            text: value.get_text().to_string().into(),
+        }
+    }
+}

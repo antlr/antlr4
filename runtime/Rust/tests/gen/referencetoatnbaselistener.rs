@@ -6,7 +6,7 @@ use dbt_antlr4::tree::ParseTreeListener;
 // A complete Visitor for a parse tree produced by ReferenceToATNParser.
 
 pub trait ReferenceToATNBaseListener<'input>:
-    ParseTreeListener<'input, ReferenceToATNParserContextType> {
+    ParseTreeListener<'input, ReferenceToATNParserContextNode> {
 
     /**
      * Enter a parse tree produced by \{@link ReferenceToATNBaseParser#s}.

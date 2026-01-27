@@ -1,34 +1,36 @@
 use crate::int_stream::IntStream;
 use crate::token_factory::TokenFactory;
 
-/// Produces tokens to be used by parser.
-/// `TokenStream` implementations are responsible for buffering tokens for parser lookahead
-pub trait TokenSource<'input> {
-    /// TokenFactory this token source produce tokens with
-    type TF: TokenFactory<'input> + 'input;
-    /// Return a {@link Token} object from your input stream (usually a
-    /// {@link CharStream}). Do not fail/return upon lexing error; keep chewing
-    /// on the characters until you get a good one; errors are not passed through
-    /// to the parser.
-    fn next_token(&mut self) -> <Self::TF as TokenFactory<'input>>::Tok;
-    /**
-     * Get the line number for the current position in the input stream. The
-     * first line in the input is line 1.
-     *
-     * Returns the line number for the current position in the input stream, or
-     * 0 if the current token source does not track line numbers.
-     */
-    fn get_line(&self) -> isize {
+/// Produces tokens to be used by parser (aka Lexer).
+///
+/// `TokenStream` implementations are responsible for buffering tokens for
+/// parser lookahead
+pub trait TokenSource<'input, 'arena, TF>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    /// Return a {@link Token} object from your input stream (usually a {@link
+    /// CharStream}). Do not fail/return upon lexing error; keep chewing on the
+    /// characters until you get a good one; errors are not passed through to
+    /// the parser.
+    fn next_token(&mut self) -> &'arena mut TF::Tok;
+
+    /// Get the line number for the current position in the input stream. The
+    /// first line in the input is line 1.
+    ///
+    /// Returns the line number for the current position in the input stream,
+    /// or 0 if the current token source does not track line numbers.
+    fn get_line(&self) -> u32 {
         0
     }
-    /**
-     * Get the index into the current line for the current position in the input
-     * stream. The first character on a line has position 0.
-     *
-     * Returns the line number for the current position in the input stream, or
-     * -1 if the current token source does not track character positions.
-     */
-    fn get_char_position_in_line(&self) -> isize {
+
+    /// Get the index into the current line for the current position in the
+    /// input stream. The first character on a line has position 0.
+    ///
+    /// Returns the line number for the current position in the input stream, or
+    /// -1 if the current token source does not track character positions.
+    fn get_char_position_in_line(&self) -> i32 {
         -1
     }
 
@@ -37,34 +39,35 @@ pub trait TokenSource<'input> {
 
     /// Returns string identifier of underlying input e.g. file name
     fn get_source_name(&self) -> String;
-    //    fn set_token_factory<'c: 'b>(&mut self, f: &'c TokenFactory);
+
     /// Gets the `TokenFactory` this token source is currently using for
     /// creating `Token` objects from the input.
     ///
     /// Required by `Parser` for creating missing tokens.
-    fn get_token_factory(&self) -> &'input Self::TF;
+    fn get_token_factory(&self) -> &TF;
 
     fn get_dfa_string(&self) -> String;
 }
 
 // allows user to call parser with &mut reference to Lexer
-impl<'input, T> TokenSource<'input> for &mut T
+impl<'input, 'arena, T, TF> TokenSource<'input, 'arena, TF> for &mut T
 where
-    T: TokenSource<'input>,
+    'input: 'arena,
+    T: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
 {
-    type TF = T::TF;
     #[inline(always)]
-    fn next_token(&mut self) -> <Self::TF as TokenFactory<'input>>::Tok {
+    fn next_token(&mut self) -> &'arena mut TF::Tok {
         (**self).next_token()
     }
 
     #[inline(always)]
-    fn get_line(&self) -> isize {
+    fn get_line(&self) -> u32 {
         (**self).get_line()
     }
 
     #[inline(always)]
-    fn get_char_position_in_line(&self) -> isize {
+    fn get_char_position_in_line(&self) -> i32 {
         (**self).get_char_position_in_line()
     }
 
@@ -79,7 +82,7 @@ where
     }
 
     #[inline(always)]
-    fn get_token_factory(&self) -> &'input Self::TF {
+    fn get_token_factory(&self) -> &TF {
         (**self).get_token_factory()
     }
 

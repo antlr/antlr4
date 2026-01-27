@@ -1,96 +1,79 @@
 #![allow(nonstandard_style)]
+#![allow(dead_code)]
 // Generated from CSV.g4 by ANTLR 4.13.2
-use dbt_antlr4::tree::{ParseTreeVisitor,ParseTreeVisitorCompat};
+use dbt_antlr4::errors::ANTLRError;
+use dbt_antlr4::tree::*;
 use super::csvparser::*;
 
-/**
- * This interface defines a complete generic visitor for a parse tree produced
- * by {@link CSVParser}.
- */
-pub trait CSVVisitor<'input>: ParseTreeVisitor<'input,CSVParserContextType>{
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#csvFile}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_csvFile(&mut self, ctx: &CsvFileContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#hdr}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_hdr(&mut self, ctx: &HdrContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#row}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_row(&mut self, ctx: &RowContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#field}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_field(&mut self, ctx: &FieldContext<'input>) { self.visit_children(ctx) }
-
-}
-
-pub trait CSVVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CSVParserContextType>{
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#csvFile}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_csvFile(&mut self, ctx: &CsvFileContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#hdr}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_hdr(&mut self, ctx: &HdrContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#row}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_row(&mut self, ctx: &RowContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CSVParser#field}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_field(&mut self, ctx: &FieldContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-}
-
-impl<'input,T> CSVVisitor<'input> for T
+/// This interface defines a complete generic visitor for a parse tree produced
+/// by {@link CSVParser}.
+pub trait CSVVisitor<'input, 'arena>
 where
-	T: CSVVisitorCompat<'input>
+    'input: 'arena,
 {
-	fn visit_csvFile(&mut self, ctx: &CsvFileContext<'input>){
-		let result = <Self as CSVVisitorCompat>::visit_csvFile(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
+    type Return: Default;
 
-	fn visit_hdr(&mut self, ctx: &HdrContext<'input>){
-		let result = <Self as CSVVisitorCompat>::visit_hdr(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
+    /// Visit a parse tree produced by {@link CSVParser#csvFile}.
+    /// @param ctx the parse tree
+    fn visit_csvFile(&mut self, ctx: &CsvFileContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
-	fn visit_row(&mut self, ctx: &RowContext<'input>){
-		let result = <Self as CSVVisitorCompat>::visit_row(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
+    /// Visit a parse tree produced by {@link CSVParser#hdr}.
+    /// @param ctx the parse tree
+    fn visit_hdr(&mut self, ctx: &HdrContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
-	fn visit_field(&mut self, ctx: &FieldContext<'input>){
-		let result = <Self as CSVVisitorCompat>::visit_field(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
+    /// Visit a parse tree produced by {@link CSVParser#row}.
+    /// @param ctx the parse tree
+    fn visit_row(&mut self, ctx: &RowContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
+    /// Visit a parse tree produced by {@link CSVParser#field}.
+    /// @param ctx the parse tree
+    fn visit_field(&mut self, ctx: &FieldContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+
+
+    /// Called on terminal(leaf) node
+    fn visit_terminal(
+        &mut self,
+        _node: &TerminalNode<'input, 'arena>,
+    ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
+
+    /// Called on error node
+    fn visit_error_node(
+        &mut self,
+        _node: &ErrorNode<'input, 'arena>,
+    ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
+
+    fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>) -> Result<Self::Return, ANTLRError> {
+        let Some(node) = tree.try_as_node() else {
+            return Err(ANTLRError::custom_error("Visitor can only visit non-leaf nodes".to_string()));
+        };
+        self.visit_node(node)
+    }
+
+    fn visit_node(&mut self, node: &CSVParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
+        node.accept(self)
+    }
+
+    fn visit_children(
+        &mut self,
+        node: &dyn NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>,
+    ) -> Result<Self::Return, ANTLRError> {
+        let mut result = Self::Return::default();
+        for child in node.iter_child_nodes() {
+            if !self.should_visit_next_child(child, &result) {
+                break;
+            }
+
+            let child_result = self.visit_node(child)?;
+            result = self.aggregate_results(result, child_result)?;
+        }
+        Ok(result)
+    }
+
+    fn aggregate_results(
+        &self,
+        _aggregate: Self::Return,
+        next: Self::Return,
+    ) -> Result<Self::Return, ANTLRError> { Ok(next) }
+
+    fn should_visit_next_child(&self, _node: &CSVParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
 }

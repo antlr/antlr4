@@ -6,7 +6,7 @@ use dbt_antlr4::tree::ParseTreeListener;
 // A complete Visitor for a parse tree produced by LabelsParser.
 
 pub trait LabelsBaseListener<'input>:
-    ParseTreeListener<'input, LabelsParserContextType> {
+    ParseTreeListener<'input, LabelsParserContextNode> {
 
     /**
      * Enter a parse tree produced by \{@link LabelsBaseParser#s}.

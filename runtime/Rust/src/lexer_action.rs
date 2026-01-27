@@ -42,7 +42,13 @@ impl LexerAction {
             LexerAction::LexerCustomAction { .. } | LexerAction::LexerIndexedCustomAction { .. }
         )
     }
-    pub(crate) fn execute<'input, T: Lexer<'input>>(&self, lexer: &mut T) {
+    pub(crate) fn execute<'input, 'arena, Input, TF, L>(&self, lexer: &mut L)
+    where
+        'input: 'arena,
+        L: Lexer<'input, 'arena, Input, TF>,
+        Input: crate::char_stream::CharStream<'input>,
+        TF: crate::token_factory::TokenFactory<'input, 'arena> + 'arena,
+    {
         match self {
             &LexerAction::LexerChannelAction(channel) => lexer.set_channel(channel),
             &LexerAction::LexerCustomAction {

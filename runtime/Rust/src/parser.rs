@@ -1,11 +1,11 @@
 //! Base parser implementation
 use std::borrow::Borrow;
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
-use std::rc::Rc;
 use std::sync::Arc;
 
+use crate::arena::Arena;
 use crate::atn::ATN;
 use crate::atn_simulator::IATNSimulator;
 use crate::error_listener::{ConsoleErrorListener, ErrorListener, ProxyErrorListener};
@@ -13,55 +13,65 @@ use crate::error_strategy::ErrorStrategy;
 use crate::errors::ANTLRError;
 use crate::interval_set::IntervalSet;
 use crate::parser_atn_simulator::ParserATNSimulator;
-use crate::parser_rule_context::ParserRuleContext;
 use crate::recognizer::{Actions, Recognizer};
-use crate::rule_context::{states_stack, CustomRuleContext, RuleContext};
+use crate::rule_context::states_stack;
 use crate::token::{Token, TOKEN_EOF};
-use crate::token_factory::{TokenAware, TokenFactory};
+use crate::token_factory::TokenFactory;
 use crate::token_stream::TokenStream;
-use crate::tree::{ErrorNode, Listenable, ParseTreeListener, TerminalNode};
+use crate::tree::{ErrorNode, ParseTreeListener, RuleNode, TerminalNode};
 use crate::utils::cell_update;
 use crate::vocabulary::Vocabulary;
-use crate::{CoerceFrom, CoerceTo};
 
 /// parser functionality required for `ParserATNSimulator` to work
 #[allow(missing_docs)] // todo rewrite it so downstream crates actually could meaningfully implement it
-pub trait Parser<'input>: Recognizer<'input> {
+pub trait Parser<'input, 'arena, TF>: Recognizer<'input, 'arena>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    fn get_arena(&self) -> &'arena Arena;
+
     fn get_interpreter(&self) -> &ParserATNSimulator;
 
-    fn get_token_factory(&self) -> &'input Self::TF;
-    fn get_parser_rule_context(&self) -> &Rc<<Self::Node as ParserNodeType<'input>>::Type>;
+    fn get_token_factory(&self) -> &TF;
+
+    fn get_current_context(&self) -> &'arena Self::Node;
+
     //    fn set_parser_rule_context(&self, v: ParserRuleContext);
-    fn consume(&mut self, err_handler: &mut impl ErrorStrategy<'input, Self>)
+    fn consume(
+        &mut self,
+        err_handler: &mut impl ErrorStrategy<'input, 'arena, TF, Self>,
+    ) -> Result<(), ANTLRError>
     where
         Self: Sized;
+
     //    fn get_parse_listeners(&self) -> Vec<ParseTreeListener>;
     //fn sempred(&mut self, _localctx: Option<&dyn ParserRuleContext>, rule_index: i32, action_index: i32) -> bool { true }
 
-    fn precpred(
-        &self,
-        localctx: Option<&<Self::Node as ParserNodeType<'input>>::Type>,
-        precedence: i32,
-    ) -> bool;
+    fn precpred(&self, localctx: Option<&Self::Node>, precedence: i32) -> bool;
 
     //    fn get_error_handler(&self) -> ErrorStrategy;
     //    fn set_error_handler(&self, e: ErrorStrategy);
-    fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, TF = Self::TF>;
-    fn get_input_stream(&self) -> &dyn TokenStream<'input, TF = Self::TF>;
-    fn get_current_token(&self) -> &<Self::TF as TokenFactory<'input>>::Tok;
+    fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, 'arena, TF>;
+    fn get_input_stream(&self) -> &dyn TokenStream<'input, 'arena, TF>;
+    fn get_current_token(&self) -> &'arena TF::Tok;
     fn get_expected_tokens(&self) -> IntervalSet;
 
-    fn add_error_listener(&mut self, listener: Box<dyn ErrorListener<'input, Self>>)
-    where
+    fn add_error_listener(
+        &mut self,
+        listener: Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+    ) where
         Self: Sized;
+
     fn remove_error_listeners(&mut self);
+
     fn notify_error_listeners(
         &self,
         msg: String,
         offending_token: Option<isize>,
         err: Option<&ANTLRError>,
     );
-    fn get_error_lister_dispatch<'a>(&'a self) -> Box<dyn ErrorListener<'input, Self> + 'a>
+    fn get_error_lister_dispatch<'a>(&'a self) -> Box<dyn ErrorListener<'input, 'arena, Self> + 'a>
     where
         Self: Sized;
 
@@ -73,48 +83,21 @@ pub trait Parser<'input>: Recognizer<'input> {
     fn get_rule_invocation_stack(&self) -> Vec<String>;
 }
 
-// trait CsvContext<'input>: for<'x> Listenable<'input, dyn CsvParseTreeListener<'input,CsvTreeNodeType> + 'x> + ParserRuleContext<'input,TF=CommonTokenFactory,Ctx=CsvTreeNodeType>{}
-//
-// struct CsvTreeNodeType;
-// impl<'a> ParserNodeType<'a> for CsvTreeNodeType{
-//     type Type = dyn CsvContext<'a>;
-// }
-
-// workaround trait for rustc not being able to handle cycles in trait defenition yet, e.g. `trait A: Super<Assoc=dyn A>{}`
-// whyyy rustc... whyyy... (╯°□°）╯︵ ┻━┻  It would have been so much cleaner.
-/// Workaround trait for rustc current limitations.
-///
-/// Basically you can consider it as if context trait for generated parser has been implemented as
-/// ```text
-/// trait GenratedParserContext:ParserRuleContext<Ctx=dyn GeneratedParserContext>{ ... }
-/// ```
-/// which is not possible, hence this a bit ugly workaround.
-///
-/// Implemented by generated parser for the type that is going to carry information about
-/// parse tree node.
-pub trait ParserNodeType<'input>: Sized {
-    /// Shortcut for `Type::TF`
-    type TF: TokenFactory<'input> + 'input;
-    /// Actual type of the parse tree node
-    type Type: ?Sized + ParserRuleContext<'input, Ctx = Self, TF = Self::TF> + 'input;
-    // type Visitor: ?Sized + ParseTreeVisitor<'input, Self>;
-}
-
 /// ### Main underlying Parser struct
 ///
 /// It is a member of generated parser struct, so
 /// almost always you don't need to create it yourself.
 /// Generated parser hides complexity of this struct and expose required flexibility via generic parameters
-pub struct BaseParser<
-    'input,
-    Ext, //: 'static, //: ParserRecog<'input, Self> + 'static, // user provided behavior, such as semantic predicates
-    I: TokenStream<'input>, // input stream
-    Ctx: ParserNodeType<'input, TF = I::TF>, // Ctx::Type is trait object type for tree node of the parser
-    T: ParseTreeListener<'input, Ctx> + ?Sized = dyn ParseTreeListener<'input, Ctx>,
-> {
-    interp: Arc<ParserATNSimulator>,
+pub struct BaseParser<'input, 'arena, Ext, Node, Input, TF>
+where
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>, // input stream
+    Node: RuleNode<'input, 'arena>,
+{
+    pub interp: Arc<ParserATNSimulator>,
     /// Rule context parser is currently processing
-    pub ctx: Option<Rc<Ctx::Type>>,
+    ctx: *mut Node,
 
     /// Track the {@link ParserRuleContext} objects during the parse and hook
     /// them up using the {@link ParserRuleContext#children} list so that it
@@ -139,24 +122,25 @@ pub struct BaseParser<
 
     state: i32,
     /// Token stream that is currently used by this parser
-    pub input: I,
+    pub input: Input,
     precedence_stack: Vec<i32>,
 
-    parse_listeners: Vec<Box<T>>,
+    parse_listeners: Vec<Box<Node::Listener>>,
     _syntax_errors: Cell<i32>,
-    error_listeners: RefCell<Vec<Box<dyn ErrorListener<'input, Self>>>>,
+    error_listeners: Vec<Box<dyn ErrorListener<'input, 'arena, Self> + 'input>>,
 
+    pub arena: &'arena Arena,
     ext: Ext,
-    pd: PhantomData<fn() -> &'input str>,
+    pd: PhantomData<fn() -> &'arena TF>,
 }
 
-impl<'input, Ext, I, Ctx, T> Deref for BaseParser<'input, Ext, I, Ctx, T>
+impl<'input, 'arena, Ext, Node, Input, TF> Deref
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    // Ctx::Type: Listenable<T>,
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: RuleNode<'input, 'arena>,
 {
     type Target = Ext;
 
@@ -165,38 +149,43 @@ where
     }
 }
 
-impl<'input, Ext, I, Ctx, T> DerefMut for BaseParser<'input, Ext, I, Ctx, T>
+impl<'input, 'arena, Ext, Node, Input, TF> DerefMut
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    // Ctx::Type: Listenable<T>,
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.ext
     }
 }
 
-pub trait ParserRecog<'a, P: Recognizer<'a>>: Actions<'a, P> {}
-
-impl<'input, Ext, I, Ctx, T> Recognizer<'input> for BaseParser<'input, Ext, I, Ctx, T>
+pub trait ParserRecog<'input, 'arena, R>: Actions<'input, 'arena, R>
 where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    // Ctx::Type: Listenable<T>,
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
 {
-    type Node = Ctx;
+}
+
+impl<'input, 'arena, Ext, Node, Input, TF> Recognizer<'input, 'arena>
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+where
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: RuleNode<'input, 'arena>,
+{
+    type Node = Node;
 
     fn sempred(
         &mut self,
-        localctx: Option<&Ctx::Type>,
+        localctx: Option<&'arena Node>,
         rule_index: i32,
         action_index: i32,
     ) -> bool {
-        <Ext as Actions<'input, Self>>::sempred(localctx, rule_index, action_index, self)
+        Ext::sempred(localctx, rule_index, action_index, self)
     }
 
     fn get_rule_names(&self) -> &[&str] {
@@ -216,103 +205,101 @@ where
     }
 }
 
-impl<'input, Ext, I, Ctx, T> TokenAware<'input> for BaseParser<'input, Ext, I, Ctx, T>
+impl<'input, 'arena, Ext, Node, Input, TF> Parser<'input, 'arena, TF>
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    // Ctx::Type: Listenable<T>,
+    'input: 'arena,
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: RuleNode<'input, 'arena>,
 {
-    type TF = I::TF;
-}
+    fn get_arena(&self) -> &'arena Arena {
+        self.arena
+    }
 
-impl<'input, Ext, I, Ctx, T> Parser<'input> for BaseParser<'input, Ext, I, Ctx, T>
-where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    Ctx::Type:
-        Listenable<T> + CoerceFrom<TerminalNode<'input, Ctx>> + CoerceFrom<ErrorNode<'input, Ctx>>,
-    // TerminalNode<'input, Ctx>: CoerceTo<Ctx::Type>,
-    // ErrorNode<'input, Ctx>: CoerceTo<Ctx::Type>,
-{
     fn get_interpreter(&self) -> &ParserATNSimulator {
         self.interp.as_ref()
     }
 
-    fn get_token_factory(&self) -> &'input Self::TF {
+    fn get_token_factory(&self) -> &TF {
         // &**crate::common_token_factory::COMMON_TOKEN_FACTORY_DEFAULT
         self.input.get_token_source().get_token_factory()
     }
 
     #[inline(always)]
-    fn get_parser_rule_context(&self) -> &Rc<Ctx::Type> {
-        self.ctx.as_ref().unwrap()
+    fn get_current_context(&self) -> &'arena Node {
+        self.ctx().unwrap()
     }
 
-    fn consume(&mut self, err_handler: &mut impl ErrorStrategy<'input, Self>) {
-        let o = self.get_current_token().clone();
+    fn consume(
+        &mut self,
+        err_handler: &mut impl ErrorStrategy<'input, 'arena, TF, Self>,
+    ) -> Result<(), ANTLRError> {
+        let o = self.get_current_token();
         if o.borrow().get_token_type() != TOKEN_EOF {
             self.input.consume();
         }
         if self.build_parse_trees || !self.parse_listeners.is_empty() {
             if err_handler.in_error_recovery_mode(self) {
                 // todo report ructc inference issue
-                let node: Rc<ErrorNode<'_, Ctx>> = self.create_error_node(o.clone());
-                self.ctx
-                    .as_deref()
-                    .unwrap()
-                    .add_child(node.clone().coerce_rc_to());
+                let node = self.create_error_node(o);
+                self.add_child_to_ctx(node);
                 for listener in &mut self.parse_listeners {
-                    listener.visit_error_node(&*node)
+                    listener.visit_error_node(
+                        node.as_error_node()
+                            .expect("node was created as error node"),
+                    )?
                 }
             } else {
-                let node: Rc<TerminalNode<'_, Ctx>> = self.create_token_node(o.clone());
-                self.ctx
-                    .as_deref()
-                    .unwrap()
-                    .add_child(node.clone().coerce_rc_to());
+                let node = self.create_token_node(o);
+                self.add_child_to_ctx(node);
                 for listener in &mut self.parse_listeners {
-                    listener.visit_terminal(&*node)
+                    listener.visit_terminal(
+                        node.as_terminal_node()
+                            .expect("node was created as terminal node"),
+                    )?
                 }
             }
         }
+        Ok(())
     }
 
-    fn precpred(&self, _localctx: Option<&Ctx::Type>, precedence: i32) -> bool {
+    fn precpred(&self, _localctx: Option<&Node>, precedence: i32) -> bool {
         //        localctx.map(|it|println!("check at{}",it.to_string_tree(self)));
         //        println!("{}",self.get_precedence());
         precedence >= self.get_precedence()
     }
 
-    fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, TF = Self::TF> {
+    fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, 'arena, TF> {
         &mut self.input //.as_mut()
     }
 
-    fn get_input_stream(&self) -> &dyn TokenStream<'input, TF = Self::TF> {
+    fn get_input_stream(&self) -> &dyn TokenStream<'input, 'arena, TF> {
         &self.input
     }
 
     #[inline]
-    fn get_current_token(&self) -> &<Self::TF as TokenFactory<'input>>::Tok {
+    fn get_current_token(&self) -> &'arena TF::Tok {
         self.input.get(self.input.index())
     }
 
     fn get_expected_tokens(&self) -> IntervalSet {
-        let states_stack = states_stack(self.ctx.as_ref().unwrap().clone());
+        let states_stack = states_stack(self.ctx().unwrap());
         self.interp
             .atn()
             .get_expected_tokens(self.state, states_stack)
     }
 
-    fn add_error_listener(&mut self, listener: Box<dyn ErrorListener<'input, Self>>) {
-        self.error_listeners.borrow_mut().push(listener)
+    fn add_error_listener(
+        &mut self,
+        listener: Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+    ) {
+        self.error_listeners.push(listener)
     }
 
     fn remove_error_listeners(&mut self) {
-        self.error_listeners.borrow_mut().clear();
+        self.error_listeners.clear();
     }
 
     fn notify_error_listeners(
@@ -326,15 +313,26 @@ where
             None => Some(self.get_current_token().borrow()),
             Some(x) => Some(self.input.get(x).borrow()),
         };
-        let line = offending_token.map(|x| x.get_line()).unwrap_or(-1);
-        let column = offending_token.map(|x| x.get_column()).unwrap_or(-1);
+        let line = offending_token.map(|x| x.get_line()).unwrap_or(0);
+        let column = offending_token
+            .map(|x| x.get_char_position_in_line())
+            .unwrap_or(-1);
 
-        for listener in self.error_listeners.borrow().iter() {
-            listener.syntax_error(self, offending_token, line, column, &msg, err)
+        for listener in self.error_listeners.iter() {
+            listener.syntax_error(
+                self,
+                offending_token.map(|x| x as _),
+                line,
+                column,
+                &msg,
+                err,
+            )
         }
     }
 
-    fn get_error_lister_dispatch<'a>(&'a self) -> Box<dyn ErrorListener<'input, Self> + 'a> {
+    fn get_error_lister_dispatch<'a>(
+        &'a self,
+    ) -> Box<dyn ErrorListener<'input, 'arena, Self> + 'a> {
         Box::new(ProxyErrorListener {
             delegates: self.error_listeners.borrow(),
         })
@@ -361,11 +359,11 @@ where
     fn get_rule_invocation_stack(&self) -> Vec<String> {
         let mut vec = Vec::new();
         let rule_names = self.get_rule_names();
-        let mut ctx = self.get_parser_rule_context().clone();
+        let mut ctx = self.get_current_context();
         loop {
             let rule_index = ctx.get_rule_index();
             vec.push(rule_names.get(rule_index).unwrap_or(&"n/a").to_string());
-            ctx = if let Some(parent) = ctx.get_parent_ctx() {
+            ctx = if let Some(parent) = ctx.get_parent() {
                 parent
             } else {
                 break;
@@ -380,21 +378,22 @@ where
 }
 
 #[allow(missing_docs)] // todo docs
-impl<'input, Ext, I, Ctx, T> BaseParser<'input, Ext, I, Ctx, T>
+impl<'input, 'arena, Ext, Node, Input, TF> BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
-    Ext: ParserRecog<'input, Self>,
-    I: TokenStream<'input>,
-    Ctx: ParserNodeType<'input, TF = I::TF>,
-    T: ParseTreeListener<'input, Ctx> + ?Sized,
-    Ctx::Type:
-        Listenable<T> + CoerceFrom<TerminalNode<'input, Ctx>> + CoerceFrom<ErrorNode<'input, Ctx>>,
-    //     TerminalNode<'input, Ctx>: CoerceTo<Ctx::Type>,
-    //     ErrorNode<'input, Ctx>: CoerceTo<Ctx::Type>,
+    Ext: ParserRecog<'input, 'arena, Self>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: RuleNode<'input, 'arena>,
 {
-    pub fn new_base_parser(input: I, interpreter: Arc<ParserATNSimulator>, ext: Ext) -> Self {
+    pub fn new_base_parser(
+        arena: &'arena Arena,
+        input: Input,
+        interpreter: Arc<ParserATNSimulator>,
+        ext: Ext,
+    ) -> Self {
         Self {
             interp: interpreter,
-            ctx: None,
+            ctx: std::ptr::null_mut(),
             build_parse_trees: true,
             matched_eof: false,
             state: -1,
@@ -402,36 +401,108 @@ where
             precedence_stack: vec![0],
             parse_listeners: vec![],
             _syntax_errors: Cell::new(0),
-            error_listeners: RefCell::new(vec![Box::new(ConsoleErrorListener {})]),
+            error_listeners: vec![Box::new(ConsoleErrorListener {})],
+            arena,
             ext,
             pd: PhantomData,
         }
     }
 
-    //
-    //    fn reset(&self) { unimplemented!() }
+    /// If current context is same as the given one by pointer comparison
+    #[inline]
+    pub fn ctx_is(&self, other: Option<&'arena Node>) -> bool {
+        if self.ctx.is_null() && other.is_none() {
+            true
+        } else if self.ctx.is_null() || other.is_none() {
+            false
+        } else {
+            std::ptr::eq(self.ctx as *const Node, other.unwrap() as *const Node)
+        }
+    }
+
+    /// Gets a reference to current context.
+    #[inline]
+    pub fn ctx(&self) -> Option<&'arena Node> {
+        if self.ctx.is_null() {
+            None
+        } else {
+            unsafe { Some(&*self.ctx) }
+        }
+    }
+
+    /// Gets a mutable reference to current context.
+    ///
+    /// # Safety
+    /// Follows the same safety rules as dereferencing *mut to &mut
+    #[inline]
+    pub unsafe fn ctx_mut(&mut self) -> Option<&'arena mut Node> {
+        if self.ctx.is_null() {
+            None
+        } else {
+            Some(&mut *self.ctx)
+        }
+    }
+
+    #[inline]
+    fn parent_ctx(&self) -> Option<&'arena Node> {
+        self.ctx().and_then(|it| it.get_parent())
+    }
+
+    #[inline]
+    fn set_current_ctx(&mut self, ctx: Option<&'arena Node>) {
+        if let Some(ctx) = ctx {
+            self.ctx = ctx as *const Node as *mut Node;
+        } else {
+            self.ctx = std::ptr::null_mut();
+        }
+    }
+
+    pub fn take_ctx(&mut self) -> Option<&'arena Node> {
+        if self.ctx.is_null() {
+            None
+        } else {
+            let ret = unsafe { &*self.ctx };
+            self.ctx = std::ptr::null_mut();
+            Some(ret)
+        }
+    }
+
+    #[inline]
+    fn add_child_to_ctx(&mut self, child: &'arena Node) {
+        if !self.ctx.is_null() {
+            unsafe {
+                (*self.ctx).add_child(child);
+            }
+        }
+    }
+
+    #[inline]
+    pub fn with_mut_ctx<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Node) -> R,
+    {
+        assert!(!self.ctx.is_null());
+        unsafe { f(&mut *self.ctx) }
+    }
 
     #[inline]
     pub fn match_token(
         &mut self,
         ttype: i32,
-        err_handler: &mut impl ErrorStrategy<'input, Self>,
-    ) -> Result<<I::TF as TokenFactory<'input>>::Tok, ANTLRError> {
-        let mut token = self.get_current_token().clone();
-        if token.borrow().get_token_type() == ttype {
+        err_handler: &mut impl ErrorStrategy<'input, 'arena, TF, Self>,
+    ) -> Result<&'arena TF::Tok, ANTLRError> {
+        let mut token = self.get_current_token();
+        if token.get_token_type() == ttype {
             if ttype == TOKEN_EOF {
                 self.matched_eof = true;
             }
 
             err_handler.report_match(self);
-            self.consume(err_handler);
+            self.consume(err_handler)?;
         } else {
             token = err_handler.recover_inline(self)?;
-            if self.build_parse_trees && token.borrow().get_token_index() == -1 {
-                self.ctx
-                    .as_ref()
-                    .unwrap()
-                    .add_child(self.create_error_node(token.clone()).coerce_rc_to());
+            if self.build_parse_trees && token.get_token_index() == -1 {
+                self.add_child_to_ctx(self.create_error_node(token));
             }
         }
         Ok(token)
@@ -440,45 +511,35 @@ where
     #[inline]
     pub fn match_wildcard(
         &mut self,
-        err_handler: &mut impl ErrorStrategy<'input, Self>,
-    ) -> Result<<I::TF as TokenFactory<'input>>::Tok, ANTLRError> {
-        let mut t = self.get_current_token().clone();
-        if t.borrow().get_token_type() > 0 {
+        err_handler: &mut impl ErrorStrategy<'input, 'arena, TF, Self>,
+    ) -> Result<&'arena TF::Tok, ANTLRError> {
+        let mut token = self.get_current_token();
+        if token.get_token_type() > 0 {
             err_handler.report_match(self);
-            self.consume(err_handler);
+            self.consume(err_handler)?;
         } else {
-            t = err_handler.recover_inline(self)?;
-            if self.build_parse_trees && t.borrow().get_token_index() == -1 {
-                self.ctx
-                    .as_ref()
-                    .unwrap()
-                    .add_child(self.create_error_node(t.clone()).coerce_rc_to());
+            token = err_handler.recover_inline(self)?;
+            if self.build_parse_trees && token.get_token_index() == -1 {
+                self.add_child_to_ctx(self.create_error_node(token));
             }
         }
-        Ok(t)
+        Ok(token)
     }
 
     /// Adds parse listener for this parser
     /// returns `listener_id` that can be used later to get listener back
     ///
-    /// Embedded listener currently must outlive `'input`. If you need to have arbitrary listener use ParseTreeWalker.
-    ///
     /// ### Example for listener usage:
     /// todo
-    pub fn add_parse_listener<L>(&mut self, listener: Box<L>) -> ListenerId<L>
-    where
-        L: CoerceTo<T>,
-    {
-        let id = ListenerId::new(&listener);
-        self.parse_listeners.push(listener.coerce_box_to());
-        id
+    pub fn add_dyn_parse_listener(&mut self, listener: Box<Node::Listener>) {
+        self.parse_listeners.push(listener);
     }
 
     /// Removes parse listener with corresponding `listener_id`, casts it back to user type and returns it to the caller.
     /// `listener_id` is returned when listener is added via `add_parse_listener`
     pub fn remove_parse_listener<L>(&mut self, listener_id: ListenerId<L>) -> Box<L>
     where
-        L: CoerceTo<T>,
+        L: ParseTreeListener<'input, 'arena, Node>,
     {
         let index = self
             .parse_listeners
@@ -494,171 +555,203 @@ where
     }
 
     pub fn trigger_enter_rule_event(&mut self) -> Result<(), ANTLRError> {
-        let ctx = self.ctx.as_deref().unwrap();
+        let ctx = self.ctx().unwrap();
         for listener in self.parse_listeners.iter_mut() {
-            // listener.enter_every_rule(ctx);
-            ctx.enter(listener)?;
+            listener.enter_every_rule(ctx)?;
+            ctx.enter_rule(listener)?;
         }
         Ok(())
     }
 
     pub fn trigger_exit_rule_event(&mut self) -> Result<(), ANTLRError> {
-        let ctx = self.ctx.as_deref().unwrap();
+        let ctx = self.ctx().unwrap();
         for listener in self.parse_listeners.iter_mut().rev() {
-            ctx.exit(listener)?;
-            // listener.exit_every_rule(ctx);
+            ctx.exit_rule(listener)?;
+            listener.exit_every_rule(ctx)?;
         }
         Ok(())
     }
-    //
-    //    fn set_token_factory(&self, factory: TokenFactory) { unimplemented!() }
-    //
-    //
+
     //    fn get_atn_with_bypass_alts(&self) { unimplemented!() }
     //
     //    fn compile_parse_tree_pattern(&self, pattern, patternRuleIndex: Lexer, lexer: Lexer) { unimplemented!() }
-    //
-    //    fn set_input_stream(&self, input: TokenStream) { unimplemented!() }
-    //
-    //    fn set_token_stream(&self, input: TokenStream) { unimplemented!() }
-
-    fn add_context_to_parse_tree(&mut self) {
-        let parent = self.ctx.as_ref().unwrap().get_parent_ctx();
-
-        if let Some(parent) = parent {
-            parent.add_child(self.ctx.clone().unwrap())
-        }
-    }
 
     #[inline]
-    pub fn enter_rule(&mut self, localctx: Rc<Ctx::Type>, state: i32, _rule_index: usize) {
-        self.set_state(state);
-        localctx.set_start(self.input.lt(1).cloned());
-        self.ctx = Some(localctx);
-        //        let mut localctx = Rc::get_mut(self.ctx.as_mut().unwrap()).unwrap();
+    pub fn enter_rule(
+        &mut self,
+        localctx: Node,
+        state: i32,
+        _rule_index: usize,
+    ) -> Result<(), ANTLRError> {
+        let child = self.arena.alloc_context(localctx);
         if self.build_parse_trees {
-            self.add_context_to_parse_tree()
+            self.set_current_ctx(child.get_parent());
+            self.add_child_to_ctx(child);
         }
-    }
 
-    #[inline]
-    pub fn exit_rule(&mut self) -> Result<(), ANTLRError> {
-        if self.matched_eof {
-            self.ctx
-                .as_ref()
-                .unwrap()
-                .set_stop(self.input.lt(1).cloned())
-        } else {
-            self.ctx
-                .as_ref()
-                .unwrap()
-                .set_stop(self.input.lt(-1).cloned())
+        self.set_state(state);
+        self.set_current_ctx(Some(child));
+        let start = self.input.lt(1).map(|it| it as _);
+        self.with_mut_ctx(|ctx| {
+            ctx.set_start(start);
+        });
+
+        if !self.parse_listeners.is_empty() {
+            self.trigger_enter_rule_event()?;
         }
-        self.trigger_exit_rule_event()?;
-        self.set_state(self.get_parser_rule_context().get_invoking_state());
-        let parent = self.ctx.as_ref().unwrap().get_parent_ctx();
-        // mem::replace(&mut self.ctx, parent);
-        self.ctx = parent;
+
         Ok(())
     }
 
-    // todo make new_ctx not option
     #[inline]
-    pub fn enter_outer_alt(
-        &mut self,
-        new_ctx: Option<Rc<Ctx::Type>>,
-        alt_num: i32,
-    ) -> Result<(), ANTLRError> {
-        if let Some(new_ctx) = new_ctx {
-            new_ctx.set_alt_number(alt_num);
+    pub fn exit_rule(&mut self) -> Result<&'arena Node, ANTLRError> {
+        assert!(self.ctx().is_some());
 
-            let ctx = self.ctx.as_ref().unwrap();
-            if self.build_parse_trees && self.ctx.is_some() && !Rc::ptr_eq(&new_ctx, ctx) {
-                if let Some(parent) = ctx.get_parent_ctx() {
-                    parent.remove_last_child();
-                    parent.add_child(new_ctx.clone())
+        if self.matched_eof {
+            // if we have matched EOF, it cannot consume past EOF so we use LT(1) here
+            let stop = self.input.lt(1).map(|it| it as _);
+            self.with_mut_ctx(|ctx| {
+                ctx.set_stop(stop);
+            });
+        } else {
+            // stop node is what we just matched
+            let stop = self.input.lt(-1).map(|it| it as _);
+            self.with_mut_ctx(|ctx| {
+                ctx.set_stop(stop);
+            });
+        }
+        if !self.parse_listeners.is_empty() {
+            self.trigger_exit_rule_event()?;
+        }
+
+        self.set_state(self.ctx().unwrap().get_invoking_state());
+        let child = self.ctx().unwrap();
+        self.set_current_ctx(child.get_parent());
+
+        Ok(child)
+    }
+
+    #[inline]
+    pub fn enter_outer_alt(&mut self, new_ctx: Option<Node>, alt_num: i32) {
+        // if we have new ctx and we are building parse trees, make sure to
+        // replace existing ctx that is previous child of parent
+        if let Some(new_ctx) = new_ctx {
+            let new_ctx = self.arena.alloc_context(new_ctx);
+            if self.build_parse_trees {
+                if let Some(parent) = self.parent_ctx() {
+                    // Temporarily set parent as current so we can mutate it,
+                    // will be immediately overwritten below
+                    self.set_current_ctx(Some(parent));
+                    self.with_mut_ctx(|ctx| {
+                        ctx.remove_last_child();
+                        ctx.add_child(new_ctx);
+                    });
                 }
             }
 
-            self.ctx = Some(new_ctx);
+            self.set_current_ctx(Some(new_ctx));
         }
 
-        self.trigger_enter_rule_event()
+        self.with_mut_ctx(|ctx| {
+            ctx.set_alt_number(alt_num);
+        });
     }
 
     pub fn enter_recursion_rule(
         &mut self,
-        localctx: Rc<Ctx::Type>,
+        localctx: Node,
         state: i32,
         _rule_index: usize,
         precedence: i32,
-    ) {
+    ) -> Result<(), ANTLRError> {
+        let localctx = self.arena.alloc_context(localctx);
+
         self.set_state(state);
         self.precedence_stack.push(precedence);
-        localctx.set_start(self.input.lt(1).cloned());
+        self.set_current_ctx(Some(localctx));
+        let start = self.input.lt(1).map(|it| it as _);
+        self.with_mut_ctx(|ctx| {
+            ctx.set_start(start);
+        });
+        if !self.parse_listeners.is_empty() {
+            self.trigger_enter_rule_event()?;
+        }
         //println!("{}",self.input.lt(1).map(Token::to_owned).unwrap());
-        self.ctx = Some(localctx);
+
+        Ok(())
     }
 
     pub fn push_new_recursion_context(
         &mut self,
-        localctx: Rc<Ctx::Type>,
+        localctx: Node,
         state: i32,
         _rule_index: usize,
-    ) -> Result<(), ANTLRError> {
-        let prev = self.ctx.take().unwrap();
-        prev.set_parent(&Some(localctx.clone()));
-        prev.set_invoking_state(state);
-        prev.set_stop(self.input.lt(-1).cloned());
+    ) -> Result<&'arena Node, ANTLRError> {
+        let localctx = self.arena.alloc_context(localctx);
 
-        //        println!("{}",prev.get_start().unwrap());
-        localctx.set_start(Some(prev.start_mut().clone()));
-        self.ctx = Some(localctx);
+        let stop = self.input.lt(-1).map(|it| it as _);
+        self.with_mut_ctx(|ctx| {
+            ctx.set_parent(Some(localctx));
+            ctx.set_invoking_state(state);
+            ctx.set_stop(stop);
+        });
 
+        let prev = self.take_ctx().unwrap();
+        self.set_current_ctx(Some(localctx));
+        let start = Some(prev.start());
+        self.with_mut_ctx(|ctx| {
+            ctx.set_start(start);
+        });
         if self.build_parse_trees {
-            self.ctx.as_ref().unwrap().add_child(prev);
+            self.add_child_to_ctx(prev);
         }
-        self.trigger_enter_rule_event()
+        if !self.parse_listeners.is_empty() {
+            self.trigger_enter_rule_event()?;
+        }
+        Ok(prev)
     }
 
     pub fn unroll_recursion_context(
         &mut self,
-        parent_ctx: Option<Rc<Ctx::Type>>,
-    ) -> Result<(), ANTLRError> {
+        parent_ctx: Option<&'arena Node>,
+    ) -> Result<&'arena Node, ANTLRError> {
+        assert!(self.ctx().is_some());
+
         self.precedence_stack.pop();
-        let retctx = self.ctx.clone().unwrap();
-        retctx.set_stop(self.input.lt(-1).cloned());
+        let stop = self.input.lt(-1).map(|it| it as _);
+        self.with_mut_ctx(|ctx| {
+            ctx.set_stop(stop);
+        });
+        let retctx = self.ctx;
+
+        // unroll so _ctx is as it was before call to recursive method
         if !self.parse_listeners.is_empty() {
-            while self.ctx.as_ref().map(Rc::as_ptr) != parent_ctx.as_ref().map(Rc::as_ptr) {
+            while !self.ctx_is(parent_ctx) {
                 self.trigger_exit_rule_event()?;
-                self.ctx = self.ctx.as_ref().unwrap().get_parent_ctx()
+                self.set_current_ctx(self.parent_ctx());
             }
         } else {
-            self.ctx = parent_ctx;
+            self.set_current_ctx(parent_ctx);
         }
 
-        //self.ctx is now parent
-        retctx.set_parent(&self.ctx);
+        // hook into tree
+        unsafe {
+            (*retctx).set_parent(parent_ctx);
+        }
 
         //        println!("{:?}",self.ctx.as_ref().map(|it|it.to_string_tree(self)));
-        if self.build_parse_trees && self.ctx.is_some() {
-            self.ctx.as_ref().unwrap().add_child(retctx);
+        if self.build_parse_trees && parent_ctx.is_some() {
+            self.add_child_to_ctx(unsafe { &*retctx });
         }
-        Ok(())
+        Ok(unsafe { &*retctx })
     }
 
-    fn create_token_node(
-        &self,
-        token: <I::TF as TokenFactory<'input>>::Tok,
-    ) -> Rc<TerminalNode<'input, Ctx>> {
-        TerminalNode::new(token).into()
+    fn create_token_node(&self, token: &'arena TF::Tok) -> &'arena mut Node {
+        self.arena.alloc_context(TerminalNode::new(token).into())
     }
 
-    fn create_error_node(
-        &self,
-        token: <I::TF as TokenFactory<'input>>::Tok,
-    ) -> Rc<ErrorNode<'input, Ctx>> {
-        ErrorNode::new(token).into()
+    fn create_error_node(&self, token: &'arena TF::Tok) -> &'arena mut Node {
+        self.arena.alloc_context(ErrorNode::new(token).into())
     }
 
     /// Text representation of generated DFA for debugging purposes
@@ -701,7 +794,7 @@ pub struct ListenerId<T: ?Sized> {
 
 impl<T: ?Sized> ListenerId<T> {
     #[allow(clippy::borrowed_box)]
-    fn new(listener: &Box<T>) -> ListenerId<T> {
+    pub fn new(listener: &Box<T>) -> ListenerId<T> {
         ListenerId {
             actual_id: listener.as_ref() as *const T as *const () as usize,
             phantom: Default::default(),

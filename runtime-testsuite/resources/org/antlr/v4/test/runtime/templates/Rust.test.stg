@@ -6,8 +6,8 @@ False() ::= "false"
 True() ::= "true"
 Not(v) ::= "!<v>"
 Assert(s) ::= ""
-//Cast(t,v) ::= "cast::\<_,<t>>(&*<v>)"
-Cast(t,v) ::= <<(if let EContextAll::<t>(ctx) = &*<v> { ctx } else { panic!("can't cast")} )>>
+Cast(t,v) ::= << <v> >>
+//Cast(t,v) ::= <<(if let EContextAll::<t>(ctx) = &*<v> { ctx } else { panic!("can't cast")} )>>
 Append(a,b) ::= "format!(\"{}{}\",<a>, <b>.unwrap())"
 AppendStr(a,b) ::= <%<a>.to_string() + &(<b>)%>
 Concat(a,b) ::= "<a><b>"
@@ -46,7 +46,7 @@ BailErrorStrategy() ::=
 recog.set_error_strategy(Box::new(dbt_antlr4::error_strategy::BailErrorStrategy::new()));
 >>
 
-ToStringTree(s) ::= "<s>.to_string_tree(&recog.base)"
+ToStringTree(s) ::= "<s>.to_string_tree(recog.base.get_rule_names())"
 Column() ::= "recog.get_char_position_in_line()"
 Text() ::= "recog.get_text()"
 ValEquals(a,b) ::= "<a> == <b>"
@@ -118,30 +118,30 @@ PositionAdjustingLexer() ::= <<
 
 PositionAdjustingLexerDef() ::= <<
 //@definitions
-   fn handleAcceptPositionForIdentifier\<'input, Input:CharStream\<From\<'input>\>\>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >) {
+   fn handleAcceptPositionForIdentifier\<'input, 'arena, Input:CharStream\<'input>, TF: TokenFactory\<'input, 'arena> + 'arena\>(this: &mut BaseLexerType\<'input, 'arena, Input, TF>) {
      let tokenText = this.get_text();
      let identifierLength = tokenText.chars().position(|it| !isIdentifierChar(it)).unwrap() as isize;
 //     while (identifierLength \< tokenText.len() as i32 && isIdentifierChar(tokenText[identifierLength as usize])) {
 //       identifierLength+=1;
 //     }
 
-     if (this.get_input_stream().unwrap().index() > this.token_start_char_index + identifierLength) {
-       let offset = identifierLength - 1;
+     if this.get_input_stream().unwrap().index() > this.token_start_char_index + identifierLength {
+       let offset = (identifierLength - 1) as i32;
        let mut input = this.input.take().unwrap();
        this.interpreter.as_mut().unwrap().resetAcceptPosition(&mut input,
-         this.token_start_char_index + offset, this.token_start_line, this.token_start_column + offset);
+         this.token_start_char_index + offset as isize, this.token_start_line, this.token_start_column + offset);
        this.input = Some(input);
        //return;
      };
 
    }
 
-   fn handleAcceptPositionForKeyword\<'input, Input:CharStream\<From\<'input>\>\>(this: &mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >, keyword: &str) {
+   fn handleAcceptPositionForKeyword\<'input, 'arena, Input:CharStream\<'input>, TF: TokenFactory\<'input, 'arena> + 'arena\>(this: &mut BaseLexerType\<'input, 'arena, Input, TF>, keyword: &str) {
    	let mut input = this.input.take().unwrap();
-     if (input.index() > this.token_start_char_index + keyword.len() as isize) {
-       let offset = keyword.len() as isize - 1;
+     if input.index() > this.token_start_char_index + keyword.len() as isize {
+       let offset = keyword.len() as i32 - 1;
        this.interpreter.as_mut().unwrap().resetAcceptPosition(&mut input,
-         this.token_start_char_index + offset, this.token_start_line, this.token_start_column + offset);
+         this.token_start_char_index + offset as isize, this.token_start_line, this.token_start_column + offset);
        //return true;
      }
      this.input = Some(input);
@@ -154,10 +154,10 @@ PositionAdjustingLexerDef() ::= <<
    }
 
 trait PositionAdjustingLexerATNSim {
-    fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: isize, charPositionInLine: isize);
+    fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: u32, charPositionInLine: i32);
   }
 impl PositionAdjustingLexerATNSim for dbt_antlr4::lexer_atn_simulator::LexerATNSimulator{
-    fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: isize, charPositionInLine: isize) {
+    fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: u32, charPositionInLine: i32) {
       input.seek(index);
       self.set_line(line);
       self.set_char_position_in_line(charPositionInLine);
@@ -168,7 +168,7 @@ impl PositionAdjustingLexerATNSim for dbt_antlr4::lexer_atn_simulator::LexerATNS
 }
 @extend{
 
-  fn before_emit(lexer:&mut BaseLexer\<'input,PositionAdjustingLexerActions,Input,LocalTokenFactory\<'input> >) {
+  fn before_emit(lexer:&mut BaseLexerType\<'input, 'arena, Input, TF>) {
     match (lexer.token_type) {
       TOKENS => handleAcceptPositionForKeyword(lexer,"tokens"),
       LABEL => handleAcceptPositionForIdentifier(lexer),
@@ -183,12 +183,13 @@ BasicListener(X) ::= <<
 @parser::definitions {
 struct TestListener;
 
-impl\<'a> ParseTreeListener\<'a,TParserContextType> for TestListener{
-	fn visit_terminal(&'_ mut self, node: &TerminalNode\<'a,TParserContextType> ) {
-		println!("{}",node.symbol.get_text());
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{
+	fn visit_terminal(&mut self, node: &TerminalNode\<'input, 'arena> ) -> Result\<(), ANTLRError> {
+		println!("{}", node.symbol.get_text());
+		Ok(())
 	}
 }
-impl\<'a> TListener\<'a> for TestListener{}
+impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {}
 }
 >>
 
@@ -201,16 +202,20 @@ TokenGetterListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl TListener\<'_> for TestListener{
-	fn exit_a(&mut self, node: &AContext) {
+impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener
+where
+    'input: 'arena,
+{
+	fn exit_a(&mut self, node: &AContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		if node.get_child_count() == 2 {
 			println!("{} {} {:?}",node.INT(0).unwrap().symbol.get_text(),node.INT(1).unwrap().symbol.get_text(),node.INT_all())
-		} else{
+		} else {
 			println!("{}",node.ID().unwrap().symbol);
 		}
+        Ok(())
 	}
 }
-impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener {}
 }
 >>
 
@@ -220,8 +225,11 @@ RuleGetterListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl TListener\<'_> for TestListener{
-	fn exit_a(&mut self, node: &AContext) {
+impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener
+where
+    'input: 'arena,
+{
+	fn exit_a(&mut self, node: &AContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		if node.get_child_count() == 2 {
 			println!("{} {} {}",
 				node.b(0).unwrap().start().get_text(),
@@ -231,9 +239,10 @@ impl TListener\<'_> for TestListener{
 		} else{
 			println!("{}",node.b(0).unwrap().start().get_text());
 		}
+        Ok(())
 	}
 }
-impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
 }
 >>
 
@@ -243,14 +252,15 @@ LRListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
-impl TListener\<'_> for TestListener{
-	fn exit_e(&mut self, ctx: &EContext) {
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
+impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {
+	fn exit_e(&mut self, ctx: &EContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		if ctx.get_child_count() == 3 {
 			println!("{} {} {}",ctx.e(0).unwrap().start().get_text(),ctx.e(1).unwrap().start().get_text(),ctx.e_all()[0].start().get_text());
 		} else {
 			println!("{}",ctx.INT().unwrap().symbol.get_text());
 		}
+        Ok(())
 	}
 }
 }
@@ -258,18 +268,19 @@ impl TListener\<'_> for TestListener{
 
 LRWithLabelsListener(X) ::= <<
 @parser::definitions {
-
 use dbt_antlr4::tree::Tree;
-use dbt_antlr4::parser_rule_context::RuleContextExt;
+
 struct TestListener;
 
-impl ParseTreeListener\<'_,TParserContextType> for TestListener{}
-impl TListener\<'_> for TestListener{
-	fn exit_Call(&mut self, ctx: &CallContext) {
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
+impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {
+	fn exit_Call(&mut self, ctx: &CallContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		println!("{} {}",ctx.e().unwrap().start().get_text(),ctx.eList().unwrap().to_string(None,None));
+        Ok(())
 	}
-	fn exit_Int(&mut self, ctx: &IntContext){
+	fn exit_Int(&mut self, ctx: &IntContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		println!("{}",ctx.INT().unwrap().symbol.get_text());
+        Ok(())
 	}
 }
 }
@@ -277,13 +288,14 @@ impl TListener\<'_> for TestListener{
 
 DeclareContextListGettersFunction() ::= <<
 fn foo() {
-  let s:SContext = unimplemented!();
-  let a:Vec\<Rc\<AContextAll> >  = s.a_all();
-  let b:Vec\<Rc\<BContextAll> >  = s.b_all();
+  let s: &SContext = unsafe { &*std::ptr::null() }; // placeholder
+  let a: Vec\<&AContextAll> = s.a_all();
+  let b: Vec\<&BContextAll> = s.b_all();
 }
 >>
 
-Declare_foo() ::= <<pub fn foo(&self) {
+Declare_foo() ::= <<
+pub fn foo(&self) {
 	println!("foo");
 }
 >>

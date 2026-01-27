@@ -1,5 +1,6 @@
+#![allow(unused_imports)]
 use std::env;
-use dbt_antlr4::parser::ParserNodeType;
+use dbt_antlr4::Arena;
 use dbt_antlr4::{InputStream, Lexer, Parser};
 use dbt_antlr4::common_token_stream::CommonTokenStream;
 use dbt_antlr4::error_listener::DiagnosticErrorListener;
@@ -8,23 +9,20 @@ use dbt_antlr4::lexer::LEXER_DEFAULT_MODE;
 use dbt_antlr4::PredictionMode;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::tree::{IsError, LeafNode, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
+use dbt_antlr4::trees::string_tree;
 mod <lexerName; format="lower">;
 use <lexerName; format="lower">::<lexerName>;
 <if(parserName)>
 mod <parserName; format="lower">;
 use <parserName; format="lower">::<parserName>;
-use <parserName; format="lower">::<grammarName>ParserContextType;
+use <parserName; format="lower">::<grammarName>ParserContextNode;
 use dbt_antlr4::errors::ANTLRError;
 <endif>
 <if(useListener)>
-mod <grammarName; format="lower">baselistener;
-use <grammarName; format="lower">baselistener::<grammarName>BaseListener;
 mod <grammarName; format="lower">listener;
 use <grammarName; format="lower">listener::<grammarName>Listener;
 <endif>
 <if(useVisitor)>
-mod <grammarName; format="lower">basevisitor;
-use <grammarName; format="lower">basevisitor::<grammarName>BaseVisitor;
 mod <grammarName; format="lower">visitor;
 use <grammarName; format="lower">visitor::<grammarName>Visitor;
 <endif>
@@ -35,10 +33,13 @@ fn main() {
 	let result = std::fs::read_to_string(string);
 	let data = result.unwrap();
 	let input = InputStream::new(data.as_str());
-    let lex = <lexerName>::new(input);
+
+    Arena::with(|arena| {
+
+    let lex = <lexerName>::\<_>::new(arena, input);
   	let mut tokens = CommonTokenStream::new(lex);
 <if(parserName)>
-	let mut parser = <parserName>::new(tokens);
+	let mut parser = <parserName>::new(arena, tokens);
 <if(showDiagnosticErrors)>
   	parser.add_error_listener(Box::new(DiagnosticErrorListener::new(true)));
 <endif>
@@ -67,29 +68,13 @@ fn main() {
   	print!("{}", tokens.get_dfa_string());
 <endif>
 <endif>
+    });
 }
 
 <if(parserName)>
 struct TreeShapeListener {
 }
 
-impl\<'input> ParseTreeListener\<'_, <grammarName>ParserContextType> for TreeShapeListener {
-    fn visit_terminal(&mut self, _node: &LeafNode\<'_, <grammarName>ParserContextType, NoError>) {}
-
-    fn visit_error_node(&mut self, _node: &LeafNode\<'_, <grammarName>ParserContextType, IsError>) {}
-
-    fn enter_every_rule(
-        &mut self,
-        _ctx: &\<<grammarName>ParserContextType as ParserNodeType>::Type,
-    ) -> Result\<(), ANTLRError> {
-        Ok(())
-    }
-
-    fn exit_every_rule(
-        &mut self,
-        _ctx: &\<<grammarName>ParserContextType as ParserNodeType>::Type,
-    ) -> Result\<(), ANTLRError> {
-        Ok(())
-    }
+impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, <grammarName>ParserContextNode\<'input, 'arena> > for TreeShapeListener {
 }
 <endif>

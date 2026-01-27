@@ -45,7 +45,7 @@ fn gen_for_grammar(
     let input = env::current_dir().unwrap().join("grammars");
     let file_name = grammar_file_name.to_owned() + ".g4";
 
-    Command::new("java")
+    let output = Command::new("java")
         .current_dir(input)
         .arg("-cp")
         .arg(antlr_path)
@@ -60,7 +60,7 @@ fn gen_for_grammar(
         .wait_with_output()?;
     // .unwrap()
     // .stdout;
-    // eprintln!("xx{}",String::from_utf8(x).unwrap());
+    eprintln!("xx{}", String::from_utf8(output.stdout).unwrap());
 
     println!("cargo:rerun-if-changed=grammars/{}", file_name);
     Ok(())

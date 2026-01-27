@@ -1,4 +1,5 @@
 //! `IntStream` extension for Lexer that allows subslicing of underlying data
+use std::borrow::Cow;
 use std::char::REPLACEMENT_CHARACTER;
 use std::convert::TryFrom;
 use std::fmt::Debug;
@@ -7,12 +8,12 @@ use std::ops::{Index, Range, RangeFrom};
 use crate::int_stream::IntStream;
 
 /// Provides underlying data for Tokens.
-pub trait CharStream<Data>: IntStream {
+pub trait CharStream<'input>: IntStream {
     /// Returns underlying data piece, either slice or owned copy.
     /// Panics if provided indexes are invalid
     /// Called by parser only on token intervals.
     /// This fact can be used by custom implementations  
-    fn get_text(&self, a: isize, b: isize) -> Data;
+    fn get_text(&self, a: isize, b: isize) -> Cow<'input, str>;
 }
 
 #[allow(clippy::len_without_is_empty)]

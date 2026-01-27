@@ -1,102 +1,41 @@
 //! General AST
 use std::any::Any;
-use std::borrow::Borrow;
 
 use std::fmt::{Debug, Formatter};
-use std::iter::from_fn;
 use std::marker::PhantomData;
-use std::ops::Deref;
-use std::rc::Rc;
 
 use crate::char_stream::InputData;
 use crate::errors::ANTLRError;
 use crate::int_stream::EOF;
 use crate::interval_set::Interval;
-use crate::parser::ParserNodeType;
 use crate::parser_rule_context::ParserRuleContext;
-use crate::recognizer::Recognizer;
-use crate::rule_context::{CustomRuleContext, RuleContext};
+use crate::rule_context::RuleContext;
 use crate::token::Token;
-use crate::token_factory::TokenFactory;
-use crate::{interval_set, trees, CoerceTo};
-use std::mem;
+use crate::{interval_set, token_factory};
 
-//todo try to make in more generic
 #[allow(missing_docs)]
-pub trait Tree<'input>: RuleContext<'input> {
-    fn get_parent(&self) -> Option<Rc<<Self::Ctx as ParserNodeType<'input>>::Type>> {
-        None
-    }
-    fn has_parent(&self) -> bool {
-        false
-    }
+pub trait Tree<'arena>: Sized {
+    fn get_parent(&self) -> Option<&'arena Self>;
+
+    fn has_parent(&self) -> bool;
+
     fn get_payload(&self) -> Box<dyn Any> {
         unimplemented!()
     }
-    fn get_child(&self, _i: usize) -> Option<Rc<<Self::Ctx as ParserNodeType<'input>>::Type>> {
+
+    fn get_child(&self, _i: usize) -> Option<&'arena Self> {
         None
     }
+
     fn get_child_count(&self) -> usize {
         0
     }
-    fn get_children<'a>(
-        &'a self,
-    ) -> Box<dyn Iterator<Item = Rc<<Self::Ctx as ParserNodeType<'input>>::Type>> + 'a>
-    where
-        'input: 'a,
-    {
-        let mut index = 0;
-        let iter = from_fn(move || {
-            if index < self.get_child_count() {
-                index += 1;
-                self.get_child(index - 1)
-            } else {
-                None
-            }
-        });
 
-        Box::new(iter)
-    }
-    // fn get_children_full(&self) -> &RefCell<Vec<Rc<<Self::Ctx as ParserNodeType<'input, Self::TF>>::Type>>> { unimplemented!() }
-
-    fn get_type_id(&self) -> std::any::TypeId;
-}
-
-pub trait TypedTreeNode {
-    fn type_id() -> std::any::TypeId;
-}
-
-/// Downcast tree node to specific type
-/// # Safety
-/// Downcasting ignores lifetime parameters, so caller must ensure that any
-/// original lifetimes attached to the source type S are accurately represented
-/// in the target type T.
-pub unsafe fn downcast_ref<'input, 'a, S, T>(node: &'a S) -> Option<&'input T>
-where
-    S: Tree<'input> + ?Sized,
-    T: TypedTreeNode,
-{
-    if node.get_type_id() == T::type_id() {
-        Some(unsafe { &*(node as *const _ as *const T) })
-    } else {
-        None
-    }
-}
-
-pub(crate) unsafe fn downcast_rc<'input, S, T>(node: Rc<S>) -> Option<Rc<T>>
-where
-    S: Tree<'input> + ?Sized,
-    T: TypedTreeNode,
-{
-    if node.get_type_id() == T::type_id() {
-        Some(unsafe { Rc::from_raw(Rc::into_raw(node) as *const T) })
-    } else {
-        None
-    }
+    fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Self> + 'a>;
 }
 
 /// Tree that knows about underlying text
-pub trait ParseTree<'input>: Tree<'input> {
+pub trait ParseTree<'input, 'arena>: Tree<'arena> {
     /// Return an {@link Interval} indicating the index in the
     /// {@link TokenStream} of the first and last token associated with this
     /// subtree. If this node is a leaf, then the interval represents a single
@@ -115,39 +54,116 @@ pub trait ParseTree<'input>: Tree<'input> {
     fn get_text(&self) -> String {
         String::new()
     }
-
-    /// Print out a whole tree, not just a node, in LISP format
-    /// (root child1 .. childN). Print just a node if this is a leaf.
-    /// We have to know the recognizer so we can get rule names.
-    fn to_string_tree(
-        &self,
-        r: &dyn Recognizer<'input, TF = Self::TF, Node = Self::Ctx>,
-    ) -> String {
-        trees::string_tree(self, r.get_rule_names())
-    }
 }
 
-// text of the node.
-// Already implemented for all rule contexts
-// pub trait NodeText {
-//     fn get_node_text(&self, rule_names: &[&str]) -> String;
-// }
-//
-// impl<T> NodeText for T {
-//     default fn get_node_text(&self, _rule_names: &[&str]) -> String { "<unknown>".to_owned() }
-// }
-//
-// impl<'input, T: CustomRuleContext<'input>> NodeText for T {
-//     default fn get_node_text(&self, rule_names: &[&str]) -> String {
-//         let rule_index = self.get_rule_index();
-//         let rule_name = rule_names[rule_index];
-//         let alt_number = self.get_alt_number();
-//         if alt_number != INVALID_ALT {
-//             return format!("{}:{}", rule_name, alt_number);
-//         }
-//         return rule_name.to_owned();
-//     }
-// }
+pub trait RuleNode<'input, 'arena>:
+    ParseTree<'input, 'arena>
+    + ParserRuleContext<'input, 'arena>
+    + From<TerminalNode<'input, 'arena>>
+    + From<ErrorNode<'input, 'arena>>
+where
+    'input: 'arena,
+    Self: 'arena,
+{
+    type Listener: ParseTreeListener<'input, 'arena, Self> + ?Sized;
+
+    /// Return the [ParserRuleContext] object associated with this rule node.
+    fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
+        self
+    }
+
+    /// Return mutable reference to the [ParserRuleContext] object associated
+    /// with this rule node.
+    fn get_rule_context_mut(&mut self) -> &mut dyn ParserRuleContext<'input, 'arena> {
+        self
+    }
+
+    /// Attempt to downcast this node to specific [ParserRuleContext] type
+    fn as_rule_context<T>(&self) -> Option<&T>
+    where
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Self>,
+    {
+        T::cast_from(self)
+    }
+
+    fn as_rule_context_mut<T>(&mut self) -> Option<&mut T>
+    where
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Self>,
+    {
+        T::cast_from_mut(self)
+    }
+
+    /// Downcast this node to terminal node, if the associated context is a
+    /// terminal node
+    fn as_terminal_node(&self) -> Option<&TerminalNode<'input, 'arena>>;
+    fn as_terminal_node_mut(&mut self) -> Option<&mut TerminalNode<'input, 'arena>>;
+
+    /// Downcast this node to error node, if the associated context is an error
+    /// node
+    fn as_error_node(&self) -> Option<&ErrorNode<'input, 'arena>>;
+    fn as_error_node_mut(&mut self) -> Option<&mut ErrorNode<'input, 'arena>>;
+
+    // fn add_token_node(&self, token: TerminalNode<'input, Self::TF>) { }
+    // fn add_error_node(&self, bad_token: ErrorNode<'input, Self::TF>) { }
+
+    fn set_exception(&self, _e: ANTLRError);
+
+    /// Sets internal parser state
+    fn set_invoking_state(&mut self, _t: i32);
+
+    fn set_alt_number(&mut self, _alt_number: i32);
+
+    fn set_start(&mut self, _t: Option<&'arena dyn Token>);
+
+    fn set_stop(&mut self, _t: Option<&'arena dyn Token>);
+
+    fn remove_last_child(&mut self);
+
+    fn add_child(&mut self, _child: &'arena Self);
+
+    fn set_parent(&mut self, _parent: Option<&'arena Self>);
+
+    /// Sets self-reference pointer to allow upcasting from context to RuleNode
+    ///
+    /// # Safety
+    /// DO NOT CALL -- internal method, only meant to be called by [Arena]
+    unsafe fn set_self_ref(&mut self, _self_ref: *const Self);
+
+    fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError>;
+
+    fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError>;
+}
+
+/// Helper trait, implemented for all rule context types that can be wrapped
+/// inside [RuleNode].
+pub trait NodeInner<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: RuleNode<'input, 'arena>,
+{
+    /// Extract a reference to self from a reference to [RuleNode].
+    ///
+    /// Used for safe downcasting.
+    fn cast_from(node: &Node) -> Option<&Self>
+    where
+        Self: Sized;
+
+    /// Extract a mutable reference to self from a mutable reference to
+    /// [RuleNode].
+    ///
+    /// Used for safe downcasting.
+    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
+    where
+        Self: Sized;
+
+    /// Upcast &self back to a `&'arena Node`.
+    ///
+    /// Only works on non-leaf nodes.
+    fn try_as_node(&'arena self) -> Option<&'arena Node>;
+
+    /// Iterate over children as [RuleNode]s
+    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a>;
+}
 
 #[doc(hidden)]
 #[derive(Debug)]
@@ -158,78 +174,143 @@ pub struct NoError;
 pub struct IsError;
 
 /// Generic leaf AST node
-pub struct LeafNode<'input, Node: ParserNodeType<'input>, T: 'static> {
-    /// Token, this leaf consist of
-    pub symbol: <Node::TF as TokenFactory<'input>>::Tok,
-    iserror: PhantomData<T>,
-}
-// tid! { impl <'input, Node, T:'static> TidAble<'input> for LeafNode<'input, Node, T> where Node:ParserNodeType<'input> }
-
-impl<'input, Node: ParserNodeType<'input>, T: 'static> CustomRuleContext<'input>
-    for LeafNode<'input, Node, T>
+pub struct LeafNode<'input, 'arena, E>
+where
+    'input: 'arena,
+    E: 'static,
 {
-    type TF = Node::TF;
-    type Ctx = Node;
+    /// Token, this leaf consist of
+    pub symbol: &'arena (dyn Token + 'input),
+    iserror: PhantomData<E>,
+}
 
+impl<'input, 'arena, E> RuleContext<'input, 'arena> for LeafNode<'input, 'arena, E>
+where
+    'input: 'arena,
+    E: 'static,
+{
     fn get_rule_index(&self) -> usize {
         usize::MAX
     }
 
+    fn get_alt_number(&self) -> i32 {
+        crate::atn::INVALID_ALT
+    }
+
     fn get_node_text(&self, _rule_names: &[&str]) -> String {
-        self.symbol.borrow().get_text().to_display()
+        self.symbol.get_text().to_display()
+    }
+
+    fn get_invoking_state(&self) -> i32 {
+        -1
+    }
+
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
+        None
     }
 }
 
-impl<'input, Node: ParserNodeType<'input>, T: 'static> ParserRuleContext<'input>
-    for LeafNode<'input, Node, T>
-{
-}
-
-impl<'input, Node: ParserNodeType<'input>, T: 'static> TypedTreeNode for LeafNode<'input, Node, T> {
-    fn type_id() -> std::any::TypeId {
-        std::any::TypeId::of::<T>()
-    }
-}
-
-impl<'input, Node: ParserNodeType<'input>, T: 'static> Tree<'input> for LeafNode<'input, Node, T> {
-    fn get_type_id(&self) -> std::any::TypeId {
-        <Self as TypedTreeNode>::type_id()
-    }
-}
-
-impl<'input, Node: ParserNodeType<'input>, T: 'static> RuleContext<'input>
-    for LeafNode<'input, Node, T>
-{
-}
-
-// impl<'input, Node: ParserNodeType<'input>, T: 'static> NodeText for LeafNode<'input, Node, T> {
-//     fn get_node_text(&self, _rule_names: &[&str]) -> String {
-//         self.symbol.borrow().get_text().to_display()
-//     }
-// }
-
-impl<'input, Node: ParserNodeType<'input>, T: 'static> ParseTree<'input>
-    for LeafNode<'input, Node, T>
+impl<'input, 'arena, E> ParserRuleContext<'input, 'arena> for LeafNode<'input, 'arena, E>
+where
+    'input: 'arena,
+    E: 'static,
 {
     fn get_text(&self) -> String {
-        self.symbol.borrow().get_text().to_display()
+        self.symbol.get_text().to_display()
+    }
+
+    fn get_child_count(&self) -> usize {
+        0
     }
 }
 
-impl<'input, Node: ParserNodeType<'input>, T: 'static> Debug for LeafNode<'input, Node, T> {
+impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node> for LeafNode<'input, 'arena, NoError>
+where
+    'input: 'arena,
+    Node: RuleNode<'input, 'arena>,
+{
+    fn cast_from(node: &Node) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        node.as_terminal_node()
+    }
+
+    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
+    where
+        Self: Sized,
+    {
+        node.as_terminal_node_mut()
+    }
+
+    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
+        Box::new(std::iter::empty())
+    }
+
+    fn try_as_node(&'arena self) -> Option<&'arena Node> {
+        None
+    }
+}
+
+impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node> for LeafNode<'input, 'arena, IsError>
+where
+    'input: 'arena,
+    Node: RuleNode<'input, 'arena>,
+{
+    fn cast_from(node: &Node) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        node.as_error_node()
+    }
+
+    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
+    where
+        Self: Sized,
+    {
+        node.as_error_node_mut()
+    }
+
+    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
+        Box::new(std::iter::empty())
+    }
+
+    fn try_as_node(&'arena self) -> Option<&'arena Node> {
+        None
+    }
+}
+
+impl<'input, 'arena, E> Default for LeafNode<'input, 'arena, E>
+where
+    'input: 'arena,
+    E: 'static,
+{
+    fn default() -> Self {
+        Self::new(token_factory::invalid())
+    }
+}
+
+impl<'input, 'arena, E> Debug for LeafNode<'input, 'arena, E>
+where
+    E: 'static,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.symbol.borrow().get_token_type() == EOF {
+        if self.symbol.get_token_type() == EOF {
             f.write_str("<EOF>")
         } else {
-            let a = self.symbol.borrow().get_text().to_display();
+            let a = self.symbol.get_text().to_display();
             f.write_str(&a)
         }
     }
 }
 
-impl<'input, Node: ParserNodeType<'input>, T: 'static> LeafNode<'input, Node, T> {
+impl<'input, 'arena, E> LeafNode<'input, 'arena, E>
+where
+    'input: 'arena,
+    E: 'static,
+{
     /// creates new leaf node
-    pub fn new(symbol: <Node::TF as TokenFactory<'input>>::Tok) -> Self {
+    pub fn new(symbol: &'arena (dyn Token + 'input)) -> Self {
         Self {
             symbol,
             iserror: Default::default(),
@@ -238,280 +319,146 @@ impl<'input, Node: ParserNodeType<'input>, T: 'static> LeafNode<'input, Node, T>
 }
 
 /// non-error AST leaf node
-pub type TerminalNode<'input, NodeType> = LeafNode<'input, NodeType, NoError>;
-
-impl<'input, Node: ParserNodeType<'input>, Listener: ParseTreeListener<'input, Node> + ?Sized>
-    Listenable<Listener> for TerminalNode<'input, Node>
-{
-    fn enter(&self, listener: &mut Listener) -> Result<(), ANTLRError> {
-        listener.visit_terminal(self);
-        Ok(())
-    }
-}
-
-impl<'input, Node: ParserNodeType<'input>, Visitor: ParseTreeVisitor<'input, Node> + ?Sized>
-    Visitable<Visitor> for TerminalNode<'input, Node>
-{
-    fn accept(&self, visitor: &mut Visitor) {
-        visitor.visit_terminal(self)
-    }
-}
+pub type TerminalNode<'input, 'arena> = LeafNode<'input, 'arena, NoError>;
 
 /// # Error Leaf
 /// Created for each token created or consumed during recovery
-pub type ErrorNode<'input, NodeType> = LeafNode<'input, NodeType, IsError>;
+pub type ErrorNode<'input, 'arena> = LeafNode<'input, 'arena, IsError>;
 
-impl<'input, Node: ParserNodeType<'input>, Listener: ParseTreeListener<'input, Node> + ?Sized>
-    Listenable<Listener> for ErrorNode<'input, Node>
+pub trait ParseTreeVisitor<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
-    fn enter(&self, listener: &mut Listener) -> Result<(), ANTLRError> {
-        listener.visit_error_node(self);
-        Ok(())
-    }
-}
-
-impl<'input, Node: ParserNodeType<'input>, Visitor: ParseTreeVisitor<'input, Node> + ?Sized>
-    Visitable<Visitor> for ErrorNode<'input, Node>
-{
-    fn accept(&self, visitor: &mut Visitor) {
-        visitor.visit_error_node(self)
-    }
-}
-
-pub trait ParseTreeVisitorCompat<'input>: VisitChildren<'input, Self::Node> {
-    type Node: ParserNodeType<'input>;
     type Return: Default;
 
-    /// Temporary storage for `ParseTreeVisitor` blanket implementation to work
-    ///
-    /// If you have `()` as a return value
-    /// either use `YourGrammarParseTreeVisitor` directly
-    /// or make
-    /// ```rust
-    /// Box::leak(Box::new(()))
-    /// # ;
-    /// ```
-    /// as an implementation of that method so that there is no need to create dummy field in your visitor
-    fn temp_result(&mut self) -> &mut Self::Return;
-
-    fn visit(&mut self, node: &<Self::Node as ParserNodeType<'input>>::Type) -> Self::Return {
-        self.visit_node(node);
-        mem::take(self.temp_result())
-    }
+    fn visit(&mut self, node: &Node) -> Result<Self::Return, ANTLRError>;
 
     /// Called on terminal(leaf) node
-    fn visit_terminal(&mut self, _node: &TerminalNode<'input, Self::Node>) -> Self::Return {
-        Self::Return::default()
+    fn visit_terminal(
+        &mut self,
+        _node: &TerminalNode<'input, 'arena>,
+    ) -> Result<Self::Return, ANTLRError> {
+        Ok(Self::Return::default())
     }
+
     /// Called on error node
-    fn visit_error_node(&mut self, _node: &ErrorNode<'input, Self::Node>) -> Self::Return {
-        Self::Return::default()
+    fn visit_error_node(
+        &mut self,
+        _node: &ErrorNode<'input, 'arena>,
+    ) -> Result<Self::Return, ANTLRError> {
+        Ok(Self::Return::default())
     }
 
     fn visit_children(
         &mut self,
-        node: &<Self::Node as ParserNodeType<'input>>::Type,
-    ) -> Self::Return {
+        node: &dyn NodeInner<'input, 'arena, Node>,
+    ) -> Result<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
-        for node in node.get_children() {
-            if !self.should_visit_next_child(&node, &result) {
+        for child in node.iter_child_nodes() {
+            if !self.should_visit_next_child(child, &result) {
                 break;
             }
 
-            let child_result = self.visit(&node);
-            result = self.aggregate_results(result, child_result);
+            let child_result = self.visit(child)?;
+            result = self.aggregate_results(result, child_result)?;
         }
-        result
+        Ok(result)
     }
 
-    fn aggregate_results(&self, _aggregate: Self::Return, next: Self::Return) -> Self::Return {
-        next
-    }
-
-    fn should_visit_next_child(
+    fn aggregate_results(
         &self,
-        _node: &<Self::Node as ParserNodeType<'input>>::Type,
-        _current: &Self::Return,
-    ) -> bool {
+        _aggregate: Self::Return,
+        next: Self::Return,
+    ) -> Result<Self::Return, ANTLRError> {
+        Ok(next)
+    }
+
+    fn should_visit_next_child(&self, _node: &Node, _current: &Self::Return) -> bool {
         true
     }
 }
 
-// struct VisitorAdapter<'input, T: ParseTreeVisitorCompat<'input>> {
-//     visitor: T,
-//     pub curr_value: T::Return,
-//     _pd: PhantomData<&'input str>,
-// }
-
-impl<'input, Node, T> ParseTreeVisitor<'input, Node> for T
-where
-    Node: ParserNodeType<'input>,
-    Node::Type: VisitableDyn<Self>,
-    T: ParseTreeVisitorCompat<'input, Node = Node>,
-{
-    fn visit_terminal(&mut self, node: &TerminalNode<'input, Node>) {
-        let result = <Self as ParseTreeVisitorCompat>::visit_terminal(self, node);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-    }
-
-    fn visit_error_node(&mut self, node: &ErrorNode<'input, Node>) {
-        let result = <Self as ParseTreeVisitorCompat>::visit_error_node(self, node);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-    }
-
-    fn visit_children(&mut self, node: &Node::Type) {
-        let result = <Self as ParseTreeVisitorCompat>::visit_children(self, node);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-    }
-}
-
-/// Base interface for visiting over syntax tree
-pub trait ParseTreeVisitor<'input, Node: ParserNodeType<'input>>:
-    VisitChildren<'input, Node>
-{
-    // Basically alias for `node.accept(self)` in visitor implementation
-    // just to make api closer to java
-
-    /// Called on terminal(leaf) node
-    fn visit_terminal(&mut self, _node: &TerminalNode<'input, Node>) {}
-    /// Called on error node
-    fn visit_error_node(&mut self, _node: &ErrorNode<'input, Node>) {}
-    /// Implement this only if you want to change children visiting algorithm
-    fn visit_children(&mut self, node: &Node::Type) {
-        node.get_children()
-            .for_each(|child| self.visit_node(&child))
-    }
-}
-
-/// Workaround for default recursive children visiting
-///
-/// Already blanket implemented for all visitors.
-/// To override it you would need to implement `ParseTreeVisitor::visit_children`
-pub trait VisitChildren<'input, Node: ParserNodeType<'input>> {
-    // fn visit_children_inner(&mut self, node: &Node::Type);
-    fn visit_node(&mut self, node: &Node::Type);
-}
-
-impl<'input, Node, T> VisitChildren<'input, Node> for T
-where
-    Node: ParserNodeType<'input>,
-    T: ParseTreeVisitor<'input, Node> + ?Sized,
-    // for<'a> &'a mut Self: CoerceUnsized<&'a mut Node::Visitor>,
-    Node::Type: VisitableDyn<T>,
-{
-    // #[inline(always)]
-    // fn visit_children_inner(&mut self, node: &Node::Type) {
-    //     // node.accept_children(self)
-    //
-    // }
-
-    fn visit_node(&mut self, node: &Node::Type) {
-        node.accept_dyn(self)
-    }
-}
-
-/// Types that can accept particular visitor
-/// ** Usually implemented only in generated parser **
-pub trait Visitable<Vis: ?Sized> {
-    /// Calls corresponding visit callback on visitor`Vis`
-    fn accept(&self, _visitor: &mut Vis) {
-        if cfg!(feature = "debug") {
-            unreachable!(
-                "should have been properly implemented by generated context when reachable"
-            )
-        }
-    }
-}
-
-// workaround trait for accepting sized visitor on rule context trait object
-#[doc(hidden)]
-pub trait VisitableDyn<Vis: ?Sized> {
-    fn accept_dyn(&self, _visitor: &mut Vis) {
-        if cfg!(feature = "debug") {
-            unreachable!(
-                "should have been properly implemented by generated context when reachable"
-            )
-        }
-    }
-}
-
 /// Base parse listener interface
-pub trait ParseTreeListener<'input, Node: ParserNodeType<'input>> {
+pub trait ParseTreeListener<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: RuleNode<'input, 'arena>,
+{
     /// Called when parser creates terminal node
-    fn visit_terminal(&mut self, _node: &TerminalNode<'input, Node>) {}
+    fn visit_terminal(&mut self, _node: &TerminalNode<'input, 'arena>) -> Result<(), ANTLRError> {
+        Ok(())
+    }
+
     /// Called when parser creates error node
-    fn visit_error_node(&mut self, _node: &ErrorNode<'input, Node>) {}
+    fn visit_error_node(&mut self, _node: &ErrorNode<'input, 'arena>) -> Result<(), ANTLRError> {
+        Ok(())
+    }
+
     /// Called when parser enters any rule node
-    fn enter_every_rule(&mut self, _ctx: &Node::Type) -> Result<(), ANTLRError> {
+    fn enter_every_rule(&mut self, _ctx: &Node) -> Result<(), ANTLRError> {
         Ok(())
     }
+
     /// Called when parser exits any rule node
-    fn exit_every_rule(&mut self, _ctx: &Node::Type) -> Result<(), ANTLRError> {
+    fn exit_every_rule(&mut self, _ctx: &Node) -> Result<(), ANTLRError> {
         Ok(())
     }
 }
-
-/// Types that can accept particular listener
-/// ** Usually implemented only in generated parser **
-pub trait Listenable<T: ?Sized> {
-    /// Calls corresponding enter callback on listener `T`
-    fn enter(&self, _listener: &mut T) -> Result<(), ANTLRError> {
-        Ok(())
-    }
-    /// Calls corresponding exit callback on listener `T`
-    fn exit(&self, _listener: &mut T) -> Result<(), ANTLRError> {
-        Ok(())
-    }
-}
-
-// #[inline]
-// pub fn temp_to_trait<Z,TraitObject>(mut input: Z, f:impl FnOnce(&mut TraitObject)) -> Z where &mut Z:CoerceUnsized<&mut TraitObject>{
-//     let a = &mut input as &mut TraitObject;
-//     f(a)
-// }
 
 /// Helper struct to accept parse listener on already generated tree
 #[derive(Debug)]
-pub struct ParseTreeWalker<'input, 'a, Node, T = dyn ParseTreeListener<'input, Node> + 'a>(
-    PhantomData<fn(&'a T) -> &'input Node::Type>,
-)
-where
-    Node: ParserNodeType<'input>,
-    T: ParseTreeListener<'input, Node> + ?Sized;
+pub struct ParseTreeWalker;
 
-impl<'input, 'a, Node, T> ParseTreeWalker<'input, 'a, Node, T>
-where
-    Node: ParserNodeType<'input>,
-    T: ParseTreeListener<'input, Node> + 'a + ?Sized,
-    Node::Type: Listenable<T>,
-{
+impl ParseTreeWalker {
     /// Walks recursively over tree `t` with `listener`
-    pub fn walk<Listener, Ctx>(
-        mut listener: Box<Listener>,
-        t: &Ctx,
-    ) -> Result<Box<Listener>, ANTLRError>
+    pub fn walk<'input, 'arena, Node>(
+        mut listener: Box<Node::Listener>,
+        t: &Node,
+    ) -> Result<Box<Node::Listener>, ANTLRError>
     where
-        // for<'x> &'x mut Listener: CoerceUnsized<&'x mut T>,
-        // for<'x> &'x Ctx: CoerceUnsized<&'x Node::Type>,
-        Listener: CoerceTo<T>,
-        Ctx: CoerceTo<Node::Type>,
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
     {
-        // let mut listener = listener as Box<T>;
-        Self::walk_inner(listener.as_mut().coerce_mut_to(), t.coerce_ref_to())?;
+        if let Some(terminal) = t.as_terminal_node() {
+            listener.visit_terminal(terminal)?;
+            return Ok(listener);
+        }
+        if let Some(error) = t.as_error_node() {
+            listener.visit_error_node(error)?;
+            return Ok(listener);
+        }
 
-        // just cast back
-        // unsafe { Box::<Listener>::from_raw(Box::into_raw(listener) as *mut _) }
+        Self::enter_rule(&mut *listener, t)?;
+        for child in t.get_children() {
+            listener = Self::walk(listener, child)?;
+        }
+        Self::exit_rule(&mut *listener, t)?;
+
         Ok(listener)
     }
 
-    fn walk_inner(listener: &mut T, t: &Node::Type) -> Result<(), ANTLRError> {
-        t.enter(listener)?;
+    fn enter_rule<'input, 'arena, Node>(
+        listener: &mut Node::Listener,
+        t: &Node,
+    ) -> Result<(), ANTLRError>
+    where
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
+    {
+        listener.enter_every_rule(t)?;
+        t.enter_rule(listener)
+    }
 
-        for child in t.get_children() {
-            Self::walk_inner(listener, child.deref())?;
-        }
-
-        t.exit(listener)?;
-        Ok(())
+    fn exit_rule<'input, 'arena, Node>(
+        listener: &mut Node::Listener,
+        t: &Node,
+    ) -> Result<(), ANTLRError>
+    where
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
+    {
+        t.exit_rule(listener)?;
+        listener.exit_every_rule(t)
     }
 }

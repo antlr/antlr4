@@ -1,9 +1,5 @@
 grammar CSV;
 
-@tokenfactory{
-pub type LocalTokenFactory<'input> = dbt_antlr4::token_factory::ArenaCommonFactory<'input>;
-}
-
 csvFile: hdr row+ ;
 hdr : row ;
 

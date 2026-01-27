@@ -10,13 +10,12 @@ use murmur3::murmur3_32::MurmurHasher;
 
 use crate::atn::ATN;
 use crate::dfa::ScopeExt;
-use crate::parser::ParserNodeType;
 use crate::parser_atn_simulator::MergeCache;
 
 use crate::prediction_context::PredictionContext::{Array, Singleton};
-use crate::rule_context::RuleContext;
 
 use crate::transition::RuleTransition;
+use crate::tree::RuleNode;
 
 pub const PREDICTION_CONTEXT_EMPTY_RETURN_STATE: i32 = 0x7FFFFFFF;
 
@@ -507,22 +506,23 @@ impl PredictionContext {
         Array(merged)
     }
 
-    pub fn from_rule_context<'input, Ctx: ParserNodeType<'input>>(
+    pub fn from_rule_context<'input, 'arena, Node>(
         atn: &ATN,
-        outer_context: &Ctx::Type,
-    ) -> Arc<PredictionContext> {
-        if outer_context.get_parent_ctx().is_none() || outer_context.is_empty()
+        outer_context: &'arena Node,
+    ) -> Arc<PredictionContext>
+    where
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
+    {
+        if outer_context.get_parent().is_none() || outer_context.get_rule_context().is_empty()
         /*ptr::eq(outer_context, empty_ctx().as_ref())*/
         {
             return EMPTY_PREDICTION_CONTEXT.clone();
         }
 
-        let parent = PredictionContext::from_rule_context::<Ctx>(
-            atn,
-            outer_context.get_parent_ctx().unwrap().deref(),
-        );
+        let parent = PredictionContext::from_rule_context(atn, outer_context.get_parent().unwrap());
 
-        let transition = atn.states[outer_context.get_invoking_state() as usize]
+        let transition = atn.states[outer_context.get_rule_context().get_invoking_state() as usize]
             .get_transitions()
             .first()
             .unwrap()

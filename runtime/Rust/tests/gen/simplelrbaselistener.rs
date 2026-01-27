@@ -6,7 +6,7 @@ use dbt_antlr4::tree::ParseTreeListener;
 // A complete Visitor for a parse tree produced by SimpleLRParser.
 
 pub trait SimpleLRBaseListener<'input>:
-    ParseTreeListener<'input, SimpleLRParserContextType> {
+    ParseTreeListener<'input, SimpleLRParserContextNode> {
 
     /**
      * Enter a parse tree produced by \{@link SimpleLRBaseParser#s}.

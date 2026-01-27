@@ -6,7 +6,7 @@ use dbt_antlr4::tree::ParseTreeListener;
 // A complete Visitor for a parse tree produced by CSVParser.
 
 pub trait CSVBaseListener<'input>:
-    ParseTreeListener<'input, CSVParserContextType> {
+    ParseTreeListener<'input, CSVParserContextNode> {
 
     /**
      * Enter a parse tree produced by \{@link CSVBaseParser#s}.

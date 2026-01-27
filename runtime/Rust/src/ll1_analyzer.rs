@@ -8,12 +8,12 @@ use crate::atn::ATN;
 use crate::atn_config::ATNConfig;
 use crate::atn_state::{ATNState, ATNStateType};
 use crate::interval_set::IntervalSet;
-use crate::parser::ParserNodeType;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
 use crate::transition::TransitionType::TRANSITION_NOTSET;
 use crate::transition::{RuleTransition, TransitionType};
+use crate::tree::RuleNode;
 
 pub struct LL1Analyzer<'a> {
     atn: &'a ATN,
@@ -26,14 +26,18 @@ impl LL1Analyzer<'_> {
 
     //    fn get_decision_lookahead(&self, _s: &dyn ATNState) -> &Vec<IntervalSet> { unimplemented!() }
 
-    pub fn look<'input, Ctx: ParserNodeType<'input>>(
+    pub fn look<'input, 'arena, Node>(
         &self,
         s: &dyn ATNState,
         stop_state: Option<&dyn ATNState>,
-        ctx: Option<&Ctx::Type>,
-    ) -> IntervalSet {
+        ctx: Option<&'arena Node>,
+    ) -> IntervalSet
+    where
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
+    {
         let mut r = IntervalSet::new();
-        let look_ctx = ctx.map(|x| PredictionContext::from_rule_context::<Ctx>(self.atn, x));
+        let look_ctx = ctx.map(|x| PredictionContext::from_rule_context(self.atn, x));
         let mut looks_busy: HashSet<ATNConfig> = HashSet::new();
         let mut called_rule_stack = BitSet::new();
         self.look_work(

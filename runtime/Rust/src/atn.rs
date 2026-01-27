@@ -7,11 +7,10 @@ use crate::dfa::ScopeExt;
 use crate::interval_set::IntervalSet;
 use crate::lexer_action::LexerAction;
 use crate::ll1_analyzer::LL1Analyzer;
-use crate::parser::ParserNodeType;
-use crate::rule_context::EmptyContextType;
+use crate::rule_context::EmptyRuleNode;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON};
-use crate::token_factory::CommonTokenFactory;
 use crate::transition::RuleTransition;
+use crate::tree::RuleNode;
 use std::fmt::{Debug, Formatter};
 
 pub const INVALID_ALT: i32 = 0;
@@ -75,7 +74,7 @@ impl ATN {
     ///rule.
     pub fn next_tokens<'a>(&self, s: &'a dyn ATNState) -> &'a IntervalSet {
         s.get_next_tokens_within_rule().get_or_init(|| {
-            self.next_tokens_in_ctx::<EmptyContextType<'_, CommonTokenFactory>>(s, None)
+            self.next_tokens_in_ctx::<EmptyRuleNode>(s, None)
                 .modify_with(|r| r.read_only = true)
         })
     }
@@ -84,13 +83,17 @@ impl ATN {
     /// If `ctx` is null, the set of tokens will not include what can follow
     /// the rule surrounding `s`. In other words, the set will be
     /// restricted to tokens reachable staying within `s`'s rule.
-    pub fn next_tokens_in_ctx<'a, Ctx: ParserNodeType<'a>>(
+    pub fn next_tokens_in_ctx<'input, 'arena, Node>(
         &self,
         s: &dyn ATNState,
-        _ctx: Option<&Ctx::Type>,
-    ) -> IntervalSet {
+        ctx: Option<&'arena Node>,
+    ) -> IntervalSet
+    where
+        'input: 'arena,
+        Node: RuleNode<'input, 'arena>,
+    {
         let analyzer = LL1Analyzer::new(self);
-        analyzer.look::<Ctx>(s, None, _ctx)
+        analyzer.look(s, None, ctx)
     }
 
     pub(crate) fn add_state(&mut self, state: Box<dyn ATNState>) {

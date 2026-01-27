@@ -3,7 +3,8 @@ use std::borrow::{Borrow, Cow};
 use std::cmp::Ordering;
 use std::collections::HashSet;
 
-use crate::parser::{Parser, ParserNodeType};
+use crate::parser::Parser;
+use crate::token_factory::TokenFactory;
 
 //pub trait SemanticContext:Sync + Send {
 ///    fn evaluate(&self, parser: &Recognizer, outerContext: &RuleContext) -> bool;
@@ -36,11 +37,17 @@ impl SemanticContext {
         pred_index: -1,
         is_ctx_dependent: false,
     };
-    pub(crate) fn evaluate<'a, T: Parser<'a>>(
+
+    pub(crate) fn evaluate<'input, 'arena, TF, P>(
         &self,
-        parser: &mut T,
-        outer_context: &<T::Node as ParserNodeType<'a>>::Type,
-    ) -> bool {
+        parser: &mut P,
+        outer_context: &'arena P::Node,
+    ) -> bool
+    where
+        'input: 'arena,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+        P: Parser<'input, 'arena, TF>,
+    {
         match self {
             SemanticContext::Predicate {
                 rule_index,
@@ -59,11 +66,17 @@ impl SemanticContext {
             SemanticContext::OR(ops) => ops.iter().any(|sem| sem.evaluate(parser, outer_context)),
         }
     }
-    pub(crate) fn eval_precedence<'a, 'b, T: Parser<'b>>(
+
+    pub(crate) fn eval_precedence<'a, 'input, 'arena, TF, P>(
         &'a self,
-        parser: &T,
-        outer_context: &<T::Node as ParserNodeType<'b>>::Type,
-    ) -> Option<Cow<'a, SemanticContext>> {
+        parser: &P,
+        outer_context: &'arena P::Node,
+    ) -> Option<Cow<'a, SemanticContext>>
+    where
+        'input: 'arena,
+        P: Parser<'input, 'arena, TF>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         match self {
             SemanticContext::Predicate { .. } => Some(Borrowed(self)),
             SemanticContext::Precedence(prec) => {

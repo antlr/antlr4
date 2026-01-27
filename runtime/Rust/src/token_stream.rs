@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 
 use crate::char_stream::InputData;
 use crate::int_stream::{IntStream, IterWrapper};
-use crate::token::{OwningToken, Token, TOKEN_EOF, TOKEN_INVALID_TYPE};
+use crate::token::{Token, TOKEN_EOF, TOKEN_INVALID_TYPE};
 use crate::token_factory::TokenFactory;
 use crate::token_source::TokenSource;
 use std::fmt::{Debug, Formatter};
@@ -15,25 +15,35 @@ use std::fmt::{Debug, Formatter};
 /// Used as an input for `Parser`s
 /// If there is an existing source of tokens, you should implement
 /// `TokenSource`, not `TokenStream`
-pub trait TokenStream<'input>: IntStream {
-    /// Token factory that created tokens in this stream
-    type TF: TokenFactory<'input> + 'input;
-
+pub trait TokenStream<'input, 'arena, TF>: IntStream
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     /// Lookahead for tokens, same as `IntSteam::la` but return reference to full token
-    fn lt(&mut self, k: isize) -> Option<&<Self::TF as TokenFactory<'input>>::Tok>;
+    fn lt(&mut self, k: isize) -> Option<&'arena TF::Tok>;
+
     /// Returns reference to token at `index`
-    fn get(&self, index: isize) -> &<Self::TF as TokenFactory<'input>>::Tok;
+    ///
+    /// FIXME: panics if the underlying stream does not support retrieving the
+    /// token at the specified index
+    fn get(&self, index: isize) -> &'arena TF::Tok;
 
     /// Token source that produced data for tokens for this stream
-    fn get_token_source(&self) -> &dyn TokenSource<'input, TF = Self::TF>;
+    fn get_token_source(&self) -> &dyn TokenSource<'input, 'arena, TF>;
+
     //    fn set_token_source(&self,source: Box<TokenSource>);
+
     /// Get combined text of all tokens in this stream
     fn get_all_text(&self) -> String {
         self.get_text_from_interval(0, self.size() - 1)
     }
+
     /// Get combined text of tokens in start..=stop interval
     fn get_text_from_interval(&self, start: isize, stop: isize) -> String;
+
     //    fn get_text_from_rule_context(&self,context: RuleContext) -> String;
+
     /// Get combined text of tokens in between `a` and `b`
     fn get_text_from_tokens<T: Token + ?Sized>(&self, a: &T, b: &T) -> String
     where
@@ -45,20 +55,30 @@ pub trait TokenStream<'input>: IntStream {
 
 /// Iterator over tokens in `T`
 #[derive(Debug)]
-pub struct TokenIter<'a, 'input: 'a, T: TokenStream<'input>>(
+pub struct TokenIter<'a, 'input, 'arena, T, TF>(
     &'a mut T,
     bool,
     PhantomData<fn() -> &'input str>,
-);
+    PhantomData<fn() -> &'arena TF::Tok>,
+)
+where
+    'input: 'a,
+    T: TokenStream<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena;
 
-impl<'a, 'input: 'a, T: TokenStream<'input>> Iterator for TokenIter<'a, 'input, T> {
-    type Item = OwningToken;
+impl<'a, 'input, 'arena, T, TF> Iterator for TokenIter<'a, 'input, 'arena, T, TF>
+where
+    'input: 'a,
+    T: TokenStream<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    type Item = &'arena TF::Tok;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 {
             return None;
         }
-        let result = self.0.lt(1).unwrap().borrow().to_owned();
+        let result = self.0.lt(1).unwrap();
         if result.get_token_type() == TOKEN_EOF {
             self.1 = true;
         } else {
@@ -69,9 +89,13 @@ impl<'a, 'input: 'a, T: TokenStream<'input>> Iterator for TokenIter<'a, 'input, 
 }
 
 /// Token stream that keeps all data in internal Vec
-pub struct UnbufferedTokenStream<'input, T: TokenSource<'input>> {
-    token_source: T,
-    pub(crate) tokens: Vec<<T::TF as TokenFactory<'input>>::Tok>,
+pub struct UnbufferedTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    token_source: TS,
+    pub(crate) tokens: Vec<&'arena TF::Tok>,
     //todo prev token for lt(-1)
     pub(crate) current_token_index: isize,
     markers_count: isize,
@@ -79,7 +103,11 @@ pub struct UnbufferedTokenStream<'input, T: TokenSource<'input>> {
     fetched_eof: bool,
 }
 
-impl<'input, T: TokenSource<'input>> Debug for UnbufferedTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> Debug for UnbufferedTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("UnbufferedTokenStream")
             .field("tokens", &self.tokens)
@@ -90,26 +118,30 @@ impl<'input, T: TokenSource<'input>> Debug for UnbufferedTokenStream<'input, T> 
     }
 }
 
-impl<'input, T: TokenSource<'input>> UnbufferedTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> UnbufferedTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     /// Creates iterator over this token stream
     pub fn iter(&mut self) -> IterWrapper<'_, Self> {
         IterWrapper(self, false)
     }
 
     /// Creates iterator over tokens in this token stream
-    pub fn token_iter(&mut self) -> TokenIter<'_, 'input, Self> {
-        TokenIter(self, false, PhantomData)
+    pub fn token_iter(&mut self) -> TokenIter<'_, 'input, 'arena, Self, TF> {
+        TokenIter(self, false, PhantomData, PhantomData)
     }
 
     /// Creates token stream that keeps all tokens inside
-    pub fn new_buffered(source: T) -> Self {
+    pub fn new_buffered(source: TS) -> Self {
         let mut a = UnbufferedTokenStream::new_unbuffered(source);
         a.mark();
         a
     }
 
     /// Creates token stream that keeps only tokens required by `mark`
-    pub fn new_unbuffered(source: T) -> Self {
+    pub fn new_unbuffered(source: TS) -> Self {
         UnbufferedTokenStream {
             token_source: source,
             tokens: vec![],
@@ -137,15 +169,12 @@ impl<'input, T: TokenSource<'input>> UnbufferedTokenStream<'input, T> {
 
     pub(crate) fn fill(&mut self, need: isize) -> isize {
         for i in 0..need {
-            if !self.tokens.is_empty()
-                && self.tokens.last().unwrap().borrow().get_token_type() == TOKEN_EOF
+            if !self.tokens.is_empty() && self.tokens.last().unwrap().get_token_type() == TOKEN_EOF
             {
                 return i;
             }
             let token = self.token_source.next_token();
-            token
-                .borrow()
-                .set_token_index(self.get_buffer_start_index() + self.tokens.len() as isize);
+            token.set_token_index(self.get_buffer_start_index() + self.tokens.len() as isize);
             self.tokens.push(token);
         }
 
@@ -153,26 +182,29 @@ impl<'input, T: TokenSource<'input>> UnbufferedTokenStream<'input, T> {
     }
 }
 
-impl<'input, T: TokenSource<'input>> TokenStream<'input> for UnbufferedTokenStream<'input, T> {
-    type TF = T::TF;
-
+impl<'input, 'arena, TS, TF> TokenStream<'input, 'arena, TF>
+    for UnbufferedTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     #[inline]
-    fn lt(&mut self, i: isize) -> Option<&<Self::TF as TokenFactory<'input>>::Tok> {
+    fn lt(&mut self, i: isize) -> Option<&'arena TF::Tok> {
         if i == -1 {
-            return self.tokens.get(self.p as usize - 1);
+            return self.tokens.get(self.p as usize - 1).copied();
         }
 
         self.sync(i);
 
-        self.tokens.get((self.p + i - 1) as usize)
+        self.tokens.get((self.p + i - 1) as usize).copied()
     }
 
     #[inline]
-    fn get(&self, index: isize) -> &<Self::TF as TokenFactory<'input>>::Tok {
-        &self.tokens[(index - self.get_buffer_start_index()) as usize]
+    fn get(&self, index: isize) -> &'arena TF::Tok {
+        self.tokens[(index - self.get_buffer_start_index()) as usize]
     }
 
-    fn get_token_source(&self) -> &dyn TokenSource<'input, TF = Self::TF> {
+    fn get_token_source(&self) -> &dyn TokenSource<'input, 'arena, TF> {
         &self.token_source
     }
 
@@ -205,7 +237,11 @@ impl<'input, T: TokenSource<'input>> TokenStream<'input> for UnbufferedTokenStre
     }
 }
 
-impl<'input, T: TokenSource<'input>> IntStream for UnbufferedTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> IntStream for UnbufferedTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     #[inline]
     fn consume(&mut self) {
         if self.fetched_eof {

@@ -1,6 +1,5 @@
 //! Error reporting
-use std::cell::Ref;
-use std::ops::Deref;
+use std::marker::PhantomData;
 
 use bit_set::BitSet;
 
@@ -11,13 +10,18 @@ use crate::errors::ANTLRError;
 use crate::parser::Parser;
 use crate::recognizer::Recognizer;
 
+use crate::token::Token;
 use crate::token_factory::TokenFactory;
 use std::borrow::Cow;
 use std::fmt::Debug;
 
 /// Describes interface for listening on parser/lexer errors.
 /// Should only listen for errors, for processing/recovering from errors use `ErrorStrategy`
-pub trait ErrorListener<'a, T: Recognizer<'a>> {
+pub trait ErrorListener<'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
     /// Called when parser/lexer encounter hard error.
     ///
     /// The `_error` is not None for all syntax errors except
@@ -26,10 +30,10 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
     /// token insertion and deletion mechanism)
     fn syntax_error(
         &self,
-        _recognizer: &T,
-        _offending_symbol: Option<&<T::TF as TokenFactory<'a>>::Inner>,
-        _line: isize,
-        _column: isize,
+        _recognizer: &R,
+        _offending_symbol: Option<&'arena dyn Token>,
+        _line: u32,
+        _column: i32,
         _msg: &str,
         _error: Option<&ANTLRError>,
     ) {
@@ -40,7 +44,7 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
     /// results in an ambiguity.
     fn report_ambiguity(
         &self,
-        _recognizer: &T,
+        _recognizer: &R,
         _dfa: &DFA,
         _start_index: isize,
         _stop_index: isize,
@@ -54,7 +58,7 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
     /// to use the full context information to make an LL decision.
     fn report_attempting_full_context(
         &self,
-        _recognizer: &T,
+        _recognizer: &R,
         _dfa: &DFA,
         _start_index: isize,
         _stop_index: isize,
@@ -67,7 +71,7 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
     /// unique result.
     fn report_context_sensitivity(
         &self,
-        _recognizer: &T,
+        _recognizer: &R,
         _dfa: &DFA,
         _start_index: isize,
         _stop_index: isize,
@@ -79,15 +83,19 @@ pub trait ErrorListener<'a, T: Recognizer<'a>> {
 
 /// Default error listener that outputs errors to stderr
 #[derive(Debug)]
-pub struct ConsoleErrorListener {}
+pub struct ConsoleErrorListener;
 
-impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ConsoleErrorListener {
+impl<'input, 'arena, R> ErrorListener<'input, 'arena, R> for ConsoleErrorListener
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
     fn syntax_error(
         &self,
-        _recognizer: &T,
-        _offending_symbol: Option<&<T::TF as TokenFactory<'a>>::Inner>,
-        line: isize,
-        column: isize,
+        _recognizer: &R,
+        _offending_symbol: Option<&'arena dyn Token>,
+        line: u32,
+        column: i32,
         msg: &str,
         _e: Option<&ANTLRError>,
     ) {
@@ -96,28 +104,33 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ConsoleErrorListener {
 }
 
 // #[derive(Debug)]
-pub(crate) struct ProxyErrorListener<'b, 'a, T> {
-    pub delegates: Ref<'b, Vec<Box<dyn ErrorListener<'a, T>>>>,
+pub(crate) struct ProxyErrorListener<'a, 'input, 'arena, R> {
+    pub delegates: &'a [Box<dyn ErrorListener<'input, 'arena, R> + 'input>],
 }
 
-impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, T> {
+impl<'input, 'arena, R> ErrorListener<'input, 'arena, R>
+    for ProxyErrorListener<'_, 'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
     fn syntax_error(
         &self,
-        _recognizer: &T,
-        offending_symbol: Option<&<T::TF as TokenFactory<'a>>::Inner>,
-        line: isize,
-        column: isize,
+        _recognizer: &R,
+        offending_symbol: Option<&'arena dyn Token>,
+        line: u32,
+        column: i32,
         msg: &str,
         e: Option<&ANTLRError>,
     ) {
-        for listener in self.delegates.deref() {
+        for listener in self.delegates {
             listener.syntax_error(_recognizer, offending_symbol, line, column, msg, e)
         }
     }
 
     fn report_ambiguity(
         &self,
-        recognizer: &T,
+        recognizer: &R,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,
@@ -125,7 +138,7 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, 
         ambig_alts: &BitSet<u32>,
         configs: &ATNConfigSet,
     ) {
-        for listener in self.delegates.deref() {
+        for listener in self.delegates {
             listener.report_ambiguity(
                 recognizer,
                 dfa,
@@ -140,14 +153,14 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, 
 
     fn report_attempting_full_context(
         &self,
-        recognizer: &T,
+        recognizer: &R,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,
         conflicting_alts: &BitSet<u32>,
         configs: &ATNConfigSet,
     ) {
-        for listener in self.delegates.deref() {
+        for listener in self.delegates {
             listener.report_attempting_full_context(
                 recognizer,
                 dfa,
@@ -161,14 +174,14 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, 
 
     fn report_context_sensitivity(
         &self,
-        recognizer: &T,
+        recognizer: &R,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,
         prediction: i32,
         configs: &ATNConfigSet,
     ) {
-        for listener in self.delegates.deref() {
+        for listener in self.delegates {
             listener.report_context_sensitivity(
                 recognizer,
                 dfa,
@@ -197,17 +210,32 @@ impl<'a, T: Recognizer<'a>> ErrorListener<'a, T> for ProxyErrorListener<'_, 'a, 
 ///   truly viable alternative. Two-stage parsing cannot be used for inputs
 ///   where this situation occurs.
 #[derive(Debug)]
-pub struct DiagnosticErrorListener {
+pub struct DiagnosticErrorListener<'input, 'arena, TF>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     exact_only: bool,
+    pd: PhantomData<fn() -> (&'arena TF, &'input str)>,
 }
 
-impl DiagnosticErrorListener {
+impl<'input, 'arena, TF> DiagnosticErrorListener<'input, 'arena, TF>
+where
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     /// When `exact_only` is true, only exactly known ambiguities are reported.
     pub fn new(exact_only: bool) -> Self {
-        Self { exact_only }
+        Self {
+            exact_only,
+            pd: PhantomData,
+        }
     }
 
-    fn get_decision_description<'a, T: Parser<'a>>(&self, recog: &T, dfa: &DFA) -> String {
+    fn get_decision_description<R>(&self, recog: &R, dfa: &DFA) -> String
+    where
+        'input: 'arena,
+        R: Recognizer<'input, 'arena>,
+    {
         let decision = dfa.decision;
         let rule_index = recog.get_atn().states[dfa.atn_start_state as usize].get_rule_index();
 
@@ -239,10 +267,16 @@ impl DiagnosticErrorListener {
     }
 }
 
-impl<'a, T: Parser<'a>> ErrorListener<'a, T> for DiagnosticErrorListener {
+impl<'input, 'arena, TF, P> ErrorListener<'input, 'arena, P>
+    for DiagnosticErrorListener<'input, 'arena, TF>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    P: Parser<'input, 'arena, TF>,
+{
     fn report_ambiguity(
         &self,
-        recognizer: &T,
+        recognizer: &P,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,
@@ -266,7 +300,7 @@ impl<'a, T: Parser<'a>> ErrorListener<'a, T> for DiagnosticErrorListener {
 
     fn report_attempting_full_context(
         &self,
-        recognizer: &T,
+        recognizer: &P,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,
@@ -285,7 +319,7 @@ impl<'a, T: Parser<'a>> ErrorListener<'a, T> for DiagnosticErrorListener {
 
     fn report_context_sensitivity(
         &self,
-        recognizer: &T,
+        recognizer: &P,
         dfa: &DFA,
         start_index: isize,
         stop_index: isize,

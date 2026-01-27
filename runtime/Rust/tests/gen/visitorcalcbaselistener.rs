@@ -6,7 +6,7 @@ use dbt_antlr4::tree::ParseTreeListener;
 // A complete Visitor for a parse tree produced by VisitorCalcParser.
 
 pub trait VisitorCalcBaseListener<'input>:
-    ParseTreeListener<'input, VisitorCalcParserContextType> {
+    ParseTreeListener<'input, VisitorCalcParserContextNode> {
 
     /**
      * Enter a parse tree produced by \{@link VisitorCalcBaseParser#s}.

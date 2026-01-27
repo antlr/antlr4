@@ -9,6 +9,7 @@ use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{ATNState, ATNStateType};
 
 use crate::atn_state::ATNStateType::RuleStopState;
+use crate::char_stream::CharStream;
 use crate::dfa::{DFAState, ProposedDFAState, DFA};
 use crate::errors::ANTLRError;
 use crate::int_stream::{IntStream, EOF};
@@ -20,6 +21,7 @@ use crate::prediction_context::{
 };
 use crate::token::TOKEN_EOF;
 
+use crate::token_factory::TokenFactory;
 use crate::transition::{
     ActionTransition, PredicateTransition, RuleTransition, Transition, TransitionType,
 };
@@ -29,15 +31,19 @@ use crate::utils::cell_update;
 #[doc(hidden)]
 pub trait ILexerATNSimulator: IATNSimulator {
     fn reset(&mut self);
-    fn match_token<'input>(
+    fn match_token<'input, 'arena, Input, TF>(
         &mut self,
         mode: usize,
-        lexer: &mut impl Lexer<'input>,
-    ) -> Result<i32, ANTLRError>;
-    fn get_char_position_in_line(&self) -> isize;
-    fn set_char_position_in_line(&mut self, column: isize);
-    fn get_line(&self) -> isize;
-    fn set_line(&mut self, line: isize);
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> Result<i32, ANTLRError>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena;
+    fn get_char_position_in_line(&self) -> i32;
+    fn set_char_position_in_line(&mut self, column: i32);
+    fn get_line(&self) -> u32;
+    fn set_line(&mut self, line: u32);
     fn consume<T: IntStream + ?Sized>(&self, input: &mut T);
     #[cold]
     fn recover(&mut self, _re: ANTLRError, input: &mut impl IntStream) {
@@ -65,12 +71,17 @@ impl ILexerATNSimulator for LexerATNSimulator {
         self.prev_accept.reset()
     }
 
-    fn match_token<'input>(
+    fn match_token<'input, 'arena, Input, TF>(
         &mut self,
         mode: usize,
         //        input:&mut dyn CharStream,
-        lexer: &mut impl Lexer<'input>,
-    ) -> Result<i32, ANTLRError> {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> Result<i32, ANTLRError>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         self.mode = mode;
         let mark = lexer.input().mark();
         //        println!("start matching on mode {}",mode);
@@ -93,20 +104,20 @@ impl ILexerATNSimulator for LexerATNSimulator {
         result
     }
 
-    fn get_char_position_in_line(&self) -> isize {
+    fn get_char_position_in_line(&self) -> i32 {
         self.current_pos.char_position_in_line.get()
     }
 
-    fn set_char_position_in_line(&mut self, column: isize) {
+    fn set_char_position_in_line(&mut self, column: i32) {
         self.current_pos.char_position_in_line.set(column)
     }
 
-    fn get_line(&self) -> isize {
+    fn get_line(&self) -> u32 {
         self.current_pos.line.get()
     }
 
-    fn set_line(&mut self, line: isize) {
-        self.current_pos.char_position_in_line.set(line)
+    fn set_line(&mut self, line: u32) {
+        self.current_pos.line.set(line)
     }
 
     fn consume<T: IntStream + ?Sized>(&self, _input: &mut T) {
@@ -176,11 +187,16 @@ impl LexerATNSimulator {
     //    }
 
     #[cold]
-    fn match_atn<'input>(
+    fn match_atn<'input, 'arena, Input, TF>(
         &mut self,
-        lexer: &mut impl Lexer<'input>,
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
         dfa: &DFA,
-    ) -> Result<i32, ANTLRError> {
+    ) -> Result<i32, ANTLRError>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         //        let start_state = self.atn().mode_to_start_state.get(self.mode as usize).ok_or(ANTLRError::IllegalStateError("invalid mode".into()))?;
         let atn = self.atn();
         let start_state = *atn
@@ -202,13 +218,18 @@ impl LexerATNSimulator {
         self.exec_atn(next_state, lexer, dfa)
     }
 
-    fn exec_atn<'input, 'dfa>(
+    fn exec_atn<'input, 'arena, 'dfa, Input, TF>(
         &mut self,
         //        input: &'a mut dyn CharStream,
         ds0: &'dfa DFAState<'dfa>,
-        lexer: &mut impl Lexer<'input>,
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
         dfa: &'dfa DFA,
-    ) -> Result<i32, ANTLRError> {
+    ) -> Result<i32, ANTLRError>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         //        if self.get_dfa().states.read().unwrap().get(ds0).unwrap().is_accept_state{
         self.capture_sim_state(lexer.input(), ds0);
         //        }
@@ -255,13 +276,18 @@ impl LexerATNSimulator {
     }
 
     #[cold]
-    fn compute_target_state<'input, 'dfa>(
+    fn compute_target_state<'input, 'arena, 'dfa, Input, TF>(
         &self,
         dfa: &'dfa DFA,
         s: &DFAState<'dfa>,
         _t: i32,
-        lexer: &mut impl Lexer<'input>,
-    ) -> &'dfa DFAState<'dfa> {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> &'dfa DFAState<'dfa>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         let mut reach = ATNConfigSet::new_ordered();
         self.get_reachable_config_set(s.configs(), &mut reach, _t, lexer);
         //        println!(" --- target computed {:?}", reach.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
@@ -287,15 +313,19 @@ impl LexerATNSimulator {
         //        states.get(to).unwrap()
     }
 
-    fn get_reachable_config_set<'input>(
+    fn get_reachable_config_set<'input, 'arena, Input, TF>(
         &self,
         // _states: &V,
         //        _input: &mut dyn CharStream,
         _closure: &ATNConfigSet,
         _reach: &mut ATNConfigSet,
         _t: i32,
-        lexer: &mut impl Lexer<'input>,
-    ) {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         let mut skip_alt = 0;
         //        println!(" --- source {:?}", _closure.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
         for config in _closure.get_items() {
@@ -342,11 +372,16 @@ impl LexerATNSimulator {
     //        unimplemented!()
     //    }
 
-    fn fail_or_accept<'input>(
+    fn fail_or_accept<'input, 'arena, Input, TF>(
         &mut self,
         _t: i32,
-        lexer: &mut impl Lexer<'input>,
-    ) -> Result<i32, ANTLRError> {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> Result<i32, ANTLRError>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         //        println!("fail_or_accept");
         if let Some(state) = self.prev_accept.dfa_state {
             //            let lexer_action_executor;
@@ -381,11 +416,16 @@ impl LexerATNSimulator {
             .set(self.prev_accept.column);
     }
 
-    fn compute_start_state<'input>(
+    fn compute_start_state<'input, 'arena, Input, TF>(
         &self,
         _p: &dyn ATNState,
-        lexer: &mut impl Lexer<'input>,
-    ) -> ATNConfigSet {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> ATNConfigSet
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         //        let initial_context = &EMPTY_PREDICTION_CONTEXT;
         let mut config_set = ATNConfigSet::new_ordered();
 
@@ -402,7 +442,7 @@ impl LexerATNSimulator {
         config_set
     }
 
-    fn closure<'input>(
+    fn closure<'input, 'arena, Input, TF>(
         &self,
         //        _input: &mut dyn CharStream,
         mut config: ATNConfig,
@@ -410,8 +450,13 @@ impl LexerATNSimulator {
         mut _current_alt_reached_accept_state: bool,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
-        lexer: &mut impl Lexer<'input>,
-    ) -> bool {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> bool
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         //        let config = &config;
         let atn = self.atn();
         let state = atn.states[config.get_state() as usize].as_ref();
@@ -493,7 +538,7 @@ impl LexerATNSimulator {
         _current_alt_reached_accept_state
     }
 
-    fn get_epsilon_target<'input>(
+    fn get_epsilon_target<'input, 'arena, Input, TF>(
         &self,
         //        _input: &mut dyn CharStream,
         _config: &mut ATNConfig,
@@ -501,8 +546,13 @@ impl LexerATNSimulator {
         _configs: &mut ATNConfigSet,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
-        lexer: &mut impl Lexer<'input>,
-    ) -> Option<ATNConfig> {
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+    ) -> Option<ATNConfig>
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         let mut result = None;
         let target = self
             .atn()
@@ -574,14 +624,19 @@ impl LexerATNSimulator {
         result
     }
 
-    fn evaluate_predicate<'input, T: Lexer<'input>>(
+    fn evaluate_predicate<'input, 'arena, Input, TF, T: Lexer<'input, 'arena, Input, TF>>(
         &self,
         //        input: &mut dyn CharStream,
         rule_index: i32,
         pred_index: i32,
         speculative: bool,
         lexer: &mut T,
-    ) -> bool {
+    ) -> bool
+    where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         if !speculative {
             return lexer.sempred(None, rule_index, pred_index);
         }
@@ -711,8 +766,8 @@ impl LexerATNSimulator {
 #[derive(Debug)]
 pub(crate) struct SimState<'dfa> {
     index: isize,
-    line: isize,
-    column: isize,
+    line: u32,
+    column: i32,
     dfa_state: Option<&'dfa DFAState<'dfa>>,
 }
 

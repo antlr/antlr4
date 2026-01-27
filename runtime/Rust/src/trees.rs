@@ -2,15 +2,17 @@
 A set of utility routines useful for all kinds of ANTLR trees.
 */
 
-use std::ops::Deref;
-
-use crate::tree::Tree;
+use crate::parser_rule_context::ParserRuleContext;
 use crate::utils;
 
 /// Print out a whole tree, not just a node, in LISP format
 /// {@code (root child1 .. childN)}. Print just a node if this is a leaf.
-pub fn string_tree<'a, T: Tree<'a> + ?Sized>(tree: &T, rule_names: &[&str]) -> String {
-    let s = utils::escape_whitespaces(get_node_text(tree, rule_names), false);
+pub fn string_tree<'input, 'arena, T>(tree: &T, rule_names: &[&str]) -> String
+where
+    'input: 'arena,
+    T: ParserRuleContext<'input, 'arena> + ?Sized,
+{
+    let s = utils::escape_whitespaces(tree.get_node_text(rule_names), false);
     if tree.get_child_count() == 0 {
         return s;
     }
@@ -18,9 +20,9 @@ pub fn string_tree<'a, T: Tree<'a> + ?Sized>(tree: &T, rule_names: &[&str]) -> S
     result.push('(');
     result.push_str(&s);
     result = tree
-        .get_children()
+        .iter_children()
         // .iter()
-        .map(|child| string_tree(child.deref(), rule_names))
+        .map(|child| string_tree(child, rule_names))
         .fold(result, |mut acc, text| {
             acc.push(' ');
             acc.push_str(&text);
@@ -28,11 +30,6 @@ pub fn string_tree<'a, T: Tree<'a> + ?Sized>(tree: &T, rule_names: &[&str]) -> S
         });
     result.push(')');
     result
-}
-
-/// Print out tree node text representation (rule name or token text)
-pub fn get_node_text<'a>(t: &(impl Tree<'a> + ?Sized), rule_names: &[&str]) -> String {
-    t.get_node_text(rule_names)
 }
 
 //pub fn get_children(t: impl Tree) -> Vec<Rc<dyn Tree>> { unimplemented!() }

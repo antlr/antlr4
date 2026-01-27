@@ -9,18 +9,30 @@ use crate::token_stream::{TokenStream, UnbufferedTokenStream};
 
 /// Default token stream that skips token that not correspond to current channel.
 #[derive(Debug)]
-pub struct CommonTokenStream<'input, T: TokenSource<'input>> {
-    base: UnbufferedTokenStream<'input, T>,
+pub struct CommonTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    base: UnbufferedTokenStream<'input, 'arena, TS, TF>,
     channel: i32,
 }
 
-impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
-    pub fn base(&self) -> &UnbufferedTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> CommonTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
+    pub fn base(&self) -> &UnbufferedTokenStream<'input, 'arena, TS, TF> {
         &self.base
     }
 }
 
-impl<'input, T: TokenSource<'input>> IntStream for CommonTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> IntStream for CommonTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     #[inline]
     fn consume(&mut self) {
         self.base.consume();
@@ -66,11 +78,14 @@ impl<'input, T: TokenSource<'input>> IntStream for CommonTokenStream<'input, T> 
     }
 }
 
-impl<'input, T: TokenSource<'input>> TokenStream<'input> for CommonTokenStream<'input, T> {
-    type TF = T::TF;
-
+impl<'input, 'arena, TS, TF> TokenStream<'input, 'arena, TF>
+    for CommonTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     #[inline(always)]
-    fn lt(&mut self, k: isize) -> Option<&<Self::TF as TokenFactory<'input>>::Tok> {
+    fn lt(&mut self, k: isize) -> Option<&'arena TF::Tok> {
         if k == 0 {
             return None;
         }
@@ -81,11 +96,11 @@ impl<'input, T: TokenSource<'input>> TokenStream<'input> for CommonTokenStream<'
     }
 
     #[inline]
-    fn get(&self, index: isize) -> &<Self::TF as TokenFactory<'input>>::Tok {
+    fn get(&self, index: isize) -> &'arena TF::Tok {
         self.base.get(index)
     }
 
-    fn get_token_source(&self) -> &dyn TokenSource<'input, TF = Self::TF> {
+    fn get_token_source(&self) -> &dyn TokenSource<'input, 'arena, TF> {
         self.base.get_token_source()
     }
 
@@ -94,14 +109,18 @@ impl<'input, T: TokenSource<'input>> TokenStream<'input> for CommonTokenStream<'
     }
 }
 
-impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
+impl<'input, 'arena, TS, TF> CommonTokenStream<'input, 'arena, TS, TF>
+where
+    TS: TokenSource<'input, 'arena, TF>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+{
     /// Creates CommonTokenStream that produces tokens from `TOKEN_DEFAULT_CHANNEL`
-    pub fn new(lexer: T) -> CommonTokenStream<'input, T> {
+    pub fn new(lexer: TS) -> CommonTokenStream<'input, 'arena, TS, TF> {
         Self::with_channel(lexer, TOKEN_DEFAULT_CHANNEL)
     }
 
     /// Creates CommonTokenStream that produces tokens from `channel`
-    pub fn with_channel(lexer: T, channel: i32) -> CommonTokenStream<'input, T> {
+    pub fn with_channel(lexer: TS, channel: i32) -> CommonTokenStream<'input, 'arena, TS, TF> {
         let mut r = CommonTokenStream {
             base: UnbufferedTokenStream::new_buffered(lexer),
             channel,
@@ -120,7 +139,7 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
         self.base.get_dfa_string()
     }
 
-    fn lt_inner(&mut self, k: isize) -> Option<&<T::TF as TokenFactory<'input>>::Tok> {
+    fn lt_inner(&mut self, k: isize) -> Option<&'arena TF::Tok> {
         let mut i = self.base.p;
         let mut n = 1; // we know tokens[p] is a good one
                        // find k good tokens
@@ -132,7 +151,7 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
             n += 1;
         }
         //		if ( i>range ) range = i;
-        self.base.tokens.get(i as usize)
+        self.base.tokens.get(i as usize).copied()
     }
 
     /// Restarts this token stream
@@ -211,10 +230,7 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
     //
     //    fn adjust_seek_index(&self, i: isize) -> int { unimplemented!() }
 
-    fn lb(
-        &mut self,
-        k: isize,
-    ) -> Option<&<<Self as TokenStream<'input>>::TF as TokenFactory<'input>>::Tok> {
+    fn lb(&mut self, k: isize) -> Option<&'arena TF::Tok> {
         if k == 0 || (self.base.p - k) < 0 {
             return None;
         }
@@ -231,7 +247,7 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
             return None;
         }
 
-        self.base.tokens.get(i as usize)
+        self.base.tokens.get(i as usize).copied()
     }
 
     //    fn get_number_of_on_channel_tokens(&self) -> int { unimplemented!() }

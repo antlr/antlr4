@@ -89,6 +89,10 @@ pub use prediction_context::PredictionContextCache;
 #[doc(inline)]
 pub use prediction_mode::PredictionMode;
 
+#[doc(inline)]
+pub use arena::Arena;
+
+mod arena;
 #[doc(hidden)]
 pub mod atn_config;
 #[doc(hidden)]
@@ -149,68 +153,687 @@ pub mod vocabulary;
 //#[cfg(test)]
 // tests are either integration tests in "tests" foulder or unit tests in some modules
 
-use std::rc::Rc;
-/// Stable workaround for CoerceUnsized
-// #[doc(hidden)]
-pub trait CoerceFrom<T> {
-    fn coerce_rc(from: Rc<T>) -> Rc<Self>;
-    fn coerce_box(from: Box<T>) -> Box<Self>;
-    fn coerce_ref(from: &T) -> &Self;
-    fn coerce_mut(from: &mut T) -> &mut Self;
-}
-
-#[doc(hidden)]
 #[macro_export]
-macro_rules! coerce_from {
-    ($lt:lifetime : $p:path) => {
-        const _: () = {
-            use std::rc::Rc;
-            impl<$lt, T> $crate::CoerceFrom<T> for dyn $p + $lt
-            where
-                T: $p + $lt,
-            {
-                fn coerce_rc(from: Rc<T>) -> Rc<Self> {
-                    from as _
-                }
-                fn coerce_box(from: Box<T>) -> Box<Self> {
-                    from as _
-                }
-                fn coerce_ref(from: &T) -> &Self {
-                    from as _
-                }
-                fn coerce_mut(from: &mut T) -> &mut Self {
-                    from as _
+macro_rules! impl_tree {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($enum_name:ident { $($variant:ident,)+ }) => {
+        impl<'input, 'arena> Tree<'arena> for $enum_name<'input, 'arena> {
+            fn get_parent(&self) -> Option<&'arena Self> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_parent(), )+
+                    _ => None,
                 }
             }
-        };
+
+            fn has_parent(&self) -> bool {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.has_parent(), )+
+                    _ => false,
+                }
+            }
+
+            // fn get_payload(&self) -> Box<dyn std::any::Any> {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => Tree::get_payload(inner), )+
+            //     }
+            // }
+
+            fn get_child(&self, i: usize) -> Option<&'arena Self> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_child(i), )+
+                    _ => None,
+                }
+            }
+
+            fn get_child_count(&self) -> usize {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_child_count(), )+
+                    _ => 0,
+                }
+            }
+
+            fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Self> + 'a> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_children(), )+
+                    _ => Box::new(std::iter::empty()) as Box<dyn Iterator<Item = &'arena Self>>,
+                }
+            }
+
+            // fn to_string_tree(&self) -> String {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => Tree::to_string_tree(inner), )+
+            //     }
+            // }
+        }
     };
 }
 
-/// Stable workaround for CoerceUnsized
-// #[doc(hidden)]
-pub trait CoerceTo<T: ?Sized> {
-    fn coerce_rc_to(self: Rc<Self>) -> Rc<T>;
-    fn coerce_box_to(self: Box<Self>) -> Box<T>;
-    fn coerce_ref_to(&self) -> &T;
-    fn coerce_mut_to(&mut self) -> &mut T;
+#[macro_export]
+macro_rules! impl_parse_tree {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($enum_name:ident { $($variant:ident,)+ }) => {
+        impl<'input, 'arena> ParseTree<'input, 'arena> for $enum_name<'input, 'arena> {
+            // fn get_source_interval(&self) -> crate::interval_set::Interval {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_source_interval(), )+
+            //         _ => crate::interval_set::Interval::new_empty(),
+            //     }
+            // }
+
+            // fn get_text(&self) -> String {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_text(), )+
+            //         _ => String::new(),
+            //     }
+            // }
+        }
+    };
 }
 
-impl<T: ?Sized, X> CoerceTo<T> for X
-where
-    T: CoerceFrom<X>,
-{
-    fn coerce_rc_to(self: Rc<Self>) -> Rc<T> {
-        T::coerce_rc(self)
-    }
-    fn coerce_box_to(self: Box<Self>) -> Box<T> {
-        T::coerce_box(self)
-    }
+#[macro_export]
+macro_rules! impl_rule_node_common {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($enum_name:ident { $($variant:ident,)+ }) => {
+        fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
+            match self {
+                // Generate a match arm for every variant
+                $( $enum_name::$variant(inner) => inner as &dyn ParserRuleContext<'input, 'arena>, )+
+                $enum_name::Terminal(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
+                $enum_name::Error(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
+            }
+        }
 
-    fn coerce_ref_to(&self) -> &T {
-        T::coerce_ref(self)
-    }
+        fn as_terminal_node(&self) -> Option<&TerminalNode<'input, 'arena>> {
+            match self {
+                $enum_name::Terminal(inner) => Some(inner),
+                _ => None,
+            }
+        }
 
-    fn coerce_mut_to(&mut self) -> &mut T {
-        T::coerce_mut(self)
-    }
+        fn as_terminal_node_mut(&mut self) -> Option<&mut TerminalNode<'input, 'arena>> {
+            match self {
+                $enum_name::Terminal(inner) => Some(inner),
+                _ => None,
+            }
+        }
+
+        fn as_error_node(&self) -> Option<&ErrorNode<'input, 'arena>> {
+            match self {
+                $enum_name::Error(inner) => Some(inner),
+                _ => None,
+            }
+        }
+
+        fn as_error_node_mut(&mut self) -> Option<&mut ErrorNode<'input, 'arena>> {
+            match self {
+                $enum_name::Error(inner) => Some(inner),
+                _ => None,
+            }
+        }
+
+        fn set_exception(&self, e: $crate::errors::ANTLRError) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_exception(e), )+
+                _ => {}
+            }
+        }
+
+        fn set_invoking_state(&mut self, t: i32) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_invoking_state(t), )+
+                _ => {}
+            }
+        }
+
+        fn set_alt_number(&mut self, alt_number: i32) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_alt_number(alt_number), )+
+                _ => {}
+            }
+        }
+
+        fn set_start(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_start(t), )+
+                _ => {}
+            }
+        }
+
+        fn set_stop(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_stop(t), )+
+                _ => {}
+            }
+        }
+
+        fn remove_last_child(&mut self) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.remove_last_child(), )+
+                _ => {}
+            }
+        }
+
+        fn add_child(&mut self, child: &'arena Self) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.add_child(child), )+
+                _ => {}
+            }
+        }
+
+        fn set_parent(&mut self, parent: Option<&'arena Self>) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_parent(parent), )+
+                _ => {}
+            }
+        }
+
+        unsafe fn set_self_ref(&mut self, self_ref: *const Self) {
+            match self {
+                $( $enum_name::$variant(inner) => inner.set_self_ref(self_ref), )+
+                _ => {}
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_rule_node {
+    // No Listener and no Visitor
+    ($enum_name:ident { $($variant:ident,)+ }; ) => {
+        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+            type Listener = dyn ParseTreeListener<'input, 'arena, Self>;
+
+            $crate::impl_rule_node_common! { $enum_name { $($variant,)+ } }
+
+            fn enter_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                Ok(())
+            }
+
+            fn exit_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                Ok(())
+            }
+        }
+    };
+
+    // Just Visitor
+    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($visit_method:ident),)* }; visitor = $visitor:ty, ) => {
+        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+            type listener = dyn ParseTreeListener<'input, 'arena, Self>;
+
+            $crate::impl_rule_node_common! { $enum_name { $( $labeled_variant,)* $($variant,)* } }
+
+            fn enter_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                Ok(())
+            }
+
+            fn exit_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                Ok(())
+            }
+
+            // fn accept(&self, visitor: &mut Self::Visitor) -> Result<<Self::Visitor as ParseTreeVisitor<'input, 'arena, Self>>::Return, ANTLRError>
+            // {
+            //     match self {
+            //         $( $enum_name::$labeled_variant(inner) => inner.dispatch_visit(visitor), )*
+            //         $( $enum_name::$variant(inner) => visitor.$visit_method(inner), )*
+            //         $enum_name::Terminal(inner) => { visitor.visit_terminal(inner) },
+            //         $enum_name::Error(inner) => { visitor.visit_error_node(inner) },
+            //     }
+            // }
+        }
+    };
+
+    // Just Listener
+    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($enter_method:ident, $exit_method:ident, ),)* }; listener = $listener:ty, ) => {
+        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+            type Listener = $listener;
+
+            $crate::impl_rule_node_common! { $enum_name { $( $labeled_variant,)* $($variant,)* } }
+
+            fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match self {
+                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_enter(listener), )*
+                    $( $enum_name::$variant(inner) => listener.$enter_method(inner), )*
+                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
+                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+                }
+            }
+
+            fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match self {
+                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_exit(listener), )*
+                    $( $enum_name::$variant(inner) => listener.$exit_method(inner), )*
+                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
+                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+                }
+            }
+        }
+    };
+
+    // Both listener and visitor
+    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($enter_method:ident, $exit_method:ident, $visit_method:ident),)* }; listener = $listener:ty, visitor = $visitor:ident, ) => {
+        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+            type Listener = $listener;
+
+            $crate::impl_rule_node_common! { $enum_name { $($labeled_variant,)* $($variant,)* } }
+
+            fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match self {
+                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_enter(listener), )*
+                    $( $enum_name::$variant(inner) => listener.$enter_method(inner), )*
+                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
+                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+                }
+            }
+
+            fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match self {
+                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_exit(listener), )*
+                    $( $enum_name::$variant(inner) => listener.$exit_method(inner), )*
+                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
+                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+                }
+            }
+        }
+
+        impl<'input, 'arena> Visitable<'input, 'arena> for $enum_name<'input, 'arena>
+        where
+            'input: 'arena,
+        {
+            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            where
+                V: $visitor<'input, 'arena> + ?Sized,
+            {
+                match self {
+                    $( $enum_name::$labeled_variant(inner) => inner.accept(visitor), )*
+                    $( $enum_name::$variant(inner) => visitor.$visit_method(inner), )+
+                    $enum_name::Terminal(inner) => { visitor.visit_terminal(inner) },
+                    $enum_name::Error(inner) => { visitor.visit_error_node(inner) },
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_listener_dispatch {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($listener:ident::$node_name:ident::$enum_name:ident { $($variant:ident($enter_method:ident, $exit_method:ident),)+ }) => {
+        impl<'input, 'arena> $enum_name<'input, 'arena>
+        where
+            'input: 'arena,
+        {
+            fn dispatch_enter(&self, listener: &mut (dyn $listener<'input, 'arena> + 'static)) -> Result<(), ANTLRError>
+            {
+                match self {
+                    $( $enum_name::$variant(inner) => listener.$enter_method(inner), )+
+                    $enum_name::Error(_) => Ok(()),
+                }
+            }
+
+            fn dispatch_exit(&self, listener: &mut (dyn $listener<'input, 'arena> + 'static)) -> Result<(), ANTLRError>
+            {
+                match self {
+                    $( $enum_name::$variant(inner) => listener.$exit_method(inner), )+
+                    $enum_name::Error(_) => Ok(()),
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_visitable {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($visitor:ident::$enum_name:ident { $($variant:ident($visit_method:ident),)+ }) => {
+        impl<'input, 'arena> Visitable<'input, 'arena> for $enum_name<'input, 'arena> {
+            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            where
+                V: $visitor<'input, 'arena> + ?Sized,
+            {
+                match self {
+                    $( $enum_name::$variant(inner) => visitor.$visit_method(inner), )+
+                    $enum_name::Error(_) => Ok(Default::default()),
+                }
+            }
+        }
+    };
+    ($visitor:ident::$ctx_name:ident($visit_method:ident)) => {
+        impl<'input, 'arena> Visitable<'input, 'arena> for $ctx_name<'input, 'arena> {
+            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            where
+                V: $visitor<'input, 'arena> + ?Sized,
+            {
+                visitor.$visit_method(self)
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_rule_context {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($enum_name:ident { $($variant:ident,)+ }) => {
+        impl<'input, 'arena> RuleContext<'input, 'arena> for $enum_name<'input, 'arena> {
+            fn get_rule_index(&self) -> usize {
+                match self {
+                    // Generate a match arm for every variant
+                    $( $enum_name::$variant(inner) => RuleContext::get_rule_index(inner), )+
+                }
+            }
+
+            fn get_alt_number(&self) -> i32 {
+                match self {
+                    $( $enum_name::$variant(inner) => RuleContext::get_alt_number(inner), )+
+                }
+            }
+
+            fn get_invoking_state(&self) -> i32 {
+                match self {
+                    $( $enum_name::$variant(inner) => RuleContext::get_invoking_state(inner), )+
+                }
+            }
+
+            fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => RuleContext::get_parent_ctx(inner), )+
+                }
+            }
+
+            fn get_node_text(&self, rule_names: &[&str]) -> String {
+                match self {
+                    $( $enum_name::$variant(inner) => RuleContext::get_node_text(inner, rule_names), )+
+                }
+            }
+
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_parser_rule_context {
+    // Pattern: EnumName { Variant1, Variant2, ... }
+    ($enum_name:ident { $($variant:ident,)+ }) => {
+        impl<'input, 'arena> ParserRuleContext<'input, 'arena> for $enum_name<'input, 'arena> {
+            fn start(&self) -> &'arena dyn $crate::token::Token {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::start(inner), )+
+                }
+            }
+
+            fn stop(&self) -> &'arena dyn $crate::token::Token {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::stop(inner), )+
+                }
+            }
+
+            fn get_parent_ctx(&self) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_parent_ctx(inner), )+
+                }
+            }
+
+            fn get_child_ctx(&self, _i: usize) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_child_ctx(inner, _i), )+
+                }
+            }
+
+            fn get_child_count(&self) -> usize {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_child_count(inner), )+
+                }
+            }
+
+            fn iter_children<'a>(
+                &'a self,
+            ) -> Box<dyn Iterator<Item = &'arena dyn ParserRuleContext<'input, 'arena>> + 'a>
+            where
+                'input: 'a,
+                'arena: 'a,
+            {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::iter_children(inner), )+
+                }
+            }
+
+            fn get_token(&self, _ttype: i32, _pos: usize) -> Option<&TerminalNode<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_token(inner, _ttype, _pos), )+
+                }
+            }
+
+            fn get_tokens(&self, _ttype: i32) -> Vec<&TerminalNode<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_tokens(inner, _ttype), )+
+                }
+            }
+
+            fn get_text(&self) -> String {
+                match self {
+                    $( $enum_name::$variant(inner) => ParserRuleContext::get_text(inner), )+
+                }
+            }
+       }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_from_contexts {
+    ($enum_name:ident { $($variant:ident($inner:ident)),+ $(,)? }) => {
+        $(
+            impl<'input, 'arena> From<$inner<'input, 'arena>> for $enum_name<'input, 'arena> {
+                fn from(ctx: $inner<'input, 'arena>) -> Self {
+                    $enum_name::$variant(ctx)
+                }
+            }
+        )+
+    };
+}
+
+#[macro_export]
+macro_rules! impl_defaults {
+    ($enum_name:ident) => {
+        impl<'input, 'arena> From<TerminalNode<'input, 'arena>> for $enum_name<'input, 'arena> {
+            fn from(node: TerminalNode<'input, 'arena>) -> Self {
+                $enum_name::Terminal(node)
+            }
+        }
+
+        impl<'input, 'arena> From<ErrorNode<'input, 'arena>> for $enum_name<'input, 'arena> {
+            fn from(node: ErrorNode<'input, 'arena>) -> Self {
+                $enum_name::Error(node)
+            }
+        }
+
+        impl<'input, 'arena> Default for $enum_name<'input, 'arena> {
+            fn default() -> Self {
+                Self::Error(ErrorNode::default())
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_into_base_ext {
+    ($enum_name:ident::$base_name:ident { $($variant:ident),+ $(,)? }) => {
+        impl<'input, 'arena> $enum_name<'input, 'arena> {
+            fn into_base_ext(self) -> $base_name<'input, 'arena> {
+                match self {
+                    $(
+                        $enum_name::$variant(inner) => inner.morph(|ctx| ctx.base),
+                    )+
+                    $enum_name::Error(inner) => inner,
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_tree_trait_delegates {
+    ($node_name:ident::$enum_name:ident { $($variant:ident),+ $(,)? }) => {
+        impl<'input, 'arena> $enum_name<'input, 'arena> {
+            fn get_parent(&self) -> Option<&'arena $node_name<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_parent(), )+
+                }
+            }
+
+            fn has_parent(&self) -> bool {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.has_parent(), )+
+                }
+            }
+
+            fn get_child(&self, i: usize) -> Option<&'arena $node_name<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_child(i), )+
+                }
+            }
+
+            fn get_child_count(&self) -> usize {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_child_count(), )+
+                }
+            }
+
+            fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena $node_name<'input, 'arena>> + 'a> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_children(), )+
+                }
+            }
+
+            fn set_start(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_start(t), )+
+                }
+            }
+
+            fn set_stop(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_stop(t), )+
+                }
+            }
+
+            fn set_parent(&mut self, parent: Option<&'arena $node_name<'input, 'arena>>) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_parent(parent), )+
+                }
+            }
+
+            fn set_invoking_state(&mut self, t: i32) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_invoking_state(t), )+
+                }
+            }
+
+            fn set_alt_number(&mut self, alt_number: i32) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_alt_number(alt_number), )+
+                }
+            }
+
+            fn set_exception(&self, e: $crate::errors::ANTLRError) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_exception(e), )+
+                }
+            }
+
+            fn remove_last_child(&mut self) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.remove_last_child(), )+
+                }
+            }
+
+            fn add_child(&mut self, child: &'arena $node_name<'input, 'arena>) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.add_child(child), )+
+                }
+            }
+
+            unsafe fn set_self_ref(&mut self, self_ref: *const $node_name<'input, 'arena>) {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.set_self_ref(self_ref), )+
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_node_inner {
+    ($node_name:ident::$variant_name:ident::$enum_name:ident { $($variant:ident),+ $(,)? }) => {
+        impl<'input, 'arena> NodeInner<'input, 'arena, $node_name<'input, 'arena>>
+            for $enum_name<'input, 'arena>
+        {
+            fn cast_from<'a>(node: &'a $node_name<'input, 'arena>) -> Option<&'a Self> {
+                match node {
+                    $node_name::$variant_name(inner) => Some(inner),
+                    _ => None,
+                }
+            }
+
+            fn cast_from_mut<'a>(node: &'a mut $node_name<'input, 'arena>) -> Option<&'a mut Self>
+            where
+                Self: Sized,
+            {
+                match node {
+                    $node_name::$variant_name(inner) => Some(inner),
+                    _ => None,
+                }
+            }
+
+            fn try_as_node(&'arena self) -> Option<&'arena $node_name<'input, 'arena>> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.try_as_node(), )+
+                }
+            }
+
+            fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena $node_name<'input, 'arena>> + 'a> {
+                match self {
+                    $( $enum_name::$variant(inner) => inner.get_children(), )+
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_token_source {
+    ($lexer:ident) => {
+        impl<'input, 'arena, Input, TF> $crate::TokenSource<'input, 'arena, TF>
+            for $lexer<'input, 'arena, Input, TF>
+        where
+            TF: $crate::token_factory::TokenFactory<'input, 'arena> + 'arena,
+            Input: $crate::char_stream::CharStream<'input>,
+        {
+            fn next_token(&mut self) -> &'arena mut TF::Tok {
+                self.base.next_token()
+            }
+
+            fn get_line(&self) -> u32 {
+                self.base.get_line()
+            }
+
+            fn get_char_position_in_line(&self) -> i32 {
+                self.base.get_char_position_in_line()
+            }
+
+            fn get_input_stream(&mut self) -> Option<&mut dyn $crate::int_stream::IntStream> {
+                self.base.get_input_stream()
+            }
+
+            fn get_source_name(&self) -> String {
+                self.base.get_source_name()
+            }
+
+            fn get_token_factory(&self) -> &TF {
+                self.base.get_token_factory()
+            }
+
+            fn get_dfa_string(&self) -> String {
+                self.base.get_dfa_string()
+            }
+        }
+    };
 }

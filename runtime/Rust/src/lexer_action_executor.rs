@@ -2,10 +2,11 @@ use std::hash::{Hash, Hasher};
 
 use murmur3::murmur3_32::MurmurHasher;
 
-use crate::int_stream::IntStream;
+use crate::char_stream::CharStream;
 use crate::lexer::Lexer;
 use crate::lexer_action::LexerAction;
 use crate::lexer_action::LexerAction::LexerIndexedCustomAction;
+use crate::token_factory::TokenFactory;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub(crate) struct LexerActionExecutor {
@@ -63,7 +64,15 @@ impl LexerActionExecutor {
         self
     }
 
-    pub fn execute<'input>(&self, lexer: &mut impl Lexer<'input>, start_index: isize) {
+    pub fn execute<'input, 'arena, Input, TF>(
+        &self,
+        lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
+        start_index: isize,
+    ) where
+        'input: 'arena,
+        Input: CharStream<'input>,
+        TF: TokenFactory<'input, 'arena> + 'arena,
+    {
         let mut requires_seek = false;
         let stop_index = lexer.input().index();
         for action in self.lexer_actions.iter() {
