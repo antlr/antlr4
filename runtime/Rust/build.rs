@@ -2,6 +2,8 @@ use std::env;
 use std::error::Error;
 use std::process::Command;
 
+const TOOL_VERSION: &str = "4.13.3-DBT100";
+
 fn main() {
     let grammars = vec![
         "VisitorBasic",
@@ -22,16 +24,16 @@ fn main() {
         None,
         None,
     ];
-    let antlr_path = "../../../tool/target/antlr4-4.13.3-DBT51-complete.jar";
+    let antlr_path = format!("../../../tool/target/antlr4-{}-complete.jar", TOOL_VERSION);
 
     for (grammar, arg) in grammars.into_iter().zip(additional_args) {
         //ignoring error because we do not need to run anything when deploying to crates.io
-        let _ = gen_for_grammar(grammar, antlr_path, arg);
+        let _ = gen_for_grammar(grammar, &antlr_path, arg);
     }
 
     println!("cargo:rerun-if-changed=build.rs");
 
-    println!("cargo:rerun-if-changed=../../../tool/target/antlr4-4.13.3-DBT51-complete.jar");
+    println!("cargo:rerun-if-changed={}", antlr_path);
 }
 
 fn gen_for_grammar(

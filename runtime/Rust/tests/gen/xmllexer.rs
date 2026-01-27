@@ -89,7 +89,7 @@ where
     Input: CharStream<'input>,
 {
     pub fn new(arena: &'arena Arena, input: Input) -> Self {
-        dbt_antlr4::recognizer::check_version("0","51");
+        dbt_antlr4::recognizer::check_version("1","0");
         let token_factory = TF::new(arena);
         let actions = XMLLexerActions {
         };
