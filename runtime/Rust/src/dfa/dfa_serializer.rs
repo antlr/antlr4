@@ -1,8 +1,7 @@
 use std::fmt::{Display, Formatter};
 
-use crate::dfa::DFA;
-use crate::dfa_state::DFAState;
-use crate::lexer_atn_simulator::ERROR_DFA_STATE_REF;
+use super::dfa_state::DFAState;
+use super::DFA;
 
 pub struct DFASerializer<'a, 'b> {
     dfa: &'a DFA,
@@ -11,20 +10,18 @@ pub struct DFASerializer<'a, 'b> {
 
 impl Display for DFASerializer<'_, '_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let dfa = &self.dfa.states;
-        dfa.for_each(|source| {
-            for (i, edge) in source.enumerate_edges() {
-                if edge != 0 && edge != ERROR_DFA_STATE_REF {
-                    let target = &dfa.get_state(edge).expect("DFA state not found");
-                    let _ = f.write_fmt(format_args!(
-                        "{}-{}->{}\n",
-                        self.get_state_string(source),
-                        (self.get_edge_label)(i),
-                        self.get_state_string(target)
-                    ));
-                }
+        let states = self.dfa.get_states();
+        for source in states {
+            for (i, target) in source.enumerate_edges() {
+                f.write_fmt(format_args!(
+                    "{}-{}->{}\n",
+                    self.get_state_string(source),
+                    (self.get_edge_label)(i),
+                    self.get_state_string(target)
+                ))?;
             }
-        });
+        }
+
         Ok(())
     }
 }
@@ -44,7 +41,7 @@ impl DFASerializer<'_, '_> {
         let mut base_str = format!(
             "{}s{}{}",
             if state.is_accept_state { ":" } else { "" },
-            state.state_number - 1,
+            state.state_number,
             if state.requires_full_context { "^" } else { "" },
         );
         if state.is_accept_state {

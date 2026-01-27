@@ -559,7 +559,7 @@ pub struct PredictionContextCache {
 }
 
 #[doc(hidden)]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct MurmurHasherBuilder {}
 
 impl BuildHasher for MurmurHasherBuilder {

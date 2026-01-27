@@ -17,12 +17,10 @@ use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::ATNStateType::RuleStopState;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, ATNStateType, ATNSTATE_BLOCK_END};
-use crate::dfa::{ScopeExt, DFA};
-use crate::dfa_state::{DFAState, DFAStateRef, PredPrediction};
+use crate::dfa::{DFAState, PredPrediction, ProposedDFAState, ScopeExt, DFA};
 use crate::errors::ANTLRError;
 use crate::int_stream::EOF;
 use crate::interval_set::IntervalSet;
-use crate::lexer_atn_simulator::ERROR_DFA_STATE_REF;
 use crate::parser::{Parser, ParserNodeType};
 
 use crate::prediction_context::{
@@ -171,7 +169,7 @@ impl ParserATNSimulator {
                         local.precedence, /*parser.get_precedence()*/
                     )
                 } else {
-                    dfa.get_s0()
+                    dfa.s0()
                 }
             };
 
@@ -185,21 +183,14 @@ impl ParserATNSimulator {
                 );
 
                 if local.dfa_ref.is_precedence_dfa() {
-                    let s0 = local.dfa_ref.get_s0().unwrap();
                     let s0_closure_updated = self.apply_precedence_filter(&s0_closure, &mut local);
 
                     {
                         //let mut dfa_mut = local.dfa_ref.borrow_mut();
                         let dfa_ref = local.dfa_ref;
-                        dfa_ref
-                            .states
-                            .get_state(s0)
-                            .expect("DFA state not found")
-                            .set_configs(Box::new(s0_closure));
-                        let new_s0 = self.add_dfastate(
-                            dfa_ref,
-                            DFAState::new_dfastate(self.atn(), 0, Box::new(s0_closure_updated)),
-                        );
+                        dfa_ref.set_s0_configs(Box::new(s0_closure));
+                        let new_s0 =
+                            self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated));
 
                         dfa_ref.set_precedence_start_state(local.precedence, new_s0);
                         new_s0
@@ -207,10 +198,7 @@ impl ParserATNSimulator {
                 } else {
                     //let mut dfa_mut = local.dfa_ref.borrow_mut();
                     let dfa_ref = local.dfa_ref;
-                    let s0 = self.add_dfastate(
-                        dfa_ref,
-                        DFAState::new_dfastate(self.atn(), 0, Box::new(s0_closure)),
-                    );
+                    let s0 = self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure));
                     dfa_ref.set_s0(s0);
                     s0
                 }
@@ -226,10 +214,10 @@ impl ParserATNSimulator {
     }
 
     #[allow(non_snake_case)]
-    fn exec_atn<'a, T: Parser<'a>>(
-        &self,
-        local: &mut Local<'_, 'a, T>,
-        s0: DFAStateRef,
+    fn exec_atn<'a, 'input, T: Parser<'input>>(
+        &'a self,
+        local: &mut Local<'a, 'input, T>,
+        s0: &'a DFAState<'a>,
     ) -> Result<i32, ANTLRError> {
         let mut previousD = s0;
 
@@ -237,29 +225,19 @@ impl ParserATNSimulator {
 
         loop {
             //            println!("exec atn loop previous D {}",previousD as i32 -1);
-            let D = if let Some(s) = {
-                let dfa = local.dfa_ref;
-                Self::get_existing_target_state(dfa, previousD, token)
-            } {
+            let D = if let Some(s) = { Self::get_existing_target_state(previousD, token) } {
                 s
             } else {
                 self.compute_target_state(previousD, token, local)
             };
-            debug_assert!(D > 0);
 
             // let dfa = local.dfa.take().unwrap();
             // let states = &dfa.states;
-            if D == ERROR_DFA_STATE_REF {
-                let previousDstate = local
-                    .dfa_ref
-                    .states
-                    .get_state(previousD)
-                    .expect("DFA state not found");
-                let err =
-                    self.no_viable_alt(local, previousDstate.configs(), self.start_index.get());
+            if D.is_error_state() {
+                let err = self.no_viable_alt(local, previousD.configs(), self.start_index.get());
                 local.input().seek(self.start_index.get());
                 let alt = self.get_syn_valid_or_sem_invalid_alt_that_finished_decision_entry_rule(
-                    previousDstate.configs(),
+                    previousD.configs(),
                     local,
                 );
                 if alt != INVALID_ALT {
@@ -269,7 +247,7 @@ impl ParserATNSimulator {
             }
 
             let dfa = local.dfa_ref;
-            let Dstate = dfa.states.get_state(D).expect("DFA state not found");
+            let Dstate = D;
             if Dstate.requires_full_context && self.prediction_mode.get() != PredictionMode::SLL {
                 let mut conflicting_alts = Dstate.configs().conflicting_alts.clone(); //todo get rid of clone?
                 if !Dstate.predicates.is_empty() {
@@ -355,44 +333,31 @@ impl ParserATNSimulator {
     }
 
     #[allow(non_snake_case)]
-    fn get_existing_target_state(dfa: &DFA, previousD: DFAStateRef, t: i32) -> Option<DFAStateRef> {
-        dfa.states
-            .get_state(previousD)
-            .expect("DFA state not found")
-            .get_edge((t + 1) as usize)
+    fn get_existing_target_state<'dfa>(
+        previousD: &DFAState<'dfa>,
+        t: i32,
+    ) -> Option<&'dfa DFAState<'dfa>> {
+        previousD.get_edge((t + 1) as usize)
     }
 
     #[allow(non_snake_case)]
-    fn compute_target_state<'a, T: Parser<'a>>(
-        &self,
+    fn compute_target_state<'a, 'input, T: Parser<'input>>(
+        &'a self,
         // dfa: &mut DFA,
-        previousD: DFAStateRef,
+        previousD: &'a DFAState<'a>,
         t: i32,
-        local: &mut Local<'_, 'a, T>,
-    ) -> DFAStateRef {
+        local: &mut Local<'a, 'input, T>,
+    ) -> &'a DFAState<'a> {
         //        println!("source config {:?}",dfa.states.read()[previousD].configs.as_ref());
         let reach = {
-            let dfa = local.dfa_ref;
-            let closure = dfa
-                .states
-                .get_state(previousD)
-                .expect("DFA state not found")
-                .configs();
+            let closure = previousD.configs();
             self.compute_reach_set(closure, t, false, local)
         };
 
         let reach = match reach {
             None => {
-                self.add_dfaedge(
-                    local
-                        .dfa_ref
-                        .states
-                        .get_state(previousD)
-                        .expect("DFA state not found"),
-                    t,
-                    ERROR_DFA_STATE_REF,
-                );
-                return ERROR_DFA_STATE_REF;
+                self.add_dfaedge(previousD, t, local.dfa_ref.get_error_state());
+                return local.dfa_ref.get_error_state();
             }
             Some(x) => x,
         };
@@ -400,31 +365,24 @@ impl ParserATNSimulator {
         let predicted_alt = self.get_unique_alt(&reach);
         //        println!("predicted_alt {}",predicted_alt);
 
-        let mut D = DFAState::new_dfastate(self.atn(), 0, reach.into());
-        let reach = D.configs();
+        let mut D = ProposedDFAState::new(reach);
 
         if predicted_alt != INVALID_ALT {
             D.is_accept_state = true;
-            D.transform_configs(|mut configs| {
-                configs.set_unique_alt(predicted_alt);
-                configs
-            });
+            D.configs.set_unique_alt(predicted_alt);
             D.prediction = predicted_alt
-        } else if self.all_configs_in_rule_stop_state(reach)
-            || has_sll_conflict_terminating_prediction(self.prediction_mode.get(), reach)
+        } else if self.all_configs_in_rule_stop_state(&D.configs)
+            || has_sll_conflict_terminating_prediction(self.prediction_mode.get(), &D.configs)
         {
-            let alts = self.get_conflicting_alts(reach);
+            let alts = self.get_conflicting_alts(&D.configs);
             D.prediction = alts.iter().next().unwrap() as i32;
-            D.transform_configs(|mut configs| {
-                configs.conflicting_alts = alts;
-                configs
-            });
+            D.configs.conflicting_alts = alts;
             D.requires_full_context = true;
             D.is_accept_state = true;
         }
 
         //        println!("target config {:?}",&D.configs);
-        if D.is_accept_state && D.configs().has_semantic_context() {
+        if D.is_accept_state && D.configs.has_semantic_context() {
             let decision_state =
                 self.atn().decision_to_state[local.dfa_ref.borrow().decision as usize];
             self.predicate_dfa_state(&mut D, self.atn().states[decision_state as usize].deref());
@@ -434,28 +392,18 @@ impl ParserATNSimulator {
             }
         }
 
-        {
-            //let mut dfa_mut = local.dfa_ref.borrow_mut();
-            let dfa_ref = local.dfa_ref;
-            let D = self.add_dfastate(dfa_ref, D);
-            self.add_dfaedge(
-                dfa_ref
-                    .states
-                    .get_state(previousD)
-                    .expect("DFA state not found"),
-                t,
-                D,
-            );
-            D
-        }
+        let dfa_ref = local.dfa_ref;
+        let D = self.add_dfastate(dfa_ref, D);
+        self.add_dfaedge(previousD, t, D);
+        D
     }
 
-    fn predicate_dfa_state(&self, dfa_state: &mut DFAState, decision_state: &dyn ATNState) {
+    fn predicate_dfa_state(&self, dfa_state: &mut ProposedDFAState, decision_state: &dyn ATNState) {
         let nalts = decision_state.get_transitions().len();
         let alts_to_collect_preds_from =
-            self.get_conflicting_alts_or_unique_alt(dfa_state.configs());
+            self.get_conflicting_alts_or_unique_alt(&dfa_state.configs);
         let alt_to_pred =
-            self.get_preds_for_ambig_alts(&alts_to_collect_preds_from, dfa_state.configs(), nalts);
+            self.get_preds_for_ambig_alts(&alts_to_collect_preds_from, &dfa_state.configs, nalts);
         if let Some(alt_to_pred) = alt_to_pred {
             dfa_state.predicates =
                 self.get_predicate_predictions(&alts_to_collect_preds_from, alt_to_pred);
@@ -1431,50 +1379,22 @@ impl ParserATNSimulator {
         alt
     }
 
-    fn add_dfaedge(&self, from: &DFAState, t: i32, to: DFAStateRef) -> DFAStateRef {
+    fn add_dfaedge<'dfa>(
+        &self,
+        from: &'dfa DFAState<'dfa>,
+        t: i32,
+        to: &'dfa DFAState<'dfa>,
+    ) -> &'dfa DFAState<'dfa> {
         if t < -1 || t > self.atn().max_token_type {
             return to;
         }
         from.set_edge((t + 1) as usize, to);
-        // if from.edges.is_empty() {
-        //     from.edges.resize(self.atn().max_token_type as usize + 2, 0);
-        // }
-        // from.edges[(t + 1) as usize] = to;
 
         to
     }
 
-    fn add_dfastate(&self, dfa: &DFA, state: DFAState) -> DFAStateRef {
-        // if dfastate.state_number == ERROR_DFA_STATE_REF {
-        //     return ERROR_DFA_STATE_REF;
-        // }
-        // let states = &dfa.states;
-
-        // let state_number = states.len();
-        // dfastate.state_number = state_number;
-
-        // let key = dfastate.default_hash();
-        // //let mut new_hash = key;
-        // if let Some(st) = dfa.states_map.get_mut(&key) {
-        //     if let Some(&st) = st.iter().find(|&&it| states[it] == dfastate) {
-        //         return st;
-        //     }
-        // }
-
-        // if !dfastate.configs.read_only() {
-        //     dfastate.configs.optimize_configs(self);
-        //     dfastate.configs.set_read_only(true);
-        //     //    new_hash = dfastate.default_hash();
-        // }
-
-        // states.push(dfastate);
-
-        // //        if key != new_hash {
-        // dfa.states_map.entry(key).or_default().push(state_number);
-        // //        }
-        // state_number
-
-        dfa.states.add_state_maybe_optimize(state, self)
+    fn add_dfastate<'dfa>(&self, dfa: &'dfa DFA, state: ProposedDFAState) -> &'dfa DFAState<'dfa> {
+        dfa.add_state(state, self)
     }
 
     fn report_attempting_full_context<'a, T: Parser<'a>>(

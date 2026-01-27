@@ -109,8 +109,6 @@ pub mod atn_deserialization_options;
 pub mod atn_state;
 pub mod char_stream;
 #[doc(hidden)]
-pub mod dfa_state;
-#[doc(hidden)]
 pub mod interval_set;
 pub mod parser_rule_context;
 mod prediction_context;
@@ -132,7 +130,6 @@ pub mod atn_config_set;
 #[doc(hidden)]
 pub mod atn_deserializer;
 pub mod common_token_stream;
-mod dfa_serializer;
 pub mod error_listener;
 pub mod error_strategy;
 pub mod errors;
