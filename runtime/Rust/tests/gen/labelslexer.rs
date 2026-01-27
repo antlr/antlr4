@@ -109,7 +109,7 @@ impl<'input, Input:CharStream<From<'input> >> LabelsLexer<'input,Input>{
     }
 
 	pub fn new_with_token_factory(input: Input, tf: &'input LocalTokenFactory<'input>) -> Self {
-		dbt_antlr4::recognizer::check_version("0","50");
+		dbt_antlr4::recognizer::check_version("0","51");
     	Self {
 			base: BaseLexer::new_base_lexer(
 				input,

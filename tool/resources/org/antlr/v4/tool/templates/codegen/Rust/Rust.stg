@@ -305,7 +305,7 @@ where
     }
 
     pub fn with_strategy(input: I, strategy: Box\<dyn ErrorStrategy\<'input,BaseParserType\<'input,I> > >) -> Self {
-		dbt_antlr4::recognizer::check_version("0","50");
+		dbt_antlr4::recognizer::check_version("0","51");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -1396,7 +1396,7 @@ impl\<'input, Input:CharStream\<From\<'input> >\> <lexer.name>\<'input,Input>{
     }
 
 	pub fn new_with_token_factory(input: Input, tf: &'input <TokenFactory()>) -> Self {
-		dbt_antlr4::recognizer::check_version("0","50");
+		dbt_antlr4::recognizer::check_version("0","51");
     	Self {
 			base: BaseLexer::new_base_lexer(
 				input,
