@@ -129,7 +129,7 @@ impl<'input, Input:CharStream<From<'input> >> XMLLexer<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.with(|d| d.clone()),
+					_decision_to_DFA.clone(),
 					_shared_context_cache.clone(),
 				),
 				XMLLexerActions{},
@@ -243,6 +243,18 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for XMLLexer<'
 	lazy_static!{
 	    static ref _ATN: Arc<ATN> =
 	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
+	    static ref _decision_to_DFA: Arc<Vec<DFA>> = {
+	        let mut dfa = Vec::new();
+	        let size = _ATN.decision_to_state.len() as i32;
+	        for i in 0..size {
+	            dfa.push(DFA::new(
+	                _ATN.clone(),
+	                _ATN.get_decision_state(i),
+	                i,
+	            ))
+	        }
+	        Arc::new(dfa)
+	    };
 		static ref _serializedATN: Vec<i32> = vec![
 			4, 0, 18, 230, 6, -1, 6, -1, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 
 			2, 2, 3, 7, 3, 2, 4, 7, 4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 
@@ -351,18 +363,4 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for XMLLexer<'
 			191, 195, 201, 216, 219, 6, 6, 0, 0, 5, 1, 0, 3, 0, 0, 5, 2, 0, 1, 10, 
 			0, 4, 0, 0
 		];
-	}
-	thread_local! {
-	    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ).into())
-	        }
-	        Rc::new(dfa)
-	    };
 	}

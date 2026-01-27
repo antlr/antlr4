@@ -114,7 +114,7 @@ impl<'input, Input:CharStream<From<'input> >> LabelsLexer<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.with(|d| d.clone()),
+					_decision_to_DFA.clone(),
 					_shared_context_cache.clone(),
 				),
 				LabelsLexerActions{},
@@ -185,6 +185,18 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for LabelsLexe
 	lazy_static!{
 	    static ref _ATN: Arc<ATN> =
 	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
+	    static ref _decision_to_DFA: Arc<Vec<DFA>> = {
+	        let mut dfa = Vec::new();
+	        let size = _ATN.decision_to_state.len() as i32;
+	        for i in 0..size {
+	            dfa.push(DFA::new(
+	                _ATN.clone(),
+	                _ATN.get_decision_state(i),
+	                i,
+	            ))
+	        }
+	        Arc::new(dfa)
+	    };
 		static ref _serializedATN: Vec<i32> = vec![
 			4, 0, 9, 47, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 
 			4, 7, 4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 1, 0, 1, 0, 
@@ -207,18 +219,4 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for LabelsLexe
 			0, 0, 0, 42, 16, 1, 0, 0, 0, 43, 44, 7, 0, 0, 0, 44, 45, 1, 0, 0, 0, 
 			45, 46, 6, 8, 0, 0, 46, 18, 1, 0, 0, 0, 3, 0, 36, 41, 1, 6, 0, 0
 		];
-	}
-	thread_local! {
-	    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ).into())
-	        }
-	        Rc::new(dfa)
-	    };
 	}

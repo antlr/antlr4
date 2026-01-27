@@ -1,7 +1,6 @@
 //! Implementation of lexer automata(DFA)
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 
-use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::usize;
@@ -10,7 +9,6 @@ use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType};
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
-use crate::atn_state::ATNStateType::RuleStopState;
 use crate::atn_state::{ATNState, ATNStateType};
 
 use crate::dfa::DFA;
@@ -90,12 +88,10 @@ impl ILexerATNSimulator for LexerATNSimulator {
             let dfa = temp
                 .get(mode)
                 .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
-            let mut dfa = dfa.borrow_mut();
 
-            let s0 = dfa.s0;
-            match s0 {
-                None => self.match_atn(lexer, &mut dfa),
-                Some(s0) => self.exec_atn(s0, lexer, &mut dfa),
+            match dfa.get_s0() {
+                None => self.match_atn(lexer, &dfa),
+                Some(s0) => self.exec_atn(s0, lexer, &dfa),
                 //                Err(_) => panic!("dfa rwlock error")
             }
         })();
@@ -144,7 +140,7 @@ impl IATNSimulator for LexerATNSimulator {
         self.base.atn()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<RefCell<DFA>> {
+    fn decision_to_dfa(&self) -> &Vec<DFA> {
         self.base.decision_to_dfa()
     }
 }
@@ -160,7 +156,7 @@ impl LexerATNSimulator {
     /// Called from generated parser.
     pub fn new_lexer_atnsimulator(
         atn: Arc<ATN>,
-        decision_to_dfa: Rc<Vec<RefCell<DFA>>>,
+        decision_to_dfa: Arc<Vec<DFA>>,
         shared_context_cache: Arc<PredictionContextCache>,
     ) -> LexerATNSimulator {
         LexerATNSimulator {
@@ -188,7 +184,7 @@ impl LexerATNSimulator {
     fn match_atn<'input>(
         &mut self,
         lexer: &mut impl Lexer<'input>,
-        dfa: &mut DFA,
+        dfa: &DFA,
     ) -> Result<i32, ANTLRError> {
         //        let start_state = self.atn().mode_to_start_state.get(self.mode as usize).ok_or(ANTLRError::IllegalStateError("invalid mode".into()))?;
         let atn = self.atn();
@@ -205,7 +201,7 @@ impl LexerATNSimulator {
 
         let next_state = self.add_dfastate(dfa, s0_closure);
         if !_supress_edge {
-            dfa.s0 = Some(next_state);
+            dfa.set_s0(next_state);
         }
 
         self.exec_atn(next_state, lexer, dfa)
@@ -216,7 +212,7 @@ impl LexerATNSimulator {
         //        input: &'a mut dyn CharStream,
         ds0: DFAStateRef,
         lexer: &mut impl Lexer<'input>,
-        dfa: &mut DFA,
+        dfa: &DFA,
     ) -> Result<i32, ANTLRError> {
         //        if self.get_dfa().states.read().unwrap().get(ds0).unwrap().is_accept_state{
         self.capture_sim_state(&dfa, lexer.input(), ds0);
@@ -252,37 +248,49 @@ impl LexerATNSimulator {
     }
 
     #[inline(always)]
-    fn get_existing_target_state(dfa: &DFA, _s: DFAStateRef, t: i32) -> Option<DFAStateRef> {
+    fn get_existing_target_state(dfa: &DFA, s: DFAStateRef, t: i32) -> Option<DFAStateRef> {
         // if t < MIN_DFA_EDGE || t > MAX_DFA_EDGE {
         //     return None;
         // }
 
-        dfa.states[_s]
-            .edges
-            .get((t - MIN_DFA_EDGE) as usize)
+        dfa.states
+            .get_state(s)
+            .expect("DFA state not found")
+            .get_edge((t - MIN_DFA_EDGE) as usize)
             .and_then(|x| match x {
                 0 => None,
                 x => Some(x),
             })
-            .copied()
     }
 
     #[cold]
     fn compute_target_state<'input>(
         &self,
-        dfa: &mut DFA,
+        dfa: &DFA,
         s: DFAStateRef,
         _t: i32,
         lexer: &mut impl Lexer<'input>,
     ) -> DFAStateRef {
         let mut reach = ATNConfigSet::new_ordered();
-        self.get_reachable_config_set(&dfa.states[s].configs, &mut reach, _t, lexer);
+        self.get_reachable_config_set(
+            &dfa.states
+                .get_state(s)
+                .expect("DFA state not found")
+                .configs(),
+            &mut reach,
+            _t,
+            lexer,
+        );
         //        println!(" --- target computed {:?}", reach.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
 
         // let mut states = dfa_mut.states;
         if reach.is_empty() {
             if !reach.has_semantic_context() {
-                self.add_dfaedge(&mut dfa.states[s], _t, ERROR_DFA_STATE_REF);
+                self.add_dfaedge(
+                    dfa.states.get_state(s).expect("DFA state not found"),
+                    _t,
+                    ERROR_DFA_STATE_REF,
+                );
             }
             return ERROR_DFA_STATE_REF;
         }
@@ -291,7 +299,7 @@ impl LexerATNSimulator {
         reach.set_has_semantic_context(false);
         let to = self.add_dfastate(dfa, Box::new(reach));
         if !supress_edge {
-            let from = &mut dfa.states[s];
+            let from = &dfa.states.get_state(s).expect("DFA state not found");
             self.add_dfaedge(from, _t, to);
         }
         //        println!("target state computed from {:?} to {:?} on symbol {}", _s, to, char::try_from(_t as u32).unwrap());
@@ -366,7 +374,8 @@ impl LexerATNSimulator {
             self.accept(lexer.input());
 
             let prediction = {
-                let dfa_state_prediction = &dfa.states[state];
+                let dfa_state_prediction =
+                    &dfa.states.get_state(state).expect("DFA state not found");
                 //                println!("accepted, prediction = {}, on dfastate {}", dfa_state_prediction.prediction, dfa_state_prediction.state_number);
                 //                lexer_action_executor = dfa_state_prediction.lexer_action_executor.clone();
                 //                let recog = self.recog.clone();
@@ -623,7 +632,12 @@ impl LexerATNSimulator {
         input: &impl IntStream,
         dfa_state: DFAStateRef,
     ) -> bool {
-        if dfa.states[dfa_state].is_accept_state {
+        if dfa
+            .states
+            .get_state(dfa_state)
+            .expect("DFA state not found")
+            .is_accept_state
+        {
             self.prev_accept = SimState {
                 index: input.index(),
                 line: self.current_pos.line.get(),
@@ -637,86 +651,94 @@ impl LexerATNSimulator {
         false
     }
 
-    fn add_dfaedge(&self, _from: &mut DFAState, t: i32, _to: DFAStateRef) {
+    fn add_dfaedge(&self, _from: &DFAState, t: i32, _to: DFAStateRef) {
         if !(MIN_DFA_EDGE..=MAX_DFA_EDGE).contains(&t) {
             return;
         }
 
-        if _from.edges.len() < (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize {
-            _from
-                .edges
-                .resize((MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize, 0);
-        }
-        _from.edges[(t - MIN_DFA_EDGE) as usize] = _to;
+        _from.set_edge_with_target_size(
+            (t - MIN_DFA_EDGE) as usize,
+            _to,
+            (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize,
+        );
+
+        // if _from.edges.len() < (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize {
+        //     _from
+        //         .edges
+        //         .resize((MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize, 0);
+        // }
+        // _from.edges[(t - MIN_DFA_EDGE) as usize] = _to;
     }
 
-    fn add_dfastate(&self, dfa: &mut DFA, _configs: Box<ATNConfigSet>) -> DFAStateRef
+    fn add_dfastate(&self, dfa: &DFA, configs: Box<ATNConfigSet>) -> DFAStateRef
 // where
     //     V: DerefMut<Target = Vec<DFAState>>,
     {
-        assert!(!_configs.has_semantic_context());
-        let mut dfastate = DFAState::new_dfastate(usize::MAX, _configs);
-        let rule_index = dfastate
-            .configs //_configs
-            .get_items()
-            .find(|c| RuleStopState == *self.atn().states[c.get_state() as usize].get_state_type())
-            .map(|c| {
-                let rule_index = self.atn().states[c.get_state() as usize].get_rule_index();
+        // assert!(!_configs.has_semantic_context());
+        // let mut dfastate = DFAState::new_dfastate(usize::MAX, _configs);
+        // let rule_index = dfastate
+        //     .configs //_configs
+        //     .get_items()
+        //     .find(|c| RuleStopState == *self.atn().states[c.get_state() as usize].get_state_type())
+        //     .map(|c| {
+        //         let rule_index = self.atn().states[c.get_state() as usize].get_rule_index();
 
-                //println!("accepted rule {} on state {}",rule_index,c.get_state());
-                (
-                    self.atn().rule_to_token_type[rule_index as usize],
-                    c.get_lexer_executor().cloned().map(Box::new),
-                )
-            });
+        //         //println!("accepted rule {} on state {}",rule_index,c.get_state());
+        //         (
+        //             self.atn().rule_to_token_type[rule_index as usize],
+        //             c.get_lexer_executor().cloned().map(Box::new),
+        //         )
+        //     });
 
-        if let Some((prediction, exec)) = rule_index {
-            dfastate.prediction = prediction;
-            dfastate.lexer_action_executor = exec;
-            dfastate.is_accept_state = true;
-        }
+        // if let Some((prediction, exec)) = rule_index {
+        //     dfastate.prediction = prediction;
+        //     dfastate.lexer_action_executor = exec;
+        //     dfastate.is_accept_state = true;
+        // }
 
-        let states = &mut dfa.states;
-        let key = dfastate.default_hash();
-        let dfastate_index: DFAStateRef = if let Some(entry) = dfa.states_map.get(&key) {
-            let find_result = entry
-                .iter()
-                .find(|it| states[**it].configs == dfastate.configs);
-            if let Some(find_result) = find_result {
-                *find_result
-            } else {
-                dfastate.state_number = states.deref().len();
-                dfastate.configs.set_read_only(true);
-                let state_number = dfastate.state_number;
-                let mut new_vec = entry.to_vec();
-                new_vec.push(state_number);
-                dfa.states_map.insert(key, new_vec);
-                //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
-                states.push(dfastate);
-                state_number
-            }
-        } else {
-            dfastate.state_number = states.deref().len();
-            dfastate.configs.set_read_only(true);
-            let state_number = dfastate.state_number;
-            //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
-            states.push(dfastate);
-            dfa.states_map.insert(key, vec![state_number]);
-            state_number
-        };
-        //println!("new DFA state {}", dfastate_index);
+        // let states = &dfa.states;
+        // let key = dfastate.default_hash();
+        // let dfastate_index: DFAStateRef = if let Some(entry) = dfa.states_map.get(&key) {
+        //     let find_result = entry
+        //         .iter()
+        //         .find(|it| states[**it].configs == dfastate.configs);
+        //     if let Some(find_result) = find_result {
+        //         *find_result
+        //     } else {
+        //         dfastate.state_number = states.deref().len();
+        //         dfastate.configs.set_read_only(true);
+        //         let state_number = dfastate.state_number;
+        //         let mut new_vec = entry.to_vec();
+        //         new_vec.push(state_number);
+        //         dfa.states_map.insert(key, new_vec);
+        //         //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
+        //         states.push(dfastate);
+        //         state_number
+        //     }
+        // } else {
+        //     dfastate.state_number = states.deref().len();
+        //     dfastate.configs.set_read_only(true);
+        //     let state_number = dfastate.state_number;
+        //     //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
+        //     states.push(dfastate);
+        //     dfa.states_map.insert(key, vec![state_number]);
+        //     state_number
+        // };
+        // //println!("new DFA state {}", dfastate_index);
 
-        //        dfa.states.write().unwrap().get_mut(*dfastate_index).unwrap()
-        dfastate_index
+        // //        dfa.states.write().unwrap().get_mut(*dfastate_index).unwrap()
+        // dfastate_index
+
+        dfa.states.add_state_from_configs(configs, self.atn())
     }
 
     /// Returns current DFA that is currently used.
-    pub fn get_dfa(&self) -> &RefCell<DFA> {
+    pub fn get_dfa(&self) -> &DFA {
         &self.decision_to_dfa()[self.mode]
     }
 
     /// Returns current DFA for particular lexer mode
-    pub fn get_dfa_for_mode(&self, mode: usize) -> &RefCell<DFA> {
+    pub fn get_dfa_for_mode(&self, mode: usize) -> &DFA {
         &self.decision_to_dfa()[mode]
     }
 

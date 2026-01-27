@@ -107,7 +107,7 @@ impl<'input, Input:CharStream<From<'input> >> ReferenceToATNLexer<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.with(|d| d.clone()),
+					_decision_to_DFA.clone(),
 					_shared_context_cache.clone(),
 				),
 				ReferenceToATNLexerActions{},
@@ -178,6 +178,18 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for ReferenceT
 	lazy_static!{
 	    static ref _ATN: Arc<ATN> =
 	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
+	    static ref _decision_to_DFA: Arc<Vec<DFA>> = {
+	        let mut dfa = Vec::new();
+	        let size = _ATN.decision_to_state.len() as i32;
+	        for i in 0..size {
+	            dfa.push(DFA::new(
+	                _ATN.clone(),
+	                _ATN.get_decision_state(i),
+	                i,
+	            ))
+	        }
+	        Arc::new(dfa)
+	    };
 		static ref _serializedATN: Vec<i32> = vec![
 			4, 0, 3, 21, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 1, 0, 4, 0, 9, 
 			8, 0, 11, 0, 12, 0, 10, 1, 1, 4, 1, 14, 8, 1, 11, 1, 12, 1, 15, 1, 2, 
@@ -190,18 +202,4 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for ReferenceT
 			17, 18, 7, 0, 0, 0, 18, 19, 1, 0, 0, 0, 19, 20, 6, 2, 0, 0, 20, 6, 1, 
 			0, 0, 0, 3, 0, 10, 15, 1, 6, 0, 0
 		];
-	}
-	thread_local! {
-	    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ).into())
-	        }
-	        Rc::new(dfa)
-	    };
 	}

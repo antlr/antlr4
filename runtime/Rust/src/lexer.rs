@@ -419,7 +419,6 @@ where
         self.get_interpreter()
             .unwrap()
             .get_dfa_for_mode(LEXER_DEFAULT_MODE)
-            .borrow()
             .to_lexer_string()
     }
 }

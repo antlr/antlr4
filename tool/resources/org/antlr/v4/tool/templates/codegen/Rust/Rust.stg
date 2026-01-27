@@ -308,7 +308,7 @@ where
 		antlr4rust::recognizer::check_version("0","5");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			_ATN.clone(),
-			_decision_to_DFA.with(|d| Rc::clone(d)),
+			_decision_to_DFA.clone(),
 			_shared_context_cache.clone(),
 		));
 		Self {
@@ -1401,7 +1401,7 @@ impl\<'input, Input:CharStream\<From\<'input> >\> <lexer.name>\<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.with(|d| d.clone()),
+					_decision_to_DFA.clone(),
 					_shared_context_cache.clone(),
 				),
 				<lexer.name>Actions{<namedActions.init>},
@@ -1476,12 +1476,7 @@ SerializedATN(model) ::= <<
 lazy_static!{
     static ref _ATN: Arc\<ATN> =
         Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-	static ref _serializedATN: Vec\<i32> = vec![
-		<model.serialized; separator=", ", wrap>
-	];
-}
-thread_local! {
-    static _decision_to_DFA: Rc\<Vec\<std::cell::RefCell\<DFA>\>\> = {
+    static ref _decision_to_DFA: Arc\<Vec\<DFA\>\> = {
         let mut dfa = Vec::new();
         let size = _ATN.decision_to_state.len() as i32;
         for i in 0..size {
@@ -1489,10 +1484,13 @@ thread_local! {
                 _ATN.clone(),
                 _ATN.get_decision_state(i),
                 i,
-            ).into())
+            ))
         }
-        Rc::new(dfa)
+        Arc::new(dfa)
     };
+	static ref _serializedATN: Vec\<i32> = vec![
+		<model.serialized; separator=", ", wrap>
+	];
 }
 >>
 

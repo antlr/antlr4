@@ -12,19 +12,19 @@ pub struct DFASerializer<'a, 'b> {
 impl Display for DFASerializer<'_, '_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let dfa = &self.dfa.states;
-        for source in dfa.iter() {
-            for (i, edge) in source.edges.iter().copied().enumerate() {
+        dfa.for_each(|source| {
+            for (i, edge) in source.enumerate_edges() {
                 if edge != 0 && edge != ERROR_DFA_STATE_REF {
-                    let target = &dfa[edge];
-                    f.write_fmt(format_args!(
+                    let target = &dfa.get_state(edge).expect("DFA state not found");
+                    let _ = f.write_fmt(format_args!(
                         "{}-{}->{}\n",
                         self.get_state_string(source),
                         (self.get_edge_label)(i),
                         self.get_state_string(target)
-                    ))?;
+                    ));
                 }
             }
-        }
+        });
         Ok(())
     }
 }

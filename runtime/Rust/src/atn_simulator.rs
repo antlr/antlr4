@@ -1,7 +1,5 @@
-use std::cell::RefCell;
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::Deref;
-use std::rc::Rc;
 use std::sync::Arc;
 
 use crate::atn::ATN;
@@ -11,13 +9,13 @@ use crate::prediction_context::PredictionContextCache;
 pub trait IATNSimulator {
     fn shared_context_cache(&self) -> &PredictionContextCache;
     fn atn(&self) -> &ATN;
-    fn decision_to_dfa(&self) -> &Vec<RefCell<DFA>>;
+    fn decision_to_dfa(&self) -> &Vec<DFA>;
 }
 
 pub struct BaseATNSimulator {
     pub atn: Arc<ATN>,
     pub shared_context_cache: Arc<PredictionContextCache>,
-    pub decision_to_dfa: Rc<Vec<RefCell<DFA>>>,
+    pub decision_to_dfa: Arc<Vec<DFA>>,
 }
 
 impl Debug for BaseATNSimulator {
@@ -29,7 +27,7 @@ impl Debug for BaseATNSimulator {
 impl BaseATNSimulator {
     pub fn new_base_atnsimulator(
         atn: Arc<ATN>,
-        decision_to_dfa: Rc<Vec<RefCell<DFA>>>,
+        decision_to_dfa: Arc<Vec<DFA>>,
         shared_context_cache: Arc<PredictionContextCache>,
     ) -> BaseATNSimulator {
         BaseATNSimulator {
@@ -49,7 +47,7 @@ impl IATNSimulator for BaseATNSimulator {
         self.atn.as_ref()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<RefCell<DFA>> {
+    fn decision_to_dfa(&self) -> &Vec<DFA> {
         self.decision_to_dfa.as_ref()
     }
 }
