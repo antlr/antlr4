@@ -111,7 +111,7 @@ impl<'input, Input:CharStream<From<'input> >> CSVLexer<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.clone(),
+					_decision_to_DFA.with(|d| d.clone()),
 					_shared_context_cache.clone(),
 				),
 				CSVLexerActions{},
@@ -179,21 +179,9 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for CSVLexer<'
 }
 
 
-		lazy_static!{
+	lazy_static!{
 	    static ref _ATN: Arc<ATN> =
 	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-	    static ref _decision_to_DFA: Arc<Vec<antlr4rust::RwLock<DFA>>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ).into())
-	        }
-	        Arc::new(dfa)
-	    };
 		static ref _serializedATN: Vec<i32> = vec![
 			4, 0, 6, 42, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 
 			4, 7, 4, 2, 5, 7, 5, 1, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 2, 1, 3, 4, 3, 
@@ -216,4 +204,18 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for CSVLexer<'
 			39, 37, 1, 0, 0, 0, 40, 41, 5, 34, 0, 0, 41, 12, 1, 0, 0, 0, 5, 0, 22, 
 			29, 35, 37, 1, 0, 1, 0
 		];
+	}
+	thread_local! {
+	    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
+	        let mut dfa = Vec::new();
+	        let size = _ATN.decision_to_state.len() as i32;
+	        for i in 0..size {
+	            dfa.push(DFA::new(
+	                _ATN.clone(),
+	                _ATN.get_decision_state(i),
+	                i,
+	            ).into())
+	        }
+	        Rc::new(dfa)
+	    };
 	}

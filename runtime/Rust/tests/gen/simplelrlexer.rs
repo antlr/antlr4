@@ -105,7 +105,7 @@ impl<'input, Input:CharStream<From<'input> >> SimpleLRLexer<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.clone(),
+					_decision_to_DFA.with(|d| d.clone()),
 					_shared_context_cache.clone(),
 				),
 				SimpleLRLexerActions{},
@@ -173,21 +173,9 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for SimpleLRLe
 }
 
 
-		lazy_static!{
+	lazy_static!{
 	    static ref _ATN: Arc<ATN> =
 	        Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-	    static ref _decision_to_DFA: Arc<Vec<antlr4rust::RwLock<DFA>>> = {
-	        let mut dfa = Vec::new();
-	        let size = _ATN.decision_to_state.len() as i32;
-	        for i in 0..size {
-	            dfa.push(DFA::new(
-	                _ATN.clone(),
-	                _ATN.get_decision_state(i),
-	                i,
-	            ).into())
-	        }
-	        Arc::new(dfa)
-	    };
 		static ref _serializedATN: Vec<i32> = vec![
 			4, 0, 2, 14, 6, -1, 2, 0, 7, 0, 2, 1, 7, 1, 1, 0, 4, 0, 7, 8, 0, 11, 
 			0, 12, 0, 8, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 1, 1, 3, 2, 1, 0, 1, 2, 
@@ -197,4 +185,18 @@ impl<'input, Input:CharStream<From<'input> >> TokenSource<'input> for SimpleLRLe
 			11, 7, 0, 0, 0, 11, 12, 1, 0, 0, 0, 12, 13, 6, 1, 0, 0, 13, 4, 1, 0, 
 			0, 0, 2, 0, 8, 1, 6, 0, 0
 		];
+	}
+	thread_local! {
+	    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
+	        let mut dfa = Vec::new();
+	        let size = _ATN.decision_to_state.len() as i32;
+	        for i in 0..size {
+	            dfa.push(DFA::new(
+	                _ATN.clone(),
+	                _ATN.get_decision_state(i),
+	                i,
+	            ).into())
+	        }
+	        Rc::new(dfa)
+	    };
 	}

@@ -98,7 +98,7 @@ where
 		antlr4rust::recognizer::check_version("0","5");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			_ATN.clone(),
-			_decision_to_DFA.clone(),
+			_decision_to_DFA.with(|d| Rc::clone(d)),
 			_shared_context_cache.clone(),
 		));
 		Self {
@@ -782,21 +782,9 @@ where
 		Ok(_localctx)
 	}
 }
-	lazy_static!{
+lazy_static!{
     static ref _ATN: Arc<ATN> =
         Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-    static ref _decision_to_DFA: Arc<Vec<antlr4rust::RwLock<DFA>>> = {
-        let mut dfa = Vec::new();
-        let size = _ATN.decision_to_state.len() as i32;
-        for i in 0..size {
-            dfa.push(DFA::new(
-                _ATN.clone(),
-                _ATN.get_decision_state(i),
-                i,
-            ).into())
-        }
-        Arc::new(dfa)
-    };
 	static ref _serializedATN: Vec<i32> = vec![
 		4, 1, 6, 22, 2, 0, 7, 0, 2, 1, 7, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 17, 8, 1, 10, 1, 12, 1, 20, 
@@ -808,4 +796,18 @@ where
 		13, 1, 0, 0, 0, 17, 20, 1, 0, 0, 0, 18, 16, 1, 0, 0, 0, 18, 19, 1, 0, 
 		0, 0, 19, 3, 1, 0, 0, 0, 20, 18, 1, 0, 0, 0, 2, 16, 18
 	];
+}
+thread_local! {
+    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
+        let mut dfa = Vec::new();
+        let size = _ATN.decision_to_state.len() as i32;
+        for i in 0..size {
+            dfa.push(DFA::new(
+                _ATN.clone(),
+                _ATN.get_decision_state(i),
+                i,
+            ).into())
+        }
+        Rc::new(dfa)
+    };
 }

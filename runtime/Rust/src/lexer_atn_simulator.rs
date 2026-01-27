@@ -1,5 +1,5 @@
 //! Implementation of lexer automata(DFA)
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 
 use std::ops::Deref;
 use std::rc::Rc;
@@ -30,7 +30,6 @@ use crate::transition::{
     ActionTransition, PredicateTransition, RuleTransition, Transition, TransitionType,
 };
 use crate::utils::cell_update;
-use parking_lot::{RwLock, RwLockUpgradableReadGuard, RwLockWriteGuard};
 
 #[allow(missing_docs)]
 pub const ERROR_DFA_STATE_REF: DFAStateRef = usize::MAX;
@@ -91,12 +90,12 @@ impl ILexerATNSimulator for LexerATNSimulator {
             let dfa = temp
                 .get(mode)
                 .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
-            let dfa = dfa.upgradable_read();
+            let mut dfa = dfa.borrow_mut();
 
             let s0 = dfa.s0;
             match s0 {
-                None => self.match_atn(lexer, dfa),
-                Some(s0) => self.exec_atn(s0, lexer, dfa),
+                None => self.match_atn(lexer, &mut dfa),
+                Some(s0) => self.exec_atn(s0, lexer, &mut dfa),
                 //                Err(_) => panic!("dfa rwlock error")
             }
         })();
@@ -145,7 +144,7 @@ impl IATNSimulator for LexerATNSimulator {
         self.base.atn()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<RwLock<DFA>> {
+    fn decision_to_dfa(&self) -> &Vec<RefCell<DFA>> {
         self.base.decision_to_dfa()
     }
 }
@@ -161,7 +160,7 @@ impl LexerATNSimulator {
     /// Called from generated parser.
     pub fn new_lexer_atnsimulator(
         atn: Arc<ATN>,
-        decision_to_dfa: Arc<Vec<RwLock<DFA>>>,
+        decision_to_dfa: Rc<Vec<RefCell<DFA>>>,
         shared_context_cache: Arc<PredictionContextCache>,
     ) -> LexerATNSimulator {
         LexerATNSimulator {
@@ -189,7 +188,7 @@ impl LexerATNSimulator {
     fn match_atn<'input>(
         &mut self,
         lexer: &mut impl Lexer<'input>,
-        dfa: RwLockUpgradableReadGuard<'_, DFA>,
+        dfa: &mut DFA,
     ) -> Result<i32, ANTLRError> {
         //        let start_state = self.atn().mode_to_start_state.get(self.mode as usize).ok_or(ANTLRError::IllegalStateError("invalid mode".into()))?;
         let atn = self.atn();
@@ -199,22 +198,17 @@ impl LexerATNSimulator {
             .ok_or_else(|| ANTLRError::IllegalStateError("invalid mode".into()))?;
 
         let _old_mode = self.mode;
-        let mut s0_closure = self.compute_start_state(atn.states[start_state as usize].as_ref(), lexer);
+        let mut s0_closure =
+            self.compute_start_state(atn.states[start_state as usize].as_ref(), lexer);
         let _supress_edge = s0_closure.has_semantic_context();
         s0_closure.set_has_semantic_context(false);
 
-        let mut dfa_mut = RwLockUpgradableReadGuard::upgrade(dfa);
-
-        let next_state = self.add_dfastate(&mut dfa_mut, s0_closure);
+        let next_state = self.add_dfastate(dfa, s0_closure);
         if !_supress_edge {
-            dfa_mut.s0 = Some(next_state);
+            dfa.s0 = Some(next_state);
         }
 
-        self.exec_atn(
-            next_state,
-            lexer,
-            RwLockWriteGuard::downgrade_to_upgradable(dfa_mut),
-        )
+        self.exec_atn(next_state, lexer, dfa)
     }
 
     fn exec_atn<'input>(
@@ -222,18 +216,17 @@ impl LexerATNSimulator {
         //        input: &'a mut dyn CharStream,
         ds0: DFAStateRef,
         lexer: &mut impl Lexer<'input>,
-        dfa: RwLockUpgradableReadGuard<'_, DFA>,
+        dfa: &mut DFA,
     ) -> Result<i32, ANTLRError> {
         //        if self.get_dfa().states.read().unwrap().get(ds0).unwrap().is_accept_state{
         self.capture_sim_state(&dfa, lexer.input(), ds0);
         //        }
-        let mut dfa = Some(dfa);
+
         let mut symbol = lexer.input().la(1);
         let mut s = ds0;
         loop {
-            let target = Self::get_existing_target_state(dfa.as_ref().unwrap(), s, symbol);
-            let target =
-                target.unwrap_or_else(|| self.compute_target_state(&mut dfa, s, symbol, lexer));
+            let target = Self::get_existing_target_state(dfa, s, symbol);
+            let target = target.unwrap_or_else(|| self.compute_target_state(dfa, s, symbol, lexer));
             //              let target = dfastates.deref().get(s).unwrap() ;x
 
             if target == ERROR_DFA_STATE_REF {
@@ -245,8 +238,7 @@ impl LexerATNSimulator {
                 self.consume(lexer.input());
             }
 
-            if self.capture_sim_state(dfa.as_ref().unwrap(), lexer.input(), target) && symbol == EOF
-            {
+            if self.capture_sim_state(dfa, lexer.input(), target) && symbol == EOF {
                 break;
             }
 
@@ -256,7 +248,7 @@ impl LexerATNSimulator {
         }
         // let _last = self.get_dfa().states.read().get(s).unwrap();
 
-        self.fail_or_accept(symbol, lexer, dfa.unwrap())
+        self.fail_or_accept(symbol, lexer, dfa)
     }
 
     #[inline(always)]
@@ -278,39 +270,31 @@ impl LexerATNSimulator {
     #[cold]
     fn compute_target_state<'input>(
         &self,
-        dfa: &mut Option<RwLockUpgradableReadGuard<'_, DFA>>,
+        dfa: &mut DFA,
         s: DFAStateRef,
         _t: i32,
         lexer: &mut impl Lexer<'input>,
     ) -> DFAStateRef {
         let mut reach = ATNConfigSet::new_ordered();
-        self.get_reachable_config_set(
-            &dfa.as_ref().unwrap().states[s].configs,
-            &mut reach,
-            _t,
-            lexer,
-        );
+        self.get_reachable_config_set(&dfa.states[s].configs, &mut reach, _t, lexer);
         //        println!(" --- target computed {:?}", reach.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
 
-        let mut dfa_mut = RwLockUpgradableReadGuard::upgrade(dfa.take().unwrap());
         // let mut states = dfa_mut.states;
         if reach.is_empty() {
             if !reach.has_semantic_context() {
-                self.add_dfaedge(&mut dfa_mut.states[s], _t, ERROR_DFA_STATE_REF);
+                self.add_dfaedge(&mut dfa.states[s], _t, ERROR_DFA_STATE_REF);
             }
-            *dfa = Some(RwLockWriteGuard::downgrade_to_upgradable(dfa_mut));
             return ERROR_DFA_STATE_REF;
         }
 
         let supress_edge = reach.has_semantic_context();
         reach.set_has_semantic_context(false);
-        let to = self.add_dfastate(&mut dfa_mut, Box::new(reach));
+        let to = self.add_dfastate(dfa, Box::new(reach));
         if !supress_edge {
-            let from = &mut dfa_mut.states[s];
+            let from = &mut dfa.states[s];
             self.add_dfaedge(from, _t, to);
         }
         //        println!("target state computed from {:?} to {:?} on symbol {}", _s, to, char::try_from(_t as u32).unwrap());
-        *dfa = Some(RwLockWriteGuard::downgrade_to_upgradable(dfa_mut));
         to
         //        states.get(to).unwrap()
     }
@@ -345,7 +329,8 @@ impl LexerATNSimulator {
                             .fix_offset_before_match(lexer.input().index() - self.start_index)
                     });
 
-                    let new = config.cloned_with_new_exec(self.atn().states[target as usize].as_ref(), exec);
+                    let new = config
+                        .cloned_with_new_exec(self.atn().states[target as usize].as_ref(), exec);
                     if self.closure(
                         new,
                         _reach,
@@ -373,7 +358,7 @@ impl LexerATNSimulator {
         &mut self,
         _t: i32,
         lexer: &mut impl Lexer<'input>,
-        dfa: RwLockUpgradableReadGuard<'_, DFA>,
+        dfa: &DFA,
     ) -> Result<i32, ANTLRError> {
         //        println!("fail_or_accept");
         if let Some(state) = self.prev_accept.dfa_state {
@@ -535,7 +520,12 @@ impl LexerATNSimulator {
         lexer: &mut impl Lexer<'input>,
     ) -> Option<ATNConfig> {
         let mut result = None;
-        let target = self.atn().states.get(_trans.get_target() as usize).unwrap().as_ref();
+        let target = self
+            .atn()
+            .states
+            .get(_trans.get_target() as usize)
+            .unwrap()
+            .as_ref();
         //        println!("epsilon target for {:?} is {:?}", _trans, target.get_state_type());
         match _trans.get_serialization_type() {
             TransitionType::TRANSITION_EPSILON => {
@@ -689,9 +679,9 @@ impl LexerATNSimulator {
         let states = &mut dfa.states;
         let key = dfastate.default_hash();
         let dfastate_index: DFAStateRef = if let Some(entry) = dfa.states_map.get(&key) {
-            let find_result = entry.iter().find(|it| {
-                states[**it].configs == dfastate.configs
-            });
+            let find_result = entry
+                .iter()
+                .find(|it| states[**it].configs == dfastate.configs);
             if let Some(find_result) = find_result {
                 *find_result
             } else {
@@ -721,12 +711,12 @@ impl LexerATNSimulator {
     }
 
     /// Returns current DFA that is currently used.
-    pub fn get_dfa(&self) -> &RwLock<DFA> {
+    pub fn get_dfa(&self) -> &RefCell<DFA> {
         &self.decision_to_dfa()[self.mode]
     }
 
     /// Returns current DFA for particular lexer mode
-    pub fn get_dfa_for_mode(&self, mode: usize) -> &RwLock<DFA> {
+    pub fn get_dfa_for_mode(&self, mode: usize) -> &RefCell<DFA> {
         &self.decision_to_dfa()[mode]
     }
 

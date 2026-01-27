@@ -99,7 +99,7 @@ where
 		antlr4rust::recognizer::check_version("0","5");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			_ATN.clone(),
-			_decision_to_DFA.clone(),
+			_decision_to_DFA.with(|d| Rc::clone(d)),
 			_shared_context_cache.clone(),
 		));
 		Self {
@@ -875,7 +875,7 @@ where
 					recog.base.set_state(7);
 					let tmp = recog.base.match_token(Labels_INT,&mut recog.err_handler)?;
 					if let EContextAll::AnIntContext(ctx) = cast_mut::<_,EContextAll >(&mut _localctx){
-					ctx.INT = Some(tmp.clone()); } else {unreachable!("cant cast");}  
+					ctx.INT = Some(tmp); } else {unreachable!("cant cast");}  
 
 					let tmp = { if let Some(it) = &if let EContextAll::AnIntContext(ctx) = cast::<_,EContextAll >(&*_localctx){
 					ctx } else {unreachable!("cant cast")} .INT { it.get_text() } else { "null" } .to_owned()}.to_owned();
@@ -920,7 +920,7 @@ where
 					recog.base.set_state(14);
 					let tmp = recog.base.match_token(Labels_ID,&mut recog.err_handler)?;
 					if let EContextAll::AnIDContext(ctx) = cast_mut::<_,EContextAll >(&mut _localctx){
-					ctx.ID = Some(tmp.clone()); } else {unreachable!("cant cast");}  
+					ctx.ID = Some(tmp); } else {unreachable!("cant cast");}  
 
 					let tmp = { if let Some(it) = &if let EContextAll::AnIDContext(ctx) = cast::<_,EContextAll >(&*_localctx){
 					ctx } else {unreachable!("cant cast")} .ID { it.get_text() } else { "null" } .to_owned()}.to_owned();
@@ -961,7 +961,7 @@ where
 							recog.base.set_state(19);
 							let tmp = recog.base.match_token(Labels_T__0,&mut recog.err_handler)?;
 							if let EContextAll::MultContext(ctx) = cast_mut::<_,EContextAll >(&mut _localctx){
-							ctx.op = Some(tmp.clone()); } else {unreachable!("cant cast");}  
+							ctx.op = Some(tmp); } else {unreachable!("cant cast");}  
 
 							/*InvokeRule e*/
 							recog.base.set_state(20);
@@ -1080,21 +1080,9 @@ where
 		Ok(_localctx)
 	}
 }
-	lazy_static!{
+lazy_static!{
     static ref _ATN: Arc<ATN> =
         Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-    static ref _decision_to_DFA: Arc<Vec<antlr4rust::RwLock<DFA>>> = {
-        let mut dfa = Vec::new();
-        let size = _ATN.decision_to_state.len() as i32;
-        for i in 0..size {
-            dfa.push(DFA::new(
-                _ATN.clone(),
-                _ATN.get_decision_state(i),
-                i,
-            ).into())
-        }
-        Arc::new(dfa)
-    };
 	static ref _serializedATN: Vec<i32> = vec![
 		4, 1, 9, 40, 2, 0, 7, 0, 2, 1, 7, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 17, 8, 1, 1, 1, 1, 1, 1, 
@@ -1114,4 +1102,18 @@ where
 		0, 0, 0, 36, 34, 1, 0, 0, 0, 36, 37, 1, 0, 0, 0, 37, 3, 1, 0, 0, 0, 38, 
 		36, 1, 0, 0, 0, 3, 16, 34, 36
 	];
+}
+thread_local! {
+    static _decision_to_DFA: Rc<Vec<std::cell::RefCell<DFA>>> = {
+        let mut dfa = Vec::new();
+        let size = _ATN.decision_to_state.len() as i32;
+        for i in 0..size {
+            dfa.push(DFA::new(
+                _ATN.clone(),
+                _ATN.get_decision_state(i),
+                i,
+            ).into())
+        }
+        Rc::new(dfa)
+    };
 }

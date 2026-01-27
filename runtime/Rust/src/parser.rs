@@ -674,7 +674,7 @@ where
     pub fn dump_dfa(&self) {
         let mut seen_one = false;
         for dfa in self.interp.decision_to_dfa() {
-            let dfa = dfa.read();
+            let dfa = dfa.borrow();
             // because s0 is saved in dfa for Rust version
             if dfa.states.len() > 1 + (dfa.is_precedence_dfa() as usize) {
                 if seen_one {

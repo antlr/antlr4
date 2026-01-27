@@ -134,9 +134,9 @@ impl DFA {
         self.is_precedence_dfa
     }
 
-    pub fn set_precedence_dfa(&mut self, precedence_dfa: bool) {
-        self.is_precedence_dfa = precedence_dfa
-    }
+    // pub fn set_precedence_dfa(&mut self, precedence_dfa: bool) {
+    //     self.is_precedence_dfa = precedence_dfa
+    // }
 
     pub fn to_string(&self, vocabulary: &dyn Vocabulary) -> String {
         if self.s0.is_none() {

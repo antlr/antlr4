@@ -1,4 +1,5 @@
 mod gen {
+    #![allow(non_snake_case)]
     mod csvlexer;
     mod csvlistener;
     mod csvparser;
@@ -125,7 +126,7 @@ mod gen {
 
             fn should_visit_next_child(
                 &self,
-                node: &<Self::Node as ParserNodeType<'_>>::Type,
+                _node: &<Self::Node as ParserNodeType<'_>>::Type,
                 current: &Self::Return,
             ) -> bool {
                 current.is_empty()
@@ -176,8 +177,8 @@ mod gen {
 
             fn should_visit_next_child(
                 &self,
-                node: &<Self::Node as ParserNodeType<'_>>::Type,
-                current: &Self::Return,
+                _node: &<Self::Node as ParserNodeType<'_>>::Type,
+                _current: &Self::Return,
             ) -> bool {
                 false
             }
@@ -203,8 +204,8 @@ mod gen {
 
             fn aggregate_results(
                 &self,
-                aggregate: Self::Return,
-                next: Self::Return,
+                _aggregate: Self::Return,
+                _next: Self::Return,
             ) -> Self::Return {
                 panic!("Should not be reachable")
             }

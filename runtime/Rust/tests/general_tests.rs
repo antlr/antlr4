@@ -9,7 +9,6 @@
 
 mod gen {
     use std::fmt::Write;
-    use std::io::Read;
     use std::iter::FromIterator;
 
     use antlr4rust::common_token_stream::CommonTokenStream;
@@ -108,7 +107,7 @@ if (x < x && a > 0) then duh
                 .get_interpreter()
                 .unwrap()
                 .get_dfa()
-                .read()
+                .borrow()
                 .to_lexer_string()
         );
         Ok(())
@@ -163,7 +162,10 @@ if (x < x && a > 0) then duh
     struct Listener {}
 
     impl<'input> ParseTreeListener<'input, CSVParserContextType> for Listener {
-        fn enter_every_rule(&mut self, ctx: &dyn CSVParserContext<'input>) -> Result<(), ANTLRError> {
+        fn enter_every_rule(
+            &mut self,
+            ctx: &dyn CSVParserContext<'input>,
+        ) -> Result<(), ANTLRError> {
             println!(
                 "rule entered {}",
                 csvparser::ruleNames
@@ -197,7 +199,10 @@ if (x < x && a > 0) then duh
     struct Listener2 {}
 
     impl<'input> ParseTreeListener<'input, ReferenceToATNParserContextType> for Listener2 {
-        fn enter_every_rule(&mut self, ctx: &dyn ReferenceToATNParserContext<'input>) -> Result<(), ANTLRError> {
+        fn enter_every_rule(
+            &mut self,
+            ctx: &dyn ReferenceToATNParserContext<'input>,
+        ) -> Result<(), ANTLRError> {
             println!(
                 "rule entered {}",
                 referencetoatnparser::ruleNames
@@ -235,7 +240,10 @@ if (x < x && a > 0) then duh
             println!("terminal node {}", node.symbol.get_text());
         }
 
-        fn enter_every_rule(&mut self, ctx: &dyn SimpleLRParserContext<'input>) -> Result<(), ANTLRError> {
+        fn enter_every_rule(
+            &mut self,
+            ctx: &dyn SimpleLRParserContext<'input>,
+        ) -> Result<(), ANTLRError> {
             println!(
                 "rule entered {}",
                 simplelrparser::ruleNames
@@ -245,7 +253,10 @@ if (x < x && a > 0) then duh
             Ok(())
         }
 
-        fn exit_every_rule(&mut self, ctx: &dyn SimpleLRParserContext<'input>) -> Result<(), ANTLRError> {
+        fn exit_every_rule(
+            &mut self,
+            ctx: &dyn SimpleLRParserContext<'input>,
+        ) -> Result<(), ANTLRError> {
             println!(
                 "rule exited {}",
                 simplelrparser::ruleNames
@@ -289,7 +300,10 @@ if (x < x && a > 0) then duh
             println!("enter terminal");
             let _ = writeln!(&mut self.data, "terminal node {}", node.symbol.get_text());
         }
-        fn enter_every_rule(&mut self, ctx: &dyn SimpleLRParserContext<'input>) -> Result<(), ANTLRError> {
+        fn enter_every_rule(
+            &mut self,
+            ctx: &dyn SimpleLRParserContext<'input>,
+        ) -> Result<(), ANTLRError> {
             println!(
                 "rule entered {}",
                 simplelrparser::ruleNames

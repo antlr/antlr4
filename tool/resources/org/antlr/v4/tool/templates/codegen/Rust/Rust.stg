@@ -308,7 +308,7 @@ where
 		antlr4rust::recognizer::check_version("0","5");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			_ATN.clone(),
-			_decision_to_DFA.clone(),
+			_decision_to_DFA.with(|d| Rc::clone(d)),
 			_shared_context_cache.clone(),
 		));
 		Self {
@@ -880,13 +880,22 @@ InvokeRule(r, argExprsChunks) ::= <<
 
 MatchToken(m) ::= <<
 <self()>.base.set_state(<m.stateNumber>);
-<LabelsAssign(m.labels,{<self()>.base.match_token(<parser.grammarName>_<m.escapedName>,&mut <self()>.err_handler)?})>
+<LabelsAssignWithBorrow(m.labels,{<self()>.base.match_token(<parser.grammarName>_<m.escapedName>,&mut <self()>.err_handler)?})>
 >>
 
 LabelsAssign(labels,assign) ::= <<
 <if(labels)>
 let tmp = <assign>;
 <labels:{l | <labelref(l,{ = Some(tmp.clone());})> };separator="\n">
+<else>
+<assign>;
+<endif>
+>>
+
+LabelsAssignWithBorrow(labels,assign) ::= <<
+<if(labels)>
+let tmp = <assign>;
+<labels:{l | <labelref(l,{ = Some(tmp);})> };separator="\n">
 <else>
 <assign>;
 <endif>
@@ -901,7 +910,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 <if(m.labels)><m.labels:{l | <labelref(l,{ = <self()>.base.input.lt(1).cloned();})>};separator="\n"><endif>
 <capture>
 if { <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) } {
-	<LabelsAssign(m.labels,{<self()>.err_handler.recover_inline(&mut <self()>.base)?})>
+	<LabelsAssignWithBorrow(m.labels,{<self()>.err_handler.recover_inline(&mut <self()>.base)?})>
 }
 else {
 	if  <self()>.base.input.la(1)==TOKEN_EOF { <self()>.base.matched_eof = true };
@@ -1392,7 +1401,7 @@ impl\<'input, Input:CharStream\<From\<'input> >\> <lexer.name>\<'input,Input>{
 				input,
 				LexerATNSimulator::new_lexer_atnsimulator(
 					_ATN.clone(),
-					_decision_to_DFA.clone(),
+					_decision_to_DFA.with(|d| d.clone()),
 					_shared_context_cache.clone(),
 				),
 				<lexer.name>Actions{<namedActions.init>},
@@ -1416,11 +1425,11 @@ impl <lexer.name>Actions{
 	<namedActions.members>
 }
 
-impl\<'input, Input:CharStream\<From\<'input> >\> Actions\<'input,BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>> for <lexer.name>Actions{
+impl\<'input, Input:CharStream\<From\<'input> >\> Actions\<'input,BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>\> for <lexer.name>Actions{
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 }
 
-impl\<'input, Input:CharStream\<From\<'input> >\> LexerRecog\<'input,BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>> for <lexer.name>Actions{
+impl\<'input, Input:CharStream\<From\<'input> >\> LexerRecog\<'input,BaseLexer\<'input,<lexer.name>Actions,Input,<TokenFactory()>\>\> for <lexer.name>Actions{
 	<namedActions.extend>
 }
 impl\<'input> TokenAware\<'input> for <lexer.name>Actions{
@@ -1464,10 +1473,15 @@ impl\<'input, Input:CharStream\<From\<'input> >\> TokenSource\<'input> for <lexe
 >>
 
 SerializedATN(model) ::= <<
-	lazy_static!{
+lazy_static!{
     static ref _ATN: Arc\<ATN> =
         Arc::new(ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-    static ref _decision_to_DFA: Arc\<Vec\<antlr4rust::RwLock\<DFA>\>> = {
+	static ref _serializedATN: Vec\<i32> = vec![
+		<model.serialized; separator=", ", wrap>
+	];
+}
+thread_local! {
+    static _decision_to_DFA: Rc\<Vec\<std::cell::RefCell\<DFA>\>\> = {
         let mut dfa = Vec::new();
         let size = _ATN.decision_to_state.len() as i32;
         for i in 0..size {
@@ -1477,11 +1491,8 @@ SerializedATN(model) ::= <<
                 i,
             ).into())
         }
-        Arc::new(dfa)
+        Rc::new(dfa)
     };
-	static ref _serializedATN: Vec\<i32> = vec![
-		<model.serialized; separator=", ", wrap>
-	];
 }
 >>
 

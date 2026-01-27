@@ -416,7 +416,11 @@ where
     }
 
     fn get_dfa_string(&self) -> String {
-        self.get_interpreter().unwrap().get_dfa_for_mode(LEXER_DEFAULT_MODE).upgradable_read().to_lexer_string()
+        self.get_interpreter()
+            .unwrap()
+            .get_dfa_for_mode(LEXER_DEFAULT_MODE)
+            .borrow()
+            .to_lexer_string()
     }
 }
 
