@@ -5,7 +5,7 @@ use std::sync::Arc;
 use murmur3::murmur3_32::MurmurHasher;
 
 use crate::atn_config::ATNConfigType::LexerATNConfig;
-use crate::atn_state::{ATNState, ATNStateRef, ATNStateType};
+use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
 use crate::dfa::ScopeExt;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContext;
@@ -148,7 +148,7 @@ impl ATNConfig {
 
     pub fn cloned_with_new_semantic(
         &self,
-        target: &dyn ATNState,
+        target: &ATNState,
         ctx: Box<SemanticContext>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -156,7 +156,7 @@ impl ATNConfig {
         new
     }
 
-    pub fn cloned(&self, target: &dyn ATNState) -> ATNConfig {
+    pub fn cloned(&self, target: &ATNState) -> ATNConfig {
         //        println!("depth {}",PredictionContext::size(self.context.as_deref()));
         let mut new = self.clone();
         new.state = target.get_state_number();
@@ -172,7 +172,7 @@ impl ATNConfig {
 
     pub fn cloned_with_new_ctx(
         &self,
-        target: &dyn ATNState,
+        target: &ATNState,
         ctx: Option<Arc<PredictionContext>>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -183,7 +183,7 @@ impl ATNConfig {
 
     pub(crate) fn cloned_with_new_exec(
         &self,
-        target: &dyn ATNState,
+        target: &ATNState,
         exec: Option<LexerActionExecutor>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -239,7 +239,7 @@ impl ATNConfig {
     }
 }
 
-fn check_non_greedy_decision(source: &ATNConfig, target: &dyn ATNState) -> bool {
+fn check_non_greedy_decision(source: &ATNConfig, target: &ATNState) -> bool {
     if let LexerATNConfig {
         passed_through_non_greedy_decision: true,
         ..
@@ -247,9 +247,9 @@ fn check_non_greedy_decision(source: &ATNConfig, target: &dyn ATNState) -> bool 
     {
         return true;
     }
-    if let ATNStateType::DecisionState {
+    if let ATNState::Decision(DecisionState {
         nongreedy: true, ..
-    } = target.get_state_type()
+    }) = target
     {
         return true;
     }

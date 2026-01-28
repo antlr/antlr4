@@ -9,7 +9,7 @@ use std::sync::Mutex;
 use crate::atn::ATN;
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::IATNSimulator;
-use crate::atn_state::{ATNDecisionState, ATNStateRef, ATNStateType};
+use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
 use crate::prediction_context::MurmurHasherBuilder;
 use crate::vocabulary::Vocabulary;
 
@@ -255,14 +255,14 @@ impl DFA {
 
 fn is_precedence_atn_state(atn: &ATN, atn_start_state: ATNStateRef) -> bool {
     matches!(
-        atn.states[atn_start_state as usize].get_state_type(),
-        ATNStateType::DecisionState {
+        atn.states[atn_start_state as usize],
+        ATNState::Decision(DecisionState {
             state: ATNDecisionState::StarLoopEntry {
                 is_precedence: true,
                 ..
             },
             ..
-        }
+        })
     )
 }
 

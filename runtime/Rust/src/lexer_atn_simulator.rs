@@ -6,9 +6,7 @@ use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType};
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
-use crate::atn_state::{ATNState, ATNStateType};
-
-use crate::atn_state::ATNStateType::RuleStopState;
+use crate::atn_state::ATNState;
 use crate::char_stream::CharStream;
 use crate::dfa::{DFAState, ProposedDFAState, DFA};
 use crate::errors::ANTLRError;
@@ -203,8 +201,7 @@ impl LexerATNSimulator {
             .ok_or_else(|| ANTLRError::illegal_state("invalid mode".into()))?;
 
         let _old_mode = self.mode;
-        let mut s0_closure =
-            self.compute_start_state(atn.states[start_state as usize].as_ref(), lexer);
+        let mut s0_closure = self.compute_start_state(&atn.states[start_state as usize], lexer);
         let _supress_edge = s0_closure.has_semantic_context();
         s0_closure.set_has_semantic_context(false);
 
@@ -337,7 +334,7 @@ impl LexerATNSimulator {
                     continue;
                 }
             }
-            let atn_state = self.atn().states[config.get_state() as usize].as_ref();
+            let atn_state = &self.atn().states[config.get_state() as usize];
             for tr in atn_state.get_transitions() {
                 if let Some(target) = tr.get_reachable_target(_t) {
                     let exec = config.get_lexer_executor().map(|x| {
@@ -345,8 +342,8 @@ impl LexerATNSimulator {
                             .fix_offset_before_match(lexer.input().index() - self.start_index)
                     });
 
-                    let new = config
-                        .cloned_with_new_exec(self.atn().states[target as usize].as_ref(), exec);
+                    let new =
+                        config.cloned_with_new_exec(&self.atn().states[target as usize], exec);
                     if self.closure(
                         new,
                         _reach,
@@ -416,7 +413,7 @@ impl LexerATNSimulator {
 
     fn compute_start_state<'input, 'arena, Input, TF>(
         &self,
-        _p: &dyn ATNState,
+        _p: &ATNState,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
     ) -> ATNConfigSet
     where
@@ -457,10 +454,10 @@ impl LexerATNSimulator {
     {
         //        let config = &config;
         let atn = self.atn();
-        let state = atn.states[config.get_state() as usize].as_ref();
+        let state = &atn.states[config.get_state() as usize];
         //        println!("closure called on state {} {:?}", state.get_state_number(), state.get_state_type());
 
-        if let ATNStateType::RuleStopState = state.get_state_type() {
+        if let ATNState::RuleStop(_) = state {
             //            println!("reached rulestopstate {}",state.get_state_number());
             if config.get_context().map(|x| x.has_empty_path()) != Some(false) {
                 if config.get_context().map(|x| x.is_empty()) != Some(false) {
@@ -479,8 +476,7 @@ impl LexerATNSimulator {
                 for i in 0..ctx.length() {
                     if ctx.get_return_state(i) != PREDICTION_CONTEXT_EMPTY_RETURN_STATE {
                         let new_ctx = ctx.get_parent(i).cloned();
-                        let return_state =
-                            self.atn().states[ctx.get_return_state(i) as usize].as_ref();
+                        let return_state = &self.atn().states[ctx.get_return_state(i) as usize];
                         let next_config = config.cloned_with_new_ctx(return_state, new_ctx);
                         _current_alt_reached_accept_state = self.closure(
                             next_config,
@@ -509,7 +505,7 @@ impl LexerATNSimulator {
             }
         }
 
-        let state = atn.states[config.get_state() as usize].as_ref();
+        let state = &atn.states[config.get_state() as usize];
 
         for tr in state.get_transitions() {
             let c = self.get_epsilon_target(
@@ -552,12 +548,7 @@ impl LexerATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
         let mut result = None;
-        let target = self
-            .atn()
-            .states
-            .get(_trans.get_target() as usize)
-            .unwrap()
-            .as_ref();
+        let target = self.atn().states.get(_trans.get_target() as usize).unwrap();
         //        println!("epsilon target for {:?} is {:?}", _trans, target.get_state_type());
         match _trans {
             Transition::Epsilon(_) => {
@@ -604,7 +595,7 @@ impl LexerATNSimulator {
                 if _treat_eofas_epsilon
                     && _trans.matches(EOF, LEXER_MIN_CHAR_VALUE, LEXER_MAX_CHAR_VALUE)
                 {
-                    let target = self.atn().states[_trans.get_target() as usize].as_ref();
+                    let target = &self.atn().states[_trans.get_target() as usize];
                     result = Some(_config.cloned(target));
                 }
             }
@@ -688,7 +679,12 @@ impl LexerATNSimulator {
         let rule_index = state
             .configs
             .get_items()
-            .find(|c| RuleStopState == *self.atn().states[c.get_state() as usize].get_state_type())
+            .find(|c| {
+                matches!(
+                    self.atn().states[c.get_state() as usize],
+                    ATNState::RuleStop(_)
+                )
+            })
             .map(|c| {
                 let rule_index = self.atn().states[c.get_state() as usize].get_rule_index();
 

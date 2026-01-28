@@ -5,7 +5,6 @@ use crate::atn_deserialization_options::ATNDeserializationOptions;
 use crate::atn_state::ATNBlockStart;
 use crate::atn_state::ATNDecisionState;
 use crate::atn_state::ATNState;
-use crate::atn_state::ATNStateType;
 use crate::atn_state::BaseATNState;
 use crate::atn_state::*;
 use crate::atn_type::ATNType;
@@ -117,12 +116,18 @@ impl ATNDeserializer {
             }
             let mut state = self.state_factory(state_type, rule_index, i);
 
-            match state.get_state_type_mut() {
-                ATNStateType::DecisionState {
-                    state: ATNDecisionState::BlockStartState { end_state, .. },
+            match state {
+                ATNState::Decision(DecisionState {
+                    state:
+                        ATNDecisionState::BlockStartState {
+                            ref mut end_state, ..
+                        },
                     ..
-                } => *end_state = *data.next().unwrap(),
-                ATNStateType::LoopEndState(loop_back) => *loop_back = *data.next().unwrap(),
+                }) => *end_state = *data.next().unwrap(),
+                ATNState::LoopEnd(LoopEndState {
+                    ref mut loop_back_state,
+                    ..
+                }) => *loop_back_state = *data.next().unwrap(),
                 _ => (),
             }
             atn.add_state(state);
@@ -132,10 +137,11 @@ impl ATNDeserializer {
         //println!("num_non_greedy {}", num_non_greedy);
         for _ in 0..num_non_greedy {
             let st = *data.next().unwrap();
-            if let ATNStateType::DecisionState { nongreedy: ng, .. } =
-                atn.states[st as usize].get_state_type_mut()
+            if let ATNState::Decision(DecisionState {
+                ref mut nongreedy, ..
+            }) = atn.states[st as usize]
             {
-                *ng = true
+                *nongreedy = true
             }
         }
 
@@ -144,12 +150,12 @@ impl ATNDeserializer {
             let num_precedence_states = *data.next().unwrap();
             for _ in 0..num_precedence_states {
                 let st = *data.next().unwrap() as usize;
-                if let ATNStateType::RuleStartState {
-                    is_left_recursive: left_rec,
+                if let ATNState::RuleStart(RuleStartState {
+                    ref mut is_left_recursive,
                     ..
-                } = atn.states[st].get_state_type_mut()
+                }) = atn.states[st]
                 {
-                    *left_rec = true
+                    *is_left_recursive = true
                 }
             }
         }
@@ -177,18 +183,18 @@ impl ATNDeserializer {
         atn.rule_to_stop_state.resize(nrules, 0);
         for i in 0..atn.states.len() {
             let state = atn.states.get(i).unwrap();
-            if let ATNStateType::RuleStopState = state.get_state_type() {
+            if let ATNState::RuleStop(_) = state {
                 let rule_index = state.get_rule_index() as usize;
                 atn.rule_to_stop_state[rule_index] = i as i32;
                 let start_state = atn
                     .states
                     .get_mut(atn.rule_to_start_state[rule_index] as usize)
                     .unwrap();
-                if let ATNStateType::RuleStartState {
-                    stop_state: stop, ..
-                } = start_state.get_state_type_mut()
+                if let ATNState::RuleStart(RuleStartState {
+                    ref mut stop_state, ..
+                }) = start_state
                 {
-                    *stop = i as i32
+                    *stop_state = i as i32
                 }
             }
         }
@@ -250,14 +256,13 @@ impl ATNDeserializer {
                         //                        println!("TRANSITION_RULE");
                         let target = atn.states.get(tr.get_target() as usize).unwrap();
 
-                        let outermost_prec_return = if let ATNStateType::RuleStartState {
+                        let outermost_prec_return = if let ATNState::RuleStart(RuleStartState {
                             is_left_recursive: true,
                             ..
-                        } = atn
+                        }) = atn
                             .states
                             .get(atn.rule_to_start_state[target.get_rule_index() as usize] as usize)
                             .unwrap()
-                            .get_state_type()
                         {
                             if tr.precedence == 0 {
                                 target.get_rule_index()
@@ -285,45 +290,48 @@ impl ATNDeserializer {
             .drain(..)
             .for_each(|(state, tr)| atn.states[state as usize].add_transition(tr));
 
-        for i in 0..atn.states.len() {
-            let atn_state = atn.states.get(i).unwrap();
-            match atn_state.get_state_type() {
-                ATNStateType::DecisionState {
-                    state:
-                        ATNDecisionState::BlockStartState {
-                            end_state: _,
-                            en: _,
-                        },
-                    ..
-                } => {
+        // for i in 0..atn.states.len() {
+        //     let atn_state = atn.states.get(i).unwrap();
+        //     match atn_state {
+        //         ATNState::Decision(DecisionState {
+        //             state:
+        //                 ATNDecisionState::BlockStartState {
+        //                     end_state: _,
+        //                     en: _,
+        //                 },
+        //             ..
+        //         }) => {
 
-                    //                    if *end_state == 0 { panic!("invalid state")}
-                    // looks like it is never used during recognition
-                    // todo missed part
-                }
-                //                ATNStateType::DecisionState {state:ATNDecisionState::PlusLoopBack,..} =>{
-                //                    for tr in atn_state.get_transitions(){
-                //                        if let ATNStateType::DecisionState {
-                //                                        state:ATNDecisionState::BlockStartState {
-                //                                            en:ATNBlockStart::PlusBlockStart(loopBack),..},..}
-                //                        = atn.states.get_mut(tr.get_target()).unwrap().get_state_type_mut(){
-                //                            *loopBack = i;
-                //
-                //                        }
-                //                    }
-                //                }
-                _x => { /*println!("{:?}",x);*/ }
-            }
-        }
+        //             //                    if *end_state == 0 { panic!("invalid state")}
+        //             // looks like it is never used during recognition
+        //             // todo missed part
+        //         }
+        //         //                ATNStateType::DecisionState {state:ATNDecisionState::PlusLoopBack,..} =>{
+        //         //                    for tr in atn_state.get_transitions(){
+        //         //                        if let ATNStateType::DecisionState {
+        //         //                                        state:ATNDecisionState::BlockStartState {
+        //         //                                            en:ATNBlockStart::PlusBlockStart(loopBack),..},..}
+        //         //                        = atn.states.get_mut(tr.get_target()).unwrap().get_state_type_mut(){
+        //         //                            *loopBack = i;
+        //         //
+        //         //                        }
+        //         //                    }
+        //         //                }
+        //         _x => { /*println!("{:?}",x);*/ }
+        //     }
+        // }
     }
 
     fn read_decisions(&self, atn: &mut ATN, _data: &mut Iter<i32>) {
         let ndecisions = *_data.next().unwrap();
         for i in 0..ndecisions {
             let s = *_data.next().unwrap();
-            let dec_state: &mut Box<dyn ATNState> = atn.states.get_mut(s as usize).unwrap();
+            let dec_state: &mut ATNState = atn.states.get_mut(s as usize).unwrap();
             atn.decision_to_state.push(s);
-            if let ATNStateType::DecisionState { decision, .. } = dec_state.get_state_type_mut() {
+            if let ATNState::Decision(DecisionState {
+                ref mut decision, ..
+            }) = dec_state
+            {
                 *decision = i
             }
         }
@@ -348,26 +356,24 @@ impl ATNDeserializer {
     fn mark_precedence_decisions(&self, _atn: &mut ATN, _data: &mut Iter<i32>) {
         let mut precedence_states = Vec::new();
         for state in _atn.states.iter() {
-            if let ATNStateType::DecisionState {
+            if let ATNState::Decision(DecisionState {
                 state: ATNDecisionState::StarLoopEntry { .. },
                 ..
-            } = state.get_state_type()
+            }) = state
             {
-                if let ATNStateType::RuleStartState {
+                if let ATNState::RuleStart(RuleStartState {
                     is_left_recursive: true,
                     ..
-                } = _atn.states
-                    [_atn.rule_to_start_state[state.get_rule_index() as usize] as usize]
-                    .get_state_type()
+                }) =
+                    _atn.states[_atn.rule_to_start_state[state.get_rule_index() as usize] as usize]
                 {
                     let maybe_loop_end =
                         state.get_transitions().iter().last().unwrap().get_target();
-                    let maybe_loop_end = _atn.states[maybe_loop_end as usize].as_ref();
-                    if let ATNStateType::LoopEndState(_) = maybe_loop_end.get_state_type() {
+                    let maybe_loop_end = &_atn.states[maybe_loop_end as usize];
+                    if let ATNState::LoopEnd(_) = maybe_loop_end {
                         if maybe_loop_end.has_epsilon_only_transitions() {
-                            if let ATNStateType::RuleStopState = _atn.states
+                            if let ATNState::RuleStop(_) = _atn.states
                                 [maybe_loop_end.get_transitions()[0].get_target() as usize]
-                                .get_state_type()
                             {
                                 precedence_states.push(state.get_state_number())
                             }
@@ -377,14 +383,14 @@ impl ATNDeserializer {
             }
         }
         for st in precedence_states {
-            if let ATNStateType::DecisionState {
+            if let ATNState::Decision(DecisionState {
                 state:
                     ATNDecisionState::StarLoopEntry {
                         loop_back_state: _,
-                        is_precedence,
+                        ref mut is_precedence,
                     },
                 ..
-            } = _atn.states[st as usize].get_state_type_mut()
+            }) = _atn.states[st as usize]
             {
                 *is_precedence = true
             }
@@ -483,74 +489,64 @@ impl ATNDeserializer {
         }
     }
 
-    fn state_factory(
-        &self,
-        type_index: i32,
-        rule_index: i32,
-        state_number: i32,
-    ) -> Box<dyn ATNState> {
-        let mut state = BaseATNState::new_base_atnstate();
-        state.state_number = state_number;
-        state.rule_index = rule_index;
-        state.state_type_id = type_index;
-        state.state_type = match type_index {
-            ATNSTATE_INVALID_TYPE => ATNStateType::InvalidState,
-            ATNSTATE_BASIC => ATNStateType::BasicState,
-            ATNSTATE_RULE_START => ATNStateType::RuleStartState {
-                stop_state: 0,
-                is_left_recursive: false,
-            },
-            ATNSTATE_BLOCK_START => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::BlockStartState {
+    fn state_factory(&self, type_index: i32, rule_index: i32, state_number: i32) -> ATNState {
+        let base = BaseATNState::new(state_number, rule_index, type_index);
+        match type_index {
+            ATNSTATE_INVALID_TYPE => ATNState::Invalid(base),
+            ATNSTATE_BASIC => BasicState::new(base).into(),
+            ATNSTATE_RULE_START => RuleStartState::new(base, 0, false).into(),
+            ATNSTATE_BLOCK_START => DecisionState::new(
+                base,
+                -1,
+                false,
+                ATNDecisionState::BlockStartState {
                     end_state: 0,
                     en: ATNBlockStart::BasicBlockStart,
                 },
-            },
-            ATNSTATE_PLUS_BLOCK_START => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::BlockStartState {
+            )
+            .into(),
+            ATNSTATE_PLUS_BLOCK_START => DecisionState::new(
+                base,
+                -1,
+                false,
+                ATNDecisionState::BlockStartState {
                     end_state: 0,
                     en: ATNBlockStart::PlusBlockStart(0),
                 },
-            },
-            ATNSTATE_STAR_BLOCK_START => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::BlockStartState {
+            )
+            .into(),
+            ATNSTATE_STAR_BLOCK_START => DecisionState::new(
+                base,
+                -1,
+                false,
+                ATNDecisionState::BlockStartState {
                     end_state: 0,
                     en: ATNBlockStart::StarBlockStart,
                 },
-            },
-            ATNSTATE_TOKEN_START => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::TokenStartState,
-            },
-            ATNSTATE_RULE_STOP => ATNStateType::RuleStopState,
-            ATNSTATE_BLOCK_END => ATNStateType::BlockEndState(0),
-            ATNSTATE_STAR_LOOP_BACK => ATNStateType::StarLoopbackState,
-            ATNSTATE_STAR_LOOP_ENTRY => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::StarLoopEntry {
+            )
+            .into(),
+            ATNSTATE_TOKEN_START => {
+                DecisionState::new(base, -1, false, ATNDecisionState::TokenStartState).into()
+            }
+            ATNSTATE_RULE_STOP => RuleStopState::new(base).into(),
+            ATNSTATE_BLOCK_END => BlockEndState::new(base, 0).into(),
+            ATNSTATE_STAR_LOOP_BACK => StarLoopbackState::new(base).into(),
+            ATNSTATE_STAR_LOOP_ENTRY => DecisionState::new(
+                base,
+                -1,
+                false,
+                ATNDecisionState::StarLoopEntry {
                     loop_back_state: 0,
                     is_precedence: false,
                 },
-            },
-            ATNSTATE_PLUS_LOOP_BACK => ATNStateType::DecisionState {
-                decision: -1,
-                nongreedy: false,
-                state: ATNDecisionState::PlusLoopBack,
-            },
-            ATNSTATE_LOOP_END => ATNStateType::LoopEndState(0),
-
-            _ => panic!("invalid ATN state type"),
-        };
-        //        println!("created state {} {:?}", state_number, state.state_type);
-        Box::new(state)
+            )
+            .into(),
+            ATNSTATE_PLUS_LOOP_BACK => {
+                DecisionState::new(base, -1, false, ATNDecisionState::PlusLoopBack).into()
+            }
+            ATNSTATE_LOOP_END => LoopEndState::new(base, 0).into(),
+            t => panic!("invalid ATN state type {}", t),
+        }
     }
 
     fn lexer_action_factory(&self, action_type: i32, data1: i32, data2: i32) -> LexerAction {

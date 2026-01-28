@@ -39,7 +39,7 @@ pub struct ATN {
 
     pub rule_to_token_type: Vec<i32>,
 
-    pub states: Vec<Box<dyn ATNState>>,
+    pub states: Vec<ATNState>,
 }
 
 impl Debug for ATN {
@@ -72,7 +72,7 @@ impl ATN {
     ///Compute the set of valid tokens that can occur starting in `s` and
     ///staying in same rule. `Token::EPSILON` is in set if we reach end of
     ///rule.
-    pub fn next_tokens<'a>(&self, s: &'a dyn ATNState) -> &'a IntervalSet {
+    pub fn next_tokens<'a>(&self, s: &'a ATNState) -> &'a IntervalSet {
         s.get_next_tokens_within_rule().get_or_init(|| {
             self.next_tokens_in_ctx::<EmptyRuleNode>(s, None)
                 .modify_with(|r| r.read_only = true)
@@ -85,7 +85,7 @@ impl ATN {
     /// restricted to tokens reachable staying within `s`'s rule.
     pub fn next_tokens_in_ctx<'input, 'arena, Node>(
         &self,
-        s: &dyn ATNState,
+        s: &ATNState,
         ctx: Option<&'arena Node>,
     ) -> IntervalSet
     where
@@ -96,7 +96,7 @@ impl ATN {
         analyzer.look(s, None, ctx)
     }
 
-    pub(crate) fn add_state(&mut self, state: Box<dyn ATNState>) {
+    pub(crate) fn add_state(&mut self, state: ATNState) {
         debug_assert_eq!(state.get_state_number() as usize, self.states.len());
         self.states.push(state)
     }
@@ -146,7 +146,7 @@ impl ATN {
         state_number: i32,
         states_stack: impl Iterator<Item = i32>, // _ctx: &Rc<Ctx::Type>,
     ) -> IntervalSet {
-        let s = self.states[state_number as usize].as_ref();
+        let s = &self.states[state_number as usize];
         let mut following = self.next_tokens(s);
         if !following.contains(TOKEN_EPSILON) {
             return following.clone();
@@ -161,10 +161,10 @@ impl ATN {
                 break;
             }
 
-            let invoking_state = self.states[state as usize].as_ref();
+            let invoking_state = &self.states[state as usize];
             let tr = invoking_state.get_transitions().first().unwrap();
             let tr = tr.try_as::<RuleTransition>().unwrap();
-            following = self.next_tokens(self.states[tr.follow_state as usize].as_ref());
+            following = self.next_tokens(&self.states[tr.follow_state as usize]);
             expected.add_set(following);
             expected.remove_one(TOKEN_EPSILON);
             // ctx = c.get_parent_ctx();
