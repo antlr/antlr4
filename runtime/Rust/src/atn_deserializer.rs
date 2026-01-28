@@ -429,15 +429,15 @@ impl ATNDeserializer {
                 outermost_precedence_return: 0,
             }
             .into(),
-            TRANSITION_RANGE => RangeTransition {
+            TRANSITION_RANGE => RangeTransition::new(
                 target,
-                start: if arg3 != 0 {
+                if arg3 != 0 {
                     super::token::TOKEN_EOF
                 } else {
                     arg1
                 },
-                stop: arg2,
-            }
+                arg2,
+            )
             .into(),
             TRANSITION_RULE => {
                 //                base.set_target(arg1 as usize);
@@ -456,11 +456,9 @@ impl ATNDeserializer {
                 pred_index: arg2,
             }
             .into(),
-            TRANSITION_ATOM => AtomTransition {
-                target,
-                label: if arg3 != 0 { EOF } else { arg1 },
+            TRANSITION_ATOM => {
+                AtomTransition::new(target, if arg3 != 0 { EOF } else { arg1 }).into()
             }
-            .into(),
             TRANSITION_ACTION => ActionTransition {
                 target,
                 is_ctx_dependent: arg3 != 0,

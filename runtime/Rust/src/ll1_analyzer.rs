@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::ops::Deref;
 use std::sync::Arc;
 
 use bit_set::BitSet;
@@ -174,13 +173,14 @@ impl LL1Analyzer<'_> {
                     add_eof,
                 ),
                 _ => {
-                    if let Some(mut set) = tr.get_label() {
+                    if let Some(set) = tr.get_label() {
                         if matches!(tr, Transition::NotSet(_)) {
-                            let complement =
-                                set.complement(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type);
-                            *set.to_mut() = complement;
+                            look.add_set(
+                                &set.complement(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type),
+                            );
+                        } else {
+                            look.add_set(set)
                         }
-                        look.add_set(set.deref())
                     }
                 }
             }

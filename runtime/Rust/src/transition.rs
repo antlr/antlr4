@@ -1,5 +1,5 @@
-use std::borrow::Cow;
 use std::fmt::Debug;
+use std::sync::OnceLock;
 
 use crate::atn_state::ATNStateRef;
 use crate::interval_set::IntervalSet;
@@ -88,7 +88,7 @@ impl Transition {
         )
     }
 
-    pub fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
+    pub fn get_label(&self) -> Option<&IntervalSet> {
         match self {
             Transition::Atom(t) => t.get_label(),
             Transition::Range(t) => t.get_label(),
@@ -146,9 +146,18 @@ pub trait ConcreteTransition {
 pub struct AtomTransition {
     pub target: ATNStateRef,
     pub label: i32,
+    label_set: OnceLock<IntervalSet>,
 }
 
 impl AtomTransition {
+    pub fn new(target: ATNStateRef, label: i32) -> Self {
+        AtomTransition {
+            target,
+            label,
+            label_set: OnceLock::new(),
+        }
+    }
+
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -157,10 +166,12 @@ impl AtomTransition {
         self.target = s
     }
 
-    fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
-        let mut r = IntervalSet::new();
-        r.add_one(self.label);
-        Some(Cow::Owned(r))
+    fn get_label(&self) -> Option<&IntervalSet> {
+        Some(self.label_set.get_or_init(|| {
+            let mut r = IntervalSet::new();
+            r.add_one(self.label);
+            r
+        }))
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -267,9 +278,19 @@ pub struct RangeTransition {
     pub target: ATNStateRef,
     pub start: i32,
     pub stop: i32,
+    label_set: OnceLock<IntervalSet>,
 }
 
 impl RangeTransition {
+    pub fn new(target: ATNStateRef, start: i32, stop: i32) -> Self {
+        RangeTransition {
+            target,
+            start,
+            stop,
+            label_set: OnceLock::new(),
+        }
+    }
+
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -277,10 +298,12 @@ impl RangeTransition {
         self.target = s
     }
 
-    fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
-        let mut r = IntervalSet::new();
-        r.add_range(self.start, self.stop);
-        Some(Cow::Owned(r))
+    fn get_label(&self) -> Option<&IntervalSet> {
+        Some(self.label_set.get_or_init(|| {
+            let mut r = IntervalSet::new();
+            r.add_range(self.start, self.stop);
+            r
+        }))
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -360,8 +383,8 @@ impl SetTransition {
         self.target = s
     }
 
-    fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
-        Some(Cow::Borrowed(&self.set))
+    fn get_label(&self) -> Option<&IntervalSet> {
+        Some(&self.set)
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -401,8 +424,8 @@ impl NotSetTransition {
         self.target = s
     }
 
-    fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
-        Some(Cow::Borrowed(&self.set))
+    fn get_label(&self) -> Option<&IntervalSet> {
+        Some(&self.set)
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
