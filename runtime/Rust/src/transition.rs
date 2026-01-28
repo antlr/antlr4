@@ -78,14 +78,14 @@ impl Transition {
     }
 
     pub fn is_epsilon(&self) -> bool {
-        match self {
+        matches!(
+            self,
             Transition::Rule(_)
-            | Transition::Epsilon(_)
-            | Transition::Action(_)
-            | Transition::Predicate(_)
-            | Transition::PrecedencePredicate(_) => true,
-            _ => false,
-        }
+                | Transition::Epsilon(_)
+                | Transition::Action(_)
+                | Transition::Predicate(_)
+                | Transition::PrecedencePredicate(_)
+        )
     }
 
     pub fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {

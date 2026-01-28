@@ -37,7 +37,6 @@ where
 
     fn get_current_context(&self) -> &'arena Self::Node;
 
-    //    fn set_parser_rule_context(&self, v: ParserRuleContext);
     fn consume(
         &mut self,
         err_handler: &mut impl ErrorStrategy<'input, 'arena, TF, Self>,
@@ -45,13 +44,8 @@ where
     where
         Self: Sized;
 
-    //    fn get_parse_listeners(&self) -> Vec<ParseTreeListener>;
-    //fn sempred(&mut self, _localctx: Option<&dyn ParserRuleContext>, rule_index: i32, action_index: i32) -> bool { true }
-
     fn precpred(&self, localctx: Option<&Self::Node>, precedence: i32) -> bool;
 
-    //    fn get_error_handler(&self) -> ErrorStrategy;
-    //    fn set_error_handler(&self, e: ErrorStrategy);
     fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, 'arena, TF>;
     fn get_input_stream(&self) -> &dyn TokenStream<'input, 'arena, TF>;
     fn get_current_token(&self) -> &'arena TF::Tok;
@@ -83,11 +77,9 @@ where
     fn get_rule_invocation_stack(&self) -> Vec<String>;
 }
 
-/// ### Main underlying Parser struct
+/// Abstract base parser implementation
 ///
-/// It is a member of generated parser struct, so
-/// almost always you don't need to create it yourself.
-/// Generated parser hides complexity of this struct and expose required flexibility via generic parameters
+/// Only meant to be instantiated by generated parsers
 pub struct BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
@@ -223,7 +215,6 @@ where
     }
 
     fn get_token_factory(&self) -> &TF {
-        // &**crate::common_token_factory::COMMON_TOKEN_FACTORY_DEFAULT
         self.input.get_token_source().get_token_factory()
     }
 
@@ -631,32 +622,6 @@ where
         Ok(child)
     }
 
-    #[inline]
-    pub fn enter_outer_alt(&mut self, new_ctx: Option<Node>, alt_num: i32) {
-        // if we have new ctx and we are building parse trees, make sure to
-        // replace existing ctx that is previous child of parent
-        if let Some(new_ctx) = new_ctx {
-            let new_ctx = self.arena.alloc_context(new_ctx);
-            if self.build_parse_trees {
-                if let Some(parent) = self.parent_ctx() {
-                    // Temporarily set parent as current so we can mutate it,
-                    // will be immediately overwritten below
-                    self.set_current_ctx(Some(parent));
-                    self.with_mut_ctx(|ctx| {
-                        ctx.remove_last_child();
-                        ctx.add_child(new_ctx);
-                    });
-                }
-            }
-
-            self.set_current_ctx(Some(new_ctx));
-        }
-
-        self.with_mut_ctx(|ctx| {
-            ctx.set_alt_number(alt_num);
-        });
-    }
-
     pub fn enter_recursion_rule(
         &mut self,
         localctx: Node,
@@ -768,21 +733,6 @@ where
             }
         }
     }
-
-    //    fn get_invoking_context(&self, ruleIndex: i32) -> ParserRuleContext { unimplemented!() }
-    //
-    //    fn in_context(&self, context: ParserRuleContext) -> bool { unimplemented!() }
-    //
-    //    fn get_expected_tokens_within_current_rule(&self) -> * IntervalSet { unimplemented!() }
-    //
-    //
-    //    fn get_rule_index(&self, ruleName: String) -> int { unimplemented!() }
-    //
-    //    fn get_dfaStrings(&self) -> String { unimplemented!() }
-    //
-    //    fn get_source_name(&self) -> String { unimplemented!() }
-    //
-    //    fn set_trace(&self, trace: * TraceListener) { unimplemented!() }
 }
 
 /// Allows to safely cast listener back to user type

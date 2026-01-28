@@ -56,7 +56,6 @@ pub enum ATNBlockStart {
 
 pub type ATNStateRef = i32;
 
-// todo no need for trait here, it is too slow for hot code
 impl ATNState {
     pub fn has_epsilon_only_transitions(&self) -> bool {
         match self {

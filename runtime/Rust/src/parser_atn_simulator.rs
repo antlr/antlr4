@@ -457,7 +457,7 @@ impl ParserATNSimulator {
         local.input().seek(self.start_index.get());
         let mut t = local.input().la(1);
         let mut predicted_alt;
-        // local.upgrade_lock();
+
         loop {
             //            println!("full_ctx loop");
 
@@ -500,7 +500,6 @@ impl ParserATNSimulator {
             }
         }
 
-        // local.downgrade_lock();
         let dfa = local.dfa_ref;
         if prev.get_unique_alt() != INVALID_ALT {
             self.report_context_sensitivity(
