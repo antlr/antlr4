@@ -162,8 +162,8 @@ impl ATN {
             }
 
             let invoking_state = self.states[state as usize].as_ref();
-            let tr = invoking_state.get_transitions().first().unwrap().as_ref();
-            let tr = tr.cast::<RuleTransition>();
+            let tr = invoking_state.get_transitions().first().unwrap();
+            let tr = tr.try_as::<RuleTransition>().unwrap();
             following = self.next_tokens(self.states[tr.follow_state as usize].as_ref());
             expected.add_set(following);
             expected.remove_one(TOKEN_EPSILON);

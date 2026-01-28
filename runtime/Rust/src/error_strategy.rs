@@ -349,8 +349,8 @@ where
             }
 
             let invoking_state = atn.states[c.get_invoking_state() as usize].as_ref();
-            let tr = invoking_state.get_transitions().first().unwrap().as_ref();
-            let tr = tr.cast::<RuleTransition>();
+            let tr = invoking_state.get_transitions().first().unwrap();
+            let tr = tr.try_as::<RuleTransition>().unwrap();
             let follow = atn.next_tokens(atn.states[tr.follow_state as usize].as_ref());
             recover_set.add_set(follow);
             ctx = c.get_parent();

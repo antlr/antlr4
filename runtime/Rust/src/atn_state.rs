@@ -83,9 +83,9 @@ pub trait ATNState: Sync + Send + Debug {
     fn get_state_number(&self) -> i32;
     fn set_state_number(&self, state_number: i32);
 
-    fn get_transitions(&self) -> &Vec<Box<dyn Transition>>;
-    fn set_transitions(&self, t: Vec<Box<dyn Transition>>);
-    fn add_transition(&mut self, trans: Box<dyn Transition>);
+    fn get_transitions(&self) -> &Vec<Transition>;
+    fn set_transitions(&self, t: Vec<Transition>);
+    fn add_transition(&mut self, trans: Transition);
 }
 
 #[derive(Debug)]
@@ -103,7 +103,7 @@ pub struct BaseATNState {
 
     pub state_type: ATNStateType,
 
-    transitions: Vec<Box<dyn Transition>>,
+    transitions: Vec<Transition>,
 }
 
 impl BaseATNState {
@@ -156,15 +156,15 @@ impl ATNState for BaseATNState {
         unimplemented!()
     }
 
-    fn get_transitions(&self) -> &Vec<Box<dyn Transition>> {
+    fn get_transitions(&self) -> &Vec<Transition> {
         &self.transitions
     }
 
-    fn set_transitions(&self, _t: Vec<Box<dyn Transition>>) {
+    fn set_transitions(&self, _t: Vec<Transition>) {
         unimplemented!()
     }
 
-    fn add_transition(&mut self, trans: Box<dyn Transition>) {
+    fn add_transition(&mut self, trans: Transition) {
         if self.transitions.is_empty() {
             self.epsilon_only_transitions = trans.is_epsilon()
         } else {

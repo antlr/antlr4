@@ -22,9 +22,7 @@ use crate::prediction_context::{
 use crate::token::TOKEN_EOF;
 
 use crate::token_factory::TokenFactory;
-use crate::transition::{
-    ActionTransition, PredicateTransition, RuleTransition, Transition, TransitionType,
-};
+use crate::transition::{ActionTransition, Transition};
 use crate::utils::cell_update;
 
 // todo rewrite this to be actually usable
@@ -516,7 +514,7 @@ impl LexerATNSimulator {
         for tr in state.get_transitions() {
             let c = self.get_epsilon_target(
                 &mut config,
-                tr.as_ref(),
+                tr,
                 _configs,
                 _speculative,
                 _treat_eofas_epsilon,
@@ -542,7 +540,7 @@ impl LexerATNSimulator {
         &self,
         //        _input: &mut dyn CharStream,
         _config: &mut ATNConfig,
-        _trans: &dyn Transition,
+        _trans: &Transition,
         _configs: &mut ATNConfigSet,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
@@ -561,12 +559,11 @@ impl LexerATNSimulator {
             .unwrap()
             .as_ref();
         //        println!("epsilon target for {:?} is {:?}", _trans, target.get_state_type());
-        match _trans.get_serialization_type() {
-            TransitionType::TRANSITION_EPSILON => {
+        match _trans {
+            Transition::Epsilon(_) => {
                 result = Some(_config.cloned(target));
             }
-            TransitionType::TRANSITION_RULE => {
-                let rt = _trans.cast::<RuleTransition>();
+            Transition::Rule(rt) => {
                 //println!("rule transition follow state{}", rt.follow_state);
                 let pred_ctx = PredictionContext::new_singleton(
                     Some(_config.get_context().unwrap().clone()),
@@ -574,14 +571,13 @@ impl LexerATNSimulator {
                 );
                 result = Some(_config.cloned_with_new_ctx(target, Some(pred_ctx.into())));
             }
-            TransitionType::TRANSITION_PREDICATE => {
-                let tr = _trans.cast::<PredicateTransition>();
+            Transition::Predicate(tr) => {
                 _configs.set_has_semantic_context(true);
                 if self.evaluate_predicate(tr.rule_index, tr.pred_index, _speculative, lexer) {
                     result = Some(_config.cloned(target));
                 }
             }
-            TransitionType::TRANSITION_ACTION => {
+            Transition::Action(_) => {
                 //println!("action transition");
                 if _config.get_context().map(|x| x.has_empty_path()) != Some(false) {
                     if let ATNConfigType::LexerATNConfig {
@@ -589,7 +585,7 @@ impl LexerATNSimulator {
                         ..
                     } = _config.get_type()
                     {
-                        let tr = _trans.cast::<ActionTransition>();
+                        let tr = _trans.try_as::<ActionTransition>().unwrap();
                         let lexer_action =
                             self.atn().lexer_actions[tr.action_index as usize].clone();
                         //dbg!(&lexer_action);
@@ -604,9 +600,7 @@ impl LexerATNSimulator {
                     result = Some(_config.cloned(target));
                 }
             }
-            TransitionType::TRANSITION_RANGE
-            | TransitionType::TRANSITION_SET
-            | TransitionType::TRANSITION_ATOM => {
+            Transition::Range(_) | Transition::Set(_) | Transition::Atom(_) => {
                 if _treat_eofas_epsilon
                     && _trans.matches(EOF, LEXER_MIN_CHAR_VALUE, LEXER_MAX_CHAR_VALUE)
                 {
@@ -614,9 +608,9 @@ impl LexerATNSimulator {
                     result = Some(_config.cloned(target));
                 }
             }
-            TransitionType::TRANSITION_WILDCARD => {}
-            TransitionType::TRANSITION_NOTSET => {}
-            TransitionType::TRANSITION_PRECEDENCE => {
+            Transition::Wildcard(_) => {}
+            Transition::NotSet(_) => {}
+            Transition::PrecedencePredicate(_) => {
                 panic!("precedence predicates are not supposed to be in lexer");
             }
         }

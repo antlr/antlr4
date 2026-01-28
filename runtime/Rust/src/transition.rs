@@ -1,4 +1,3 @@
-use std::any::{Any, TypeId};
 use std::borrow::Cow;
 use std::fmt::Debug;
 
@@ -32,52 +31,115 @@ pub const TRANSITION_NOTSET: i32 = 8;
 pub const TRANSITION_WILDCARD: i32 = 9;
 pub const TRANSITION_PRECEDENCE: i32 = 10;
 
-#[allow(non_camel_case_types)]
-#[derive(Debug, Eq, PartialEq)]
-pub enum TransitionType {
-    TRANSITION_EPSILON = 1,
-    TRANSITION_RANGE,
-    TRANSITION_RULE,
-    TRANSITION_PREDICATE,
-    TRANSITION_ATOM,
-    TRANSITION_ACTION,
-    TRANSITION_SET,
-    TRANSITION_NOTSET,
-    TRANSITION_WILDCARD,
-    TRANSITION_PRECEDENCE,
+/// Transition between ATNStates
+#[derive(Debug)]
+pub enum Transition {
+    Atom(AtomTransition),
+    Rule(RuleTransition),
+    Epsilon(EpsilonTransition),
+    Range(RangeTransition),
+    Action(ActionTransition),
+    Set(SetTransition),
+    NotSet(NotSetTransition),
+    Wildcard(WildcardTransition),
+    Predicate(PredicateTransition),
+    PrecedencePredicate(PrecedencePredicateTransition),
 }
 
-// todo remove trait because it is too slow
-/// Transition between ATNStates
-pub trait Transition: Sync + Send + Debug + Any {
-    fn get_target(&self) -> ATNStateRef;
-    fn set_target(&mut self, s: ATNStateRef);
-    fn is_epsilon(&self) -> bool {
-        false
+impl Transition {
+    pub fn get_target(&self) -> ATNStateRef {
+        match self {
+            Transition::Atom(t) => t.get_target(),
+            Transition::Rule(t) => t.get_target(),
+            Transition::Epsilon(t) => t.get_target(),
+            Transition::Range(t) => t.get_target(),
+            Transition::Action(t) => t.get_target(),
+            Transition::Set(t) => t.get_target(),
+            Transition::NotSet(t) => t.get_target(),
+            Transition::Wildcard(t) => t.get_target(),
+            Transition::Predicate(t) => t.get_target(),
+            Transition::PrecedencePredicate(t) => t.get_target(),
+        }
     }
-    fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
-        None
+
+    pub fn set_target(&mut self, s: ATNStateRef) {
+        match self {
+            Transition::Atom(t) => t.set_target(s),
+            Transition::Rule(t) => t.set_target(s),
+            Transition::Epsilon(t) => t.set_target(s),
+            Transition::Range(t) => t.set_target(s),
+            Transition::Action(t) => t.set_target(s),
+            Transition::Set(t) => t.set_target(s),
+            Transition::NotSet(t) => t.set_target(s),
+            Transition::Wildcard(t) => t.set_target(s),
+            Transition::Predicate(t) => t.set_target(s),
+            Transition::PrecedencePredicate(t) => t.set_target(s),
+        }
     }
-    fn get_serialization_type(&self) -> TransitionType;
-    fn matches(&self, symbol: i32, min_vocab_symbol: i32, max_vocab_symbol: i32) -> bool;
-    fn get_predicate(&self) -> Option<SemanticContext> {
-        None
+
+    pub fn is_epsilon(&self) -> bool {
+        match self {
+            Transition::Rule(_)
+            | Transition::Epsilon(_)
+            | Transition::Action(_)
+            | Transition::Predicate(_)
+            | Transition::PrecedencePredicate(_) => true,
+            _ => false,
+        }
     }
-    fn get_reachable_target(&self, symbol: i32) -> Option<ATNStateRef> {
+
+    pub fn get_label(&self) -> Option<Cow<'_, IntervalSet>> {
+        match self {
+            Transition::Atom(t) => t.get_label(),
+            Transition::Range(t) => t.get_label(),
+            Transition::Set(t) => t.get_label(),
+            Transition::NotSet(t) => t.get_label(),
+            _ => None,
+        }
+    }
+
+    pub fn matches(&self, symbol: i32, min_vocab_symbol: i32, max_vocab_symbol: i32) -> bool {
+        match self {
+            Transition::Atom(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Rule(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Epsilon(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Range(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Action(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Set(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::NotSet(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Wildcard(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::Predicate(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
+            Transition::PrecedencePredicate(t) => {
+                t.matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            }
+        }
+    }
+
+    pub fn get_predicate(&self) -> Option<SemanticContext> {
+        match self {
+            Transition::Predicate(t) => t.get_predicate(),
+            Transition::PrecedencePredicate(t) => t.get_predicate(),
+            _ => None,
+        }
+    }
+
+    pub fn get_reachable_target(&self, symbol: i32) -> Option<ATNStateRef> {
         //        println!("reachable target called on {:?}", self);
         if self.matches(symbol, LEXER_MIN_CHAR_VALUE, LEXER_MAX_CHAR_VALUE) {
             return Some(self.get_target());
         }
         None
     }
+
+    pub fn try_as<T: ConcreteTransition>(&self) -> Option<&T> {
+        T::cast_from(self)
+    }
 }
 
-impl dyn Transition {
-    #[inline]
-    pub fn cast<T: Transition>(&self) -> &T {
-        assert_eq!(self.type_id(), TypeId::of::<T>());
-        unsafe { &*(self as *const dyn Transition as *const T) }
-    }
+pub trait ConcreteTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized;
 }
 
 #[derive(Debug)]
@@ -86,7 +148,7 @@ pub struct AtomTransition {
     pub label: i32,
 }
 
-impl Transition for AtomTransition {
+impl AtomTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -101,12 +163,26 @@ impl Transition for AtomTransition {
         Some(Cow::Owned(r))
     }
 
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_ATOM
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         _symbol == self.label
+    }
+}
+
+impl From<AtomTransition> for Transition {
+    fn from(t: AtomTransition) -> Self {
+        Transition::Atom(t)
+    }
+}
+
+impl ConcreteTransition for AtomTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Atom(at) => Some(at),
+            _ => None,
+        }
     }
 }
 
@@ -118,24 +194,34 @@ pub struct RuleTransition {
     pub precedence: i32,
 }
 
-impl Transition for RuleTransition {
-    fn get_target(&self) -> ATNStateRef {
+impl RuleTransition {
+    pub fn get_target(&self) -> ATNStateRef {
         self.target
     }
-    fn set_target(&mut self, s: ATNStateRef) {
+    pub fn set_target(&mut self, s: ATNStateRef) {
         self.target = s
     }
 
-    fn is_epsilon(&self) -> bool {
-        true
-    }
-
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_RULE
-    }
-
-    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         unimplemented!()
+    }
+}
+
+impl From<RuleTransition> for Transition {
+    fn from(t: RuleTransition) -> Self {
+        Transition::Rule(t)
+    }
+}
+
+impl ConcreteTransition for RuleTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Rule(rt) => Some(rt),
+            _ => None,
+        }
     }
 }
 
@@ -145,7 +231,7 @@ pub struct EpsilonTransition {
     pub outermost_precedence_return: i32,
 }
 
-impl Transition for EpsilonTransition {
+impl EpsilonTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -153,16 +239,26 @@ impl Transition for EpsilonTransition {
         self.target = s
     }
 
-    fn is_epsilon(&self) -> bool {
-        true
-    }
-
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_EPSILON
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
+    }
+}
+
+impl From<EpsilonTransition> for Transition {
+    fn from(t: EpsilonTransition) -> Self {
+        Transition::Epsilon(t)
+    }
+}
+
+impl ConcreteTransition for EpsilonTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Epsilon(et) => Some(et),
+            _ => None,
+        }
     }
 }
 
@@ -173,7 +269,7 @@ pub struct RangeTransition {
     pub stop: i32,
 }
 
-impl Transition for RangeTransition {
+impl RangeTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -187,12 +283,26 @@ impl Transition for RangeTransition {
         Some(Cow::Owned(r))
     }
 
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_RANGE
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         _symbol >= self.start && _symbol <= self.stop
+    }
+}
+
+impl From<RangeTransition> for Transition {
+    fn from(t: RangeTransition) -> Self {
+        Transition::Range(t)
+    }
+}
+
+impl ConcreteTransition for RangeTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Range(rt) => Some(rt),
+            _ => None,
+        }
     }
 }
 
@@ -205,7 +315,7 @@ pub struct ActionTransition {
     pub pred_index: i32,
 }
 
-impl Transition for ActionTransition {
+impl ActionTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -213,16 +323,26 @@ impl Transition for ActionTransition {
         self.target = s
     }
 
-    fn is_epsilon(&self) -> bool {
-        true
-    }
-
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_ACTION
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
+    }
+}
+
+impl From<ActionTransition> for Transition {
+    fn from(t: ActionTransition) -> Self {
+        Transition::Action(t)
+    }
+}
+
+impl ConcreteTransition for ActionTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Action(at) => Some(at),
+            _ => None,
+        }
     }
 }
 
@@ -232,7 +352,7 @@ pub struct SetTransition {
     pub set: IntervalSet,
 }
 
-impl Transition for SetTransition {
+impl SetTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -244,12 +364,26 @@ impl Transition for SetTransition {
         Some(Cow::Borrowed(&self.set))
     }
 
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_SET
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         self.set.contains(_symbol)
+    }
+}
+
+impl From<SetTransition> for Transition {
+    fn from(t: SetTransition) -> Self {
+        Transition::Set(t)
+    }
+}
+
+impl ConcreteTransition for SetTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Set(st) => Some(st),
+            _ => None,
+        }
     }
 }
 
@@ -259,7 +393,7 @@ pub struct NotSetTransition {
     pub set: IntervalSet,
 }
 
-impl Transition for NotSetTransition {
+impl NotSetTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -271,12 +405,26 @@ impl Transition for NotSetTransition {
         Some(Cow::Borrowed(&self.set))
     }
 
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_NOTSET
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         _symbol >= _min_vocab_symbol && _symbol <= _max_vocab_symbol && !self.set.contains(_symbol)
+    }
+}
+
+impl From<NotSetTransition> for Transition {
+    fn from(t: NotSetTransition) -> Self {
+        Transition::NotSet(t)
+    }
+}
+
+impl ConcreteTransition for NotSetTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::NotSet(nt) => Some(nt),
+            _ => None,
+        }
     }
 }
 
@@ -285,7 +433,7 @@ pub struct WildcardTransition {
     pub target: ATNStateRef,
 }
 
-impl Transition for WildcardTransition {
+impl WildcardTransition {
     fn get_target(&self) -> ATNStateRef {
         self.target
     }
@@ -293,12 +441,26 @@ impl Transition for WildcardTransition {
         self.target = s
     }
 
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_WILDCARD
-    }
-
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         _symbol < _max_vocab_symbol && _symbol > _min_vocab_symbol
+    }
+}
+
+impl From<WildcardTransition> for Transition {
+    fn from(t: WildcardTransition) -> Self {
+        Transition::Wildcard(t)
+    }
+}
+
+impl ConcreteTransition for WildcardTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Wildcard(wt) => Some(wt),
+            _ => None,
+        }
     }
 }
 
@@ -310,33 +472,43 @@ pub struct PredicateTransition {
     pub pred_index: i32,
 }
 
-impl Transition for PredicateTransition {
-    fn get_target(&self) -> ATNStateRef {
+impl PredicateTransition {
+    pub fn get_target(&self) -> ATNStateRef {
         self.target
     }
 
-    fn set_target(&mut self, s: ATNStateRef) {
+    pub fn set_target(&mut self, s: ATNStateRef) {
         self.target = s
     }
 
-    fn is_epsilon(&self) -> bool {
-        true
-    }
-
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_PREDICATE
-    }
-
-    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
     }
 
-    fn get_predicate(&self) -> Option<SemanticContext> {
+    pub fn get_predicate(&self) -> Option<SemanticContext> {
         Some(SemanticContext::Predicate {
             rule_index: self.rule_index,
             pred_index: self.pred_index,
             is_ctx_dependent: self.is_ctx_dependent,
         })
+    }
+}
+
+impl From<PredicateTransition> for Transition {
+    fn from(t: PredicateTransition) -> Self {
+        Transition::Predicate(t)
+    }
+}
+
+impl ConcreteTransition for PredicateTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::Predicate(pt) => Some(pt),
+            _ => None,
+        }
     }
 }
 
@@ -346,27 +518,38 @@ pub struct PrecedencePredicateTransition {
     pub precedence: i32,
 }
 
-impl Transition for PrecedencePredicateTransition {
-    fn get_target(&self) -> ATNStateRef {
+impl PrecedencePredicateTransition {
+    pub fn get_target(&self) -> ATNStateRef {
         self.target
     }
-    fn set_target(&mut self, s: ATNStateRef) {
+
+    pub fn set_target(&mut self, s: ATNStateRef) {
         self.target = s
     }
 
-    fn is_epsilon(&self) -> bool {
-        true
-    }
-
-    fn get_serialization_type(&self) -> TransitionType {
-        TransitionType::TRANSITION_PRECEDENCE
-    }
-
-    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
     }
 
-    fn get_predicate(&self) -> Option<SemanticContext> {
+    pub fn get_predicate(&self) -> Option<SemanticContext> {
         Some(SemanticContext::Precedence(self.precedence))
+    }
+}
+
+impl From<PrecedencePredicateTransition> for Transition {
+    fn from(t: PrecedencePredicateTransition) -> Self {
+        Transition::PrecedencePredicate(t)
+    }
+}
+
+impl ConcreteTransition for PrecedencePredicateTransition {
+    fn cast_from(t: &Transition) -> Option<&Self>
+    where
+        Self: Sized,
+    {
+        match t {
+            Transition::PrecedencePredicate(pt) => Some(pt),
+            _ => None,
+        }
     }
 }

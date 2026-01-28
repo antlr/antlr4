@@ -5,8 +5,7 @@ use crate::parser::Parser;
 use crate::rule_context::states_stack;
 use crate::token::{OwningToken, Token};
 use crate::token_factory::TokenFactory;
-use crate::transition::PredicateTransition;
-use crate::transition::TransitionType::TRANSITION_PREDICATE;
+use crate::transition::Transition;
 use std::error::Error;
 use std::fmt;
 use std::fmt::Formatter;
@@ -211,8 +210,7 @@ impl ANTLRError {
             .get_transitions()
             .first()
             .unwrap();
-        let (rule_index, _) = if tr.get_serialization_type() == TRANSITION_PREDICATE {
-            let pr = tr.deref().cast::<PredicateTransition>();
+        let (rule_index, _) = if let Transition::Predicate(pr) = tr {
             (pr.rule_index, pr.pred_index)
         } else {
             (0, 0)

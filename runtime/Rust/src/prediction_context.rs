@@ -526,8 +526,8 @@ impl PredictionContext {
             .get_transitions()
             .first()
             .unwrap()
-            .deref()
-            .cast::<RuleTransition>();
+            .try_as::<RuleTransition>()
+            .unwrap();
 
         PredictionContext::new_singleton(Some(parent), transition.follow_state).alloc()
     }

@@ -11,8 +11,7 @@ use crate::interval_set::IntervalSet;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
-use crate::transition::TransitionType::TRANSITION_NOTSET;
-use crate::transition::{RuleTransition, TransitionType};
+use crate::transition::Transition;
 use crate::tree::RuleNode;
 
 pub struct LL1Analyzer<'a> {
@@ -122,9 +121,8 @@ impl LL1Analyzer<'_> {
 
         for tr in s.get_transitions() {
             let target = self.atn.states[tr.get_target() as usize].as_ref();
-            match tr.get_serialization_type() {
-                TransitionType::TRANSITION_RULE => {
-                    let rule_tr = tr.as_ref().cast::<RuleTransition>();
+            match tr {
+                Transition::Rule(rule_tr) => {
                     if called_rule_stack.contains(target.get_rule_index() as usize) {
                         continue;
                     }
@@ -147,7 +145,7 @@ impl LL1Analyzer<'_> {
                     );
                     called_rule_stack.remove(target.get_rule_index() as usize);
                 }
-                TransitionType::TRANSITION_PREDICATE | TransitionType::TRANSITION_PRECEDENCE => {
+                Transition::Predicate(_) | Transition::PrecedencePredicate(_) => {
                     if see_thru_preds {
                         self.look_work(
                             target,
@@ -163,7 +161,7 @@ impl LL1Analyzer<'_> {
                         look.add_one(TOKEN_INVALID_TYPE);
                     }
                 }
-                TransitionType::TRANSITION_WILDCARD => {
+                Transition::Wildcard(_) => {
                     look.add_range(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type)
                 }
                 _ if tr.is_epsilon() => self.look_work(
@@ -178,7 +176,7 @@ impl LL1Analyzer<'_> {
                 ),
                 _ => {
                     if let Some(mut set) = tr.get_label() {
-                        if tr.get_serialization_type() == TRANSITION_NOTSET {
+                        if matches!(tr, Transition::NotSet(_)) {
                             let complement =
                                 set.complement(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type);
                             *set.to_mut() = complement;

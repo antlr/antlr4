@@ -245,10 +245,9 @@ impl ATNDeserializer {
         let mut new_tr = Vec::new();
         for i in &atn.states {
             for tr in i.get_transitions() {
-                match tr.get_serialization_type() {
-                    TransitionType::TRANSITION_RULE => {
+                match tr {
+                    Transition::Rule(tr) => {
                         //                        println!("TRANSITION_RULE");
-                        let tr = tr.as_ref().cast::<RuleTransition>();
                         let target = atn.states.get(tr.get_target() as usize).unwrap();
 
                         let outermost_prec_return = if let ATNStateType::RuleStartState {
@@ -275,7 +274,7 @@ impl ATNDeserializer {
                         };
                         new_tr.push((
                             atn.rule_to_stop_state[target.get_rule_index() as usize],
-                            Box::new(return_tr),
+                            return_tr.into(),
                         ));
                     }
                     _ => continue,
@@ -409,7 +408,7 @@ impl ATNDeserializer {
         arg2: i32,
         arg3: i32,
         sets: &[IntervalSet],
-    ) -> Box<dyn Transition> {
+    ) -> Transition {
         //        //        let target = atn.states.get
         //        let mut base = BaseTransition {
         //            target: trg,
@@ -419,11 +418,12 @@ impl ATNDeserializer {
         //        };
 
         match type_index {
-            TRANSITION_EPSILON => Box::new(EpsilonTransition {
+            TRANSITION_EPSILON => EpsilonTransition {
                 target,
                 outermost_precedence_return: 0,
-            }),
-            TRANSITION_RANGE => Box::new(RangeTransition {
+            }
+            .into(),
+            TRANSITION_RANGE => RangeTransition {
                 target,
                 start: if arg3 != 0 {
                     super::token::TOKEN_EOF
@@ -431,46 +431,54 @@ impl ATNDeserializer {
                     arg1
                 },
                 stop: arg2,
-            }),
+            }
+            .into(),
             TRANSITION_RULE => {
                 //                base.set_target(arg1 as usize);
-                Box::new(RuleTransition {
+                RuleTransition {
                     target: arg1,
                     follow_state: target,
                     rule_index: arg2,
                     precedence: arg3,
-                })
+                }
             }
-            TRANSITION_PREDICATE => Box::new(PredicateTransition {
+            .into(),
+            TRANSITION_PREDICATE => PredicateTransition {
                 target,
                 is_ctx_dependent: arg3 != 0,
                 rule_index: arg1,
                 pred_index: arg2,
-            }),
-            TRANSITION_ATOM => Box::new(AtomTransition {
+            }
+            .into(),
+            TRANSITION_ATOM => AtomTransition {
                 target,
                 label: if arg3 != 0 { EOF } else { arg1 },
-            }),
-            TRANSITION_ACTION => Box::new(ActionTransition {
+            }
+            .into(),
+            TRANSITION_ACTION => ActionTransition {
                 target,
                 is_ctx_dependent: arg3 != 0,
                 rule_index: arg1,
                 action_index: arg2,
                 pred_index: 0,
-            }),
-            TRANSITION_SET => Box::new(SetTransition {
+            }
+            .into(),
+            TRANSITION_SET => SetTransition {
                 target,
                 set: sets[arg1 as usize].clone(),
-            }),
-            TRANSITION_NOTSET => Box::new(NotSetTransition {
+            }
+            .into(),
+            TRANSITION_NOTSET => NotSetTransition {
                 target,
                 set: sets[arg1 as usize].clone(),
-            }),
-            TRANSITION_WILDCARD => Box::new(WildcardTransition { target }),
-            TRANSITION_PRECEDENCE => Box::new(PrecedencePredicateTransition {
+            }
+            .into(),
+            TRANSITION_WILDCARD => WildcardTransition { target }.into(),
+            TRANSITION_PRECEDENCE => PrecedencePredicateTransition {
                 target,
                 precedence: arg1,
-            }),
+            }
+            .into(),
             _ => panic!("invalid transition type"),
         }
     }

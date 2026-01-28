@@ -34,7 +34,7 @@ use crate::token_factory::TokenFactory;
 use crate::token_stream::TokenStream;
 use crate::transition::{
     ActionTransition, EpsilonTransition, PrecedencePredicateTransition, PredicateTransition,
-    RuleTransition, Transition, TransitionType,
+    RuleTransition, Transition,
 };
 
 /// ### The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -555,7 +555,7 @@ impl ParserATNSimulator {
             }
 
             for tr in state.get_transitions() {
-                self.get_reachable_target(tr.as_ref(), t).map(|target| {
+                self.get_reachable_target(tr, t).map(|target| {
                     let added = c.cloned(self.atn().states[target as usize].as_ref());
                     intermediate.add_cached(added, Some(local.merge_cache))
                 });
@@ -770,7 +770,7 @@ impl ParserATNSimulator {
         config_set
     }
 
-    fn get_reachable_target(&self, trans: &dyn Transition, ttype: i32) -> Option<ATNStateRef> {
+    fn get_reachable_target(&self, trans: &Transition, ttype: i32) -> Option<ATNStateRef> {
         if trans.matches(ttype, 0, self.atn().max_token_type) {
             return Some(trans.get_target());
         }
@@ -1126,12 +1126,10 @@ impl ParserATNSimulator {
                 continue;
             }
 
-            let continue_collecting = tr.get_serialization_type()
-                != TransitionType::TRANSITION_ACTION
-                && collect_predicates;
+            let continue_collecting = !matches!(tr, Transition::Action(_)) && collect_predicates;
             let c = self.get_epsilon_target(
                 &config,
-                tr.as_ref(),
+                tr,
                 continue_collecting,
                 depth == 0,
                 full_ctx,
@@ -1148,8 +1146,8 @@ impl ParserATNSimulator {
                     let dfa = local.dfa_ref;
                     if dfa.is_precedence_dfa() {
                         let outermost_precedence_return = tr
-                            .as_ref()
-                            .cast::<EpsilonTransition>()
+                            .try_as::<EpsilonTransition>()
+                            .unwrap()
                             .outermost_precedence_return;
                         let atn_start_state =
                             self.atn().states[dfa.atn_start_state as usize].as_ref();
@@ -1170,9 +1168,7 @@ impl ParserATNSimulator {
                         continue;
                     }
 
-                    if tr.get_serialization_type() == TransitionType::TRANSITION_RULE
-                        && new_depth >= 0
-                    {
+                    if matches!(tr, Transition::Rule(_)) && new_depth >= 0 {
                         new_depth += 1
                     }
                 }
@@ -1278,7 +1274,7 @@ impl ParserATNSimulator {
     fn get_epsilon_target<'a, 'input, 'arena, TF, P>(
         &'a self,
         config: &ATNConfig,
-        t: &dyn Transition,
+        t: &Transition,
         collect_predicates: bool,
         in_context: bool,
         full_ctx: bool,
@@ -1290,42 +1286,40 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        match t.get_serialization_type() {
-            TransitionType::TRANSITION_EPSILON => {
+        match t {
+            Transition::Epsilon(_) => {
                 Some(config.cloned(self.atn().states[t.get_target() as usize].as_ref()))
             }
-            TransitionType::TRANSITION_RULE => {
-                Some(self.rule_transition(config, t.cast::<RuleTransition>()))
+            Transition::Rule(_) => {
+                Some(self.rule_transition(config, t.try_as::<RuleTransition>().unwrap()))
             }
-            TransitionType::TRANSITION_PREDICATE => self.pred_transition(
+            Transition::Predicate(_) => self.pred_transition(
                 config,
-                t.cast::<PredicateTransition>(),
+                t.try_as::<PredicateTransition>().unwrap(),
                 collect_predicates,
                 in_context,
                 full_ctx,
                 local,
             ),
-            TransitionType::TRANSITION_ACTION => {
-                Some(self.action_transition(config, t.cast::<ActionTransition>()))
+            Transition::Action(_) => {
+                Some(self.action_transition(config, t.try_as::<ActionTransition>().unwrap()))
             }
-            TransitionType::TRANSITION_PRECEDENCE => self.precedence_transition(
+            Transition::PrecedencePredicate(_) => self.precedence_transition(
                 config,
-                t.cast::<PrecedencePredicateTransition>(),
+                t.try_as::<PrecedencePredicateTransition>().unwrap(),
                 collect_predicates,
                 in_context,
                 full_ctx,
                 local,
             ),
-            TransitionType::TRANSITION_ATOM
-            | TransitionType::TRANSITION_SET
-            | TransitionType::TRANSITION_RANGE => {
+            Transition::Atom(_) | Transition::Set(_) | Transition::Range(_) => {
                 if treat_eofas_epsilon && t.matches(TOKEN_EOF, 0, 1) {
                     Some(config.cloned(self.atn().states[t.get_target() as usize].as_ref()))
                 } else {
                     None
                 }
             }
-            TransitionType::TRANSITION_NOTSET | TransitionType::TRANSITION_WILDCARD => None,
+            Transition::NotSet(_) | Transition::Wildcard(_) => None,
         }
     }
 
