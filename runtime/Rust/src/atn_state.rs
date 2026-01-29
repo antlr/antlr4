@@ -476,7 +476,8 @@ impl From<DecisionState> for ATNState {
 pub struct ATNStateRef(*const ATNState);
 
 impl ATNStateRef {
-    pub(crate) fn invalid() -> Self {
+    #[inline]
+    pub fn invalid() -> Self {
         static INVALID_STATE: ATNState = ATNState::Invalid(BaseATNState {
             next_tokens_within_rule: OnceLock::new(),
             epsilon_only_transitions: false,
