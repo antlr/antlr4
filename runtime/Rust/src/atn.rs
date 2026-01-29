@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::pin::Pin;
 
 use crate::atn_state::ATNState;
 use crate::atn_state::ATNStateRef;
@@ -39,7 +40,7 @@ pub struct ATN {
 
     pub rule_to_token_type: Vec<i32>,
 
-    pub states: Vec<ATNState>,
+    states: Vec<Pin<Box<ATNState>>>,
 }
 
 impl Debug for ATN {
@@ -72,9 +73,9 @@ impl ATN {
     ///Compute the set of valid tokens that can occur starting in `s` and
     ///staying in same rule. `Token::EPSILON` is in set if we reach end of
     ///rule.
-    pub fn next_tokens<'a>(&self, s: &'a ATNState) -> &'a IntervalSet {
+    pub fn next_tokens<'a>(&self, s: &'a ATNStateRef) -> &'a IntervalSet {
         s.get_next_tokens_within_rule().get_or_init(|| {
-            self.next_tokens_in_ctx::<EmptyRuleNode>(s, None)
+            self.next_tokens_in_ctx::<EmptyRuleNode>(*s, None)
                 .modify_with(|r| r.read_only = true)
         })
     }
@@ -85,7 +86,7 @@ impl ATN {
     /// restricted to tokens reachable staying within `s`'s rule.
     pub fn next_tokens_in_ctx<'input, 'arena, Node>(
         &self,
-        s: &ATNState,
+        s: ATNStateRef,
         ctx: Option<&'arena Node>,
     ) -> IntervalSet
     where
@@ -97,8 +98,13 @@ impl ATN {
     }
 
     pub(crate) fn add_state(&mut self, state: ATNState) {
-        debug_assert_eq!(state.get_state_number() as usize, self.states.len());
-        self.states.push(state)
+        let state_number = state.get_state_number();
+        *self.get_state_mut(state_number) = state;
+    }
+
+    pub(crate) fn alloc_states(&mut self, count: usize) {
+        self.states
+            .resize_with(self.states.len() + count, || Box::pin(ATNState::default()));
     }
 
     // fn remove_state(&self, _state: ATNStateRef) { unimplemented!() }
@@ -107,6 +113,26 @@ impl ATN {
 
     pub fn get_decision_state(&self, decision: i32) -> ATNStateRef {
         self.decision_to_state[decision as usize]
+    }
+
+    pub fn make_state_ref(&self, state_number: i32) -> ATNStateRef {
+        ATNStateRef::from(&self.states[state_number as usize])
+    }
+
+    pub fn get_state(&self, state_number: i32) -> &ATNState {
+        &self.states[state_number as usize]
+    }
+
+    pub fn get_state_mut(&mut self, state_number: i32) -> &mut ATNState {
+        &mut self.states[state_number as usize]
+    }
+
+    pub fn iter_states(&self) -> impl Iterator<Item = &ATNState> {
+        self.states.iter().map(|s| &**s)
+    }
+
+    pub fn states_count(&self) -> usize {
+        self.states.len()
     }
 
     /// Computes the set of input symbols which could follow ATN state number
@@ -146,8 +172,8 @@ impl ATN {
         state_number: i32,
         states_stack: impl Iterator<Item = i32>, // _ctx: &Rc<Ctx::Type>,
     ) -> IntervalSet {
-        let s = &self.states[state_number as usize];
-        let mut following = self.next_tokens(s);
+        let s = self.make_state_ref(state_number);
+        let mut following = self.next_tokens(&s);
         if !following.contains(TOKEN_EPSILON) {
             return following.clone();
         }
@@ -164,7 +190,7 @@ impl ATN {
             let invoking_state = &self.states[state as usize];
             let tr = invoking_state.get_transitions().first().unwrap();
             let tr = tr.try_as::<RuleTransition>().unwrap();
-            following = self.next_tokens(&self.states[tr.follow_state as usize]);
+            following = self.next_tokens(&tr.follow_state);
             expected.add_set(following);
             expected.remove_one(TOKEN_EPSILON);
             // ctx = c.get_parent_ctx();

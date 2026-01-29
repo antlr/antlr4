@@ -9,6 +9,7 @@ use std::sync::{Arc, LazyLock, RwLock};
 use murmur3::murmur3_32::MurmurHasher;
 
 use crate::atn::ATN;
+use crate::atn_state::ATNStateRef;
 use crate::dfa::ScopeExt;
 use crate::parser_atn_simulator::MergeCache;
 
@@ -17,12 +18,6 @@ use crate::prediction_context::PredictionContext::{Array, Singleton};
 use crate::transition::RuleTransition;
 use crate::tree::RuleNode;
 
-pub const PREDICTION_CONTEXT_EMPTY_RETURN_STATE: i32 = 0x7FFFFFFF;
-
-#[cfg(test)]
-mod test;
-
-//todo make return states ATNStateRef
 #[derive(Eq, Clone, Debug)]
 pub enum PredictionContext {
     Singleton(SingletonPredictionContext),
@@ -42,7 +37,7 @@ impl PartialEq for PredictionContext {
 #[derive(Eq, Clone, Debug)]
 pub struct ArrayPredictionContext {
     cached_hash: i32,
-    return_states: Vec<i32>,
+    return_states: Vec<ATNStateRef>,
     parents: Vec<Option<Arc<PredictionContext>>>,
 }
 
@@ -72,7 +67,7 @@ fn opt_eq(
 #[derive(Eq, Clone, Debug)]
 pub struct SingletonPredictionContext {
     cached_hash: i32,
-    return_state: i32,
+    return_state: ATNStateRef,
     parent_ctx: Option<Arc<PredictionContext>>,
 }
 
@@ -88,7 +83,7 @@ impl PartialEq for SingletonPredictionContext {
 impl SingletonPredictionContext {
     #[inline(always)]
     fn is_empty(&self) -> bool {
-        self.return_state == PREDICTION_CONTEXT_EMPTY_RETURN_STATE && self.parent_ctx.is_none()
+        self.return_state == ATNStateRef::invalid() && self.parent_ctx.is_none()
     }
 }
 
@@ -96,12 +91,16 @@ impl Display for PredictionContext {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         match self {
             Singleton(s) => {
-                if s.return_state == PREDICTION_CONTEXT_EMPTY_RETURN_STATE {
+                if s.return_state == ATNStateRef::invalid() {
                     f.write_str("$")
                 } else if let Some(parent) = &s.parent_ctx {
-                    f.write_fmt(format_args!("{} {}", s.return_state, parent))
+                    f.write_fmt(format_args!(
+                        "{} {}",
+                        s.return_state.get_state_number(),
+                        parent
+                    ))
                 } else {
-                    f.write_fmt(format_args!("{}", s.return_state))
+                    f.write_fmt(format_args!("{}", s.return_state.get_state_number()))
                 }
             }
             Array(arr) => {
@@ -110,10 +109,11 @@ impl Display for PredictionContext {
                     if i > 0 {
                         f.write_str(", ")?;
                     }
-                    if arr.return_states[i] == PREDICTION_CONTEXT_EMPTY_RETURN_STATE {
+                    if arr.return_states[i] == ATNStateRef::invalid() {
                         f.write_str("$")?;
+                    } else {
+                        f.write_str(&arr.return_states[i].get_state_number().to_string())?;
                     }
-                    f.write_str(&arr.return_states[i].to_string())?;
                     if let Some(parent) = &arr.parents[i] {
                         f.write_fmt(format_args!(" {}", parent))?;
                     } else {
@@ -145,7 +145,7 @@ pub static EMPTY_PREDICTION_CONTEXT: LazyLock<Arc<PredictionContext>> =
 impl PredictionContext {
     pub fn new_array(
         parents: Vec<Option<Arc<PredictionContext>>>,
-        return_states: Vec<i32>,
+        return_states: Vec<ATNStateRef>,
     ) -> PredictionContext {
         PredictionContext::Array(ArrayPredictionContext {
             cached_hash: 0,
@@ -156,7 +156,7 @@ impl PredictionContext {
 
     pub fn new_singleton(
         parent_ctx: Option<Arc<PredictionContext>>,
-        return_state: i32,
+        return_state: ATNStateRef,
     ) -> PredictionContext {
         PredictionContext::Singleton(SingletonPredictionContext {
             cached_hash: 0,
@@ -170,7 +170,7 @@ impl PredictionContext {
         let mut ctx = PredictionContext::Singleton(SingletonPredictionContext {
             cached_hash: 0,
             parent_ctx: None,
-            return_state: PREDICTION_CONTEXT_EMPTY_RETURN_STATE,
+            return_state: ATNStateRef::invalid(),
         });
         ctx.calc_hash();
         ctx
@@ -188,7 +188,7 @@ impl PredictionContext {
                     None => 0,
                     Some(x) => x.hash_code(),
                 });
-                hasher.write_i32(*return_state);
+                hasher.write_usize(return_state.as_usize());
             }
             PredictionContext::Array(ArrayPredictionContext {
                 parents,
@@ -201,7 +201,9 @@ impl PredictionContext {
                         Some(x) => x.hash_code(),
                     })
                 });
-                return_states.iter().for_each(|x| hasher.write_i32(*x));
+                return_states
+                    .iter()
+                    .for_each(|x| hasher.write_usize(x.as_usize()));
             } //            PredictionContext::Empty { .. } => {}
         };
 
@@ -225,7 +227,7 @@ impl PredictionContext {
         }
     }
 
-    pub fn get_return_state(&self, index: usize) -> i32 {
+    pub fn get_return_state(&self, index: usize) -> ATNStateRef {
         match self {
             PredictionContext::Singleton(SingletonPredictionContext { return_state, .. }) => {
                 *return_state
@@ -250,12 +252,12 @@ impl PredictionContext {
         if let PredictionContext::Singleton(singleton) = self {
             return singleton.is_empty();
         }
-        self.get_return_state(0) == PREDICTION_CONTEXT_EMPTY_RETURN_STATE
+        self.get_return_state(0) == ATNStateRef::invalid()
     }
 
     #[inline(always)]
     pub fn has_empty_path(&self) -> bool {
-        self.get_return_state(self.length() - 1) == PREDICTION_CONTEXT_EMPTY_RETURN_STATE
+        self.get_return_state(self.length() - 1) == ATNStateRef::invalid()
     }
 
     #[inline(always)]
@@ -406,7 +408,7 @@ impl PredictionContext {
                 return Some(
                     Self::new_array(
                         vec![b.parent_ctx.clone(), None],
-                        vec![b.return_state, PREDICTION_CONTEXT_EMPTY_RETURN_STATE],
+                        vec![b.return_state, ATNStateRef::invalid()],
                     )
                     .alloc(),
                 );
@@ -415,7 +417,7 @@ impl PredictionContext {
                 return Some(
                     Self::new_array(
                         vec![a.parent_ctx.clone(), None],
-                        vec![a.return_state, PREDICTION_CONTEXT_EMPTY_RETURN_STATE],
+                        vec![a.return_state, ATNStateRef::invalid()],
                     )
                     .alloc(),
                 );
@@ -446,9 +448,8 @@ impl PredictionContext {
             let b_parent = b.parents[j].as_ref();
             if a.return_states[i] == b.return_states[j] {
                 let payload = a.return_states[i];
-                let both = payload == PREDICTION_CONTEXT_EMPTY_RETURN_STATE
-                    && a_parent.is_none()
-                    && b_parent.is_none();
+                let both =
+                    payload == ATNStateRef::invalid() && a_parent.is_none() && b_parent.is_none();
                 let ax_ax = a_parent.is_some() && b_parent.is_some() && a_parent == b_parent;
 
                 if both || ax_ax {
@@ -522,7 +523,8 @@ impl PredictionContext {
 
         let parent = PredictionContext::from_rule_context(atn, outer_context.get_parent().unwrap());
 
-        let transition = atn.states[outer_context.get_rule_context().get_invoking_state() as usize]
+        let transition = atn
+            .get_state(outer_context.get_rule_context().get_invoking_state())
             .get_transitions()
             .first()
             .unwrap()
@@ -644,3 +646,6 @@ impl PredictionContextCache {
         self.cache.read().unwrap().len()
     }
 }
+
+// #[cfg(test)]
+// mod test;

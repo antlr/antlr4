@@ -6,6 +6,7 @@ use bit_set::BitSet;
 use crate::atn::ATN;
 use crate::atn_config::ATNConfig;
 use crate::atn_state::ATNState;
+use crate::atn_state::ATNStateRef;
 use crate::interval_set::IntervalSet;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
@@ -26,8 +27,8 @@ impl LL1Analyzer<'_> {
 
     pub fn look<'input, 'arena, Node>(
         &self,
-        s: &ATNState,
-        stop_state: Option<&ATNState>,
+        s: ATNStateRef,
+        stop_state: Option<ATNStateRef>,
         ctx: Option<&'arena Node>,
     ) -> IntervalSet
     where
@@ -54,8 +55,8 @@ impl LL1Analyzer<'_> {
     #[allow(clippy::too_many_arguments)]
     fn look_work(
         &self,
-        s: &ATNState,
-        stop_state: Option<&ATNState>,
+        s: ATNStateRef,
+        stop_state: Option<ATNStateRef>,
         ctx: Option<Arc<PredictionContext>>,
         look: &mut IntervalSet,
         look_busy: &mut HashSet<ATNConfig>,
@@ -63,7 +64,7 @@ impl LL1Analyzer<'_> {
         see_thru_preds: bool,
         add_eof: bool,
     ) {
-        let c = ATNConfig::new(s.get_state_number(), 0, ctx.clone());
+        let c = ATNConfig::new(s, 0, ctx.clone());
         if !look_busy.insert(c) {
             return;
         }
@@ -82,7 +83,7 @@ impl LL1Analyzer<'_> {
             }
         }
 
-        if let ATNState::RuleStop(_) = s {
+        if let ATNState::RuleStop(_) = *s {
             match ctx {
                 None => {
                     look.add_one(TOKEN_EPSILON);
@@ -97,7 +98,7 @@ impl LL1Analyzer<'_> {
                     called_rule_stack.remove(s.get_rule_index() as usize);
                     for i in 0..ctx.length() {
                         self.look_work(
-                            &self.atn.states[ctx.get_return_state(i) as usize],
+                            ctx.get_return_state(i),
                             stop_state,
                             ctx.get_parent(i).cloned(),
                             look,
@@ -118,7 +119,7 @@ impl LL1Analyzer<'_> {
         }
 
         for tr in s.get_transitions() {
-            let target = &self.atn.states[tr.get_target() as usize];
+            let target = tr.get_target();
             match tr {
                 Transition::Rule(rule_tr) => {
                     if called_rule_stack.contains(target.get_rule_index() as usize) {

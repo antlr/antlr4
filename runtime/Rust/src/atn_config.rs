@@ -14,8 +14,6 @@ use crate::semantic_context::SemanticContext;
 #[derive(Clone)]
 pub struct ATNConfig {
     precedence_filter_suppressed: bool,
-    //todo since ATNState is immutable when we started working with ATNConfigs
-    // looks like it is possible to have usual reference here
     state: ATNStateRef,
     alt: i32,
     //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
@@ -42,7 +40,7 @@ impl PartialEq for ATNConfig {
 
 impl Hash for ATNConfig {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_i32(self.get_state());
+        state.write_usize(self.get_state().as_usize());
         state.write_i32(self.get_alt());
         match self.get_context() {
             None => state.write_i32(0),
@@ -70,7 +68,7 @@ impl Hash for ATNConfig {
 impl Debug for ATNConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.write_fmt(format_args!(
-            "({},{},[{}]",
+            "({:?},{},[{}]",
             self.state,
             self.alt,
             self.context.as_deref().unwrap()
@@ -148,7 +146,7 @@ impl ATNConfig {
 
     pub fn cloned_with_new_semantic(
         &self,
-        target: &ATNState,
+        target: ATNStateRef,
         ctx: Box<SemanticContext>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -156,10 +154,10 @@ impl ATNConfig {
         new
     }
 
-    pub fn cloned(&self, target: &ATNState) -> ATNConfig {
+    pub fn cloned(&self, target: ATNStateRef) -> ATNConfig {
         //        println!("depth {}",PredictionContext::size(self.context.as_deref()));
         let mut new = self.clone();
-        new.state = target.get_state_number();
+        new.state = target;
         if let ATNConfigType::LexerATNConfig {
             passed_through_non_greedy_decision,
             ..
@@ -172,7 +170,7 @@ impl ATNConfig {
 
     pub fn cloned_with_new_ctx(
         &self,
-        target: &ATNState,
+        target: ATNStateRef,
         ctx: Option<Arc<PredictionContext>>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -183,7 +181,7 @@ impl ATNConfig {
 
     pub(crate) fn cloned_with_new_exec(
         &self,
-        target: &ATNState,
+        target: ATNStateRef,
         exec: Option<LexerActionExecutor>,
     ) -> ATNConfig {
         let mut new = self.cloned(target);
@@ -239,7 +237,7 @@ impl ATNConfig {
     }
 }
 
-fn check_non_greedy_decision(source: &ATNConfig, target: &ATNState) -> bool {
+fn check_non_greedy_decision(source: &ATNConfig, target: ATNStateRef) -> bool {
     if let LexerATNConfig {
         passed_through_non_greedy_decision: true,
         ..
@@ -249,7 +247,7 @@ fn check_non_greedy_decision(source: &ATNConfig, target: &ATNState) -> bool {
     }
     if let ATNState::Decision(DecisionState {
         nongreedy: true, ..
-    }) = target
+    }) = *target
     {
         return true;
     }

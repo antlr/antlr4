@@ -66,7 +66,7 @@ pub struct DFA {
 impl DFA {
     // ---- Begin direct Java port ----
     pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA {
-        let (s0, precedence_state) = if is_precedence_atn_state(atn, atn_start_state) {
+        let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
             let mut precedence_state =
                 DFAState::new(atn, 0, Box::new(ATNConfigSet::new_base_atnconfig_set(true)));
             precedence_state.is_accept_state = false;
@@ -253,9 +253,9 @@ impl DFA {
     }
 }
 
-fn is_precedence_atn_state(atn: &ATN, atn_start_state: ATNStateRef) -> bool {
+fn is_precedence_atn_state(atn_start_state: ATNStateRef) -> bool {
     matches!(
-        atn.states[atn_start_state as usize],
+        *atn_start_state,
         ATNState::Decision(DecisionState {
             state: ATNDecisionState::StarLoopEntry {
                 is_precedence: true,

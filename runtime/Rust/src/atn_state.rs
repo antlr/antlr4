@@ -1,5 +1,6 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Formatter};
 use std::ops::{Deref, DerefMut};
+use std::pin::Pin;
 use std::sync::OnceLock;
 
 use crate::interval_set::IntervalSet;
@@ -32,7 +33,7 @@ pub enum ATNState {
 }
 
 #[doc(hidden)]
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 pub enum ATNDecisionState {
     StarLoopEntry {
         loop_back_state: ATNStateRef,
@@ -47,14 +48,12 @@ pub enum ATNDecisionState {
 }
 
 #[doc(hidden)]
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 pub enum ATNBlockStart {
     BasicBlockStart,
     StarBlockStart,
     PlusBlockStart(ATNStateRef),
 }
-
-pub type ATNStateRef = i32;
 
 impl ATNState {
     pub fn has_epsilon_only_transitions(&self) -> bool {
@@ -146,6 +145,16 @@ impl ATNState {
             ATNState::Decision(s) => s.add_transition(trans),
             ATNState::Invalid(s) => s.add_transition(trans),
         }
+    }
+}
+
+impl Default for ATNState {
+    fn default() -> Self {
+        ATNState::Invalid(BaseATNState::new(
+            ATNSTATE_INVALID_STATE_NUMBER,
+            -1,
+            ATNSTATE_INVALID_TYPE,
+        ))
     }
 }
 
@@ -463,3 +472,91 @@ impl From<DecisionState> for ATNState {
         ATNState::Decision(value)
     }
 }
+
+pub struct ATNStateRef(*const ATNState);
+
+impl ATNStateRef {
+    pub(crate) fn invalid() -> Self {
+        static INVALID_STATE: ATNState = ATNState::Invalid(BaseATNState {
+            next_tokens_within_rule: OnceLock::new(),
+            epsilon_only_transitions: false,
+            rule_index: -1,
+            state_number: ATNSTATE_INVALID_STATE_NUMBER,
+            state_type_id: ATNSTATE_INVALID_TYPE,
+            transitions: Vec::new(),
+        });
+
+        ATNStateRef(&INVALID_STATE as *const ATNState)
+    }
+
+    pub(crate) unsafe fn as_mut(&self) -> &mut ATNState {
+        unsafe { &mut *(self.0 as *mut ATNState) }
+    }
+
+    pub fn as_usize(&self) -> usize {
+        self.0 as usize
+    }
+}
+
+impl From<&Pin<Box<ATNState>>> for ATNStateRef {
+    fn from(value: &Pin<Box<ATNState>>) -> Self {
+        ATNStateRef(&**value as *const ATNState)
+    }
+}
+
+impl PartialEq for ATNStateRef {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl Eq for ATNStateRef {}
+
+impl PartialOrd for ATNStateRef {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for ATNStateRef {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.get_state_number().cmp(&other.get_state_number())
+    }
+}
+
+impl Deref for ATNStateRef {
+    type Target = ATNState;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.0 }
+    }
+}
+
+impl AsRef<ATNState> for ATNStateRef {
+    fn as_ref(&self) -> &ATNState {
+        unsafe { &*self.0 }
+    }
+}
+
+impl Clone for ATNStateRef {
+    fn clone(&self) -> Self {
+        ATNStateRef(self.0)
+    }
+}
+
+impl Copy for ATNStateRef {}
+
+impl std::hash::Hash for ATNStateRef {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_usize(self.0 as usize);
+    }
+}
+
+impl Debug for ATNStateRef {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ATNStateRef({})", self.get_state_number())
+    }
+}
+
+unsafe impl Send for ATNStateRef {}
+unsafe impl Sync for ATNStateRef {}

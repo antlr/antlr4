@@ -237,7 +237,7 @@ where
         R: Recognizer<'input, 'arena>,
     {
         let decision = dfa.decision;
-        let rule_index = recog.get_atn().states[dfa.atn_start_state as usize].get_rule_index();
+        let rule_index = dfa.atn_start_state.get_rule_index();
 
         let rule_names = recog.get_rule_names();
         if let Some(&rule_name) = rule_names.get(rule_index as usize) {

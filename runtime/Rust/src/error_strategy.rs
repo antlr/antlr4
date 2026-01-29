@@ -257,16 +257,13 @@ where
         let current_token = recognizer.get_input_stream_mut().la(1);
 
         let atn = recognizer.get_interpreter().atn();
-        let current_state = &atn.states[recognizer.get_state() as usize];
+        let current_state = atn.get_state(recognizer.get_state());
         let next = current_state
             .get_transitions()
             .first()
             .unwrap()
             .get_target();
-        let expect_at_ll2 = atn.next_tokens_in_ctx(
-            &atn.states[next as usize],
-            Some(recognizer.get_current_context()),
-        );
+        let expect_at_ll2 = atn.next_tokens_in_ctx(next, Some(recognizer.get_current_context()));
         if expect_at_ll2.contains(current_token) {
             self.report_missing_token(recognizer);
             return true;
@@ -348,10 +345,10 @@ where
                 break;
             }
 
-            let invoking_state = &atn.states[c.get_invoking_state() as usize];
+            let invoking_state = atn.get_state(c.get_invoking_state());
             let tr = invoking_state.get_transitions().first().unwrap();
             let tr = tr.try_as::<RuleTransition>().unwrap();
-            let follow = atn.next_tokens(&atn.states[tr.follow_state as usize]);
+            let follow = atn.next_tokens(&tr.follow_state);
             recover_set.add_set(follow);
             ctx = c.get_parent();
         }
@@ -431,9 +428,12 @@ where
             return Ok(());
         }
         let next = recognizer.get_input_stream_mut().la(1);
-        let state = &recognizer.get_interpreter().atn().states[recognizer.get_state() as usize];
+        let state = recognizer
+            .get_interpreter()
+            .atn()
+            .make_state_ref(recognizer.get_state());
 
-        let next_tokens = recognizer.get_interpreter().atn().next_tokens(state);
+        let next_tokens = recognizer.get_interpreter().atn().next_tokens(&state);
         //        println!("{:?}",next_tokens);
 
         if next_tokens.contains(next) {

@@ -206,7 +206,10 @@ impl ANTLRError {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        let tr = recog.get_interpreter().atn().states[recog.get_state() as usize]
+        let tr = recog
+            .get_interpreter()
+            .atn()
+            .get_state(recog.get_state())
             .get_transitions()
             .first()
             .unwrap();
