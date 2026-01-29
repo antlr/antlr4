@@ -258,8 +258,7 @@ where
             Some(alts) => Cow::Borrowed(alts),
             None => Cow::Owned(
                 _configs
-                    .configs
-                    .iter()
+                    .get_items()
                     .map(|config| config.get_alt() as usize)
                     .collect::<BitSet>(),
             ),

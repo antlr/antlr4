@@ -571,7 +571,7 @@ impl ParserATNSimulator {
             let mut closure_busy = HashSet::new();
             //            println!("calc reach {:?}",intermediate.length());
 
-            for c in intermediate.configs {
+            for c in intermediate.into_iter() {
                 let treat_eofas_epsilon = t == TOKEN_EOF;
                 self.closure(
                     c,
@@ -636,7 +636,7 @@ impl ParserATNSimulator {
         // can just remove instead of creating new instance because we own configs
         // it significantly differs from java version though
         let mut result = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
-        for c in configs.configs {
+        for c in configs.into_iter() {
             let state = c.get_state();
             if matches!(*state, ATNState::RuleStop(_)) {
                 result.add_cached(c, Some(merge_cache));
@@ -766,7 +766,7 @@ impl ParserATNSimulator {
     ) -> Option<Vec<SemanticContext>> {
         let mut alt_to_pred = Vec::with_capacity(nalts + 1);
         alt_to_pred.resize_with(nalts + 1, || None);
-        for c in configs.configs.iter() {
+        for c in configs.get_items() {
             let alt = c.get_alt() as usize;
             if ambig_alts.contains(alt) {
                 alt_to_pred[alt] = Some(SemanticContext::or(

@@ -20,7 +20,7 @@ pub struct ATNConfigSet {
     // so i think we can replace configs and lookup with indexhashset
     config_lookup: HashMap<Key, usize, MurmurHasherBuilder>,
 
-    pub(crate) configs: Vec<ATNConfig>,
+    configs: Vec<ATNConfig>,
 
     pub(crate) conflicting_alts: BitSet,
 
@@ -86,6 +86,15 @@ impl Eq for ATNConfigSet {}
 impl Hash for ATNConfigSet {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.configs.hash(state)
+    }
+}
+
+impl IntoIterator for ATNConfigSet {
+    type Item = ATNConfig;
+    type IntoIter = std::vec::IntoIter<ATNConfig>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.configs.into_iter()
     }
 }
 
