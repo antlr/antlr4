@@ -712,19 +712,19 @@ impl ParserATNSimulator {
             }
 
             let updated_sem_ctx = config
-                .semantic_context
+                .semantic_context()
                 .eval_precedence(local.parser, local.outer_context());
 
             if let Some(updated_sem_ctx) = updated_sem_ctx.as_deref() {
                 states_from_alt1.insert(config.get_state(), config.get_context());
 
-                if *updated_sem_ctx != *config.semantic_context {
+                if updated_sem_ctx != config.semantic_context() {
                     config_set.add_cached(
                         ATNConfig::new_with_semantic(
                             config.get_state(),
                             config.get_alt(),
                             config.get_context().cloned(),
-                            Box::new(updated_sem_ctx.clone()),
+                            updated_sem_ctx.clone(),
                         ),
                         Some(local.merge_cache),
                     );
@@ -771,7 +771,7 @@ impl ParserATNSimulator {
             if ambig_alts.contains(alt) {
                 alt_to_pred[alt] = Some(SemanticContext::or(
                     alt_to_pred[alt].as_ref(),
-                    Some(&*c.semantic_context),
+                    Some(c.semantic_context()),
                 ));
             }
         }
@@ -872,10 +872,10 @@ impl ParserATNSimulator {
         let mut failed = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
         for c in configs.get_items() {
             let clone = c.clone();
-            if *c.semantic_context != SemanticContext::NONE {
+            if c.semantic_context() != &SemanticContext::NONE {
                 let predicate_eval_result = self.eval_predicate(
                     local,
-                    &*c.semantic_context,
+                    c.semantic_context(),
                     c.get_alt(),
                     configs.full_context(),
                 );
@@ -1043,7 +1043,7 @@ impl ParserATNSimulator {
                         return_state,
                         config.get_alt(),
                         new_ctx,
-                        config.semantic_context.clone(),
+                        config.semantic_context().clone(),
                     );
                     c.set_reaches_into_outer_context(config.get_reaches_into_outer_context());
                     assert!(depth > i32::MIN);
@@ -1326,8 +1326,8 @@ impl ParserATNSimulator {
                 }
             } else {
                 let new_sem_ctx =
-                    SemanticContext::and(Some(&*config.semantic_context), pt.get_predicate());
-                return Some(config.cloned_with_new_semantic(pt.target, Box::new(new_sem_ctx)));
+                    SemanticContext::and(Some(config.semantic_context()), pt.get_predicate());
+                return Some(config.cloned_with_new_semantic(pt.target, new_sem_ctx));
             }
         } else {
             return Some(config.cloned(pt.target));
@@ -1366,8 +1366,8 @@ impl ParserATNSimulator {
                 }
             } else {
                 let new_sem_ctx =
-                    SemanticContext::and(Some(&*config.semantic_context), pt.get_predicate());
-                return Some(config.cloned_with_new_semantic(pt.target, Box::new(new_sem_ctx)));
+                    SemanticContext::and(Some(config.semantic_context()), pt.get_predicate());
+                return Some(config.cloned_with_new_semantic(pt.target, new_sem_ctx));
             }
         } else {
             return Some(config.cloned(pt.target));

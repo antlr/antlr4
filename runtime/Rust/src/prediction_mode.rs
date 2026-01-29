@@ -98,7 +98,7 @@ pub(crate) fn has_sll_conflict_terminating_prediction(
                 it.get_state(),
                 it.get_alt(),
                 it.get_context().cloned(),
-                Box::new(SemanticContext::NONE),
+                SemanticContext::NONE,
             );
             dup.add(c);
         });

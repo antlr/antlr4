@@ -19,7 +19,7 @@ pub struct ATNConfig {
     //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
     //another todo check arena alloc
     context: Option<Arc<PredictionContext>>,
-    pub semantic_context: Box<SemanticContext>,
+    semantic_context: SemanticContext,
     pub reaches_into_outer_context: i32,
     pub(crate) config_type: ATNConfigType,
 }
@@ -85,7 +85,7 @@ impl Debug for ATNConfig {
 pub(crate) enum ATNConfigType {
     BaseATNConfig,
     LexerATNConfig {
-        lexer_action_executor: Option<Box<LexerActionExecutor>>,
+        lexer_action_executor: Option<Arc<LexerActionExecutor>>,
         passed_through_non_greedy_decision: bool,
     },
 }
@@ -114,7 +114,7 @@ impl ATNConfig {
             state,
             alt,
             context,
-            semantic_context: Box::new(SemanticContext::NONE),
+            semantic_context: SemanticContext::NONE,
             reaches_into_outer_context: 0,
             config_type: ATNConfigType::BaseATNConfig,
         }
@@ -124,7 +124,7 @@ impl ATNConfig {
         state: ATNStateRef,
         alt: i32,
         context: Option<Arc<PredictionContext>>,
-        semantic_context: Box<SemanticContext>,
+        semantic_context: SemanticContext,
     ) -> ATNConfig {
         let mut new = Self::new(state, alt, context);
         new.semantic_context = semantic_context;
@@ -144,11 +144,7 @@ impl ATNConfig {
         atnconfig
     }
 
-    pub fn cloned_with_new_semantic(
-        &self,
-        target: ATNStateRef,
-        ctx: Box<SemanticContext>,
-    ) -> ATNConfig {
+    pub fn cloned_with_new_semantic(&self, target: ATNStateRef, ctx: SemanticContext) -> ATNConfig {
         let mut new = self.cloned(target);
         new.semantic_context = ctx;
         new
@@ -190,7 +186,7 @@ impl ATNConfig {
             passed_through_non_greedy_decision: _,
         } = &mut new.config_type
         {
-            *lexer_action_executor = exec.map(Box::new);
+            *lexer_action_executor = exec.map(Arc::new);
             //            *passed_through_non_greedy_decision = check_non_greedy_decision(self, target);
         }
         new
@@ -210,6 +206,10 @@ impl ATNConfig {
 
     pub fn get_context(&self) -> Option<&Arc<PredictionContext>> {
         self.context.as_ref()
+    }
+
+    pub fn semantic_context(&self) -> &SemanticContext {
+        &self.semantic_context
     }
 
     pub fn take_context(&mut self) -> Arc<PredictionContext> {

@@ -2,7 +2,6 @@ use std::cmp::max;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::ops::Deref;
 
 use bit_set::BitSet;
 use murmur3::murmur3_32::MurmurHasher;
@@ -122,13 +121,13 @@ impl ATNConfigSet {
         let mut hasher = MurmurHasher::default();
         config.get_state().hash(&mut hasher);
         config.get_alt().hash(&mut hasher);
-        config.semantic_context.hash(&mut hasher);
+        config.semantic_context().hash(&mut hasher);
 
         Key::Partial(
             hasher.finish() as i32,
             config.get_state(),
             config.get_alt(),
-            config.semantic_context.deref().clone(),
+            config.semantic_context().clone(),
         )
     }
 
@@ -139,7 +138,7 @@ impl ATNConfigSet {
     ) -> bool {
         assert!(!self.read_only);
 
-        if *config.semantic_context != SemanticContext::NONE {
+        if config.semantic_context() != &SemanticContext::NONE {
             self.has_semantic_context = true
         }
 

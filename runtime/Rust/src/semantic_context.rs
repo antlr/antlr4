@@ -2,6 +2,7 @@ use std::borrow::Cow::{Borrowed, Owned};
 use std::borrow::{Borrow, Cow};
 use std::cmp::Ordering;
 use std::collections::HashSet;
+use std::sync::{Arc, LazyLock};
 
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
@@ -27,8 +28,8 @@ pub enum SemanticContext {
         is_ctx_dependent: bool,
     },
     Precedence(i32),
-    AND(Vec<SemanticContext>),
-    OR(Vec<SemanticContext>),
+    AND(Arc<[SemanticContext]>),
+    OR(Arc<[SemanticContext]>),
 }
 
 impl SemanticContext {
@@ -37,6 +38,12 @@ impl SemanticContext {
         pred_index: -1,
         is_ctx_dependent: false,
     };
+
+    pub fn none() -> Arc<SemanticContext> {
+        static NONE: LazyLock<Arc<SemanticContext>> =
+            LazyLock::new(|| Arc::new(SemanticContext::NONE));
+        NONE.clone()
+    }
 
     pub(crate) fn evaluate<'input, 'arena, TF, P>(
         &self,
@@ -89,7 +96,7 @@ impl SemanticContext {
             SemanticContext::OR(ops) => {
                 let mut differs = false;
                 let mut operands = vec![];
-                for context in ops {
+                for context in ops.iter() {
                     let evaluated = context.eval_precedence(parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
@@ -119,7 +126,7 @@ impl SemanticContext {
             SemanticContext::AND(ops) => {
                 let mut differs = false;
                 let mut operands = vec![];
-                for context in ops {
+                for context in ops.iter() {
                     let evaluated = context.eval_precedence(parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
