@@ -3,6 +3,7 @@ use std::borrow::Borrow;
 use std::cell::Cell;
 use std::collections::{HashMap, HashSet};
 
+use std::hash::Hasher;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
@@ -22,7 +23,7 @@ use crate::interval_set::IntervalSet;
 use crate::parser::Parser;
 
 use crate::prediction_context::{
-    MurmurHasherBuilder, PredictionContext, PredictionContextCache, EMPTY_PREDICTION_CONTEXT,
+    NoopHasherBuilder, PredictionContext, PredictionContextCache, EMPTY_PREDICTION_CONTEXT,
 };
 use crate::prediction_mode::*;
 use crate::semantic_context::SemanticContext;
@@ -112,11 +113,7 @@ where
     }
 }
 
-pub(crate) type MergeCache = HashMap<
-    (Arc<PredictionContext>, Arc<PredictionContext>),
-    Arc<PredictionContext>,
-    MurmurHasherBuilder,
->;
+pub(crate) type MergeCache = HashMap<MergeKey, Arc<PredictionContext>, NoopHasherBuilder>;
 
 impl ParserATNSimulator {
     /// creates new `ParserATNSimulator`
@@ -160,7 +157,7 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         self.start_index.set(parser.get_input_stream_mut().index());
-        let mut merge_cache: MergeCache = HashMap::with_hasher(MurmurHasherBuilder {});
+        let mut merge_cache: MergeCache = HashMap::with_hasher(NoopHasherBuilder {});
         let mut local = Local {
             outer_context: parser.get_current_context(),
             dfa_ref: &self.decision_to_dfa()[decision as usize],
@@ -536,7 +533,7 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         //        println!("in computeReachSet, starting closure: {:?}",closure);
-        let mut intermediate = ATNConfigSet::new_base_atnconfig_set(full_ctx);
+        let mut intermediate = ATNConfigSet::new(full_ctx);
 
         let mut skipped_stop_states = Vec::<&ATNConfig>::new();
 
@@ -567,7 +564,7 @@ impl ParserATNSimulator {
             look_to_end_of_rule = true;
             intermediate
         } else {
-            let mut reach = ATNConfigSet::new_base_atnconfig_set(full_ctx);
+            let mut reach = ATNConfigSet::new(full_ctx);
             let mut closure_busy = HashSet::new();
             //            println!("calc reach {:?}",intermediate.length());
 
@@ -635,7 +632,7 @@ impl ParserATNSimulator {
 
         // can just remove instead of creating new instance because we own configs
         // it significantly differs from java version though
-        let mut result = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
+        let mut result = ATNConfigSet::new(configs.full_context());
         for c in configs.into_iter() {
             let state = c.get_state();
             if matches!(*state, ATNState::RuleStop(_)) {
@@ -669,7 +666,7 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         //        let initial_ctx = PredictionContext::prediction_context_from_rule_context(self.atn(),ctx);
-        let mut configs = ATNConfigSet::new_base_atnconfig_set(full_ctx);
+        let mut configs = ATNConfigSet::new(full_ctx);
         //        println!("initial {:?}",initial_ctx);
         //        println!("initial state {:?}",a);
 
@@ -704,7 +701,7 @@ impl ParserATNSimulator {
     {
         //println!("apply_precedence_filter");
         let mut states_from_alt1 = HashMap::new();
-        let mut config_set = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
+        let mut config_set = ATNConfigSet::new(configs.full_context());
 
         for config in configs.get_items() {
             if config.get_alt() != 1 {
@@ -868,8 +865,8 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        let mut succeeded = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
-        let mut failed = ATNConfigSet::new_base_atnconfig_set(configs.full_context());
+        let mut succeeded = ATNConfigSet::new(configs.full_context());
+        let mut failed = ATNConfigSet::new(configs.full_context());
         for c in configs.get_items() {
             let clone = c.clone();
             if c.semantic_context() != &SemanticContext::NONE {
@@ -1350,6 +1347,7 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
+        #[allow(clippy::nonminimal_bool)]
         if collect_predicates && (!pt.is_ctx_dependent || (pt.is_ctx_dependent && in_context)) {
             if full_ctx {
                 let curr_pos = local.input().index();
@@ -1538,3 +1536,53 @@ impl IATNSimulator for ParserATNSimulator {
         self.base.decision_to_dfa()
     }
 }
+
+#[derive(PartialEq, Eq)]
+pub struct MergeKey {
+    pub left: Arc<PredictionContext>,
+    pub right: Arc<PredictionContext>,
+}
+
+impl std::hash::Hash for MergeKey {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let left_hash = self.left.hash_code();
+        let right_hash = self.right.hash_code();
+        state.write_u64((left_hash as u64) << 32 | (right_hash as u64));
+    }
+}
+
+impl MergeKey {
+    pub fn new(left: Arc<PredictionContext>, right: Arc<PredictionContext>) -> Self {
+        Self { left, right }
+    }
+
+    pub fn reverse(self) -> Self {
+        Self {
+            left: self.right,
+            right: self.left,
+        }
+    }
+}
+
+// #[derive(PartialEq, Eq)]
+// pub struct MergeKeyRef<'a> {
+//     pub left: &'a Arc<PredictionContext>,
+//     pub right: &'a Arc<PredictionContext>,
+// }
+
+// impl std::hash::Hash for MergeKeyRef<'_> {
+//     fn hash<H: Hasher>(&self, state: &mut H) {
+//         let left_hash = self.left.hash_code();
+//         let right_hash = self.right.hash_code();
+//         state.write_u64((left_hash as u64) << 32 | (right_hash as u64));
+//     }
+// }
+
+// impl<'a> Borrow<MergeKeyRef<'a>> for MergeKey {
+//     fn borrow(&self) -> &MergeKeyRef<'a> {
+//         &MergeKeyRef {
+//             left: &self.left,
+//             right: &self.right,
+//         }
+//     }
+// }

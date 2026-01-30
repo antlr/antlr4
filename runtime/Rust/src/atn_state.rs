@@ -490,6 +490,8 @@ impl ATNStateRef {
         ATNStateRef(&INVALID_STATE as *const ATNState)
     }
 
+    #[allow(clippy::mut_from_ref)]
+    #[inline]
     pub(crate) unsafe fn as_mut(&self) -> &mut ATNState {
         unsafe { &mut *(self.0 as *mut ATNState) }
     }
@@ -541,7 +543,7 @@ impl AsRef<ATNState> for ATNStateRef {
 
 impl Clone for ATNStateRef {
     fn clone(&self) -> Self {
-        ATNStateRef(self.0)
+        *self
     }
 }
 

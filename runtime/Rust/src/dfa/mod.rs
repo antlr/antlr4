@@ -10,7 +10,7 @@ use crate::atn::ATN;
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
-use crate::prediction_context::MurmurHasherBuilder;
+use crate::prediction_context::NoopHasherBuilder;
 use crate::vocabulary::Vocabulary;
 
 mod dfa_serializer;
@@ -45,7 +45,7 @@ pub(crate) trait ScopeExt: Sized {
 impl<Any: Sized> ScopeExt for Any {}
 
 type StoredDFAState = Pin<Box<DFAState<'static>>>;
-type StateStore = Mutex<HashMap<DFAStateKey, StoredDFAState, MurmurHasherBuilder>>;
+type StateStore = Mutex<HashMap<DFAStateKey, StoredDFAState, NoopHasherBuilder>>;
 
 #[derive(Debug)]
 pub struct DFA {
@@ -67,8 +67,7 @@ impl DFA {
     // ---- Begin direct Java port ----
     pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA {
         let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
-            let mut precedence_state =
-                DFAState::new(atn, 0, Box::new(ATNConfigSet::new_base_atnconfig_set(true)));
+            let mut precedence_state = DFAState::new(atn, 0, Box::new(ATNConfigSet::new(true)));
             precedence_state.is_accept_state = false;
             precedence_state.requires_full_context = false;
 

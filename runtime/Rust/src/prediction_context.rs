@@ -10,7 +10,7 @@ use murmur3::murmur3_32::MurmurHasher;
 use crate::atn::ATN;
 use crate::atn_state::ATNStateRef;
 use crate::dfa::ScopeExt;
-use crate::parser_atn_simulator::MergeCache;
+use crate::parser_atn_simulator::{MergeCache, MergeKey};
 
 use crate::prediction_context::PredictionContext::{Array, Singleton};
 
@@ -35,7 +35,7 @@ impl PartialEq for PredictionContext {
 
 #[derive(Eq, Debug)]
 pub struct ArrayPredictionContext {
-    cached_hash: i32,
+    cached_hash: u32,
     return_states: Vec<ATNStateRef>,
     parents: Vec<Option<Arc<PredictionContext>>>,
 }
@@ -65,7 +65,7 @@ fn opt_eq(
 
 #[derive(Eq, Clone, Debug)]
 pub struct SingletonPredictionContext {
-    cached_hash: i32,
+    cached_hash: u32,
     return_state: ATNStateRef,
     parent_ctx: Option<Arc<PredictionContext>>,
 }
@@ -128,7 +128,7 @@ impl Display for PredictionContext {
 
 impl Hash for PredictionContext {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_i32(self.hash_code())
+        state.write_u32(self.hash_code())
     }
 }
 
@@ -177,7 +177,7 @@ impl PredictionContext {
                 return_state,
                 ..
             }) => {
-                hasher.write_i32(match parent_ctx {
+                hasher.write_u32(match parent_ctx {
                     None => 0,
                     Some(x) => x.hash_code(),
                 });
@@ -189,7 +189,7 @@ impl PredictionContext {
                 ..
             }) => {
                 parents.iter().for_each(|x| {
-                    hasher.write_i32(match x {
+                    hasher.write_u32(match x {
                         None => 0,
                         Some(x) => x.hash_code(),
                     })
@@ -200,7 +200,7 @@ impl PredictionContext {
             } //            PredictionContext::Empty { .. } => {}
         };
 
-        let hash = hasher.finish() as i32;
+        let hash = hasher.finish() as u32;
 
         match self {
             PredictionContext::Singleton(SingletonPredictionContext { cached_hash, .. })
@@ -254,7 +254,7 @@ impl PredictionContext {
     }
 
     #[inline(always)]
-    pub fn hash_code(&self) -> i32 {
+    pub fn hash_code(&self) -> u32 {
         match self {
             PredictionContext::Singleton(SingletonPredictionContext { cached_hash, .. })
             | PredictionContext::Array(ArrayPredictionContext { cached_hash, .. }) => *cached_hash,
@@ -279,10 +279,8 @@ impl PredictionContext {
         }
 
         if let Some(cache) = merge_cache {
-            if let Some(prev) = cache
-                .get(&(a.clone(), b.clone()))
-                .or_else(|| cache.get(&(b.clone(), a.clone())))
-            {
+            let key = MergeKey::new(a.clone(), b.clone());
+            if let Some(prev) = cache.get(&key).or_else(|| cache.get(&key.reverse())) {
                 return prev.clone();
             }
         }
@@ -318,7 +316,7 @@ impl PredictionContext {
         if let Some(cache) = merge_cache {
             //            cache.entry(a.clone()).or_insert_with(||HashMap::new())
             //                .insert(b.clone(),r.clone());
-            cache.insert((a.clone(), b.clone()), r.clone());
+            cache.insert(MergeKey::new(a.clone(), b.clone()), r.clone());
         }
         r
     }
@@ -351,7 +349,7 @@ impl PredictionContext {
                     vec![a.parent_ctx.clone(), b.parent_ctx.clone()]
                 };
                 let mut result = ArrayPredictionContext {
-                    cached_hash: -1,
+                    cached_hash: 0,
                     parents,
                     return_states: vec![a.return_state, b.return_state],
                 };
@@ -409,7 +407,7 @@ impl PredictionContext {
         merge_cache: &mut Option<&mut MergeCache>,
     ) -> PredictionContext {
         let mut merged = ArrayPredictionContext {
-            cached_hash: -1,
+            cached_hash: 0,
             parents: Vec::with_capacity(a.length() + b.length()),
             return_states: Vec::with_capacity(a.length() + b.length()),
         };
@@ -505,8 +503,7 @@ impl PredictionContext {
     }
 
     fn combine_common_parents(array: &mut ArrayPredictionContext) {
-        let mut uniq_parents =
-            HashMap::<Option<Arc<PredictionContext>>, Option<Arc<PredictionContext>>>::new();
+        let mut uniq_parents = HashMap::with_hasher(NoopHasherBuilder {});
         for p in 0..array.parents.len() {
             let parent = array.parents[p].as_ref().cloned();
             if !uniq_parents.contains_key(&parent) {
@@ -527,26 +524,14 @@ impl PredictionContext {
 #[derive(Debug)]
 pub struct PredictionContextCache {
     //todo test dashmap
-    cache: RwLock<HashMap<Arc<PredictionContext>, Arc<PredictionContext>, MurmurHasherBuilder>>,
-}
-
-#[doc(hidden)]
-#[derive(Debug, Default)]
-pub struct MurmurHasherBuilder {}
-
-impl BuildHasher for MurmurHasherBuilder {
-    type Hasher = MurmurHasher;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        MurmurHasher::default()
-    }
+    cache: RwLock<HashMap<Arc<PredictionContext>, Arc<PredictionContext>, NoopHasherBuilder>>,
 }
 
 impl PredictionContextCache {
     #[doc(hidden)]
     pub fn new() -> PredictionContextCache {
         PredictionContextCache {
-            cache: RwLock::new(HashMap::with_hasher(MurmurHasherBuilder {})),
+            cache: RwLock::new(HashMap::with_hasher(NoopHasherBuilder {})),
         }
     }
 
@@ -614,6 +599,50 @@ impl PredictionContextCache {
     #[doc(hidden)]
     pub fn length(&self) -> usize {
         self.cache.read().unwrap().len()
+    }
+}
+
+#[derive(Default)]
+pub struct NoopHasher(u64);
+
+impl Hasher for NoopHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, _bytes: &[u8]) {
+        panic!("NoopHasher does not support write");
+    }
+
+    fn write_u8(&mut self, i: u8) {
+        self.0 = i as u64;
+    }
+
+    fn write_u16(&mut self, i: u16) {
+        self.0 = i as u64;
+    }
+
+    fn write_u32(&mut self, i: u32) {
+        self.0 = i as u64;
+    }
+
+    fn write_u64(&mut self, i: u64) {
+        self.0 = i;
+    }
+
+    fn write_usize(&mut self, i: usize) {
+        self.0 = i as u64;
+    }
+}
+
+#[derive(Default)]
+pub struct NoopHasherBuilder {}
+
+impl BuildHasher for NoopHasherBuilder {
+    type Hasher = NoopHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        NoopHasher::default()
     }
 }
 

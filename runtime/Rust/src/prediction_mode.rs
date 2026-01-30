@@ -6,7 +6,7 @@ use crate::atn::INVALID_ALT;
 use crate::atn_config::ATNConfig;
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_state::ATNStateRef;
-use crate::prediction_context::PredictionContext;
+use crate::prediction_context::{NoopHasherBuilder, PredictionContext};
 use crate::semantic_context::SemanticContext;
 
 /// This enum defines the prediction modes available in ANTLR 4 along with
@@ -90,7 +90,7 @@ pub(crate) fn has_sll_conflict_terminating_prediction(
     //    if all_configs_in_rule_stop_states(configs) {
     //        return true          checked outside
     //    }
-    let mut dup = ATNConfigSet::new_base_atnconfig_set(true);
+    let mut dup = ATNConfigSet::new(true);
     let mut configs = configs;
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
         configs.get_items().for_each(|it| {
@@ -150,12 +150,28 @@ pub(crate) fn get_alts(altsets: &[BitSet]) -> BitSet {
     })
 }
 
-//
 pub(crate) fn get_conflicting_alt_subsets(configs: &ATNConfigSet) -> Vec<BitSet> {
-    let mut configs_to_alts: HashMap<(ATNStateRef, &PredictionContext), BitSet> = HashMap::new();
+    #[derive(Eq, PartialEq)]
+    struct KeyWrapper<'a> {
+        state: ATNStateRef,
+        context: &'a PredictionContext,
+    }
+
+    impl<'a> std::hash::Hash for KeyWrapper<'a> {
+        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+            let ptr = self.state.as_usize() as u64;
+            state.write_u64(ptr ^ (self.context.hash_code() as u64));
+        }
+    }
+
+    let mut configs_to_alts: HashMap<KeyWrapper, BitSet, _> =
+        HashMap::with_hasher(NoopHasherBuilder {});
     for c in configs.get_items() {
         let alts = configs_to_alts
-            .entry((c.get_state(), c.get_context().unwrap()))
+            .entry(KeyWrapper {
+                state: c.get_state(),
+                context: c.get_context().unwrap(),
+            })
             .or_default();
 
         alts.insert(c.get_alt() as usize);

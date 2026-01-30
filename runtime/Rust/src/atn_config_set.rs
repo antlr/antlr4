@@ -1,26 +1,25 @@
 use std::cmp::max;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
+use std::ops::Deref;
+use std::pin::Pin;
 
 use bit_set::BitSet;
 use murmur3::murmur3_32::MurmurHasher;
 
 use crate::atn_config::ATNConfig;
 use crate::atn_simulator::IATNSimulator;
-use crate::atn_state::ATNStateRef;
 use crate::parser_atn_simulator::MergeCache;
-use crate::prediction_context::{MurmurHasherBuilder, PredictionContext};
+use crate::prediction_context::{NoopHasherBuilder, PredictionContext};
 use crate::semantic_context::SemanticContext;
 
 pub struct ATNConfigSet {
     cached_hash: u64,
 
-    //todo looks like we need only iteration for configs
-    // so i think we can replace configs and lookup with indexhashset
-    config_lookup: HashMap<Key, usize, MurmurHasherBuilder>,
+    config_lookup: HashSet<Key, NoopHasherBuilder>,
 
-    configs: Vec<ATNConfig>,
+    configs: Vec<Pin<Box<ATNConfig>>>,
 
     pub(crate) conflicting_alts: BitSet,
 
@@ -37,22 +36,7 @@ pub struct ATNConfigSet {
     /// creates key for lookup
     /// Key::Full - for Lexer
     /// Key::Partial  - for Parser
-    hasher: fn(&ATNConfig) -> Key,
-}
-
-#[derive(Eq, PartialEq)]
-enum Key {
-    Full(ATNConfig),
-    Partial(i32, ATNStateRef, i32, SemanticContext),
-}
-
-impl Hash for Key {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        match self {
-            Key::Full(x) => x.hash(state),
-            Key::Partial(hash, _, _, _) => state.write_i32(*hash),
-        }
-    }
+    key_maker: unsafe fn(&ATNConfig) -> Key,
 }
 
 impl Debug for ATNConfigSet {
@@ -89,55 +73,28 @@ impl Hash for ATNConfigSet {
     }
 }
 
-impl IntoIterator for ATNConfigSet {
-    type Item = ATNConfig;
-    type IntoIter = std::vec::IntoIter<ATNConfig>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.configs.into_iter()
-    }
-}
-
 impl ATNConfigSet {
-    pub fn new_base_atnconfig_set(full_ctx: bool) -> ATNConfigSet {
+    pub fn new(full_ctx: bool) -> ATNConfigSet {
         ATNConfigSet {
             cached_hash: 0,
-            config_lookup: HashMap::with_hasher(MurmurHasherBuilder {}),
-            configs: vec![],
+            config_lookup: HashSet::with_hasher(NoopHasherBuilder {}),
+            configs: Vec::with_capacity(7),
             conflicting_alts: Default::default(),
             dips_into_outer_context: false,
             full_ctx,
             has_semantic_context: false,
             read_only: false,
             unique_alt: 0,
-            hasher: Self::local_hash_key,
+            key_maker: Key::partial,
         }
     }
 
     // for lexerATNConfig
     pub fn new_ordered() -> ATNConfigSet {
-        let mut a = ATNConfigSet::new_base_atnconfig_set(true);
+        let mut a = ATNConfigSet::new(true);
 
-        a.hasher = Self::full_hash_key;
+        a.key_maker = Key::full;
         a
-    }
-
-    fn full_hash_key(config: &ATNConfig) -> Key {
-        Key::Full(config.clone())
-    }
-
-    fn local_hash_key(config: &ATNConfig) -> Key {
-        let mut hasher = MurmurHasher::default();
-        config.get_state().hash(&mut hasher);
-        config.get_alt().hash(&mut hasher);
-        config.semantic_context().hash(&mut hasher);
-
-        Key::Partial(
-            hasher.finish() as i32,
-            config.get_state(),
-            config.get_alt(),
-            config.semantic_context().clone(),
-        )
     }
 
     pub fn add_cached(
@@ -155,11 +112,10 @@ impl ATNConfigSet {
             self.dips_into_outer_context = true
         }
 
-        let hasher = self.hasher;
-        let key = hasher(&config);
+        let key = unsafe { (self.key_maker)(&config) };
 
         if let Some(existing) = self.config_lookup.get(&key) {
-            let existing = self.configs.get_mut(*existing).unwrap();
+            let existing = unsafe { existing.as_ref_mut() };
             let root_is_wildcard = !self.full_ctx;
 
             let merged = PredictionContext::merge(
@@ -169,10 +125,9 @@ impl ATNConfigSet {
                 &mut merge_cache,
             );
 
-            existing.set_reaches_into_outer_context(max(
-                existing.get_reaches_into_outer_context(),
-                config.get_reaches_into_outer_context(),
-            ));
+            let v1 = existing.get_reaches_into_outer_context();
+            let v2 = config.get_reaches_into_outer_context();
+            existing.set_reaches_into_outer_context(max(v1, v2));
 
             if config.is_precedence_filter_suppressed() {
                 existing.set_precedence_filter_suppressed(true)
@@ -180,7 +135,9 @@ impl ATNConfigSet {
 
             existing.set_context(merged);
         } else {
-            self.config_lookup.insert(key, self.configs.len());
+            let config = Box::pin(config);
+            let key = unsafe { (self.key_maker)(&config) };
+            self.config_lookup.insert(key);
             self.cached_hash = 0;
             self.configs.push(config);
         }
@@ -192,7 +149,14 @@ impl ATNConfigSet {
     }
 
     pub fn get_items(&self) -> impl Iterator<Item = &ATNConfig> {
-        self.configs.iter()
+        self.configs.iter().map(|x| &**x)
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn into_iter(self) -> impl Iterator<Item = ATNConfig> {
+        self.configs
+            .into_iter()
+            .map(|x| unsafe { *Pin::into_inner_unchecked(x) })
     }
 
     pub fn optimize_configs(&mut self, _interpreter: &dyn IATNSimulator) {
@@ -202,11 +166,11 @@ impl ATNConfigSet {
 
         for config in self.configs.iter_mut() {
             let mut visited = HashMap::new();
-            config.set_context(
-                _interpreter
-                    .shared_context_cache()
-                    .get_shared_context(config.get_context().unwrap(), &mut visited),
-            );
+            let context = config.get_context().unwrap();
+            let context = _interpreter
+                .shared_context_cache()
+                .get_shared_context(context, &mut visited);
+            config.set_context(context);
         }
     }
 
@@ -275,5 +239,82 @@ impl ATNConfigSet {
 
     pub fn set_dips_into_outer_context(&mut self, _v: bool) {
         self.dips_into_outer_context = _v
+    }
+}
+
+enum Key {
+    Full(*const ATNConfig, u64),
+    Partial(*const ATNConfig, u64),
+}
+
+impl AsRef<ATNConfig> for Key {
+    fn as_ref(&self) -> &ATNConfig {
+        match self {
+            Key::Full(x, _) => unsafe { &**x },
+            Key::Partial(x, _) => unsafe { &**x },
+        }
+    }
+}
+
+impl Deref for Key {
+    type Target = ATNConfig;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Key::Full(x, _) => unsafe { &**x },
+            Key::Partial(x, _) => unsafe { &**x },
+        }
+    }
+}
+
+impl PartialEq for Key {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Key::Full(..), Key::Full(..)) => self.as_ref() == other.as_ref(),
+            (Key::Partial(..), Key::Partial(..)) => {
+                let left = self.as_ref();
+                let right = other.as_ref();
+                left.get_state() == right.get_state()
+                    && left.get_alt() == right.get_alt()
+                    && left.semantic_context() == right.semantic_context()
+            }
+            _ => false,
+        }
+    }
+}
+
+impl Eq for Key {}
+
+impl Hash for Key {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            Key::Full(_, hash) => state.write_u64(*hash),
+            Key::Partial(_, hash) => state.write_u64(*hash),
+        }
+    }
+}
+
+impl Key {
+    unsafe fn full(config: &ATNConfig) -> Self {
+        let mut hasher = MurmurHasher::default();
+        config.hash(&mut hasher);
+        Key::Full(config as *const ATNConfig, hasher.finish())
+    }
+
+    unsafe fn partial(config: &ATNConfig) -> Self {
+        let mut hasher = MurmurHasher::default();
+        config.get_state().hash(&mut hasher);
+        config.get_alt().hash(&mut hasher);
+        config.semantic_context().hash(&mut hasher);
+        Key::Partial(config as *const ATNConfig, hasher.finish())
+    }
+
+    #[allow(clippy::mut_from_ref)]
+    #[inline]
+    unsafe fn as_ref_mut(&self) -> &mut ATNConfig {
+        match self {
+            Key::Full(x, _) => &mut *(*x as *mut ATNConfig),
+            Key::Partial(x, _) => &mut *(*x as *mut ATNConfig),
+        }
     }
 }

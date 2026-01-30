@@ -185,9 +185,7 @@ fn calc_edge_set_size(atn: &ATN) -> usize {
 
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static>> = LazyLock::new(|| DFAState {
     state_number: -1,
-    configs: AtomicPtr::new(Box::into_raw(Box::new(
-        ATNConfigSet::new_base_atnconfig_set(true),
-    ))),
+    configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new(true)))),
     edges: Vec::new(),
     is_accept_state: false,
     prediction: 0,

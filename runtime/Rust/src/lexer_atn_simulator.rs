@@ -438,7 +438,7 @@ impl LexerATNSimulator {
         &self,
         //        _input: &mut dyn CharStream,
         mut config: ATNConfig,
-        _configs: &mut ATNConfigSet,
+        config_set: &mut ATNConfigSet,
         mut _current_alt_reached_accept_state: bool,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
@@ -456,10 +456,10 @@ impl LexerATNSimulator {
             //            println!("reached rulestopstate {}",state.get_state_number());
             if config.get_context().map(|x| x.has_empty_path()) != Some(false) {
                 if config.get_context().map(|x| x.is_empty()) != Some(false) {
-                    _configs.add(config);
+                    config_set.add(config);
                     return true;
                 } else {
-                    _configs.add(
+                    config_set.add(
                         config.cloned_with_new_ctx(state, Some(EMPTY_PREDICTION_CONTEXT.clone())),
                     );
                     _current_alt_reached_accept_state = true
@@ -475,7 +475,7 @@ impl LexerATNSimulator {
                         let next_config = config.cloned_with_new_ctx(return_state, new_ctx);
                         _current_alt_reached_accept_state = self.closure(
                             next_config,
-                            _configs,
+                            config_set,
                             _current_alt_reached_accept_state,
                             _speculative,
                             _treat_eofas_epsilon,
@@ -495,7 +495,7 @@ impl LexerATNSimulator {
             } = config.config_type
             {
                 if !_current_alt_reached_accept_state || !passed_through_non_greedy_decision {
-                    _configs.add(config.clone());
+                    config_set.add(config.clone());
                 }
             }
         }
@@ -506,7 +506,7 @@ impl LexerATNSimulator {
             let c = self.get_epsilon_target(
                 &mut config,
                 tr,
-                _configs,
+                config_set,
                 _speculative,
                 _treat_eofas_epsilon,
                 lexer,
@@ -515,7 +515,7 @@ impl LexerATNSimulator {
             if let Some(c) = c {
                 _current_alt_reached_accept_state = self.closure(
                     c,
-                    _configs,
+                    config_set,
                     _current_alt_reached_accept_state,
                     _speculative,
                     _treat_eofas_epsilon,
