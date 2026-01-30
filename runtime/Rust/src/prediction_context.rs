@@ -520,10 +520,8 @@ impl PredictionContext {
 //
 //    fn get_cached_base_prediction_context(context PredictionContext, contextCache: * PredictionContextCache, visited: map[PredictionContext]PredictionContext) -> PredictionContext { unimplemented!() }
 
-///Public for implementation reasons
 #[derive(Debug)]
 pub struct PredictionContextCache {
-    //todo test dashmap
     cache: RwLock<HashMap<Arc<PredictionContext>, Arc<PredictionContext>, NoopHasherBuilder>>,
 }
 
