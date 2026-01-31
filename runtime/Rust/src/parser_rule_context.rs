@@ -95,7 +95,7 @@ where
     start: &'arena dyn Token,
     stop: &'arena dyn Token,
     /// error if there was any in this node
-    pub exception: Cell<Option<Box<ANTLRError>>>,
+    pub exception: Cell<Option<bumpalo::boxed::Box<'arena, ANTLRError>>>,
     /// List of children of current node
     pub(crate) children: bumpalo::collections::Vec<'arena, &'arena Ext::Node>,
 }
@@ -336,8 +336,8 @@ where
         self.base.set_parent(parent);
     }
 
-    pub fn set_exception(&self, e: ANTLRError) {
-        self.exception.set(Some(Box::new(e)));
+    pub fn set_exception(&self, e: ANTLRError, arena: &'arena Arena) {
+        self.exception.set(Some(arena.alloc_exception(e)));
     }
 
     pub fn set_invoking_state(&mut self, t: i32) {

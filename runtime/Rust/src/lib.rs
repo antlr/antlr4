@@ -271,9 +271,9 @@ macro_rules! impl_rule_node_common {
             }
         }
 
-        fn set_exception(&self, e: $crate::errors::ANTLRError) {
+        fn set_exception(&self, e: $crate::errors::ANTLRError, arena: &'arena $crate::Arena) {
             match self {
-                $( $enum_name::$variant(inner) => inner.set_exception(e), )+
+                $( $enum_name::$variant(inner) => inner.set_exception(e, arena), )+
                 _ => {}
             }
         }
@@ -733,9 +733,9 @@ macro_rules! impl_tree_trait_delegates {
                 }
             }
 
-            fn set_exception(&self, e: $crate::errors::ANTLRError) {
+            fn set_exception(&self, e: $crate::errors::ANTLRError, arena: &'arena $crate::Arena) {
                 match self {
-                    $( $enum_name::$variant(inner) => inner.set_exception(e), )+
+                    $( $enum_name::$variant(inner) => inner.set_exception(e, arena), )+
                 }
             }
 

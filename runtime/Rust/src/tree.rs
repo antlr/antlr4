@@ -11,7 +11,7 @@ use crate::interval_set::Interval;
 use crate::parser_rule_context::ParserRuleContext;
 use crate::rule_context::RuleContext;
 use crate::token::Token;
-use crate::{interval_set, token_factory};
+use crate::{interval_set, token_factory, Arena};
 
 #[allow(missing_docs)]
 pub trait Tree<'arena>: Sized {
@@ -106,7 +106,7 @@ where
     // fn add_token_node(&self, token: TerminalNode<'input, Self::TF>) { }
     // fn add_error_node(&self, bad_token: ErrorNode<'input, Self::TF>) { }
 
-    fn set_exception(&self, _e: ANTLRError);
+    fn set_exception(&self, _e: ANTLRError, arena: &'arena Arena);
 
     /// Sets internal parser state
     fn set_invoking_state(&mut self, _t: i32);

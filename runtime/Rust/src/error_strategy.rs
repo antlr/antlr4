@@ -544,7 +544,7 @@ where
     fn process_error(&self, recognizer: &mut P, e: &ANTLRError) -> ANTLRError {
         let mut ctx = recognizer.get_current_context();
         let _: Option<()> = (|| loop {
-            ctx.set_exception(e.clone());
+            ctx.set_exception(e.clone(), recognizer.get_arena());
             ctx = ctx.get_parent()?
         })();
         ANTLRError::fall_through(Arc::new(ParseCancelledError(e.clone())))

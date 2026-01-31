@@ -22,4 +22,4 @@ byteorder = "^1"
 murmur3 = "=0.4" # 0.5 is incompatible currently
 bit-set = "0.8.0"
 hashbrown = "0.16.1"
-bumpalo = {version = "3.19.1", features = ["collections"]}
+bumpalo = {version = "3.19.1", features = ["collections", "boxed"]}

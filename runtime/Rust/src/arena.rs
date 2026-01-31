@@ -52,6 +52,10 @@ impl Arena {
         res
     }
 
+    pub fn alloc_exception<'a, T>(&'a self, value: T) -> bumpalo::boxed::Box<'a, T> {
+        bumpalo::boxed::Box::new_in(value, &self.payloads)
+    }
+
     pub fn alloc_payload<T>(&self, value: T) -> &mut T {
         self.payloads.alloc(value)
     }
