@@ -105,11 +105,7 @@ impl ATNConfigSet {
         a
     }
 
-    pub fn add_cached(
-        &mut self,
-        config: ATNConfig,
-        mut merge_cache: Option<&mut MergeCache>,
-    ) -> bool {
+    pub fn add_cached(&mut self, config: ATNConfig, merge_cache: &mut MergeCache) -> bool {
         assert!(!self.read_only);
 
         if config.semantic_context() != &SemanticContext::NONE {
@@ -133,7 +129,7 @@ impl ATNConfigSet {
                 existing.get_context().unwrap(),
                 config.get_context().unwrap(),
                 root_is_wildcard,
-                &mut merge_cache,
+                merge_cache,
             );
 
             let v1 = existing.get_reaches_into_outer_context();
@@ -155,7 +151,29 @@ impl ATNConfigSet {
     }
 
     pub fn add(&mut self, config: ATNConfig) -> bool {
-        self.add_cached(config, None)
+        assert!(!self.read_only);
+
+        if config.semantic_context() != &SemanticContext::NONE {
+            self.has_semantic_context = true
+        }
+
+        if config.get_reaches_into_outer_context() > 0 {
+            self.dips_into_outer_context = true
+        }
+
+        let key = (self.key_maker)(&config, self.configs.len());
+
+        if self
+            .config_lookup
+            .find(key.hash_code(), |k| k.eq(&config, &self.configs))
+            .is_none()
+        {
+            self.configs.push(config);
+            self.config_lookup
+                .insert_unique(key.hash_code(), key, Key::hash_code);
+            self.cached_hash = 0;
+        }
+        true
     }
 
     pub fn get_items(&self) -> impl Iterator<Item = &ATNConfig> {

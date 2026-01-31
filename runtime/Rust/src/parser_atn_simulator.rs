@@ -550,7 +550,7 @@ impl ParserATNSimulator {
             for tr in state.get_transitions() {
                 self.get_reachable_target(tr, t).map(|target| {
                     let added = c.cloned(target);
-                    intermediate.add_cached(added, Some(local.merge_cache))
+                    intermediate.add_cached(added, local.merge_cache)
                 });
             }
         }
@@ -596,7 +596,7 @@ impl ParserATNSimulator {
             && (!full_ctx || !Self::has_config_in_rule_stop_state(&reach))
         {
             for c in skipped_stop_states {
-                reach.add_cached(c.clone(), Some(local.merge_cache));
+                reach.add_cached(c.clone(), local.merge_cache);
             }
         }
         //        println!("result?");
@@ -636,7 +636,7 @@ impl ParserATNSimulator {
         for c in configs.into_iter() {
             let state = c.get_state();
             if matches!(*state, ATNState::RuleStop(_)) {
-                result.add_cached(c, Some(merge_cache));
+                result.add_cached(c, merge_cache);
                 continue;
             }
 
@@ -645,7 +645,7 @@ impl ParserATNSimulator {
                 if next_tokens.contains(TOKEN_EPSILON) {
                     let end_of_rule_state =
                         self.atn().rule_to_stop_state[state.get_rule_index() as usize];
-                    result.add_cached(c.cloned(end_of_rule_state), Some(merge_cache));
+                    result.add_cached(c.cloned(end_of_rule_state), merge_cache);
                 }
             }
         }
@@ -723,10 +723,10 @@ impl ParserATNSimulator {
                             config.get_context().cloned(),
                             updated_sem_ctx.clone(),
                         ),
-                        Some(local.merge_cache),
+                        local.merge_cache,
                     );
                 } else {
-                    config_set.add_cached(config.clone(), Some(local.merge_cache));
+                    config_set.add_cached(config.clone(), local.merge_cache);
                 }
             }
         }
@@ -1010,7 +1010,7 @@ impl ParserATNSimulator {
                                 config.get_state(),
                                 Some(EMPTY_PREDICTION_CONTEXT.clone()),
                             );
-                            configs.add_cached(new_config, Some(local.merge_cache));
+                            configs.add_cached(new_config, local.merge_cache);
                         } else {
                             self.closure_work(
                                 config.clone(),
@@ -1057,7 +1057,7 @@ impl ParserATNSimulator {
                 }
                 return;
             } else if full_ctx {
-                configs.add_cached(config, Some(local.merge_cache));
+                configs.add_cached(config, local.merge_cache);
                 return;
             }
         }
@@ -1093,7 +1093,7 @@ impl ParserATNSimulator {
         //        println!("closure_work started {:?}",config);
         let p = config.get_state();
         if !p.has_epsilon_only_transitions() {
-            configs.add_cached(config.clone(), Some(local.merge_cache));
+            configs.add_cached(config.clone(), local.merge_cache);
         }
 
         for (i, tr) in p.get_transitions().iter().enumerate() {
@@ -1563,26 +1563,3 @@ impl MergeKey {
         }
     }
 }
-
-// #[derive(PartialEq, Eq)]
-// pub struct MergeKeyRef<'a> {
-//     pub left: &'a Arc<PredictionContext>,
-//     pub right: &'a Arc<PredictionContext>,
-// }
-
-// impl std::hash::Hash for MergeKeyRef<'_> {
-//     fn hash<H: Hasher>(&self, state: &mut H) {
-//         let left_hash = self.left.hash_code();
-//         let right_hash = self.right.hash_code();
-//         state.write_u64((left_hash as u64) << 32 | (right_hash as u64));
-//     }
-// }
-
-// impl<'a> Borrow<MergeKeyRef<'a>> for MergeKey {
-//     fn borrow(&self) -> &MergeKeyRef<'a> {
-//         &MergeKeyRef {
-//             left: &self.left,
-//             right: &self.right,
-//         }
-//     }
-// }

@@ -33,6 +33,29 @@ impl PartialEq for PredictionContext {
     }
 }
 
+#[derive(Eq, Clone, Debug)]
+pub struct SingletonPredictionContext {
+    cached_hash: u32,
+    return_state: ATNStateRef,
+    parent_ctx: Option<Arc<PredictionContext>>,
+}
+
+impl PartialEq for SingletonPredictionContext {
+    #[inline(always)]
+    fn eq(&self, other: &Self) -> bool {
+        self.cached_hash == other.cached_hash
+            && self.return_state == other.return_state
+            && opt_eq((&self.parent_ctx, &other.parent_ctx))
+    }
+}
+
+impl SingletonPredictionContext {
+    #[inline(always)]
+    fn is_empty(&self) -> bool {
+        self.return_state == ATNStateRef::invalid() && self.parent_ctx.is_none()
+    }
+}
+
 #[derive(Eq, Debug)]
 pub struct ArrayPredictionContext {
     cached_hash: u32,
@@ -60,29 +83,6 @@ fn opt_eq(
         (Some(s), Some(o)) => Arc::ptr_eq(s, o) || *s == *o,
         (None, None) => true,
         _ => false,
-    }
-}
-
-#[derive(Eq, Clone, Debug)]
-pub struct SingletonPredictionContext {
-    cached_hash: u32,
-    return_state: ATNStateRef,
-    parent_ctx: Option<Arc<PredictionContext>>,
-}
-
-impl PartialEq for SingletonPredictionContext {
-    #[inline(always)]
-    fn eq(&self, other: &Self) -> bool {
-        self.cached_hash == other.cached_hash
-            && self.return_state == other.return_state
-            && opt_eq((&self.parent_ctx, &other.parent_ctx))
-    }
-}
-
-impl SingletonPredictionContext {
-    #[inline(always)]
-    fn is_empty(&self) -> bool {
-        self.return_state == ATNStateRef::invalid() && self.parent_ctx.is_none()
     }
 }
 
@@ -271,24 +271,22 @@ impl PredictionContext {
         a: &Arc<PredictionContext>,
         b: &Arc<PredictionContext>,
         root_is_wildcard: bool,
-        merge_cache: &mut Option<&mut MergeCache>,
+        cache: &mut MergeCache,
         //                 eq_hash:&mut HashSet<(*const PredictionContext,*const PredictionContext)>
     ) -> Arc<PredictionContext> {
         if Arc::ptr_eq(a, b) || **a == **b {
             return a.clone();
         }
 
-        if let Some(cache) = merge_cache {
-            let key = MergeKey::new(a.clone(), b.clone());
-            if let Some(prev) = cache.get(&key).or_else(|| cache.get(&key.reverse())) {
-                return prev.clone();
-            }
+        let key = MergeKey::new(a.clone(), b.clone());
+        if let Some(prev) = cache.get(&key).or_else(|| cache.get(&key.reverse())) {
+            return prev.clone();
         }
 
         let r = match (a.deref(), b.deref()) {
             (PredictionContext::Singleton(sa), PredictionContext::Singleton(sb)) => {
                 //                println!("single result = {}",result);
-                Self::merge_singletons(sa, sb, root_is_wildcard, merge_cache)
+                Self::merge_singletons(sa, sb, root_is_wildcard, cache)
             }
             (sa, sb) => {
                 if root_is_wildcard {
@@ -300,7 +298,7 @@ impl PredictionContext {
                     }
                 }
 
-                let mut result = Self::merge_arrays(sa, sb, root_is_wildcard, merge_cache);
+                let mut result = Self::merge_arrays(sa, sb, root_is_wildcard, cache);
                 result.calc_hash();
 
                 if result == *sa {
@@ -313,11 +311,11 @@ impl PredictionContext {
             }
         };
         assert_ne!(r.hash_code(), 0);
-        if let Some(cache) = merge_cache {
-            //            cache.entry(a.clone()).or_insert_with(||HashMap::new())
-            //                .insert(b.clone(),r.clone());
-            cache.insert(MergeKey::new(a.clone(), b.clone()), r.clone());
-        }
+
+        //            cache.entry(a.clone()).or_insert_with(||HashMap::new())
+        //                .insert(b.clone(),r.clone());
+        cache.insert(MergeKey::new(a.clone(), b.clone()), r.clone());
+
         r
     }
 
@@ -325,7 +323,7 @@ impl PredictionContext {
         a: &SingletonPredictionContext,
         b: &SingletonPredictionContext,
         root_is_wildcard: bool,
-        merge_cache: &mut Option<&mut MergeCache>,
+        merge_cache: &mut MergeCache,
     ) -> Arc<PredictionContext> {
         Self::merge_root(a, b, root_is_wildcard).unwrap_or_else(|| {
             if a.return_state == b.return_state {
@@ -404,7 +402,7 @@ impl PredictionContext {
         a: &PredictionContext,
         b: &PredictionContext,
         root_is_wildcard: bool,
-        merge_cache: &mut Option<&mut MergeCache>,
+        merge_cache: &mut MergeCache,
     ) -> PredictionContext {
         let mut merged = ArrayPredictionContext {
             cached_hash: 0,
