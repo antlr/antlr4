@@ -692,39 +692,6 @@ impl LexerATNSimulator {
         }
         state.configs.set_read_only(true);
 
-        // let states = &dfa.states;
-        // let key = dfastate.default_hash();
-        // let dfastate_index: DFAStateRef = if let Some(entry) = dfa.states_map.get(&key) {
-        //     let find_result = entry
-        //         .iter()
-        //         .find(|it| states[**it].configs == dfastate.configs);
-        //     if let Some(find_result) = find_result {
-        //         *find_result
-        //     } else {
-        //         dfastate.state_number = states.deref().len();
-        //         dfastate.configs.set_read_only(true);
-        //         let state_number = dfastate.state_number;
-        //         let mut new_vec = entry.to_vec();
-        //         new_vec.push(state_number);
-        //         dfa.states_map.insert(key, new_vec);
-        //         //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
-        //         states.push(dfastate);
-        //         state_number
-        //     }
-        // } else {
-        //     dfastate.state_number = states.deref().len();
-        //     dfastate.configs.set_read_only(true);
-        //     let state_number = dfastate.state_number;
-        //     //println!("inserting new DFA state {} with size {}", i, dfastate.configs.length());
-        //     states.push(dfastate);
-        //     dfa.states_map.insert(key, vec![state_number]);
-        //     state_number
-        // };
-        // //println!("new DFA state {}", dfastate_index);
-
-        // //        dfa.states.write().unwrap().get_mut(*dfastate_index).unwrap()
-        // dfastate_index
-
         dfa.add_state(state, self)
     }
 

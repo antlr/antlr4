@@ -59,8 +59,8 @@ impl SingletonPredictionContext {
 #[derive(Eq, Debug)]
 pub struct ArrayPredictionContext {
     cached_hash: u32,
-    return_states: Vec<ATNStateRef>,
-    parents: Vec<Option<Arc<PredictionContext>>>,
+    return_states: Box<[ATNStateRef]>,
+    parents: Box<[Option<Arc<PredictionContext>>]>,
 }
 
 impl PartialEq for ArrayPredictionContext {
@@ -137,8 +137,8 @@ pub static EMPTY_PREDICTION_CONTEXT: LazyLock<Arc<PredictionContext>> =
 
 impl PredictionContext {
     pub fn new_array(
-        parents: Vec<Option<Arc<PredictionContext>>>,
-        return_states: Vec<ATNStateRef>,
+        parents: Box<[Option<Arc<PredictionContext>>]>,
+        return_states: Box<[ATNStateRef]>,
     ) -> PredictionContext {
         PredictionContext::Array(ArrayPredictionContext {
             cached_hash: 0,
@@ -267,7 +267,7 @@ impl PredictionContext {
         Arc::new(self)
     }
 
-    pub fn merge(
+    pub(crate) fn merge(
         a: &Arc<PredictionContext>,
         b: &Arc<PredictionContext>,
         root_is_wildcard: bool,
@@ -342,14 +342,14 @@ impl PredictionContext {
                 }
             } else {
                 let parents = if a.parent_ctx == b.parent_ctx {
-                    vec![a.parent_ctx.clone(), a.parent_ctx.clone()]
+                    Box::new([a.parent_ctx.clone(), a.parent_ctx.clone()])
                 } else {
-                    vec![a.parent_ctx.clone(), b.parent_ctx.clone()]
+                    Box::new([a.parent_ctx.clone(), b.parent_ctx.clone()])
                 };
                 let mut result = ArrayPredictionContext {
                     cached_hash: 0,
                     parents,
-                    return_states: vec![a.return_state, b.return_state],
+                    return_states: Box::new([a.return_state, b.return_state]),
                 };
                 // if !result.return_states.is_sorted()
                 if !result.return_states.windows(2).all(|x| x[0] <= x[1]) {
@@ -378,8 +378,8 @@ impl PredictionContext {
             if a.is_empty() {
                 return Some(
                     Self::new_array(
-                        vec![b.parent_ctx.clone(), None],
-                        vec![b.return_state, ATNStateRef::invalid()],
+                        Box::new([b.parent_ctx.clone(), None]),
+                        Box::new([b.return_state, ATNStateRef::invalid()]),
                     )
                     .alloc(),
                 );
@@ -387,8 +387,8 @@ impl PredictionContext {
             if b.is_empty() {
                 return Some(
                     Self::new_array(
-                        vec![a.parent_ctx.clone(), None],
-                        vec![a.return_state, ATNStateRef::invalid()],
+                        Box::new([a.parent_ctx.clone(), None]),
+                        Box::new([a.return_state, ATNStateRef::invalid()]),
                     )
                     .alloc(),
                 );
@@ -404,11 +404,8 @@ impl PredictionContext {
         root_is_wildcard: bool,
         merge_cache: &mut MergeCache,
     ) -> PredictionContext {
-        let mut merged = ArrayPredictionContext {
-            cached_hash: 0,
-            parents: Vec::with_capacity(a.length() + b.length()),
-            return_states: Vec::with_capacity(a.length() + b.length()),
-        };
+        let mut parents = merge_cache.alloc_vec(a.length() + b.length());
+        let mut return_states = merge_cache.alloc_vec(a.length() + b.length());
         let mut i = 0;
         let mut j = 0;
 
@@ -422,8 +419,8 @@ impl PredictionContext {
                 let ax_ax = a_parent.is_some() && b_parent.is_some() && a_parent == b_parent;
 
                 if both || ax_ax {
-                    merged.return_states.push(payload);
-                    merged.parents.push(a_parent.cloned());
+                    return_states.push(payload);
+                    parents.push(a_parent.cloned());
                 } else {
                     let merged_parent = Self::merge(
                         a_parent.unwrap(),
@@ -431,46 +428,62 @@ impl PredictionContext {
                         root_is_wildcard,
                         merge_cache,
                     );
-                    merged.return_states.push(payload);
-                    merged.parents.push(Some(merged_parent));
+                    return_states.push(payload);
+                    parents.push(Some(merged_parent));
                 }
                 i += 1;
                 j += 1;
             } else if a.get_return_state(i) < b.get_return_state(j) {
-                merged.return_states.push(a.get_return_state(i));
-                merged.parents.push(a_parent.cloned());
+                return_states.push(a.get_return_state(i));
+                parents.push(a_parent.cloned());
                 i += 1;
             } else {
-                merged.return_states.push(b.get_return_state(j));
-                merged.parents.push(b_parent.cloned());
+                return_states.push(b.get_return_state(j));
+                parents.push(b_parent.cloned());
                 j += 1;
             }
         }
 
         if i < a.length() {
             for p in i..a.length() {
-                merged.parents.push(a.get_parent(p).cloned());
-                merged.return_states.push(a.get_return_state(p));
+                parents.push(a.get_parent(p).cloned());
+                return_states.push(a.get_return_state(p));
             }
         }
         if j < b.length() {
             for p in j..b.length() {
-                merged.parents.push(b.get_parent(p).cloned());
-                merged.return_states.push(b.get_return_state(p));
+                parents.push(b.get_parent(p).cloned());
+                return_states.push(b.get_return_state(p));
             }
         }
 
-        if merged.parents.len() < a.length() + b.length() {
-            if merged.parents.len() == 1 {
-                Self::new_singleton(merged.parents[0].clone(), merged.return_states[0]);
+        if parents.len() < a.length() + b.length() {
+            if parents.len() == 1 {
+                Self::new_singleton(parents[0].clone(), return_states[0]);
             }
-            merged.return_states.shrink_to_fit();
-            merged.parents.shrink_to_fit();
         }
 
-        PredictionContext::combine_common_parents(&mut merged);
-
+        PredictionContext::combine_common_parents(&mut parents);
+        let merged = ArrayPredictionContext {
+            cached_hash: 0,
+            parents: parents.into_iter().collect(),
+            return_states: return_states.into_iter().collect(),
+        };
         Array(merged)
+    }
+
+    fn combine_common_parents(parents: &mut [Option<Arc<PredictionContext>>]) {
+        let mut uniq_parents = HashMap::with_hasher(NoopHasherBuilder {});
+        for p in 0..parents.len() {
+            let parent = parents[p].as_ref().cloned();
+            if !uniq_parents.contains_key(&parent) {
+                uniq_parents.insert(parent.clone(), parent.clone());
+            }
+        }
+
+        parents.iter_mut().for_each(|parent| {
+            *parent = (*uniq_parents.get(parent).unwrap()).clone();
+        });
     }
 
     pub fn from_rule_context<'input, 'arena, Node>(
@@ -498,20 +511,6 @@ impl PredictionContext {
             .unwrap();
 
         PredictionContext::new_singleton(Some(parent), transition.follow_state).alloc()
-    }
-
-    fn combine_common_parents(array: &mut ArrayPredictionContext) {
-        let mut uniq_parents = HashMap::with_hasher(NoopHasherBuilder {});
-        for p in 0..array.parents.len() {
-            let parent = array.parents[p].as_ref().cloned();
-            if !uniq_parents.contains_key(&parent) {
-                uniq_parents.insert(parent.clone(), parent.clone());
-            }
-        }
-
-        array.parents.iter_mut().for_each(|parent| {
-            *parent = (*uniq_parents.get(parent).unwrap()).clone();
-        });
     }
 }
 
@@ -576,7 +575,7 @@ impl PredictionContextCache {
         } else if parents.len() == 1 {
             PredictionContext::new_singleton(parents[0].clone(), context.get_return_state(0))
         } else if let Array(array) = context.deref() {
-            PredictionContext::new_array(parents, array.return_states.clone())
+            PredictionContext::new_array(parents.into(), array.return_states.clone())
         } else {
             unreachable!()
         };

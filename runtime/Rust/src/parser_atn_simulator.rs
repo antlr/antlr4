@@ -92,7 +92,7 @@ where
 {
     outer_context: &'arena P::Node,
     dfa_ref: &'a DFA,
-    merge_cache: &'a mut MergeCache,
+    merge_cache: &'a mut MergeCache<'a>,
     precedence: i32,
     parser: &'a mut P,
     pd: PhantomData<Box<dyn TokenStream<'input, 'arena, TF>>>,
@@ -112,8 +112,6 @@ where
         self.outer_context
     }
 }
-
-pub(crate) type MergeCache = HashMap<MergeKey, Arc<PredictionContext>, NoopHasherBuilder>;
 
 impl ParserATNSimulator {
     /// creates new `ParserATNSimulator`
@@ -157,7 +155,8 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         self.start_index.set(parser.get_input_stream_mut().index());
-        let mut merge_cache: MergeCache = HashMap::with_hasher(NoopHasherBuilder {});
+        let local_arena = bumpalo::Bump::new();
+        let mut merge_cache = MergeCache::new(&local_arena);
         let mut local = Local {
             outer_context: parser.get_current_context(),
             dfa_ref: &self.decision_to_dfa()[decision as usize],
@@ -1534,6 +1533,32 @@ impl IATNSimulator for ParserATNSimulator {
 
     fn decision_to_dfa(&self) -> &Vec<DFA> {
         self.base.decision_to_dfa()
+    }
+}
+
+pub(crate) struct MergeCache<'a> {
+    map: HashMap<MergeKey, Arc<PredictionContext>, NoopHasherBuilder>,
+    arena: &'a bumpalo::Bump,
+}
+
+impl<'a> MergeCache<'a> {
+    pub fn new(arena: &'a bumpalo::Bump) -> Self {
+        Self {
+            map: HashMap::with_hasher(NoopHasherBuilder {}),
+            arena,
+        }
+    }
+
+    pub fn alloc_vec<T>(&self, capacity: usize) -> bumpalo::collections::Vec<'a, T> {
+        bumpalo::collections::Vec::with_capacity_in(capacity, &self.arena)
+    }
+
+    pub fn get(&self, key: &MergeKey) -> Option<Arc<PredictionContext>> {
+        self.map.get(key).cloned()
+    }
+
+    pub fn insert(&mut self, key: MergeKey, value: Arc<PredictionContext>) {
+        self.map.insert(key, value);
     }
 }
 

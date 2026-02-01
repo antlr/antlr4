@@ -105,7 +105,8 @@ impl ATNConfigSet {
         a
     }
 
-    pub fn add_cached(&mut self, config: ATNConfig, merge_cache: &mut MergeCache) -> bool {
+    // for parser
+    pub(crate) fn add_cached(&mut self, config: ATNConfig, merge_cache: &mut MergeCache) -> bool {
         assert!(!self.read_only);
 
         if config.semantic_context() != &SemanticContext::NONE {
@@ -150,7 +151,8 @@ impl ATNConfigSet {
         true
     }
 
-    pub fn add(&mut self, config: ATNConfig) -> bool {
+    // for lexer
+    pub(crate) fn add(&mut self, config: ATNConfig) -> bool {
         assert!(!self.read_only);
 
         if config.semantic_context() != &SemanticContext::NONE {
