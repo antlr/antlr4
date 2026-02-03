@@ -274,8 +274,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
             return a;
         }
 
-        let key = MergeKey::new(a, b);
-        if let Some(prev) = cache.get(&key).or_else(|| cache.get(&key.reverse())) {
+        if let Some(prev) = cache.get(&MergeKey::new(a, b)) {
             return prev;
         }
 

@@ -1598,17 +1598,37 @@ impl<'ephemeral> MergeCache<'ephemeral> {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Eq)]
 pub struct MergeKey<'ephemeral> {
     pub left: &'ephemeral PredictionContext<'ephemeral>,
     pub right: &'ephemeral PredictionContext<'ephemeral>,
 }
 
+impl PartialEq for MergeKey<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        (self.left == other.left && self.right == other.right)
+            || (self.left == other.right && self.right == other.left)
+    }
+}
+
 impl std::hash::Hash for MergeKey<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        let left_hash = self.left.hash_code();
-        let right_hash = self.right.hash_code();
-        state.write_u64((left_hash as u64) << 32 | (right_hash as u64));
+        let h1 = self.left.hash_code();
+        let h2 = self.right.hash_code();
+
+        // Commutative sum
+        let sum = (h1 as u64).wrapping_add(h2 as u64);
+        // Commutative product (optional extra entropy)
+        let product = (h1 as u64).wrapping_mul(h2 as u64);
+
+        // Combine and mix
+        let mut combined = sum ^ (product << 32 | product >> 32);
+
+        // Apply a fast mixer (e.g., SplitMix64)
+        combined = (combined ^ (combined >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+        combined = (combined ^ (combined >> 27)).wrapping_mul(0x94d049bb133111eb);
+
+        state.write_u64(combined ^ (combined >> 31));
     }
 }
 
