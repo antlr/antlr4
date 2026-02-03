@@ -1,8 +1,9 @@
 use std::borrow::Cow::{Borrowed, Owned};
 use std::borrow::{Borrow, Cow};
 use std::cmp::Ordering;
-use std::collections::HashSet;
 use std::sync::{Arc, LazyLock};
+
+use hashbrown::{DefaultHashBuilder, HashSet};
 
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
@@ -28,8 +29,8 @@ pub enum SemanticContext {
         is_ctx_dependent: bool,
     },
     Precedence(i32),
-    AND(Arc<[SemanticContext]>),
-    OR(Arc<[SemanticContext]>),
+    And(Arc<[SemanticContext]>),
+    Or(Arc<[SemanticContext]>),
 }
 
 impl SemanticContext {
@@ -45,8 +46,9 @@ impl SemanticContext {
         NONE.clone()
     }
 
-    pub(crate) fn evaluate<'input, 'arena, TF, P>(
+    pub(crate) fn evaluate<'ephemeral, 'input, 'arena, TF, P>(
         &self,
+        ephemerals: &'ephemeral bumpalo::Bump,
         parser: &mut P,
         outer_context: &'arena P::Node,
     ) -> bool
@@ -69,13 +71,18 @@ impl SemanticContext {
                 parser.sempred(_localctx, *rule_index, *pred_index)
             }
             SemanticContext::Precedence(prec) => parser.precpred(Some(outer_context), *prec),
-            SemanticContext::AND(ops) => ops.iter().all(|sem| sem.evaluate(parser, outer_context)),
-            SemanticContext::OR(ops) => ops.iter().any(|sem| sem.evaluate(parser, outer_context)),
+            SemanticContext::And(ops) => ops
+                .iter()
+                .all(|sem| sem.evaluate(ephemerals, parser, outer_context)),
+            SemanticContext::Or(ops) => ops
+                .iter()
+                .any(|sem| sem.evaluate(ephemerals, parser, outer_context)),
         }
     }
 
-    pub(crate) fn eval_precedence<'a, 'input, 'arena, TF, P>(
+    pub(crate) fn eval_precedence<'a, 'ephemeral, 'input, 'arena, TF, P>(
         &'a self,
+        ephemerals: &'ephemeral bumpalo::Bump,
         parser: &P,
         outer_context: &'arena P::Node,
     ) -> Option<Cow<'a, SemanticContext>>
@@ -93,11 +100,11 @@ impl SemanticContext {
                     None
                 }
             }
-            SemanticContext::OR(ops) => {
+            SemanticContext::Or(ops) => {
                 let mut differs = false;
-                let mut operands = vec![];
+                let mut operands = bumpalo::collections::Vec::new_in(ephemerals);
                 for context in ops.iter() {
-                    let evaluated = context.eval_precedence(parser, outer_context);
+                    let evaluated = context.eval_precedence(ephemerals, parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
                     if let Some(evaluated) = evaluated {
@@ -120,14 +127,14 @@ impl SemanticContext {
                 let mut operands = operands.drain(..);
                 let result = operands.next().unwrap();
                 Some(operands.fold(result, |acc, it| {
-                    Owned(SemanticContext::or(Some(acc), Some(it)))
+                    Owned(SemanticContext::or(ephemerals, Some(acc), Some(it)))
                 }))
             }
-            SemanticContext::AND(ops) => {
+            SemanticContext::And(ops) => {
                 let mut differs = false;
-                let mut operands = vec![];
+                let mut operands = bumpalo::collections::Vec::new_in(ephemerals);
                 for context in ops.iter() {
-                    let evaluated = context.eval_precedence(parser, outer_context);
+                    let evaluated = context.eval_precedence(ephemerals, parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
                     if let Some(evaluated) = evaluated {
@@ -150,26 +157,30 @@ impl SemanticContext {
                 let mut operands = operands.drain(..);
                 let result = operands.next().unwrap();
                 Some(operands.fold(result, |acc, it| {
-                    Owned(SemanticContext::and(Some(acc), Some(it)))
+                    Owned(SemanticContext::and(ephemerals, Some(acc), Some(it)))
                 }))
             }
         }
     }
 
-    pub fn new_and(a: &SemanticContext, b: &SemanticContext) -> SemanticContext {
-        let mut operands = HashSet::new();
-        if let SemanticContext::AND(ops) = a {
+    pub fn new_and<'ephemeral>(
+        ephemerals: &'ephemeral bumpalo::Bump,
+        a: &SemanticContext,
+        b: &SemanticContext,
+    ) -> SemanticContext {
+        let mut operands = HashSet::new_in(ephemerals);
+        if let SemanticContext::And(ops) = a {
             operands.extend(ops.iter().cloned())
         } else {
             operands.insert(a.clone());
         }
-        if let SemanticContext::AND(ops) = b {
+        if let SemanticContext::And(ops) = b {
             operands.extend(ops.iter().cloned())
         } else {
             operands.insert(b.clone());
         }
 
-        let precedence_predicates = filter_precedence_predicate(&mut operands);
+        let precedence_predicates = filter_precedence_predicate(ephemerals, &mut operands);
         if !precedence_predicates.is_empty() {
             let reduced = precedence_predicates.iter().min_by(sort_prec_pred);
             operands.insert(reduced.unwrap().clone());
@@ -179,17 +190,21 @@ impl SemanticContext {
             return operands.into_iter().next().unwrap();
         }
 
-        SemanticContext::AND(operands.into_iter().collect())
+        SemanticContext::And(operands.into_iter().collect())
     }
 
-    pub fn new_or(a: &SemanticContext, b: &SemanticContext) -> SemanticContext {
-        let mut operands = HashSet::new();
-        if let SemanticContext::OR(ops) = a {
+    pub fn new_or<'ephemeral>(
+        ephemerals: &'ephemeral bumpalo::Bump,
+        a: &SemanticContext,
+        b: &SemanticContext,
+    ) -> SemanticContext {
+        let mut operands = HashSet::new_in(ephemerals);
+        if let SemanticContext::Or(ops) = a {
             operands.extend(ops.iter().cloned())
         } else {
             operands.insert(a.clone());
         }
-        if let SemanticContext::OR(ops) = b {
+        if let SemanticContext::Or(ops) = b {
             ops.iter().for_each(|it| {
                 operands.insert(it.clone());
             });
@@ -197,7 +212,7 @@ impl SemanticContext {
             operands.insert(b.clone());
         }
 
-        let precedence_predicates = filter_precedence_predicate(&mut operands);
+        let precedence_predicates = filter_precedence_predicate(ephemerals, &mut operands);
         if !precedence_predicates.is_empty() {
             let reduced = precedence_predicates.iter().max_by(sort_prec_pred);
             operands.insert(reduced.unwrap().clone());
@@ -207,10 +222,11 @@ impl SemanticContext {
             return operands.into_iter().next().unwrap();
         }
 
-        SemanticContext::OR(operands.into_iter().collect())
+        SemanticContext::Or(operands.into_iter().collect())
     }
 
-    pub fn and(
+    pub fn and<'ephemeral>(
+        ephemerals: &'ephemeral bumpalo::Bump,
         a: Option<impl Borrow<SemanticContext>>,
         b: Option<impl Borrow<SemanticContext>>,
     ) -> SemanticContext {
@@ -227,12 +243,13 @@ impl SemanticContext {
                     return a.clone();
                 }
 
-                Self::new_and(a, b)
+                Self::new_and(ephemerals, a, b)
             }
         }
     }
 
-    pub fn or(
+    pub fn or<'ephemeral>(
+        ephemerals: &'ephemeral bumpalo::Bump,
         a: Option<impl Borrow<SemanticContext>>,
         b: Option<impl Borrow<SemanticContext>>,
     ) -> SemanticContext {
@@ -246,7 +263,7 @@ impl SemanticContext {
                     return Self::NONE;
                 }
 
-                Self::new_or(a, b)
+                Self::new_or(ephemerals, a, b)
             }
         }
     }
@@ -255,12 +272,15 @@ impl SemanticContext {
 fn sort_prec_pred(a: &&SemanticContext, b: &&SemanticContext) -> Ordering {
     match (*a, *b) {
         (SemanticContext::Precedence(a), SemanticContext::Precedence(b)) => a.cmp(b),
-        _ => panic!("shoudl be sorting list of precedence predicates"),
+        _ => panic!("should be sorting list of precedence predicates"),
     }
 }
 
-fn filter_precedence_predicate(collection: &mut HashSet<SemanticContext>) -> Vec<SemanticContext> {
-    let mut result = vec![];
+fn filter_precedence_predicate<'ephemeral>(
+    ephemerals: &'ephemeral bumpalo::Bump,
+    collection: &mut HashSet<SemanticContext, DefaultHashBuilder, &bumpalo::Bump>,
+) -> bumpalo::collections::Vec<'ephemeral, SemanticContext> {
+    let mut result = bumpalo::collections::Vec::new_in(ephemerals);
     collection.retain(|it| {
         if let SemanticContext::Precedence(_) = it {
             result.push(it.clone());

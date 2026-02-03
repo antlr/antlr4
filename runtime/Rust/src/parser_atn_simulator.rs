@@ -410,7 +410,7 @@ impl ParserATNSimulator {
         //        println!("target config {:?}",&D.configs);
         if D.is_accept_state && D.configs.has_semantic_context() {
             let decision_state = self.atn().decision_to_state[local.dfa_ref.decision as usize];
-            self.predicate_dfa_state(&mut D, &decision_state);
+            self.predicate_dfa_state(local.ephemerals(), &mut D, &decision_state);
             //            println!("predicates compute target {:?}",&D.predicates);
             if !D.predicates.is_empty() {
                 D.prediction = INVALID_ALT
@@ -423,12 +423,21 @@ impl ParserATNSimulator {
         D
     }
 
-    fn predicate_dfa_state(&self, dfa_state: &mut ProposedDFAState, decision_state: &ATNState) {
+    fn predicate_dfa_state<'ephemeral>(
+        &self,
+        ephemerals: &'ephemeral bumpalo::Bump,
+        dfa_state: &mut ProposedDFAState,
+        decision_state: &ATNState,
+    ) {
         let nalts = decision_state.get_transitions().len();
         let alts_to_collect_preds_from =
             self.get_conflicting_alts_or_unique_alt(&dfa_state.configs);
-        let alt_to_pred =
-            self.get_preds_for_ambig_alts(&alts_to_collect_preds_from, &dfa_state.configs, nalts);
+        let alt_to_pred = self.get_preds_for_ambig_alts(
+            ephemerals,
+            &alts_to_collect_preds_from,
+            &dfa_state.configs,
+            nalts,
+        );
         if let Some(alt_to_pred) = alt_to_pred {
             dfa_state.predicates =
                 self.get_predicate_predictions(&alts_to_collect_preds_from, alt_to_pred);
@@ -544,7 +553,7 @@ impl ParserATNSimulator {
         //        println!("in computeReachSet, starting closure: {:?}",closure);
         let mut intermediate = ATNConfigSet::new(local.ephemerals(), full_ctx);
 
-        let mut skipped_stop_states = Vec::<&ATNConfig>::new();
+        let mut skipped_stop_states = bumpalo::collections::Vec::new_in(local.ephemerals());
 
         for c in closure.get_items() {
             let state = c.get_state();
@@ -717,9 +726,11 @@ impl ParserATNSimulator {
                 continue;
             }
 
-            let updated_sem_ctx = config
-                .semantic_context()
-                .eval_precedence(local.parser, local.outer_context());
+            let updated_sem_ctx = config.semantic_context().eval_precedence(
+                local.ephemerals(),
+                local.parser,
+                local.outer_context(),
+            );
 
             if let Some(updated_sem_ctx) = updated_sem_ctx.as_deref() {
                 states_from_alt1.insert(config.get_state(), config.get_context());
@@ -760,18 +771,20 @@ impl ParserATNSimulator {
         None
     }
 
-    fn get_preds_for_ambig_alts(
+    fn get_preds_for_ambig_alts<'ephemeral>(
         &self,
+        ephemerals: &'ephemeral bumpalo::Bump,
         ambig_alts: &BitSet,
         configs: &ATNConfigSet,
         nalts: usize,
     ) -> Option<Vec<SemanticContext>> {
-        let mut alt_to_pred = Vec::with_capacity(nalts + 1);
-        alt_to_pred.resize_with(nalts + 1, || None);
+        let mut alt_to_pred = bumpalo::collections::Vec::with_capacity_in(nalts + 1, ephemerals);
+        alt_to_pred.resize(nalts + 1, None);
         for c in configs.get_items() {
             let alt = c.get_alt() as usize;
             if ambig_alts.contains(alt) {
                 alt_to_pred[alt] = Some(SemanticContext::or(
+                    ephemerals,
                     alt_to_pred[alt].as_ref(),
                     Some(c.semantic_context()),
                 ));
@@ -955,7 +968,8 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        pred.borrow().evaluate(local.parser, local.outer_context)
+        pred.borrow()
+            .evaluate(local.ephemerals(), local.parser, local.outer_context)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1326,8 +1340,11 @@ impl ParserATNSimulator {
                     return Some(config.clone().with_state(pt.target));
                 }
             } else {
-                let new_sem_ctx =
-                    SemanticContext::and(Some(config.semantic_context()), pt.get_predicate());
+                let new_sem_ctx = SemanticContext::and(
+                    local.ephemerals(),
+                    Some(config.semantic_context()),
+                    pt.get_predicate(),
+                );
                 return Some(
                     config
                         .clone()
@@ -1372,8 +1389,11 @@ impl ParserATNSimulator {
                     return Some(config.clone().with_state(pt.target));
                 }
             } else {
-                let new_sem_ctx =
-                    SemanticContext::and(Some(config.semantic_context()), pt.get_predicate());
+                let new_sem_ctx = SemanticContext::and(
+                    local.ephemerals(),
+                    Some(config.semantic_context()),
+                    pt.get_predicate(),
+                );
                 return Some(
                     config
                         .clone()
@@ -1566,6 +1586,7 @@ pub(crate) struct MergeCache<'ephemeral> {
         NoopHasherBuilder,
         &'ephemeral bumpalo::Bump,
     >,
+
     pub ephemerals: &'ephemeral bumpalo::Bump,
 }
 
