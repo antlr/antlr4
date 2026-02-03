@@ -1,7 +1,6 @@
-use std::collections::HashSet;
-use std::sync::Arc;
-
 use bit_set::BitSet;
+use hashbrown::DefaultHashBuilder;
+use hashbrown::HashSet;
 
 use crate::atn::ATN;
 use crate::atn_config::ATNConfig;
@@ -35,11 +34,15 @@ impl LL1Analyzer<'_> {
         'input: 'arena,
         Node: RuleNode<'input, 'arena>,
     {
+        let arena = bumpalo::Bump::new();
+
         let mut r = IntervalSet::new();
-        let look_ctx = ctx.map(|x| PredictionContext::from_rule_context(self.atn, x));
-        let mut looks_busy: HashSet<ATNConfig> = HashSet::new();
+        let look_ctx = ctx.map(|x| PredictionContext::from_rule_context(self.atn, x, &arena));
+        let mut looks_busy: HashSet<ATNConfig<'_>, _, &bumpalo::Bump> = HashSet::new_in(&arena);
         let mut called_rule_stack = BitSet::new();
+
         self.look_work(
+            &arena,
             s,
             stop_state,
             look_ctx,
@@ -53,18 +56,19 @@ impl LL1Analyzer<'_> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn look_work(
+    fn look_work<'ephemeral>(
         &self,
+        arena: &'ephemeral bumpalo::Bump,
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
-        ctx: Option<Arc<PredictionContext>>,
+        ctx: Option<&'ephemeral PredictionContext<'ephemeral>>,
         look: &mut IntervalSet,
-        look_busy: &mut HashSet<ATNConfig>,
+        look_busy: &mut HashSet<ATNConfig<'ephemeral>, DefaultHashBuilder, &bumpalo::Bump>,
         called_rule_stack: &mut BitSet,
         see_thru_preds: bool,
         add_eof: bool,
     ) {
-        let c = ATNConfig::new(s, 0, ctx.clone());
+        let c = ATNConfig::new(s, 0, ctx);
         if !look_busy.insert(c) {
             return;
         }
@@ -93,14 +97,15 @@ impl LL1Analyzer<'_> {
                     look.add_one(TOKEN_EOF);
                     return;
                 }
-                Some(ctx) if ctx != *EMPTY_PREDICTION_CONTEXT => {
+                Some(ctx) if ctx != &*EMPTY_PREDICTION_CONTEXT => {
                     let removed = called_rule_stack.contains(s.get_rule_index() as usize);
                     called_rule_stack.remove(s.get_rule_index() as usize);
                     for i in 0..ctx.length() {
                         self.look_work(
+                            arena,
                             ctx.get_return_state(i),
                             stop_state,
-                            ctx.get_parent(i).cloned(),
+                            ctx.get_parent(i),
                             look,
                             look_busy,
                             called_rule_stack,
@@ -126,13 +131,12 @@ impl LL1Analyzer<'_> {
                         continue;
                     }
 
-                    let new_ctx = Arc::new(PredictionContext::new_singleton(
-                        ctx.clone(),
-                        rule_tr.follow_state,
-                    ));
+                    let new_ctx = PredictionContext::new_singleton(ctx, rule_tr.follow_state);
+                    let new_ctx = arena.alloc(new_ctx);
 
                     called_rule_stack.insert(target.get_rule_index() as usize);
                     self.look_work(
+                        arena,
                         target,
                         stop_state,
                         Some(new_ctx),
@@ -147,9 +151,10 @@ impl LL1Analyzer<'_> {
                 Transition::Predicate(_) | Transition::PrecedencePredicate(_) => {
                     if see_thru_preds {
                         self.look_work(
+                            arena,
                             target,
                             stop_state,
-                            ctx.clone(),
+                            ctx,
                             look,
                             look_busy,
                             called_rule_stack,
@@ -164,9 +169,10 @@ impl LL1Analyzer<'_> {
                     look.add_range(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type)
                 }
                 _ if tr.is_epsilon() => self.look_work(
+                    arena,
                     target,
                     stop_state,
-                    ctx.clone(),
+                    ctx,
                     look,
                     look_busy,
                     called_rule_stack,

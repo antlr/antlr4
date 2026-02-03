@@ -83,23 +83,20 @@ impl PredictionMode {
 
 //
 //
-pub(crate) fn has_sll_conflict_terminating_prediction(
+pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
+    arena: &'ephemeral bumpalo::Bump,
     mode: PredictionMode,
-    configs: &ATNConfigSet,
+    configs: &ATNConfigSet<'ephemeral>,
 ) -> bool {
     //    if all_configs_in_rule_stop_states(configs) {
     //        return true          checked outside
     //    }
-    let mut dup = ATNConfigSet::new(true);
+    let mut dup = ATNConfigSet::new(arena, true);
     let mut configs = configs;
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
         configs.get_items().for_each(|it| {
-            let c = ATNConfig::new_with_semantic(
-                it.get_state(),
-                it.get_alt(),
-                it.get_context().cloned(),
-                SemanticContext::NONE,
-            );
+            let c = ATNConfig::new(it.get_state(), it.get_alt(), it.get_context())
+                .with_semantic_context(SemanticContext::NONE);
             dup.add(c);
         });
         configs = &dup;
@@ -154,7 +151,7 @@ pub(crate) fn get_conflicting_alt_subsets(configs: &ATNConfigSet) -> Vec<BitSet>
     #[derive(Eq, PartialEq)]
     struct KeyWrapper<'a> {
         state: ATNStateRef,
-        context: &'a PredictionContext,
+        context: &'a PredictionContext<'a>,
     }
 
     impl<'a> std::hash::Hash for KeyWrapper<'a> {

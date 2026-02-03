@@ -67,7 +67,7 @@ impl DFA {
     // ---- Begin direct Java port ----
     pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA {
         let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
-            let mut precedence_state = DFAState::new(atn, 0, Box::new(ATNConfigSet::new(true)));
+            let mut precedence_state = DFAState::new(atn, 0, Box::new(ATNConfigSet::new_empty()));
             precedence_state.is_accept_state = false;
             precedence_state.requires_full_context = false;
 
@@ -182,7 +182,7 @@ impl DFA {
             .store(s as *const DFAState as *mut DFAState, Ordering::Relaxed);
     }
 
-    pub fn set_s0_configs(&self, configs: Box<ATNConfigSet>) {
+    pub fn set_s0_configs(&self, configs: Box<ATNConfigSet<'static>>) {
         let s0 = self.s0().expect("setting configs on a null s0 state");
         s0.set_configs(configs);
     }
@@ -228,7 +228,7 @@ impl DFA {
         interpreter: &dyn IATNSimulator,
     ) -> StoredDFAState {
         let ProposedDFAState {
-            mut configs,
+            configs,
             is_accept_state,
             prediction,
             lexer_action_executor,
@@ -236,12 +236,9 @@ impl DFA {
             predicates,
         } = proposed;
 
-        if !configs.read_only() {
-            configs.optimize_configs(interpreter);
-            configs.set_read_only(true);
-        }
+        let configs = configs.into_stored(interpreter);
 
-        let mut state = DFAState::new(interpreter.atn(), state_number, configs.into());
+        let mut state = DFAState::new(interpreter.atn(), state_number, configs);
         state.is_accept_state = is_accept_state;
         state.prediction = prediction;
         state.lexer_action_executor = lexer_action_executor;
@@ -266,7 +263,7 @@ fn is_precedence_atn_state(atn_start_state: ATNStateRef) -> bool {
 }
 
 #[derive(Clone)]
-struct DFAStateKey(*mut ATNConfigSet);
+struct DFAStateKey(*mut ATNConfigSet<'static>);
 
 unsafe impl Send for DFAStateKey {}
 
@@ -290,7 +287,7 @@ impl Eq for DFAStateKey {}
 
 impl std::hash::Hash for DFAStateKey {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        let configs = unsafe { &mut *self.0 };
+        let configs = unsafe { &*self.0 };
         let hash = configs.hash_code();
         state.write_u64(hash);
     }

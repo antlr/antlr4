@@ -24,8 +24,8 @@ impl Display for PredPrediction {
 }
 
 #[derive(Debug)]
-pub struct ProposedDFAState {
-    pub configs: ATNConfigSet,
+pub struct ProposedDFAState<'ephemeral> {
+    pub configs: ATNConfigSet<'ephemeral>,
     pub is_accept_state: bool,
     pub prediction: i32,
     pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor>>,
@@ -33,8 +33,8 @@ pub struct ProposedDFAState {
     pub predicates: Vec<PredPrediction>,
 }
 
-impl ProposedDFAState {
-    pub fn new(configs: ATNConfigSet) -> Self {
+impl<'ephemeral> ProposedDFAState<'ephemeral> {
+    pub fn new(configs: ATNConfigSet<'ephemeral>) -> Self {
         ProposedDFAState {
             configs,
             is_accept_state: false,
@@ -46,14 +46,14 @@ impl ProposedDFAState {
     }
 }
 
-impl PartialEq for ProposedDFAState {
+impl PartialEq for ProposedDFAState<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.configs == other.configs
     }
 }
-impl Eq for ProposedDFAState {}
+impl Eq for ProposedDFAState<'_> {}
 
-impl Hash for ProposedDFAState {
+impl Hash for ProposedDFAState<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.configs.hash(state);
     }
@@ -64,7 +64,7 @@ pub struct DFAState<'dfa> {
     /// Number of this state in corresponding DFA
     pub state_number: i32,
 
-    configs: AtomicPtr<ATNConfigSet>,
+    configs: AtomicPtr<ATNConfigSet<'static>>,
 
     edges: Vec<AtomicPtr<DFAState<'dfa>>>,
 
@@ -131,7 +131,7 @@ impl<'dfa> DFAState<'dfa> {
             .collect()
     }
 
-    pub fn configs(&self) -> &ATNConfigSet {
+    pub fn configs(&self) -> &ATNConfigSet<'static> {
         // SAFETY:
         // - The only way to instantiate a DFAState is via DFAState::new, which
         //   guarantees that configs is initialized to a valid ATNConfigSet
@@ -145,7 +145,7 @@ impl<'dfa> DFAState<'dfa> {
 
     // ---- Below are private methods only callable by DFA ----
 
-    pub(super) fn new(atn: &ATN, state_number: i32, configs: Box<ATNConfigSet>) -> Self {
+    pub(super) fn new(atn: &ATN, state_number: i32, configs: Box<ATNConfigSet<'static>>) -> Self {
         let mut edges = Vec::new();
         // Pre-allocate enough space for the edge set for the given ATN --
         // avoids a lock on the edges
@@ -168,7 +168,7 @@ impl<'dfa> DFAState<'dfa> {
         }
     }
 
-    pub(super) fn set_configs(&self, configs: Box<ATNConfigSet>) {
+    pub(super) fn set_configs(&self, configs: Box<ATNConfigSet<'static>>) {
         let old = self.configs.swap(Box::into_raw(configs), Ordering::Relaxed);
         // SAFETY: `old` was previously a valid pointer to a Box<ATNConfigSet>
         unsafe {
@@ -185,7 +185,7 @@ fn calc_edge_set_size(atn: &ATN) -> usize {
 
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static>> = LazyLock::new(|| DFAState {
     state_number: -1,
-    configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new(true)))),
+    configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
     edges: Vec::new(),
     is_accept_state: false,
     prediction: 0,

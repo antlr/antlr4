@@ -12,35 +12,33 @@ use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
 
 #[derive(Clone)]
-pub struct ATNConfig {
+pub struct ATNConfig<'ephemeral> {
     precedence_filter_suppressed: bool,
     state: ATNStateRef,
     alt: i32,
     //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
-    //another todo check arena alloc
-    context: Option<Arc<PredictionContext>>,
+    context: Option<&'ephemeral PredictionContext<'ephemeral>>,
     semantic_context: SemanticContext,
     pub reaches_into_outer_context: i32,
     pub(crate) config_type: ATNConfigType,
 }
 
-impl Eq for ATNConfig {}
+impl Eq for ATNConfig<'_> {}
 
-impl PartialEq for ATNConfig {
+impl PartialEq for ATNConfig<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.get_state() == other.get_state()
             && self.get_alt() == other.get_alt()
-            // Arc is optimized to not do a deep equalitiy if arc pointers are equal so that's enough
-            && self.context == other.context
+            && crate::prediction_context::opt_eq((&self.context, &other.context))
             && self.get_type() == other.get_type()
             && self.semantic_context == other.semantic_context
             && self.precedence_filter_suppressed == other.precedence_filter_suppressed
     }
 }
 
-impl Hash for ATNConfig {
+impl Hash for ATNConfig<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_usize(self.get_state().as_usize());
+        state.write_i32(self.get_state().get_state_number());
         state.write_i32(self.get_alt());
         match self.get_context() {
             None => state.write_i32(0),
@@ -65,13 +63,13 @@ impl Hash for ATNConfig {
     }
 }
 
-impl Debug for ATNConfig {
+impl Debug for ATNConfig<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.write_fmt(format_args!(
             "({:?},{},[{}]",
             self.state,
             self.alt,
-            self.context.as_deref().unwrap()
+            self.context.unwrap()
         ))?;
         if self.reaches_into_outer_context > 0 {
             f.write_fmt(format_args!(",up={}", self.reaches_into_outer_context))?;
@@ -90,7 +88,7 @@ pub(crate) enum ATNConfigType {
     },
 }
 
-impl ATNConfig {
+impl<'ephemeral> ATNConfig<'ephemeral> {
     pub(crate) fn get_lexer_executor(&self) -> Option<&LexerActionExecutor> {
         match &self.config_type {
             ATNConfigType::BaseATNConfig => None,
@@ -108,7 +106,11 @@ impl ATNConfig {
         })
     }
 
-    pub fn new(state: ATNStateRef, alt: i32, context: Option<Arc<PredictionContext>>) -> ATNConfig {
+    pub fn new(
+        state: ATNStateRef,
+        alt: i32,
+        context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+    ) -> Self {
         ATNConfig {
             precedence_filter_suppressed: false,
             state,
@@ -120,23 +122,12 @@ impl ATNConfig {
         }
     }
 
-    pub fn new_with_semantic(
+    pub fn new_lexer(
         state: ATNStateRef,
         alt: i32,
-        context: Option<Arc<PredictionContext>>,
-        semantic_context: SemanticContext,
-    ) -> ATNConfig {
-        let mut new = Self::new(state, alt, context);
-        new.semantic_context = semantic_context;
-        new
-    }
-
-    pub fn new_lexer_atnconfig6(
-        _state: ATNStateRef,
-        _alt: i32,
-        _context: Arc<PredictionContext>,
-    ) -> ATNConfig {
-        let mut atnconfig = ATNConfig::new(_state, _alt, Some(_context));
+        context: &'ephemeral PredictionContext<'ephemeral>,
+    ) -> Self {
+        let mut atnconfig = Self::new(state, alt, Some(context));
         atnconfig.config_type = ATNConfigType::LexerATNConfig {
             lexer_action_executor: None,
             passed_through_non_greedy_decision: false,
@@ -144,52 +135,67 @@ impl ATNConfig {
         atnconfig
     }
 
-    pub fn cloned_with_new_semantic(&self, target: ATNStateRef, ctx: SemanticContext) -> ATNConfig {
-        let mut new = self.cloned(target);
-        new.semantic_context = ctx;
-        new
+    pub fn with_semantic_context(self, semantic_context: SemanticContext) -> Self {
+        ATNConfig {
+            semantic_context,
+            ..self
+        }
     }
 
-    pub fn cloned(&self, target: ATNStateRef) -> ATNConfig {
-        //        println!("depth {}",PredictionContext::size(self.context.as_deref()));
-        let mut new = self.clone();
-        new.state = target;
-        if let ATNConfigType::LexerATNConfig {
+    pub fn with_state(self, state: ATNStateRef) -> Self {
+        let config_type = if let ATNConfigType::LexerATNConfig {
+            lexer_action_executor,
+            passed_through_non_greedy_decision,
+        } = self.config_type
+        {
+            ATNConfigType::LexerATNConfig {
+                lexer_action_executor,
+                passed_through_non_greedy_decision: passed_through_non_greedy_decision
+                    || matches!(
+                        *state,
+                        ATNState::Decision(DecisionState {
+                            nongreedy: true,
+                            ..
+                        })
+                    ),
+            }
+        } else {
+            self.config_type
+        };
+        Self {
+            state,
+            config_type,
+            ..self
+        }
+    }
+
+    pub fn with_prediction_context<'target>(
+        self,
+        context: Option<&'target PredictionContext<'target>>,
+    ) -> ATNConfig<'target> {
+        ATNConfig { context, ..self }
+    }
+
+    pub(crate) fn with_lexer_executor(
+        self,
+        lexer_action_executor: Option<Arc<LexerActionExecutor>>,
+    ) -> Self {
+        let config_type = if let ATNConfigType::LexerATNConfig {
             passed_through_non_greedy_decision,
             ..
-        } = &mut new.config_type
+        } = self.config_type
         {
-            *passed_through_non_greedy_decision = check_non_greedy_decision(self, target);
+            ATNConfigType::LexerATNConfig {
+                lexer_action_executor,
+                passed_through_non_greedy_decision,
+            }
+        } else {
+            self.config_type
+        };
+        ATNConfig {
+            config_type,
+            ..self
         }
-        new
-    }
-
-    pub fn cloned_with_new_ctx(
-        &self,
-        target: ATNStateRef,
-        ctx: Option<Arc<PredictionContext>>,
-    ) -> ATNConfig {
-        let mut new = self.cloned(target);
-        new.context = ctx;
-
-        new
-    }
-
-    pub(crate) fn cloned_with_new_exec(
-        &self,
-        target: ATNStateRef,
-        exec: Option<LexerActionExecutor>,
-    ) -> ATNConfig {
-        let mut new = self.cloned(target);
-        if let ATNConfigType::LexerATNConfig {
-            lexer_action_executor,
-            passed_through_non_greedy_decision: _,
-        } = &mut new.config_type
-        {
-            *lexer_action_executor = exec.map(Arc::new);
-            //            *passed_through_non_greedy_decision = check_non_greedy_decision(self, target);
-        }
-        new
     }
 
     pub fn get_state(&self) -> ATNStateRef {
@@ -204,20 +210,20 @@ impl ATNConfig {
         &self.config_type
     }
 
-    pub fn get_context(&self) -> Option<&Arc<PredictionContext>> {
-        self.context.as_ref()
+    pub fn get_context(&self) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+        self.context
     }
 
     pub fn semantic_context(&self) -> &SemanticContext {
         &self.semantic_context
     }
 
-    pub fn take_context(&mut self) -> Arc<PredictionContext> {
+    pub fn take_context(&mut self) -> &'ephemeral PredictionContext<'ephemeral> {
         self.context.take().unwrap()
     }
 
-    pub fn set_context(&mut self, _v: Arc<PredictionContext>) {
-        self.context = Some(_v);
+    pub fn set_context(&mut self, context: &'ephemeral PredictionContext<'ephemeral>) {
+        self.context = Some(context);
     }
 
     pub fn get_reaches_into_outer_context(&self) -> i32 {
@@ -235,21 +241,4 @@ impl ATNConfig {
     pub fn set_precedence_filter_suppressed(&mut self, _v: bool) {
         self.precedence_filter_suppressed = _v;
     }
-}
-
-fn check_non_greedy_decision(source: &ATNConfig, target: ATNStateRef) -> bool {
-    if let LexerATNConfig {
-        passed_through_non_greedy_decision: true,
-        ..
-    } = source.get_type()
-    {
-        return true;
-    }
-    if let ATNState::Decision(DecisionState {
-        nongreedy: true, ..
-    }) = *target
-    {
-        return true;
-    }
-    false
 }
