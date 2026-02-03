@@ -84,14 +84,14 @@ impl PredictionMode {
 //
 //
 pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
-    arena: &'ephemeral bumpalo::Bump,
+    ephemerals: &'ephemeral bumpalo::Bump,
     mode: PredictionMode,
     configs: &ATNConfigSet<'ephemeral>,
 ) -> bool {
     //    if all_configs_in_rule_stop_states(configs) {
     //        return true          checked outside
     //    }
-    let mut dup = ATNConfigSet::new(arena, true);
+    let mut dup = ATNConfigSet::new(ephemerals, true);
     let mut configs = configs;
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
         configs.get_items().for_each(|it| {

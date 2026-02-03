@@ -455,10 +455,10 @@ impl ConfigSetStore<'static> {
 }
 
 impl<'ephemeral> ConfigSetStore<'ephemeral> {
-    fn new_ephemeral(arena: &'ephemeral bumpalo::Bump) -> Self {
+    fn new_ephemeral(ephemerals: &'ephemeral bumpalo::Bump) -> Self {
         ConfigSetStore::Ephemeral(EphemeralStore {
-            lookup: HashTable::with_capacity_in(7, arena),
-            configs: bumpalo::collections::Vec::new_in(arena),
+            lookup: HashTable::with_capacity_in(7, ephemerals),
+            configs: bumpalo::collections::Vec::new_in(ephemerals),
         })
     }
 

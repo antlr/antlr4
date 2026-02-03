@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
 
@@ -341,7 +341,9 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
                 } else {
                     merge_cache.alloc([a.parent_ctx, b.parent_ctx])
                 };
-                let return_states = merge_cache.arena.alloc([a.return_state, b.return_state]);
+                let return_states = merge_cache
+                    .ephemerals
+                    .alloc([a.return_state, b.return_state]);
 
                 if return_states[0] > return_states[1] {
                     parents.swap(0, 1);
@@ -447,7 +449,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         if parents.len() == 1 {
             merge_cache.alloc(Self::new_singleton(parents[0], return_states[0]))
         } else {
-            PredictionContext::combine_common_parents(parents.as_mut_slice());
+            PredictionContext::combine_common_parents(parents.as_mut_slice(), merge_cache);
             merge_cache.alloc(Self::new_array(
                 parents.into_bump_slice(),
                 return_states.into_bump_slice(),
@@ -455,8 +457,12 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         }
     }
 
-    fn combine_common_parents(parents: &mut [Option<&'ephemeral PredictionContext<'ephemeral>>]) {
-        let mut uniq_parents = HashMap::with_hasher(NoopHasherBuilder {});
+    fn combine_common_parents(
+        parents: &mut [Option<&'ephemeral PredictionContext<'ephemeral>>],
+        merge_cache: &mut MergeCache<'ephemeral>,
+    ) {
+        let mut uniq_parents =
+            hashbrown::HashMap::with_hasher_in(NoopHasherBuilder {}, merge_cache.ephemerals);
         for parent in parents.iter() {
             uniq_parents.entry(*parent).or_insert_with(|| *parent);
         }
