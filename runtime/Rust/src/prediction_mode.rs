@@ -96,7 +96,7 @@ pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
         configs.get_items().for_each(|it| {
             let c = ATNConfig::new(it.get_state(), it.get_alt(), it.get_context())
-                .with_semantic_context(SemanticContext::NONE);
+                .with_semantic_context(&SemanticContext::NONE);
             dup.add(c);
         });
         configs = &dup;

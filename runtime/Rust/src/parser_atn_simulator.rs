@@ -423,9 +423,9 @@ impl ParserATNSimulator {
         D
     }
 
-    fn predicate_dfa_state<'ephemeral>(
+    fn predicate_dfa_state(
         &self,
-        ephemerals: &'ephemeral bumpalo::Bump,
+        ephemerals: &bumpalo::Bump,
         dfa_state: &mut ProposedDFAState,
         decision_state: &ATNState,
     ) {
@@ -738,7 +738,9 @@ impl ParserATNSimulator {
                 if updated_sem_ctx != config.semantic_context() {
                     config_set.add_cached(
                         ATNConfig::new(config.get_state(), config.get_alt(), config.get_context())
-                            .with_semantic_context(updated_sem_ctx.clone()),
+                            .with_semantic_context(
+                                local.ephemerals().alloc(updated_sem_ctx.clone()),
+                            ),
                         local.merge_cache,
                     );
                 } else {
@@ -771,9 +773,9 @@ impl ParserATNSimulator {
         None
     }
 
-    fn get_preds_for_ambig_alts<'ephemeral>(
+    fn get_preds_for_ambig_alts(
         &self,
-        ephemerals: &'ephemeral bumpalo::Bump,
+        ephemerals: &bumpalo::Bump,
         ambig_alts: &BitSet,
         configs: &ATNConfigSet,
         nalts: usize,
@@ -968,8 +970,7 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        pred.borrow()
-            .evaluate(local.ephemerals(), local.parser, local.outer_context)
+        pred.borrow().evaluate(local.parser, local.outer_context)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1057,7 +1058,7 @@ impl ParserATNSimulator {
                     //                    let new_ctx = context.take_parent(i).unwrap();
                     let new_ctx = context.get_parent(i);
                     let mut c = ATNConfig::new(return_state, config.get_alt(), new_ctx)
-                        .with_semantic_context(config.semantic_context().clone());
+                        .with_semantic_context(config.semantic_context());
                     c.set_reaches_into_outer_context(config.get_reaches_into_outer_context());
                     assert!(depth > i32::MIN);
                     self.closure_checking_stop_state(
@@ -1349,7 +1350,7 @@ impl ParserATNSimulator {
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(new_sem_ctx),
+                        .with_semantic_context(local.ephemerals().alloc(new_sem_ctx)),
                 );
             }
         } else {
@@ -1398,7 +1399,7 @@ impl ParserATNSimulator {
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(new_sem_ctx),
+                        .with_semantic_context(local.ephemerals().alloc(new_sem_ctx)),
                 );
             }
         } else {
@@ -1643,7 +1644,7 @@ impl std::hash::Hash for MergeKey<'_> {
         let product = (h1 as u64).wrapping_mul(h2 as u64);
 
         // Combine and mix
-        let mut combined = sum ^ (product << 32 | product >> 32);
+        let mut combined = sum ^ product.rotate_right(32);
 
         // Apply a fast mixer (e.g., SplitMix64)
         combined = (combined ^ (combined >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);

@@ -1,7 +1,6 @@
 //! Implementation of lexer automata(DFA)
 use std::cell::Cell;
 use std::rc::Rc;
-use std::sync::Arc;
 
 use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType};
@@ -321,7 +320,7 @@ impl LexerATNSimulator {
         _reach: &mut ATNConfigSet<'ephemeral>,
         _t: i32,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        arena: &'ephemeral bumpalo::Bump,
+        ephemerals: &'ephemeral bumpalo::Bump,
     ) where
         'input: 'arena,
         Input: CharStream<'input>,
@@ -344,14 +343,13 @@ impl LexerATNSimulator {
             for tr in atn_state.get_transitions() {
                 if let Some(target) = tr.get_reachable_target(_t) {
                     let exec = config.get_lexer_executor().map(|x| {
-                        x.clone()
-                            .fix_offset_before_match(lexer.input().index() - self.start_index)
+                        ephemerals.alloc(
+                            x.clone()
+                                .fix_offset_before_match(lexer.input().index() - self.start_index),
+                        ) as &'ephemeral LexerActionExecutor
                     });
 
-                    let new = config
-                        .clone()
-                        .with_state(target)
-                        .with_lexer_executor(exec.map(Arc::new));
+                    let new = config.clone().with_state(target).with_lexer_executor(exec);
                     if self.closure(
                         new,
                         _reach,
@@ -359,7 +357,7 @@ impl LexerATNSimulator {
                         true,
                         _t == EOF,
                         lexer,
-                        arena,
+                        ephemerals,
                     ) {
                         skip_alt = config.get_alt();
                         break;
@@ -564,7 +562,7 @@ impl LexerATNSimulator {
         _speculative: bool,
         _treat_eofas_epsilon: bool,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        arena: &'ephemeral bumpalo::Bump,
+        ephemerals: &'ephemeral bumpalo::Bump,
     ) -> Option<ATNConfig<'ephemeral>>
     where
         'input: 'arena,
@@ -588,7 +586,7 @@ impl LexerATNSimulator {
                     _config
                         .clone()
                         .with_state(target)
-                        .with_prediction_context(Some(arena.alloc(pred_ctx))),
+                        .with_prediction_context(Some(ephemerals.alloc(pred_ctx))),
                 );
             }
             Transition::Predicate(tr) => {
@@ -617,7 +615,7 @@ impl LexerATNSimulator {
                             _config
                                 .clone()
                                 .with_state(target)
-                                .with_lexer_executor(Some(Arc::new(lexer_action_executor))),
+                                .with_lexer_executor(Some(ephemerals.alloc(lexer_action_executor))),
                         )
                     }
                 } else {

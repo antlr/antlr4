@@ -48,7 +48,6 @@ impl SemanticContext {
 
     pub(crate) fn evaluate<'ephemeral, 'input, 'arena, TF, P>(
         &self,
-        ephemerals: &'ephemeral bumpalo::Bump,
         parser: &mut P,
         outer_context: &'arena P::Node,
     ) -> bool
@@ -71,12 +70,8 @@ impl SemanticContext {
                 parser.sempred(_localctx, *rule_index, *pred_index)
             }
             SemanticContext::Precedence(prec) => parser.precpred(Some(outer_context), *prec),
-            SemanticContext::And(ops) => ops
-                .iter()
-                .all(|sem| sem.evaluate(ephemerals, parser, outer_context)),
-            SemanticContext::Or(ops) => ops
-                .iter()
-                .any(|sem| sem.evaluate(ephemerals, parser, outer_context)),
+            SemanticContext::And(ops) => ops.iter().all(|sem| sem.evaluate(parser, outer_context)),
+            SemanticContext::Or(ops) => ops.iter().any(|sem| sem.evaluate(parser, outer_context)),
         }
     }
 
@@ -163,8 +158,8 @@ impl SemanticContext {
         }
     }
 
-    pub fn new_and<'ephemeral>(
-        ephemerals: &'ephemeral bumpalo::Bump,
+    pub fn new_and(
+        ephemerals: &bumpalo::Bump,
         a: &SemanticContext,
         b: &SemanticContext,
     ) -> SemanticContext {
@@ -193,8 +188,8 @@ impl SemanticContext {
         SemanticContext::And(operands.into_iter().collect())
     }
 
-    pub fn new_or<'ephemeral>(
-        ephemerals: &'ephemeral bumpalo::Bump,
+    pub fn new_or(
+        ephemerals: &bumpalo::Bump,
         a: &SemanticContext,
         b: &SemanticContext,
     ) -> SemanticContext {
@@ -225,8 +220,8 @@ impl SemanticContext {
         SemanticContext::Or(operands.into_iter().collect())
     }
 
-    pub fn and<'ephemeral>(
-        ephemerals: &'ephemeral bumpalo::Bump,
+    pub fn and(
+        ephemerals: &bumpalo::Bump,
         a: Option<impl Borrow<SemanticContext>>,
         b: Option<impl Borrow<SemanticContext>>,
     ) -> SemanticContext {
@@ -248,8 +243,8 @@ impl SemanticContext {
         }
     }
 
-    pub fn or<'ephemeral>(
-        ephemerals: &'ephemeral bumpalo::Bump,
+    pub fn or(
+        ephemerals: &bumpalo::Bump,
         a: Option<impl Borrow<SemanticContext>>,
         b: Option<impl Borrow<SemanticContext>>,
     ) -> SemanticContext {

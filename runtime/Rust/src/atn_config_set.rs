@@ -1,13 +1,15 @@
 use std::cmp::max;
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
+use std::pin::Pin;
 
 use bit_set::BitSet;
 use hashbrown::HashTable;
 use murmur3::murmur3_32::MurmurHasher;
 
-use crate::atn_config::ATNConfig;
+use crate::atn_config::{ATNConfig, ATNConfigType};
 use crate::atn_simulator::IATNSimulator;
+use crate::lexer_action_executor::LexerActionExecutor;
 use crate::parser_atn_simulator::MergeCache;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
@@ -117,24 +119,68 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
                     s.configs.iter().for_each(|c| c.hash(&mut hasher));
                     hasher.finish()
                 };
+                let semantic_contexts: Vec<SemanticContext> = s
+                    .configs
+                    .iter()
+                    .map(|config| config.semantic_context().clone())
+                    .collect();
+                let lexer_action_executors: Vec<Option<LexerActionExecutor>> = s
+                    .configs
+                    .iter()
+                    .map(|config| match &config.config_type {
+                        ATNConfigType::BaseATNConfig => None,
+                        ATNConfigType::LexerATNConfig {
+                            lexer_action_executor,
+                            ..
+                        } => lexer_action_executor.cloned(),
+                    })
+                    .collect();
+                let semantic_contexts = Pin::new(semantic_contexts.into_boxed_slice());
+                let lexer_action_executors = Pin::new(lexer_action_executors.into_boxed_slice());
 
                 let static_configs = s
                     .configs
                     .into_iter()
-                    .map(|config| {
-                        let stored_context = config.get_context().map(|context| {
+                    .enumerate()
+                    .map(|(i, config)| {
+                        let static_context = config.get_context().map(|context| {
                             interpreter
                                 .shared_context_cache()
                                 .get_shared_context(context)
                                 .get_static_ref()
                         });
-                        config.with_prediction_context(stored_context)
+                        let static_semantic_context = unsafe {
+                            &*(semantic_contexts.get_unchecked(i) as *const SemanticContext)
+                        };
+                        let static_config_type = match &config.config_type {
+                            ATNConfigType::BaseATNConfig => ATNConfigType::BaseATNConfig,
+                            ATNConfigType::LexerATNConfig {
+                                passed_through_non_greedy_decision,
+                                ..
+                            } => ATNConfigType::LexerATNConfig {
+                                lexer_action_executor: unsafe {
+                                    lexer_action_executors
+                                        .get_unchecked(i)
+                                        .as_ref()
+                                        .map(|exec| &*(exec as *const LexerActionExecutor))
+                                },
+                                passed_through_non_greedy_decision:
+                                    *passed_through_non_greedy_decision,
+                            },
+                        };
+                        config.make_static(
+                            static_context,
+                            static_semantic_context,
+                            static_config_type,
+                        )
                     })
                     .collect();
 
                 Box::new(ATNConfigSet {
                     configs: ConfigSetStore::Static(StaticStore {
                         cached_hash,
+                        semantic_contexts,
+                        lexer_action_executors,
                         configs: static_configs,
                     }),
                     ..self
@@ -367,6 +413,12 @@ struct EphemeralStore<'ephemeral> {
 
 struct StaticStore {
     cached_hash: u64,
+    // Backing store for ATNConfig::semantic_context
+    #[allow(dead_code)]
+    semantic_contexts: Pin<Box<[SemanticContext]>>,
+    // Backing store for ATNConfig::config_type
+    #[allow(dead_code)]
+    lexer_action_executors: Pin<Box<[Option<LexerActionExecutor>]>>,
     configs: Vec<ATNConfig<'static>>,
 }
 
@@ -449,6 +501,8 @@ impl ConfigSetStore<'static> {
         };
         ConfigSetStore::Static(StaticStore {
             cached_hash,
+            semantic_contexts: Box::pin([]),
+            lexer_action_executors: Box::pin([]),
             configs,
         })
     }
@@ -468,11 +522,4 @@ impl<'ephemeral> ConfigSetStore<'ephemeral> {
             ConfigSetStore::Static(s) => s.configs.iter(),
         }
     }
-
-    // fn get(&self, index: usize) -> &ATNConfig<'ephemeral> {
-    //     match self {
-    //         ConfigSetStore::Ephemeral(s) => &s.configs[index],
-    //         ConfigSetStore::Static(s) => &s.configs[index],
-    //     }
-    // }
 }
