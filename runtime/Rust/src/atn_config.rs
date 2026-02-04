@@ -1,11 +1,8 @@
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
-use murmur3::murmur3_32::MurmurHasher;
-
 use crate::atn_config::ATNConfigType::LexerATNConfig;
 use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
-use crate::dfa::ScopeExt;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
@@ -96,13 +93,6 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
                 ..
             } => lexer_action_executor.as_deref(),
         }
-    }
-
-    pub fn default_hash(&self) -> u64 {
-        MurmurHasher::default().convert_with(|mut x| {
-            self.hash(&mut x);
-            x.finish()
-        })
     }
 
     pub fn new(

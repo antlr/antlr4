@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use std::sync::atomic::{AtomicPtr, Ordering};
 use std::sync::LazyLock;
 
-use murmur3::murmur3_32::MurmurHasher;
+use fxhash::hash64;
 
 use crate::atn::ATN;
 use crate::atn_config_set::ATNConfigSet;
@@ -88,9 +88,7 @@ impl<'dfa> DFAState<'dfa> {
     // pub fn get_alt_set(&self) -> &Set { unimplemented!() }
 
     pub fn default_hash(&self) -> u64 {
-        let mut hasher = MurmurHasher::default();
-        self.configs().hash(&mut hasher);
-        hasher.finish()
+        hash64(self.configs())
     }
 
     pub fn is_error_state(&self) -> bool {

@@ -23,9 +23,6 @@ pub use dfa_state::ProposedDFAState;
 
 ///Helper trait for scope management and temporary values not living long enough
 pub(crate) trait ScopeExt: Sized {
-    fn convert_with<T, F: FnOnce(Self) -> T>(self, f: F) -> T {
-        f(self)
-    }
     fn run<T, F: FnOnce(&Self) -> T>(&self, f: F) -> T {
         f(self)
     }

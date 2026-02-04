@@ -1,6 +1,6 @@
 use std::hash::{Hash, Hasher};
 
-use murmur3::murmur3_32::MurmurHasher;
+use fxhash::{hash64, FxHasher64};
 
 use crate::char_stream::CharStream;
 use crate::lexer::Lexer;
@@ -31,7 +31,7 @@ impl LexerActionExecutor {
         }) = old
         {
             let new_hash = {
-                let mut hasher = MurmurHasher::default();
+                let mut hasher = FxHasher64::default();
                 hasher.write_u64(*cached_hash);
                 lexer_action.hash(&mut hasher);
                 hasher.finish()
@@ -48,11 +48,7 @@ impl LexerActionExecutor {
             }
         } else {
             LexerActionExecutor {
-                cached_hash: {
-                    let mut hasher = MurmurHasher::default();
-                    lexer_action.hash(&mut hasher);
-                    hasher.finish()
-                },
+                cached_hash: { hash64(&lexer_action) },
                 lexer_actions: Box::new([lexer_action]),
             }
         }

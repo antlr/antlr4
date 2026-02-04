@@ -4,8 +4,8 @@ use std::hash::{Hash, Hasher};
 use std::pin::Pin;
 
 use bit_set::BitSet;
+use fxhash::{hash64, FxHasher64};
 use hashbrown::HashTable;
-use murmur3::murmur3_32::MurmurHasher;
 
 use crate::atn_config::{ATNConfig, ATNConfigType};
 use crate::atn_simulator::IATNSimulator;
@@ -115,7 +115,7 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
         match self.configs {
             ConfigSetStore::Ephemeral(s) => {
                 let cached_hash = {
-                    let mut hasher = MurmurHasher::default();
+                    let mut hasher = FxHasher64::default();
                     s.configs.iter().for_each(|c| c.hash(&mut hasher));
                     hasher.finish()
                 };
@@ -199,7 +199,7 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
     pub fn hash_code(&self) -> u64 {
         match &self.configs {
             ConfigSetStore::Ephemeral(s) => {
-                let mut hasher = MurmurHasher::default();
+                let mut hasher = FxHasher64::default();
                 s.configs.iter().for_each(|c| c.hash(&mut hasher));
                 hasher.finish()
             }
@@ -354,9 +354,7 @@ impl Key {
     }
 
     fn full_hash(config: &ATNConfig) -> u64 {
-        let mut hasher = MurmurHasher::default();
-        config.hash(&mut hasher);
-        hasher.finish()
+        hash64(config)
     }
 
     fn partial(config: &ATNConfig, index: usize) -> Self {
@@ -364,7 +362,7 @@ impl Key {
     }
 
     fn partial_hash(config: &ATNConfig) -> u64 {
-        let mut hasher = MurmurHasher::default();
+        let mut hasher = FxHasher64::default();
         config.get_state().hash(&mut hasher);
         config.get_alt().hash(&mut hasher);
         config.semantic_context().hash(&mut hasher);
@@ -494,11 +492,7 @@ impl ConfigSetStore<'_> {
 impl ConfigSetStore<'static> {
     fn new_empty() -> Self {
         let configs = Vec::new();
-        let cached_hash = {
-            let mut hasher = MurmurHasher::default();
-            configs.hash(&mut hasher);
-            hasher.finish()
-        };
+        let cached_hash = hash64(&configs);
         ConfigSetStore::Static(StaticStore {
             cached_hash,
             semantic_contexts: Box::pin([]),

@@ -6,7 +6,7 @@ use std::hash::{BuildHasher, Hash, Hasher};
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock, RwLock};
 
-use murmur3::murmur3_32::MurmurHasher;
+use fxhash::FxHasher32;
 
 use crate::atn::ATN;
 use crate::atn_state::ATNStateRef;
@@ -173,7 +173,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 
     fn calc_hash(&mut self) {
-        let mut hasher = MurmurHasher::default();
+        let mut hasher = FxHasher32::default();
         match self {
             PredictionContext::Singleton(SingletonPredictionContext {
                 parent_ctx,
