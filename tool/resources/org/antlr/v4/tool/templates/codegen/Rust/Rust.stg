@@ -1127,7 +1127,7 @@ where
 }
 
 impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
-	fn new(base: <currentRule.name; format="cap">ContextExt\<'input, 'arena>, <ctorAttrs:{a | , <a>}>) -> Self {
+	fn new(base: <currentRule.name; format="cap">ContextExt\<'input, 'arena>) -> Self {
         Self {
             base,
             <struct.tokenDecls:{a | <a.escapedName>:None, }>
@@ -1139,16 +1139,13 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: <parser.name>ContextNode\<'input, 'arena>,<ctorAttrs:{a | , <a>}>) -> <currentRule.name; format="cap">ContextAll\<'input, 'arena\>
+	fn copy_from(src: <parser.name>ContextNode\<'input, 'arena>) -> <currentRule.name; format="cap">ContextAll\<'input, 'arena\>
     {
         let <parser.name>ContextNode::<currentRule.name; format="cap">Context(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         <currentRule.name; format="cap">ContextAll::<struct.escapedName>(
-            <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-                <ctorAttrs:{a | <a.escapedName>: src.get_<a.escapedName>().clone(), }; separator=", ">
-            ))
+            <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }

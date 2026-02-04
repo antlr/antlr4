@@ -495,22 +495,20 @@ where
 }
 
 impl<'input, 'arena> AddContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>,) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         ExprContextAll::AddContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -569,22 +567,20 @@ where
 }
 
 impl<'input, 'arena> NumberContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>,) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         ExprContextAll::NumberContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -659,22 +655,20 @@ where
 }
 
 impl<'input, 'arena> MultiplyContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>,) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         ExprContextAll::MultiplyContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }

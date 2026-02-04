@@ -491,7 +491,7 @@ where
 }
 
 impl<'input, 'arena> AddContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             a:None, b:None, 
@@ -499,15 +499,13 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::AddContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -565,7 +563,7 @@ where
 }
 
 impl<'input, 'arena> ParensContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             x:None, 
@@ -573,15 +571,13 @@ impl<'input, 'arena> ParensContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::ParensContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -645,7 +641,7 @@ where
 }
 
 impl<'input, 'arena> MultContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             op:None, 
@@ -654,15 +650,13 @@ impl<'input, 'arena> MultContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::MultContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -720,7 +714,7 @@ where
 }
 
 impl<'input, 'arena> DecContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             x:None, 
@@ -728,15 +722,13 @@ impl<'input, 'arena> DecContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::DecContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -798,7 +790,7 @@ where
 }
 
 impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             ID:None, 
@@ -806,15 +798,13 @@ impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::AnIDContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -876,7 +866,7 @@ where
 }
 
 impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             INT:None, 
@@ -884,15 +874,13 @@ impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::AnIntContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
@@ -950,7 +938,7 @@ where
 }
 
 impl<'input, 'arena> IncContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>, ) -> Self {
+	fn new(base: EContextExt<'input, 'arena>) -> Self {
         Self {
             base,
             x:None, 
@@ -958,15 +946,13 @@ impl<'input, 'arena> IncContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>,) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
         EContextAll::IncContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(
-                ext_src,
-            ))
+            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
         )
 	}
 }
