@@ -739,7 +739,7 @@ impl ParserATNSimulator {
                     config_set.add_cached(
                         ATNConfig::new(config.get_state(), config.get_alt(), config.get_context())
                             .with_semantic_context(
-                                local.ephemerals().alloc(updated_sem_ctx.clone()),
+                                local.merge_cache.alloc_with_drop(updated_sem_ctx.clone()),
                             ),
                         local.merge_cache,
                     );
@@ -1350,7 +1350,7 @@ impl ParserATNSimulator {
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(local.ephemerals().alloc(new_sem_ctx)),
+                        .with_semantic_context(local.merge_cache.alloc_with_drop(new_sem_ctx)),
                 );
             }
         } else {
@@ -1399,7 +1399,7 @@ impl ParserATNSimulator {
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(local.ephemerals().alloc(new_sem_ctx)),
+                        .with_semantic_context(local.merge_cache.alloc_with_drop(new_sem_ctx)),
                 );
             }
         } else {
@@ -1588,6 +1588,7 @@ pub(crate) struct MergeCache<'ephemeral> {
         &'ephemeral bumpalo::Bump,
     >,
 
+    drop_list: Vec<Box<dyn FnOnce() + 'ephemeral>>,
     pub ephemerals: &'ephemeral bumpalo::Bump,
 }
 
@@ -1595,6 +1596,7 @@ impl<'ephemeral> MergeCache<'ephemeral> {
     pub fn new(ephemerals: &'ephemeral bumpalo::Bump) -> Self {
         Self {
             map: HashMap::with_hasher_in(NoopHasherBuilder {}, ephemerals),
+            drop_list: Vec::new(),
             ephemerals,
         }
     }
@@ -1607,6 +1609,15 @@ impl<'ephemeral> MergeCache<'ephemeral> {
         self.ephemerals.alloc(value)
     }
 
+    pub fn alloc_with_drop<T>(&mut self, value: T) -> &'ephemeral mut T {
+        let res = self.ephemerals.alloc(value);
+        let ptr = res as *mut T;
+        self.drop_list.push(Box::new(move || unsafe {
+            std::ptr::drop_in_place(ptr);
+        }));
+        res
+    }
+
     pub fn get(&self, key: &MergeKey) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
         self.map.get(key).cloned()
     }
@@ -1617,6 +1628,14 @@ impl<'ephemeral> MergeCache<'ephemeral> {
         value: &'ephemeral PredictionContext<'ephemeral>,
     ) {
         self.map.insert(key, value);
+    }
+}
+
+impl Drop for MergeCache<'_> {
+    fn drop(&mut self) {
+        for drop_fn in self.drop_list.drain(..).rev() {
+            drop_fn();
+        }
     }
 }
 

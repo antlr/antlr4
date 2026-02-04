@@ -11,7 +11,7 @@ use crate::token_factory::TokenFactory;
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub(crate) struct LexerActionExecutor {
     cached_hash: u64,
-    lexer_actions: Vec<LexerAction>,
+    lexer_actions: Box<[LexerAction]>,
 }
 
 impl Hash for LexerActionExecutor {
@@ -21,30 +21,41 @@ impl Hash for LexerActionExecutor {
 }
 
 impl LexerActionExecutor {
-    pub(crate) fn new(lexer_actions: Vec<LexerAction>) -> LexerActionExecutor {
-        //        let mut hasher = ;
-        let cached_hash = lexer_actions
-            .iter()
-            .fold(MurmurHasher::default(), |mut acc, x| {
-                x.hash(&mut acc);
-                acc
-            })
-            .finish();
-        LexerActionExecutor {
-            lexer_actions,
-            cached_hash,
-        }
-    }
-
     pub(crate) fn new_copy_append(
         old: Option<&Self>,
         lexer_action: LexerAction,
     ) -> LexerActionExecutor {
-        let mut new = old
-            .cloned()
-            .unwrap_or_else(|| LexerActionExecutor::new(Vec::new()));
-        new.lexer_actions.push(lexer_action);
-        new
+        if let Some(LexerActionExecutor {
+            lexer_actions,
+            cached_hash,
+        }) = old
+        {
+            let new_hash = {
+                let mut hasher = MurmurHasher::default();
+                hasher.write_u64(*cached_hash);
+                lexer_action.hash(&mut hasher);
+                hasher.finish()
+            };
+            let new_actions = lexer_actions
+                .iter()
+                .cloned()
+                .chain(std::iter::once(lexer_action))
+                .collect::<Box<[_]>>();
+
+            LexerActionExecutor {
+                lexer_actions: new_actions,
+                cached_hash: new_hash,
+            }
+        } else {
+            LexerActionExecutor {
+                cached_hash: {
+                    let mut hasher = MurmurHasher::default();
+                    lexer_action.hash(&mut hasher);
+                    hasher.finish()
+                },
+                lexer_actions: Box::new([lexer_action]),
+            }
+        }
     }
 
     pub fn fix_offset_before_match(mut self, offset: isize) -> LexerActionExecutor {
