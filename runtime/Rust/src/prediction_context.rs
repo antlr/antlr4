@@ -615,24 +615,19 @@ impl PredictionContextCache {
         };
         let owned = PredictionContextOwned::from(inner);
 
-        // {
-        //     let mut cache = self
-        //         .cache
-        //         .write()
-        //         .expect("PredictionContextCache lock poisoned");
+        {
+            let mut cache = self
+                .cache
+                .write()
+                .expect("PredictionContextCache lock poisoned");
 
-        //     if let Some(cached) = cache.get(&owned) {
-        //         return cached.clone();
-        //     }
-        //     cache.insert(owned.clone());
-        // }
-        let is_new = self
-            .cache
-            .write()
-            .expect("PredictionContextCache lock poisoned")
-            .insert(owned.clone());
-        assert!(is_new, "PredictionContextCache invariant violated");
+            // First in wins:
+            if let Some(cached) = cache.get(&owned) {
+                return cached.clone();
+            }
 
+            cache.insert(owned.clone());
+        }
         owned
     }
 

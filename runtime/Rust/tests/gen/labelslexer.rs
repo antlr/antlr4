@@ -3,6 +3,8 @@
 #![allow(unused_imports)]
 #![allow(nonstandard_style)]
 #![allow(unused_variables)]
+#![allow(unused_braces)]
+#![allow(unused_parens)]
 use dbt_antlr4::Arena;
 use dbt_antlr4::atn::ATN;
 use dbt_antlr4::char_stream::CharStream;

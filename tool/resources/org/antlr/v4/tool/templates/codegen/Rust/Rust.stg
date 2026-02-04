@@ -56,6 +56,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 #![allow(non_upper_case_globals)]
 #![allow(nonstandard_style)]
 #![allow(unused_braces)]
+#![allow(unused_parens)]
 <namedActions.header>
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
@@ -1232,6 +1233,8 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 #![allow(unused_imports)]
 #![allow(nonstandard_style)]
 #![allow(unused_variables)]
+#![allow(unused_braces)]
+#![allow(unused_parens)]
 <namedActions.header>
 use dbt_antlr4::Arena;
 use dbt_antlr4::atn::ATN;

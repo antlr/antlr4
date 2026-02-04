@@ -5,6 +5,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(nonstandard_style)]
 #![allow(unused_braces)]
+#![allow(unused_parens)]
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
