@@ -146,7 +146,7 @@ impl CSVTreeWalker
         };
         let listener_ptr = Box::into_raw(listener);
         let listener = unsafe { Box::from_raw(listener_ptr as *mut <CSVParserContextNode as RuleNode>::Listener) };
-        let listener = dbt_antlr4::tree::ParseTreeWalker::walk(listener, node)?;
+        let listener = ParseTreeWalker::walk(listener, node)?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
 }

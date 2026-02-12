@@ -349,7 +349,7 @@ impl <file.grammarName>TreeWalker
         };
         let listener_ptr = Box::into_raw(listener);
         let listener = unsafe { Box::from_raw(listener_ptr as *mut \<<parser.name>ContextNode as RuleNode>::Listener) };
-        let listener = dbt_antlr4::tree::ParseTreeWalker::walk(listener, node)?;
+        let listener = ParseTreeWalker::walk(listener, node)?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
 }
@@ -1277,7 +1277,7 @@ pub const ruleNames: [&'static str;<length(lexer.ruleNames)>] = [
 <namedActions.definitions>
 
 pub type LexerContext\<'input, 'arena> = BaseRuleContext\<'input, 'arena, EmptyCustomRuleContext\<'input, 'arena>\>;
-type BaseLexerType\<'input, 'arena, Input, TF> = BaseLexer\<'input, 'arena, <lexer.name>Actions, Input, TF>;
+pub type BaseLexerType\<'input, 'arena, Input, TF> = BaseLexer\<'input, 'arena, <lexer.name>Actions, Input, TF>;
 
 pub struct <lexer.name>\<'input, 'arena, Input, TF = CommonTokenFactory\<'input, 'arena\>\>
 where

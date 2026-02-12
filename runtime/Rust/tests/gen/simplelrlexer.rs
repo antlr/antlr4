@@ -47,7 +47,7 @@ static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
 pub type LexerContext<'input, 'arena> = BaseRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
-type BaseLexerType<'input, 'arena, Input, TF> = BaseLexer<'input, 'arena, SimpleLRLexerActions, Input, TF>;
+pub type BaseLexerType<'input, 'arena, Input, TF> = BaseLexer<'input, 'arena, SimpleLRLexerActions, Input, TF>;
 
 pub struct SimpleLRLexer<'input, 'arena, Input, TF = CommonTokenFactory<'input, 'arena>>
 where

@@ -288,6 +288,7 @@ impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 
 
 DeclareContextListGettersFunction() ::= <<
 fn foo() {
+  #[allow(deref_nullptr)]
   let s: &SContext = unsafe { &*std::ptr::null() }; // placeholder
   let a: Vec\<&AContextAll> = s.a_all();
   let b: Vec\<&BContextAll> = s.b_all();
