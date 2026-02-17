@@ -43,12 +43,6 @@ export default class CommonTokenFactory extends TokenFactory {
         }
         return t;
     }
-
-    createThin(type, text) {
-        const t = new CommonToken(null, type);
-        t.text = text;
-        return t;
-    }
 }
 
 /**

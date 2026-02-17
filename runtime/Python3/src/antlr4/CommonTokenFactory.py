@@ -53,9 +53,4 @@ class CommonTokenFactory(TokenFactory):
             t.text = source[1].getText(start,stop)
         return t
 
-    def createThin(self, type:int, text:str):
-        t = CommonToken(type=type)
-        t.text = text
-        return t
-
 CommonTokenFactory.DEFAULT = CommonTokenFactory()
