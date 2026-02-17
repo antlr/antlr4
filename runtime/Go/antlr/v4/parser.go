@@ -317,8 +317,8 @@ func (p *BaseParser) GetTokenFactory() TokenFactory {
 }
 
 // setTokenFactory is used to tell our token source and error strategy about a new way to create tokens.
-func (p *BaseParser) setTokenFactory(factory TokenFactory) {
-	p.input.GetTokenSource().setTokenFactory(factory)
+func (p *BaseParser) SetTokenFactory(factory TokenFactory) {
+	p.input.GetTokenSource().SetTokenFactory(factory)
 }
 
 // GetATNWithBypassAlts - the ATN with bypass alternatives is expensive to create, so we create it
