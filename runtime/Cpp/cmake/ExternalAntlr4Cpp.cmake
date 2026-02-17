@@ -35,8 +35,13 @@ if(MSVC)
   set(ANTLR4_RUNTIME_LIBRARIES
       ${ANTLR4_OUTPUT_DIR}/antlr4-runtime.dll)
 else()
-  set(ANTLR4_STATIC_LIBRARIES
-      ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.a)
+  if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(ANTLR4_STATIC_LIBRARIES
+            ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime-static.a)
+  else()
+    set(ANTLR4_STATIC_LIBRARIES
+            ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.a)
+  endif()
   if(MINGW)
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
