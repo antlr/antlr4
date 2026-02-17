@@ -9,7 +9,6 @@ package org.antlr.v4.tool;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -658,7 +657,7 @@ public class Grammar implements AttributeResolver {
 		if ( isLexer() &&
 			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
 		{
-			return CharSupport.getANTLRCharLiteralForChar(ttype);
+			return CharSupport.getPrintable(ttype);
 		}
 
 		if ( ttype==Token.EOF ) {
@@ -699,7 +698,7 @@ public class Grammar implements AttributeResolver {
 		if ( isLexer() &&
 			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
 		{
-			return CharSupport.getANTLRCharLiteralForChar(ttype);
+			return CharSupport.getPrintable(ttype);
 		}
 
 		if ( ttype==Token.EOF ) {

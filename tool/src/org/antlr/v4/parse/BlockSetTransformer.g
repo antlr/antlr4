@@ -106,13 +106,13 @@ setElement[boolean inLexer]
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
-	:	(	^(a=STRING_LITERAL elementOptions) {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
-		|	  a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
+	:	(	^(a=STRING_LITERAL elementOptions) {!inLexer || GrammarLiteralParser.parseCharFromStringLiteral($a.getText()).isCodepoint()}?
+		|	  a=STRING_LITERAL {!inLexer || GrammarLiteralParser.parseCharFromStringLiteral($a.getText()).isCodepoint()}?
 		|	{!inLexer}?=> ^(TOKEN_REF elementOptions)
 		|	{!inLexer}?=>   TOKEN_REF
 		|	{inLexer}?=>  ^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
-			{CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1 &&
-			 CharSupport.getCharValueFromGrammarCharLiteral($b.getText())!=-1}?
+			{GrammarLiteralParser.parseCharFromStringLiteral($a.getText()).isCodepoint() &&
+			 GrammarLiteralParser.parseCharFromStringLiteral($b.getText()).isCodepoint()}?
 		)
 	;
 
