@@ -121,7 +121,16 @@ The fine print for predicates in the lexer more or less follow these same guidel
 
 ## Predicates in Lexer Rules
 
-In parser rules, predicates must appear on the left edge of alternatives to aid in alternative prediction. Lexers, on the other hand, prefer predicates on the right edge of lexer rules because they choose rules after seeing a token's entire text. Predicates in lexer rules can technically be anywhere within the rule. Some positions might be more or less efficient than others; ANTLR makes no guarantees about the optimal spot. A predicate in a lexer rule might be executed multiple times even during a single token match. You can embed multiple predicates per lexer rule and they are evaluated as the lexer reaches them during matching.
+In parser rules, predicates must appear on the left edge of alternatives to aid in alternative prediction.
+Lexers, on the other hand, prefer predicates on the right edge of lexer rules because they choose rules after seeing a token's entire text.
+Predicates in lexer rules can technically be anywhere within the rule.
+A predicate in a lexer rule might be executed multiple times even during a single token match.
+You can embed multiple predicates per lexer rule, and they are evaluated as the lexer reaches them during matching.
+
+Position at the beginning of lexer rule is strictly not recommended because it significantly degrades performance.
+Even if only one lexer rule contains a predicate on the left-hand side, no lexer rule is cached at all,
+and the predicate is being calculated for every token.
+Read more about predicates performance in the article [Improving the performance of an ANTLR parser](https://tomassetti.me/improving-the-performance-of-an-antlr-parser/).
 
 Loosely speaking, the lexer's goal is to choose the rule that matches the most input characters. At each character, the lexer decides which rules are still viable. Eventually, only a single rule will be still viable. At that point, the lexer creates a token object according the rule's token type and matched text.
 

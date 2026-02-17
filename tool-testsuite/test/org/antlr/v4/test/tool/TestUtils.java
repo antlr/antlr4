@@ -2,10 +2,12 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -126,5 +128,18 @@ public class TestUtils {
 
 		Utils.setSize(strings, 4);
 		assertEquals(4, strings.size());
+	}
+
+	@Test
+	public void testConflictingErrorCodes() {
+		HashMap<Integer, ErrorType> existingErrorTypes = new HashMap<>();
+		for (ErrorType errorType : ErrorType.values()) {
+			ErrorType existingErrorType = existingErrorTypes.get(errorType.code);
+			if (existingErrorType == null) {
+				existingErrorTypes.put(errorType.code, errorType);
+			} else {
+				Assert.fail("Error code of " + errorType + " conflicts with " + existingErrorType + " (" + errorType.code + ")");
+			}
+		}
 	}
 }
