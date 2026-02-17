@@ -14,7 +14,7 @@
 
 using namespace antlr4::dfa;
 
-const Vocabulary Vocabulary::EMPTY_VOCABULARY;
+const Vocabulary Vocabulary{};
 
 Vocabulary::Vocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames)
 : Vocabulary(std::move(literalNames), std::move(symbolicNames), {}) {
