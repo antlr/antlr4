@@ -77,6 +77,7 @@ public class Grammar implements AttributeResolver {
 	static {
 		parserOptions.add("superClass");
 		parserOptions.add("contextSuperClass");
+		parserOptions.add("finalContextClass");
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");

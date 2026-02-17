@@ -25,6 +25,7 @@ public class ParserFile extends OutputFile {
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public ActionChunk contextSuperClass;
+	public boolean finalContextClass;
 	public String grammarName;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
@@ -41,5 +42,6 @@ public class ParserFile extends OutputFile {
 		if (g.getOptionString("contextSuperClass") != null) {
 			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
 		}
+		finalContextClass = Boolean.valueOf(g.getOptionString("finalContextClass"));
 	}
 }
