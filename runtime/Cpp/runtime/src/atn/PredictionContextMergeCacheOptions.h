@@ -53,7 +53,7 @@ namespace atn {
 
     bool hasClearEveryN() const { return getClearEveryN() != 0; }
 
-    PredictionContextMergeCacheOptions& setClearEveryN(uint64_t clearEveryN) {
+    PredictionContextMergeCacheOptions& setClearEveryN(size_t clearEveryN) {
       _clearEveryN = clearEveryN;
       return *this;
     }
@@ -64,7 +64,7 @@ namespace atn {
 
   private:
     size_t _maxSize = std::numeric_limits<size_t>::max();
-    uint64_t _clearEveryN = 1;
+    size_t _clearEveryN = 1;
   };
 
 }  // namespace atn
