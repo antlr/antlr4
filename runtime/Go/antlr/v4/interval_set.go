@@ -294,6 +294,9 @@ func (i *IntervalSet) toIndexString() string {
 			names = append(names, strconv.Itoa(v.Start)+".."+strconv.Itoa(v.Stop-1))
 		}
 	}
+	if len(names) == 0 {
+		return ""
+	}
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
 	}
@@ -307,6 +310,9 @@ func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []strin
 		for j := v.Start; j < v.Stop; j++ {
 			names = append(names, i.elementName(literalNames, symbolicNames, j))
 		}
+	}
+	if len(names) == 0 {
+		return ""
 	}
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
