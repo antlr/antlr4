@@ -106,6 +106,12 @@ public class Antlr4Mojo extends AbstractMojo {
 	protected boolean forceATN;
 
 	/**
+	 * Skip grammar file change detect and just compile them.
+	 */
+	@Parameter(property = "antlr4.forceCompile", defaultValue = "false")
+	protected boolean forceCompile;
+
+	/**
 	 * A list of grammar options to explicitly specify to the tool. These
 	 * options are passed to the tool using the
 	 * <code>-D&lt;option&gt;=&lt;value&gt;</code> syntax.
@@ -394,7 +400,7 @@ public class Antlr4Mojo extends AbstractMojo {
         for (File grammarFile : grammarFiles) {
             String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
             File outputFile = new File(outputDirectory, tokensFileName);
-            if ( (! outputFile.exists()) ||
+            if (forceCompile || (! outputFile.exists()) ||
                  outputFile.lastModified() <= grammarFile.lastModified() ||
                  dependencies.isDependencyChanged(grammarFile)) {
                 grammarFilesToProcess.add(grammarFile);
