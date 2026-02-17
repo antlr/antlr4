@@ -62,6 +62,8 @@ public class Python3Target extends Target {
 
 	public Python3Target(CodeGenerator gen) {
 		super(gen);
+		// note that lineWidth isn't a hard upper limit.
+		gen.lineWidth = 79;
 	}
 
 	@Override
