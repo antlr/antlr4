@@ -133,23 +133,25 @@ public class TokenVocabParser {
 	 */
 	public File getImportedVocabFile() {
 		String vocabName = g.getOptionString("tokenVocab");
-		File f = new File(g.tool.libDirectory,
-						  File.separator +
-						  vocabName +
-						  CodeGenerator.VOCAB_FILE_EXTENSION);
-		if (f.exists()) {
-			return f;
-		}
+    for (String libDirectory : g.tool.libDirectories) {
+      File f = new File(libDirectory,
+                File.separator +
+                vocabName +
+                CodeGenerator.VOCAB_FILE_EXTENSION);
+      if (f.exists()) {
+        return f;
+      }
+    }
 
 		// We did not find the vocab file in the lib directory, so we need
 		// to look for it in the output directory which is where .tokens
 		// files are generated (in the base, not relative to the input
 		// location.)
-		f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+		File f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
 		if ( f.exists() ) {
 			return f;
 		}
-		
+
 		// Still not found? Use the grammar's subfolder then.
 		String fileDirectory;
 
