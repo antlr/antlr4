@@ -28,7 +28,7 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * The alternative number for the decision which is guarded by the semantic
 	 * context {@link #semctx}. Note that other ATN
 	 * configurations may predict the same alternative which are guarded by
-	 * other semantic contexts and/or {@link SemanticContext#NONE}.
+	 * other semantic contexts.
 	 */
 	public final int predictedAlt;
 	/**
