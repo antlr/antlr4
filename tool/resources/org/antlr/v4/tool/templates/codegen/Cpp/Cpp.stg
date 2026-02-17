@@ -583,6 +583,7 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 class <file.exportMacro> <struct.escapedName> : public <if (contextSuperClass)><contextSuperClass><else>antlr4::ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
+  <ctorAttrs: {a | <a>;}; separator = "\n">
   <attrs: {a | <a>;}; separator = "\n">
   <if (ctorAttrs)><struct.escapedName>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
   <struct.escapedName>(antlr4::ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
@@ -624,6 +625,7 @@ size_t <parser.name>::<struct.escapedName>::getRuleIndex() const {
 <if (struct.provideCopyFrom)>
 void <parser.name>::<struct.escapedName>::copyFrom(<struct.escapedName> *ctx) {
   <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
+  <struct.ctorAttrs: {a | this-><a.escapedName> = ctx-><a.escapedName>;}; separator = "\n">
   <struct.attrs: {a | this-><a.escapedName> = ctx-><a.escapedName>;}; separator = "\n">
 }
 <endif>
@@ -1172,4 +1174,3 @@ previousContext = _localctx;
 initValue(typeName) ::= <<
 <cppTypeInitMap.(typeName)>
 >>
-

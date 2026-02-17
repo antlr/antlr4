@@ -848,8 +848,17 @@ public $<d.name>;}; separator="\n\n">
  */
 public $<d.name>;}; separator="\n\n">
 <endif>
-<if(struct.attributeDecls)>
+<if(struct.ctorAttrs)>
 <if(struct.tokenListDecls || struct.tokenDecls || struct.ruleContextDecls || struct.ruleContextListDecls)>
+
+<endif>
+	<struct.ctorAttrs : {d | /**
+ * @var <d.type><if(!d.initValue)>|null<endif> $<d.name>
+ */
+public $<d.name><if(d.initValue)> = <d.initValue><endif>;}; separator="\n\n">
+<endif>
+<if(struct.attributeDecls)>
+<if(struct.tokenListDecls || struct.tokenDecls || struct.ruleContextDecls || struct.ruleContextListDecls || struct.ctorAttrs)>
 
 <endif>
 	<struct.attributeDecls : {d | /**
@@ -949,6 +958,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
 	{
 		parent::copyFrom($context);
 
+		<struct.ctorAttrs:{a | $this-><a.name> = $context-><a.name>;}; separator="\n">
 		<struct.attrs:{a | $this-><a.name> = $context-><a.name>;}; separator="\n">
 	}
 <endif>
