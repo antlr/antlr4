@@ -148,7 +148,7 @@ namespace Antlr4.Runtime.Dfa
 		public override String ToString()
 		{
 			StringBuilder buf = new StringBuilder();
-			buf.Append(stateNumber).Append(":").Append(configSet);
+			buf.Append(stateNumber).Append(':').Append(configSet);
 			if (isAcceptState)
 			{
 				buf.Append("=>");
