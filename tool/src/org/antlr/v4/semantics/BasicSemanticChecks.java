@@ -322,8 +322,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( rulesNode.getChildCount()==0 ) {
 			GrammarAST root = (GrammarAST)rulesNode.getParent();
 			GrammarAST IDNode = (GrammarAST)root.getChild(0);
-			g.tool.errMgr.grammarError(ErrorType.NO_RULES, g.fileName,
-					null, IDNode.getText(), g);
+			g.tool.errMgr.grammarError(ErrorType.NO_RULES, g.fileName, root.token, IDNode.getText(), g);
 		}
 	}
 

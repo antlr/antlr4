@@ -21,9 +21,9 @@ public class ToolMessage extends ANTLRMessage {
 		super(errorType);
 	}
     public ToolMessage(ErrorType errorType, Object... args) {
-        super(errorType, null, Token.INVALID_TOKEN, args);
+        super(errorType, null, null, args);
     }
     public ToolMessage(ErrorType errorType, Throwable e, Object... args) {
-        super(errorType, e, Token.INVALID_TOKEN, args);
+        super(errorType, e, null, null, args);
     }
 }

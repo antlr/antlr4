@@ -21,7 +21,7 @@ public class ErrorManager {
 
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
 
-	public Tool tool;
+	public final Tool tool;
 	public int errors;
 	public int warnings;
 
@@ -160,13 +160,6 @@ public class ErrorManager {
 	{
         ANTLRMessage msg = new GrammarSemanticsMessage(etype,fileName,token,args);
 		emit(etype, msg);
-
-	}
-
-	public void leftRecursionCycles(String fileName, Collection<? extends Collection<Rule>> cycles) {
-		errors++;
-		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, cycles);
-		tool.error(msg);
 	}
 
     public int getNumErrors() {

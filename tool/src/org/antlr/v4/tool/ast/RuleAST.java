@@ -16,8 +16,15 @@ public class RuleAST extends GrammarASTWithOptions {
 		super(node);
 	}
 
-	public RuleAST(Token t) { super(t); }
-    public RuleAST(int type) { super(type); }
+	public RuleAST(Token t) {
+		super(t);
+	}
+    public RuleAST(int type) {
+		super(type);
+	}
+	public RuleAST(int type, Token t, String text) {
+		super(type, t, text);
+	}
 
 	public boolean isLexerRule() {
 		String name = getRuleName();
