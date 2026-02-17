@@ -2101,26 +2101,24 @@ public class ParserATNSimulator extends ATNSimulator {
 			return D;
 		}
 
-		synchronized (dfa.states) {
-			DFAState existing = dfa.states.get(D);
+		DFAState existing = dfa.states.get(D);
 
-			if ( existing!=null ) {
-				if ( trace_atn_sim ) System.out.println("addDFAState " + D + " exists");
-				return existing;
-			}
-
-			D.stateNumber = dfa.states.size();
-
-			if (!D.configs.isReadonly()) {
-				D.configs.optimizeConfigs(this);
-				D.configs.setReadonly(true);
-			}
-
-			if ( trace_atn_sim ) System.out.println("addDFAState new "+D);
-
-			dfa.states.put(D, D);
-			return D;
+		if ( existing!=null ) {
+			if ( trace_atn_sim ) System.out.println("addDFAState " + D + " exists");
+			return existing;
 		}
+
+		D.stateNumber = dfa.states.size();
+
+		if (!D.configs.isReadonly()) {
+			D.configs.optimizeConfigs(this);
+			D.configs.setReadonly(true);
+		}
+
+		if ( trace_atn_sim ) System.out.println("addDFAState new "+D);
+
+		dfa.states.put(D, D);
+		return D;
 	}
 
 	protected void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts, ATNConfigSet configs, int startIndex, int stopIndex) {
