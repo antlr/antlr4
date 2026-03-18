@@ -22,6 +22,7 @@ fn main() {
         None,
         None,
         None,
+        Some("-stacker"),
         None,
     ];
     let antlr_path = format!("../../../tool/target/antlr4-{}-complete.jar", TOOL_VERSION);

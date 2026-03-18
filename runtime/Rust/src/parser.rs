@@ -22,8 +22,10 @@ use crate::tree::{ErrorNode, ParseTreeListener, RuleNode, TerminalNode};
 use crate::utils::cell_update;
 use crate::vocabulary::Vocabulary;
 
+const DEFAULT_RECURSION_LIMIT: u32 = 1000;
+
 /// parser functionality required for `ParserATNSimulator` to work
-#[allow(missing_docs)] // todo rewrite it so downstream crates actually could meaningfully implement it
+#[allow(missing_docs)]
 pub trait Parser<'input, 'arena, TF>: Recognizer<'input, 'arena>
 where
     'input: 'arena,
@@ -75,6 +77,9 @@ where
     fn get_state(&self) -> i32;
     fn set_state(&mut self, v: i32);
     fn get_rule_invocation_stack(&self) -> Vec<String>;
+
+    fn get_recursion_limit(&self) -> u32;
+    fn set_recursion_limit(&mut self, v: u32);
 }
 
 /// Abstract base parser implementation
@@ -116,6 +121,7 @@ where
     /// Token stream that is currently used by this parser
     pub input: Input,
     precedence_stack: Vec<i32>,
+    pub recursion_limit: u32,
 
     parse_listeners: Vec<Box<Node::Listener>>,
     _syntax_errors: Cell<i32>,
@@ -363,6 +369,14 @@ where
         vec
     }
 
+    fn get_recursion_limit(&self) -> u32 {
+        self.recursion_limit
+    }
+
+    fn set_recursion_limit(&mut self, v: u32) {
+        self.recursion_limit = v;
+    }
+
     //    fn get_rule_invocation_stack(&self, c: _) -> Vec<String> {
     //        unimplemented!()
     //    }
@@ -390,6 +404,7 @@ where
             state: -1,
             input,
             precedence_stack: vec![0],
+            recursion_limit: DEFAULT_RECURSION_LIMIT,
             parse_listeners: vec![],
             _syntax_errors: Cell::new(0),
             error_listeners: vec![Box::new(ConsoleErrorListener {})],

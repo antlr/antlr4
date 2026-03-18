@@ -607,11 +607,20 @@ where
     TF: TokenFactory\<'input, 'arena\> + 'arena,
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
+    #[inline]
 	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub fn <endif> <currentRule.escapedName>(&mut self,<args; separator=", ">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
 		self.<currentRule.escapedName>_rec(0<currentRule.args:{a | , <a.escapedName>}>)
 	}
 
+    #[inline]
 	fn <currentRule.escapedName>_rec(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
+        <if(file.genStacker)>dbt_antlr4::stacker::maybe_grow(100 * 1024, 2 * 1024 * 1024,
+              || self.<currentRule.escapedName>_rec_inner(_p<args:{a | , <a>}>))
+        <else>self.<currentRule.escapedName>_rec_inner(_p<args:{a | , <a>}>)
+        <endif>
+    }
+
+	fn <currentRule.escapedName>_rec_inner(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
 		let recog = self;
 		let _parentctx = <self()>.base.take_ctx();
 		let _parentState = <self()>.base.get_state();

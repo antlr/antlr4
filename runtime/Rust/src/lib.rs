@@ -150,8 +150,11 @@ mod atn_type;
 // mod context_factory;
 pub mod rule_context;
 pub mod vocabulary;
-//#[cfg(test)]
-// tests are either integration tests in "tests" foulder or unit tests in some modules
+
+// ======= Re-exports ========
+pub use stacker;
+
+// ======= Macros =======
 
 #[macro_export]
 macro_rules! impl_tree {

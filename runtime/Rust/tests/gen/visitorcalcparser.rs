@@ -681,11 +681,17 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
+    #[inline]
 	pub fn  expr(&mut self,) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
 		self.expr_rec(0)
 	}
 
+    #[inline]
 	fn expr_rec(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
+        self.expr_rec_inner(_p)
+    }
+
+	fn expr_rec_inner(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();

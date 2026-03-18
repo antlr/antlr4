@@ -390,11 +390,17 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
+    #[inline]
 	pub fn  a(&mut self,) -> Result<&'arena AContextAll<'input, 'arena>, ANTLRError> {
 		self.a_rec(0)
 	}
 
+    #[inline]
 	fn a_rec(&mut self, _p: i32) -> Result<&'arena AContextAll<'input, 'arena>, ANTLRError> {
+        self.a_rec_inner(_p)
+    }
+
+	fn a_rec_inner(&mut self, _p: i32) -> Result<&'arena AContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();

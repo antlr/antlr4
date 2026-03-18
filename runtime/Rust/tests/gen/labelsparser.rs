@@ -965,11 +965,18 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
+    #[inline]
 	pub fn  e(&mut self,) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
 		self.e_rec(0)
 	}
 
+    #[inline]
 	fn e_rec(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
+        dbt_antlr4::stacker::maybe_grow(100 * 1024, 2 * 1024 * 1024,
+                      || self.e_rec_inner(_p))
+    }
+
+	fn e_rec_inner(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();

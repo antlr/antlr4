@@ -27,7 +27,7 @@ mod gen {
     use dbt_antlr4::token_stream::{TokenStream, UnbufferedTokenStream};
     use dbt_antlr4::tree::{ParseTreeListener, TerminalNode};
     use dbt_antlr4::trees::string_tree;
-    use dbt_antlr4::{Arena, InputStream};
+    use dbt_antlr4::{Arena, InputStream, Parser};
     use referencetoatnlexer::ReferenceToATNLexer;
     use referencetoatnlistener::ReferenceToATNListener;
     use referencetoatnparser::ReferenceToATNParser;
@@ -407,6 +407,31 @@ if (x < x && a > 0) then duh
                 }
                 _ => panic!("oops"),
             }
+        });
+    }
+
+    // Deep recursion support requires stacker. Without stacker, the test will
+    // fail with stack overflow
+    #[test]
+    fn test_deep_recursion() {
+        let input = "(".repeat(1000) + "a" + &(")".repeat(1000));
+        Arena::with(|arena| {
+            let input = InputStream::new(input.as_str());
+            let lexer = LabelsLexer::<_>::new(arena, input);
+            let token_source = CommonTokenStream::new(lexer);
+            let mut parser = LabelsParser::new(arena, token_source);
+            parser.set_recursion_limit(1500);
+            let result = parser.s().expect("parser error");
+            assert_eq!(
+                1,
+                result
+                    .q
+                    .as_ref()
+                    .unwrap()
+                    .get_v()
+                    .split_whitespace()
+                    .count()
+            );
         });
     }
 }
