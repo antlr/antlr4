@@ -15,31 +15,31 @@ where
 
     /// Visit a parse tree produced by {@link CSVParser#csvFile}.
     /// @param ctx the parse tree
-    fn visit_csvFile(&mut self, ctx: &CsvFileContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_csvFile(&mut self, ctx: &'arena CsvFileContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by {@link CSVParser#hdr}.
     /// @param ctx the parse tree
-    fn visit_hdr(&mut self, ctx: &HdrContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_hdr(&mut self, ctx: &'arena HdrContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by {@link CSVParser#row}.
     /// @param ctx the parse tree
-    fn visit_row(&mut self, ctx: &RowContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_row(&mut self, ctx: &'arena RowContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by {@link CSVParser#field}.
     /// @param ctx the parse tree
-    fn visit_field(&mut self, ctx: &FieldContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_field(&mut self, ctx: &'arena FieldContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
 
     /// Called on terminal(leaf) node
     fn visit_terminal(
         &mut self,
-        _node: &TerminalNode<'input, 'arena>,
+        _node: &'arena TerminalNode<'input, 'arena>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     /// Called on error node
     fn visit_error_node(
         &mut self,
-        _node: &ErrorNode<'input, 'arena>,
+        _node: &'arena ErrorNode<'input, 'arena>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>) -> Result<Self::Return, ANTLRError> {
@@ -49,13 +49,13 @@ where
         self.visit_node(node)
     }
 
-    fn visit_node(&mut self, node: &CSVParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
+    fn visit_node(&mut self, node: &'arena CSVParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
         node.accept(self)
     }
 
     fn visit_children(
         &mut self,
-        node: &dyn NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>,
+        node: &'arena dyn NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>,
     ) -> Result<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
         for child in node.iter_child_nodes() {
@@ -75,5 +75,5 @@ where
         next: Self::Return,
     ) -> Result<Self::Return, ANTLRError> { Ok(next) }
 
-    fn should_visit_next_child(&self, _node: &CSVParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
+    fn should_visit_next_child(&self, _node: &'arena CSVParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
 }

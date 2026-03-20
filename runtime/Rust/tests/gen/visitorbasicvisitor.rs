@@ -15,19 +15,19 @@ where
 
     /// Visit a parse tree produced by {@link VisitorBasicParser#s}.
     /// @param ctx the parse tree
-    fn visit_s(&mut self, ctx: &SContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_s(&mut self, ctx: &'arena SContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
 
     /// Called on terminal(leaf) node
     fn visit_terminal(
         &mut self,
-        _node: &TerminalNode<'input, 'arena>,
+        _node: &'arena TerminalNode<'input, 'arena>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     /// Called on error node
     fn visit_error_node(
         &mut self,
-        _node: &ErrorNode<'input, 'arena>,
+        _node: &'arena ErrorNode<'input, 'arena>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserContextNode<'input, 'arena>>) -> Result<Self::Return, ANTLRError> {
@@ -37,13 +37,13 @@ where
         self.visit_node(node)
     }
 
-    fn visit_node(&mut self, node: &VisitorBasicParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
+    fn visit_node(&mut self, node: &'arena VisitorBasicParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
         node.accept(self)
     }
 
     fn visit_children(
         &mut self,
-        node: &dyn NodeInner<'input, 'arena, VisitorBasicParserContextNode<'input, 'arena>>,
+        node: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserContextNode<'input, 'arena>>,
     ) -> Result<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
         for child in node.iter_child_nodes() {
@@ -63,5 +63,5 @@ where
         next: Self::Return,
     ) -> Result<Self::Return, ANTLRError> { Ok(next) }
 
-    fn should_visit_next_child(&self, _node: &VisitorBasicParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
+    fn should_visit_next_child(&self, _node: &'arena VisitorBasicParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
 }

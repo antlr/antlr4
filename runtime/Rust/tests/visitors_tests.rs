@@ -346,7 +346,7 @@ mod gen {
 
             fn visit_row(
                 &mut self,
-                ctx: &RowContext<'input, 'arena>,
+                ctx: &'arena RowContext<'input, 'arena>,
             ) -> Result<Self::Return, ANTLRError> {
                 if ctx.field_all().len() > 1 {
                     self.visit_children(ctx)

@@ -124,7 +124,7 @@ where
     }
 }
 pub trait Visitable<'input, 'arena> {
-    fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+    fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
     where
         'input: 'arena,
         V: CSVVisitor<'input, 'arena> + ?Sized;

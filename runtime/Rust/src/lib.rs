@@ -442,7 +442,7 @@ macro_rules! impl_rule_node {
         where
             'input: 'arena,
         {
-            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
             where
                 V: $visitor<'input, 'arena> + ?Sized,
             {
@@ -489,7 +489,7 @@ macro_rules! impl_visitable {
     // Pattern: EnumName { Variant1, Variant2, ... }
     ($visitor:ident::$enum_name:ident { $($variant:ident($visit_method:ident),)+ }) => {
         impl<'input, 'arena> Visitable<'input, 'arena> for $enum_name<'input, 'arena> {
-            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
             where
                 V: $visitor<'input, 'arena> + ?Sized,
             {
@@ -502,7 +502,7 @@ macro_rules! impl_visitable {
     };
     ($visitor:ident::$ctx_name:ident($visit_method:ident)) => {
         impl<'input, 'arena> Visitable<'input, 'arena> for $ctx_name<'input, 'arena> {
-            fn accept<V>(&self, visitor: &mut V) -> Result<V::Return, ANTLRError>
+            fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
             where
                 V: $visitor<'input, 'arena> + ?Sized,
             {
