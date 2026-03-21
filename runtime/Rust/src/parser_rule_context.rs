@@ -4,20 +4,20 @@ use std::borrow::{Borrow, BorrowMut};
 use std::cell::Cell;
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
+use std::ptr::NonNull;
 
 use crate::errors::ANTLRError;
 use crate::rule_context::{
-    BaseRuleContext, CustomRuleContext, EmptyCustomRuleContext, RuleContext,
+    BaseRuleContextInner, CustomRuleContext, EmptyCustomRuleContext, EmptyRuleNode, RuleContext,
 };
 use crate::token::Token;
-use crate::tree::{NodeInner, RuleNode as _, TerminalNode, Tree as _};
+use crate::tree::{NodeInner, RuleNode, TerminalNode};
 use crate::{token_factory, Arena};
 
-/// Syntax tree node for particular parser rule.
+/// Language-agnostic behaviors of the Antlr AST.
 ///
-/// Not yet good for custom implementations so currently easiest option
-/// is to just copy `BaseParserRuleContext` or `BaseRuleContext` and strip/extend them
-#[allow(missing_docs)]
+/// This is the language-agnostic, dyn-compatible interface for parser rule
+/// contexts.
 pub trait ParserRuleContext<'input, 'arena>: RuleContext<'input, 'arena> + Debug
 where
     'input: 'arena,
@@ -82,37 +82,70 @@ where
     }
 }
 
-pub type EmptyParserRuleContext<'input, 'arena> =
-    BaseParserRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
+pub type EmptyParserRuleContext<'input, 'arena> = BaseParserRuleContextInner<
+    'input,
+    'arena,
+    EmptyCustomRuleContext<'input, 'arena>,
+    EmptyRuleNode<'input, 'arena>,
+>;
 
-/// Default rule context implementation that keeps everything provided by parser
-pub struct BaseParserRuleContext<'input, 'arena, Ext>
+/// Core AST node type -- this augments [BaseParserRuleContextInner] with
+/// additional states that allows it to be strung together into a tree, as well
+/// as tying it back to the corresponding input.
+///
+/// This is Rust's version of the `ParserRuleContext` "abstract base class", it
+/// will be specialized into language-specific concrete types by monomorphizing
+/// the `Ext` type parameter, which is implemented by generated code.
+pub struct BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    // Note: `Node` is redundant as a type parameter -- its sole purpose here is
+    // to "lift" out the `ExtCtx::Node` associated type, to work around the
+    // limitation that Rust's variance propagation doesn't work over type
+    // projections. Without this, all rule context types would be invariant over
+    // 'input and 'arena.
+    Node: RuleNode<'input, 'arena>,
 {
-    pub(crate) base: BaseRuleContext<'input, 'arena, Ext>,
+    pub(crate) base: BaseRuleContextInner<'input, 'arena, Ext, Node>,
 
+    /// List of children of current node
+    pub(crate) children: bumpalo::collections::Vec<'arena, &'arena Node>,
     start: &'arena dyn Token,
     stop: &'arena dyn Token,
-    /// error if there was any in this node
-    pub exception: Cell<Option<bumpalo::boxed::Box<'arena, ANTLRError>>>,
-    /// List of children of current node
-    pub(crate) children: bumpalo::collections::Vec<'arena, &'arena Ext::Node>,
+
+    // Need a `Cell` here because this field has to be mutatable by client code,
+    // which is not allowed to obtain a `&mut self`. As such, we store a
+    // type-erased pointer here, to avoid having `'arena` appear inside a
+    // `Cell`, which would make it invariant.
+    exception: Cell<Option<NonNull<ANTLRError>>>,
 }
 
-impl<'input, 'arena, Ext> Debug for BaseParserRuleContext<'input, 'arena, Ext>
+/// Convenience alias — resolves the `Node` parameter automatically from `Ext::Node`.
+pub type BaseParserRuleContext<'input, 'arena, Ext> = BaseParserRuleContextInner<
+    'input,
+    'arena,
+    Ext,
+    <Ext as CustomRuleContext<'input, 'arena>>::Node,
+>;
+
+impl<'input, 'arena, Ext, Node> Debug for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.write_str(type_name::<Self>())
     }
 }
 
-impl<'input, 'arena, Ext> RuleContext<'input, 'arena> for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> RuleContext<'input, 'arena>
+    for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
     'input: 'arena,
-    Ext: CustomRuleContext<'input, 'arena> + 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
     fn get_invoking_state(&self) -> i32 {
         self.base.get_invoking_state()
@@ -131,9 +164,11 @@ where
     }
 }
 
-impl<'input, 'arena, Ext> Deref for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> Deref for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     type Target = Ext;
     fn deref(&self) -> &Self::Target {
@@ -141,38 +176,47 @@ where
     }
 }
 
-impl<'input, 'arena, Ext> DerefMut for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> DerefMut for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.base.ext
     }
 }
 
-impl<'input, 'arena, Ext> Borrow<Ext> for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> Borrow<Ext>
+    for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn borrow(&self) -> &Ext {
         &self.base.ext
     }
 }
 
-impl<'input, 'arena, Ext> BorrowMut<Ext> for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> BorrowMut<Ext>
+    for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn borrow_mut(&mut self) -> &mut Ext {
         &mut self.base.ext
     }
 }
 
-impl<'input, 'arena, Ext> ParserRuleContext<'input, 'arena>
-    for BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> ParserRuleContext<'input, 'arena>
+    for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
     'input: 'arena,
-    Ext: CustomRuleContext<'input, 'arena> + 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
     #[inline]
     fn start(&self) -> &'arena dyn Token {
@@ -236,51 +280,55 @@ where
         let mut result = String::new();
 
         for child in self.children.iter() {
-            result += &child.get_text()
+            result += &ParserRuleContext::get_text(*child)
         }
 
         result
     }
 }
 
-impl<'input, 'arena, Ctx> NodeInner<'input, 'arena, Ctx::Node>
-    for BaseParserRuleContext<'input, 'arena, Ctx>
+impl<'input, 'arena, Ctx, Node> NodeInner<'input, 'arena, Node>
+    for BaseParserRuleContextInner<'input, 'arena, Ctx, Node>
 where
-    Ctx: CustomRuleContext<'input, 'arena> + 'arena,
+    'input: 'arena,
+    Ctx: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
-    fn cast_from(node: &Ctx::Node) -> Option<&Self> {
+    fn cast_from(node: &Node) -> Option<&Self> {
         Ctx::base_ref_from_node(node)
     }
 
-    fn cast_from_mut(node: &mut Ctx::Node) -> Option<&mut Self>
+    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
     where
         Self: Sized,
     {
         Ctx::base_mut_ref_from_node(node)
     }
 
-    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Ctx::Node> + 'a> {
+    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
         self.get_children()
     }
 
-    fn try_as_node(&'arena self) -> Option<&'arena Ctx::Node> {
+    fn try_as_node(&'arena self) -> Option<&'arena Node> {
         self.base.try_as_node()
     }
 }
 
 #[allow(missing_docs)]
-impl<'input, 'arena, Ext> BaseParserRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena> + 'arena,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
     pub fn new(
         arena: &'arena Arena,
-        parent: Option<&'arena Ext::Node>,
+        parent: Option<&'arena Node>,
         invoking_state: i32,
         ext: Ext,
     ) -> Self {
         Self {
-            base: BaseRuleContext::new(parent, invoking_state, ext),
+            base: BaseRuleContextInner::new(parent, invoking_state, ext),
             start: token_factory::invalid(),
             stop: token_factory::invalid(),
             exception: Cell::new(None),
@@ -289,14 +337,14 @@ where
     }
 
     pub fn copy_from<Src>(
-        node: BaseParserRuleContext<'input, 'arena, Src>,
+        node: BaseParserRuleContextInner<'input, 'arena, Src, Node>,
         ctor: impl FnOnce(Src) -> Ext,
     ) -> Self
     where
-        Src: CustomRuleContext<'input, 'arena, Node = Ext::Node>,
+        Src: CustomRuleContext<'input, 'arena, Node = Node>,
     {
         Self {
-            base: BaseRuleContext::copy_from(node.base, ctor),
+            base: BaseRuleContextInner::copy_from(node.base, ctor),
             start: node.start,
             stop: node.stop,
             exception: Cell::new(None),
@@ -307,11 +355,11 @@ where
     pub fn morph<Tgt>(
         self,
         ctor: impl FnOnce(Ext) -> Tgt,
-    ) -> BaseParserRuleContext<'input, 'arena, Tgt>
+    ) -> BaseParserRuleContextInner<'input, 'arena, Tgt, Node>
     where
-        Tgt: CustomRuleContext<'input, 'arena, Node = Ext::Node>,
+        Tgt: CustomRuleContext<'input, 'arena, Node = Node>,
     {
-        BaseParserRuleContext {
+        BaseParserRuleContextInner {
             base: self.base.morph(ctor),
             start: self.start,
             stop: self.stop,
@@ -320,7 +368,7 @@ where
         }
     }
 
-    pub fn get_parent(&self) -> Option<&'arena Ext::Node> {
+    pub fn get_parent(&self) -> Option<&'arena Node> {
         self.base.parent()
     }
 
@@ -328,16 +376,19 @@ where
         self.base.has_parent()
     }
 
-    pub fn set_self_ref(&mut self, self_ref: *const Ext::Node) {
+    pub fn set_self_ref(&mut self, self_ref: *const Node) {
         self.base.set_self_ref(self_ref);
     }
 
-    pub fn set_parent(&mut self, parent: Option<&'arena Ext::Node>) {
+    pub fn set_parent(&mut self, parent: Option<&'arena Node>) {
         self.base.set_parent(parent);
     }
 
     pub fn set_exception(&self, e: ANTLRError, arena: &'arena Arena) {
-        self.exception.set(Some(arena.alloc_exception(e)));
+        // alloc returns &mut T from the bump arena; converting to NonNull is
+        // always non-null and the allocation lives for 'arena.
+        let ptr = NonNull::from(arena.alloc_payload(e));
+        self.exception.set(Some(ptr));
     }
 
     pub fn set_invoking_state(&mut self, t: i32) {
@@ -360,15 +411,15 @@ where
         self.children.pop();
     }
 
-    pub fn add_child(&mut self, child: &'arena Ext::Node) {
+    pub fn add_child(&mut self, child: &'arena Node) {
         self.children.push(child);
     }
 
-    pub fn get_child(&self, i: usize) -> Option<&'arena Ext::Node> {
+    pub fn get_child(&self, i: usize) -> Option<&'arena Node> {
         self.children.get(i).copied()
     }
 
-    pub fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Ext::Node> + 'a> {
+    pub fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
         let mut index = 0;
         let iter = std::iter::from_fn(move || {
             if index < self.get_child_count() {
@@ -386,7 +437,7 @@ where
     where
         'input: 'a,
         'arena: 'a,
-        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Ext::Node>,
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Node>,
     {
         self.children
             .iter()
@@ -399,7 +450,7 @@ where
     where
         'input: 'a,
         'arena: 'a,
-        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Ext::Node>,
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Node>,
     {
         self.children
             .iter()
@@ -415,7 +466,7 @@ where
     pub fn to_string(
         &'arena self,
         rule_names: Option<&[&str]>,
-        stop: Option<&'arena Ext::Node>,
+        stop: Option<&'arena Node>,
     ) -> String {
         let mut result = String::from("[");
         let mut next = Some(self.try_as_node().unwrap());

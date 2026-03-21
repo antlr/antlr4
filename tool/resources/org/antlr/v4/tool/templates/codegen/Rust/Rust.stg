@@ -71,7 +71,7 @@ use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::dfa::DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -1012,7 +1012,7 @@ CaptureNextToken(d) ::= "<d.varName> = <self()>.base.input.lt(1).unwrap();"
 CaptureNextTokenType(d) ::= "<d.varName> = <self()>.base.input.la(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
-pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena\>\>;
+pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContextInner<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena\>, <parser.name>ContextNode\<'input, 'arena\>\>;
 <if(file.genVisitor && !struct.provideCopyFrom)>dbt_antlr4::impl_visitable! { <parser.grammarName>Visitor::<struct.escapedName>(visit_<struct.derivedFromName>) }<endif>
 pub struct <struct.escapedName>Ext\<'input, 'arena> {
 	<attrs:{a | pub <a>,}; separator="\n">
@@ -1086,7 +1086,7 @@ where
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods,signatures) ::= <<
 
-pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena>\>;
+pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContextInner<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena\>, <parser.name>ContextNode\<'input, 'arena\>>;
 
 pub trait <struct.escapedName>Attrs\<'input, 'arena>: ParserRuleContext\<'input, 'arena>
 where

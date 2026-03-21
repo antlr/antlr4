@@ -19,7 +19,7 @@ use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::dfa::DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -223,7 +223,7 @@ where
 //------------------- csvFile ----------------
 pub type CsvFileContextAll<'input, 'arena> = CsvFileContext<'input, 'arena>;
 
-pub type CsvFileContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, CsvFileContextExt<'input, 'arena>>;
+pub type CsvFileContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, CsvFileContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
 dbt_antlr4::impl_visitable! { CSVVisitor::CsvFileContext(visit_csvFile) }
 pub struct CsvFileContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
@@ -338,7 +338,7 @@ where
 //------------------- hdr ----------------
 pub type HdrContextAll<'input, 'arena> = HdrContext<'input, 'arena>;
 
-pub type HdrContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, HdrContextExt<'input, 'arena>>;
+pub type HdrContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, HdrContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
 dbt_antlr4::impl_visitable! { CSVVisitor::HdrContext(visit_hdr) }
 pub struct HdrContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
@@ -428,7 +428,7 @@ where
 //------------------- row ----------------
 pub type RowContextAll<'input, 'arena> = RowContext<'input, 'arena>;
 
-pub type RowContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, RowContextExt<'input, 'arena>>;
+pub type RowContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, RowContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
 dbt_antlr4::impl_visitable! { CSVVisitor::RowContext(visit_row) }
 pub struct RowContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
@@ -552,7 +552,7 @@ where
 //------------------- field ----------------
 pub type FieldContextAll<'input, 'arena> = FieldContext<'input, 'arena>;
 
-pub type FieldContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, FieldContextExt<'input, 'arena>>;
+pub type FieldContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, FieldContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
 dbt_antlr4::impl_visitable! { CSVVisitor::FieldContext(visit_field) }
 pub struct FieldContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,

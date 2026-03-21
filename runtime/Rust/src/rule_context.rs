@@ -277,40 +277,74 @@ where
     }
 }
 
-pub type EmptyRuleContext<'input, 'arena> =
-    BaseRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
+pub type EmptyRuleContext<'input, 'arena> = BaseRuleContextInner<
+    'input,
+    'arena,
+    EmptyCustomRuleContext<'input, 'arena>,
+    EmptyRuleNode<'input, 'arena>,
+>;
 
-/// Minimal parse tree node implementation, that stores only data required for correct parsing
-pub struct BaseRuleContext<'input, 'arena, ExtCtx>
+/// Core rule context implementation -- this defines the minimal set of states
+/// required for the Antlr parsing algorithm to function.
+///
+/// This is the Rust version of the `RuleContext` "abstract base class", it will
+/// be specialized into language-specific concrete types by monomorphizing the
+/// `ExtCtx` type parameter, which is implemented by generated code.
+pub struct BaseRuleContextInner<'input, 'arena, ExtCtx, Node>
 where
-    ExtCtx: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    ExtCtx: CustomRuleContext<'input, 'arena, Node = Node>,
+    // Note: `Node` is redundant as a type parameter -- its sole purpose here is
+    // to "lift" out the `ExtCtx::Node` associated type, to work around the
+    // limitation that Rust's variance propagation doesn't work over type
+    // projections. Without this, all rule context types would be invariant over
+    // 'input and 'arena.
+    Node: RuleNode<'input, 'arena>,
 {
-    parent: Option<&'arena ExtCtx::Node>,
-    self_ref: *const ExtCtx::Node,
+    parent: Option<&'arena Node>,
     invoking_state: i32,
     pub(crate) ext: ExtCtx,
+
+    // This is an unfortunate memory overhead, however it's the price we have to
+    // pay to support dynamic type casting, which is so central to Antlr's AST
+    // API.
+    self_ref: *const Node,
+
+    // Carries 'input so Rust sees it as covariant rather than unused/invariant.
+    _input: PhantomData<&'input ()>,
 }
 
+/// Convenience alias — resolves the `Node` parameter automatically from `ExtCtx::Node`.
+pub type BaseRuleContext<'input, 'arena, ExtCtx> = BaseRuleContextInner<
+    'input,
+    'arena,
+    ExtCtx,
+    <ExtCtx as CustomRuleContext<'input, 'arena>>::Node,
+>;
+
 #[allow(missing_docs)]
-impl<'input, 'arena, Ext> BaseRuleContext<'input, 'arena, Ext>
+impl<'input, 'arena, Ext, Node> BaseRuleContextInner<'input, 'arena, Ext, Node>
 where
-    Ext: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    Ext: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
-    pub(crate) fn new(parent: Option<&'arena Ext::Node>, invoking_state: i32, ext: Ext) -> Self {
+    pub(crate) fn new(parent: Option<&'arena Node>, invoking_state: i32, ext: Ext) -> Self {
         Self {
             parent,
             self_ref: std::ptr::null(),
             invoking_state,
             ext,
+            _input: PhantomData,
         }
     }
 
     pub(crate) fn copy_from<Src>(
-        node: BaseRuleContext<'input, 'arena, Src>,
+        node: BaseRuleContextInner<'input, 'arena, Src, Node>,
         ctor: impl FnOnce(Src) -> Ext,
     ) -> Self
     where
-        Src: CustomRuleContext<'input, 'arena, Node = Ext::Node>,
+        Src: CustomRuleContext<'input, 'arena, Node = Node>,
     {
         Self {
             parent: node.parent,
@@ -320,26 +354,28 @@ where
             self_ref: node.self_ref,
             invoking_state: node.invoking_state,
             ext: ctor(node.ext),
+            _input: PhantomData,
         }
     }
 
     pub(crate) fn morph<Tgt>(
         self,
         ctor: impl FnOnce(Ext) -> Tgt,
-    ) -> BaseRuleContext<'input, 'arena, Tgt>
+    ) -> BaseRuleContextInner<'input, 'arena, Tgt, Node>
     where
-        Tgt: CustomRuleContext<'input, 'arena, Node = Ext::Node>,
+        Tgt: CustomRuleContext<'input, 'arena, Node = Node>,
     {
-        BaseRuleContext {
+        BaseRuleContextInner {
             parent: self.parent,
             self_ref: self.self_ref,
             invoking_state: self.invoking_state,
             ext: ctor(self.ext),
+            _input: PhantomData,
         }
     }
 
     #[inline]
-    pub fn parent(&self) -> Option<&'arena Ext::Node> {
+    pub fn parent(&self) -> Option<&'arena Node> {
         self.parent
     }
 
@@ -349,7 +385,7 @@ where
     }
 
     #[inline]
-    pub fn try_as_node(&self) -> Option<&'arena Ext::Node> {
+    pub fn try_as_node(&self) -> Option<&'arena Node> {
         if self.self_ref.is_null() {
             None
         } else {
@@ -357,11 +393,11 @@ where
         }
     }
 
-    pub(crate) fn set_self_ref(&mut self, self_ref: *const Ext::Node) {
+    pub(crate) fn set_self_ref(&mut self, self_ref: *const Node) {
         self.self_ref = self_ref;
     }
 
-    pub(crate) fn set_parent(&mut self, parent: Option<&'arena Ext::Node>) {
+    pub(crate) fn set_parent(&mut self, parent: Option<&'arena Node>) {
         self.parent = parent;
     }
 
@@ -374,28 +410,36 @@ where
     }
 }
 
-impl<'input, 'arena, ExtCtx> Borrow<ExtCtx> for BaseRuleContext<'input, 'arena, ExtCtx>
+impl<'input, 'arena, ExtCtx, Node> Borrow<ExtCtx>
+    for BaseRuleContextInner<'input, 'arena, ExtCtx, Node>
 where
-    ExtCtx: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    ExtCtx: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn borrow(&self) -> &ExtCtx {
         &self.ext
     }
 }
 
-impl<'input, 'arena, ExtCtx> BorrowMut<ExtCtx> for BaseRuleContext<'input, 'arena, ExtCtx>
+impl<'input, 'arena, ExtCtx, Node> BorrowMut<ExtCtx>
+    for BaseRuleContextInner<'input, 'arena, ExtCtx, Node>
 where
-    ExtCtx: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    ExtCtx: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn borrow_mut(&mut self) -> &mut ExtCtx {
         &mut self.ext
     }
 }
 
-impl<'input, 'arena, Ctx> RuleContext<'input, 'arena> for BaseRuleContext<'input, 'arena, Ctx>
+impl<'input, 'arena, Ctx, Node> RuleContext<'input, 'arena>
+    for BaseRuleContextInner<'input, 'arena, Ctx, Node>
 where
     'input: 'arena,
-    Ctx: CustomRuleContext<'input, 'arena> + 'arena,
+    Ctx: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
+    Node: RuleNode<'input, 'arena>,
 {
     #[inline(always)]
     fn get_invoking_state(&self) -> i32 {
@@ -423,9 +467,11 @@ where
     }
 }
 
-impl<'input, 'arena, ExtCtx> Debug for BaseRuleContext<'input, 'arena, ExtCtx>
+impl<'input, 'arena, ExtCtx, Node> Debug for BaseRuleContextInner<'input, 'arena, ExtCtx, Node>
 where
-    ExtCtx: CustomRuleContext<'input, 'arena>,
+    'input: 'arena,
+    ExtCtx: CustomRuleContext<'input, 'arena, Node = Node>,
+    Node: RuleNode<'input, 'arena>,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(type_name::<Self>())

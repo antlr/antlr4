@@ -410,6 +410,53 @@ if (x < x && a > 0) then duh
         });
     }
 
+    #[test]
+    fn test_ast_type_variance() {
+        // This is a compile-only test to make sure that the lifetimes on the
+        // AST types are working properly
+        #![allow(dead_code)]
+
+        fn context_check1<'long, 'short, 'arena>(
+            x: visitorcalcparser::ExprContextAll<'long, 'arena>,
+        ) -> visitorcalcparser::ExprContextAll<'short, 'arena>
+        where
+            'long: 'short,
+            'short: 'arena,
+        {
+            x
+        }
+
+        fn context_check2<'input, 'long, 'short>(
+            x: visitorcalcparser::ExprContextAll<'input, 'long>,
+        ) -> visitorcalcparser::ExprContextAll<'input, 'short>
+        where
+            'input: 'long,
+            'long: 'short,
+        {
+            x
+        }
+
+        fn node_check1<'long, 'short, 'arena>(
+            x: visitorcalcparser::VisitorCalcParserContextNode<'long, 'arena>,
+        ) -> visitorcalcparser::VisitorCalcParserContextNode<'short, 'arena>
+        where
+            'long: 'short,
+            'short: 'arena,
+        {
+            x
+        }
+
+        fn node_check2<'input, 'long, 'short>(
+            x: visitorcalcparser::VisitorCalcParserContextNode<'input, 'long>,
+        ) -> visitorcalcparser::VisitorCalcParserContextNode<'input, 'short>
+        where
+            'input: 'long,
+            'long: 'short,
+        {
+            x
+        }
+    }
+
     // Deep recursion support requires stacker. Without stacker, the test will
     // fail with stack overflow
     #[test]

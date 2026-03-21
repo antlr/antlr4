@@ -19,7 +19,7 @@ use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::dfa::DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -212,7 +212,7 @@ where
 //------------------- s ----------------
 pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>>;
+pub type SContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, SContextExt<'input, 'arena>, VisitorBasicParserContextNode<'input, 'arena>>;
 dbt_antlr4::impl_visitable! { VisitorBasicVisitor::SContext(visit_s) }
 pub struct SContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,

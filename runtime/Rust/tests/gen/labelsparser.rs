@@ -19,7 +19,7 @@ use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::dfa::DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -249,7 +249,7 @@ where
 //------------------- s ----------------
 pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>>;
+pub type SContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, SContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 pub struct SContextExt<'input, 'arena> {
 	pub q: Option<&'arena EContextAll<'input, 'arena>>,
     ph: PhantomData<(&'arena (), &'input ())>,
@@ -376,7 +376,7 @@ impl<'input, 'arena> Deref for EContextAll<'input, 'arena>{
 	}
 }
 
-pub type EContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, EContextExt<'input, 'arena>>;
+pub type EContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, EContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 pub struct EContextExt<'input, 'arena> {
 	pub v: String,
     ph: PhantomData<(&'arena (), &'input ())>,
@@ -434,7 +434,7 @@ where
     fn set_v(&mut self,attr: String) { self.deref_mut().v = attr; }  
 }
 
-pub type AddContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AddContextExt<'input, 'arena>>;
+pub type AddContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, AddContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait AddContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -511,7 +511,7 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
 	}
 }
 
-pub type ParensContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, ParensContextExt<'input, 'arena>>;
+pub type ParensContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, ParensContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait ParensContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -583,7 +583,7 @@ impl<'input, 'arena> ParensContextExt<'input, 'arena> {
 	}
 }
 
-pub type MultContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, MultContextExt<'input, 'arena>>;
+pub type MultContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, MultContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait MultContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -662,7 +662,7 @@ impl<'input, 'arena> MultContextExt<'input, 'arena> {
 	}
 }
 
-pub type DecContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, DecContextExt<'input, 'arena>>;
+pub type DecContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, DecContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait DecContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -734,7 +734,7 @@ impl<'input, 'arena> DecContextExt<'input, 'arena> {
 	}
 }
 
-pub type AnIDContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AnIDContextExt<'input, 'arena>>;
+pub type AnIDContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, AnIDContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait AnIDContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -810,7 +810,7 @@ impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
 	}
 }
 
-pub type AnIntContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AnIntContextExt<'input, 'arena>>;
+pub type AnIntContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, AnIntContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait AnIntContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
@@ -886,7 +886,7 @@ impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
 	}
 }
 
-pub type IncContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, IncContextExt<'input, 'arena>>;
+pub type IncContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, IncContextExt<'input, 'arena>, LabelsParserContextNode<'input, 'arena>>;
 
 pub trait IncContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
 where
