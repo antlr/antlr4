@@ -48,7 +48,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;3]  = [
 static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|| PredictionContextCache::new());
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
-pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, SimpleLRParserExt<'input, 'arena>, SimpleLRParserContextNode<'input, 'arena>, Input, TF>;
+pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, SimpleLRParserExt<'input, 'arena>, SimpleLRParserContextNode<'input, 'arena>, Input, TF, dyn SimpleLRListener<'input, 'arena>>;
 
 pub struct SimpleLRParser<'input, 'arena, Input, TF>
 where

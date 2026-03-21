@@ -257,7 +257,7 @@ pub const ruleNames: [&'static str; <length(parser.ruleNames)>] = [
 <vocabulary(parser.literalNames, parser.symbolicNames)>
 <namedActions.definitions>
 
-pub type BaseParserType\<'input, 'arena, Input, TF> = BaseParser\<'input, 'arena, <parser.name>Ext\<'input, 'arena>, <parser.name>ContextNode\<'input, 'arena>, Input, TF\>;
+pub type BaseParserType\<'input, 'arena, Input, TF> = BaseParser\<'input, 'arena, <parser.name>Ext\<'input, 'arena>, <parser.name>ContextNode\<'input, 'arena>, Input, TF, dyn <parser.grammarName>Listener\<'input, 'arena>\>;
 
 pub struct <parser.name>\<'input, 'arena, Input, TF>
 where

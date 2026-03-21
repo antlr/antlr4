@@ -455,6 +455,21 @@ if (x < x && a > 0) then duh
         {
             x
         }
+
+        fn parse_visitor_calc<'input, 'arena>(
+            input: &'input str,
+            arena: &'arena Arena,
+        ) -> Result<&'arena visitorcalcparser::SContext<'input, 'arena>, ANTLRError>
+        where
+            'input: 'arena,
+            'arena: 'input,
+        {
+            let input = InputStream::new(input);
+            let lexer = visitorcalclexer::VisitorCalcLexer::<_>::new(arena, input);
+            let token_source = CommonTokenStream::new(lexer);
+            let mut parser = visitorcalcparser::VisitorCalcParser::new(arena, token_source);
+            parser.s()
+        }
     }
 
     // Deep recursion support requires stacker. Without stacker, the test will

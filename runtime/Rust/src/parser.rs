@@ -85,12 +85,13 @@ where
 /// Abstract base parser implementation
 ///
 /// Only meant to be instantiated by generated parsers
-pub struct BaseParser<'input, 'arena, Ext, Node, Input, TF>
+pub struct BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>, // input stream
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     pub interp: Arc<ParserATNSimulator>,
     /// Rule context parser is currently processing
@@ -123,22 +124,23 @@ where
     precedence_stack: Vec<i32>,
     pub recursion_limit: u32,
 
-    parse_listeners: Vec<Box<Node::Listener>>,
+    parse_listeners: Vec<Box<Listener>>,
     _syntax_errors: Cell<i32>,
     error_listeners: Vec<Box<dyn ErrorListener<'input, 'arena, Self> + 'input>>,
 
     pub arena: &'arena Arena,
     ext: Ext,
-    pd: PhantomData<fn() -> &'arena TF>,
+    pd: PhantomData<fn() -> (&'input (), &'arena TF)>,
 }
 
-impl<'input, 'arena, Ext, Node, Input, TF> Deref
-    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+impl<'input, 'arena, Ext, Node, Input, TF, Listener> Deref
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     type Target = Ext;
 
@@ -147,13 +149,14 @@ where
     }
 }
 
-impl<'input, 'arena, Ext, Node, Input, TF> DerefMut
-    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+impl<'input, 'arena, Ext, Node, Input, TF, Listener> DerefMut
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.ext
@@ -167,13 +170,14 @@ where
 {
 }
 
-impl<'input, 'arena, Ext, Node, Input, TF> Recognizer<'input, 'arena>
-    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+impl<'input, 'arena, Ext, Node, Input, TF, Listener> Recognizer<'input, 'arena>
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     type Node = Node;
 
@@ -203,14 +207,15 @@ where
     }
 }
 
-impl<'input, 'arena, Ext, Node, Input, TF> Parser<'input, 'arena, TF>
-    for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+impl<'input, 'arena, Ext, Node, Input, TF, Listener> Parser<'input, 'arena, TF>
+    for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     fn get_arena(&self) -> &'arena Arena {
         self.arena
@@ -383,12 +388,14 @@ where
 }
 
 #[allow(missing_docs)] // todo docs
-impl<'input, 'arena, Ext, Node, Input, TF> BaseParser<'input, 'arena, Ext, Node, Input, TF>
+impl<'input, 'arena, Ext, Node, Input, TF, Listener>
+    BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: RuleNode<'input, 'arena>,
+    Node: RuleNode<'input, 'arena, Listener = Listener>,
+    Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     pub fn new_base_parser(
         arena: &'arena Arena,
