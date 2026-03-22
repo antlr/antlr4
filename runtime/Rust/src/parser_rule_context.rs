@@ -18,7 +18,7 @@ use crate::{token_factory, Arena};
 ///
 /// This is the language-agnostic, dyn-compatible interface for parser rule
 /// contexts.
-pub trait ParserRuleContext<'input, 'arena>: RuleContext<'input, 'arena> + Debug
+pub trait ParserRuleContext<'input, 'arena>: RuleContext<'arena> + Debug
 where
     'input: 'arena,
 {
@@ -140,7 +140,7 @@ where
     }
 }
 
-impl<'input, 'arena, Ext, Node> RuleContext<'input, 'arena>
+impl<'input, 'arena, Ext, Node> RuleContext<'arena>
     for BaseParserRuleContextInner<'input, 'arena, Ext, Node>
 where
     'input: 'arena,
@@ -151,7 +151,7 @@ where
         self.base.get_invoking_state()
     }
 
-    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
         self.base.get_parent_ctx()
     }
 

@@ -516,7 +516,7 @@ macro_rules! impl_visitable {
 macro_rules! impl_rule_context {
     // Pattern: EnumName { Variant1, Variant2, ... }
     ($enum_name:ident { $($variant:ident,)+ }) => {
-        impl<'input, 'arena> RuleContext<'input, 'arena> for $enum_name<'input, 'arena> {
+        impl<'input, 'arena> RuleContext<'arena> for $enum_name<'input, 'arena> {
             fn get_rule_index(&self) -> usize {
                 match self {
                     // Generate a match arm for every variant
@@ -536,7 +536,7 @@ macro_rules! impl_rule_context {
                 }
             }
 
-            fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
+            fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
                 match self {
                     $( $enum_name::$variant(inner) => RuleContext::get_parent_ctx(inner), )+
                 }

@@ -184,7 +184,7 @@ where
     iserror: PhantomData<E>,
 }
 
-impl<'input, 'arena, E> RuleContext<'input, 'arena> for LeafNode<'input, 'arena, E>
+impl<'input, 'arena, E> RuleContext<'arena> for LeafNode<'input, 'arena, E>
 where
     'input: 'arena,
     E: 'static,
@@ -205,7 +205,7 @@ where
         -1
     }
 
-    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
         None
     }
 }

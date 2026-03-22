@@ -19,10 +19,7 @@ use crate::{
 use std::any::type_name;
 
 /// Language-agnostic, dyn-compatible, read-only interface to the AST.
-pub trait RuleContext<'input, 'arena>
-where
-    'input: 'arena,
-{
+pub trait RuleContext<'arena> {
     /// Internal parser state
     fn get_invoking_state(&self) -> i32;
 
@@ -33,7 +30,7 @@ where
     }
 
     /// Get parent context
-    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>>;
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>>;
 
     /// Rule index that corresponds to this context type
     fn get_rule_index(&self) -> usize;
@@ -434,7 +431,7 @@ where
     }
 }
 
-impl<'input, 'arena, Ctx, Node> RuleContext<'input, 'arena>
+impl<'input, 'arena, Ctx, Node> RuleContext<'arena>
     for BaseRuleContextInner<'input, 'arena, Ctx, Node>
 where
     'input: 'arena,
@@ -446,8 +443,8 @@ where
         self.invoking_state
     }
 
-    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'input, 'arena>> {
-        self.parent.map(|rc| rc as &dyn RuleContext<'input, 'arena>)
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
+        self.parent.map(|rc| rc as &dyn RuleContext<'arena>)
     }
 
     fn get_rule_index(&self) -> usize {
