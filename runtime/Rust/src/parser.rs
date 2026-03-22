@@ -8,7 +8,9 @@ use std::sync::Arc;
 use crate::arena::Arena;
 use crate::atn::ATN;
 use crate::atn_simulator::IATNSimulator;
-use crate::error_listener::{ConsoleErrorListener, ErrorListener, ProxyErrorListener};
+use crate::error_listener::{
+    ConsoleErrorListener, ErrorListener, ErrorListenerDelegate, ProxyErrorListener,
+};
 use crate::error_strategy::ErrorStrategy;
 use crate::errors::ANTLRError;
 use crate::interval_set::IntervalSet;
@@ -87,6 +89,7 @@ where
 /// Only meant to be instantiated by generated parsers
 pub struct BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
+    'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>, // input stream
@@ -94,8 +97,9 @@ where
     Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
     pub interp: Arc<ParserATNSimulator>,
+
     /// Rule context parser is currently processing
-    ctx: *mut Node,
+    ctx: *mut (),
 
     /// Track the {@link ParserRuleContext} objects during the parse and hook
     /// them up using the {@link ParserRuleContext#children} list so that it
@@ -126,16 +130,17 @@ where
 
     parse_listeners: Vec<Box<Listener>>,
     _syntax_errors: Cell<i32>,
-    error_listeners: Vec<Box<dyn ErrorListener<'input, 'arena, Self> + 'input>>,
+    error_listeners: Vec<ErrorListenerDelegate<'input, 'arena, Self>>,
 
     pub arena: &'arena Arena,
     ext: Ext,
-    pd: PhantomData<fn() -> (&'input (), &'arena TF)>,
+    pd: PhantomData<(&'input (), &'arena TF, &'arena Node)>,
 }
 
 impl<'input, 'arena, Ext, Node, Input, TF, Listener> Deref
     for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
+    'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
@@ -152,6 +157,7 @@ where
 impl<'input, 'arena, Ext, Node, Input, TF, Listener> DerefMut
     for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
+    'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
@@ -173,6 +179,7 @@ where
 impl<'input, 'arena, Ext, Node, Input, TF, Listener> Recognizer<'input, 'arena>
     for BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
+    'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
@@ -297,7 +304,8 @@ where
         &mut self,
         listener: Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
     ) {
-        self.error_listeners.push(listener)
+        self.error_listeners
+            .push(ErrorListenerDelegate::new(listener))
     }
 
     fn remove_error_listeners(&mut self) {
@@ -391,6 +399,7 @@ where
 impl<'input, 'arena, Ext, Node, Input, TF, Listener>
     BaseParser<'input, 'arena, Ext, Node, Input, TF, Listener>
 where
+    'input: 'arena,
     Ext: ParserRecog<'input, 'arena, Self>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
@@ -414,7 +423,10 @@ where
             recursion_limit: DEFAULT_RECURSION_LIMIT,
             parse_listeners: vec![],
             _syntax_errors: Cell::new(0),
-            error_listeners: vec![Box::new(ConsoleErrorListener {})],
+            error_listeners: vec![ErrorListenerDelegate::new(
+                Box::new(ConsoleErrorListener {})
+                    as Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+            )],
             arena,
             ext,
             pd: PhantomData,
@@ -439,7 +451,7 @@ where
         if self.ctx.is_null() {
             None
         } else {
-            unsafe { Some(&*self.ctx) }
+            unsafe { Some(&*(self.ctx as *const Node)) }
         }
     }
 
@@ -452,7 +464,7 @@ where
         if self.ctx.is_null() {
             None
         } else {
-            Some(&mut *self.ctx)
+            Some(&mut *(self.ctx as *mut Node))
         }
     }
 
@@ -464,7 +476,7 @@ where
     #[inline]
     fn set_current_ctx(&mut self, ctx: Option<&'arena Node>) {
         if let Some(ctx) = ctx {
-            self.ctx = ctx as *const Node as *mut Node;
+            self.ctx = ctx as *const Node as *mut Node as *mut ();
         } else {
             self.ctx = std::ptr::null_mut();
         }
@@ -474,7 +486,7 @@ where
         if self.ctx.is_null() {
             None
         } else {
-            let ret = unsafe { &*self.ctx };
+            let ret = unsafe { &*(self.ctx as *const Node) };
             self.ctx = std::ptr::null_mut();
             Some(ret)
         }
@@ -484,7 +496,7 @@ where
     fn add_child_to_ctx(&mut self, child: &'arena Node) {
         if !self.ctx.is_null() {
             unsafe {
-                (*self.ctx).add_child(child);
+                (*(self.ctx as *mut Node)).add_child(child);
             }
         }
     }
@@ -495,7 +507,7 @@ where
         F: FnOnce(&mut Node) -> R,
     {
         assert!(!self.ctx.is_null());
-        unsafe { f(&mut *self.ctx) }
+        unsafe { f(&mut *(self.ctx as *mut Node)) }
     }
 
     #[inline]
@@ -723,14 +735,14 @@ where
 
         // hook into tree
         unsafe {
-            (*retctx).set_parent(parent_ctx);
+            (*(retctx as *mut Node)).set_parent(parent_ctx);
         }
 
         //        println!("{:?}",self.ctx.as_ref().map(|it|it.to_string_tree(self)));
         if self.build_parse_trees && parent_ctx.is_some() {
-            self.add_child_to_ctx(unsafe { &*retctx });
+            self.add_child_to_ctx(unsafe { &*(retctx as *const Node) });
         }
-        Ok(unsafe { &*retctx })
+        Ok(unsafe { &*(retctx as *const Node) })
     }
 
     fn create_token_node(&self, token: &'arena TF::Tok) -> &'arena mut Node {

@@ -31,7 +31,7 @@ where
     fn syntax_error(
         &self,
         _recognizer: &R,
-        _offending_symbol: Option<&'arena dyn Token>,
+        _offending_symbol: Option<&dyn Token>,
         _line: u32,
         _column: i32,
         _msg: &str,
@@ -93,7 +93,7 @@ where
     fn syntax_error(
         &self,
         _recognizer: &R,
-        _offending_symbol: Option<&'arena dyn Token>,
+        _offending_symbol: Option<&dyn Token>,
         line: u32,
         column: i32,
         msg: &str,
@@ -104,8 +104,12 @@ where
 }
 
 // #[derive(Debug)]
-pub(crate) struct ProxyErrorListener<'a, 'input, 'arena, R> {
-    pub delegates: &'a [Box<dyn ErrorListener<'input, 'arena, R> + 'input>],
+pub(crate) struct ProxyErrorListener<'a, 'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
+    pub delegates: &'a [ErrorListenerDelegate<'input, 'arena, R>],
 }
 
 impl<'input, 'arena, R> ErrorListener<'input, 'arena, R>
@@ -117,7 +121,7 @@ where
     fn syntax_error(
         &self,
         _recognizer: &R,
-        offending_symbol: Option<&'arena dyn Token>,
+        offending_symbol: Option<&dyn Token>,
         line: u32,
         column: i32,
         msg: &str,
@@ -335,6 +339,141 @@ where
         recognizer.notify_error_listeners(msg, None, None);
     }
 }
+
+/// Essentially a compile-time replacement for `Box<dyn ErrorListener<'input,
+/// 'arena, R>>`, that has covariant type parameters. Used to workaround the
+/// fact that `Box<dyn Trait>` is invariant over the trait's type parameters.
+pub(crate) struct ErrorListenerDelegate<'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
+    data: *mut (),
+    vtable: *const (),
+
+    // Covariant in `'input` (same variance as `&'input ()`).
+    _marker: PhantomData<(&'input (), &'arena (), R)>,
+}
+
+impl<'input, 'arena, R> ErrorListenerDelegate<'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
+    pub(crate) fn new(inner: Box<dyn ErrorListener<'input, 'arena, R> + 'input>) -> Self {
+        let raw = Box::into_raw(inner);
+        // SAFETY: *mut dyn Trait is a fat pointer (data_ptr, vtable_ptr).
+        let (data, vtable): (*mut (), *const ()) = unsafe { std::mem::transmute(raw) };
+        Self {
+            data,
+            vtable,
+            _marker: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn as_dyn(&self) -> &(dyn ErrorListener<'input, 'arena, R> + 'input) {
+        unsafe { std::mem::transmute((self.data as *const (), self.vtable)) }
+    }
+}
+
+impl<'input, 'arena, R> Drop for ErrorListenerDelegate<'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
+    fn drop(&mut self) {
+        unsafe {
+            let ptr: *mut (dyn ErrorListener<'input, 'arena, R> + 'input) =
+                std::mem::transmute((self.data, self.vtable));
+            drop(Box::from_raw(ptr));
+        }
+    }
+}
+
+impl<'input, 'arena, R> ErrorListener<'input, 'arena, R>
+    for ErrorListenerDelegate<'input, 'arena, R>
+where
+    'input: 'arena,
+    R: Recognizer<'input, 'arena>,
+{
+    #[inline(always)]
+    fn syntax_error(
+        &self,
+        recognizer: &R,
+        offending_symbol: Option<&dyn Token>,
+        line: u32,
+        column: i32,
+        msg: &str,
+        error: Option<&ANTLRError>,
+    ) {
+        self.as_dyn()
+            .syntax_error(recognizer, offending_symbol, line, column, msg, error)
+    }
+
+    #[inline(always)]
+    fn report_ambiguity(
+        &self,
+        recognizer: &R,
+        dfa: &DFA,
+        start_index: isize,
+        stop_index: isize,
+        exact: bool,
+        ambig_alts: &BitSet<u32>,
+        configs: &ATNConfigSet,
+    ) {
+        self.as_dyn().report_ambiguity(
+            recognizer,
+            dfa,
+            start_index,
+            stop_index,
+            exact,
+            ambig_alts,
+            configs,
+        )
+    }
+
+    #[inline(always)]
+    fn report_attempting_full_context(
+        &self,
+        recognizer: &R,
+        dfa: &DFA,
+        start_index: isize,
+        stop_index: isize,
+        conflicting_alts: &BitSet<u32>,
+        configs: &ATNConfigSet,
+    ) {
+        self.as_dyn().report_attempting_full_context(
+            recognizer,
+            dfa,
+            start_index,
+            stop_index,
+            conflicting_alts,
+            configs,
+        )
+    }
+
+    #[inline(always)]
+    fn report_context_sensitivity(
+        &self,
+        recognizer: &R,
+        dfa: &DFA,
+        start_index: isize,
+        stop_index: isize,
+        prediction: i32,
+        configs: &ATNConfigSet,
+    ) {
+        self.as_dyn().report_context_sensitivity(
+            recognizer,
+            dfa,
+            start_index,
+            stop_index,
+            prediction,
+            configs,
+        )
+    }
+}
+
 /*
 impl DefaultErrorListener {
     fn new_default_error_listener() -> * DefaultErrorListener { unimplemented!() }

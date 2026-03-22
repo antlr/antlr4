@@ -18,7 +18,7 @@ use dbt_antlr4::recognizer::{Recognizer,Actions};
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::dfa::DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
-use dbt_antlr4::error_strategy::{ErrorStrategy, DefaultErrorStrategy};
+use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
 use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
@@ -58,7 +58,7 @@ where
 {
 	base: BaseParserType<'input, 'arena, Input, TF>,
     interpreter: Arc<ParserATNSimulator>,
-    pub err_handler: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'input>,
+    err_handler: ErrorStrategyDelegate<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>>,
 }
 
 impl<'input, 'arena, Input, TF> ReferenceToATNParser<'input, 'arena, Input, TF>
@@ -85,7 +85,7 @@ where
 				}
 			),
 			interpreter,
-            err_handler: strategy,
+            err_handler: unsafe { ErrorStrategyDelegate::new(strategy) },
         }
     }
 
@@ -94,7 +94,7 @@ where
     }
 
     pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'input>) {
-        self.err_handler = strategy;
+        self.err_handler = unsafe { ErrorStrategyDelegate::new(strategy) };
     }
 
     /// Adds parse listener for this parser

@@ -4,7 +4,6 @@ use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
-use std::ops::DerefMut;
 use std::sync::Arc;
 
 use crate::atn_simulator::IATNSimulator;
@@ -87,49 +86,6 @@ where
     /// This method is called when the parser successfully matches an input
     /// symbol.
     fn report_match(&mut self, recognizer: &mut P);
-}
-
-impl<'input, 'arena, TF, P> ErrorStrategy<'input, 'arena, TF, P>
-    for Box<dyn ErrorStrategy<'input, 'arena, TF, P> + 'arena>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    P: Parser<'input, 'arena, TF>,
-{
-    #[inline(always)]
-    fn reset(&mut self, recognizer: &mut P) {
-        self.deref_mut().reset(recognizer)
-    }
-
-    #[inline(always)]
-    fn recover_inline(&mut self, recognizer: &mut P) -> Result<&'arena TF::Tok, ANTLRError> {
-        self.deref_mut().recover_inline(recognizer)
-    }
-
-    #[inline(always)]
-    fn recover(&mut self, recognizer: &mut P, e: &ANTLRError) -> Result<(), ANTLRError> {
-        self.deref_mut().recover(recognizer, e)
-    }
-
-    #[inline(always)]
-    fn sync(&mut self, recognizer: &mut P) -> Result<(), ANTLRError> {
-        self.deref_mut().sync(recognizer)
-    }
-
-    #[inline(always)]
-    fn in_error_recovery_mode(&mut self, recognizer: &mut P) -> bool {
-        self.deref_mut().in_error_recovery_mode(recognizer)
-    }
-
-    #[inline(always)]
-    fn report_error(&mut self, recognizer: &mut P, e: &ANTLRError) {
-        self.deref_mut().report_error(recognizer, e)
-    }
-
-    #[inline(always)]
-    fn report_match(&mut self, recognizer: &mut P) {
-        self.deref_mut().report_match(recognizer)
-    }
 }
 
 /// This is the default implementation of `ErrorStrategy` used for
@@ -610,4 +566,93 @@ where
 
     #[inline(always)]
     fn report_match(&mut self, _recognizer: &mut P) {}
+}
+
+/// Essentially a type-erased `Box<dyn ErrorStrategy<'input, 'arena, TF, P> +
+/// 'input>` that is covariant over its type parameters.
+///
+/// NOTE: this is an *internal* type, declared public only because it needs to
+/// be used in generated code. There is no safe way to construct this type from
+/// user code.
+pub struct ErrorStrategyDelegate<'input, 'arena, TF, P>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    P: Parser<'input, 'arena, TF>,
+{
+    data: *mut (),
+    vtable: *const (),
+
+    _marker: PhantomData<(&'input (), &'arena (), TF, P)>,
+}
+
+impl<'input, 'arena, TF, P> ErrorStrategyDelegate<'input, 'arena, TF, P>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    P: Parser<'input, 'arena, TF>,
+{
+    // SAFETY: This is an internal type that is only meant to be constructed by
+    // generated code, NOT for public consumption.
+    pub unsafe fn new(s: Box<dyn ErrorStrategy<'input, 'arena, TF, P> + 'input>) -> Self {
+        let raw = Box::into_raw(s);
+        // SAFETY: *mut dyn Trait is a fat pointer (data_ptr, vtable_ptr).
+        let (data, vtable): (*mut (), *const ()) = unsafe { std::mem::transmute(raw) };
+        Self {
+            data,
+            vtable,
+            _marker: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn as_mut_dyn(&mut self) -> &mut (dyn ErrorStrategy<'input, 'arena, TF, P> + 'input) {
+        // SAFETY: the [ErrorStrategy] trait is actually covariant over 'input
+        // and 'arena, so transmuting to a reference with the same lifetime is
+        // sound.
+        unsafe { std::mem::transmute((self.data, self.vtable)) }
+    }
+}
+
+impl<'input, 'arena, TF, P> ErrorStrategy<'input, 'arena, TF, P>
+    for ErrorStrategyDelegate<'input, 'arena, TF, P>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    P: Parser<'input, 'arena, TF>,
+{
+    #[inline(always)]
+    fn reset(&mut self, recognizer: &mut P) {
+        self.as_mut_dyn().reset(recognizer)
+    }
+
+    #[inline(always)]
+    fn recover_inline(&mut self, recognizer: &mut P) -> Result<&'arena TF::Tok, ANTLRError> {
+        self.as_mut_dyn().recover_inline(recognizer)
+    }
+
+    #[inline(always)]
+    fn recover(&mut self, recognizer: &mut P, e: &ANTLRError) -> Result<(), ANTLRError> {
+        self.as_mut_dyn().recover(recognizer, e)
+    }
+
+    #[inline(always)]
+    fn sync(&mut self, recognizer: &mut P) -> Result<(), ANTLRError> {
+        self.as_mut_dyn().sync(recognizer)
+    }
+
+    #[inline(always)]
+    fn in_error_recovery_mode(&mut self, recognizer: &mut P) -> bool {
+        self.as_mut_dyn().in_error_recovery_mode(recognizer)
+    }
+
+    #[inline(always)]
+    fn report_error(&mut self, recognizer: &mut P, e: &ANTLRError) {
+        self.as_mut_dyn().report_error(recognizer, e)
+    }
+
+    #[inline(always)]
+    fn report_match(&mut self, recognizer: &mut P) {
+        self.as_mut_dyn().report_match(recognizer)
+    }
 }
