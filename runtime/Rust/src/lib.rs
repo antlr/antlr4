@@ -1,5 +1,4 @@
 #![crate_type = "lib"]
-// #![warn(rust_2018_idioms)]
 // #![warn(missing_docs)] // warn if there is missing docs
 // #![warn(missing_debug_implementations)]
 // #![warn(trivial_numeric_casts)]
