@@ -73,11 +73,10 @@ where
 impl<'input, 'arena, Input, TF> CSVParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
-    'arena: 'input,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-    pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'input>) -> Self {
+    pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
 		dbt_antlr4::recognizer::check_version("1","0");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
@@ -102,7 +101,7 @@ where
     	Self::with_strategy(arena, input, Box::new(DefaultErrorStrategy::new()))
     }
 
-    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'input>) {
+    pub fn set_error_strategy(&mut self, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) {
         self.err_handler = unsafe { ErrorStrategyDelegate::new(strategy) };
     }
 
@@ -288,7 +287,6 @@ where
 impl<'input, 'arena, Input, TF> CSVParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
-    'arena: 'input,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
@@ -395,7 +393,6 @@ where
 impl<'input, 'arena, Input, TF> CSVParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
-    'arena: 'input,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
@@ -489,7 +486,6 @@ where
 impl<'input, 'arena, Input, TF> CSVParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
-    'arena: 'input,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
@@ -621,7 +617,6 @@ where
 impl<'input, 'arena, Input, TF> CSVParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
-    'arena: 'input,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {

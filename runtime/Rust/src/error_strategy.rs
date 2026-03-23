@@ -569,7 +569,7 @@ where
 }
 
 /// Essentially a type-erased `Box<dyn ErrorStrategy<'input, 'arena, TF, P> +
-/// 'input>` that is covariant over its type parameters.
+/// 'input>` that is covariant over 'input.
 ///
 /// NOTE: this is an *internal* type, declared public only because it needs to
 /// be used in generated code. There is no safe way to construct this type from
@@ -583,7 +583,8 @@ where
     data: *mut (),
     vtable: *const (),
 
-    _marker: PhantomData<(&'input (), &'arena (), TF, P)>,
+    // Invariant over 'arena, covariant over 'input, TF, P
+    _marker: PhantomData<(&'input (), *mut &'arena (), TF, P)>,
 }
 
 impl<'input, 'arena, TF, P> ErrorStrategyDelegate<'input, 'arena, TF, P>
@@ -592,9 +593,10 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     P: Parser<'input, 'arena, TF>,
 {
-    // SAFETY: This is an internal type that is only meant to be constructed by
-    // generated code, NOT for public consumption.
-    pub unsafe fn new(s: Box<dyn ErrorStrategy<'input, 'arena, TF, P> + 'input>) -> Self {
+    /// # Safety
+    /// This is an internal type that is only meant to be constructed by
+    /// generated code, NOT for public consumption.
+    pub unsafe fn new(s: Box<dyn ErrorStrategy<'input, 'arena, TF, P> + 'arena>) -> Self {
         let raw = Box::into_raw(s);
         // SAFETY: *mut dyn Trait is a fat pointer (data_ptr, vtable_ptr).
         let (data, vtable): (*mut (), *const ()) = unsafe { std::mem::transmute(raw) };
@@ -606,11 +608,26 @@ where
     }
 
     #[inline(always)]
-    fn as_mut_dyn(&mut self) -> &mut (dyn ErrorStrategy<'input, 'arena, TF, P> + 'input) {
+    fn as_mut_dyn(&mut self) -> &mut (dyn ErrorStrategy<'input, 'arena, TF, P> + 'arena) {
         // SAFETY: the [ErrorStrategy] trait is actually covariant over 'input
         // and 'arena, so transmuting to a reference with the same lifetime is
         // sound.
         unsafe { std::mem::transmute((self.data, self.vtable)) }
+    }
+}
+
+impl<'input, 'arena, TF, P> Drop for ErrorStrategyDelegate<'input, 'arena, TF, P>
+where
+    'input: 'arena,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    P: Parser<'input, 'arena, TF>,
+{
+    fn drop(&mut self) {
+        unsafe {
+            let ptr: *mut (dyn ErrorStrategy<'input, 'arena, TF, P> + 'arena) =
+                std::mem::transmute((self.data, self.vtable));
+            drop(Box::from_raw(ptr));
+        }
     }
 }
 

@@ -351,8 +351,8 @@ where
     data: *mut (),
     vtable: *const (),
 
-    // Covariant in `'input` (same variance as `&'input ()`).
-    _marker: PhantomData<(&'input (), &'arena (), R)>,
+    // Invariant over 'arena, covariant over 'input, R
+    _marker: PhantomData<(&'input (), *mut &'arena (), R)>,
 }
 
 impl<'input, 'arena, R> ErrorListenerDelegate<'input, 'arena, R>

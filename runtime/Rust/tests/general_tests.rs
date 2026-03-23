@@ -12,6 +12,7 @@ mod gen {
     use std::iter::FromIterator;
 
     use dbt_antlr4::common_token_stream::CommonTokenStream;
+    use dbt_antlr4::error_listener::ErrorListener;
     use dbt_antlr4::errors::ANTLRError;
     use dbt_antlr4::int_stream::IntStream;
     use dbt_antlr4::lexer::Lexer;
@@ -23,7 +24,7 @@ mod gen {
     use dbt_antlr4::recognizer::Recognizer;
     use dbt_antlr4::rule_context::RuleContext as _;
     use dbt_antlr4::token::{Token, TOKEN_EOF};
-    use dbt_antlr4::token_factory::CommonTokenFactory;
+    use dbt_antlr4::token_factory::{CommonTokenFactory, TokenFactory};
     use dbt_antlr4::token_stream::{TokenStream, UnbufferedTokenStream};
     use dbt_antlr4::tree::{ParseTreeListener, TerminalNode};
     use dbt_antlr4::trees::string_tree;
@@ -75,8 +76,7 @@ if (x < x && a > 0) then duh
             .to_owned();
 
         Arena::with(|arena| {
-            let mut _lexer =
-                XMLLexer::<_, CommonTokenFactory>::new(arena, InputStream::new(&*data));
+            let mut _lexer = XMLLexer::<_, CommonTokenFactory>::new(arena, InputStream::new(&data));
             //        _lexer.base.add_error_listener();
             let _a = "a".to_owned() + "";
             let mut string = String::new();
@@ -398,12 +398,12 @@ if (x < x && a > 0) then duh
             let token_source = CommonTokenStream::new(lexer);
             let mut parser = LabelsParser::new(arena, token_source);
             let result = parser.s().expect("parser error");
-            let string = result.q.as_ref().unwrap().get_v();
+            let string = result.q.unwrap().get_v();
             assert_eq!("* + a 4 2", string);
-            let x = result.q.as_deref().unwrap();
+            let x = result.q.unwrap();
             match x {
                 EContextAll::MultContext(x) => {
-                    assert_eq!("(a+4)", x.a.as_ref().unwrap().get_text())
+                    assert_eq!("(a+4)", x.a.unwrap().get_text())
                 }
                 _ => panic!("oops"),
             }
@@ -426,15 +426,16 @@ if (x < x && a > 0) then duh
             x
         }
 
-        fn context_check2<'input, 'long, 'short>(
-            x: visitorcalcparser::ExprContextAll<'input, 'long>,
-        ) -> visitorcalcparser::ExprContextAll<'input, 'short>
-        where
-            'input: 'long,
-            'long: 'short,
-        {
-            x
-        }
+        // This should not compile -- 'arena is invariant
+        // fn context_check2<'input, 'long, 'short>(
+        //     x: visitorcalcparser::ExprContextAll<'input, 'long>,
+        // ) -> visitorcalcparser::ExprContextAll<'input, 'short>
+        // where
+        //     'input: 'long,
+        //     'long: 'short,
+        // {
+        //     x
+        // }
 
         fn node_check1<'long, 'short, 'arena>(
             x: visitorcalcparser::VisitorCalcParserContextNode<'long, 'arena>,
@@ -446,28 +447,53 @@ if (x < x && a > 0) then duh
             x
         }
 
-        fn node_check2<'input, 'long, 'short>(
-            x: visitorcalcparser::VisitorCalcParserContextNode<'input, 'long>,
-        ) -> visitorcalcparser::VisitorCalcParserContextNode<'input, 'short>
+        // This should not compile -- 'arena is invariant
+        // fn node_check2<'input, 'long, 'short>(
+        //     x: visitorcalcparser::VisitorCalcParserContextNode<'input, 'long>,
+        // ) -> visitorcalcparser::VisitorCalcParserContextNode<'input, 'short>
+        // where
+        //     'input: 'long,
+        //     'long: 'short,
+        // {
+        //     x
+        // }
+
+        // This should not compile -- error listeners can not hold onto 'arena references:
+        // struct ErrorListenerImpl<'input, 'arena> {
+        //     input: &'input str,
+        //     _marker: PhantomData<&'arena ()>,
+        // }
+
+        struct ErrorListenerImpl<'input> {
+            input: &'input str,
+        }
+
+        impl<'input, 'arena, Input, TF>
+            ErrorListener<
+                'input,
+                'arena,
+                visitorcalcparser::BaseParserType<'input, 'arena, Input, TF>,
+            > for ErrorListenerImpl<'input>
         where
-            'input: 'long,
-            'long: 'short,
+            'input: 'arena,
+            TF: TokenFactory<'input, 'arena> + 'arena,
+            Input: TokenStream<'input, 'arena, TF> + 'arena,
         {
-            x
         }
 
         fn parse_visitor_calc<'input, 'arena>(
             input: &'input str,
             arena: &'arena Arena,
+            error_listener: ErrorListenerImpl<'input>,
         ) -> Result<&'arena visitorcalcparser::SContext<'input, 'arena>, ANTLRError>
         where
             'input: 'arena,
-            'arena: 'input,
         {
             let input = InputStream::new(input);
             let lexer = visitorcalclexer::VisitorCalcLexer::<_>::new(arena, input);
             let token_source = CommonTokenStream::new(lexer);
             let mut parser = visitorcalcparser::VisitorCalcParser::new(arena, token_source);
+            parser.add_error_listener(Box::new(error_listener));
             parser.s()
         }
     }

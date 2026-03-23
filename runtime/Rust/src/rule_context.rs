@@ -307,8 +307,8 @@ where
     // API.
     self_ref: *const Node,
 
-    // Carries 'input so Rust sees it as covariant rather than unused/invariant.
-    _input: PhantomData<&'input ()>,
+    // Covariant over 'input, invariant over 'arena
+    _marker: PhantomData<(&'input (), *mut &'arena ())>,
 }
 
 /// Convenience alias — resolves the `Node` parameter automatically from `ExtCtx::Node`.
@@ -332,7 +332,7 @@ where
             self_ref: std::ptr::null(),
             invoking_state,
             ext,
-            _input: PhantomData,
+            _marker: PhantomData,
         }
     }
 
@@ -351,7 +351,7 @@ where
             self_ref: node.self_ref,
             invoking_state: node.invoking_state,
             ext: ctor(node.ext),
-            _input: PhantomData,
+            _marker: PhantomData,
         }
     }
 
@@ -367,7 +367,7 @@ where
             self_ref: self.self_ref,
             invoking_state: self.invoking_state,
             ext: ctor(self.ext),
-            _input: PhantomData,
+            _marker: PhantomData,
         }
     }
 
