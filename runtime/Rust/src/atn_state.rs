@@ -1,6 +1,7 @@
 use std::fmt::{Debug, Formatter};
 use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
+use std::ptr::NonNull;
 use std::sync::OnceLock;
 
 use crate::interval_set::IntervalSet;
@@ -473,7 +474,7 @@ impl From<DecisionState> for ATNState {
     }
 }
 
-pub struct ATNStateRef(*const ATNState);
+pub struct ATNStateRef(NonNull<ATNState>);
 
 impl ATNStateRef {
     #[inline]
@@ -487,23 +488,23 @@ impl ATNStateRef {
             transitions: Vec::new(),
         });
 
-        ATNStateRef(&INVALID_STATE as *const ATNState)
+        ATNStateRef(NonNull::from(&INVALID_STATE))
     }
 
     #[allow(clippy::mut_from_ref)]
     #[inline]
     pub(crate) unsafe fn as_mut(&self) -> &mut ATNState {
-        unsafe { &mut *(self.0 as *mut ATNState) }
+        unsafe { &mut *(self.0.as_ptr() as *mut ATNState) }
     }
 
     pub fn as_usize(&self) -> usize {
-        self.0 as usize
+        self.0.as_ptr() as usize
     }
 }
 
 impl From<&Pin<Box<ATNState>>> for ATNStateRef {
     fn from(value: &Pin<Box<ATNState>>) -> Self {
-        ATNStateRef(&**value as *const ATNState)
+        ATNStateRef(NonNull::from(&**value))
     }
 }
 
@@ -531,13 +532,13 @@ impl Deref for ATNStateRef {
     type Target = ATNState;
 
     fn deref(&self) -> &Self::Target {
-        unsafe { &*self.0 }
+        unsafe { &*self.0.as_ptr() }
     }
 }
 
 impl AsRef<ATNState> for ATNStateRef {
     fn as_ref(&self) -> &ATNState {
-        unsafe { &*self.0 }
+        unsafe { &*self.0.as_ptr() }
     }
 }
 
@@ -551,7 +552,7 @@ impl Copy for ATNStateRef {}
 
 impl std::hash::Hash for ATNStateRef {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        state.write_usize(self.0 as usize);
+        state.write_usize(self.0.as_ptr() as usize);
     }
 }
 
