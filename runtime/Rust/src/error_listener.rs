@@ -45,7 +45,7 @@ where
     fn report_ambiguity(
         &self,
         _recognizer: &R,
-        _dfa: &DFA,
+        _dfa: &DFA<ATNConfigSet<'static>>,
         _start_index: isize,
         _stop_index: isize,
         _exact: bool,
@@ -59,7 +59,7 @@ where
     fn report_attempting_full_context(
         &self,
         _recognizer: &R,
-        _dfa: &DFA,
+        _dfa: &DFA<ATNConfigSet<'static>>,
         _start_index: isize,
         _stop_index: isize,
         _conflicting_alts: &BitSet,
@@ -72,7 +72,7 @@ where
     fn report_context_sensitivity(
         &self,
         _recognizer: &R,
-        _dfa: &DFA,
+        _dfa: &DFA<ATNConfigSet<'static>>,
         _start_index: isize,
         _stop_index: isize,
         _prediction: i32,
@@ -135,7 +135,7 @@ where
     fn report_ambiguity(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -158,7 +158,7 @@ where
     fn report_attempting_full_context(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         conflicting_alts: &BitSet<u32>,
@@ -179,7 +179,7 @@ where
     fn report_context_sensitivity(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         prediction: i32,
@@ -235,7 +235,7 @@ where
         }
     }
 
-    fn get_decision_description<R>(&self, recog: &R, dfa: &DFA) -> String
+    fn get_decision_description<R>(&self, recog: &R, dfa: &DFA<ATNConfigSet<'static>>) -> String
     where
         'input: 'arena,
         R: Recognizer<'input, 'arena>,
@@ -280,7 +280,7 @@ where
     fn report_ambiguity(
         &self,
         recognizer: &P,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -304,7 +304,7 @@ where
     fn report_attempting_full_context(
         &self,
         recognizer: &P,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         _conflicting_alts: &BitSet<u32>,
@@ -323,7 +323,7 @@ where
     fn report_context_sensitivity(
         &self,
         recognizer: &P,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         _prediction: i32,
@@ -415,7 +415,7 @@ where
     fn report_ambiguity(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -437,7 +437,7 @@ where
     fn report_attempting_full_context(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         conflicting_alts: &BitSet<u32>,
@@ -457,7 +457,7 @@ where
     fn report_context_sensitivity(
         &self,
         recognizer: &R,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         prediction: i32,

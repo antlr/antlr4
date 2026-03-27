@@ -1,11 +1,12 @@
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
-use crate::atn_config::ATNConfigType::LexerATNConfig;
 use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
+
+pub trait ATNConfigType: PartialEq + Eq + Hash + Debug + Clone {}
 
 #[derive(Clone)]
 pub struct ATNConfig<'ephemeral> {
@@ -16,7 +17,6 @@ pub struct ATNConfig<'ephemeral> {
     context: Option<&'ephemeral PredictionContext<'ephemeral>>,
     semantic_context: &'ephemeral SemanticContext,
     pub reaches_into_outer_context: i32,
-    pub(crate) config_type: ATNConfigType<'ephemeral>,
 }
 
 impl Eq for ATNConfig<'_> {}
@@ -26,7 +26,6 @@ impl PartialEq for ATNConfig<'_> {
         self.get_state() == other.get_state()
             && self.get_alt() == other.get_alt()
             && crate::prediction_context::opt_eq((&self.context, &other.context))
-            && self.get_type() == other.get_type()
             && self.semantic_context == other.semantic_context
             && self.precedence_filter_suppressed == other.precedence_filter_suppressed
     }
@@ -41,21 +40,6 @@ impl Hash for ATNConfig<'_> {
             Some(c) => c.hash(state),
         }
         self.semantic_context.hash(state);
-        if let LexerATNConfig {
-            lexer_action_executor,
-            passed_through_non_greedy_decision,
-        } = &self.config_type
-        {
-            state.write_i32(if *passed_through_non_greedy_decision {
-                1
-            } else {
-                0
-            });
-            match lexer_action_executor {
-                None => state.write_i32(0),
-                Some(ex) => ex.hash(state),
-            }
-        }
     }
 }
 
@@ -75,26 +59,9 @@ impl Debug for ATNConfig<'_> {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Debug)]
-pub(crate) enum ATNConfigType<'ephemeral> {
-    BaseATNConfig,
-    LexerATNConfig {
-        lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
-        passed_through_non_greedy_decision: bool,
-    },
-}
+impl ATNConfigType for ATNConfig<'_> {}
 
 impl<'ephemeral> ATNConfig<'ephemeral> {
-    pub(crate) fn get_lexer_executor(&self) -> Option<&LexerActionExecutor> {
-        match &self.config_type {
-            ATNConfigType::BaseATNConfig => None,
-            ATNConfigType::LexerATNConfig {
-                lexer_action_executor,
-                ..
-            } => lexer_action_executor.as_deref(),
-        }
-    }
-
     pub fn new(
         state: ATNStateRef,
         alt: i32,
@@ -107,21 +74,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
             context,
             semantic_context: &SemanticContext::NONE,
             reaches_into_outer_context: 0,
-            config_type: ATNConfigType::BaseATNConfig,
         }
-    }
-
-    pub fn new_lexer(
-        state: ATNStateRef,
-        alt: i32,
-        context: &'ephemeral PredictionContext<'ephemeral>,
-    ) -> Self {
-        let mut atnconfig = Self::new(state, alt, Some(context));
-        atnconfig.config_type = ATNConfigType::LexerATNConfig {
-            lexer_action_executor: None,
-            passed_through_non_greedy_decision: false,
-        };
-        atnconfig
     }
 
     pub fn with_semantic_context(self, semantic_context: &'ephemeral SemanticContext) -> Self {
@@ -132,30 +85,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
     }
 
     pub fn with_state(self, state: ATNStateRef) -> Self {
-        let config_type = if let ATNConfigType::LexerATNConfig {
-            lexer_action_executor,
-            passed_through_non_greedy_decision,
-        } = self.config_type
-        {
-            ATNConfigType::LexerATNConfig {
-                lexer_action_executor,
-                passed_through_non_greedy_decision: passed_through_non_greedy_decision
-                    || matches!(
-                        *state,
-                        ATNState::Decision(DecisionState {
-                            nongreedy: true,
-                            ..
-                        })
-                    ),
-            }
-        } else {
-            self.config_type
-        };
-        Self {
-            state,
-            config_type,
-            ..self
-        }
+        Self { state, ..self }
     }
 
     pub fn with_prediction_context(
@@ -165,33 +95,10 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         ATNConfig { context, ..self }
     }
 
-    pub(crate) fn with_lexer_executor(
-        self,
-        lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
-    ) -> Self {
-        let config_type = if let ATNConfigType::LexerATNConfig {
-            passed_through_non_greedy_decision,
-            ..
-        } = self.config_type
-        {
-            ATNConfigType::LexerATNConfig {
-                lexer_action_executor,
-                passed_through_non_greedy_decision,
-            }
-        } else {
-            self.config_type
-        };
-        ATNConfig {
-            config_type,
-            ..self
-        }
-    }
-
     pub(crate) fn make_static(
         self,
         prediction_context: Option<&'static PredictionContext<'static>>,
         semantic_context: &'static SemanticContext,
-        config_type: ATNConfigType<'static>,
     ) -> ATNConfig<'static> {
         ATNConfig {
             precedence_filter_suppressed: self.precedence_filter_suppressed,
@@ -200,7 +107,6 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
             context: prediction_context,
             semantic_context,
             reaches_into_outer_context: self.reaches_into_outer_context,
-            config_type,
         }
     }
 
@@ -210,10 +116,6 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
 
     pub fn get_alt(&self) -> i32 {
         self.alt
-    }
-
-    pub(crate) fn get_type(&self) -> &ATNConfigType<'ephemeral> {
-        &self.config_type
     }
 
     pub fn get_context(&self) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
@@ -246,5 +148,161 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
 
     pub fn set_precedence_filter_suppressed(&mut self, _v: bool) {
         self.precedence_filter_suppressed = _v;
+    }
+}
+
+#[derive(Clone)]
+pub struct LexerATNConfig<'ephemeral> {
+    base: ATNConfig<'ephemeral>,
+    lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
+    passed_through_non_greedy_decision: bool,
+}
+
+impl Debug for LexerATNConfig<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        f.write_fmt(format_args!(
+            "LexerATNConfig({:?},lexer_action_executor={:?},passed_through_non_greedy_decision={})",
+            self.base, self.lexer_action_executor, self.passed_through_non_greedy_decision
+        ))
+    }
+}
+
+impl Hash for LexerATNConfig<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.base.hash(state);
+
+        state.write_i32(if self.passed_through_non_greedy_decision {
+            1
+        } else {
+            0
+        });
+        match self.lexer_action_executor {
+            None => state.write_i32(0),
+            Some(ex) => ex.hash(state),
+        }
+    }
+}
+
+impl<'ephemeral> PartialEq for LexerATNConfig<'ephemeral> {
+    fn eq(&self, other: &Self) -> bool {
+        self.base == other.base
+            && self.passed_through_non_greedy_decision == other.passed_through_non_greedy_decision
+            && self.lexer_action_executor == other.lexer_action_executor
+    }
+}
+
+impl Eq for LexerATNConfig<'_> {}
+
+impl ATNConfigType for LexerATNConfig<'_> {}
+
+impl<'ephemeral> LexerATNConfig<'ephemeral> {
+    pub fn new(
+        state: ATNStateRef,
+        alt: i32,
+        context: &'ephemeral PredictionContext<'ephemeral>,
+    ) -> Self {
+        let base = ATNConfig::new(state, alt, Some(context));
+        LexerATNConfig {
+            base,
+            lexer_action_executor: None,
+            passed_through_non_greedy_decision: false,
+        }
+    }
+
+    pub(crate) fn get_lexer_executor(&self) -> Option<&LexerActionExecutor> {
+        self.lexer_action_executor
+    }
+
+    pub fn with_state(self, state: ATNStateRef) -> Self {
+        let passed_through_non_greedy_decision = self.passed_through_non_greedy_decision
+            || matches!(
+                *state,
+                ATNState::Decision(DecisionState {
+                    nongreedy: true,
+                    ..
+                })
+            );
+        Self {
+            base: self.base.with_state(state),
+            passed_through_non_greedy_decision,
+            ..self
+        }
+    }
+
+    pub fn with_prediction_context(
+        self,
+        context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+    ) -> Self {
+        Self {
+            base: self.base.with_prediction_context(context),
+            ..self
+        }
+    }
+
+    pub(crate) fn make_static(
+        self,
+        prediction_context: Option<&'static PredictionContext<'static>>,
+        semantic_context: &'static SemanticContext,
+        lexer_action_executor: Option<&'static LexerActionExecutor>,
+    ) -> LexerATNConfig<'static> {
+        LexerATNConfig {
+            base: self.base.make_static(prediction_context, semantic_context),
+            lexer_action_executor,
+            passed_through_non_greedy_decision: self.passed_through_non_greedy_decision,
+        }
+    }
+
+    pub(crate) fn with_lexer_executor(
+        self,
+        lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
+    ) -> Self {
+        Self {
+            lexer_action_executor,
+            ..self
+        }
+    }
+
+    pub fn get_state(&self) -> ATNStateRef {
+        self.base.get_state()
+    }
+
+    pub fn get_alt(&self) -> i32 {
+        self.base.get_alt()
+    }
+
+    pub fn get_context(&self) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+        self.base.get_context()
+    }
+
+    pub fn semantic_context(&self) -> &'ephemeral SemanticContext {
+        self.base.semantic_context()
+    }
+
+    pub fn take_context(&mut self) -> &'ephemeral PredictionContext<'ephemeral> {
+        self.base.take_context()
+    }
+
+    pub fn set_context(&mut self, context: &'ephemeral PredictionContext<'ephemeral>) {
+        self.base.set_context(context);
+    }
+
+    pub fn get_reaches_into_outer_context(&self) -> i32 {
+        self.base.get_reaches_into_outer_context()
+    }
+
+    pub fn set_reaches_into_outer_context(&mut self, v: i32) {
+        self.base.set_reaches_into_outer_context(v);
+    }
+
+    pub fn is_precedence_filter_suppressed(&self) -> bool {
+        self.base.is_precedence_filter_suppressed()
+    }
+
+    pub fn set_precedence_filter_suppressed(&mut self, v: bool) {
+        self.base.set_precedence_filter_suppressed(v);
+    }
+
+    pub fn has_passed_through_non_greedy_decision(&self) -> bool {
+        self.passed_through_non_greedy_decision
     }
 }

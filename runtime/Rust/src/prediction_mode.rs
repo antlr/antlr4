@@ -91,20 +91,23 @@ pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
     //    if all_configs_in_rule_stop_states(configs) {
     //        return true          checked outside
     //    }
-    let mut dup = ATNConfigSet::new(ephemerals, true);
-    let mut configs = configs;
+
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
+        let mut dup = ATNConfigSet::new(ephemerals, true);
         configs.get_items().for_each(|it| {
             let c = ATNConfig::new(it.get_state(), it.get_alt(), it.get_context())
                 .with_semantic_context(&SemanticContext::NONE);
             dup.add(c);
         });
-        configs = &dup;
+
+        let altsets = get_conflicting_alt_subsets(&dup);
+
+        has_conflicting_alt_set(&altsets) && !has_state_associated_with_one_alt(&dup)
+    } else {
+        let altsets = get_conflicting_alt_subsets(configs);
+
+        has_conflicting_alt_set(&altsets) && !has_state_associated_with_one_alt(configs)
     }
-
-    let altsets = get_conflicting_alt_subsets(configs);
-
-    has_conflicting_alt_set(&altsets) && !has_state_associated_with_one_alt(configs)
 }
 
 //fn all_configs_in_rule_stop_states(configs: &ATNConfigSet) -> bool {

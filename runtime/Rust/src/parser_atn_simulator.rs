@@ -76,7 +76,7 @@ use crate::transition::{
 /// **For more info see Java version**
 #[derive(Debug)]
 pub struct ParserATNSimulator {
-    base: BaseATNSimulator,
+    base: BaseATNSimulator<ATNConfigSet<'static>>,
     prediction_mode: Cell<PredictionMode>,
     start_index: Cell<isize>,
     // pd:PhantomData<P>
@@ -90,7 +90,7 @@ where
     P: Parser<'input, 'arena, TF>,
 {
     outer_context: &'arena P::Node,
-    dfa_ref: &'a DFA,
+    dfa_ref: &'a DFA<ATNConfigSet<'static>>,
     merge_cache: &'b mut MergeCache<'a>,
     precedence: i32,
     parser: &'a mut P,
@@ -120,7 +120,7 @@ impl ParserATNSimulator {
     /// creates new `ParserATNSimulator`
     pub fn new(
         atn: &'static ATN,
-        decision_to_dfa: &'static Vec<DFA>,
+        decision_to_dfa: &'static Vec<DFA<ATNConfigSet<'static>>>,
         shared_context_cache: &'static PredictionContextCache,
     ) -> ParserATNSimulator {
         ParserATNSimulator {
@@ -228,7 +228,7 @@ impl ParserATNSimulator {
     fn exec_atn<'a, 'b, 'input, 'arena, TF, P>(
         &self,
         local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-        s0: &'a DFAState<'a>,
+        s0: &'a DFAState<'a, ATNConfigSet<'static>>,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
@@ -351,9 +351,9 @@ impl ParserATNSimulator {
 
     #[allow(non_snake_case)]
     fn get_existing_target_state<'dfa>(
-        previousD: &DFAState<'dfa>,
+        previousD: &DFAState<'dfa, ATNConfigSet<'static>>,
         t: i32,
-    ) -> Option<&'dfa DFAState<'dfa>> {
+    ) -> Option<&'dfa DFAState<'dfa, ATNConfigSet<'static>>> {
         previousD.get_edge((t + 1) as usize)
     }
 
@@ -361,10 +361,10 @@ impl ParserATNSimulator {
     fn compute_target_state<'a, 'b, 'input, 'arena, TF, P>(
         &self,
         // dfa: &mut DFA,
-        previousD: &'a DFAState<'a>,
+        previousD: &'a DFAState<'a, ATNConfigSet<'static>>,
         t: i32,
         local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> &'a DFAState<'a>
+    ) -> &'a DFAState<'a, ATNConfigSet<'static>>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -426,7 +426,7 @@ impl ParserATNSimulator {
     fn predicate_dfa_state(
         &self,
         ephemerals: &bumpalo::Bump,
-        dfa_state: &mut ProposedDFAState,
+        dfa_state: &mut ProposedDFAState<ATNConfigSet<'_>>,
         decision_state: &ATNState,
     ) {
         let nalts = decision_state.get_transitions().len();
@@ -1479,10 +1479,10 @@ impl ParserATNSimulator {
 
     fn add_dfaedge<'dfa>(
         &self,
-        from: &'dfa DFAState<'dfa>,
+        from: &'dfa DFAState<'dfa, ATNConfigSet<'static>>,
         t: i32,
-        to: &'dfa DFAState<'dfa>,
-    ) -> &'dfa DFAState<'dfa> {
+        to: &'dfa DFAState<'dfa, ATNConfigSet<'static>>,
+    ) -> &'dfa DFAState<'dfa, ATNConfigSet<'static>> {
         if t < -1 || t > self.atn().max_token_type {
             return to;
         }
@@ -1491,15 +1491,19 @@ impl ParserATNSimulator {
         to
     }
 
-    fn add_dfastate<'dfa>(&self, dfa: &'dfa DFA, state: ProposedDFAState) -> &'dfa DFAState<'dfa> {
+    fn add_dfastate<'dfa>(
+        &self,
+        dfa: &'dfa DFA<ATNConfigSet<'static>>,
+        state: ProposedDFAState<ATNConfigSet<'_>>,
+    ) -> &'dfa DFAState<'dfa, ATNConfigSet<'static>> {
         dfa.add_state(state, self)
     }
 
     fn report_attempting_full_context<'input, 'arena, TF, P>(
         &self,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         conflicting_alts: &BitSet,
-        configs: &ATNConfigSet,
+        configs: &ATNConfigSet<'static>,
         start_index: isize,
         stop_index: isize,
         parser: &mut P,
@@ -1523,9 +1527,9 @@ impl ParserATNSimulator {
 
     fn report_context_sensitivity<'input, 'arena, TF, P>(
         &self,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         prediction: i32,
-        configs: &ATNConfigSet,
+        configs: &ATNConfigSet<'_>,
         start_index: isize,
         stop_index: isize,
         parser: &mut P,
@@ -1542,12 +1546,12 @@ impl ParserATNSimulator {
     #[allow(clippy::too_many_arguments)]
     fn report_ambiguity<'input, 'arena, TF, P>(
         &self,
-        dfa: &DFA,
+        dfa: &DFA<ATNConfigSet<'static>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet,
-        configs: &ATNConfigSet,
+        configs: &ATNConfigSet<'_>,
         parser: &mut P,
     ) where
         'input: 'arena,
@@ -1566,7 +1570,7 @@ impl ParserATNSimulator {
     }
 }
 
-impl IATNSimulator for ParserATNSimulator {
+impl IATNSimulator<ATNConfigSet<'static>> for ParserATNSimulator {
     fn shared_context_cache(&self) -> &PredictionContextCache {
         self.base.shared_context_cache()
     }
@@ -1575,7 +1579,7 @@ impl IATNSimulator for ParserATNSimulator {
         self.base.atn()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<DFA> {
+    fn decision_to_dfa(&self) -> &Vec<DFA<ATNConfigSet<'static>>> {
         self.base.decision_to_dfa()
     }
 }

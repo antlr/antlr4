@@ -11,7 +11,7 @@ use dbt_antlr4::char_stream::CharStream;
 use dbt_antlr4::int_stream::IntStream;
 use dbt_antlr4::lexer::{BaseLexer, LexerRecog, Lexer as _};
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
-use dbt_antlr4::dfa::DFA;
+use dbt_antlr4::dfa::LexerDFA as DFA;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
 use dbt_antlr4::PredictionContextCache;

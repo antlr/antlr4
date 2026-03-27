@@ -1,14 +1,19 @@
 use std::fmt::{Display, Formatter};
 
+use crate::atn_config_set::ConfigSet;
+
 use super::dfa_state::DFAState;
 use super::DFA;
 
-pub struct DFASerializer<'a, 'b> {
-    dfa: &'a DFA,
+pub struct DFASerializer<'a, 'b, CS>
+where
+    CS: ConfigSet + 'static,
+{
+    dfa: &'a DFA<CS>,
     get_edge_label: &'b dyn Fn(usize) -> String,
 }
 
-impl Display for DFASerializer<'_, '_> {
+impl<CS: ConfigSet> Display for DFASerializer<'_, '_, CS> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let states = self.dfa.get_states();
         for source in states {
@@ -26,18 +31,18 @@ impl Display for DFASerializer<'_, '_> {
     }
 }
 
-impl DFASerializer<'_, '_> {
+impl<CS: ConfigSet> DFASerializer<'_, '_, CS> {
     pub fn new<'a, 'b>(
-        dfa: &'a DFA,
+        dfa: &'a DFA<CS>,
         get_edge_label: &'b dyn Fn(usize) -> String,
-    ) -> DFASerializer<'a, 'b> {
+    ) -> DFASerializer<'a, 'b, CS> {
         DFASerializer {
             dfa,
             get_edge_label,
         }
     }
 
-    fn get_state_string(&self, state: &DFAState) -> String {
+    fn get_state_string(&self, state: &DFAState<CS>) -> String {
         let mut base_str = format!(
             "{}s{}{}",
             if state.is_accept_state { ":" } else { "" },

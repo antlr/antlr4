@@ -494,7 +494,7 @@ impl ATNStateRef {
     #[allow(clippy::mut_from_ref)]
     #[inline]
     pub(crate) unsafe fn as_mut(&self) -> &mut ATNState {
-        unsafe { &mut *(self.0.as_ptr() as *mut ATNState) }
+        unsafe { &mut *(self.0.as_ptr()) }
     }
 
     pub fn as_usize(&self) -> usize {
