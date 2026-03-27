@@ -1,3 +1,3 @@
-edition = "2018"
+edition = "2021"
 #fn_single_line = true
 #fn_args_layout = "Compressed"
