@@ -8,9 +8,10 @@ use crate::semantic_context::SemanticContext;
 
 pub trait ATNConfigType: PartialEq + Eq + Hash + Debug + Clone {}
 
+const SUPPRESS_PRECEDENCE_FILTER: i32 = 0x40000000;
+
 #[derive(Clone)]
 pub struct ATNConfig<'ephemeral> {
-    precedence_filter_suppressed: bool,
     state: ATNStateRef,
     alt: i32,
     //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
@@ -27,7 +28,7 @@ impl PartialEq for ATNConfig<'_> {
             && self.get_alt() == other.get_alt()
             && crate::prediction_context::opt_eq((&self.context, &other.context))
             && self.semantic_context == other.semantic_context
-            && self.precedence_filter_suppressed == other.precedence_filter_suppressed
+            && self.is_precedence_filter_suppressed() == other.is_precedence_filter_suppressed()
     }
 }
 
@@ -68,7 +69,6 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         context: Option<&'ephemeral PredictionContext<'ephemeral>>,
     ) -> Self {
         ATNConfig {
-            precedence_filter_suppressed: false,
             state,
             alt,
             context,
@@ -101,7 +101,6 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         semantic_context: &'static SemanticContext,
     ) -> ATNConfig<'static> {
         ATNConfig {
-            precedence_filter_suppressed: self.precedence_filter_suppressed,
             state: self.state,
             alt: self.alt,
             context: prediction_context,
@@ -142,12 +141,17 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         self.reaches_into_outer_context = _v
     }
 
+    #[inline]
     pub fn is_precedence_filter_suppressed(&self) -> bool {
-        self.precedence_filter_suppressed
+        self.reaches_into_outer_context & SUPPRESS_PRECEDENCE_FILTER != 0
     }
 
-    pub fn set_precedence_filter_suppressed(&mut self, _v: bool) {
-        self.precedence_filter_suppressed = _v;
+    pub fn set_precedence_filter_suppressed(&mut self, value: bool) {
+        if value {
+            self.reaches_into_outer_context |= SUPPRESS_PRECEDENCE_FILTER;
+        } else {
+            self.reaches_into_outer_context &= !SUPPRESS_PRECEDENCE_FILTER;
+        }
     }
 }
 
@@ -294,6 +298,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self.base.set_reaches_into_outer_context(v);
     }
 
+    #[inline]
     pub fn is_precedence_filter_suppressed(&self) -> bool {
         self.base.is_precedence_filter_suppressed()
     }
