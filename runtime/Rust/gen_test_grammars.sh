@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TOOL_VERSION="4.13.3-DBT110"
+TOOL_VERSION="4.13.3-DBT120"
 ANTLR_PATH="../../../tool/target/antlr4-${TOOL_VERSION}-complete.jar"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

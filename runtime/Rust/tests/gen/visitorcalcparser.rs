@@ -32,7 +32,7 @@ use std::marker::PhantomData;
 use std::sync::{LazyLock, Arc};
 use std::ops::{DerefMut, Deref};
 
-dbt_antlr4::check_version!("1","1");
+dbt_antlr4::check_version!("1","2");
 pub const VisitorCalc_INT:i32=1; 
 pub const VisitorCalc_MUL:i32=2; 
 pub const VisitorCalc_DIV:i32=3; 

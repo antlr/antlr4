@@ -30,7 +30,7 @@ use std::marker::PhantomData;
 use std::sync::{LazyLock, Arc};
 use std::ops::{DerefMut, Deref};
 
-dbt_antlr4::check_version!("1","1");
+dbt_antlr4::check_version!("1","2");
 pub const SimpleLR_ID:i32=1; 
 pub const SimpleLR_WS:i32=2;
 pub const SimpleLR_EOF:i32=EOF;

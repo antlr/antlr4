@@ -30,7 +30,7 @@ use std::marker::PhantomData;
 use std::sync::{LazyLock, Arc};
 use std::ops::{DerefMut, Deref};
 
-dbt_antlr4::check_version!("1","1");
+dbt_antlr4::check_version!("1","2");
 pub const Labels_T__0:i32=1; 
 pub const Labels_T__1:i32=2; 
 pub const Labels_T__2:i32=3; 
