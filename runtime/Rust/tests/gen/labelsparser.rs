@@ -144,29 +144,6 @@ impl LabelsTreeWalker
     }
 }
 
-impl<'input, 'arena, Input, TF> Deref for LabelsParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    type Target = BaseParserType<'input, 'arena, Input, TF>;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl<'input, 'arena, Input, TF> DerefMut for LabelsParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
 #[derive(Debug)]
 pub enum LabelsParserContextNode<'input, 'arena> {
     SContext(SContext<'input, 'arena>),
@@ -176,6 +153,7 @@ pub enum LabelsParserContextNode<'input, 'arena> {
     Error(ErrorNode<'input, 'arena>),
 }
 
+dbt_antlr4::impl_deref! { parser => LabelsParser }
 dbt_antlr4::impl_defaults! { LabelsParserContextNode }
 dbt_antlr4::impl_from_contexts! { LabelsParserContextNode { SContext(SContext),   EContext(EContextAll), } }
 dbt_antlr4::impl_tree! { LabelsParserContextNode { SContext, EContext, } }

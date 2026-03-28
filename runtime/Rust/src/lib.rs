@@ -829,3 +829,55 @@ macro_rules! impl_token_source {
         }
     };
 }
+
+#[macro_export]
+macro_rules! impl_deref {
+    (parser => $parser_name:ident) => {
+        impl<'input, 'arena, Input, TF> Deref for $parser_name<'input, 'arena, Input, TF>
+        where
+            'input: 'arena,
+            TF: TokenFactory<'input, 'arena> + 'arena,
+            Input: TokenStream<'input, 'arena, TF> + 'arena,
+        {
+            type Target = BaseParserType<'input, 'arena, Input, TF>;
+            fn deref(&self) -> &Self::Target {
+                &self.base
+            }
+        }
+
+        impl<'input, 'arena, Input, TF> DerefMut for $parser_name<'input, 'arena, Input, TF>
+        where
+            'input: 'arena,
+            TF: TokenFactory<'input, 'arena> + 'arena,
+            Input: TokenStream<'input, 'arena, TF> + 'arena,
+        {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.base
+            }
+        }
+    };
+    (lexer => $lexer_name:ident) => {
+        impl<'input, 'arena, Input, TF> Deref for $lexer_name<'input, 'arena, Input, TF>
+        where
+            'input: 'arena,
+            TF: TokenFactory<'input, 'arena> + 'arena,
+            Input: CharStream<'input> + 'arena,
+        {
+            type Target = BaseLexerType<'input, 'arena, Input, TF>;
+            fn deref(&self) -> &Self::Target {
+                &self.base
+            }
+        }
+
+        impl<'input, 'arena, Input, TF> DerefMut for $lexer_name<'input, 'arena, Input, TF>
+        where
+            'input: 'arena,
+            TF: TokenFactory<'input, 'arena> + 'arena,
+            Input: CharStream<'input> + 'arena,
+        {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.base
+            }
+        }
+    };
+}

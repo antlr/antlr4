@@ -150,29 +150,6 @@ impl CSVTreeWalker
     }
 }
 
-impl<'input, 'arena, Input, TF> Deref for CSVParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    type Target = BaseParserType<'input, 'arena, Input, TF>;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl<'input, 'arena, Input, TF> DerefMut for CSVParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
 #[derive(Debug)]
 pub enum CSVParserContextNode<'input, 'arena> {
     CsvFileContext(CsvFileContext<'input, 'arena>),
@@ -184,6 +161,7 @@ pub enum CSVParserContextNode<'input, 'arena> {
     Error(ErrorNode<'input, 'arena>),
 }
 
+dbt_antlr4::impl_deref! { parser => CSVParser }
 dbt_antlr4::impl_defaults! { CSVParserContextNode }
 dbt_antlr4::impl_from_contexts! { CSVParserContextNode { CsvFileContext(CsvFileContext),  HdrContext(HdrContext),  RowContext(RowContext),  FieldContext(FieldContext),  } }
 dbt_antlr4::impl_tree! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext, } }

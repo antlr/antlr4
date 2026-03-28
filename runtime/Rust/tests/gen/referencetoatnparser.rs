@@ -135,29 +135,6 @@ impl ReferenceToATNTreeWalker
     }
 }
 
-impl<'input, 'arena, Input, TF> Deref for ReferenceToATNParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    type Target = BaseParserType<'input, 'arena, Input, TF>;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl<'input, 'arena, Input, TF> DerefMut for ReferenceToATNParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
 #[derive(Debug)]
 pub enum ReferenceToATNParserContextNode<'input, 'arena> {
     AContext(AContext<'input, 'arena>),
@@ -166,6 +143,7 @@ pub enum ReferenceToATNParserContextNode<'input, 'arena> {
     Error(ErrorNode<'input, 'arena>),
 }
 
+dbt_antlr4::impl_deref! { parser => ReferenceToATNParser }
 dbt_antlr4::impl_defaults! { ReferenceToATNParserContextNode }
 dbt_antlr4::impl_from_contexts! { ReferenceToATNParserContextNode { AContext(AContext),  } }
 dbt_antlr4::impl_tree! { ReferenceToATNParserContextNode { AContext, } }

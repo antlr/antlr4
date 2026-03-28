@@ -69,6 +69,7 @@ where
 }
 
 dbt_antlr4::impl_token_source! { LabelsLexer }
+dbt_antlr4::impl_deref! { lexer => LabelsLexer }
 
 impl<'input, 'arena, Input, TF> LabelsLexer<'input, 'arena, Input, TF>
 where
@@ -82,29 +83,6 @@ where
         };
         let base = BaseLexerType::new_base_lexer(input, actions, token_factory);
         Self { base }
-    }
-}
-
-impl<'input, 'arena, Input, TF> Deref for LabelsLexer<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: CharStream<'input>,
-{
-    type Target = BaseLexerType<'input, 'arena, Input, TF>;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl<'input, 'arena, Input, TF> DerefMut for LabelsLexer<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: CharStream<'input>,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
     }
 }
 

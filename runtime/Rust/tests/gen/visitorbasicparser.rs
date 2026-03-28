@@ -142,29 +142,6 @@ impl VisitorBasicTreeWalker
     }
 }
 
-impl<'input, 'arena, Input, TF> Deref for VisitorBasicParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    type Target = BaseParserType<'input, 'arena, Input, TF>;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl<'input, 'arena, Input, TF> DerefMut for VisitorBasicParser<'input, 'arena, Input, TF>
-where
-    'input: 'arena,
-    TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
 #[derive(Debug)]
 pub enum VisitorBasicParserContextNode<'input, 'arena> {
     SContext(SContext<'input, 'arena>),
@@ -173,6 +150,7 @@ pub enum VisitorBasicParserContextNode<'input, 'arena> {
     Error(ErrorNode<'input, 'arena>),
 }
 
+dbt_antlr4::impl_deref! { parser => VisitorBasicParser }
 dbt_antlr4::impl_defaults! { VisitorBasicParserContextNode }
 dbt_antlr4::impl_from_contexts! { VisitorBasicParserContextNode { SContext(SContext),  } }
 dbt_antlr4::impl_tree! { VisitorBasicParserContextNode { SContext, } }
