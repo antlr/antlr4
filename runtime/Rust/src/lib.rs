@@ -153,7 +153,38 @@ pub mod vocabulary;
 // ======= Re-exports ========
 pub use stacker;
 
+pub const VERSION_MAJOR: &str = env!("CARGO_PKG_VERSION_MAJOR");
+pub const VERSION_MINOR: &str = env!("CARGO_PKG_VERSION_MINOR");
+
 // ======= Macros =======
+
+pub const fn version_str_eq(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    let mut i = 0;
+    while i < a.len() {
+        if a[i] != b[i] {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+#[macro_export]
+macro_rules! check_version {
+    ($major:literal, $minor:literal) => {
+        const _: () = assert!(
+            $crate::version_str_eq($major, $crate::VERSION_MAJOR)
+                && $crate::version_str_eq($minor, $crate::VERSION_MINOR),
+            "Generated parser is not compatible with current runtime version, \
+             please regenerate using the matching ANTLR tool version, \
+             or update the runtime to match the version used for generation."
+        );
+    };
+}
 
 #[macro_export]
 macro_rules! impl_tree {

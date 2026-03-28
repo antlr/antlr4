@@ -32,6 +32,7 @@ use std::marker::PhantomData;
 use std::sync::{LazyLock, Arc};
 use std::ops::{DerefMut, Deref};
 
+dbt_antlr4::check_version!("1","1");
 pub const VisitorBasic_A:i32=1;
 pub const VisitorBasic_EOF:i32=EOF;
 pub const RULE_s:usize = 0;
@@ -69,7 +70,6 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-		dbt_antlr4::recognizer::check_version("1","1");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,

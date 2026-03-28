@@ -23,6 +23,7 @@ use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 use std::ops::{DerefMut, Deref};
 use std::sync::LazyLock;
 
+dbt_antlr4::check_version!("1","1");
 pub const ID:i32=1; 
 pub const ATN:i32=2; 
 pub const WS:i32=3;
@@ -68,7 +69,6 @@ where
     Input: CharStream<'input>,
 {
     pub fn new(arena: &'arena Arena, input: Input) -> Self {
-        dbt_antlr4::recognizer::check_version("1","1");
         let token_factory = TF::new(arena);
         let actions = ReferenceToATNLexerActions {
         };

@@ -30,6 +30,7 @@ use std::marker::PhantomData;
 use std::sync::{LazyLock, Arc};
 use std::ops::{DerefMut, Deref};
 
+dbt_antlr4::check_version!("1","1");
 pub const SimpleLR_ID:i32=1; 
 pub const SimpleLR_WS:i32=2;
 pub const SimpleLR_EOF:i32=EOF;
@@ -68,7 +69,6 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-		dbt_antlr4::recognizer::check_version("1","1");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,

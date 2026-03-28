@@ -245,6 +245,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+dbt_antlr4::check_version!("1","1");
 <if(parser.tokens)>
 <parser.tokens:{k | pub const <parser.grammarName>_<k>:i32=<parser.tokens.(k)>;}; separator=" \n">
 <endif>
@@ -277,7 +278,6 @@ where
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box\<dyn ErrorStrategy\<'input, 'arena, TF, BaseParserType\<'input, 'arena, Input, TF>\> + 'arena>) -> Self {
-		dbt_antlr4::recognizer::check_version("1","1");
 		let interpreter = Arc::new(ParserATNSimulator::new(
 			&_ATN,
 			&_decision_to_DFA,
@@ -1264,6 +1264,7 @@ use std::sync::LazyLock;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+dbt_antlr4::check_version!("1","1");
 <if(lexer.tokens)>
 <lexer.tokens:{k | pub const <k>:i32=<lexer.tokens.(k)>}; separator="; \n", wrap, anchor>;
 <endif>
@@ -1303,7 +1304,6 @@ where
     Input: CharStream\<'input>,
 {
     pub fn new(arena: &'arena Arena, input: Input) -> Self {
-        dbt_antlr4::recognizer::check_version("1","1");
         let token_factory = TF::new(arena);
         let actions = <lexer.name>Actions {
             <namedActions.init>
