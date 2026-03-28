@@ -20,16 +20,6 @@ pub trait ConfigSet: PartialEq + Eq + Hash {
     fn new_empty() -> Self;
 
     fn hash_code(&self) -> u64;
-
-    // fn get_items(&self) -> Box<dyn Iterator<Item = &Self::ConfigType> + '_>;
-
-    // fn length(&self) -> usize;
-
-    // fn is_empty(&self) -> bool;
-
-    // fn has_semantic_context(&self) -> bool;
-
-    // fn set_has_semantic_context(&mut self, v: bool);
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
