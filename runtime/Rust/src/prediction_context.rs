@@ -341,7 +341,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
                     merge_cache.alloc([a.parent_ctx, b.parent_ctx])
                 };
                 let return_states = merge_cache
-                    .ephemerals
+                    .scratch()
                     .alloc([a.return_state, b.return_state]);
 
                 if return_states[0] > return_states[1] {
@@ -461,7 +461,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         merge_cache: &mut MergeCache<'ephemeral>,
     ) {
         let mut uniq_parents =
-            hashbrown::HashMap::with_hasher_in(NoopHasherBuilder {}, merge_cache.ephemerals);
+            hashbrown::HashMap::with_hasher_in(NoopHasherBuilder {}, merge_cache.scratch());
         for parent in parents.iter() {
             uniq_parents.entry(*parent).or_insert_with(|| *parent);
         }

@@ -12,12 +12,12 @@ use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
 
 #[derive(Eq, PartialEq, Debug)]
-pub struct PredPrediction {
+pub struct PredPrediction<'ephemeral> {
     pub(crate) alt: i32,
-    pub(crate) pred: SemanticContext,
+    pub(crate) pred: SemanticContext<'ephemeral>,
 }
 
-impl Display for PredPrediction {
+impl Display for PredPrediction<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.write_fmt(format_args!("({},{:?})", self.alt, self.pred))
     }
@@ -33,7 +33,7 @@ where
     pub prediction: i32,
     pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor>>,
     pub requires_full_context: bool,
-    pub predicates: Vec<PredPrediction>,
+    pub predicates: Vec<PredPrediction<'ephemeral>>,
 
     _marker: std::marker::PhantomData<&'ephemeral ()>,
 }
@@ -84,7 +84,7 @@ where
     pub prediction: i32,
     pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor>>,
     pub requires_full_context: bool,
-    pub predicates: Vec<PredPrediction>,
+    pub predicates: Vec<PredPrediction<'dfa>>,
     // dfa_ref: PhantomData<&'dfa super::DFA>,
 }
 

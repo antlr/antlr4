@@ -111,8 +111,8 @@ where
         self.outer_context
     }
 
-    fn ephemerals(&self) -> &'a bumpalo::Bump {
-        self.merge_cache.ephemerals
+    fn scratch(&self) -> &'a bumpalo::Bump {
+        self.merge_cache.scratch
     }
 }
 
@@ -298,7 +298,7 @@ impl ParserATNSimulator {
                     PredictionContext::from_rule_context(
                         self.atn(),
                         local.outer_context(),
-                        local.merge_cache.ephemerals,
+                        local.merge_cache.scratch,
                     ),
                     true,
                     local,
@@ -395,7 +395,7 @@ impl ParserATNSimulator {
             D.prediction = predicted_alt
         } else if Self::all_configs_in_rule_stop_state(&D.configs)
             || has_sll_conflict_terminating_prediction(
-                local.ephemerals(),
+                local.scratch(),
                 self.prediction_mode.get(),
                 &D.configs,
             )
@@ -410,7 +410,7 @@ impl ParserATNSimulator {
         //        println!("target config {:?}",&D.configs);
         if D.is_accept_state && D.configs.has_semantic_context() {
             let decision_state = self.atn().decision_to_state[local.dfa_ref.decision as usize];
-            self.predicate_dfa_state(local.ephemerals(), &mut D, &decision_state);
+            self.predicate_dfa_state(local.scratch(), &mut D, &decision_state);
             //            println!("predicates compute target {:?}",&D.predicates);
             if !D.predicates.is_empty() {
                 D.prediction = INVALID_ALT
@@ -423,17 +423,17 @@ impl ParserATNSimulator {
         D
     }
 
-    fn predicate_dfa_state(
+    fn predicate_dfa_state<'scratch>(
         &self,
-        ephemerals: &bumpalo::Bump,
-        dfa_state: &mut ProposedDFAState<ATNConfigSet<'_>>,
+        scratch: &'scratch bumpalo::Bump,
+        dfa_state: &mut ProposedDFAState<ATNConfigSet<'scratch>>,
         decision_state: &ATNState,
     ) {
         let nalts = decision_state.get_transitions().len();
         let alts_to_collect_preds_from =
             self.get_conflicting_alts_or_unique_alt(&dfa_state.configs);
         let alt_to_pred = self.get_preds_for_ambig_alts(
-            ephemerals,
+            scratch,
             &alts_to_collect_preds_from,
             &dfa_state.configs,
             nalts,
@@ -551,9 +551,9 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         //        println!("in computeReachSet, starting closure: {:?}",closure);
-        let mut intermediate = ATNConfigSet::new(local.ephemerals(), full_ctx);
+        let mut intermediate = ATNConfigSet::new(local.scratch(), full_ctx);
 
-        let mut skipped_stop_states = bumpalo::collections::Vec::new_in(local.ephemerals());
+        let mut skipped_stop_states = bumpalo::collections::Vec::new_in(local.scratch());
 
         for c in closure.get_items() {
             let state = c.get_state();
@@ -582,8 +582,8 @@ impl ParserATNSimulator {
             look_to_end_of_rule = true;
             intermediate
         } else {
-            let mut reach = ATNConfigSet::new(local.ephemerals(), full_ctx);
-            let mut closure_busy = HashSet::new_in(local.ephemerals());
+            let mut reach = ATNConfigSet::new(local.scratch(), full_ctx);
+            let mut closure_busy = HashSet::new_in(local.scratch());
             //            println!("calc reach {:?}",intermediate.length());
 
             for c in intermediate.into_iter() {
@@ -650,7 +650,7 @@ impl ParserATNSimulator {
 
         // can just remove instead of creating new instance because we own configs
         // it significantly differs from java version though
-        let mut result = ATNConfigSet::new(merge_cache.ephemerals, configs.full_context());
+        let mut result = ATNConfigSet::new(merge_cache.scratch, configs.full_context());
         for c in configs.into_iter() {
             let state = c.get_state();
             if matches!(*state, ATNState::RuleStop(_)) {
@@ -684,14 +684,14 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         //        let initial_ctx = PredictionContext::prediction_context_from_rule_context(self.atn(),ctx);
-        let mut configs = ATNConfigSet::new(local.ephemerals(), full_ctx);
+        let mut configs = ATNConfigSet::new(local.scratch(), full_ctx);
         //        println!("initial {:?}",initial_ctx);
         //        println!("initial state {:?}",a);
 
         for (i, tr) in a.get_transitions().iter().enumerate() {
             let target = tr.get_target();
             let c = ATNConfig::new(target, (i + 1) as i32, Some(initial_ctx));
-            let mut closure_busy = HashSet::new_in(local.ephemerals());
+            let mut closure_busy = HashSet::new_in(local.scratch());
             self.closure(
                 c,
                 &mut configs,
@@ -718,8 +718,8 @@ impl ParserATNSimulator {
         P: Parser<'input, 'arena, TF>,
     {
         //println!("apply_precedence_filter");
-        let mut states_from_alt1 = HashMap::new_in(local.ephemerals());
-        let mut config_set = ATNConfigSet::new(local.ephemerals(), configs.full_context());
+        let mut states_from_alt1 = HashMap::new_in(local.scratch());
+        let mut config_set = ATNConfigSet::new(local.scratch(), configs.full_context());
 
         for config in configs.get_items() {
             if config.get_alt() != 1 {
@@ -727,7 +727,7 @@ impl ParserATNSimulator {
             }
 
             let updated_sem_ctx = config.semantic_context().eval_precedence(
-                local.ephemerals(),
+                local.scratch(),
                 local.parser,
                 local.outer_context(),
             );
@@ -739,7 +739,7 @@ impl ParserATNSimulator {
                     config_set.add_cached(
                         ATNConfig::new(config.get_state(), config.get_alt(), config.get_context())
                             .with_semantic_context(
-                                local.merge_cache.alloc_with_drop(updated_sem_ctx.clone()),
+                                local.merge_cache.alloc(updated_sem_ctx.clone()),
                             ),
                         local.merge_cache,
                     );
@@ -773,13 +773,13 @@ impl ParserATNSimulator {
         None
     }
 
-    fn get_preds_for_ambig_alts(
+    fn get_preds_for_ambig_alts<'scratch>(
         &self,
-        ephemerals: &bumpalo::Bump,
+        ephemerals: &'scratch bumpalo::Bump,
         ambig_alts: &BitSet,
-        configs: &ATNConfigSet,
+        configs: &ATNConfigSet<'scratch>,
         nalts: usize,
-    ) -> Option<Vec<SemanticContext>> {
+    ) -> Option<Vec<SemanticContext<'scratch>>> {
         let mut alt_to_pred = bumpalo::collections::Vec::with_capacity_in(nalts + 1, ephemerals);
         alt_to_pred.resize(nalts + 1, None);
         for c in configs.get_items() {
@@ -815,11 +815,11 @@ impl ParserATNSimulator {
         Some(alt_to_pred)
     }
 
-    fn get_predicate_predictions(
+    fn get_predicate_predictions<'scratch>(
         &self,
         ambig_alts: &BitSet,
-        alt_to_pred: Vec<SemanticContext>,
-    ) -> Vec<PredPrediction> {
+        alt_to_pred: Vec<SemanticContext<'scratch>>,
+    ) -> Vec<PredPrediction<'scratch>> {
         let mut pairs = vec![];
         let mut contains_predicate = false;
         for (i, pred) in alt_to_pred.into_iter().enumerate().skip(1) {
@@ -886,8 +886,8 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        let mut succeeded = ATNConfigSet::new(local.ephemerals(), configs.full_context());
-        let mut failed = ATNConfigSet::new(local.ephemerals(), configs.full_context());
+        let mut succeeded = ATNConfigSet::new(local.scratch(), configs.full_context());
+        let mut failed = ATNConfigSet::new(local.scratch(), configs.full_context());
         for c in configs.get_items() {
             let clone = c.clone();
             if c.semantic_context() != &SemanticContext::NONE {
@@ -1342,7 +1342,7 @@ impl ParserATNSimulator {
                 }
             } else {
                 let new_sem_ctx = SemanticContext::and(
-                    local.ephemerals(),
+                    local.scratch(),
                     Some(config.semantic_context()),
                     pt.get_predicate(),
                 );
@@ -1391,7 +1391,7 @@ impl ParserATNSimulator {
                 }
             } else {
                 let new_sem_ctx = SemanticContext::and(
-                    local.ephemerals(),
+                    local.scratch(),
                     Some(config.semantic_context()),
                     pt.get_predicate(),
                 );
@@ -1399,7 +1399,7 @@ impl ParserATNSimulator {
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(local.merge_cache.alloc_with_drop(new_sem_ctx)),
+                        .with_semantic_context(local.merge_cache.alloc(new_sem_ctx)),
                 );
             }
         } else {
@@ -1584,69 +1584,54 @@ impl IATNSimulator<ATNConfigSet<'static>> for ParserATNSimulator {
     }
 }
 
-pub(crate) struct MergeCache<'ephemeral> {
+pub(crate) struct MergeCache<'scratch> {
     map: HashMap<
-        MergeKey<'ephemeral>,
-        &'ephemeral PredictionContext<'ephemeral>,
+        MergeKey<'scratch>,
+        &'scratch PredictionContext<'scratch>,
         NoopHasherBuilder,
-        &'ephemeral bumpalo::Bump,
+        &'scratch bumpalo::Bump,
     >,
 
-    drop_list: Vec<Box<dyn FnOnce() + 'ephemeral>>,
-    pub ephemerals: &'ephemeral bumpalo::Bump,
+    scratch: &'scratch bumpalo::Bump,
 }
 
-impl<'ephemeral> MergeCache<'ephemeral> {
-    pub fn new(ephemerals: &'ephemeral bumpalo::Bump) -> Self {
+impl<'scratch> MergeCache<'scratch> {
+    pub fn new(scratch: &'scratch bumpalo::Bump) -> Self {
         Self {
-            map: HashMap::with_hasher_in(NoopHasherBuilder {}, ephemerals),
-            drop_list: Vec::new(),
-            ephemerals,
+            map: HashMap::with_hasher_in(NoopHasherBuilder {}, scratch),
+            scratch,
         }
     }
 
-    pub fn alloc_vec<T>(&self, capacity: usize) -> bumpalo::collections::Vec<'ephemeral, T> {
-        bumpalo::collections::Vec::with_capacity_in(capacity, self.ephemerals)
+    pub fn scratch(&self) -> &'scratch bumpalo::Bump {
+        self.scratch
     }
 
-    pub fn alloc<T>(&self, value: T) -> &'ephemeral mut T {
-        self.ephemerals.alloc(value)
+    pub fn alloc_vec<T>(&self, capacity: usize) -> bumpalo::collections::Vec<'scratch, T> {
+        bumpalo::collections::Vec::with_capacity_in(capacity, self.scratch)
     }
 
-    pub fn alloc_with_drop<T>(&mut self, value: T) -> &'ephemeral mut T {
-        let res = self.ephemerals.alloc(value);
-        let ptr = res as *mut T;
-        self.drop_list.push(Box::new(move || unsafe {
-            std::ptr::drop_in_place(ptr);
-        }));
-        res
+    pub fn alloc<T>(&self, value: T) -> &'scratch mut T {
+        self.scratch.alloc(value)
     }
 
-    pub fn get(&self, key: &MergeKey) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+    pub fn get(&self, key: &MergeKey) -> Option<&'scratch PredictionContext<'scratch>> {
         self.map.get(key).cloned()
     }
 
     pub fn insert(
         &mut self,
-        key: MergeKey<'ephemeral>,
-        value: &'ephemeral PredictionContext<'ephemeral>,
+        key: MergeKey<'scratch>,
+        value: &'scratch PredictionContext<'scratch>,
     ) {
         self.map.insert(key, value);
     }
 }
 
-impl Drop for MergeCache<'_> {
-    fn drop(&mut self) {
-        for drop_fn in self.drop_list.drain(..).rev() {
-            drop_fn();
-        }
-    }
-}
-
 #[derive(Eq)]
-pub struct MergeKey<'ephemeral> {
-    pub left: &'ephemeral PredictionContext<'ephemeral>,
-    pub right: &'ephemeral PredictionContext<'ephemeral>,
+pub struct MergeKey<'scratch> {
+    pub left: &'scratch PredictionContext<'scratch>,
+    pub right: &'scratch PredictionContext<'scratch>,
 }
 
 impl PartialEq for MergeKey<'_> {
@@ -1677,10 +1662,10 @@ impl std::hash::Hash for MergeKey<'_> {
     }
 }
 
-impl<'ephemeral> MergeKey<'ephemeral> {
+impl<'scratch> MergeKey<'scratch> {
     pub fn new(
-        left: &'ephemeral PredictionContext<'ephemeral>,
-        right: &'ephemeral PredictionContext<'ephemeral>,
+        left: &'scratch PredictionContext<'scratch>,
+        right: &'scratch PredictionContext<'scratch>,
     ) -> Self {
         Self { left, right }
     }

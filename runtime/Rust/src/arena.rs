@@ -64,3 +64,16 @@ impl Arena {
         self.payloads.alloc(value)
     }
 }
+
+pub(crate) fn is_in_arena<T>(ptr: &T, arena: &bumpalo::Bump) -> bool {
+    let p = ptr as *const T as usize;
+    // SAFETY: We're not allocating from the arena while iterating over the
+    // chunks
+    unsafe {
+        arena.iter_allocated_chunks_raw().any(|(start, size)| {
+            let start = start as usize;
+            let end = start + size;
+            p >= start && p < end
+        })
+    }
+}

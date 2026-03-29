@@ -1,52 +1,35 @@
-use std::borrow::Cow::{Borrowed, Owned};
-use std::borrow::{Borrow, Cow};
 use std::cmp::Ordering;
-use std::sync::{Arc, LazyLock};
 
+use bumpalo::collections::CollectIn;
 use hashbrown::{DefaultHashBuilder, HashSet};
 
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
 
-//pub trait SemanticContext:Sync + Send {
-///    fn evaluate(&self, parser: &Recognizer, outerContext: &RuleContext) -> bool;
-///    fn eval_precedence(&self, parser: &Recognizer, outerContext: &RuleContext, ) -> Box<dyn SemanticContext>;
-//}
-
-// fn empty() -> SemanticContext {
-//     SemanticContext::Predicate {
-//         rule_index: -1,
-//         pred_index: -1,
-//         is_ctx_dependent: false,
-//     }
-// }
-
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
-pub enum SemanticContext {
+pub enum SemanticContext<'ephemeral> {
     Predicate {
         rule_index: i32,
         pred_index: i32,
         is_ctx_dependent: bool,
     },
     Precedence(i32),
-    And(Arc<[SemanticContext]>),
-    Or(Arc<[SemanticContext]>),
+    And(&'ephemeral [SemanticContext<'ephemeral>]),
+    Or(&'ephemeral [SemanticContext<'ephemeral>]),
 }
 
-impl SemanticContext {
-    pub const NONE: SemanticContext = SemanticContext::Predicate {
+impl<'ephemeral> SemanticContext<'ephemeral> {
+    pub const NONE: SemanticContext<'static> = SemanticContext::Predicate {
         rule_index: -1,
         pred_index: -1,
         is_ctx_dependent: false,
     };
 
-    pub fn none() -> Arc<SemanticContext> {
-        static NONE: LazyLock<Arc<SemanticContext>> =
-            LazyLock::new(|| Arc::new(SemanticContext::NONE));
-        NONE.clone()
+    pub fn none() -> &'static SemanticContext<'static> {
+        &Self::NONE
     }
 
-    pub(crate) fn evaluate<'ephemeral, 'input, 'arena, TF, P>(
+    pub(crate) fn evaluate<'input, 'arena, TF, P>(
         &self,
         parser: &mut P,
         outer_context: &'arena P::Node,
@@ -75,36 +58,37 @@ impl SemanticContext {
         }
     }
 
-    pub(crate) fn eval_precedence<'a, 'ephemeral, 'input, 'arena, TF, P>(
+    pub(crate) fn eval_precedence<'a, 'scratch, 'input, 'arena, TF, P>(
         &'a self,
-        ephemerals: &'ephemeral bumpalo::Bump,
+        scratch: &'scratch bumpalo::Bump,
         parser: &P,
         outer_context: &'arena P::Node,
-    ) -> Option<Cow<'a, SemanticContext>>
+    ) -> Option<&'scratch SemanticContext<'scratch>>
     where
+        'a: 'scratch,
         'input: 'arena,
         P: Parser<'input, 'arena, TF>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
         match self {
-            SemanticContext::Predicate { .. } => Some(Borrowed(self)),
+            SemanticContext::Predicate { .. } => Some(self),
             SemanticContext::Precedence(prec) => {
                 if parser.precpred(Some(outer_context), *prec) {
-                    Some(Owned(Self::NONE))
+                    Some(Self::none())
                 } else {
                     None
                 }
             }
             SemanticContext::Or(ops) => {
                 let mut differs = false;
-                let mut operands = bumpalo::collections::Vec::new_in(ephemerals);
+                let mut operands = bumpalo::collections::Vec::new_in(scratch);
                 for context in ops.iter() {
-                    let evaluated = context.eval_precedence(ephemerals, parser, outer_context);
+                    let evaluated = context.eval_precedence(scratch, parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
                     if let Some(evaluated) = evaluated {
                         if *evaluated == Self::NONE {
-                            return Some(Owned(Self::NONE));
+                            return Some(Self::none());
                         } else {
                             operands.push(evaluated);
                         }
@@ -112,24 +96,20 @@ impl SemanticContext {
                 }
 
                 if !differs {
-                    return Some(Borrowed(self));
+                    return Some(self);
                 }
 
                 if operands.is_empty() {
                     return None;
                 }
 
-                let mut operands = operands.drain(..);
-                let result = operands.next().unwrap();
-                Some(operands.fold(result, |acc, it| {
-                    Owned(SemanticContext::or(ephemerals, Some(acc), Some(it)))
-                }))
+                Some(scratch.alloc(Self::new_or(scratch, operands.as_slice())))
             }
             SemanticContext::And(ops) => {
                 let mut differs = false;
-                let mut operands = bumpalo::collections::Vec::new_in(ephemerals);
+                let mut operands = bumpalo::collections::Vec::new_in(scratch);
                 for context in ops.iter() {
-                    let evaluated = context.eval_precedence(ephemerals, parser, outer_context);
+                    let evaluated = context.eval_precedence(scratch, parser, outer_context);
                     differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
 
                     if let Some(evaluated) = evaluated {
@@ -142,40 +122,32 @@ impl SemanticContext {
                 }
 
                 if !differs {
-                    return Some(Borrowed(self));
+                    return Some(self);
                 }
 
                 if operands.is_empty() {
-                    return Some(Owned(Self::NONE));
+                    return Some(Self::none());
                 }
 
-                let mut operands = operands.drain(..);
-                let result = operands.next().unwrap();
-                Some(operands.fold(result, |acc, it| {
-                    Owned(SemanticContext::and(ephemerals, Some(acc), Some(it)))
-                }))
+                Some(scratch.alloc(Self::new_and(scratch, operands.as_slice())))
             }
         }
     }
 
-    pub fn new_and(
-        ephemerals: &bumpalo::Bump,
-        a: &SemanticContext,
-        b: &SemanticContext,
-    ) -> SemanticContext {
-        let mut operands = HashSet::new_in(ephemerals);
-        if let SemanticContext::And(ops) = a {
-            operands.extend(ops.iter().cloned())
-        } else {
-            operands.insert(a.clone());
-        }
-        if let SemanticContext::And(ops) = b {
-            operands.extend(ops.iter().cloned())
-        } else {
-            operands.insert(b.clone());
-        }
+    pub fn new_and<'scratch>(
+        scratch: &'scratch bumpalo::Bump,
+        elems: &[&'scratch SemanticContext<'scratch>],
+    ) -> SemanticContext<'scratch> {
+        let mut operands = HashSet::new_in(scratch);
+        elems.iter().for_each(|it| {
+            if let SemanticContext::And(ops) = it {
+                operands.extend(ops.iter().cloned())
+            } else {
+                operands.insert((*it).clone());
+            }
+        });
 
-        let precedence_predicates = filter_precedence_predicate(ephemerals, &mut operands);
+        let precedence_predicates = filter_precedence_predicate(scratch, &mut operands);
         if !precedence_predicates.is_empty() {
             let reduced = precedence_predicates.iter().min_by(sort_prec_pred);
             operands.insert(reduced.unwrap().clone());
@@ -185,29 +157,24 @@ impl SemanticContext {
             return operands.into_iter().next().unwrap();
         }
 
-        SemanticContext::And(operands.into_iter().collect())
+        let operands: bumpalo::collections::Vec<_> = operands.into_iter().collect_in(scratch);
+        SemanticContext::And(operands.into_bump_slice())
     }
 
-    pub fn new_or(
-        ephemerals: &bumpalo::Bump,
-        a: &SemanticContext,
-        b: &SemanticContext,
-    ) -> SemanticContext {
-        let mut operands = HashSet::new_in(ephemerals);
-        if let SemanticContext::Or(ops) = a {
-            operands.extend(ops.iter().cloned())
-        } else {
-            operands.insert(a.clone());
-        }
-        if let SemanticContext::Or(ops) = b {
-            ops.iter().for_each(|it| {
-                operands.insert(it.clone());
-            });
-        } else {
-            operands.insert(b.clone());
-        }
+    pub fn new_or<'scratch>(
+        scratch: &'scratch bumpalo::Bump,
+        elems: &[&'scratch SemanticContext<'scratch>],
+    ) -> SemanticContext<'scratch> {
+        let mut operands = HashSet::new_in(scratch);
+        elems.iter().for_each(|it| {
+            if let SemanticContext::Or(ops) = it {
+                operands.extend(ops.iter().cloned())
+            } else {
+                operands.insert((*it).clone());
+            }
+        });
 
-        let precedence_predicates = filter_precedence_predicate(ephemerals, &mut operands);
+        let precedence_predicates = filter_precedence_predicate(scratch, &mut operands);
         if !precedence_predicates.is_empty() {
             let reduced = precedence_predicates.iter().max_by(sort_prec_pred);
             operands.insert(reduced.unwrap().clone());
@@ -217,20 +184,20 @@ impl SemanticContext {
             return operands.into_iter().next().unwrap();
         }
 
-        SemanticContext::Or(operands.into_iter().collect())
+        let operands: bumpalo::collections::Vec<_> = operands.into_iter().collect_in(scratch);
+        SemanticContext::Or(operands.into_bump_slice())
     }
 
-    pub fn and(
-        ephemerals: &bumpalo::Bump,
-        a: Option<impl Borrow<SemanticContext>>,
-        b: Option<impl Borrow<SemanticContext>>,
-    ) -> SemanticContext {
+    pub fn and<'scratch>(
+        scratch: &'scratch bumpalo::Bump,
+        a: Option<&'scratch SemanticContext<'scratch>>,
+        b: Option<&'scratch SemanticContext<'scratch>>,
+    ) -> SemanticContext<'scratch> {
         match (a, b) {
             (None, None) => Self::NONE,
-            (None, Some(b)) => b.borrow().clone(),
-            (Some(a), None) => a.borrow().clone(),
+            (None, Some(b)) => b.clone(),
+            (Some(a), None) => a.clone(),
             (Some(a), Some(b)) => {
-                let (a, b) = (a.borrow(), b.borrow());
                 if *a == Self::NONE {
                     return b.clone();
                 }
@@ -238,27 +205,26 @@ impl SemanticContext {
                     return a.clone();
                 }
 
-                Self::new_and(ephemerals, a, b)
+                Self::new_and(scratch, &[a, b])
             }
         }
     }
 
-    pub fn or(
-        ephemerals: &bumpalo::Bump,
-        a: Option<impl Borrow<SemanticContext>>,
-        b: Option<impl Borrow<SemanticContext>>,
-    ) -> SemanticContext {
+    pub fn or<'scratch>(
+        scratch: &'scratch bumpalo::Bump,
+        a: Option<&'scratch SemanticContext<'scratch>>,
+        b: Option<&'scratch SemanticContext<'scratch>>,
+    ) -> SemanticContext<'scratch> {
         match (a, b) {
             (None, None) => Self::NONE,
-            (None, Some(b)) => b.borrow().clone(),
-            (Some(a), None) => a.borrow().clone(),
+            (None, Some(b)) => b.clone(),
+            (Some(a), None) => a.clone(),
             (Some(a), Some(b)) => {
-                let (a, b) = (a.borrow(), b.borrow());
                 if *a == Self::NONE || *b == Self::NONE {
                     return Self::NONE;
                 }
 
-                Self::new_or(ephemerals, a, b)
+                Self::new_or(scratch, &[a, b])
             }
         }
     }
@@ -271,11 +237,15 @@ fn sort_prec_pred(a: &&SemanticContext, b: &&SemanticContext) -> Ordering {
     }
 }
 
-fn filter_precedence_predicate<'ephemeral>(
-    ephemerals: &'ephemeral bumpalo::Bump,
-    collection: &mut HashSet<SemanticContext, DefaultHashBuilder, &bumpalo::Bump>,
-) -> bumpalo::collections::Vec<'ephemeral, SemanticContext> {
-    let mut result = bumpalo::collections::Vec::new_in(ephemerals);
+fn filter_precedence_predicate<'scratch, 'ephemeral>(
+    scratch: &'scratch bumpalo::Bump,
+    collection: &mut HashSet<
+        SemanticContext<'ephemeral>,
+        DefaultHashBuilder,
+        &'scratch bumpalo::Bump,
+    >,
+) -> bumpalo::collections::Vec<'scratch, SemanticContext<'ephemeral>> {
+    let mut result = bumpalo::collections::Vec::new_in(scratch);
     collection.retain(|it| {
         if let SemanticContext::Precedence(_) = it {
             result.push(it.clone());

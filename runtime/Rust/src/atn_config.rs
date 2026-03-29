@@ -16,7 +16,7 @@ pub struct ATNConfig<'ephemeral> {
     alt: i32,
     //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
     context: Option<&'ephemeral PredictionContext<'ephemeral>>,
-    semantic_context: &'ephemeral SemanticContext,
+    semantic_context: &'ephemeral SemanticContext<'ephemeral>,
     pub reaches_into_outer_context: i32,
 }
 
