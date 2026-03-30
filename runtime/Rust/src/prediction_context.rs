@@ -1,13 +1,12 @@
-use std::borrow::Borrow;
-use std::collections::HashSet;
+use std::cell::RefCell;
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
-
-use std::pin::Pin;
-use std::sync::{Arc, LazyLock, RwLock};
+use std::sync::LazyLock;
 
 use fxhash::FxHasher32;
+use hashbrown::HashSet;
 
+use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
 use crate::atn_state::ATNStateRef;
 use crate::dfa::ScopeExt;
@@ -55,9 +54,22 @@ impl SingletonPredictionContext<'_> {
     fn is_empty(&self) -> bool {
         self.return_state == ATNStateRef::invalid() && self.parent_ctx.is_none()
     }
+
+    fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> SingletonPredictionContext<'sim> {
+        if let Some(parent) = self.parent_ctx {
+            if !is_ref_in_arena(parent, arena) {
+                return SingletonPredictionContext {
+                    parent_ctx: Some(arena.alloc(parent.promote(arena))),
+                    ..*self
+                };
+            }
+        }
+
+        unsafe { std::mem::transmute(self.clone()) }
+    }
 }
 
-#[derive(Eq, Debug)]
+#[derive(Clone, Eq, Debug)]
 pub struct ArrayPredictionContext<'ephemeral> {
     cached_hash: u32,
     return_states: &'ephemeral [ATNStateRef],
@@ -70,6 +82,28 @@ impl PartialEq for ArrayPredictionContext<'_> {
         self.cached_hash == other.cached_hash
             && self.return_states == other.return_states
             && self.parents.iter().zip(other.parents.iter()).all(opt_eq)
+    }
+}
+
+impl ArrayPredictionContext<'_> {
+    fn promote<'ephemeral>(
+        &self,
+        arena: &'ephemeral bumpalo::Bump,
+    ) -> ArrayPredictionContext<'ephemeral> {
+        if is_slice_in_arena(self.return_states, arena) && is_slice_in_arena(self.parents, arena) {
+            return unsafe { std::mem::transmute(self.clone()) };
+        }
+
+        let return_states = arena.alloc_slice_copy(self.return_states);
+        let parents = arena.alloc_slice_fill_with(self.parents.len(), |i| {
+            self.parents[i]
+                .map(|p| arena.alloc(p.promote(arena)) as &'ephemeral PredictionContext<'ephemeral>)
+        });
+        ArrayPredictionContext {
+            cached_hash: self.cached_hash,
+            return_states,
+            parents,
+        }
     }
 }
 
@@ -211,6 +245,13 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
                 *cached_hash = hash
             }
         };
+    }
+
+    pub fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> PredictionContext<'sim> {
+        match self {
+            PredictionContext::Singleton(singleton) => Singleton(singleton.promote(arena)),
+            PredictionContext::Array(array) => Array(array.promote(arena)),
+        }
     }
 
     pub fn get_parent(&self, index: usize) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
@@ -504,60 +545,18 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct PredictionContextOwned(Pin<Arc<PredictionContextInner>>);
-
 #[derive(Debug)]
-struct PredictionContextInner {
-    #[allow(dead_code)]
-    states_store: Option<Pin<Box<[ATNStateRef]>>>,
-    #[allow(dead_code)]
-    parents_store: Option<Pin<Box<[Option<&'static PredictionContext<'static>>]>>>,
-    context: PredictionContext<'static>,
+pub struct PredictionContextCache<'sim> {
+    cache: RefCell<HashSet<PredictionContext<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
+    arena: &'sim bumpalo::Bump,
 }
 
-impl From<PredictionContextInner> for PredictionContextOwned {
-    fn from(value: PredictionContextInner) -> Self {
-        PredictionContextOwned(Arc::pin(value))
-    }
-}
-
-impl<'a> Borrow<PredictionContext<'a>> for PredictionContextOwned {
-    fn borrow(&self) -> &PredictionContext<'a> {
-        &self.0.context
-    }
-}
-
-impl PartialEq for PredictionContextOwned {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.context == other.0.context
-    }
-}
-
-impl Eq for PredictionContextOwned {}
-
-impl Hash for PredictionContextOwned {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.context.hash(state)
-    }
-}
-
-impl PredictionContextOwned {
-    pub(crate) fn get_static_ref(&self) -> &'static PredictionContext<'static> {
-        unsafe { &*(&self.0.context as *const PredictionContext) }
-    }
-}
-
-#[derive(Debug)]
-pub struct PredictionContextCache {
-    cache: RwLock<HashSet<PredictionContextOwned, NoopHasherBuilder>>,
-}
-
-impl PredictionContextCache {
+impl<'sim> PredictionContextCache<'sim> {
     #[doc(hidden)]
-    pub fn new() -> PredictionContextCache {
+    pub fn new(arena: &'sim bumpalo::Bump) -> PredictionContextCache<'sim> {
         PredictionContextCache {
-            cache: RwLock::new(HashSet::with_hasher(NoopHasherBuilder {})),
+            cache: RefCell::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena)),
+            arena,
         }
     }
 
@@ -565,75 +564,49 @@ impl PredictionContextCache {
     pub fn get_shared_context<'a>(
         &self,
         context: &'a PredictionContext<'a>,
-    ) -> PredictionContextOwned {
+    ) -> &'sim PredictionContext<'sim> {
         // if context.is_empty() {
         //     return context;
         // }
 
-        if let Some(cached) = self
-            .cache
-            .read()
-            .expect("PredictionContextCache lock poisoned")
-            .get(context)
-        {
-            return cached.clone();
+        if let Some(cached) = self.cache.borrow().get(context) {
+            return unsafe { std::mem::transmute(cached) };
         }
 
-        let inner = match context {
-            PredictionContext::Singleton(singleton) => PredictionContextInner {
-                states_store: None,
-                parents_store: None,
-                context: PredictionContext::Singleton(SingletonPredictionContext {
+        let shared = match context {
+            PredictionContext::Singleton(singleton) => {
+                PredictionContext::Singleton(SingletonPredictionContext {
                     cached_hash: singleton.cached_hash,
-                    parent_ctx: singleton
-                        .parent_ctx
-                        .map(|x| self.get_shared_context(x).get_static_ref()),
+                    parent_ctx: singleton.parent_ctx.map(|x| self.get_shared_context(x)),
                     return_state: singleton.return_state,
-                }),
-            },
+                })
+            }
             PredictionContext::Array(array) => {
-                let parents_store: Box<[_]> = array
-                    .parents
-                    .iter()
-                    .map(|x| x.map(|p| self.get_shared_context(p).get_static_ref()))
-                    .collect();
-                let parents = unsafe {
-                    &*(&*parents_store as *const [Option<&'static PredictionContext<'static>>])
-                };
-                let states_store = array.return_states.to_vec().into_boxed_slice();
-                let return_states = unsafe { &*(&*states_store as *const [ATNStateRef]) };
-                PredictionContextInner {
-                    states_store: Some(Pin::new(states_store)),
-                    parents_store: Some(Pin::new(parents_store)),
-                    context: PredictionContext::Array(ArrayPredictionContext {
-                        cached_hash: array.cached_hash,
-                        parents,
-                        return_states,
-                    }),
-                }
+                let return_states = self.arena.alloc_slice_copy(array.return_states);
+                let parents = self.arena.alloc_slice_fill_with(array.parents.len(), |i| {
+                    array.parents[i].map(|p| self.get_shared_context(p))
+                });
+
+                PredictionContext::Array(ArrayPredictionContext {
+                    cached_hash: array.cached_hash,
+                    parents,
+                    return_states,
+                })
             }
         };
-        let owned = PredictionContextOwned::from(inner);
-
-        {
-            let mut cache = self
-                .cache
-                .write()
-                .expect("PredictionContextCache lock poisoned");
-
-            // First in wins:
-            if let Some(cached) = cache.get(&owned) {
-                return cached.clone();
-            }
-
-            cache.insert(owned.clone());
+        self.cache.borrow_mut().insert(shared);
+        unsafe {
+            std::mem::transmute(
+                self.cache.borrow()
+                    .get(context)
+                    .expect("context should exist now because it was just inserted"),
+            )
         }
-        owned
     }
 
     #[doc(hidden)]
     pub fn length(&self) -> usize {
-        self.cache.read().unwrap().len()
+        self.cache.borrow().len()
     }
 }
 

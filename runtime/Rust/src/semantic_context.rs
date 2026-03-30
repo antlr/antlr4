@@ -1,8 +1,8 @@
 use std::cmp::Ordering;
 
-use bumpalo::collections::CollectIn;
 use hashbrown::{DefaultHashBuilder, HashSet};
 
+use crate::arena::is_slice_in_arena;
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
 
@@ -157,8 +157,8 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
             return operands.into_iter().next().unwrap();
         }
 
-        let operands: bumpalo::collections::Vec<_> = operands.into_iter().collect_in(scratch);
-        SemanticContext::And(operands.into_bump_slice())
+        let operands: &[_] = scratch.alloc_slice_fill_iter(operands.into_iter());
+        SemanticContext::And(operands)
     }
 
     pub fn new_or<'scratch>(
@@ -184,8 +184,8 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
             return operands.into_iter().next().unwrap();
         }
 
-        let operands: bumpalo::collections::Vec<_> = operands.into_iter().collect_in(scratch);
-        SemanticContext::Or(operands.into_bump_slice())
+        let operands: &[_] = scratch.alloc_slice_fill_iter(operands.into_iter());
+        SemanticContext::Or(operands)
     }
 
     pub fn and<'scratch>(
@@ -226,6 +226,20 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
 
                 Self::new_or(scratch, &[a, b])
             }
+        }
+    }
+
+    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> SemanticContext<'sim> {
+        match self {
+            SemanticContext::And(ops) if !is_slice_in_arena(ops, arena) => {
+                let promoted: &[_] = arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                SemanticContext::And(promoted)
+            }
+            SemanticContext::Or(ops) if !is_slice_in_arena(ops, arena) => {
+                let promoted: &[_] = arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                SemanticContext::Or(promoted)
+            }
+            _ => unsafe { std::mem::transmute(self.clone()) },
         }
     }
 }
