@@ -141,8 +141,8 @@ impl IATNSimulator<LexerATNConfigSet<'static>> for LexerATNSimulator {
         self.base.atn()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<DFA<LexerATNConfigSet<'static>>> {
-        self.base.decision_to_dfa()
+    fn decision_to_dfa<'sim>(&'sim self, decision: usize) -> &'sim DFA<'sim, LexerATNConfigSet<'static>> {
+        self.base.decision_to_dfa(decision)
     }
 }
 
@@ -722,12 +722,12 @@ impl LexerATNSimulator {
 
     /// Returns current DFA that is currently used.
     pub fn get_dfa(&self) -> &DFA<LexerATNConfigSet<'static>> {
-        &self.decision_to_dfa()[self.mode]
+        self.decision_to_dfa(self.mode)
     }
 
     /// Returns current DFA for particular lexer mode
     pub fn get_dfa_for_mode(&self, mode: usize) -> &DFA<LexerATNConfigSet<'static>> {
-        &self.decision_to_dfa()[mode]
+        self.decision_to_dfa(mode)
     }
 
     // fn get_token_name(&self, _tt: i32) -> String { unimplemented!() }

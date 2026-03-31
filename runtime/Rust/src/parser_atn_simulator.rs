@@ -163,7 +163,7 @@ impl ParserATNSimulator {
 
         let mut local = Local {
             outer_context: parser.get_current_context(),
-            dfa_ref: &self.decision_to_dfa()[decision as usize],
+            dfa_ref: self.decision_to_dfa(decision as usize),
             merge_cache: &mut merge_cache,
             precedence: parser.get_precedence(),
             parser,
@@ -1579,8 +1579,8 @@ impl IATNSimulator<ATNConfigSet<'static>> for ParserATNSimulator {
         self.base.atn()
     }
 
-    fn decision_to_dfa(&self) -> &Vec<DFA<ATNConfigSet<'static>>> {
-        self.base.decision_to_dfa()
+    fn decision_to_dfa<'sim>(&'sim self, decision: usize) -> &'sim DFA<'sim, ATNConfigSet<'sim>> {
+        self.base.decision_to_dfa(decision)
     }
 }
 

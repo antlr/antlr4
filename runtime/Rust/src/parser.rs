@@ -756,7 +756,8 @@ where
     /// Text representation of generated DFA for debugging purposes
     pub fn dump_dfa(&self) {
         let mut seen_one = false;
-        for dfa in self.interp.decision_to_dfa() {
+        for i in 0..self.interp.atn().decision_to_state.len() {
+            let dfa = self.interp.decision_to_dfa(i);
             if !dfa.is_empty() {
                 if seen_one {
                     println!()

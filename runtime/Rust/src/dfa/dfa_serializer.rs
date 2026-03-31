@@ -5,12 +5,12 @@ use crate::atn_config_set::ConfigSet;
 use super::dfa_state::DFAState;
 use super::DFA;
 
-pub struct DFASerializer<'a, 'b, CS>
+pub struct DFASerializer<'sim, 'a, CS>
 where
-    CS: ConfigSet + 'static,
+    CS: ConfigSet + 'sim,
 {
-    dfa: &'a DFA<CS>,
-    get_edge_label: &'b dyn Fn(usize) -> String,
+    dfa: &'a DFA<'sim, CS>,
+    get_edge_label: &'a dyn Fn(usize) -> String,
 }
 
 impl<CS: ConfigSet> Display for DFASerializer<'_, '_, CS> {
@@ -31,11 +31,11 @@ impl<CS: ConfigSet> Display for DFASerializer<'_, '_, CS> {
     }
 }
 
-impl<CS: ConfigSet> DFASerializer<'_, '_, CS> {
-    pub fn new<'a, 'b>(
-        dfa: &'a DFA<CS>,
-        get_edge_label: &'b dyn Fn(usize) -> String,
-    ) -> DFASerializer<'a, 'b, CS> {
+impl<'sim, 'a, CS: ConfigSet> DFASerializer<'sim, 'a, CS> {
+    pub fn new(
+        dfa: &'a DFA<'sim, CS>,
+        get_edge_label: &'a dyn Fn(usize) -> String,
+    ) -> DFASerializer<'sim, 'a, CS> {
         DFASerializer {
             dfa,
             get_edge_label,
