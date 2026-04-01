@@ -31,7 +31,7 @@ where
     pub configs: CS,
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor>>,
+    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'ephemeral>>>,
     pub requires_full_context: bool,
     pub predicates: Vec<PredPrediction<'ephemeral>>,
 
@@ -71,7 +71,7 @@ impl<'ephemeral, CS: ConfigSet> Hash for ProposedDFAState<'ephemeral, CS> {
 #[derive(Debug)]
 pub struct DFAState<'dfa, CS>
 where
-    CS: ConfigSet + 'static,
+    CS: ConfigSet + 'dfa,
 {
     /// Number of this state in corresponding DFA
     pub state_number: i32,
@@ -82,7 +82,7 @@ where
 
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor>>,
+    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'dfa>>>,
     pub requires_full_context: bool,
     pub predicates: Vec<PredPrediction<'dfa>>,
     // dfa_ref: PhantomData<&'dfa super::DFA>,

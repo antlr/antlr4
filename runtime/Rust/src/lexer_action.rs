@@ -1,6 +1,6 @@
 use std::hash::Hash;
 
-use crate::lexer::Lexer;
+use crate::{arena::is_ref_in_arena, lexer::Lexer};
 
 pub(crate) const LEXER_ACTION_TYPE_CHANNEL: i32 = 0;
 pub(crate) const LEXER_ACTION_TYPE_CUSTOM: i32 = 1;
@@ -13,7 +13,7 @@ pub(crate) const LEXER_ACTION_TYPE_TYPE: i32 = 7;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub(crate) enum LexerAction {
+pub(crate) enum LexerAction<'ephemeral> {
     LexerChannelAction(i32),
     LexerCustomAction {
         rule_index: i32,
@@ -27,11 +27,11 @@ pub(crate) enum LexerAction {
     LexerTypeAction(i32),
     LexerIndexedCustomAction {
         offset: isize,
-        action: Box<LexerAction>,
+        action: &'ephemeral LexerAction<'ephemeral>,
     },
 }
 
-impl LexerAction {
+impl<'ephemeral> LexerAction<'ephemeral> {
     //    fn get_action_type(&self) -> i32 {
     //        unimplemented!()
     ////        unsafe {discriminant_value(self)} as i32
@@ -66,6 +66,22 @@ impl LexerAction {
             &LexerAction::LexerSkipAction => lexer.skip(),
             &LexerAction::LexerTypeAction(ty) => lexer.set_type(ty),
             LexerAction::LexerIndexedCustomAction { action, .. } => action.execute(lexer),
+        }
+    }
+
+    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> LexerAction<'sim> {
+        match self {
+            LexerAction::LexerIndexedCustomAction { offset, action } if is_ref_in_arena(action, arena) => {
+                // Safety: the action is already in the target arena, so can
+                // live as long as the target lifetime:
+                unsafe { std::mem::transmute(self.clone()) }
+            }
+            LexerAction::LexerIndexedCustomAction { offset, action } => LexerAction::LexerIndexedCustomAction {
+                offset: *offset,
+                action: arena.alloc(action.promote(arena)),
+            },
+            // Safety: these don't hold any references, so effectively 'static
+            _ => unsafe { std::mem::transmute(self.clone()) },
         }
     }
 }

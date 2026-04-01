@@ -158,7 +158,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
 #[derive(Clone)]
 pub struct LexerATNConfig<'ephemeral> {
     base: ATNConfig<'ephemeral>,
-    lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
+    lexer_action_executor: Option<&'ephemeral LexerActionExecutor<'ephemeral>>,
     passed_through_non_greedy_decision: bool,
 }
 

@@ -2,6 +2,7 @@ use std::hash::{Hash, Hasher};
 
 use fxhash::{hash64, FxHasher64};
 
+use crate::arena::is_slice_in_arena;
 use crate::char_stream::CharStream;
 use crate::lexer::Lexer;
 use crate::lexer_action::LexerAction;
@@ -9,22 +10,23 @@ use crate::lexer_action::LexerAction::LexerIndexedCustomAction;
 use crate::token_factory::TokenFactory;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
-pub(crate) struct LexerActionExecutor {
+pub(crate) struct LexerActionExecutor<'ephemeral> {
     cached_hash: u64,
-    lexer_actions: Box<[LexerAction]>,
+    lexer_actions: &'ephemeral [LexerAction<'ephemeral>],
 }
 
-impl Hash for LexerActionExecutor {
+impl Hash for LexerActionExecutor<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         state.write_u64(self.cached_hash)
     }
 }
 
-impl LexerActionExecutor {
+impl<'ephemeral> LexerActionExecutor<'ephemeral> {
     pub(crate) fn new_copy_append(
+        arena: &'ephemeral bumpalo::Bump,
         old: Option<&Self>,
-        lexer_action: LexerAction,
-    ) -> LexerActionExecutor {
+        lexer_action: LexerAction<'ephemeral>,
+    ) -> LexerActionExecutor<'ephemeral> {
         if let Some(LexerActionExecutor {
             lexer_actions,
             cached_hash,
@@ -36,11 +38,13 @@ impl LexerActionExecutor {
                 lexer_action.hash(&mut hasher);
                 hasher.finish()
             };
-            let new_actions = lexer_actions
-                .iter()
-                .cloned()
-                .chain(std::iter::once(lexer_action))
-                .collect::<Box<[_]>>();
+            let new_actions = arena.alloc_slice_fill_with(lexer_actions.len() + 1, |i| {
+                if i < lexer_actions.len() {
+                    lexer_actions[i].clone()
+                } else {
+                    lexer_action.clone()
+                }
+            });
 
             LexerActionExecutor {
                 lexer_actions: new_actions,
@@ -49,26 +53,29 @@ impl LexerActionExecutor {
         } else {
             LexerActionExecutor {
                 cached_hash: { hash64(&lexer_action) },
-                lexer_actions: Box::new([lexer_action]),
+                lexer_actions: arena.alloc_slice_fill_iter(std::iter::once(lexer_action)),
             }
         }
     }
 
-    pub fn fix_offset_before_match(mut self, offset: isize) -> LexerActionExecutor {
-        for action in self.lexer_actions.iter_mut() {
-            match action {
-                LexerAction::LexerIndexedCustomAction { .. } => {}
-                _ => {
-                    if action.is_position_dependent() {
-                        *action = LexerIndexedCustomAction {
-                            offset,
-                            action: Box::new(action.clone()),
-                        };
-                    }
+    pub fn fix_offset_before_match(&self, arena: &'ephemeral bumpalo::Bump, offset: isize) -> LexerActionExecutor<'ephemeral> {
+        let fixed_actions = arena.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
+            let action = self.lexer_actions[i].clone();
+            if let LexerAction::LexerIndexedCustomAction { .. } = action {
+                action
+            } else if action.is_position_dependent() {
+                LexerIndexedCustomAction {
+                    offset,
+                    action: arena.alloc(action),
                 }
+            } else {
+                action
             }
+        });
+        LexerActionExecutor {
+            lexer_actions: fixed_actions,
+            cached_hash: self.cached_hash,
         }
-        self
     }
 
     pub fn execute<'input, 'arena, Input, TF>(
@@ -98,5 +105,19 @@ impl LexerActionExecutor {
         }
     }
 
-    //    fn hash(&self) -> int { unimplemented!() }
+    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> LexerActionExecutor<'sim> {
+        if is_slice_in_arena(self.lexer_actions, arena) {
+            // Safety: the actions are already in the target arena, so can
+            // live as long as the target lifetime:
+            return unsafe { std::mem::transmute(self.clone()) };
+        }
+        
+        let promoted_actions = arena.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
+            self.lexer_actions[i].promote(arena)
+        });
+        LexerActionExecutor {
+            lexer_actions: promoted_actions,
+            cached_hash: self.cached_hash,
+        }
+    }
 }
