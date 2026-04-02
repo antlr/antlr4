@@ -156,7 +156,7 @@ PositionAdjustingLexerDef() ::= <<
 trait PositionAdjustingLexerATNSim {
     fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: u32, charPositionInLine: i32);
   }
-impl PositionAdjustingLexerATNSim for dbt_antlr4::lexer_atn_simulator::LexerATNSimulator{
+impl\<'sim> PositionAdjustingLexerATNSim for dbt_antlr4::lexer_atn_simulator::LexerATNSimulator\<'sim>{
     fn resetAcceptPosition(&mut self, input: &mut dyn IntStream, index: isize, line: u32, charPositionInLine: i32) {
       input.seek(index);
       self.set_line(line);

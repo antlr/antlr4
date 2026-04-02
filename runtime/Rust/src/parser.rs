@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use std::cell::Cell;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::arena::Arena;
 use crate::atn::ATN;
@@ -96,7 +96,7 @@ where
     Node: RuleNode<'input, 'arena, Listener = Listener>,
     Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
-    pub interp: Arc<ParserATNSimulator<'arena>>,
+    pub interp: Rc<ParserATNSimulator<'arena>>,
 
     /// Rule context parser is currently processing
     ctx: *mut (),
@@ -413,11 +413,11 @@ where
     pub fn new_base_parser(
         arena: &'arena Arena,
         input: Input,
-        interpreter: Arc<ParserATNSimulator<'arena>>,
+        interp: Rc<ParserATNSimulator<'arena>>,
         ext: Ext,
     ) -> Self {
         Self {
-            interp: interpreter,
+            interp,
             ctx: std::ptr::null_mut(),
             build_parse_trees: true,
             matched_eof: false,

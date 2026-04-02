@@ -27,7 +27,8 @@ use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 use dbt_antlr4::token_factory::TokenFactory;
 use super::referencetoatnlistener::*;
 use std::marker::PhantomData;
-use std::sync::{LazyLock, Arc};
+use std::sync::LazyLock;
+use std::rc::Rc;
 use std::ops::{DerefMut, Deref};
 
 dbt_antlr4::check_version!("1","2");
@@ -46,7 +47,6 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;4]  = [
 	None, Some("ID"), Some("ATN"), Some("WS")
 ];
 
-static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|| PredictionContextCache::new());
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
 pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, ReferenceToATNParserExt<'input, 'arena>, ReferenceToATNParserContextNode<'input, 'arena>, Input, TF, dyn ReferenceToATNListener<'input, 'arena>>;
@@ -58,7 +58,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	base: BaseParserType<'input, 'arena, Input, TF>,
-    interpreter: Arc<ParserATNSimulator>,
+    interpreter: Rc<ParserATNSimulator<'arena>>,
     err_handler: ErrorStrategyDelegate<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>>,
 }
 
@@ -69,16 +69,10 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-		let interpreter = Arc::new(ParserATNSimulator::new(
-			&_ATN,
-			&_decision_to_DFA,
-			&_shared_context_cache,
-		));
+		let interpreter = Rc::new(ParserATNSimulator::new(&_ATN, arena));
 		Self {
 			base: BaseParser::new_base_parser(
-				arena,
-				input,
-				Arc::clone(&interpreter),
+				arena, input, Rc::clone(&interpreter),
 				ReferenceToATNParserExt {
 					_pd: Default::default(),
 				}
@@ -328,18 +322,6 @@ where
 
 static _ATN: LazyLock<ATN> =
     LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-static _decision_to_DFA: LazyLock<Vec<DFA>> = LazyLock::new(|| {
-    let size = _ATN.decision_to_state.len() as i32;
-    let mut dfa = Vec::with_capacity(size as usize);
-    for i in 0..size {
-        dfa.push(DFA::new(
-            &_ATN,
-            _ATN.get_decision_state(i),
-            i,
-        ))
-    }
-    dfa
-});
 static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![
     4, 1, 3, 14, 2, 0, 7, 0, 1, 0, 5, 0, 4, 8, 0, 10, 0, 12, 0, 7, 9, 0, 
     1, 0, 3, 0, 10, 8, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 2, 

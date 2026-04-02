@@ -93,7 +93,7 @@ where
     dfa_ref: &'sim DFA<'sim, ATNConfigSet<'sim>>,
     merge_cache: &'cache mut MergeCache<'scratch>,
     precedence: i32,
-    parser: &'sim mut P,
+    parser: &'cache mut P,
     pd: PhantomData<Box<dyn TokenStream<'input, 'arena, TF>>>,
 }
 
@@ -143,7 +143,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     pub fn adaptive_predict<'input, 'arena, TF, P>(
         &self,
         decision: i32,
-        parser: &'sim mut P,
+        parser: &mut P,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,

@@ -11,7 +11,6 @@ use dbt_antlr4::char_stream::CharStream;
 use dbt_antlr4::int_stream::IntStream;
 use dbt_antlr4::lexer::{BaseLexer, LexerRecog, Lexer as _};
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
-use dbt_antlr4::dfa::LexerDFA as DFA;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
 use dbt_antlr4::PredictionContextCache;
@@ -44,7 +43,6 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;2]  = [
 	None, Some("A")
 ];
 
-static _shared_context_cache: LazyLock<PredictionContextCache> = LazyLock::new(|| PredictionContextCache::new());
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
 pub type LexerContext<'input, 'arena> = BaseRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
@@ -69,10 +67,9 @@ where
     Input: CharStream<'input>,
 {
     pub fn new(arena: &'arena Arena, input: Input) -> Self {
-        let token_factory = TF::new(arena);
         let actions = VisitorBasicLexerActions {
         };
-        let base = BaseLexerType::new_base_lexer(input, actions, token_factory);
+        let base = BaseLexerType::new_base_lexer(input, actions, arena);
         Self { base }
     }
 }
@@ -102,29 +99,13 @@ where
     fn get_literal_names(&self) -> &[Option<&str>] { &_LITERAL_NAMES }
     fn get_symbolic_names(&self) -> &[Option<&str>] { &_SYMBOLIC_NAMES }
     fn get_grammar_file_name(&self) -> &'static str { "VisitorBasicLexer.g4" }
-    fn get_atn_simulator(&self) -> LexerATNSimulator {
-        LexerATNSimulator::new_lexer_atnsimulator(
-            &_ATN,
-            &_decision_to_DFA,
-            &_shared_context_cache,
-        )
+    fn get_atn_simulator(&self, arena: &'arena Arena) -> LexerATNSimulator<'arena> {
+        LexerATNSimulator::new_lexer_atnsimulator(&_ATN, arena)
     }
 }
 
 static _ATN: LazyLock<ATN> =
     LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
-static _decision_to_DFA: LazyLock<Vec<DFA>> = LazyLock::new(|| {
-    let size = _ATN.decision_to_state.len() as i32;
-    let mut dfa = Vec::with_capacity(size as usize);
-    for i in 0..size {
-        dfa.push(DFA::new(
-            &_ATN,
-            _ATN.get_decision_state(i),
-            i,
-        ))
-    }
-    dfa
-});
 static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![
     4, 0, 1, 5, 6, -1, 2, 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 4, 
     0, 1, 1, 0, 0, 0, 1, 3, 1, 0, 0, 0, 3, 4, 5, 65, 0, 0, 4, 2, 1, 0, 0, 
