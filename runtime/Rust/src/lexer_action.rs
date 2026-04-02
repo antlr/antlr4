@@ -71,17 +71,21 @@ impl<'ephemeral> LexerAction<'ephemeral> {
 
     pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> LexerAction<'sim> {
         match self {
-            LexerAction::LexerIndexedCustomAction { offset, action } if is_ref_in_arena(action, arena) => {
+            LexerAction::LexerIndexedCustomAction { offset, action }
+                if is_ref_in_arena(action, arena) =>
+            {
                 // Safety: the action is already in the target arena, so can
                 // live as long as the target lifetime:
-                unsafe { std::mem::transmute(self.clone()) }
+                unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) }
             }
-            LexerAction::LexerIndexedCustomAction { offset, action } => LexerAction::LexerIndexedCustomAction {
-                offset: *offset,
-                action: arena.alloc(action.promote(arena)),
-            },
+            LexerAction::LexerIndexedCustomAction { offset, action } => {
+                LexerAction::LexerIndexedCustomAction {
+                    offset: *offset,
+                    action: arena.alloc(action.promote(arena)),
+                }
+            }
             // Safety: these don't hold any references, so effectively 'static
-            _ => unsafe { std::mem::transmute(self.clone()) },
+            _ => unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) },
         }
     }
 }

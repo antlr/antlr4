@@ -115,7 +115,7 @@ impl Transition {
         }
     }
 
-    pub fn get_predicate(&self) -> Option<SemanticContext> {
+    pub fn get_predicate(&self) -> Option<SemanticContext<'static>> {
         match self {
             Transition::Predicate(t) => t.get_predicate(),
             Transition::PrecedencePredicate(t) => t.get_predicate(),
@@ -508,7 +508,7 @@ impl PredicateTransition {
         false
     }
 
-    pub fn get_predicate(&self) -> Option<SemanticContext> {
+    pub fn get_predicate(&self) -> Option<SemanticContext<'static>> {
         Some(SemanticContext::Predicate {
             rule_index: self.rule_index,
             pred_index: self.pred_index,
@@ -554,7 +554,7 @@ impl PrecedencePredicateTransition {
         false
     }
 
-    pub fn get_predicate(&self) -> Option<SemanticContext> {
+    pub fn get_predicate(&self) -> Option<SemanticContext<'static>> {
         Some(SemanticContext::Precedence(self.precedence))
     }
 }

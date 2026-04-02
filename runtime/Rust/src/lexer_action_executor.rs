@@ -58,7 +58,11 @@ impl<'ephemeral> LexerActionExecutor<'ephemeral> {
         }
     }
 
-    pub fn fix_offset_before_match(&self, arena: &'ephemeral bumpalo::Bump, offset: isize) -> LexerActionExecutor<'ephemeral> {
+    pub fn fix_offset_before_match(
+        &self,
+        arena: &'ephemeral bumpalo::Bump,
+        offset: isize,
+    ) -> LexerActionExecutor<'ephemeral> {
         let fixed_actions = arena.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
             let action = self.lexer_actions[i].clone();
             if let LexerAction::LexerIndexedCustomAction { .. } = action {
@@ -109,9 +113,9 @@ impl<'ephemeral> LexerActionExecutor<'ephemeral> {
         if is_slice_in_arena(self.lexer_actions, arena) {
             // Safety: the actions are already in the target arena, so can
             // live as long as the target lifetime:
-            return unsafe { std::mem::transmute(self.clone()) };
+            return unsafe { std::mem::transmute::<Self, LexerActionExecutor<'sim>>(self.clone()) };
         }
-        
+
         let promoted_actions = arena.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
             self.lexer_actions[i].promote(arena)
         });

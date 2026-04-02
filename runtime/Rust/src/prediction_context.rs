@@ -6,7 +6,6 @@ use std::sync::LazyLock;
 use fxhash::FxHasher32;
 use hashbrown::HashSet;
 
-use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
 use crate::atn_state::ATNStateRef;
 use crate::dfa::ScopeExt;
@@ -54,19 +53,6 @@ impl SingletonPredictionContext<'_> {
     fn is_empty(&self) -> bool {
         self.return_state == ATNStateRef::invalid() && self.parent_ctx.is_none()
     }
-
-    fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> SingletonPredictionContext<'sim> {
-        if let Some(parent) = self.parent_ctx {
-            if !is_ref_in_arena(parent, arena) {
-                return SingletonPredictionContext {
-                    parent_ctx: Some(arena.alloc(parent.promote(arena))),
-                    ..*self
-                };
-            }
-        }
-
-        unsafe { std::mem::transmute(self.clone()) }
-    }
 }
 
 #[derive(Clone, Eq, Debug)]
@@ -82,28 +68,6 @@ impl PartialEq for ArrayPredictionContext<'_> {
         self.cached_hash == other.cached_hash
             && self.return_states == other.return_states
             && self.parents.iter().zip(other.parents.iter()).all(opt_eq)
-    }
-}
-
-impl ArrayPredictionContext<'_> {
-    fn promote<'ephemeral>(
-        &self,
-        arena: &'ephemeral bumpalo::Bump,
-    ) -> ArrayPredictionContext<'ephemeral> {
-        if is_slice_in_arena(self.return_states, arena) && is_slice_in_arena(self.parents, arena) {
-            return unsafe { std::mem::transmute(self.clone()) };
-        }
-
-        let return_states = arena.alloc_slice_copy(self.return_states);
-        let parents = arena.alloc_slice_fill_with(self.parents.len(), |i| {
-            self.parents[i]
-                .map(|p| arena.alloc(p.promote(arena)) as &'ephemeral PredictionContext<'ephemeral>)
-        });
-        ArrayPredictionContext {
-            cached_hash: self.cached_hash,
-            return_states,
-            parents,
-        }
     }
 }
 
@@ -245,13 +209,6 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
                 *cached_hash = hash
             }
         };
-    }
-
-    pub fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> PredictionContext<'sim> {
-        match self {
-            PredictionContext::Singleton(singleton) => Singleton(singleton.promote(arena)),
-            PredictionContext::Array(array) => Array(array.promote(arena)),
-        }
     }
 
     pub fn get_parent(&self, index: usize) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
@@ -570,7 +527,11 @@ impl<'sim> PredictionContextCache<'sim> {
         // }
 
         if let Some(cached) = self.cache.borrow().get(context) {
-            return unsafe { std::mem::transmute(cached) };
+            // SAFETY: the cache is backed by the 'sim arena, so any reference
+            // returned from it must be valid for 'sim:
+            return unsafe {
+                std::mem::transmute::<&PredictionContext<'_>, &'sim PredictionContext<'sim>>(cached)
+            };
         }
 
         let shared = match context {
@@ -597,7 +558,8 @@ impl<'sim> PredictionContextCache<'sim> {
         self.cache.borrow_mut().insert(shared);
         unsafe {
             std::mem::transmute(
-                self.cache.borrow()
+                self.cache
+                    .borrow()
                     .get(context)
                     .expect("context should exist now because it was just inserted"),
             )
@@ -607,6 +569,10 @@ impl<'sim> PredictionContextCache<'sim> {
     #[doc(hidden)]
     pub fn length(&self) -> usize {
         self.cache.borrow().len()
+    }
+
+    pub fn arena(&self) -> &'sim bumpalo::Bump {
+        self.arena
     }
 }
 

@@ -84,7 +84,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
                 let mut operands = bumpalo::collections::Vec::new_in(scratch);
                 for context in ops.iter() {
                     let evaluated = context.eval_precedence(scratch, parser, outer_context);
-                    differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
+                    differs |= evaluated.is_some() && context == evaluated.unwrap();
 
                     if let Some(evaluated) = evaluated {
                         if *evaluated == Self::NONE {
@@ -110,7 +110,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
                 let mut operands = bumpalo::collections::Vec::new_in(scratch);
                 for context in ops.iter() {
                     let evaluated = context.eval_precedence(scratch, parser, outer_context);
-                    differs |= evaluated.is_some() && context == evaluated.as_deref().unwrap();
+                    differs |= evaluated.is_some() && context == evaluated.unwrap();
 
                     if let Some(evaluated) = evaluated {
                         if *evaluated != Self::NONE {
@@ -136,7 +136,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
 
     pub fn new_and<'scratch>(
         scratch: &'scratch bumpalo::Bump,
-        elems: &[&'scratch SemanticContext<'scratch>],
+        elems: &[&SemanticContext<'scratch>],
     ) -> SemanticContext<'scratch> {
         let mut operands = HashSet::new_in(scratch);
         elems.iter().for_each(|it| {
@@ -157,13 +157,13 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
             return operands.into_iter().next().unwrap();
         }
 
-        let operands: &[_] = scratch.alloc_slice_fill_iter(operands.into_iter());
+        let operands: &[_] = scratch.alloc_slice_fill_iter(operands);
         SemanticContext::And(operands)
     }
 
     pub fn new_or<'scratch>(
         scratch: &'scratch bumpalo::Bump,
-        elems: &[&'scratch SemanticContext<'scratch>],
+        elems: &[&SemanticContext<'scratch>],
     ) -> SemanticContext<'scratch> {
         let mut operands = HashSet::new_in(scratch);
         elems.iter().for_each(|it| {
@@ -184,14 +184,14 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
             return operands.into_iter().next().unwrap();
         }
 
-        let operands: &[_] = scratch.alloc_slice_fill_iter(operands.into_iter());
+        let operands: &[_] = scratch.alloc_slice_fill_iter(operands);
         SemanticContext::Or(operands)
     }
 
     pub fn and<'scratch>(
         scratch: &'scratch bumpalo::Bump,
-        a: Option<&'scratch SemanticContext<'scratch>>,
-        b: Option<&'scratch SemanticContext<'scratch>>,
+        a: Option<&SemanticContext<'scratch>>,
+        b: Option<&SemanticContext<'scratch>>,
     ) -> SemanticContext<'scratch> {
         match (a, b) {
             (None, None) => Self::NONE,
@@ -212,8 +212,8 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
 
     pub fn or<'scratch>(
         scratch: &'scratch bumpalo::Bump,
-        a: Option<&'scratch SemanticContext<'scratch>>,
-        b: Option<&'scratch SemanticContext<'scratch>>,
+        a: Option<&SemanticContext<'scratch>>,
+        b: Option<&SemanticContext<'scratch>>,
     ) -> SemanticContext<'scratch> {
         match (a, b) {
             (None, None) => Self::NONE,
@@ -232,14 +232,16 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
     pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> SemanticContext<'sim> {
         match self {
             SemanticContext::And(ops) if !is_slice_in_arena(ops, arena) => {
-                let promoted: &[_] = arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                let promoted: &[_] =
+                    arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
                 SemanticContext::And(promoted)
             }
             SemanticContext::Or(ops) if !is_slice_in_arena(ops, arena) => {
-                let promoted: &[_] = arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                let promoted: &[_] =
+                    arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
                 SemanticContext::Or(promoted)
             }
-            _ => unsafe { std::mem::transmute(self.clone()) },
+            _ => unsafe { std::mem::transmute::<Self, SemanticContext<'sim>>(self.clone()) },
         }
     }
 }

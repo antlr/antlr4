@@ -5,8 +5,9 @@ use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
+use crate::PredictionContextCache;
 
-pub trait ATNConfigType: PartialEq + Eq + Hash + Debug + Clone {}
+pub trait ATNConfigType<'ephemeral>: PartialEq + Eq + Hash + Debug + Clone {}
 
 const SUPPRESS_PRECEDENCE_FILTER: i32 = 0x40000000;
 
@@ -60,7 +61,7 @@ impl Debug for ATNConfig<'_> {
     }
 }
 
-impl ATNConfigType for ATNConfig<'_> {}
+impl<'ephemeral> ATNConfigType<'ephemeral> for ATNConfig<'ephemeral> {}
 
 impl<'ephemeral> ATNConfig<'ephemeral> {
     pub fn new(
@@ -77,7 +78,10 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         }
     }
 
-    pub fn with_semantic_context(self, semantic_context: &'ephemeral SemanticContext) -> Self {
+    pub fn with_semantic_context(
+        self,
+        semantic_context: &'ephemeral SemanticContext<'ephemeral>,
+    ) -> Self {
         ATNConfig {
             semantic_context,
             ..self
@@ -95,17 +99,14 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         ATNConfig { context, ..self }
     }
 
-    pub(crate) fn make_static(
-        self,
-        prediction_context: Option<&'static PredictionContext<'static>>,
-        semantic_context: &'static SemanticContext,
-    ) -> ATNConfig<'static> {
+    pub(crate) fn finalize<'sim>(self, cache: &'sim PredictionContextCache) -> ATNConfig<'sim> {
         ATNConfig {
-            state: self.state,
-            alt: self.alt,
-            context: prediction_context,
-            semantic_context,
-            reaches_into_outer_context: self.reaches_into_outer_context,
+            context: self.context.map(|c| cache.get_shared_context(c)),
+            semantic_context: cache
+                .arena()
+                .alloc(self.semantic_context.promote(cache.arena()))
+                as &'sim _,
+            ..self
         }
     }
 
@@ -121,7 +122,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         self.context
     }
 
-    pub fn semantic_context(&self) -> &'ephemeral SemanticContext {
+    pub fn semantic_context(&self) -> &'ephemeral SemanticContext<'ephemeral> {
         self.semantic_context
     }
 
@@ -197,7 +198,7 @@ impl<'ephemeral> PartialEq for LexerATNConfig<'ephemeral> {
 
 impl Eq for LexerATNConfig<'_> {}
 
-impl ATNConfigType for LexerATNConfig<'_> {}
+impl<'ephemeral> ATNConfigType<'ephemeral> for LexerATNConfig<'ephemeral> {}
 
 impl<'ephemeral> LexerATNConfig<'ephemeral> {
     pub fn new(
@@ -213,7 +214,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         }
     }
 
-    pub(crate) fn get_lexer_executor(&self) -> Option<&LexerActionExecutor> {
+    pub(crate) fn get_lexer_executor(&self) -> Option<&'ephemeral LexerActionExecutor<'ephemeral>> {
         self.lexer_action_executor
     }
 
@@ -243,16 +244,16 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         }
     }
 
-    pub(crate) fn make_static(
+    pub(crate) fn finalize<'sim>(
         self,
-        prediction_context: Option<&'static PredictionContext<'static>>,
-        semantic_context: &'static SemanticContext,
-        lexer_action_executor: Option<&'static LexerActionExecutor>,
-    ) -> LexerATNConfig<'static> {
+        cache: &'sim PredictionContextCache,
+    ) -> LexerATNConfig<'sim> {
         LexerATNConfig {
-            base: self.base.make_static(prediction_context, semantic_context),
-            lexer_action_executor,
-            passed_through_non_greedy_decision: self.passed_through_non_greedy_decision,
+            base: self.base.finalize(cache),
+            lexer_action_executor: self
+                .lexer_action_executor
+                .map(|ex| cache.arena().alloc(ex.promote(cache.arena())) as &'sim _),
+            ..self
         }
     }
 
@@ -278,7 +279,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self.base.get_context()
     }
 
-    pub fn semantic_context(&self) -> &'ephemeral SemanticContext {
+    pub fn semantic_context(&self) -> &'ephemeral SemanticContext<'ephemeral> {
         self.base.semantic_context()
     }
 

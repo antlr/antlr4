@@ -1,25 +1,27 @@
 use std::cmp::max;
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::pin::Pin;
 
 use bit_set::BitSet;
 use fxhash::{hash64, FxHasher64};
 use hashbrown::HashTable;
 
 use crate::atn_config::{ATNConfig, ATNConfigType, LexerATNConfig};
-use crate::atn_simulator::IATNSimulator;
-use crate::lexer_action_executor::LexerActionExecutor;
 use crate::parser_atn_simulator::MergeCache;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
+use crate::PredictionContextCache;
 
-pub trait ConfigSet: PartialEq + Eq + Hash {
-    type ConfigType: ATNConfigType;
+pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
+    type ConfigType: ATNConfigType<'ephemeral>;
+    type FinalizedType<'x>: ConfigSet<'x>;
 
     fn new_empty() -> Self;
 
     fn hash_code(&self) -> u64;
+
+    fn finalize<'sim>(self, cache: &'sim PredictionContextCache<'sim>)
+        -> Self::FinalizedType<'sim>;
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -66,7 +68,7 @@ impl PartialEq for ATNConfigSet<'_> {
 
 impl Eq for ATNConfigSet<'_> {}
 
-impl Hash for ATNConfigSet<'_> {
+impl<'ephemeral> Hash for ATNConfigSet<'ephemeral> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.configs.iter().for_each(|c| c.hash(state));
     }
@@ -74,15 +76,16 @@ impl Hash for ATNConfigSet<'_> {
 
 impl<'ephemeral> IntoIterator for ATNConfigSet<'ephemeral> {
     type Item = ATNConfig<'ephemeral>;
-    type IntoIter = ConfigSetIntoIter<'ephemeral, ATNConfig<'ephemeral>>;
+    type IntoIter = <ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         self.configs.into_iter()
     }
 }
 
-impl<'ephemeral> ConfigSet for ATNConfigSet<'ephemeral> {
+impl<'ephemeral> ConfigSet<'ephemeral> for ATNConfigSet<'ephemeral> {
     type ConfigType = ATNConfig<'ephemeral>;
+    type FinalizedType<'x> = ATNConfigSet<'x>;
 
     fn new_empty() -> Self {
         ATNConfigSet {
@@ -92,13 +95,29 @@ impl<'ephemeral> ConfigSet for ATNConfigSet<'ephemeral> {
                 has_semantic_context: false,
                 unique_alt: 0,
             },
-            configs: ConfigSetStore::new_empty(),
+            configs: ConfigSetStore::<ATNConfig<'static>>::new_empty(),
             conflicting_alts: Default::default(),
         }
     }
 
     fn hash_code(&self) -> u64 {
         self.configs.hash_code()
+    }
+
+    fn finalize<'sim>(
+        self,
+        cache: &'sim PredictionContextCache<'sim>,
+    ) -> Self::FinalizedType<'sim> {
+        // unsafe {
+        //     std::mem::transmute(ATNConfigSet {
+        //         configs: self.configs.finalize(cache),
+        //         ..self
+        //     })
+        // }
+        ATNConfigSet {
+            configs: self.configs.finalize(cache),
+            ..self
+        }
     }
 }
 
@@ -123,8 +142,8 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
         merge_cache: &mut MergeCache<'ephemeral>,
     ) -> bool {
         let store = match &mut self.configs {
-            ConfigSetStore::Ephemeral(s) => s,
-            ConfigSetStore::Static(_) => panic!("Cannot add to read-only ATNConfigSet"),
+            ConfigSetStore::Scratch(s) => s,
+            ConfigSetStore::Final(_) => panic!("Cannot add to read-only ATNConfigSet"),
         };
 
         if config.semantic_context() != &SemanticContext::NONE {
@@ -169,66 +188,10 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
         true
     }
 
-    pub fn into_stored(
-        self,
-        interpreter: &dyn IATNSimulator<ATNConfigSet<'static>>,
-    ) -> Box<ATNConfigSet<'static>> {
-        match self.configs {
-            ConfigSetStore::Ephemeral(s) => {
-                let cached_hash = {
-                    let mut hasher = FxHasher64::default();
-                    s.configs.iter().for_each(|c| c.hash(&mut hasher));
-                    hasher.finish()
-                };
-                let semantic_contexts: Vec<SemanticContext> = s
-                    .configs
-                    .iter()
-                    .map(|config| config.semantic_context().clone())
-                    .collect();
-                let semantic_contexts = Pin::new(semantic_contexts.into_boxed_slice());
-
-                let static_configs = s
-                    .configs
-                    .into_iter()
-                    .enumerate()
-                    .map(|(i, config)| {
-                        let static_context = config.get_context().map(|context| {
-                            interpreter
-                                .shared_context_cache()
-                                .get_shared_context(context)
-                                .get_static_ref()
-                        });
-                        let static_semantic_context = unsafe {
-                            &*(semantic_contexts.get_unchecked(i) as *const SemanticContext)
-                        };
-                        config.make_static(static_context, static_semantic_context)
-                    })
-                    .collect();
-
-                Box::new(ATNConfigSet {
-                    configs: ConfigSetStore::Static(StaticStore {
-                        cached_hash,
-                        semantic_contexts,
-                        lexer_action_executors: Box::pin([]),
-                        configs: static_configs,
-                    }),
-                    ..self
-                })
-            }
-            ConfigSetStore::Static(_) => Box::new(
-                // Safety: if self.configs is ConfigSetStore::Static, then we
-                // are 'static already
-                unsafe {
-                    std::mem::transmute::<ATNConfigSet<'ephemeral>, ATNConfigSet<'static>>(self)
-                },
-            ),
-        }
-    }
-
     pub(crate) fn add(&mut self, config: ATNConfig<'ephemeral>) -> bool {
         let store = match &mut self.configs {
-            ConfigSetStore::Ephemeral(s) => s,
-            ConfigSetStore::Static(_) => panic!("Cannot add to read-only ATNConfigSet"),
+            ConfigSetStore::Scratch(s) => s,
+            ConfigSetStore::Final(_) => panic!("Cannot add to read-only ATNConfigSet"),
         };
 
         if config.semantic_context() != &SemanticContext::NONE {
@@ -329,15 +292,17 @@ impl Hash for LexerATNConfigSet<'_> {
 
 impl<'ephemeral> IntoIterator for LexerATNConfigSet<'ephemeral> {
     type Item = LexerATNConfig<'ephemeral>;
-    type IntoIter = ConfigSetIntoIter<'ephemeral, LexerATNConfig<'ephemeral>>;
+    type IntoIter =
+        <ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         self.configs.into_iter()
     }
 }
 
-impl<'ephemeral> ConfigSet for LexerATNConfigSet<'ephemeral> {
+impl<'ephemeral> ConfigSet<'ephemeral> for LexerATNConfigSet<'ephemeral> {
     type ConfigType = LexerATNConfig<'ephemeral>;
+    type FinalizedType<'x> = LexerATNConfigSet<'x>;
 
     fn new_empty() -> Self {
         LexerATNConfigSet {
@@ -347,11 +312,19 @@ impl<'ephemeral> ConfigSet for LexerATNConfigSet<'ephemeral> {
                 has_semantic_context: false,
                 unique_alt: 0,
             },
-            configs: ConfigSetStore::new_empty(),
+            configs: ConfigSetStore::<LexerATNConfig>::new_empty(),
         }
     }
+
     fn hash_code(&self) -> u64 {
         self.configs.hash_code()
+    }
+
+    fn finalize<'sim>(self, cache: &'sim PredictionContextCache) -> Self::FinalizedType<'sim> {
+        LexerATNConfigSet {
+            configs: self.configs.finalize(cache),
+            ..self
+        }
     }
 }
 
@@ -368,84 +341,10 @@ impl<'ephemeral> LexerATNConfigSet<'ephemeral> {
         }
     }
 
-    pub fn into_stored(
-        self,
-        interpreter: &dyn IATNSimulator<LexerATNConfigSet<'static>>,
-    ) -> Box<LexerATNConfigSet<'static>> {
-        match self.configs {
-            ConfigSetStore::Ephemeral(s) => {
-                let cached_hash = {
-                    let mut hasher = FxHasher64::default();
-                    s.configs.iter().for_each(|c| c.hash(&mut hasher));
-                    hasher.finish()
-                };
-                let semantic_contexts: Vec<SemanticContext> = s
-                    .configs
-                    .iter()
-                    .map(|config| config.semantic_context().clone())
-                    .collect();
-                let lexer_action_executors: Vec<Option<LexerActionExecutor>> = s
-                    .configs
-                    .iter()
-                    .map(|config| config.get_lexer_executor().cloned())
-                    .collect();
-                let semantic_contexts = Pin::new(semantic_contexts.into_boxed_slice());
-                let lexer_action_executors = Pin::new(lexer_action_executors.into_boxed_slice());
-
-                let static_configs = s
-                    .configs
-                    .into_iter()
-                    .enumerate()
-                    .map(|(i, config)| {
-                        let static_context = config.get_context().map(|context| {
-                            interpreter
-                                .shared_context_cache()
-                                .get_shared_context(context)
-                                .get_static_ref()
-                        });
-                        let static_semantic_context = unsafe {
-                            &*(semantic_contexts.get_unchecked(i) as *const SemanticContext)
-                        };
-                        let lexer_action_executor = unsafe {
-                            lexer_action_executors
-                                .get_unchecked(i)
-                                .as_ref()
-                                .map(|exec| &*(exec as *const LexerActionExecutor))
-                        };
-
-                        config.make_static(
-                            static_context,
-                            static_semantic_context,
-                            lexer_action_executor,
-                        )
-                    })
-                    .collect();
-
-                Box::new(LexerATNConfigSet {
-                    configs: ConfigSetStore::Static(StaticStore {
-                        cached_hash,
-                        semantic_contexts,
-                        lexer_action_executors,
-                        configs: static_configs,
-                    }),
-                    ..self
-                })
-            }
-            ConfigSetStore::Static(_) => Box::new(
-                // Safety: if self.configs is ConfigSetStore::Static, then we
-                // are 'static already
-                unsafe {
-                    std::mem::transmute::<LexerATNConfigSet<'ephemeral>, LexerATNConfigSet<'static>>(
-                        self,
-                    )
-                },
-            ),
-        }
-    }
     pub(crate) fn add(&mut self, config: LexerATNConfig<'ephemeral>) -> bool {
         let store = match &mut self.configs {
-            ConfigSetStore::Ephemeral(s) => s,
-            ConfigSetStore::Static(_) => panic!("Cannot add to read-only ATNConfigSet"),
+            ConfigSetStore::Scratch(s) => s,
+            ConfigSetStore::Final(_) => panic!("Cannot add to read-only ATNConfigSet"),
         };
 
         if config.semantic_context() != &SemanticContext::NONE {
@@ -555,39 +454,44 @@ impl Key {
     }
 }
 
-enum ConfigSetStore<'ephemeral, AC>
+pub enum ConfigSetStore<'ephemeral, AC>
 where
-    AC: ATNConfigType + 'ephemeral,
+    AC: ATNConfigType<'ephemeral> + 'ephemeral,
 {
-    Ephemeral(EphemeralStore<'ephemeral, AC>),
-    Static(StaticStore<AC>),
+    Scratch(ScratchStore<'ephemeral, AC>),
+    Final(ImmutableStore<'ephemeral, AC>),
 }
 
-struct EphemeralStore<'ephemeral, AC>
+pub struct ScratchStore<'ephemeral, AC>
 where
-    AC: ATNConfigType,
+    AC: ATNConfigType<'ephemeral>,
 {
     lookup: HashTable<Key, &'ephemeral bumpalo::Bump>,
     configs: bumpalo::collections::Vec<'ephemeral, AC>,
 }
 
-struct StaticStore<AC>
+impl<'ephemeral, AC> ScratchStore<'ephemeral, AC>
 where
-    AC: ATNConfigType,
+    AC: ATNConfigType<'ephemeral>,
 {
-    cached_hash: u64,
-    // Backing store for ATNConfig::semantic_context
-    #[allow(dead_code)]
-    semantic_contexts: Pin<Box<[SemanticContext]>>,
-    // Backing store for ATNConfig::config_type
-    #[allow(dead_code)]
-    lexer_action_executors: Pin<Box<[Option<LexerActionExecutor>]>>,
-    configs: Vec<AC>,
+    fn hash_code(&self) -> u64 {
+        let mut hasher = FxHasher64::default();
+        self.configs.iter().for_each(|c| c.hash(&mut hasher));
+        hasher.finish()
+    }
 }
 
-impl<AC> PartialEq for ConfigSetStore<'_, AC>
+pub struct ImmutableStore<'ephemeral, AC>
 where
-    AC: ATNConfigType,
+    AC: ATNConfigType<'ephemeral>,
+{
+    cached_hash: u64,
+    configs: &'ephemeral [AC],
+}
+
+impl<'ephemeral, AC> PartialEq for ConfigSetStore<'ephemeral, AC>
+where
+    AC: ATNConfigType<'ephemeral>,
 {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
@@ -604,93 +508,77 @@ where
     }
 }
 
-impl<AC> Eq for ConfigSetStore<'_, AC> where AC: ATNConfigType {}
-
-pub enum ConfigSetIntoIter<'ephemeral, AC>
-where
-    AC: ATNConfigType + 'ephemeral,
-{
-    Ephemeral(bumpalo::collections::vec::IntoIter<'ephemeral, AC>),
-    Static(std::vec::IntoIter<AC>),
-}
-
-impl<'ephemeral, AC> Iterator for ConfigSetIntoIter<'ephemeral, AC>
-where
-    AC: ATNConfigType + 'ephemeral,
-{
-    type Item = AC;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self {
-            ConfigSetIntoIter::Ephemeral(it) => it.next(),
-            ConfigSetIntoIter::Static(it) => it.next(),
-        }
-    }
-}
+impl<'ephemeral, AC> Eq for ConfigSetStore<'ephemeral, AC> where AC: ATNConfigType<'ephemeral> {}
 
 impl<'ephemeral, AC> IntoIterator for ConfigSetStore<'ephemeral, AC>
 where
-    AC: ATNConfigType + 'ephemeral,
+    AC: ATNConfigType<'ephemeral> + 'ephemeral,
 {
     type Item = AC;
-    type IntoIter = ConfigSetIntoIter<'ephemeral, AC>;
+    type IntoIter = bumpalo::collections::vec::IntoIter<'ephemeral, AC>;
 
     fn into_iter(self) -> Self::IntoIter {
         match self {
-            ConfigSetStore::Ephemeral(s) => ConfigSetIntoIter::Ephemeral(s.configs.into_iter()),
-            ConfigSetStore::Static(s) => ConfigSetIntoIter::Static(s.configs.into_iter()),
+            ConfigSetStore::Scratch(s) => s.configs.into_iter(),
+            ConfigSetStore::Final(..) => panic!("Cannot consume a read-only ConfigSetStore"),
         }
     }
 }
 
-impl<AC> ConfigSetStore<'_, AC>
+impl<'ephemeral, AC> ConfigSetStore<'ephemeral, AC>
 where
-    AC: ATNConfigType,
+    AC: ATNConfigType<'ephemeral>,
 {
     fn len(&self) -> usize {
         match self {
-            ConfigSetStore::Ephemeral(s) => s.configs.len(),
-            ConfigSetStore::Static(s) => s.configs.len(),
+            ConfigSetStore::Scratch(s) => s.configs.len(),
+            ConfigSetStore::Final(s) => s.configs.len(),
         }
     }
 
     fn is_empty(&self) -> bool {
         match self {
-            ConfigSetStore::Ephemeral(s) => s.configs.is_empty(),
-            ConfigSetStore::Static(s) => s.configs.is_empty(),
+            ConfigSetStore::Scratch(s) => s.configs.is_empty(),
+            ConfigSetStore::Final(s) => s.configs.is_empty(),
         }
     }
 
     fn read_only(&self) -> bool {
         match self {
-            ConfigSetStore::Ephemeral(_) => false,
-            ConfigSetStore::Static(_) => true,
+            ConfigSetStore::Scratch(_) => false,
+            ConfigSetStore::Final(_) => true,
         }
     }
 }
 
-impl<AC> ConfigSetStore<'static, AC>
-where
-    AC: ATNConfigType,
-{
+impl ConfigSetStore<'static, ATNConfig<'static>> {
     fn new_empty() -> Self {
-        let configs = Vec::new();
-        let cached_hash = hash64(&configs);
-        ConfigSetStore::Static(StaticStore {
-            cached_hash,
-            semantic_contexts: Box::pin([]),
-            lexer_action_executors: Box::pin([]),
-            configs,
+        static EMPTY_ATNCONFIGS: [ATNConfig; 0] = [];
+
+        ConfigSetStore::Final(ImmutableStore {
+            cached_hash: hash64(&EMPTY_ATNCONFIGS),
+            configs: &EMPTY_ATNCONFIGS,
+        })
+    }
+}
+
+impl ConfigSetStore<'static, LexerATNConfig<'static>> {
+    fn new_empty() -> Self {
+        static EMPTY_LEXERATNCONFIGS: [LexerATNConfig; 0] = [];
+
+        ConfigSetStore::Final(ImmutableStore {
+            cached_hash: hash64(&EMPTY_LEXERATNCONFIGS),
+            configs: &EMPTY_LEXERATNCONFIGS,
         })
     }
 }
 
 impl<'ephemeral, AC> ConfigSetStore<'ephemeral, AC>
 where
-    AC: ATNConfigType + 'ephemeral,
+    AC: ATNConfigType<'ephemeral> + 'ephemeral,
 {
     fn new_ephemeral(ephemerals: &'ephemeral bumpalo::Bump) -> Self {
-        ConfigSetStore::Ephemeral(EphemeralStore {
+        ConfigSetStore::Scratch(ScratchStore {
             lookup: HashTable::with_capacity_in(7, ephemerals),
             configs: bumpalo::collections::Vec::new_in(ephemerals),
         })
@@ -698,19 +586,61 @@ where
 
     fn iter(&self) -> impl Iterator<Item = &AC> {
         match self {
-            ConfigSetStore::Ephemeral(s) => s.configs.iter(),
-            ConfigSetStore::Static(s) => s.configs.iter(),
+            ConfigSetStore::Scratch(s) => s.configs.iter(),
+            ConfigSetStore::Final(s) => s.configs.iter(),
         }
     }
 
     fn hash_code(&self) -> u64 {
         match self {
-            ConfigSetStore::Ephemeral(s) => {
-                let mut hasher = FxHasher64::default();
-                s.configs.iter().for_each(|c| c.hash(&mut hasher));
-                hasher.finish()
+            ConfigSetStore::Scratch(s) => s.hash_code(),
+            ConfigSetStore::Final(s) => s.cached_hash,
+        }
+    }
+}
+
+impl<'ephemeral> ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>> {
+    fn finalize<'sim>(
+        self,
+        cache: &'sim PredictionContextCache,
+    ) -> ConfigSetStore<'sim, ATNConfig<'sim>> {
+        match self {
+            ConfigSetStore::Scratch(s) => {
+                let cached_hash = s.hash_code();
+
+                ConfigSetStore::Final(ImmutableStore {
+                    cached_hash,
+                    configs: cache
+                        .arena()
+                        .alloc_slice_fill_iter(s.configs.into_iter().map(|c| c.finalize(cache))),
+                })
             }
-            ConfigSetStore::Static(s) => s.cached_hash,
+            ConfigSetStore::Final(_) => unsafe {
+                std::mem::transmute::<Self, ConfigSetStore<'sim, ATNConfig<'sim>>>(self)
+            },
+        }
+    }
+}
+
+impl<'ephemeral> ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> {
+    fn finalize<'sim>(
+        self,
+        cache: &'sim PredictionContextCache,
+    ) -> ConfigSetStore<'sim, LexerATNConfig<'sim>> {
+        match self {
+            ConfigSetStore::Scratch(s) => {
+                let cached_hash = s.hash_code();
+
+                ConfigSetStore::Final(ImmutableStore {
+                    cached_hash,
+                    configs: cache
+                        .arena()
+                        .alloc_slice_fill_iter(s.configs.into_iter().map(|c| c.finalize(cache))),
+                })
+            }
+            ConfigSetStore::Final(_) => unsafe {
+                std::mem::transmute::<Self, ConfigSetStore<'sim, LexerATNConfig<'sim>>>(self)
+            },
         }
     }
 }

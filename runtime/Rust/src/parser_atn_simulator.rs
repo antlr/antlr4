@@ -10,7 +10,7 @@ use hashbrown::{DefaultHashBuilder, HashMap, HashSet};
 
 use crate::atn::{ATN, INVALID_ALT};
 use crate::atn_config::ATNConfig;
-use crate::atn_config_set::ATNConfigSet;
+use crate::atn_config_set::{ATNConfigSet, ConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
     ATNDecisionState, ATNState, ATNStateRef, DecisionState, ATNSTATE_BLOCK_END,
@@ -24,9 +24,9 @@ use crate::parser::Parser;
 use crate::prediction_context::{
     NoopHasherBuilder, PredictionContext, PredictionContextCache, EMPTY_PREDICTION_CONTEXT,
 };
-use crate::prediction_mode::*;
 use crate::semantic_context::SemanticContext;
 use crate::token::{OwningToken, Token, TOKEN_EOF, TOKEN_EPSILON};
+use crate::{prediction_mode::*, Arena};
 
 use crate::token_factory::TokenFactory;
 use crate::token_stream::TokenStream;
@@ -75,29 +75,30 @@ use crate::transition::{
 ///
 /// **For more info see Java version**
 #[derive(Debug)]
-pub struct ParserATNSimulator {
-    base: BaseATNSimulator<ATNConfigSet<'static>>,
+pub struct ParserATNSimulator<'sim> {
+    base: BaseATNSimulator<'sim, ATNConfigSet<'sim>>,
     prediction_mode: Cell<PredictionMode>,
     start_index: Cell<isize>,
     // pd:PhantomData<P>
 }
 
 /// Just a local helper structure to spoil function parameters as little as possible
-struct Local<'a, 'b, 'input, 'arena, TF, P>
+struct Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
     P: Parser<'input, 'arena, TF>,
 {
     outer_context: &'arena P::Node,
-    dfa_ref: &'a DFA<ATNConfigSet<'static>>,
-    merge_cache: &'b mut MergeCache<'a>,
+    dfa_ref: &'sim DFA<'sim, ATNConfigSet<'sim>>,
+    merge_cache: &'cache mut MergeCache<'scratch>,
     precedence: i32,
-    parser: &'a mut P,
+    parser: &'sim mut P,
     pd: PhantomData<Box<dyn TokenStream<'input, 'arena, TF>>>,
 }
 
-impl<'a, 'b, 'input, 'arena, TF, P> Local<'a, 'b, 'input, 'arena, TF, P>
+impl<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>
+    Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -111,24 +112,16 @@ where
         self.outer_context
     }
 
-    fn scratch(&self) -> &'a bumpalo::Bump {
+    fn scratch(&self) -> &'scratch bumpalo::Bump {
         self.merge_cache.scratch
     }
 }
 
-impl ParserATNSimulator {
+impl<'sim> ParserATNSimulator<'sim> {
     /// creates new `ParserATNSimulator`
-    pub fn new(
-        atn: &'static ATN,
-        decision_to_dfa: &'static Vec<DFA<ATNConfigSet<'static>>>,
-        shared_context_cache: &'static PredictionContextCache,
-    ) -> ParserATNSimulator {
+    pub fn new(atn: &'static ATN, arena: &'sim Arena) -> Self {
         ParserATNSimulator {
-            base: BaseATNSimulator::new_base_atnsimulator(
-                atn,
-                decision_to_dfa,
-                shared_context_cache,
-            ),
+            base: BaseATNSimulator::new_base_atnsimulator(atn, arena),
             prediction_mode: Cell::new(PredictionMode::LL),
             start_index: Cell::new(0),
         }
@@ -150,20 +143,23 @@ impl ParserATNSimulator {
     pub fn adaptive_predict<'input, 'arena, TF, P>(
         &self,
         decision: i32,
-        parser: &mut P,
+        parser: &'sim mut P,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
+        'arena: 'sim,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
         self.start_index.set(parser.get_input_stream_mut().index());
-        let ephemerals = bumpalo::Bump::new();
-        let mut merge_cache = MergeCache::new(&ephemerals);
+        let scratch = bumpalo::Bump::new();
+        let mut merge_cache = MergeCache::new(&scratch);
 
         let mut local = Local {
             outer_context: parser.get_current_context(),
-            dfa_ref: self.decision_to_dfa(decision as usize),
+            dfa_ref: self
+                .decision_to_dfa(decision as usize)
+                .expect("decision is valid"),
             merge_cache: &mut merge_cache,
             precedence: parser.get_precedence(),
             parser,
@@ -199,7 +195,10 @@ impl ParserATNSimulator {
                     let dfa_ref = local.dfa_ref;
 
                     let s0_closure_updated = self.apply_precedence_filter(&s0_closure, &mut local);
-                    dfa_ref.set_s0_configs(s0_closure.into_stored(self));
+                    dfa_ref.set_s0_configs(
+                        self.sim_arena()
+                            .alloc(s0_closure.finalize(self.shared_context_cache())),
+                    );
                     let new_s0 =
                         self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated));
 
@@ -225,13 +224,14 @@ impl ParserATNSimulator {
     }
 
     #[allow(non_snake_case)]
-    fn exec_atn<'a, 'b, 'input, 'arena, TF, P>(
+    fn exec_atn<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-        s0: &'a DFAState<'a, ATNConfigSet<'static>>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+        s0: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
+        'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
@@ -272,7 +272,7 @@ impl ParserATNSimulator {
                         local.input().seek(self.start_index.get())
                     }
 
-                    conflicting_alts = self.eval_semantic_context(local, &Dstate.predicates, true);
+                    conflicting_alts = self.eval_semantic_context(local, Dstate.predicates, true);
                     //                    println!("conflicting_alts {:?}",&conflicting_alts);
                     if conflicting_alts.len() == 1 {
                         return Ok(conflicting_alts.iter().next().unwrap() as i32);
@@ -316,7 +316,7 @@ impl ParserATNSimulator {
                 let stop_index = local.input().index();
                 local.input().seek(self.start_index.get());
 
-                let alts = self.eval_semantic_context(local, &Dstate.predicates, true);
+                let alts = self.eval_semantic_context(local, Dstate.predicates, true);
                 match alts.len() {
                     0 => {
                         return Err(self.no_viable_alt(
@@ -350,23 +350,24 @@ impl ParserATNSimulator {
     }
 
     #[allow(non_snake_case)]
-    fn get_existing_target_state<'dfa>(
-        previousD: &DFAState<'dfa, ATNConfigSet<'static>>,
+    fn get_existing_target_state(
+        previousD: &DFAState<'sim, ATNConfigSet<'sim>>,
         t: i32,
-    ) -> Option<&'dfa DFAState<'dfa, ATNConfigSet<'static>>> {
+    ) -> Option<&'sim DFAState<'sim, ATNConfigSet<'sim>>> {
         previousD.get_edge((t + 1) as usize)
     }
 
     #[allow(non_snake_case)]
-    fn compute_target_state<'a, 'b, 'input, 'arena, TF, P>(
+    fn compute_target_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         // dfa: &mut DFA,
-        previousD: &'a DFAState<'a, ATNConfigSet<'static>>,
+        previousD: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
         t: i32,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> &'a DFAState<'a, ATNConfigSet<'static>>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> &'sim DFAState<'sim, ATNConfigSet<'sim>>
     where
         'input: 'arena,
+        'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
@@ -418,7 +419,7 @@ impl ParserATNSimulator {
         }
 
         let dfa_ref = local.dfa_ref;
-        let D = self.add_dfastate(dfa_ref, D);
+        let D = dfa_ref.add_state(D, self);
         self.add_dfaedge(previousD, t, D);
         D
     }
@@ -426,24 +427,24 @@ impl ParserATNSimulator {
     fn predicate_dfa_state<'scratch>(
         &self,
         scratch: &'scratch bumpalo::Bump,
-        dfa_state: &mut ProposedDFAState<ATNConfigSet<'scratch>>,
+        proposed_state: &mut ProposedDFAState<'scratch, ATNConfigSet<'scratch>>,
         decision_state: &ATNState,
     ) {
         let nalts = decision_state.get_transitions().len();
         let alts_to_collect_preds_from =
-            self.get_conflicting_alts_or_unique_alt(&dfa_state.configs);
+            self.get_conflicting_alts_or_unique_alt(&proposed_state.configs);
         let alt_to_pred = self.get_preds_for_ambig_alts(
             scratch,
             &alts_to_collect_preds_from,
-            &dfa_state.configs,
+            &proposed_state.configs,
             nalts,
         );
         if let Some(alt_to_pred) = alt_to_pred {
-            dfa_state.predicates =
-                self.get_predicate_predictions(&alts_to_collect_preds_from, alt_to_pred);
-            dfa_state.prediction = INVALID_ALT;
+            proposed_state.predicates =
+                self.get_predicate_predictions(scratch, &alts_to_collect_preds_from, alt_to_pred);
+            proposed_state.prediction = INVALID_ALT;
         } else {
-            dfa_state.prediction = alts_to_collect_preds_from
+            proposed_state.prediction = alts_to_collect_preds_from
                 .iter()
                 .next()
                 .unwrap_or(0 /*in java it is -1 but looks like 0 is good enough*/)
@@ -451,14 +452,15 @@ impl ParserATNSimulator {
         }
     }
 
-    fn exec_atn_with_full_context<'a, 'b, 'input, 'arena, TF, P>(
+    fn exec_atn_with_full_context<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
         // _D: &DFAState,
-        s0: ATNConfigSet<'a>,
+        s0: ATNConfigSet<'scratch>,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
+        'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
@@ -538,15 +540,16 @@ impl ParserATNSimulator {
     }
 
     // ATNConfigSet is pretty big so should be boxed to move it cheaper
-    fn compute_reach_set<'a, 'b, 'input, 'arena, TF, P>(
+    fn compute_reach_set<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        closure: &ATNConfigSet<'a>,
+        closure: &ATNConfigSet<'scratch>,
         t: i32,
         full_ctx: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> Option<ATNConfigSet<'a>>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> Option<ATNConfigSet<'scratch>>
     where
         'input: 'arena,
+        'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
@@ -671,15 +674,16 @@ impl ParserATNSimulator {
         result
     }
 
-    fn compute_start_state<'a, 'b, 'input, 'arena, TF, P>(
+    fn compute_start_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         a: ATNStateRef,
-        initial_ctx: &'a PredictionContext<'a>,
+        initial_ctx: &'scratch PredictionContext<'scratch>,
         full_ctx: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> ATNConfigSet<'a>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> ATNConfigSet<'scratch>
     where
         'input: 'arena,
+        'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
@@ -707,11 +711,11 @@ impl ParserATNSimulator {
         configs
     }
 
-    fn apply_precedence_filter<'a, 'b, 'input, 'arena, TF, P>(
+    fn apply_precedence_filter<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        configs: &ATNConfigSet<'a>,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> ATNConfigSet<'a>
+        configs: &ATNConfigSet<'scratch>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> ATNConfigSet<'scratch>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -732,7 +736,7 @@ impl ParserATNSimulator {
                 local.outer_context(),
             );
 
-            if let Some(updated_sem_ctx) = updated_sem_ctx.as_deref() {
+            if let Some(updated_sem_ctx) = updated_sem_ctx {
                 states_from_alt1.insert(config.get_state(), config.get_context());
 
                 if updated_sem_ctx != config.semantic_context() {
@@ -775,18 +779,18 @@ impl ParserATNSimulator {
 
     fn get_preds_for_ambig_alts<'scratch>(
         &self,
-        ephemerals: &'scratch bumpalo::Bump,
+        scratch: &'scratch bumpalo::Bump,
         ambig_alts: &BitSet,
         configs: &ATNConfigSet<'scratch>,
         nalts: usize,
     ) -> Option<Vec<SemanticContext<'scratch>>> {
-        let mut alt_to_pred = bumpalo::collections::Vec::with_capacity_in(nalts + 1, ephemerals);
+        let mut alt_to_pred = bumpalo::collections::Vec::with_capacity_in(nalts + 1, scratch);
         alt_to_pred.resize(nalts + 1, None);
         for c in configs.get_items() {
             let alt = c.get_alt() as usize;
             if ambig_alts.contains(alt) {
                 alt_to_pred[alt] = Some(SemanticContext::or(
-                    ephemerals,
+                    scratch,
                     alt_to_pred[alt].as_ref(),
                     Some(c.semantic_context()),
                 ));
@@ -817,10 +821,11 @@ impl ParserATNSimulator {
 
     fn get_predicate_predictions<'scratch>(
         &self,
+        scratch: &'scratch bumpalo::Bump,
         ambig_alts: &BitSet,
         alt_to_pred: Vec<SemanticContext<'scratch>>,
-    ) -> Vec<PredPrediction<'scratch>> {
-        let mut pairs = vec![];
+    ) -> &'scratch [PredPrediction<'scratch>] {
+        let mut pairs = bumpalo::collections::Vec::with_capacity_in(alt_to_pred.len(), scratch);
         let mut contains_predicate = false;
         for (i, pred) in alt_to_pred.into_iter().enumerate().skip(1) {
             if pred != SemanticContext::NONE {
@@ -835,23 +840,23 @@ impl ParserATNSimulator {
             }
         }
         if !contains_predicate {
-            return Vec::new();
+            return &[];
         }
 
-        pairs
+        pairs.into_bump_slice()
     }
 
     fn get_syn_valid_or_sem_invalid_alt_that_finished_decision_entry_rule<
-        'a,
-        'b,
         'input,
         'arena,
+        'scratch,
+        'cache,
         TF,
         P,
     >(
         &self,
-        configs: &ATNConfigSet<'a>,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        configs: &ATNConfigSet<'scratch>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) -> i32
     where
         'input: 'arena,
@@ -876,11 +881,11 @@ impl ParserATNSimulator {
         INVALID_ALT
     }
 
-    fn split_according_to_semantic_validity<'a, 'b, 'input, 'arena, TF, P>(
+    fn split_according_to_semantic_validity<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        configs: &ATNConfigSet<'a>,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> (ATNConfigSet<'a>, ATNConfigSet<'a>)
+        configs: &ATNConfigSet<'scratch>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> (ATNConfigSet<'scratch>, ATNConfigSet<'scratch>)
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -922,10 +927,10 @@ impl ParserATNSimulator {
         alts.get_min().unwrap_or(INVALID_ALT)
     }
 
-    fn eval_semantic_context<'a, 'b, 'input, 'arena, TF, P>(
+    fn eval_semantic_context<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-        pred_predictions: &Vec<PredPrediction>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+        pred_predictions: &'sim [PredPrediction<'sim>],
         complete: bool,
     ) -> BitSet
     where
@@ -958,10 +963,10 @@ impl ParserATNSimulator {
         predictions
     }
 
-    fn eval_predicate<'a, 'b, 'input, 'arena, TF, P>(
+    fn eval_predicate<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-        pred: impl Borrow<SemanticContext>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+        pred: &SemanticContext,
         _alt: i32,
         _full_ctx: bool,
     ) -> bool
@@ -970,19 +975,19 @@ impl ParserATNSimulator {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        pred.borrow().evaluate(local.parser, local.outer_context)
+        pred.evaluate(local.parser, local.outer_context)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn closure<'a, 'b, 'input, 'arena, TF, P>(
+    fn closure<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        config: ATNConfig<'a>,
-        configs: &mut ATNConfigSet<'a>,
-        closure_busy: &mut HashSet<ATNConfig<'a>, DefaultHashBuilder, &bumpalo::Bump>,
+        config: ATNConfig<'scratch>,
+        configs: &mut ATNConfigSet<'scratch>,
+        closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
         treat_eofas_epsilon: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1006,16 +1011,16 @@ impl ParserATNSimulator {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn closure_checking_stop_state<'a, 'b, 'input, 'arena, TF, P>(
+    fn closure_checking_stop_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        mut config: ATNConfig<'a>,
-        configs: &mut ATNConfigSet<'a>,
-        closure_busy: &mut HashSet<ATNConfig<'a>, DefaultHashBuilder, &bumpalo::Bump>,
+        mut config: ATNConfig<'scratch>,
+        configs: &mut ATNConfigSet<'scratch>,
+        closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
         depth: i32,
         treat_eofas_epsilon: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1091,16 +1096,16 @@ impl ParserATNSimulator {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn closure_work<'a, 'b, 'input, 'arena, TF, P>(
+    fn closure_work<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        config: ATNConfig<'a>,
-        configs: &mut ATNConfigSet<'a>,
-        closure_busy: &mut HashSet<ATNConfig<'a>, DefaultHashBuilder, &bumpalo::Bump>,
+        config: ATNConfig<'scratch>,
+        configs: &mut ATNConfigSet<'scratch>,
+        closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
         depth: i32,
         treat_eofas_epsilon: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1256,16 +1261,16 @@ impl ParserATNSimulator {
     //    fn get_rule_name(&self, index: i32) -> String { unimplemented!() }
 
     #[allow(clippy::too_many_arguments)]
-    fn get_epsilon_target<'a, 'b, 'input, 'arena, TF, P>(
+    fn get_epsilon_target<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        config: &ATNConfig<'a>,
+        config: &ATNConfig<'scratch>,
         t: &Transition,
         collect_predicates: bool,
         in_context: bool,
         full_ctx: bool,
         treat_eofas_epsilon: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> Option<ATNConfig<'a>>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> Option<ATNConfig<'scratch>>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1312,15 +1317,15 @@ impl ParserATNSimulator {
         config.clone().with_state(t.target)
     }
 
-    fn precedence_transition<'a, 'b, 'input, 'arena, TF, P>(
+    fn precedence_transition<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        config: &ATNConfig<'a>,
+        config: &ATNConfig<'scratch>,
         pt: &PrecedencePredicateTransition,
         collect_predicates: bool,
         in_context: bool,
         full_ctx: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> Option<ATNConfig<'a>>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> Option<ATNConfig<'scratch>>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1332,7 +1337,7 @@ impl ParserATNSimulator {
                 local.input().seek(self.start_index.get());
                 let prec_succeeds = self.eval_predicate(
                     local,
-                    pt.get_predicate().unwrap(),
+                    local.scratch().alloc(pt.get_predicate().unwrap()) as &_,
                     config.get_alt(),
                     full_ctx,
                 );
@@ -1344,13 +1349,14 @@ impl ParserATNSimulator {
                 let new_sem_ctx = SemanticContext::and(
                     local.scratch(),
                     Some(config.semantic_context()),
-                    pt.get_predicate(),
+                    pt.get_predicate()
+                        .map(|pred| local.scratch().alloc(pred) as &_),
                 );
                 return Some(
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(local.merge_cache.alloc_with_drop(new_sem_ctx)),
+                        .with_semantic_context(local.scratch().alloc(new_sem_ctx)),
                 );
             }
         } else {
@@ -1360,15 +1366,15 @@ impl ParserATNSimulator {
         None
     }
 
-    fn pred_transition<'a, 'b, 'input, 'arena, TF, P>(
+    fn pred_transition<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        config: &ATNConfig<'a>,
+        config: &ATNConfig<'scratch>,
         pt: &PredicateTransition,
         collect_predicates: bool,
         in_context: bool,
         full_ctx: bool,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
-    ) -> Option<ATNConfig<'a>>
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
+    ) -> Option<ATNConfig<'scratch>>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -1381,7 +1387,7 @@ impl ParserATNSimulator {
                 local.input().seek(self.start_index.get());
                 let prec_succeeds = self.eval_predicate(
                     local,
-                    pt.get_predicate().unwrap(),
+                    local.scratch().alloc(pt.get_predicate().unwrap()) as &_,
                     config.get_alt(),
                     full_ctx,
                 );
@@ -1393,13 +1399,14 @@ impl ParserATNSimulator {
                 let new_sem_ctx = SemanticContext::and(
                     local.scratch(),
                     Some(config.semantic_context()),
-                    pt.get_predicate(),
+                    pt.get_predicate()
+                        .map(|pred| local.scratch().alloc(pred) as &_),
                 );
                 return Some(
                     config
                         .clone()
                         .with_state(pt.target)
-                        .with_semantic_context(local.merge_cache.alloc(new_sem_ctx)),
+                        .with_semantic_context(local.scratch().alloc(new_sem_ctx)),
                 );
             }
         } else {
@@ -1409,12 +1416,12 @@ impl ParserATNSimulator {
         None
     }
 
-    fn rule_transition<'a>(
+    fn rule_transition<'scratch>(
         &self,
-        config: &ATNConfig<'a>,
+        config: &ATNConfig<'scratch>,
         t: &RuleTransition,
-        merge_cache: &mut MergeCache<'a>,
-    ) -> ATNConfig<'a> {
+        merge_cache: &mut MergeCache<'scratch>,
+    ) -> ATNConfig<'scratch> {
         assert!(config.get_context().is_some());
 
         let new_ctx = PredictionContext::new_singleton(config.get_context(), t.follow_state);
@@ -1446,9 +1453,9 @@ impl ParserATNSimulator {
     //
     //    fn dump_dead_end_configs(&self, nvae: * NoViableAltError) { unimplemented!() }
     //
-    fn no_viable_alt<'a, 'b, 'input, 'arena, TF, P>(
+    fn no_viable_alt<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        local: &mut Local<'a, 'b, 'input, 'arena, TF, P>,
+        local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
         _configs: &ATNConfigSet,
         start_index: isize,
     ) -> ANTLRError
@@ -1477,12 +1484,12 @@ impl ParserATNSimulator {
         alt
     }
 
-    fn add_dfaedge<'dfa>(
+    fn add_dfaedge(
         &self,
-        from: &'dfa DFAState<'dfa, ATNConfigSet<'static>>,
+        from: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
         t: i32,
-        to: &'dfa DFAState<'dfa, ATNConfigSet<'static>>,
-    ) -> &'dfa DFAState<'dfa, ATNConfigSet<'static>> {
+        to: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
+    ) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
         if t < -1 || t > self.atn().max_token_type {
             return to;
         }
@@ -1491,19 +1498,19 @@ impl ParserATNSimulator {
         to
     }
 
-    fn add_dfastate<'dfa>(
+    fn add_dfastate<'scratch>(
         &self,
-        dfa: &'dfa DFA<ATNConfigSet<'static>>,
-        state: ProposedDFAState<ATNConfigSet<'_>>,
-    ) -> &'dfa DFAState<'dfa, ATNConfigSet<'static>> {
+        dfa: &'sim DFA<'sim, ATNConfigSet<'sim>>,
+        state: ProposedDFAState<'scratch, ATNConfigSet<'scratch>>,
+    ) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
         dfa.add_state(state, self)
     }
 
     fn report_attempting_full_context<'input, 'arena, TF, P>(
         &self,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         conflicting_alts: &BitSet,
-        configs: &ATNConfigSet<'static>,
+        configs: &ATNConfigSet<'sim>,
         start_index: isize,
         stop_index: isize,
         parser: &mut P,
@@ -1525,11 +1532,11 @@ impl ParserATNSimulator {
             )
     }
 
-    fn report_context_sensitivity<'input, 'arena, TF, P>(
+    fn report_context_sensitivity<'input, 'arena, 'scratch, TF, P>(
         &self,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         prediction: i32,
-        configs: &ATNConfigSet<'_>,
+        configs: &ATNConfigSet<'scratch>,
         start_index: isize,
         stop_index: isize,
         parser: &mut P,
@@ -1544,14 +1551,14 @@ impl ParserATNSimulator {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn report_ambiguity<'input, 'arena, TF, P>(
+    fn report_ambiguity<'input, 'arena, 'scratch, TF, P>(
         &self,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet,
-        configs: &ATNConfigSet<'_>,
+        configs: &ATNConfigSet<'scratch>,
         parser: &mut P,
     ) where
         'input: 'arena,
@@ -1570,17 +1577,21 @@ impl ParserATNSimulator {
     }
 }
 
-impl IATNSimulator<ATNConfigSet<'static>> for ParserATNSimulator {
-    fn shared_context_cache(&self) -> &PredictionContextCache {
+impl<'sim> IATNSimulator<'sim, ATNConfigSet<'sim>> for ParserATNSimulator<'sim> {
+    fn shared_context_cache(&self) -> &'sim PredictionContextCache<'sim> {
         self.base.shared_context_cache()
     }
 
-    fn atn(&self) -> &ATN {
+    fn atn(&self) -> &'static ATN {
         self.base.atn()
     }
 
-    fn decision_to_dfa<'sim>(&'sim self, decision: usize) -> &'sim DFA<'sim, ATNConfigSet<'sim>> {
+    fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, ATNConfigSet<'sim>>> {
         self.base.decision_to_dfa(decision)
+    }
+
+    fn sim_arena(&self) -> &'sim bumpalo::Bump {
+        self.base.sim_arena()
     }
 }
 

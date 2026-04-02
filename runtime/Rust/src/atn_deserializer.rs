@@ -552,7 +552,12 @@ impl ATNDeserializer {
         }
     }
 
-    fn lexer_action_factory(&self, action_type: i32, data1: i32, data2: i32) -> LexerAction {
+    fn lexer_action_factory(
+        &self,
+        action_type: i32,
+        data1: i32,
+        data2: i32,
+    ) -> LexerAction<'static> {
         match action_type {
             LEXER_ACTION_TYPE_CHANNEL => LexerChannelAction(data1),
             LEXER_ACTION_TYPE_CUSTOM => LexerCustomAction {

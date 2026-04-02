@@ -7,6 +7,7 @@ use fxhash::hash64;
 
 use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
+use crate::atn_simulator::IATNSimulator;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
@@ -23,24 +24,33 @@ impl Display for PredPrediction<'_> {
     }
 }
 
+impl<'ephemeral> PredPrediction<'ephemeral> {
+    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> PredPrediction<'sim> {
+        PredPrediction {
+            alt: self.alt,
+            pred: self.pred.promote(arena),
+        }
+    }
+}
+
 #[derive(Debug)]
-pub struct ProposedDFAState<'ephemeral, CS>
+pub struct ProposedDFAState<'scratch, CS>
 where
-    CS: ConfigSet + 'ephemeral,
+    CS: ConfigSet<'scratch> + 'scratch,
 {
     pub configs: CS,
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'ephemeral>>>,
+    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'scratch>>>,
     pub requires_full_context: bool,
-    pub predicates: Vec<PredPrediction<'ephemeral>>,
+    pub predicates: &'scratch [PredPrediction<'scratch>],
 
-    _marker: std::marker::PhantomData<&'ephemeral ()>,
+    _marker: std::marker::PhantomData<&'scratch ()>,
 }
 
-impl<'ephemeral, CS> ProposedDFAState<'ephemeral, CS>
+impl<'scratch, CS> ProposedDFAState<'scratch, CS>
 where
-    CS: ConfigSet + 'ephemeral,
+    CS: ConfigSet<'scratch> + 'scratch,
 {
     pub fn new(configs: CS) -> Self {
         ProposedDFAState {
@@ -49,54 +59,79 @@ where
             prediction: 0,
             lexer_action_executor: None,
             requires_full_context: false,
-            predicates: Vec::new(),
+            predicates: &[],
             _marker: std::marker::PhantomData,
         }
     }
+
+    pub(crate) fn finalize<'sim>(
+        self,
+        recog: &impl IATNSimulator<'sim, CS::FinalizedType<'sim>>,
+        state_number: i32,
+    ) -> DFAState<'sim, CS::FinalizedType<'sim>> {
+        let configs = self.configs.finalize(recog.shared_context_cache());
+        let predicates = recog
+            .sim_arena()
+            .alloc_slice_fill_iter(self.predicates.iter().map(|p| p.promote(recog.sim_arena())));
+
+        let mut state = DFAState::new(
+            recog.atn(),
+            recog.sim_arena(),
+            state_number,
+            configs,
+            predicates,
+        );
+        state.is_accept_state = self.is_accept_state;
+        state.prediction = self.prediction;
+        state.lexer_action_executor = self
+            .lexer_action_executor
+            .map(|ex| recog.sim_arena().alloc(ex.promote(recog.sim_arena())) as &'sim _);
+        state.requires_full_context = self.requires_full_context;
+        state
+    }
 }
 
-impl<'ephemeral, CS: ConfigSet> PartialEq for ProposedDFAState<'ephemeral, CS> {
+impl<'ephemeral, CS: ConfigSet<'ephemeral>> PartialEq for ProposedDFAState<'ephemeral, CS> {
     fn eq(&self, other: &Self) -> bool {
         self.configs == other.configs
     }
 }
-impl<'ephemeral, CS: ConfigSet> Eq for ProposedDFAState<'ephemeral, CS> {}
+impl<'ephemeral, CS: ConfigSet<'ephemeral>> Eq for ProposedDFAState<'ephemeral, CS> {}
 
-impl<'ephemeral, CS: ConfigSet> Hash for ProposedDFAState<'ephemeral, CS> {
+impl<'ephemeral, CS: ConfigSet<'ephemeral>> Hash for ProposedDFAState<'ephemeral, CS> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.configs.hash(state);
     }
 }
 
 #[derive(Debug)]
-pub struct DFAState<'dfa, CS>
+pub struct DFAState<'sim, CS>
 where
-    CS: ConfigSet + 'dfa,
+    CS: ConfigSet<'sim> + 'sim,
 {
     /// Number of this state in corresponding DFA
     pub state_number: i32,
 
     configs: AtomicPtr<CS>,
 
-    edges: Vec<AtomicPtr<DFAState<'dfa, CS>>>,
+    edges: &'sim [AtomicPtr<DFAState<'sim, CS>>],
 
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'dfa>>>,
+    pub(crate) lexer_action_executor: Option<&'sim LexerActionExecutor<'sim>>,
     pub requires_full_context: bool,
-    pub predicates: Vec<PredPrediction<'dfa>>,
-    // dfa_ref: PhantomData<&'dfa super::DFA>,
+    pub predicates: &'sim [PredPrediction<'sim>],
 }
 
-impl<CS: ConfigSet> PartialEq for DFAState<'_, CS> {
+impl<'sim, CS: ConfigSet<'sim>> PartialEq for DFAState<'sim, CS> {
     fn eq(&self, other: &Self) -> bool {
         self.configs() == other.configs()
     }
 }
 
-impl<CS: ConfigSet> Eq for DFAState<'_, CS> {}
+impl<'sim, CS: ConfigSet<'sim>> Eq for DFAState<'sim, CS> {}
 
-impl<'dfa, CS: ConfigSet> DFAState<'dfa, CS> {
+impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     pub fn default_hash(&self) -> u64 {
         hash64(self.configs())
     }
@@ -105,7 +140,7 @@ impl<'dfa, CS: ConfigSet> DFAState<'dfa, CS> {
         self.state_number == -1
     }
 
-    pub fn get_edge(&self, index: usize) -> Option<&'dfa DFAState<'dfa, CS>> {
+    pub fn get_edge(&self, index: usize) -> Option<&'sim DFAState<'sim, CS>> {
         self.edges.get(index).and_then(|ptr| {
             let v = ptr.load(Ordering::Relaxed);
             if v.is_null() {
@@ -116,14 +151,14 @@ impl<'dfa, CS: ConfigSet> DFAState<'dfa, CS> {
         })
     }
 
-    pub fn set_edge(&self, index: usize, state_ref: &DFAState<'dfa, CS>) {
+    pub fn set_edge(&self, index: usize, state_ref: &DFAState<'sim, CS>) {
         self.edges[index].store(
-            state_ref as *const DFAState<'dfa, CS> as *mut DFAState<'dfa, CS>,
+            state_ref as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>,
             Ordering::Relaxed,
         );
     }
 
-    pub fn enumerate_edges(&self) -> Vec<(usize, &'dfa DFAState<'dfa, CS>)> {
+    pub fn enumerate_edges(&self) -> Vec<(usize, &'sim DFAState<'sim, CS>)> {
         self.edges
             .iter()
             .map(|ptr| ptr.load(Ordering::Relaxed))
@@ -153,35 +188,35 @@ impl<'dfa, CS: ConfigSet> DFAState<'dfa, CS> {
 
     // ---- Below are private methods only callable by DFA ----
 
-    pub(super) fn new(atn: &ATN, state_number: i32, configs: Box<CS>) -> Self {
-        let mut edges = Vec::new();
-        // Pre-allocate enough space for the edge set for the given ATN --
-        // avoids a lock on the edges
-        if state_number >= 0 {
-            edges.resize_with(calc_edge_set_size(atn), || {
-                AtomicPtr::new(std::ptr::null_mut())
-            });
-        }
+    pub(super) fn new(
+        atn: &ATN,
+        arena: &'sim bumpalo::Bump,
+        state_number: i32,
+        configs: CS,
+        predicates: &'sim [PredPrediction<'sim>],
+    ) -> Self {
+        let nedges = if state_number >= 0 {
+            calc_edge_set_size(atn)
+        } else {
+            0
+        };
+        let edges = arena.alloc_slice_fill_with(nedges, |_| AtomicPtr::new(std::ptr::null_mut()));
+        let configs = AtomicPtr::new(arena.alloc(configs) as *mut CS);
 
         DFAState {
             state_number,
-            configs: AtomicPtr::new(Box::into_raw(configs)),
+            configs,
             edges,
             is_accept_state: false,
             prediction: 0,
             lexer_action_executor: None,
             requires_full_context: false,
-            predicates: Vec::new(),
-            //dfa_ref: PhantomData::<&'dfa super::DFA>,
+            predicates,
         }
     }
 
-    pub(super) fn set_configs(&self, configs: Box<CS>) {
-        let old = self.configs.swap(Box::into_raw(configs), Ordering::Relaxed);
-        // SAFETY: `old` was previously a valid pointer to a Box<CS>
-        unsafe {
-            drop(Box::from_raw(old));
-        }
+    pub(super) fn set_configs(&self, configs: &'sim mut CS) {
+        self.configs.swap(configs as *mut CS, Ordering::Relaxed);
     }
 
     // fn set_prediction(&self, _v: i32) { unimplemented!() }
@@ -192,25 +227,35 @@ fn calc_edge_set_size(atn: &ATN) -> usize {
 }
 
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>> =
-    LazyLock::new(|| DFAState {
-        state_number: -1,
-        configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
-        edges: Vec::new(),
-        is_accept_state: false,
-        prediction: 0,
-        lexer_action_executor: None,
-        requires_full_context: false,
-        predicates: Vec::new(),
+    LazyLock::new(|| {
+        static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, ATNConfigSet>>; 0] = [];
+        static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];
+
+        DFAState {
+            state_number: -1,
+            configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
+            edges: &EMPTY_EDGE_SET,
+            is_accept_state: false,
+            prediction: 0,
+            lexer_action_executor: None,
+            requires_full_context: false,
+            predicates: &EMPTY_PREDICATES,
+        }
     });
 
 pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATNConfigSet>> =
-    LazyLock::new(|| DFAState {
-        state_number: -1,
-        configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
-        edges: Vec::new(),
-        is_accept_state: false,
-        prediction: 0,
-        lexer_action_executor: None,
-        requires_full_context: false,
-        predicates: Vec::new(),
+    LazyLock::new(|| {
+        static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, LexerATNConfigSet>>; 0] = [];
+        static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];
+
+        DFAState {
+            state_number: -1,
+            configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
+            edges: &EMPTY_EDGE_SET,
+            is_accept_state: false,
+            prediction: 0,
+            lexer_action_executor: None,
+            requires_full_context: false,
+            predicates: &EMPTY_PREDICATES,
+        }
     });

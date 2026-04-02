@@ -35,7 +35,7 @@ where
 {
     fn get_arena(&self) -> &'arena Arena;
 
-    fn get_interpreter(&self) -> &ParserATNSimulator;
+    fn get_interpreter(&self) -> &'arena ParserATNSimulator<'arena>;
 
     fn get_token_factory(&self) -> &TF;
 
@@ -96,7 +96,7 @@ where
     Node: RuleNode<'input, 'arena, Listener = Listener>,
     Listener: ParseTreeListener<'input, 'arena, Node> + ?Sized,
 {
-    pub interp: Arc<ParserATNSimulator>,
+    pub interp: Arc<ParserATNSimulator<'arena>>,
 
     /// Rule context parser is currently processing
     ctx: *mut (),
@@ -228,8 +228,12 @@ where
         self.arena
     }
 
-    fn get_interpreter(&self) -> &ParserATNSimulator {
-        self.interp.as_ref()
+    fn get_interpreter(&self) -> &'arena ParserATNSimulator<'arena> {
+        unsafe {
+            std::mem::transmute::<&ParserATNSimulator<'arena>, &'arena ParserATNSimulator<'arena>>(
+                &*self.interp,
+            )
+        }
     }
 
     fn get_token_factory(&self) -> &TF {
@@ -409,7 +413,7 @@ where
     pub fn new_base_parser(
         arena: &'arena Arena,
         input: Input,
-        interpreter: Arc<ParserATNSimulator>,
+        interpreter: Arc<ParserATNSimulator<'arena>>,
         ext: Ext,
     ) -> Self {
         Self {
@@ -757,7 +761,10 @@ where
     pub fn dump_dfa(&self) {
         let mut seen_one = false;
         for i in 0..self.interp.atn().decision_to_state.len() {
-            let dfa = self.interp.decision_to_dfa(i);
+            let dfa = self
+                .interp
+                .decision_to_dfa(i)
+                .expect("dfa should exist for each decision");
             if !dfa.is_empty() {
                 if seen_one {
                     println!()

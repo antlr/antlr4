@@ -16,6 +16,7 @@ use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
 use crate::prediction_context::{PredictionContext, PredictionContextCache};
 use crate::token::TOKEN_EOF;
+use crate::Arena;
 
 use crate::token_factory::TokenFactory;
 use crate::transition::{ActionTransition, Transition};
@@ -23,7 +24,7 @@ use crate::utils::cell_update;
 
 // todo rewrite this to be actually usable
 #[doc(hidden)]
-pub trait ILexerATNSimulator: IATNSimulator<LexerATNConfigSet<'static>> {
+pub trait ILexerATNSimulator<'sim>: IATNSimulator<'sim, LexerATNConfigSet<'sim>> {
     fn reset(&mut self);
     fn match_token<'input, 'arena, Input, TF>(
         &mut self,
@@ -49,18 +50,18 @@ pub trait ILexerATNSimulator: IATNSimulator<LexerATNConfigSet<'static>> {
 
 /// Simple DFA implementation enough for lexer.
 #[derive(Debug)]
-pub struct LexerATNSimulator {
-    base: BaseATNSimulator<LexerATNConfigSet<'static>>,
+pub struct LexerATNSimulator<'sim> {
+    base: BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
 
     //    merge_cache: DoubleDict,
     start_index: isize,
     pub(crate) current_pos: Rc<LexerPosition>,
     mode: usize,
-    prev_accept: SimState<'static>,
+    prev_accept: SimState<'sim>,
     // lexer_action_executor: Option<Box<LexerActionExecutor>>,
 }
 
-impl ILexerATNSimulator for LexerATNSimulator {
+impl<'sim> ILexerATNSimulator<'sim> for LexerATNSimulator<'sim> {
     fn reset(&mut self) {
         self.prev_accept.reset()
     }
@@ -76,7 +77,7 @@ impl ILexerATNSimulator for LexerATNSimulator {
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
-        let arena = bumpalo::Bump::new();
+        let scratch = bumpalo::Bump::new();
 
         self.mode = mode;
         let mark = lexer.input().mark();
@@ -85,14 +86,12 @@ impl ILexerATNSimulator for LexerATNSimulator {
             self.start_index = lexer.input().index();
             self.prev_accept.reset();
             let dfa = self
-                .base
-                .decision_to_dfa
-                .get(mode)
+                .decision_to_dfa(mode)
                 .ok_or_else(|| ANTLRError::illegal_state("invalid mode".into()))?;
 
             match dfa.s0() {
-                None => self.match_atn(lexer, dfa, &arena),
-                Some(s0) => self.exec_atn(s0, lexer, dfa, &arena),
+                None => self.match_atn(lexer, dfa, &scratch),
+                Some(s0) => self.exec_atn(s0, lexer, dfa, &scratch),
                 //                Err(_) => panic!("dfa rwlock error")
             }
         })();
@@ -132,17 +131,21 @@ impl ILexerATNSimulator for LexerATNSimulator {
     //    }
 }
 
-impl IATNSimulator<LexerATNConfigSet<'static>> for LexerATNSimulator {
-    fn shared_context_cache(&self) -> &PredictionContextCache {
+impl<'sim> IATNSimulator<'sim, LexerATNConfigSet<'sim>> for LexerATNSimulator<'sim> {
+    fn shared_context_cache(&self) -> &'sim PredictionContextCache<'sim> {
         self.base.shared_context_cache()
     }
 
-    fn atn(&self) -> &ATN {
+    fn atn(&self) -> &'static ATN {
         self.base.atn()
     }
 
-    fn decision_to_dfa<'sim>(&'sim self, decision: usize) -> &'sim DFA<'sim, LexerATNConfigSet<'static>> {
+    fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, LexerATNConfigSet<'sim>>> {
         self.base.decision_to_dfa(decision)
+    }
+
+    fn sim_arena(&self) -> &'sim bumpalo::Bump {
+        self.base.sim_arena()
     }
 }
 
@@ -152,21 +155,16 @@ pub const MIN_DFA_EDGE: i32 = 0;
 pub const MAX_DFA_EDGE: i32 = 127;
 pub const LEXER_DFA_EDGE_SET_SIZE: usize = (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as usize;
 
-impl LexerATNSimulator {
+impl<'sim> LexerATNSimulator<'sim> {
     /// Creates `LexerATNSimulator` instance which creates DFA over `atn`
     ///
     /// Called from generated parser.
     pub fn new_lexer_atnsimulator(
         atn: &'static ATN,
-        decision_to_dfa: &'static Vec<DFA<LexerATNConfigSet<'static>>>,
-        shared_context_cache: &'static PredictionContextCache,
-    ) -> LexerATNSimulator {
+        arena: &'sim Arena,
+    ) -> LexerATNSimulator<'sim> {
         LexerATNSimulator {
-            base: BaseATNSimulator::new_base_atnsimulator(
-                atn,
-                decision_to_dfa,
-                shared_context_cache,
-            ),
+            base: BaseATNSimulator::new_base_atnsimulator(atn, arena),
             start_index: 0,
             current_pos: Rc::new(LexerPosition {
                 line: Cell::new(0),
@@ -183,11 +181,11 @@ impl LexerATNSimulator {
     //    }
 
     #[cold]
-    fn match_atn<'ephemeral, 'input, 'arena, Input, TF>(
+    fn match_atn<'scratch, 'input, 'arena, Input, TF>(
         &mut self,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        dfa: &DFA<LexerATNConfigSet<'static>>,
-        arena: &'ephemeral bumpalo::Bump,
+        dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
+        scratch: &'scratch bumpalo::Bump,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
@@ -202,7 +200,7 @@ impl LexerATNSimulator {
             .ok_or_else(|| ANTLRError::illegal_state("invalid mode".into()))?;
 
         let _old_mode = self.mode;
-        let mut s0_closure = self.compute_start_state(start_state.as_ref(), lexer, arena);
+        let mut s0_closure = self.compute_start_state(start_state.as_ref(), lexer, scratch);
         let _supress_edge = s0_closure.has_semantic_context();
         s0_closure.set_has_semantic_context(false);
 
@@ -211,16 +209,16 @@ impl LexerATNSimulator {
             dfa.set_s0(next_state);
         }
 
-        self.exec_atn(next_state, lexer, dfa, arena)
+        self.exec_atn(next_state, lexer, dfa, scratch)
     }
 
-    fn exec_atn<'ephemeral, 'input, 'arena, 'dfa, Input, TF>(
+    fn exec_atn<'scratch, 'input, 'arena, Input, TF>(
         &mut self,
         //        input: &'a mut dyn CharStream,
-        ds0: &'dfa DFAState<'dfa, LexerATNConfigSet<'static>>,
+        ds0: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        dfa: &'dfa DFA<LexerATNConfigSet<'static>>,
-        arena: &'ephemeral bumpalo::Bump,
+        dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
+        scratch: &'scratch bumpalo::Bump,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
@@ -236,7 +234,7 @@ impl LexerATNSimulator {
         loop {
             let target = Self::get_existing_target_state(s, symbol);
             let target =
-                target.unwrap_or_else(|| self.compute_target_state(dfa, s, symbol, lexer, arena));
+                target.unwrap_or_else(|| self.compute_target_state(dfa, s, symbol, lexer, scratch));
             //              let target = dfastates.deref().get(s).unwrap() ;x
 
             if target.is_error_state() {
@@ -262,10 +260,10 @@ impl LexerATNSimulator {
     }
 
     #[inline(always)]
-    fn get_existing_target_state<'dfa>(
-        s: &'dfa DFAState<'dfa, LexerATNConfigSet<'static>>,
+    fn get_existing_target_state(
+        s: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
         t: i32,
-    ) -> Option<&'dfa DFAState<'dfa, LexerATNConfigSet<'static>>> {
+    ) -> Option<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>> {
         // if t < MIN_DFA_EDGE || t > MAX_DFA_EDGE {
         //     return None;
         // }
@@ -274,21 +272,21 @@ impl LexerATNSimulator {
     }
 
     #[cold]
-    fn compute_target_state<'ephemeral, 'input, 'arena, 'dfa, Input, TF>(
+    fn compute_target_state<'scratch, 'input, 'arena, Input, TF>(
         &self,
-        dfa: &'dfa DFA<LexerATNConfigSet<'static>>,
-        s: &DFAState<'dfa, LexerATNConfigSet<'static>>,
+        dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
+        s: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
         _t: i32,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        arena: &'ephemeral bumpalo::Bump,
-    ) -> &'dfa DFAState<'dfa, LexerATNConfigSet<'static>>
+        scratch: &'scratch bumpalo::Bump,
+    ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>>
     where
         'input: 'arena,
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
-        let mut reach = LexerATNConfigSet::new(arena);
-        self.get_reachable_config_set(s.configs(), &mut reach, _t, lexer, arena);
+        let mut reach = LexerATNConfigSet::new(scratch);
+        self.get_reachable_config_set(s.configs(), &mut reach, _t, lexer, scratch);
         //        println!(" --- target computed {:?}", reach.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
 
         // let mut states = dfa_mut.states;
@@ -312,17 +310,18 @@ impl LexerATNSimulator {
         //        states.get(to).unwrap()
     }
 
-    fn get_reachable_config_set<'ephemeral, 'input, 'arena, Input, TF>(
+    fn get_reachable_config_set<'scratch, 'input, 'arena, Input, TF>(
         &self,
         // _states: &V,
         //        _input: &mut dyn CharStream,
-        _closure: &LexerATNConfigSet<'ephemeral>,
-        _reach: &mut LexerATNConfigSet<'ephemeral>,
+        _closure: &'scratch LexerATNConfigSet<'scratch>,
+        _reach: &mut LexerATNConfigSet<'scratch>,
         _t: i32,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        ephemerals: &'ephemeral bumpalo::Bump,
+        scratch: &'scratch bumpalo::Bump,
     ) where
         'input: 'arena,
+        'sim: 'scratch,
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
@@ -337,10 +336,10 @@ impl LexerATNSimulator {
             for tr in atn_state.get_transitions() {
                 if let Some(target) = tr.get_reachable_target(_t) {
                     let exec = config.get_lexer_executor().map(|x| {
-                        ephemerals.alloc(
-                            x.clone()
-                                .fix_offset_before_match(lexer.input().index() - self.start_index),
-                        ) as &'ephemeral LexerActionExecutor
+                        scratch.alloc(x.fix_offset_before_match(
+                            scratch,
+                            lexer.input().index() - self.start_index,
+                        )) as &'scratch LexerActionExecutor<'scratch>
                     });
 
                     let new = config.clone().with_state(target).with_lexer_executor(exec);
@@ -351,7 +350,7 @@ impl LexerATNSimulator {
                         true,
                         _t == EOF,
                         lexer,
-                        ephemerals,
+                        scratch,
                     ) {
                         skip_alt = config.get_alt();
                         break;
@@ -412,19 +411,20 @@ impl LexerATNSimulator {
             .set(self.prev_accept.column);
     }
 
-    fn compute_start_state<'ephemeral, 'input, 'arena, Input, TF>(
+    fn compute_start_state<'scratch, 'input, 'arena, Input, TF>(
         &self,
         p: &ATNState,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        arena: &'ephemeral bumpalo::Bump,
-    ) -> LexerATNConfigSet<'ephemeral>
+        scratch: &'scratch bumpalo::Bump,
+    ) -> LexerATNConfigSet<'scratch>
     where
         'input: 'arena,
+        'sim: 'scratch,
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
         //        let initial_context = &EMPTY_PREDICTION_CONTEXT;
-        let mut config_set = LexerATNConfigSet::new(arena);
+        let mut config_set = LexerATNConfigSet::new(scratch);
         for (i, tr) in p.get_transitions().iter().enumerate() {
             let target = tr.get_target();
             let atn_config = LexerATNConfig::new(target, (i + 1) as i32, &EMPTY_PREDICTION_CONTEXT);
@@ -435,7 +435,7 @@ impl LexerATNSimulator {
                 false,
                 false,
                 lexer,
-                arena,
+                scratch,
             );
         }
 
@@ -443,18 +443,19 @@ impl LexerATNSimulator {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn closure<'ephemeral, 'input, 'arena, Input, TF>(
+    fn closure<'scratch, 'input, 'arena, Input, TF>(
         &self,
-        mut config: LexerATNConfig<'ephemeral>,
-        config_set: &mut LexerATNConfigSet<'ephemeral>,
+        mut config: LexerATNConfig<'scratch>,
+        config_set: &mut LexerATNConfigSet<'scratch>,
         mut _current_alt_reached_accept_state: bool,
         speculative: bool,
         treat_eofas_epsilon: bool,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        arena: &'ephemeral bumpalo::Bump,
+        scratch: &'scratch bumpalo::Bump,
     ) -> bool
     where
         'input: 'arena,
+        'sim: 'scratch,
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
@@ -495,7 +496,7 @@ impl LexerATNSimulator {
                             speculative,
                             treat_eofas_epsilon,
                             lexer,
-                            arena,
+                            scratch,
                         )
                     }
                 }
@@ -512,16 +513,17 @@ impl LexerATNSimulator {
         }
 
         let state = config.get_state();
+        let config = scratch.alloc(config);
 
         for tr in state.get_transitions() {
             let c = self.get_epsilon_target(
-                &mut config,
+                config,
                 tr,
                 config_set,
                 speculative,
                 treat_eofas_epsilon,
                 lexer,
-                arena,
+                scratch,
             );
 
             if let Some(c) = c {
@@ -532,7 +534,7 @@ impl LexerATNSimulator {
                     speculative,
                     treat_eofas_epsilon,
                     lexer,
-                    arena,
+                    scratch,
                 );
             }
         }
@@ -541,19 +543,20 @@ impl LexerATNSimulator {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn get_epsilon_target<'ephemeral, 'input, 'arena, Input, TF>(
+    fn get_epsilon_target<'scratch, 'input, 'arena, Input, TF>(
         &self,
         //        _input: &mut dyn CharStream,
-        _config: &mut LexerATNConfig<'ephemeral>,
+        _config: &'scratch LexerATNConfig<'scratch>,
         _trans: &Transition,
-        _configs: &mut LexerATNConfigSet<'ephemeral>,
+        _configs: &mut LexerATNConfigSet<'scratch>,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
-        ephemerals: &'ephemeral bumpalo::Bump,
-    ) -> Option<LexerATNConfig<'ephemeral>>
+        scratch: &'scratch bumpalo::Bump,
+    ) -> Option<LexerATNConfig<'scratch>>
     where
         'input: 'arena,
+        'sim: 'scratch,
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
@@ -574,7 +577,7 @@ impl LexerATNSimulator {
                     _config
                         .clone()
                         .with_state(target)
-                        .with_prediction_context(Some(ephemerals.alloc(pred_ctx))),
+                        .with_prediction_context(Some(scratch.alloc(pred_ctx))),
                 );
             }
             Transition::Predicate(tr) => {
@@ -590,6 +593,7 @@ impl LexerATNSimulator {
                     let lexer_action = self.atn().lexer_actions[tr.action_index as usize].clone();
                     //dbg!(&lexer_action);
                     let lexer_action_executor = LexerActionExecutor::new_copy_append(
+                        self.sim_arena(),
                         _config.get_lexer_executor(),
                         lexer_action,
                     );
@@ -597,7 +601,7 @@ impl LexerATNSimulator {
                         _config
                             .clone()
                             .with_state(target)
-                            .with_lexer_executor(Some(ephemerals.alloc(lexer_action_executor))),
+                            .with_lexer_executor(Some(scratch.alloc(lexer_action_executor))),
                     )
                 } else {
                     result = Some(_config.clone().with_state(target));
@@ -653,10 +657,10 @@ impl LexerATNSimulator {
         result
     }
 
-    fn capture_sim_state<'dfa>(
+    fn capture_sim_state(
         &mut self,
         input: &impl IntStream,
-        dfa_state: &'dfa DFAState<'dfa, LexerATNConfigSet<'static>>,
+        dfa_state: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
     ) -> bool {
         if dfa_state.is_accept_state {
             self.set_prev_accept(SimState {
@@ -672,15 +676,15 @@ impl LexerATNSimulator {
         false
     }
 
-    fn set_prev_accept<'dfa>(&mut self, s: SimState<'dfa>) {
-        self.prev_accept = unsafe { std::mem::transmute::<SimState<'dfa>, SimState<'static>>(s) };
+    fn set_prev_accept(&mut self, s: SimState<'sim>) {
+        self.prev_accept = s;
     }
 
-    fn add_dfaedge<'dfa>(
+    fn add_dfaedge(
         &self,
-        from: &DFAState<'dfa, LexerATNConfigSet<'static>>,
+        from: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
         t: i32,
-        _to: &DFAState<'dfa, LexerATNConfigSet<'static>>,
+        _to: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
     ) {
         if !(MIN_DFA_EDGE..=MAX_DFA_EDGE).contains(&t) {
             return;
@@ -689,11 +693,11 @@ impl LexerATNSimulator {
         from.set_edge((t - MIN_DFA_EDGE) as usize, _to);
     }
 
-    fn add_dfastate<'dfa>(
+    fn add_dfastate(
         &self,
-        dfa: &'dfa DFA<LexerATNConfigSet<'static>>,
+        dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
         configs: LexerATNConfigSet,
-    ) -> &'dfa DFAState<'dfa, LexerATNConfigSet<'static>> {
+    ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>> {
         assert!(!configs.has_semantic_context());
 
         let mut state = ProposedDFAState::new(configs);
@@ -717,17 +721,18 @@ impl LexerATNSimulator {
             state.is_accept_state = true;
         }
 
-        dfa.add_lexer_state(state, self)
+        dfa.add_state(state, self)
     }
 
     /// Returns current DFA that is currently used.
-    pub fn get_dfa(&self) -> &DFA<LexerATNConfigSet<'static>> {
+    pub fn get_dfa(&self) -> &'sim DFA<'sim, LexerATNConfigSet<'sim>> {
         self.decision_to_dfa(self.mode)
+            .expect("self.mode should be valid")
     }
 
     /// Returns current DFA for particular lexer mode
-    pub fn get_dfa_for_mode(&self, mode: usize) -> &DFA<LexerATNConfigSet<'static>> {
-        self.decision_to_dfa(mode)
+    pub fn get_dfa_for_mode(&self, mode: usize) -> &'sim DFA<'sim, LexerATNConfigSet<'sim>> {
+        self.decision_to_dfa(mode).expect("mode should be valid")
     }
 
     // fn get_token_name(&self, _tt: i32) -> String { unimplemented!() }
@@ -736,15 +741,15 @@ impl LexerATNSimulator {
 }
 
 #[derive(Debug)]
-pub(crate) struct SimState<'dfa> {
+pub(crate) struct SimState<'sim> {
     index: isize,
     line: u32,
     column: i32,
-    dfa_state: Option<&'dfa DFAState<'dfa, LexerATNConfigSet<'static>>>,
+    dfa_state: Option<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>>,
 }
 
-impl<'dfa> SimState<'dfa> {
-    pub(crate) fn new() -> SimState<'dfa> {
+impl<'sim> SimState<'sim> {
+    pub(crate) fn new() -> SimState<'sim> {
         SimState {
             index: -1,
             line: 0,

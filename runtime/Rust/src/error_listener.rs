@@ -42,10 +42,10 @@ where
     #[allow(clippy::too_many_arguments)]
     /// This method is called by the parser when a full-context prediction
     /// results in an ambiguity.
-    fn report_ambiguity(
+    fn report_ambiguity<'sim>(
         &self,
         _recognizer: &R,
-        _dfa: &DFA<ATNConfigSet<'static>>,
+        _dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         _start_index: isize,
         _stop_index: isize,
         _exact: bool,
@@ -56,10 +56,10 @@ where
 
     /// This method is called when an SLL conflict occurs and the parser is about
     /// to use the full context information to make an LL decision.
-    fn report_attempting_full_context(
+    fn report_attempting_full_context<'sim>(
         &self,
         _recognizer: &R,
-        _dfa: &DFA<ATNConfigSet<'static>>,
+        _dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         _start_index: isize,
         _stop_index: isize,
         _conflicting_alts: &BitSet,
@@ -69,10 +69,10 @@ where
 
     /// This method is called by the parser when a full-context prediction has a
     /// unique result.
-    fn report_context_sensitivity(
+    fn report_context_sensitivity<'sim>(
         &self,
         _recognizer: &R,
-        _dfa: &DFA<ATNConfigSet<'static>>,
+        _dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         _start_index: isize,
         _stop_index: isize,
         _prediction: i32,
@@ -132,10 +132,10 @@ where
         }
     }
 
-    fn report_ambiguity(
+    fn report_ambiguity<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -155,10 +155,10 @@ where
         }
     }
 
-    fn report_attempting_full_context(
+    fn report_attempting_full_context<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         conflicting_alts: &BitSet<u32>,
@@ -176,10 +176,10 @@ where
         }
     }
 
-    fn report_context_sensitivity(
+    fn report_context_sensitivity<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         prediction: i32,
@@ -235,7 +235,11 @@ where
         }
     }
 
-    fn get_decision_description<R>(&self, recog: &R, dfa: &DFA<ATNConfigSet<'static>>) -> String
+    fn get_decision_description<'sim, R>(
+        &self,
+        recog: &R,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
+    ) -> String
     where
         'input: 'arena,
         R: Recognizer<'input, 'arena>,
@@ -253,10 +257,10 @@ where
     /// Computes the set of conflicting or ambiguous alternatives from a
     /// configuration set, if that information was not already provided by the
     /// parser in `alts`.
-    pub fn get_conflicting_alts<'a>(
+    pub fn get_conflicting_alts<'a, 'sim>(
         &self,
         alts: Option<&'a BitSet>,
-        _configs: &ATNConfigSet,
+        _configs: &ATNConfigSet<'sim>,
     ) -> Cow<'a, BitSet> {
         match alts {
             Some(alts) => Cow::Borrowed(alts),
@@ -277,10 +281,10 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     P: Parser<'input, 'arena, TF>,
 {
-    fn report_ambiguity(
+    fn report_ambiguity<'sim>(
         &self,
         recognizer: &P,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -301,10 +305,10 @@ where
         recognizer.notify_error_listeners(msg, None, None);
     }
 
-    fn report_attempting_full_context(
+    fn report_attempting_full_context<'sim>(
         &self,
         recognizer: &P,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         _conflicting_alts: &BitSet<u32>,
@@ -320,10 +324,10 @@ where
         recognizer.notify_error_listeners(msg, None, None);
     }
 
-    fn report_context_sensitivity(
+    fn report_context_sensitivity<'sim>(
         &self,
         recognizer: &P,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         _prediction: i32,
@@ -412,10 +416,10 @@ where
     }
 
     #[inline(always)]
-    fn report_ambiguity(
+    fn report_ambiguity<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         exact: bool,
@@ -434,10 +438,10 @@ where
     }
 
     #[inline(always)]
-    fn report_attempting_full_context(
+    fn report_attempting_full_context<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         conflicting_alts: &BitSet<u32>,
@@ -454,10 +458,10 @@ where
     }
 
     #[inline(always)]
-    fn report_context_sensitivity(
+    fn report_context_sensitivity<'sim>(
         &self,
         recognizer: &R,
-        dfa: &DFA<ATNConfigSet<'static>>,
+        dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         start_index: isize,
         stop_index: isize,
         prediction: i32,

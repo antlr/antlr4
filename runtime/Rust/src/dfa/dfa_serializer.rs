@@ -7,13 +7,13 @@ use super::DFA;
 
 pub struct DFASerializer<'sim, 'a, CS>
 where
-    CS: ConfigSet + 'sim,
+    CS: ConfigSet<'sim>,
 {
     dfa: &'a DFA<'sim, CS>,
     get_edge_label: &'a dyn Fn(usize) -> String,
 }
 
-impl<CS: ConfigSet> Display for DFASerializer<'_, '_, CS> {
+impl<'sim, CS: ConfigSet<'sim>> Display for DFASerializer<'sim, '_, CS> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let states = self.dfa.get_states();
         for source in states {
@@ -31,7 +31,7 @@ impl<CS: ConfigSet> Display for DFASerializer<'_, '_, CS> {
     }
 }
 
-impl<'sim, 'a, CS: ConfigSet> DFASerializer<'sim, 'a, CS> {
+impl<'sim, 'a, CS: ConfigSet<'sim>> DFASerializer<'sim, 'a, CS> {
     pub fn new(
         dfa: &'a DFA<'sim, CS>,
         get_edge_label: &'a dyn Fn(usize) -> String,
@@ -42,7 +42,7 @@ impl<'sim, 'a, CS: ConfigSet> DFASerializer<'sim, 'a, CS> {
         }
     }
 
-    fn get_state_string(&self, state: &DFAState<CS>) -> String {
+    fn get_state_string(&self, state: &DFAState<'sim, CS>) -> String {
         let mut base_str = format!(
             "{}s{}{}",
             if state.is_accept_state { ":" } else { "" },
