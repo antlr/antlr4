@@ -5,6 +5,8 @@ use std::cell::Cell;
 
 use std::rc::Rc;
 
+use crate::atn_config_set::LexerATNConfigSet;
+use crate::atn_simulator::BaseATNSimulator;
 use crate::char_stream::CharStream;
 use crate::error_listener::{ConsoleErrorListener, ErrorListener};
 use crate::errors::ANTLRError;
@@ -84,7 +86,10 @@ where
 
     fn get_grammar_file_name(&self) -> &'static str;
 
-    fn get_atn_simulator(&self, arena: &'arena Arena) -> LexerATNSimulator<'arena>;
+    fn get_atn_simulator(
+        &self,
+        arena: &'arena Arena,
+    ) -> &'arena BaseATNSimulator<'arena, LexerATNConfigSet<'arena>>;
 }
 
 /// Default implementation of Lexer
@@ -289,9 +294,10 @@ where
     /// Creates new lexer instance
     pub fn new_base_lexer(input: Input, recog: Ext, arena: &'arena Arena) -> Self {
         let factory = TF::new(arena);
+        let interpreter = LexerATNSimulator::new(recog.get_atn_simulator(arena));
 
         let mut lexer = Self {
-            interpreter: Some(Box::new(recog.get_atn_simulator(arena))),
+            interpreter: Some(Box::new(interpreter)),
             input: Some(input),
             recog,
             factory,

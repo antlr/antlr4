@@ -16,7 +16,6 @@ use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
 use crate::prediction_context::{PredictionContext, PredictionContextCache};
 use crate::token::TOKEN_EOF;
-use crate::Arena;
 
 use crate::token_factory::TokenFactory;
 use crate::transition::{ActionTransition, Transition};
@@ -51,7 +50,7 @@ pub trait ILexerATNSimulator<'sim>: IATNSimulator<'sim, LexerATNConfigSet<'sim>>
 /// Simple DFA implementation enough for lexer.
 #[derive(Debug)]
 pub struct LexerATNSimulator<'sim> {
-    base: BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
+    base: &'sim BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
 
     //    merge_cache: DoubleDict,
     start_index: isize,
@@ -157,14 +156,11 @@ pub const LEXER_DFA_EDGE_SET_SIZE: usize = (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as 
 
 impl<'sim> LexerATNSimulator<'sim> {
     /// Creates `LexerATNSimulator` instance which creates DFA over `atn`
-    ///
-    /// Called from generated parser.
-    pub fn new_lexer_atnsimulator(
-        atn: &'static ATN,
-        arena: &'sim Arena,
+    pub fn new(
+        base: &'sim BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
     ) -> LexerATNSimulator<'sim> {
         LexerATNSimulator {
-            base: BaseATNSimulator::new_base_atnsimulator(atn, arena),
+            base,
             start_index: 0,
             current_pos: Rc::new(LexerPosition {
                 line: Cell::new(0),

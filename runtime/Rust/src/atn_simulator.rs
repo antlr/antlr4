@@ -1,4 +1,3 @@
-use std::cell::OnceCell;
 use std::fmt::{Debug, Error, Formatter};
 
 use crate::atn::ATN;
@@ -27,7 +26,7 @@ where
     // Memory managed by arena:
     shared_context_cache: &'sim PredictionContextCache<'sim>,
     // Memory managed by arena:
-    decision_to_dfa: &'sim [OnceCell<DFA<'sim, CS>>],
+    decision_to_dfa: &'sim [DFA<'sim, CS>],
 }
 
 impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
@@ -36,21 +35,37 @@ impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
     }
 }
 
-impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
-    pub fn new_base_atnsimulator(
-        atn: &'static ATN,
-        arena: &'sim Arena,
-    ) -> BaseATNSimulator<'sim, CS> {
-        let (arena_ref, raw_arena) = unsafe { arena.make_sim_arena() };
-        let shared_context_cache = arena_ref.alloc(PredictionContextCache::new(arena_ref));
+impl<CS: ConfigSet<'static>> BaseATNSimulator<'static, CS> {
+    pub fn new_static(atn: &'static ATN) -> BaseATNSimulator<'static, CS> {
+        let arena: &'static bumpalo::Bump = Box::leak(Box::new(bumpalo::Bump::new()));
+        let shared_context_cache = arena.alloc(PredictionContextCache::new(arena));
         let decision_to_dfa =
-            arena_ref.alloc_slice_fill_with(atn.decision_to_state.len(), |_| OnceCell::new());
+            arena.alloc_slice_fill_with(atn.decision_to_state.len(), |decision| {
+                DFA::<CS>::new(
+                    atn,
+                    arena,
+                    atn.get_decision_state(decision as i32),
+                    decision as i32,
+                )
+            });
 
         BaseATNSimulator {
             atn,
-            arena: raw_arena,
+            arena: arena as *const bumpalo::Bump,
             shared_context_cache,
             decision_to_dfa,
+        }
+    }
+
+    pub fn as_ref<'sim>(
+        &self,
+        _arena: &'sim Arena,
+    ) -> &'sim BaseATNSimulator<'sim, CS::FinalizedType<'sim>> {
+        // SAFETY: the 'static lifetime of self is guaranteed to outlive 'sim, and the
+        // arena is not used for any memory management in this method:
+        unsafe {
+            &*(self as *const BaseATNSimulator<'static, CS>
+                as *const BaseATNSimulator<'sim, CS::FinalizedType<'sim>>)
         }
     }
 }
@@ -65,16 +80,7 @@ impl<'sim, CS: ConfigSet<'sim>> IATNSimulator<'sim, CS> for BaseATNSimulator<'si
     }
 
     fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, CS>> {
-        self.decision_to_dfa.get(decision).map(|cell| {
-            cell.get_or_init(|| {
-                DFA::<CS>::new(
-                    self.atn(),
-                    self.sim_arena(),
-                    self.atn.get_decision_state(decision as i32),
-                    decision as i32,
-                )
-            })
-        })
+        self.decision_to_dfa.get(decision)
     }
 
     fn sim_arena(&self) -> &'sim bumpalo::Bump {

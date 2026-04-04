@@ -24,9 +24,9 @@ use crate::parser::Parser;
 use crate::prediction_context::{
     NoopHasherBuilder, PredictionContext, PredictionContextCache, EMPTY_PREDICTION_CONTEXT,
 };
+use crate::prediction_mode::*;
 use crate::semantic_context::SemanticContext;
 use crate::token::{OwningToken, Token, TOKEN_EOF, TOKEN_EPSILON};
-use crate::{prediction_mode::*, Arena};
 
 use crate::token_factory::TokenFactory;
 use crate::token_stream::TokenStream;
@@ -76,7 +76,7 @@ use crate::transition::{
 /// **For more info see Java version**
 #[derive(Debug)]
 pub struct ParserATNSimulator<'sim> {
-    base: BaseATNSimulator<'sim, ATNConfigSet<'sim>>,
+    base: &'sim BaseATNSimulator<'sim, ATNConfigSet<'sim>>,
     prediction_mode: Cell<PredictionMode>,
     start_index: Cell<isize>,
     // pd:PhantomData<P>
@@ -119,9 +119,9 @@ where
 
 impl<'sim> ParserATNSimulator<'sim> {
     /// creates new `ParserATNSimulator`
-    pub fn new(atn: &'static ATN, arena: &'sim Arena) -> Self {
+    pub fn new(base: &'sim BaseATNSimulator<'sim, ATNConfigSet<'sim>>) -> Self {
         ParserATNSimulator {
-            base: BaseATNSimulator::new_base_atnsimulator(atn, arena),
+            base,
             prediction_mode: Cell::new(PredictionMode::LL),
             start_index: Cell::new(0),
         }

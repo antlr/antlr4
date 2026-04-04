@@ -10,7 +10,9 @@ use dbt_antlr4::atn::ATN;
 use dbt_antlr4::char_stream::CharStream;
 use dbt_antlr4::int_stream::IntStream;
 use dbt_antlr4::lexer::{BaseLexer, LexerRecog, Lexer as _};
+use dbt_antlr4::atn_config_set::LexerATNConfigSet;
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::atn_simulator::BaseATNSimulator;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
 use dbt_antlr4::PredictionContextCache;
@@ -99,9 +101,14 @@ where
     fn get_literal_names(&self) -> &[Option<&str>] { &_LITERAL_NAMES }
     fn get_symbolic_names(&self) -> &[Option<&str>] { &_SYMBOLIC_NAMES }
     fn get_grammar_file_name(&self) -> &'static str { "SimpleLRLexer.g4" }
-    fn get_atn_simulator(&self, arena: &'arena Arena) -> LexerATNSimulator<'arena> {
-        LexerATNSimulator::new_lexer_atnsimulator(&_ATN, arena)
+    fn get_atn_simulator(&self, arena: &'arena Arena) -> &'arena BaseATNSimulator<'arena, LexerATNConfigSet<'arena>> {
+        BASE_ATN_SIMULATOR.with(|sim| sim.as_ref(arena))
     }
+}
+
+thread_local! {
+    static BASE_ATN_SIMULATOR: BaseATNSimulator<'static, LexerATNConfigSet<'static>> =
+        BaseATNSimulator::<'static, LexerATNConfigSet<'static>>::new_static(&_ATN);
 }
 
 static _ATN: LazyLock<ATN> =

@@ -15,7 +15,9 @@ use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
 use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::rule_context::{CustomRuleContext, RuleContext};
 use dbt_antlr4::recognizer::{Recognizer,Actions};
+use dbt_antlr4::atn_config_set::ATNConfigSet;
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
+use dbt_antlr4::atn_simulator::BaseATNSimulator;
 use dbt_antlr4::dfa::ParserDFA as DFA;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
@@ -71,6 +73,11 @@ where
     err_handler: ErrorStrategyDelegate<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>>,
 }
 
+thread_local! {
+    static BASE_ATN_SIMULATOR: BaseATNSimulator<'static, ATNConfigSet<'static>> =
+        BaseATNSimulator::<'static, ATNConfigSet<'static>>::new_static(&_ATN);
+}
+
 impl<'input, 'arena, Input, TF> LabelsParser<'input, 'arena, Input, TF>
 where
     'input: 'arena,
@@ -78,7 +85,8 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-		let interpreter = Rc::new(ParserATNSimulator::new(&_ATN, arena));
+        let base_simulator = BASE_ATN_SIMULATOR.with(|sim| sim.as_ref(arena));
+		let interpreter = Rc::new(ParserATNSimulator::new(base_simulator));
 		Self {
 			base: BaseParser::new_base_parser(
 				arena, input, Rc::clone(&interpreter),
