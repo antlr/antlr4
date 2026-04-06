@@ -7,10 +7,11 @@ use fxhash::hash64;
 
 use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
-use crate::atn_simulator::IATNSimulator;
+use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
+use crate::PredictionContextCache;
 
 #[derive(Eq, PartialEq, Debug)]
 pub struct PredPrediction<'ephemeral> {
@@ -25,10 +26,13 @@ impl Display for PredPrediction<'_> {
 }
 
 impl<'ephemeral> PredPrediction<'ephemeral> {
-    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> PredPrediction<'sim> {
+    pub(crate) fn promote<'sim, CS>(&self, dfa: &DFAStateStore<'sim, CS>) -> PredPrediction<'sim>
+    where
+        CS: ConfigSet<'sim> + 'sim,
+    {
         PredPrediction {
             alt: self.alt,
-            pred: self.pred.promote(arena),
+            pred: self.pred.promote(dfa),
         }
     }
 }
@@ -66,26 +70,20 @@ where
 
     pub(crate) fn finalize<'sim>(
         self,
-        recog: &impl IATNSimulator<'sim, CS::FinalizedType<'sim>>,
-        state_number: i32,
+        atn: &ATN,
+        cache: &'sim PredictionContextCache<'sim>,
+        dfa: &DFAStateStore<'sim, CS::FinalizedType<'sim>>,
     ) -> DFAState<'sim, CS::FinalizedType<'sim>> {
-        let configs = self.configs.finalize(recog.shared_context_cache());
-        let predicates = recog
-            .sim_arena()
-            .alloc_slice_fill_iter(self.predicates.iter().map(|p| p.promote(recog.sim_arena())));
+        let state_number = dfa.len() as i32;
+        let configs = self.configs.finalize(cache, dfa);
+        let predicates = dfa.alloc_slice_fill_iter(self.predicates.iter().map(|p| p.promote(dfa)));
 
-        let mut state = DFAState::new(
-            recog.atn(),
-            recog.sim_arena(),
-            state_number,
-            configs,
-            predicates,
-        );
+        let mut state = DFAState::new(atn, dfa, state_number, configs, predicates);
         state.is_accept_state = self.is_accept_state;
         state.prediction = self.prediction;
         state.lexer_action_executor = self
             .lexer_action_executor
-            .map(|ex| recog.sim_arena().alloc(ex.promote(recog.sim_arena())) as &'sim _);
+            .map(|ex| dfa.alloc(ex.promote(dfa)) as &'sim _);
         state.requires_full_context = self.requires_full_context;
         state
     }
@@ -190,7 +188,7 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
 
     pub(super) fn new(
         atn: &ATN,
-        arena: &'sim bumpalo::Bump,
+        dfa: &DFAStateStore<'sim, CS>,
         state_number: i32,
         configs: CS,
         predicates: &'sim [PredPrediction<'sim>],
@@ -200,8 +198,8 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
         } else {
             0
         };
-        let edges = arena.alloc_slice_fill_with(nedges, |_| AtomicPtr::new(std::ptr::null_mut()));
-        let configs = AtomicPtr::new(arena.alloc(configs) as *mut CS);
+        let edges = dfa.alloc_slice_fill_with(nedges, |_| AtomicPtr::new(std::ptr::null_mut()));
+        let configs = AtomicPtr::new(dfa.alloc(configs) as *mut CS);
 
         DFAState {
             state_number,
@@ -229,7 +227,6 @@ fn calc_edge_set_size(atn: &ATN) -> usize {
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>> =
     LazyLock::new(|| {
         static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, ATNConfigSet>>; 0] = [];
-        static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];
 
         DFAState {
             state_number: -1,
@@ -246,7 +243,6 @@ pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>>
 pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATNConfigSet>> =
     LazyLock::new(|| {
         static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, LexerATNConfigSet>>; 0] = [];
-        static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];
 
         DFAState {
             state_number: -1,
@@ -259,3 +255,5 @@ pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATN
             predicates: &EMPTY_PREDICATES,
         }
     });
+
+static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];

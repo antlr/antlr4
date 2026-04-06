@@ -13,7 +13,6 @@ where
     fn atn(&self) -> &'static ATN;
     fn shared_context_cache(&self) -> &'sim PredictionContextCache<'sim>;
     fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, CS>>;
-    fn sim_arena(&self) -> &'sim bumpalo::Bump;
 }
 
 pub struct BaseATNSimulator<'sim, CS>
@@ -21,12 +20,10 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     pub atn: &'static ATN,
-    // (True) owner of the 'sim lifetime:
-    arena: *const bumpalo::Bump,
     // Memory managed by arena:
-    shared_context_cache: &'sim PredictionContextCache<'sim>,
+    shared_context_cache: PredictionContextCache<'sim>,
     // Memory managed by arena:
-    decision_to_dfa: &'sim [DFA<'sim, CS>],
+    decision_to_dfa: Vec<DFA<'sim, CS>>,
 }
 
 impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
@@ -38,20 +35,19 @@ impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
 impl<CS: ConfigSet<'static>> BaseATNSimulator<'static, CS> {
     pub fn new_static(atn: &'static ATN) -> BaseATNSimulator<'static, CS> {
         let arena: &'static bumpalo::Bump = Box::leak(Box::new(bumpalo::Bump::new()));
-        let shared_context_cache = arena.alloc(PredictionContextCache::new(arena));
-        let decision_to_dfa =
-            arena.alloc_slice_fill_with(atn.decision_to_state.len(), |decision| {
+        let shared_context_cache = PredictionContextCache::new(arena);
+        let decision_to_dfa = (0..atn.decision_to_state.len())
+            .map(|decision| {
                 DFA::<CS>::new(
                     atn,
-                    arena,
                     atn.get_decision_state(decision as i32),
                     decision as i32,
                 )
-            });
+            })
+            .collect();
 
         BaseATNSimulator {
             atn,
-            arena: arena as *const bumpalo::Bump,
             shared_context_cache,
             decision_to_dfa,
         }
@@ -76,25 +72,16 @@ impl<'sim, CS: ConfigSet<'sim>> IATNSimulator<'sim, CS> for BaseATNSimulator<'si
     }
 
     fn shared_context_cache(&self) -> &'sim PredictionContextCache<'sim> {
-        self.shared_context_cache
+        unsafe {
+            std::mem::transmute::<&PredictionContextCache<'sim>, &'sim PredictionContextCache<'sim>>(
+                &self.shared_context_cache,
+            )
+        }
     }
 
     fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, CS>> {
-        self.decision_to_dfa.get(decision)
-    }
-
-    fn sim_arena(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: previously leaked by Box::into_raw in the constructor, and
-        // not modified thereafter:
-        unsafe { &*self.arena }
-    }
-}
-
-impl<'sim, CS: ConfigSet<'sim>> Drop for BaseATNSimulator<'sim, CS> {
-    fn drop(&mut self) {
-        // SAFETY: previously leaked by Box::into_raw in the constructor, and
-        // not modified thereafter:
-        let arena = unsafe { Box::from_raw(self.arena as *mut bumpalo::Bump) };
-        drop(arena);
+        self.decision_to_dfa
+            .get(decision)
+            .map(|dfa| unsafe { std::mem::transmute::<&DFA<'sim, CS>, &'sim DFA<'sim, CS>>(dfa) })
     }
 }

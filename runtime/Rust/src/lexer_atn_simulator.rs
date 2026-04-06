@@ -142,10 +142,6 @@ impl<'sim> IATNSimulator<'sim, LexerATNConfigSet<'sim>> for LexerATNSimulator<'s
     fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, LexerATNConfigSet<'sim>>> {
         self.base.decision_to_dfa(decision)
     }
-
-    fn sim_arena(&self) -> &'sim bumpalo::Bump {
-        self.base.sim_arena()
-    }
 }
 
 #[allow(missing_docs)]
@@ -589,7 +585,7 @@ impl<'sim> LexerATNSimulator<'sim> {
                     let lexer_action = self.atn().lexer_actions[tr.action_index as usize].clone();
                     //dbg!(&lexer_action);
                     let lexer_action_executor = LexerActionExecutor::new_copy_append(
-                        self.sim_arena(),
+                        scratch,
                         _config.get_lexer_executor(),
                         lexer_action,
                     );

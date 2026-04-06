@@ -1,6 +1,6 @@
 use std::hash::Hash;
 
-use crate::{arena::is_ref_in_arena, lexer::Lexer};
+use crate::{atn_config_set::ConfigSet, dfa::DFAStateStore, lexer::Lexer};
 
 pub(crate) const LEXER_ACTION_TYPE_CHANNEL: i32 = 0;
 pub(crate) const LEXER_ACTION_TYPE_CUSTOM: i32 = 1;
@@ -12,7 +12,7 @@ pub(crate) const LEXER_ACTION_TYPE_SKIP: i32 = 6;
 pub(crate) const LEXER_ACTION_TYPE_TYPE: i32 = 7;
 
 #[allow(clippy::enum_variant_names)]
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(Clone, Default, Eq, PartialEq, Debug, Hash)]
 pub(crate) enum LexerAction<'ephemeral> {
     LexerChannelAction(i32),
     LexerCustomAction {
@@ -23,6 +23,7 @@ pub(crate) enum LexerAction<'ephemeral> {
     LexerMoreAction,
     LexerPopModeAction,
     LexerPushModeAction(i32),
+    #[default]
     LexerSkipAction,
     LexerTypeAction(i32),
     LexerIndexedCustomAction {
@@ -69,10 +70,13 @@ impl<'ephemeral> LexerAction<'ephemeral> {
         }
     }
 
-    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> LexerAction<'sim> {
+    pub(crate) fn promote<'sim, CS>(&self, dfa: &DFAStateStore<'sim, CS>) -> LexerAction<'sim>
+    where
+        CS: ConfigSet<'sim> + 'sim,
+    {
         match self {
             LexerAction::LexerIndexedCustomAction { offset, action }
-                if is_ref_in_arena(action, arena) =>
+                if dfa.contains_ref(action) =>
             {
                 // Safety: the action is already in the target arena, so can
                 // live as long as the target lifetime:
@@ -81,7 +85,7 @@ impl<'ephemeral> LexerAction<'ephemeral> {
             LexerAction::LexerIndexedCustomAction { offset, action } => {
                 LexerAction::LexerIndexedCustomAction {
                     offset: *offset,
-                    action: arena.alloc(action.promote(arena)),
+                    action: dfa.alloc(action.promote(dfa)),
                 }
             }
             // Safety: these don't hold any references, so effectively 'static

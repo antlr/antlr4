@@ -10,7 +10,7 @@ use hashbrown::{DefaultHashBuilder, HashMap, HashSet};
 
 use crate::atn::{ATN, INVALID_ALT};
 use crate::atn_config::ATNConfig;
-use crate::atn_config_set::{ATNConfigSet, ConfigSet};
+use crate::atn_config_set::ATNConfigSet;
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
     ATNDecisionState, ATNState, ATNStateRef, DecisionState, ATNSTATE_BLOCK_END,
@@ -195,10 +195,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                     let dfa_ref = local.dfa_ref;
 
                     let s0_closure_updated = self.apply_precedence_filter(&s0_closure, &mut local);
-                    dfa_ref.set_s0_configs(
-                        self.sim_arena()
-                            .alloc(s0_closure.finalize(self.shared_context_cache())),
-                    );
+                    dfa_ref.set_s0_configs(s0_closure, self.shared_context_cache());
                     let new_s0 =
                         self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated));
 
@@ -1588,10 +1585,6 @@ impl<'sim> IATNSimulator<'sim, ATNConfigSet<'sim>> for ParserATNSimulator<'sim> 
 
     fn decision_to_dfa(&self, decision: usize) -> Option<&'sim DFA<'sim, ATNConfigSet<'sim>>> {
         self.base.decision_to_dfa(decision)
-    }
-
-    fn sim_arena(&self) -> &'sim bumpalo::Bump {
-        self.base.sim_arena()
     }
 }
 

@@ -7,6 +7,7 @@ use fxhash::{hash64, FxHasher64};
 use hashbrown::HashTable;
 
 use crate::atn_config::{ATNConfig, ATNConfigType, LexerATNConfig};
+use crate::dfa::DFAStateStore;
 use crate::parser_atn_simulator::MergeCache;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
@@ -20,8 +21,11 @@ pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
 
     fn hash_code(&self) -> u64;
 
-    fn finalize<'sim>(self, cache: &'sim PredictionContextCache<'sim>)
-        -> Self::FinalizedType<'sim>;
+    fn finalize<'sim>(
+        self,
+        cache: &'sim PredictionContextCache<'sim>,
+        dfa: &DFAStateStore<'sim, Self::FinalizedType<'sim>>,
+    ) -> Self::FinalizedType<'sim>;
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -107,15 +111,10 @@ impl<'ephemeral> ConfigSet<'ephemeral> for ATNConfigSet<'ephemeral> {
     fn finalize<'sim>(
         self,
         cache: &'sim PredictionContextCache<'sim>,
+        dfa: &DFAStateStore<'sim, Self::FinalizedType<'sim>>,
     ) -> Self::FinalizedType<'sim> {
-        // unsafe {
-        //     std::mem::transmute(ATNConfigSet {
-        //         configs: self.configs.finalize(cache),
-        //         ..self
-        //     })
-        // }
         ATNConfigSet {
-            configs: self.configs.finalize(cache),
+            configs: self.configs.finalize(cache, dfa),
             ..self
         }
     }
@@ -320,9 +319,13 @@ impl<'ephemeral> ConfigSet<'ephemeral> for LexerATNConfigSet<'ephemeral> {
         self.configs.hash_code()
     }
 
-    fn finalize<'sim>(self, cache: &'sim PredictionContextCache) -> Self::FinalizedType<'sim> {
+    fn finalize<'sim>(
+        self,
+        cache: &'sim PredictionContextCache<'sim>,
+        dfa: &DFAStateStore<'sim, Self::FinalizedType<'sim>>,
+    ) -> Self::FinalizedType<'sim> {
         LexerATNConfigSet {
-            configs: self.configs.finalize(cache),
+            configs: self.configs.finalize(cache, dfa),
             ..self
         }
     }
@@ -603,6 +606,7 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>> {
     fn finalize<'sim>(
         self,
         cache: &'sim PredictionContextCache,
+        dfa: &DFAStateStore<'sim, ATNConfigSet<'sim>>,
     ) -> ConfigSetStore<'sim, ATNConfig<'sim>> {
         match self {
             ConfigSetStore::Scratch(s) => {
@@ -610,9 +614,9 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>> {
 
                 ConfigSetStore::Final(ImmutableStore {
                     cached_hash,
-                    configs: cache
-                        .arena()
-                        .alloc_slice_fill_iter(s.configs.into_iter().map(|c| c.finalize(cache))),
+                    configs: dfa.alloc_slice_fill_iter(
+                        s.configs.into_iter().map(|c| c.finalize(cache, dfa)),
+                    ),
                 })
             }
             ConfigSetStore::Final(_) => unsafe {
@@ -626,6 +630,7 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> {
     fn finalize<'sim>(
         self,
         cache: &'sim PredictionContextCache,
+        dfa: &DFAStateStore<'sim, LexerATNConfigSet<'sim>>,
     ) -> ConfigSetStore<'sim, LexerATNConfig<'sim>> {
         match self {
             ConfigSetStore::Scratch(s) => {
@@ -633,9 +638,9 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> {
 
                 ConfigSetStore::Final(ImmutableStore {
                     cached_hash,
-                    configs: cache
-                        .arena()
-                        .alloc_slice_fill_iter(s.configs.into_iter().map(|c| c.finalize(cache))),
+                    configs: dfa.alloc_slice_fill_iter(
+                        s.configs.into_iter().map(|c| c.finalize(cache, dfa)),
+                    ),
                 })
             }
             ConfigSetStore::Final(_) => unsafe {

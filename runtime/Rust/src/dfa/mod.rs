@@ -1,14 +1,18 @@
-use std::cell::{Cell, RefCell};
 use std::convert::TryFrom;
-
 use std::hash::Hasher;
+use std::mem::ManuallyDrop;
+use std::pin::Pin;
+use std::sync::atomic::{AtomicPtr, Ordering};
+use std::sync::Mutex;
 
+use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
 use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
 use crate::prediction_context::NoopHasherBuilder;
 use crate::vocabulary::Vocabulary;
+use crate::PredictionContextCache;
 
 mod dfa_serializer;
 mod dfa_state;
@@ -42,10 +46,6 @@ pub(crate) trait ScopeExt: Sized {
 
 impl<Any: Sized> ScopeExt for Any {}
 
-type StoredDFAState<'sim, CS> = &'sim DFAState<'sim, CS>;
-type StateStore<'sim, CS> =
-    HashMap<DFAStateKey<CS>, StoredDFAState<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>;
-
 #[derive(Debug)]
 pub struct DFA<'sim, CS>
 where
@@ -56,14 +56,13 @@ where
 
     pub decision: i32,
 
-    /// Set of all dfa states.
-    states: RefCell<StateStore<'sim, CS>>,
+    /// Set of all DFA states.
+    states: Mutex<DFAStateStore<'sim, CS>>,
 
     /// Initial DFA state
-    s0: Cell<Option<&'sim DFAState<'sim, CS>>>,
+    s0: AtomicPtr<DFAState<'sim, CS>>,
 
     precedence_state: bool,
-    // arena: &'sim bumpalo::Bump,
 }
 
 impl<'sim, CS> DFA<'sim, CS>
@@ -71,18 +70,15 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     // ---- Begin direct Java port ----
-    pub fn new(
-        atn: &'static ATN,
-        arena: &'sim bumpalo::Bump,
-        atn_start_state: ATNStateRef,
-        decision: i32,
-    ) -> DFA<'sim, CS> {
+    pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA<'sim, CS> {
+        let state_store = DFAStateStore::new();
+
         let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
-            let mut precedence_state = DFAState::new(atn, arena, 0, CS::new_empty(), &[]);
+            let mut precedence_state = DFAState::new(atn, &state_store, 0, CS::new_empty(), &[]);
             precedence_state.is_accept_state = false;
             precedence_state.requires_full_context = false;
 
-            let precedence_state = arena.alloc(precedence_state);
+            let precedence_state = state_store.alloc(precedence_state);
 
             (Some(precedence_state as &'sim DFAState<'sim, CS>), true)
         } else {
@@ -92,10 +88,11 @@ where
         DFA {
             atn_start_state,
             decision,
-            states: RefCell::new(StateStore::with_hasher_in(NoopHasherBuilder {}, arena)),
-            s0: Cell::new(s0),
+            states: Mutex::new(state_store),
+            s0: AtomicPtr::new(s0.map_or(std::ptr::null_mut(), |s| {
+                s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
+            })),
             precedence_state,
-            //arena,
         }
     }
 
@@ -135,7 +132,13 @@ where
 
     /// Return a list of all states in this DFA, ordered by state number.
     pub fn get_states(&self) -> Vec<&'sim DFAState<'sim, CS>> {
-        let mut states = self.states.borrow().values().copied().collect::<Vec<_>>();
+        let mut states = self
+            .states
+            .lock()
+            .expect("StateStore lock poisoned")
+            .values()
+            .copied()
+            .collect::<Vec<_>>();
         states.sort_by_key(|s| s.state_number);
         states
     }
@@ -168,24 +171,42 @@ where
     // ---- End direct Java port ----
 
     pub fn len(&self) -> usize {
-        self.states.borrow().len()
+        self.states.lock().expect("StateStore lock poisoned").len()
     }
 
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
+    #[inline]
     pub fn s0(&self) -> Option<&'sim DFAState<'sim, CS>> {
-        self.s0.get()
+        let x = self.s0.load(Ordering::Relaxed);
+        if x.is_null() {
+            None
+        } else {
+            Some(unsafe { &*x })
+        }
     }
 
     pub fn set_s0(&self, s: &'sim DFAState<'sim, CS>) {
-        self.s0.set(Some(s));
+        self.s0.store(
+            s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>,
+            Ordering::Relaxed,
+        );
     }
 
-    pub fn set_s0_configs(&self, configs: &'sim mut CS) {
+    pub fn set_s0_configs<'ephemeral, ECS>(
+        &self,
+        configs: ECS,
+        cache: &'sim PredictionContextCache<'sim>,
+    ) where
+        ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
+    {
         let s0 = self.s0().expect("setting configs on a null s0 state");
-        s0.set_configs(configs);
+        let states = self.states.lock().expect("StateStore lock poisoned");
+        let configs = configs.finalize(cache, &states);
+
+        s0.set_configs(states.alloc(configs));
     }
 
     pub fn add_state<'ephemeral, ECS>(
@@ -196,25 +217,18 @@ where
     where
         ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
     {
-        let mut state_store = self.states.borrow_mut();
+        let mut state_store = self.states.lock().expect("StateStore lock poisoned");
 
         let proposed = {
             let mut proposed = proposed;
             if let Some(existing) = state_store.get(&DFAStateKey::from_proposed(&mut proposed)) {
-                return unsafe { std::mem::transmute::<&_, &'sim _>(&**existing) };
+                return existing;
             }
             proposed
         };
 
-        let state = recog
-            .sim_arena()
-            .alloc(proposed.finalize(recog, state_store.len() as i32))
-            as &'sim _;
-        let key = DFAStateKey::from_state(state);
-        let existing = state_store.insert(key, state);
-        assert!(existing.is_none());
-
-        state
+        let state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
+        state_store.add(state)
     }
 }
 
@@ -254,7 +268,7 @@ fn is_precedence_atn_state(atn_start_state: ATNStateRef) -> bool {
 }
 
 #[derive(Clone)]
-struct DFAStateKey<CS>(*mut CS);
+struct DFAStateKey<CS>(*const CS);
 
 unsafe impl<CS> Send for DFAStateKey<CS> {}
 
@@ -263,14 +277,14 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     pub fn from_state(entry: &'sim DFAState<'sim, CS>) -> Self {
-        DFAStateKey(entry.configs() as *const CS as *mut CS)
+        DFAStateKey(entry.configs() as *const CS)
     }
 
     pub fn from_proposed<'ephemeral, ECS>(state: &mut ProposedDFAState<'ephemeral, ECS>) -> Self
     where
         ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
     {
-        let ptr = &state.configs as *const ECS as *mut CS;
+        let ptr = &state.configs as *const ECS as *const CS;
         DFAStateKey(ptr)
     }
 }
@@ -303,5 +317,105 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "DFAStateKey({:p})", self.0)
+    }
+}
+
+#[derive(Debug)]
+pub struct DFAStateStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    map: ManuallyDrop<
+        HashMap<DFAStateKey<CS>, &'sim DFAState<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>,
+    >,
+    arena: Pin<Box<bumpalo::Bump>>,
+}
+
+impl<'sim, CS> DFAStateStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    pub fn new() -> Self {
+        let arena = Box::pin(bumpalo::Bump::new());
+        let arena_ref =
+            // SAFETY: self-reference cast
+            unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&arena) };
+        DFAStateStore {
+            map: ManuallyDrop::new(HashMap::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
+            arena,
+        }
+    }
+
+    fn get(&self, key: &DFAStateKey<CS>) -> Option<&&'sim DFAState<'sim, CS>> {
+        self.map.get(key)
+    }
+
+    pub fn add(&mut self, dfa: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
+        let value = self.alloc(dfa);
+        let existing = self.map.insert(DFAStateKey::from_state(value), value);
+        assert!(existing.is_none());
+        value
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = &&'sim DFAState<'sim, CS>> {
+        self.map.values()
+    }
+
+    pub fn len(&self) -> usize {
+        self.map.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
+
+    pub fn contains_slice<T>(&self, ptr: &[T]) -> bool {
+        is_slice_in_arena(ptr, &self.arena)
+    }
+
+    pub fn contains_ref<T>(&self, ptr: &T) -> bool {
+        is_ref_in_arena(ptr, &self.arena)
+    }
+
+    pub fn alloc_slice_fill_iter<T, I>(&self, iter: I) -> &'sim [T]
+    where
+        I: IntoIterator<Item = T>,
+        I::IntoIter: ExactSizeIterator,
+    {
+        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
+        unsafe { std::mem::transmute::<&[T], &'sim [T]>(self.arena.alloc_slice_fill_iter(iter)) }
+    }
+
+    pub fn alloc_slice_fill_with<T, F>(&self, len: usize, f: F) -> &'sim [T]
+    where
+        F: FnMut(usize) -> T,
+    {
+        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
+        unsafe { std::mem::transmute::<&[T], &'sim [T]>(self.arena.alloc_slice_fill_with(len, f)) }
+    }
+
+    pub fn alloc_slice_fill_default<T: Default>(&self, len: usize) -> &'sim mut [T] {
+        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
+        unsafe {
+            std::mem::transmute::<&mut [T], &'sim mut [T]>(self.arena.alloc_slice_fill_default(len))
+        }
+    }
+
+    pub fn alloc<T>(&self, value: T) -> &'sim mut T {
+        // SAFETY: the allocated value is backed by the 'sim-lifetime arena
+        unsafe { std::mem::transmute::<&mut T, &'sim mut T>(self.arena.alloc(value)) }
+    }
+
+    pub fn allocated_bytes(&self) -> usize {
+        self.arena.allocated_bytes()
+    }
+}
+
+impl<'sim, CS> Default for DFAStateStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    fn default() -> Self {
+        Self::new()
     }
 }

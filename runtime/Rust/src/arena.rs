@@ -63,16 +63,6 @@ impl Arena {
     pub fn alloc<T>(&self, value: T) -> &mut T {
         self.payloads.alloc(value)
     }
-
-    /// Constructs an arena for the ATN simulators -- this will be the owner of
-    /// the 'sim lifetime.
-    pub(crate) unsafe fn make_sim_arena(&self) -> (&bumpalo::Bump, *mut bumpalo::Bump) {
-        let raw = Box::into_raw(Box::new(bumpalo::Bump::new()));
-        (
-            std::mem::transmute::<&bumpalo::Bump, &bumpalo::Bump>(&*raw),
-            raw,
-        )
-    }
 }
 
 pub(crate) fn is_ref_in_arena<T>(ptr: &T, arena: &bumpalo::Bump) -> bool {

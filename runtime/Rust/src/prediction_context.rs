@@ -1,7 +1,8 @@
-use std::cell::RefCell;
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
-use std::sync::LazyLock;
+use std::mem::ManuallyDrop;
+use std::pin::Pin;
+use std::sync::{LazyLock, RwLock};
 
 use fxhash::FxHasher32;
 use hashbrown::HashSet;
@@ -135,7 +136,7 @@ pub static EMPTY_PREDICTION_CONTEXT: LazyLock<PredictionContext<'static>> =
     LazyLock::new(PredictionContext::new_empty);
 
 impl PredictionContext<'static> {
-    pub fn new_empty() -> Self {
+    fn new_empty() -> Self {
         PredictionContext::Singleton(SingletonPredictionContext {
             cached_hash: 0,
             parent_ctx: None,
@@ -502,19 +503,87 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 }
 
-#[derive(Debug)]
-pub struct PredictionContextCache<'sim> {
-    cache: RefCell<HashSet<PredictionContext<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
-    arena: &'sim bumpalo::Bump,
+struct PredictionContextCacheInner<'sim> {
+    cache: ManuallyDrop<HashSet<PredictionContext<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
+    arena: Pin<Box<bumpalo::Bump>>,
 }
+
+impl<'sim> PredictionContextCacheInner<'sim> {
+    pub fn new(_: &'sim bumpalo::Bump) -> Self {
+        let arena = Box::pin(bumpalo::Bump::new());
+        // SAFETY: self-reference cast
+        let arena_ref =
+            unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&arena) };
+
+        PredictionContextCacheInner {
+            cache: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
+            arena,
+        }
+    }
+
+    pub fn allocated_size(&self) -> usize {
+        self.arena.allocated_bytes()
+    }
+
+    pub fn _alloc<T>(&mut self, value: T) -> &'sim mut T {
+        // SAFETY: the returned reference is allocated from the 'sim arena, so it must be valid for 'sim:
+        unsafe { std::mem::transmute::<&mut T, &'sim mut T>(self.arena.alloc(value)) }
+    }
+
+    pub fn alloc_slice_copy<T: Copy>(&mut self, slice: &[T]) -> &'sim mut [T] {
+        // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
+        unsafe {
+            std::mem::transmute::<&mut [T], &'sim mut [T]>(self.arena.alloc_slice_copy(slice))
+        }
+    }
+
+    pub fn alloc_slice_fill_default<T: Default>(&mut self, len: usize) -> &'sim mut [T] {
+        // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
+        unsafe {
+            std::mem::transmute::<&mut [T], &'sim mut [T]>(self.arena.alloc_slice_fill_default(len))
+        }
+    }
+
+    pub fn get(&self, context: &PredictionContext<'_>) -> Option<&'sim PredictionContext<'sim>> {
+        // SAFETY: the cache is backed by the 'sim arena, so any reference
+        // returned from it must be valid for 'sim:
+        unsafe {
+            std::mem::transmute::<
+                Option<&PredictionContext<'_>>,
+                Option<&'sim PredictionContext<'sim>>,
+            >(self.cache.get(context))
+        }
+        // self.cache.get(context).map(|ctx| *ctx)
+    }
+
+    pub fn get_or_insert(
+        &mut self,
+        context: PredictionContext<'sim>,
+    ) -> &'sim PredictionContext<'sim> {
+        // if let Some(cached) = self.cache.get(&context) {
+        //     return *cached;
+        // }
+
+        // let context_ref = self.alloc(context);
+        // let has_existing = self.cache.insert(context_ref);
+        // assert!(!has_existing);
+        // context_ref
+        // SAFETY: the cache is backed by the 'sim arena, so any reference
+        // returned from it must be valid for 'sim:
+        unsafe {
+            std::mem::transmute::<&PredictionContext<'sim>, &'sim PredictionContext<'sim>>(
+                self.cache.get_or_insert(context),
+            )
+        }
+    }
+}
+
+pub struct PredictionContextCache<'sim>(RwLock<PredictionContextCacheInner<'sim>>);
 
 impl<'sim> PredictionContextCache<'sim> {
     #[doc(hidden)]
     pub fn new(arena: &'sim bumpalo::Bump) -> PredictionContextCache<'sim> {
-        PredictionContextCache {
-            cache: RefCell::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena)),
-            arena,
-        }
+        PredictionContextCache(RwLock::new(PredictionContextCacheInner::new(arena)))
     }
 
     #[doc(hidden)]
@@ -522,19 +591,16 @@ impl<'sim> PredictionContextCache<'sim> {
         &self,
         context: &'a PredictionContext<'a>,
     ) -> &'sim PredictionContext<'sim> {
-        // if context.is_empty() {
-        //     return context;
-        // }
-
-        if let Some(cached) = self.cache.borrow().get(context) {
-            // SAFETY: the cache is backed by the 'sim arena, so any reference
-            // returned from it must be valid for 'sim:
-            return unsafe {
-                std::mem::transmute::<&PredictionContext<'_>, &'sim PredictionContext<'sim>>(cached)
-            };
+        if let Some(cached) = self
+            .0
+            .read()
+            .expect("PredictionContextCache lock poisoned")
+            .get(context)
+        {
+            return cached;
         }
 
-        let shared = match context {
+        let shared: PredictionContext<'sim> = match context {
             PredictionContext::Singleton(singleton) => {
                 PredictionContext::Singleton(SingletonPredictionContext {
                     cached_hash: singleton.cached_hash,
@@ -543,10 +609,23 @@ impl<'sim> PredictionContextCache<'sim> {
                 })
             }
             PredictionContext::Array(array) => {
-                let return_states = self.arena.alloc_slice_copy(array.return_states);
-                let parents = self.arena.alloc_slice_fill_with(array.parents.len(), |i| {
-                    array.parents[i].map(|p| self.get_shared_context(p))
-                });
+                let (return_states, parents) = {
+                    let mut locked = self
+                        .0
+                        .write()
+                        .expect("PredictionContextCache lock poisoned");
+
+                    let return_states = locked.alloc_slice_copy(array.return_states);
+                    let parents: &'sim mut [Option<&PredictionContext<'sim>>] =
+                        locked.alloc_slice_fill_default(array.parents.len());
+                    (return_states, parents)
+                };
+                parents
+                    .iter_mut()
+                    .zip(array.parents.iter())
+                    .for_each(|(parent, original)| {
+                        *parent = original.map(|x| self.get_shared_context(x))
+                    });
 
                 PredictionContext::Array(ArrayPredictionContext {
                     cached_hash: array.cached_hash,
@@ -555,24 +634,27 @@ impl<'sim> PredictionContextCache<'sim> {
                 })
             }
         };
-        self.cache.borrow_mut().insert(shared);
-        unsafe {
-            std::mem::transmute(
-                self.cache
-                    .borrow()
-                    .get(context)
-                    .expect("context should exist now because it was just inserted"),
-            )
-        }
+
+        self.0
+            .write()
+            .expect("PredictionContextCache lock poisoned")
+            .get_or_insert(shared)
     }
 
     #[doc(hidden)]
     pub fn length(&self) -> usize {
-        self.cache.borrow().len()
+        self.0
+            .read()
+            .expect("PredictionContextCache lock poisoned")
+            .cache
+            .len()
     }
 
-    pub fn arena(&self) -> &'sim bumpalo::Bump {
-        self.arena
+    pub fn allocated_size(&self) -> usize {
+        self.0
+            .read()
+            .expect("PredictionContextCache lock poisoned")
+            .allocated_size()
     }
 }
 

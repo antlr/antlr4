@@ -2,7 +2,8 @@ use std::cmp::Ordering;
 
 use hashbrown::{DefaultHashBuilder, HashSet};
 
-use crate::arena::is_slice_in_arena;
+use crate::atn_config_set::ConfigSet;
+use crate::dfa::DFAStateStore;
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
 
@@ -229,16 +230,19 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
         }
     }
 
-    pub(crate) fn promote<'sim>(&self, arena: &'sim bumpalo::Bump) -> SemanticContext<'sim> {
+    pub(crate) fn promote<'sim, CS>(&self, dfa: &DFAStateStore<'sim, CS>) -> SemanticContext<'sim>
+    where
+        CS: ConfigSet<'sim> + 'sim,
+    {
         match self {
-            SemanticContext::And(ops) if !is_slice_in_arena(ops, arena) => {
+            SemanticContext::And(ops) if !dfa.contains_slice(ops) => {
                 let promoted: &[_] =
-                    arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                    dfa.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(dfa)));
                 SemanticContext::And(promoted)
             }
-            SemanticContext::Or(ops) if !is_slice_in_arena(ops, arena) => {
+            SemanticContext::Or(ops) if !dfa.contains_slice(ops) => {
                 let promoted: &[_] =
-                    arena.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(arena)));
+                    dfa.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(dfa)));
                 SemanticContext::Or(promoted)
             }
             _ => unsafe { std::mem::transmute::<Self, SemanticContext<'sim>>(self.clone()) },

@@ -1,7 +1,9 @@
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
+use crate::atn_config_set::{ConfigSet, LexerATNConfigSet};
 use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
+use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
@@ -99,13 +101,17 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         ATNConfig { context, ..self }
     }
 
-    pub(crate) fn finalize<'sim>(self, cache: &'sim PredictionContextCache) -> ATNConfig<'sim> {
+    pub(crate) fn finalize<'sim, CS>(
+        self,
+        cache: &'sim PredictionContextCache,
+        dfa: &DFAStateStore<'sim, CS>,
+    ) -> ATNConfig<'sim>
+    where
+        CS: ConfigSet<'sim>,
+    {
         ATNConfig {
             context: self.context.map(|c| cache.get_shared_context(c)),
-            semantic_context: cache
-                .arena()
-                .alloc(self.semantic_context.promote(cache.arena()))
-                as &'sim _,
+            semantic_context: dfa.alloc(self.semantic_context.promote(dfa)) as &'sim _,
             ..self
         }
     }
@@ -247,12 +253,13 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
     pub(crate) fn finalize<'sim>(
         self,
         cache: &'sim PredictionContextCache,
+        dfa: &DFAStateStore<'sim, LexerATNConfigSet<'sim>>,
     ) -> LexerATNConfig<'sim> {
         LexerATNConfig {
-            base: self.base.finalize(cache),
+            base: self.base.finalize(cache, dfa),
             lexer_action_executor: self
                 .lexer_action_executor
-                .map(|ex| cache.arena().alloc(ex.promote(cache.arena())) as &'sim _),
+                .map(|ex| dfa.alloc(ex.promote(dfa)) as &'sim _),
             ..self
         }
     }
