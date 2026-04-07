@@ -1,7 +1,9 @@
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
 use std::mem::ManuallyDrop;
+use std::ops::Deref;
 use std::pin::Pin;
+use std::ptr::NonNull;
 use std::sync::{LazyLock, RwLock};
 
 use fxhash::FxHasher32;
@@ -33,20 +35,11 @@ impl PartialEq for PredictionContext<'_> {
     }
 }
 
-#[derive(Eq, Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SingletonPredictionContext<'ephemeral> {
     cached_hash: u32,
     return_state: ATNStateRef,
-    parent_ctx: Option<&'ephemeral PredictionContext<'ephemeral>>,
-}
-
-impl PartialEq for SingletonPredictionContext<'_> {
-    #[inline(always)]
-    fn eq(&self, other: &Self) -> bool {
-        self.cached_hash == other.cached_hash
-            && self.return_state == other.return_state
-            && opt_eq((&self.parent_ctx, &other.parent_ctx))
-    }
+    parent_ctx: Option<PredictionContextRef<'ephemeral>>,
 }
 
 impl SingletonPredictionContext<'_> {
@@ -56,34 +49,11 @@ impl SingletonPredictionContext<'_> {
     }
 }
 
-#[derive(Clone, Eq, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ArrayPredictionContext<'ephemeral> {
     cached_hash: u32,
     return_states: &'ephemeral [ATNStateRef],
-    parents: &'ephemeral [Option<&'ephemeral PredictionContext<'ephemeral>>],
-}
-
-impl PartialEq for ArrayPredictionContext<'_> {
-    #[inline(always)]
-    fn eq(&self, other: &Self) -> bool {
-        self.cached_hash == other.cached_hash
-            && self.return_states == other.return_states
-            && self.parents.iter().zip(other.parents.iter()).all(opt_eq)
-    }
-}
-
-#[inline(always)]
-pub fn opt_eq<'a, 'b>(
-    arg: (
-        &Option<&'a PredictionContext<'a>>,
-        &Option<&'b PredictionContext<'b>>,
-    ),
-) -> bool {
-    match arg {
-        (Some(s), Some(o)) => std::ptr::eq(*s, *o) || *s == *o,
-        (None, None) => true,
-        _ => false,
-    }
+    parents: &'ephemeral [Option<PredictionContextRef<'ephemeral>>],
 }
 
 impl Display for PredictionContext<'_> {
@@ -132,23 +102,18 @@ impl Hash for PredictionContext<'_> {
     }
 }
 
-pub static EMPTY_PREDICTION_CONTEXT: LazyLock<PredictionContext<'static>> =
-    LazyLock::new(PredictionContext::new_empty);
-
-impl PredictionContext<'static> {
-    fn new_empty() -> Self {
-        PredictionContext::Singleton(SingletonPredictionContext {
-            cached_hash: 0,
-            parent_ctx: None,
-            return_state: ATNStateRef::invalid(),
-        })
-        .modify_with(|x| x.calc_hash())
-    }
-}
+static EMPTY_PREDICTION_CONTEXT: LazyLock<PredictionContext<'static>> = LazyLock::new(|| {
+    PredictionContext::Singleton(SingletonPredictionContext {
+        cached_hash: 0,
+        parent_ctx: None,
+        return_state: ATNStateRef::invalid(),
+    })
+    .modify_with(|x| x.calc_hash())
+});
 
 impl<'ephemeral> PredictionContext<'ephemeral> {
     pub fn new_singleton(
-        parent_ctx: Option<&'ephemeral PredictionContext<'ephemeral>>,
+        parent_ctx: Option<PredictionContextRef<'ephemeral>>,
         return_state: ATNStateRef,
     ) -> Self {
         PredictionContext::Singleton(SingletonPredictionContext {
@@ -160,7 +125,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 
     fn new_array(
-        parents: &'ephemeral [Option<&'ephemeral PredictionContext<'ephemeral>>],
+        parents: &'ephemeral [Option<PredictionContextRef<'ephemeral>>],
         return_states: &'ephemeral [ATNStateRef],
     ) -> Self {
         PredictionContext::Array(ArrayPredictionContext {
@@ -212,7 +177,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         };
     }
 
-    pub fn get_parent(&self, index: usize) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+    pub fn get_parent(&self, index: usize) -> Option<PredictionContextRef<'ephemeral>> {
         match self {
             PredictionContext::Singleton(singleton) => {
                 //                assert_eq!(index, 0);
@@ -235,10 +200,8 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
 
     pub fn length(&self) -> usize {
         match self {
-            PredictionContext::Singleton { .. } => 1,
-            PredictionContext::Array(ArrayPredictionContext { return_states, .. }) => {
-                return_states.len()
-            }
+            Self::Singleton { .. } => 1,
+            Self::Array(ArrayPredictionContext { return_states, .. }) => return_states.len(),
         }
     }
 
@@ -264,12 +227,12 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 
     pub(crate) fn merge(
-        a: &'ephemeral PredictionContext<'ephemeral>,
-        b: &'ephemeral PredictionContext<'ephemeral>,
+        a: PredictionContextRef<'ephemeral>,
+        b: PredictionContextRef<'ephemeral>,
         root_is_wildcard: bool,
         cache: &mut MergeCache<'ephemeral>,
-    ) -> &'ephemeral PredictionContext<'ephemeral> {
-        if std::ptr::eq(a, b) || *a == *b {
+    ) -> PredictionContextRef<'ephemeral> {
+        if a == b {
             return a;
         }
 
@@ -277,7 +240,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
             return prev;
         }
 
-        let r = match (a, b) {
+        let r = match (a.as_ref(), b.as_ref()) {
             (PredictionContext::Singleton(sa), PredictionContext::Singleton(sb)) => {
                 //                println!("single result = {}",result);
                 Self::merge_singletons(sa, sb, root_is_wildcard, cache)
@@ -285,18 +248,18 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
             (sa, sb) => {
                 if root_is_wildcard {
                     if sa.is_empty() {
-                        return &EMPTY_PREDICTION_CONTEXT;
+                        return PredictionContextRef::new_empty();
                     }
                     if sb.is_empty() {
-                        return &EMPTY_PREDICTION_CONTEXT;
+                        return PredictionContextRef::new_empty();
                     }
                 }
 
-                let result = Self::merge_arrays(sa, sb, root_is_wildcard, cache);
+                let result = Self::merge_arrays(a, b, root_is_wildcard, cache);
 
-                if result == sa {
+                if result == a {
                     a
-                } else if result == sb {
+                } else if result == b {
                     b
                 } else {
                     result
@@ -317,18 +280,18 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         b: &'ephemeral SingletonPredictionContext<'ephemeral>,
         root_is_wildcard: bool,
         merge_cache: &mut MergeCache<'ephemeral>,
-    ) -> &'ephemeral PredictionContext<'ephemeral> {
+    ) -> PredictionContextRef<'ephemeral> {
         Self::merge_root(a, b, root_is_wildcard, merge_cache).unwrap_or_else(|| {
             let res = if a.return_state == b.return_state {
                 let parent = Self::merge(
-                    a.parent_ctx.as_ref().unwrap(),
-                    b.parent_ctx.as_ref().unwrap(),
+                    *a.parent_ctx.as_ref().unwrap(),
+                    *b.parent_ctx.as_ref().unwrap(),
                     root_is_wildcard,
                     merge_cache,
                 );
-                if std::ptr::eq(parent, *a.parent_ctx.as_ref().unwrap()) {
+                if parent.ptr_eq(a.parent_ctx.as_ref().unwrap()) {
                     Singleton(a.clone())
-                } else if std::ptr::eq(parent, *b.parent_ctx.as_ref().unwrap()) {
+                } else if parent.ptr_eq(b.parent_ctx.as_ref().unwrap()) {
                     Singleton(b.clone())
                 } else {
                     Self::new_singleton(Some(parent), a.return_state)
@@ -350,7 +313,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
 
                 Self::new_array(parents, return_states)
             };
-            merge_cache.alloc(res)
+            merge_cache.alloc(res).into()
         })
     }
 
@@ -359,26 +322,36 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         b: &'ephemeral SingletonPredictionContext<'ephemeral>,
         root_is_wildcard: bool,
         merge_cache: &mut MergeCache<'ephemeral>,
-    ) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+    ) -> Option<PredictionContextRef<'ephemeral>> {
         if root_is_wildcard {
             if a.is_empty() || b.is_empty() {
-                return Some(&EMPTY_PREDICTION_CONTEXT);
+                return Some(PredictionContextRef::new_empty());
             }
         } else {
             if a.is_empty() && b.is_empty() {
-                return Some(&EMPTY_PREDICTION_CONTEXT);
+                return Some(PredictionContextRef::new_empty());
             }
             if a.is_empty() {
-                return Some(merge_cache.alloc(Self::new_array(
-                    merge_cache.alloc([b.parent_ctx, None]),
-                    merge_cache.alloc([b.return_state, ATNStateRef::invalid()]),
-                )));
+                return Some(
+                    merge_cache
+                        .alloc(Self::new_array(
+                            merge_cache
+                                .alloc([b.parent_ctx, Some(PredictionContextRef::new_empty())]),
+                            merge_cache.alloc([b.return_state, ATNStateRef::invalid()]),
+                        ))
+                        .into(),
+                );
             }
             if b.is_empty() {
-                return Some(merge_cache.alloc(Self::new_array(
-                    merge_cache.alloc([a.parent_ctx, None]),
-                    merge_cache.alloc([a.return_state, ATNStateRef::invalid()]),
-                )));
+                return Some(
+                    merge_cache
+                        .alloc(Self::new_array(
+                            merge_cache
+                                .alloc([a.parent_ctx, Some(PredictionContextRef::new_empty())]),
+                            merge_cache.alloc([a.return_state, ATNStateRef::invalid()]),
+                        ))
+                        .into(),
+                );
             }
         }
 
@@ -386,11 +359,11 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
     }
 
     fn merge_arrays(
-        a: &'ephemeral PredictionContext<'ephemeral>,
-        b: &'ephemeral PredictionContext<'ephemeral>,
+        a: PredictionContextRef<'ephemeral>,
+        b: PredictionContextRef<'ephemeral>,
         root_is_wildcard: bool,
         merge_cache: &mut MergeCache<'ephemeral>,
-    ) -> &'ephemeral PredictionContext<'ephemeral> {
+    ) -> PredictionContextRef<'ephemeral> {
         let mut parents = merge_cache.alloc_vec(a.length() + b.length());
         let mut return_states = merge_cache.alloc_vec(a.length() + b.length());
         let mut i = 0;
@@ -445,18 +418,22 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         }
 
         if parents.len() == 1 {
-            merge_cache.alloc(Self::new_singleton(parents[0], return_states[0]))
+            merge_cache
+                .alloc(Self::new_singleton(parents[0], return_states[0]))
+                .into()
         } else {
             PredictionContext::combine_common_parents(parents.as_mut_slice(), merge_cache);
-            merge_cache.alloc(Self::new_array(
-                parents.into_bump_slice(),
-                return_states.into_bump_slice(),
-            ))
+            merge_cache
+                .alloc(Self::new_array(
+                    parents.into_bump_slice(),
+                    return_states.into_bump_slice(),
+                ))
+                .into()
         }
     }
 
     fn combine_common_parents(
-        parents: &mut [Option<&'ephemeral PredictionContext<'ephemeral>>],
+        parents: &mut [Option<PredictionContextRef<'ephemeral>>],
         merge_cache: &mut MergeCache<'ephemeral>,
     ) {
         let mut uniq_parents =
@@ -474,7 +451,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         atn: &ATN,
         outer_context: &'arena Node,
         arena: &'ephemeral bumpalo::Bump,
-    ) -> &'ephemeral PredictionContext<'ephemeral>
+    ) -> PredictionContextRef<'ephemeral>
     where
         'input: 'arena,
         Node: RuleNode<'input, 'arena>,
@@ -482,7 +459,7 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
         if outer_context.get_parent().is_none() || outer_context.get_rule_context().is_empty()
         /*ptr::eq(outer_context, empty_ctx().as_ref())*/
         {
-            return &EMPTY_PREDICTION_CONTEXT;
+            return PredictionContextRef::new_empty();
         }
 
         let parent =
@@ -496,15 +473,150 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
             .try_as::<RuleTransition>()
             .unwrap();
 
-        arena.alloc(PredictionContext::new_singleton(
-            Some(parent),
-            transition.follow_state,
+        arena
+            .alloc(PredictionContext::new_singleton(
+                Some(parent),
+                transition.follow_state,
+            ))
+            .into()
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RefType {
+    Interned,
+    Adhoc,
+}
+
+#[derive(Clone, Copy, Eq, Debug)]
+pub struct PredictionContextRef<'ephemeral>(NonNull<PredictionContext<'ephemeral>>);
+
+impl<'ephemeral> PredictionContextRef<'ephemeral> {
+    pub fn new_empty() -> Self {
+        PredictionContextRef(NonNull::from(
+            &EMPTY_PREDICTION_CONTEXT as &'ephemeral PredictionContext<'ephemeral>,
         ))
+    }
+
+    /// Creates an ad-hoc [PredictionContextRef] from the given
+    /// [PredictionContext] reference. The lifetime of the reference itself is
+    /// discarded and forgotten.
+    ///
+    /// # Safety
+    /// - If 't: 'ephemeral, then this function is safe. This is the case for
+    ///   the `From<&PredictionContext>` impls, which are safe wrappers around
+    ///   this function.
+    /// - Otherwise, the caller must ensure that the returned
+    ///   [PredictionContextRef] instance does not outlive 't, without the aid
+    ///   of the borrow checker
+    unsafe fn new_adhoc<'t>(context: &'t PredictionContext<'ephemeral>) -> Self {
+        // We set the least-significant bit to 1 to indicate that this is an
+        // adhoc (non-interned) context:
+        let ptr = (context as *const PredictionContext<'ephemeral> as usize) | 1;
+        PredictionContextRef(NonNull::new(ptr as *mut PredictionContext<'ephemeral>).unwrap())
+    }
+
+    fn new_interned(context: &'ephemeral PredictionContext<'ephemeral>) -> Self {
+        PredictionContextRef(NonNull::from(context))
+    }
+
+    #[inline]
+    pub fn as_ref(&self) -> &'ephemeral PredictionContext<'ephemeral> {
+        // Hand-rolled niche optimization: we tuck the RefType into the
+        // pointer's least-significant bit (and pray to god that we don't
+        // encounter insane platforms where PredictionContext is not aligned to
+        // at least even addresses). To dereference, we mask out the bit and
+        // then cast back to a valid pointer:
+        let ptr = (self.0.as_ptr() as usize) & !1;
+        unsafe { &*(ptr as *const PredictionContext<'ephemeral>) }
+    }
+
+    #[inline]
+    pub fn ref_type(&self) -> RefType {
+        if (self.0.as_ptr() as usize) & 1 == 0 {
+            RefType::Interned
+        } else {
+            RefType::Adhoc
+        }
+    }
+
+    #[inline]
+    pub fn is_interned(&self) -> bool {
+        self.ref_type() == RefType::Interned
+    }
+
+    #[inline]
+    pub fn ptr_eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl<'ephemeral> Default for PredictionContextRef<'ephemeral> {
+    fn default() -> Self {
+        Self::new_empty()
+    }
+}
+
+impl<'ephemeral> Deref for PredictionContextRef<'ephemeral> {
+    type Target = PredictionContext<'ephemeral>;
+
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+impl Hash for PredictionContextRef<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.as_ref().hash(state);
+    }
+}
+
+impl Display for PredictionContextRef<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        self.as_ref().fmt(f)
+    }
+}
+
+impl PartialEq for PredictionContextRef<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.0 == other.0 {
+            return true;
+        }
+        // If both contexts are interned, then pointer equality is sufficient:
+        if self.is_interned() && other.is_interned() {
+            return false;
+        }
+        // Otherwise, we have to fall back to (slow) value equality:
+        self.as_ref() == other.as_ref()
+    }
+}
+
+unsafe impl Send for PredictionContextRef<'_> {}
+unsafe impl Sync for PredictionContextRef<'_> {}
+
+impl<'ephemeral> From<&'ephemeral PredictionContext<'ephemeral>>
+    for PredictionContextRef<'ephemeral>
+{
+    fn from(context: &'ephemeral PredictionContext<'ephemeral>) -> Self {
+        // SAFETY: 't: 'ephemeral (they are the same as declared in the function
+        // signature)
+        unsafe { Self::new_adhoc(context) }
+    }
+}
+
+impl<'ephemeral> From<&'ephemeral mut PredictionContext<'ephemeral>>
+    for PredictionContextRef<'ephemeral>
+{
+    fn from(context: &'ephemeral mut PredictionContext<'ephemeral>) -> Self {
+        // SAFETY: 't: 'ephemeral (they are the same as declared in the function
+        // signature)
+        unsafe { Self::new_adhoc(context) }
     }
 }
 
 struct PredictionContextCacheInner<'sim> {
-    cache: ManuallyDrop<HashSet<PredictionContext<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
+    cache:
+        ManuallyDrop<HashSet<PredictionContextRef<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
     arena: Pin<Box<bumpalo::Bump>>,
 }
 
@@ -525,7 +637,7 @@ impl<'sim> PredictionContextCacheInner<'sim> {
         self.arena.allocated_bytes()
     }
 
-    pub fn _alloc<T>(&mut self, value: T) -> &'sim mut T {
+    pub fn alloc<T>(&mut self, value: T) -> &'sim mut T {
         // SAFETY: the returned reference is allocated from the 'sim arena, so it must be valid for 'sim:
         unsafe { std::mem::transmute::<&mut T, &'sim mut T>(self.arena.alloc(value)) }
     }
@@ -537,6 +649,16 @@ impl<'sim> PredictionContextCacheInner<'sim> {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn alloc_slice_fill_copy<T: Copy>(&mut self, len: usize, value: T) -> &'sim mut [T] {
+        // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
+        unsafe {
+            std::mem::transmute::<&mut [T], &'sim mut [T]>(
+                self.arena.alloc_slice_fill_copy(len, value),
+            )
+        }
+    }
+
     pub fn alloc_slice_fill_default<T: Default>(&mut self, len: usize) -> &'sim mut [T] {
         // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
         unsafe {
@@ -544,37 +666,29 @@ impl<'sim> PredictionContextCacheInner<'sim> {
         }
     }
 
-    pub fn get(&self, context: &PredictionContext<'_>) -> Option<&'sim PredictionContext<'sim>> {
+    pub fn get(&self, context: &PredictionContextRef<'_>) -> Option<PredictionContextRef<'sim>> {
         // SAFETY: the cache is backed by the 'sim arena, so any reference
         // returned from it must be valid for 'sim:
-        unsafe {
-            std::mem::transmute::<
-                Option<&PredictionContext<'_>>,
-                Option<&'sim PredictionContext<'sim>>,
-            >(self.cache.get(context))
-        }
-        // self.cache.get(context).map(|ctx| *ctx)
+        self.cache.get(context).map(|ctx| unsafe {
+            std::mem::transmute::<PredictionContextRef<'_>, PredictionContextRef<'sim>>(*ctx)
+        })
     }
 
-    pub fn get_or_insert(
-        &mut self,
-        context: PredictionContext<'sim>,
-    ) -> &'sim PredictionContext<'sim> {
-        // if let Some(cached) = self.cache.get(&context) {
-        //     return *cached;
-        // }
-
-        // let context_ref = self.alloc(context);
-        // let has_existing = self.cache.insert(context_ref);
-        // assert!(!has_existing);
-        // context_ref
-        // SAFETY: the cache is backed by the 'sim arena, so any reference
-        // returned from it must be valid for 'sim:
-        unsafe {
-            std::mem::transmute::<&PredictionContext<'sim>, &'sim PredictionContext<'sim>>(
-                self.cache.get_or_insert(context),
-            )
+    fn get_or_insert(&mut self, context: PredictionContext<'sim>) -> PredictionContextRef<'sim> {
+        if let Some(cached) = self
+            .cache
+            // SAFETY: the temporary PredictionContextRef is immediately
+            // discarded after the lookup, so it cannot be used outside the
+            // scope of this function:
+            .get(unsafe { &PredictionContextRef::new_adhoc(&context) })
+        {
+            return *cached;
         }
+
+        let context_ref = PredictionContextRef::new_interned(self.alloc(context));
+        let is_new = self.cache.insert(context_ref);
+        assert!(is_new);
+        context_ref
     }
 }
 
@@ -589,8 +703,12 @@ impl<'sim> PredictionContextCache<'sim> {
     #[doc(hidden)]
     pub fn get_shared_context<'a>(
         &self,
-        context: &'a PredictionContext<'a>,
-    ) -> &'sim PredictionContext<'sim> {
+        context: &PredictionContextRef<'a>,
+    ) -> PredictionContextRef<'sim> {
+        if context.is_empty() {
+            return PredictionContextRef::new_empty();
+        }
+
         if let Some(cached) = self
             .0
             .read()
@@ -600,11 +718,11 @@ impl<'sim> PredictionContextCache<'sim> {
             return cached;
         }
 
-        let shared: PredictionContext<'sim> = match context {
+        let shared: PredictionContext<'sim> = match context.as_ref() {
             PredictionContext::Singleton(singleton) => {
                 PredictionContext::Singleton(SingletonPredictionContext {
                     cached_hash: singleton.cached_hash,
-                    parent_ctx: singleton.parent_ctx.map(|x| self.get_shared_context(x)),
+                    parent_ctx: singleton.parent_ctx.map(|x| self.get_shared_context(&x)),
                     return_state: singleton.return_state,
                 })
             }
@@ -616,7 +734,7 @@ impl<'sim> PredictionContextCache<'sim> {
                         .expect("PredictionContextCache lock poisoned");
 
                     let return_states = locked.alloc_slice_copy(array.return_states);
-                    let parents: &'sim mut [Option<&PredictionContext<'sim>>] =
+                    let parents: &'sim mut [Option<PredictionContextRef<'sim>>] =
                         locked.alloc_slice_fill_default(array.parents.len());
                     (return_states, parents)
                 };
@@ -624,7 +742,7 @@ impl<'sim> PredictionContextCache<'sim> {
                     .iter_mut()
                     .zip(array.parents.iter())
                     .for_each(|(parent, original)| {
-                        *parent = original.map(|x| self.get_shared_context(x))
+                        *parent = original.map(|x| self.get_shared_context(&x))
                     });
 
                 PredictionContext::Array(ArrayPredictionContext {

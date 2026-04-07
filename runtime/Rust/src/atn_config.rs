@@ -5,7 +5,7 @@ use crate::atn_config_set::{ConfigSet, LexerATNConfigSet};
 use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
 use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
-use crate::prediction_context::PredictionContext;
+use crate::prediction_context::PredictionContextRef;
 use crate::semantic_context::SemanticContext;
 use crate::PredictionContextCache;
 
@@ -17,8 +17,7 @@ const SUPPRESS_PRECEDENCE_FILTER: i32 = 0x40000000;
 pub struct ATNConfig<'ephemeral> {
     state: ATNStateRef,
     alt: i32,
-    //todo maybe option is unnecessary and PredictionContext::EMPTY would be enough
-    context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+    context: Option<PredictionContextRef<'ephemeral>>,
     semantic_context: &'ephemeral SemanticContext<'ephemeral>,
     pub reaches_into_outer_context: i32,
 }
@@ -29,7 +28,7 @@ impl PartialEq for ATNConfig<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.get_state() == other.get_state()
             && self.get_alt() == other.get_alt()
-            && crate::prediction_context::opt_eq((&self.context, &other.context))
+            && self.context == other.context
             && self.semantic_context == other.semantic_context
             && self.is_precedence_filter_suppressed() == other.is_precedence_filter_suppressed()
     }
@@ -69,7 +68,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
     pub fn new(
         state: ATNStateRef,
         alt: i32,
-        context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+        context: Option<PredictionContextRef<'ephemeral>>,
     ) -> Self {
         ATNConfig {
             state,
@@ -96,9 +95,12 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
 
     pub fn with_prediction_context(
         self,
-        context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+        context: Option<impl Into<PredictionContextRef<'ephemeral>>>,
     ) -> Self {
-        ATNConfig { context, ..self }
+        ATNConfig {
+            context: context.map(|c| c.into()),
+            ..self
+        }
     }
 
     pub(crate) fn finalize<'sim, CS>(
@@ -110,7 +112,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         CS: ConfigSet<'sim>,
     {
         ATNConfig {
-            context: self.context.map(|c| cache.get_shared_context(c)),
+            context: self.context.map(|c| cache.get_shared_context(&c)),
             semantic_context: dfa.alloc(self.semantic_context.promote(dfa)) as &'sim _,
             ..self
         }
@@ -124,7 +126,7 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         self.alt
     }
 
-    pub fn get_context(&self) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+    pub fn get_context(&self) -> Option<PredictionContextRef<'ephemeral>> {
         self.context
     }
 
@@ -132,11 +134,11 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
         self.semantic_context
     }
 
-    pub fn take_context(&mut self) -> &'ephemeral PredictionContext<'ephemeral> {
+    pub fn take_context(&mut self) -> PredictionContextRef<'ephemeral> {
         self.context.take().unwrap()
     }
 
-    pub fn set_context(&mut self, context: &'ephemeral PredictionContext<'ephemeral>) {
+    pub fn set_context(&mut self, context: PredictionContextRef<'ephemeral>) {
         self.context = Some(context);
     }
 
@@ -207,11 +209,7 @@ impl Eq for LexerATNConfig<'_> {}
 impl<'ephemeral> ATNConfigType<'ephemeral> for LexerATNConfig<'ephemeral> {}
 
 impl<'ephemeral> LexerATNConfig<'ephemeral> {
-    pub fn new(
-        state: ATNStateRef,
-        alt: i32,
-        context: &'ephemeral PredictionContext<'ephemeral>,
-    ) -> Self {
+    pub fn new(state: ATNStateRef, alt: i32, context: PredictionContextRef<'ephemeral>) -> Self {
         let base = ATNConfig::new(state, alt, Some(context));
         LexerATNConfig {
             base,
@@ -242,7 +240,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
 
     pub fn with_prediction_context(
         self,
-        context: Option<&'ephemeral PredictionContext<'ephemeral>>,
+        context: Option<impl Into<PredictionContextRef<'ephemeral>>>,
     ) -> Self {
         Self {
             base: self.base.with_prediction_context(context),
@@ -282,7 +280,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self.base.get_alt()
     }
 
-    pub fn get_context(&self) -> Option<&'ephemeral PredictionContext<'ephemeral>> {
+    pub fn get_context(&self) -> Option<PredictionContextRef<'ephemeral>> {
         self.base.get_context()
     }
 
@@ -290,11 +288,11 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self.base.semantic_context()
     }
 
-    pub fn take_context(&mut self) -> &'ephemeral PredictionContext<'ephemeral> {
+    pub fn take_context(&mut self) -> PredictionContextRef<'ephemeral> {
         self.base.take_context()
     }
 
-    pub fn set_context(&mut self, context: &'ephemeral PredictionContext<'ephemeral>) {
+    pub fn set_context(&mut self, context: PredictionContextRef<'ephemeral>) {
         self.base.set_context(context);
     }
 

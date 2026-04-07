@@ -22,7 +22,7 @@ use crate::interval_set::IntervalSet;
 use crate::parser::Parser;
 
 use crate::prediction_context::{
-    NoopHasherBuilder, PredictionContext, PredictionContextCache, EMPTY_PREDICTION_CONTEXT,
+    NoopHasherBuilder, PredictionContext, PredictionContextCache, PredictionContextRef,
 };
 use crate::prediction_mode::*;
 use crate::semantic_context::SemanticContext;
@@ -186,7 +186,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                 let s0_closure = self.compute_start_state(
                     local.dfa_ref.borrow().atn_start_state,
                     // PredictionContext::from_rule_context::<'a,T::Node>(self.atn(), empty_ctx::<T::Node>().as_ref()),
-                    &EMPTY_PREDICTION_CONTEXT,
+                    PredictionContextRef::new_empty(),
                     false,
                     &mut local,
                 );
@@ -674,7 +674,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn compute_start_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         a: ATNStateRef,
-        initial_ctx: &'scratch PredictionContext<'scratch>,
+        initial_ctx: PredictionContextRef<'scratch>,
         full_ctx: bool,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) -> ATNConfigSet<'scratch>
@@ -1032,7 +1032,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                             let new_config = config
                                 .clone()
                                 .with_state(config.get_state())
-                                .with_prediction_context(Some(&EMPTY_PREDICTION_CONTEXT));
+                                .with_prediction_context(Some(PredictionContextRef::new_empty()));
                             configs.add_cached(new_config, local.merge_cache);
                         } else {
                             self.closure_work(
@@ -1591,7 +1591,7 @@ impl<'sim> IATNSimulator<'sim, ATNConfigSet<'sim>> for ParserATNSimulator<'sim> 
 pub(crate) struct MergeCache<'scratch> {
     map: HashMap<
         MergeKey<'scratch>,
-        &'scratch PredictionContext<'scratch>,
+        PredictionContextRef<'scratch>,
         NoopHasherBuilder,
         &'scratch bumpalo::Bump,
     >,
@@ -1619,23 +1619,19 @@ impl<'scratch> MergeCache<'scratch> {
         self.scratch.alloc(value)
     }
 
-    pub fn get(&self, key: &MergeKey) -> Option<&'scratch PredictionContext<'scratch>> {
-        self.map.get(key).cloned()
+    pub fn get(&self, key: &MergeKey) -> Option<PredictionContextRef<'scratch>> {
+        self.map.get(key).copied()
     }
 
-    pub fn insert(
-        &mut self,
-        key: MergeKey<'scratch>,
-        value: &'scratch PredictionContext<'scratch>,
-    ) {
+    pub fn insert(&mut self, key: MergeKey<'scratch>, value: PredictionContextRef<'scratch>) {
         self.map.insert(key, value);
     }
 }
 
 #[derive(Eq)]
 pub struct MergeKey<'scratch> {
-    pub left: &'scratch PredictionContext<'scratch>,
-    pub right: &'scratch PredictionContext<'scratch>,
+    pub left: PredictionContextRef<'scratch>,
+    pub right: PredictionContextRef<'scratch>,
 }
 
 impl PartialEq for MergeKey<'_> {
@@ -1668,8 +1664,8 @@ impl std::hash::Hash for MergeKey<'_> {
 
 impl<'scratch> MergeKey<'scratch> {
     pub fn new(
-        left: &'scratch PredictionContext<'scratch>,
-        right: &'scratch PredictionContext<'scratch>,
+        left: PredictionContextRef<'scratch>,
+        right: PredictionContextRef<'scratch>,
     ) -> Self {
         Self { left, right }
     }

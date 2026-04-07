@@ -8,7 +8,7 @@ use crate::atn_state::ATNState;
 use crate::atn_state::ATNStateRef;
 use crate::interval_set::IntervalSet;
 use crate::prediction_context::PredictionContext;
-use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
+use crate::prediction_context::PredictionContextRef;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
 use crate::transition::Transition;
 use crate::tree::RuleNode;
@@ -61,7 +61,7 @@ impl LL1Analyzer<'_> {
         arena: &'ephemeral bumpalo::Bump,
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
-        ctx: Option<&'ephemeral PredictionContext<'ephemeral>>,
+        ctx: Option<PredictionContextRef<'ephemeral>>,
         look: &mut IntervalSet,
         look_busy: &mut HashSet<ATNConfig<'ephemeral>, DefaultHashBuilder, &bumpalo::Bump>,
         called_rule_stack: &mut BitSet,
@@ -97,7 +97,7 @@ impl LL1Analyzer<'_> {
                     look.add_one(TOKEN_EOF);
                     return;
                 }
-                Some(ctx) if ctx != &*EMPTY_PREDICTION_CONTEXT => {
+                Some(ctx) if ctx != PredictionContextRef::new_empty() => {
                     let removed = called_rule_stack.contains(s.get_rule_index() as usize);
                     called_rule_stack.remove(s.get_rule_index() as usize);
                     for i in 0..ctx.length() {
@@ -139,7 +139,7 @@ impl LL1Analyzer<'_> {
                         arena,
                         target,
                         stop_state,
-                        Some(new_ctx),
+                        Some(new_ctx.into()),
                         look,
                         look_busy,
                         called_rule_stack,

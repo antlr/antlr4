@@ -13,7 +13,7 @@ use crate::errors::ANTLRError;
 use crate::int_stream::{IntStream, EOF};
 use crate::lexer::{Lexer, LexerPosition, LEXER_MAX_CHAR_VALUE, LEXER_MIN_CHAR_VALUE};
 use crate::lexer_action_executor::LexerActionExecutor;
-use crate::prediction_context::EMPTY_PREDICTION_CONTEXT;
+use crate::prediction_context::PredictionContextRef;
 use crate::prediction_context::{PredictionContext, PredictionContextCache};
 use crate::token::TOKEN_EOF;
 
@@ -419,7 +419,8 @@ impl<'sim> LexerATNSimulator<'sim> {
         let mut config_set = LexerATNConfigSet::new(scratch);
         for (i, tr) in p.get_transitions().iter().enumerate() {
             let target = tr.get_target();
-            let atn_config = LexerATNConfig::new(target, (i + 1) as i32, &EMPTY_PREDICTION_CONTEXT);
+            let atn_config =
+                LexerATNConfig::new(target, (i + 1) as i32, PredictionContextRef::new_empty());
             self.closure(
                 atn_config,
                 &mut config_set,
@@ -465,7 +466,7 @@ impl<'sim> LexerATNSimulator<'sim> {
                         config
                             .clone()
                             .with_state(state)
-                            .with_prediction_context(Some(&EMPTY_PREDICTION_CONTEXT)),
+                            .with_prediction_context(Some(PredictionContextRef::new_empty())),
                     );
                     _current_alt_reached_accept_state = true
                 }

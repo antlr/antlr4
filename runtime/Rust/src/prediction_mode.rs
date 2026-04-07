@@ -6,7 +6,7 @@ use crate::atn::INVALID_ALT;
 use crate::atn_config::ATNConfig;
 use crate::atn_config_set::ATNConfigSet;
 use crate::atn_state::ATNStateRef;
-use crate::prediction_context::{NoopHasherBuilder, PredictionContext};
+use crate::prediction_context::{NoopHasherBuilder, PredictionContextRef};
 use crate::semantic_context::SemanticContext;
 
 /// This enum defines the prediction modes available in ANTLR 4 along with
@@ -154,7 +154,7 @@ pub(crate) fn get_conflicting_alt_subsets(configs: &ATNConfigSet) -> Vec<BitSet>
     #[derive(Eq, PartialEq)]
     struct KeyWrapper<'a> {
         state: ATNStateRef,
-        context: &'a PredictionContext<'a>,
+        context: PredictionContextRef<'a>,
     }
 
     impl<'a> std::hash::Hash for KeyWrapper<'a> {
