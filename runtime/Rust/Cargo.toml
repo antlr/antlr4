@@ -1,6 +1,6 @@
 [package]
 name = "dbt-antlr4"
-version = "1.2.2"
+version = "1.2.3"
 authors = ["Konstantin Anisimov <rrevenantt@gmail.com>", "Alex Snaps <alex@wcgw.dev>", "Bo Lin <bo@dreamsphere.org>"]
 homepage = "https://github.com/sdf-labs/antlr4"
 repository = "https://github.com/sdf-labs/antlr4"
