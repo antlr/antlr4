@@ -620,20 +620,22 @@ struct PredictionContextCacheInner<'sim> {
     arena: Pin<Box<bumpalo::Bump>>,
 }
 
-impl<'sim> PredictionContextCacheInner<'sim> {
-    pub fn new(_: &'sim bumpalo::Bump) -> Self {
+impl PredictionContextCacheInner<'static> {
+    pub fn new() -> Self {
         let arena = Box::pin(bumpalo::Bump::new());
         // SAFETY: self-reference cast
         let arena_ref =
-            unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&arena) };
+            unsafe { std::mem::transmute::<&bumpalo::Bump, &'static bumpalo::Bump>(&arena) };
 
         PredictionContextCacheInner {
             cache: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
             arena,
         }
     }
+}
 
-    pub fn allocated_size(&self) -> usize {
+impl<'sim> PredictionContextCacheInner<'sim> {
+    pub fn allocated_bytes(&self) -> usize {
         self.arena.allocated_bytes()
     }
 
@@ -694,12 +696,14 @@ impl<'sim> PredictionContextCacheInner<'sim> {
 
 pub struct PredictionContextCache<'sim>(RwLock<PredictionContextCacheInner<'sim>>);
 
-impl<'sim> PredictionContextCache<'sim> {
+impl PredictionContextCache<'static> {
     #[doc(hidden)]
-    pub fn new(arena: &'sim bumpalo::Bump) -> PredictionContextCache<'sim> {
-        PredictionContextCache(RwLock::new(PredictionContextCacheInner::new(arena)))
+    pub fn new() -> Self {
+        PredictionContextCache(RwLock::new(PredictionContextCacheInner::new()))
     }
+}
 
+impl<'sim> PredictionContextCache<'sim> {
     #[doc(hidden)]
     pub fn get_shared_context<'a>(
         &self,
@@ -768,11 +772,11 @@ impl<'sim> PredictionContextCache<'sim> {
             .len()
     }
 
-    pub fn allocated_size(&self) -> usize {
+    pub fn allocated_bytes(&self) -> usize {
         self.0
             .read()
             .expect("PredictionContextCache lock poisoned")
-            .allocated_size()
+            .allocated_bytes()
     }
 }
 

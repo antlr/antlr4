@@ -230,6 +230,13 @@ where
         let state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
         state_store.add(state)
     }
+
+    pub fn allocated_bytes(&self) -> usize {
+        self.states
+            .lock()
+            .expect("StateStore lock poisoned")
+            .allocated_bytes()
+    }
 }
 
 impl<'sim> DFA<'sim, ATNConfigSet<'sim>> {

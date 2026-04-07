@@ -5,7 +5,7 @@ use std::rc::Rc;
 use crate::atn::ATN;
 use crate::atn_config::LexerATNConfig;
 use crate::atn_config_set::LexerATNConfigSet;
-use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
+use crate::atn_simulator::{BaseATNSimulatorHandle, IATNSimulator};
 use crate::atn_state::{ATNState, ATNStateRef};
 use crate::char_stream::CharStream;
 use crate::dfa::{DFAState, ProposedDFAState, DFA};
@@ -50,7 +50,7 @@ pub trait ILexerATNSimulator<'sim>: IATNSimulator<'sim, LexerATNConfigSet<'sim>>
 /// Simple DFA implementation enough for lexer.
 #[derive(Debug)]
 pub struct LexerATNSimulator<'sim> {
-    base: &'sim BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
+    base: BaseATNSimulatorHandle<'sim, LexerATNConfigSet<'sim>>,
 
     //    merge_cache: DoubleDict,
     start_index: isize,
@@ -153,7 +153,7 @@ pub const LEXER_DFA_EDGE_SET_SIZE: usize = (MAX_DFA_EDGE - MIN_DFA_EDGE + 1) as 
 impl<'sim> LexerATNSimulator<'sim> {
     /// Creates `LexerATNSimulator` instance which creates DFA over `atn`
     pub fn new(
-        base: &'sim BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
+        base: BaseATNSimulatorHandle<'sim, LexerATNConfigSet<'sim>>,
     ) -> LexerATNSimulator<'sim> {
         LexerATNSimulator {
             base,
