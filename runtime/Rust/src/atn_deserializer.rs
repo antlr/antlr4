@@ -10,7 +10,6 @@ use crate::atn_state::*;
 use crate::atn_type::ATNType;
 use crate::int_stream::EOF;
 use crate::interval_set::IntervalSet;
-use crate::lexer_action::LexerAction::*;
 use crate::lexer_action::*;
 use crate::transition::Transition;
 use crate::transition::*;
@@ -559,17 +558,17 @@ impl ATNDeserializer {
         data2: i32,
     ) -> LexerAction<'static> {
         match action_type {
-            LEXER_ACTION_TYPE_CHANNEL => LexerChannelAction(data1),
-            LEXER_ACTION_TYPE_CUSTOM => LexerCustomAction {
+            LEXER_ACTION_TYPE_CHANNEL => LexerAction::Channel(data1),
+            LEXER_ACTION_TYPE_CUSTOM => LexerAction::Custom {
                 rule_index: data1,
                 action_index: data2,
             },
-            LEXER_ACTION_TYPE_MODE => LexerModeAction(data1),
-            LEXER_ACTION_TYPE_MORE => LexerMoreAction,
-            LEXER_ACTION_TYPE_POP_MODE => LexerPopModeAction,
-            LEXER_ACTION_TYPE_PUSH_MODE => LexerPushModeAction(data1),
-            LEXER_ACTION_TYPE_SKIP => LexerSkipAction,
-            LEXER_ACTION_TYPE_TYPE => LexerTypeAction(data1),
+            LEXER_ACTION_TYPE_MODE => LexerAction::Mode(data1),
+            LEXER_ACTION_TYPE_MORE => LexerAction::More,
+            LEXER_ACTION_TYPE_POP_MODE => LexerAction::PopMode,
+            LEXER_ACTION_TYPE_PUSH_MODE => LexerAction::PushMode(data1),
+            LEXER_ACTION_TYPE_SKIP => LexerAction::Skip,
+            LEXER_ACTION_TYPE_TYPE => LexerAction::Type(data1),
             _ => panic!("invalid action type {}", action_type),
         }
     }

@@ -14,22 +14,25 @@ pub(crate) const LEXER_ACTION_TYPE_TYPE: i32 = 7;
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Default, Eq, PartialEq, Debug, Hash)]
 pub(crate) enum LexerAction<'ephemeral> {
-    LexerChannelAction(i32),
-    LexerCustomAction {
+    Channel(i32),
+    Custom {
         rule_index: i32,
         action_index: i32,
     },
-    LexerModeAction(i32),
-    LexerMoreAction,
-    LexerPopModeAction,
-    LexerPushModeAction(i32),
+    Mode(i32),
+    More,
+    PopMode,
+    PushMode(i32),
     #[default]
-    LexerSkipAction,
-    LexerTypeAction(i32),
-    LexerIndexedCustomAction {
-        offset: isize,
-        action: &'ephemeral LexerAction<'ephemeral>,
-    },
+    Skip,
+    Type(i32),
+    IndexedCustom(&'ephemeral LexerIndexedCustomAction<'ephemeral>),
+}
+
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+pub(crate) struct LexerIndexedCustomAction<'ephemeral> {
+    pub(crate) offset: isize,
+    pub(crate) action: LexerAction<'ephemeral>,
 }
 
 impl<'ephemeral> LexerAction<'ephemeral> {
@@ -40,7 +43,7 @@ impl<'ephemeral> LexerAction<'ephemeral> {
     pub fn is_position_dependent(&self) -> bool {
         matches!(
             self,
-            LexerAction::LexerCustomAction { .. } | LexerAction::LexerIndexedCustomAction { .. }
+            LexerAction::Custom { .. } | LexerAction::IndexedCustom { .. }
         )
     }
     pub(crate) fn execute<'input, 'arena, Input, TF, L>(&self, lexer: &mut L)
@@ -51,22 +54,22 @@ impl<'ephemeral> LexerAction<'ephemeral> {
         TF: crate::token_factory::TokenFactory<'input, 'arena> + 'arena,
     {
         match self {
-            &LexerAction::LexerChannelAction(channel) => lexer.set_channel(channel),
-            &LexerAction::LexerCustomAction {
+            &LexerAction::Channel(channel) => lexer.set_channel(channel),
+            &LexerAction::Custom {
                 rule_index,
                 action_index,
             } => {
                 lexer.action(None, rule_index, action_index);
             }
-            &LexerAction::LexerModeAction(mode) => lexer.set_mode(mode as usize),
-            &LexerAction::LexerMoreAction => lexer.more(),
-            &LexerAction::LexerPopModeAction => {
+            &LexerAction::Mode(mode) => lexer.set_mode(mode as usize),
+            &LexerAction::More => lexer.more(),
+            &LexerAction::PopMode => {
                 lexer.pop_mode();
             }
-            &LexerAction::LexerPushModeAction(mode) => lexer.push_mode(mode as usize),
-            &LexerAction::LexerSkipAction => lexer.skip(),
-            &LexerAction::LexerTypeAction(ty) => lexer.set_type(ty),
-            LexerAction::LexerIndexedCustomAction { action, .. } => action.execute(lexer),
+            &LexerAction::PushMode(mode) => lexer.push_mode(mode as usize),
+            &LexerAction::Skip => lexer.skip(),
+            &LexerAction::Type(ty) => lexer.set_type(ty),
+            LexerAction::IndexedCustom(action) => action.action.execute(lexer),
         }
     }
 
@@ -75,18 +78,16 @@ impl<'ephemeral> LexerAction<'ephemeral> {
         CS: ConfigSet<'sim> + 'sim,
     {
         match self {
-            LexerAction::LexerIndexedCustomAction { offset, action }
-                if dfa.contains_ref(action) =>
-            {
+            LexerAction::IndexedCustom(action) if dfa.contains_ref(action) => {
                 // Safety: the action is already in the target arena, so can
                 // live as long as the target lifetime:
                 unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) }
             }
-            LexerAction::LexerIndexedCustomAction { offset, action } => {
-                LexerAction::LexerIndexedCustomAction {
-                    offset: *offset,
-                    action: dfa.alloc(action.promote(dfa)),
-                }
+            LexerAction::IndexedCustom(action) => {
+                LexerAction::IndexedCustom(dfa.alloc(LexerIndexedCustomAction {
+                    offset: action.offset,
+                    action: action.action.promote(dfa),
+                }))
             }
             // Safety: these don't hold any references, so effectively 'static
             _ => unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) },

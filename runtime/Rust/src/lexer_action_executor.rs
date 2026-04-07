@@ -6,8 +6,7 @@ use crate::atn_config_set::ConfigSet;
 use crate::char_stream::CharStream;
 use crate::dfa::DFAStateStore;
 use crate::lexer::Lexer;
-use crate::lexer_action::LexerAction;
-use crate::lexer_action::LexerAction::LexerIndexedCustomAction;
+use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
 use crate::token_factory::TokenFactory;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -66,13 +65,10 @@ impl<'ephemeral> LexerActionExecutor<'ephemeral> {
     ) -> LexerActionExecutor<'ephemeral> {
         let fixed_actions = arena.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
             let action = self.lexer_actions[i].clone();
-            if let LexerAction::LexerIndexedCustomAction { .. } = action {
+            if let LexerAction::IndexedCustom(..) = action {
                 action
             } else if action.is_position_dependent() {
-                LexerIndexedCustomAction {
-                    offset,
-                    action: arena.alloc(action),
-                }
+                LexerAction::IndexedCustom(arena.alloc(LexerIndexedCustomAction { offset, action }))
             } else {
                 action
             }
@@ -96,7 +92,7 @@ impl<'ephemeral> LexerActionExecutor<'ephemeral> {
         let stop_index = lexer.input().index();
         for action in self.lexer_actions.iter() {
             //println!("executing action {:?}",action);
-            if let LexerAction::LexerIndexedCustomAction { offset, .. } = action {
+            if let LexerAction::IndexedCustom(LexerIndexedCustomAction { offset, .. }) = action {
                 lexer.input().seek(start_index + offset);
                 requires_seek = start_index + offset != stop_index;
             } else if action.is_position_dependent() {
