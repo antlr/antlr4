@@ -13,9 +13,9 @@ use dbt_antlr4::lexer::{BaseLexer, LexerRecog, Lexer as _};
 use dbt_antlr4::atn_config_set::LexerATNConfigSet;
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
 use dbt_antlr4::atn_simulator::BaseATNSimulator;
+use dbt_antlr4::atn_simulator::LexerATNSimulatorManager as ATNSimulatorManager;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
-use dbt_antlr4::atn_simulator::{LexerATNSimulatorManager as ATNSimulatorManager, BaseATNSimulatorHandle};
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::recognizer::Actions;
 use dbt_antlr4::token_factory::{CommonTokenFactory, TokenFactory};
@@ -50,6 +50,7 @@ static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(Voc
 
 pub type LexerContext<'input, 'arena> = BaseRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
 pub type BaseLexerType<'input, 'arena, Input, TF> = BaseLexer<'input, 'arena, SimpleLRLexerActions, Input, TF>;
+pub fn lexer_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 
 pub struct SimpleLRLexer<'input, 'arena, Input, TF = CommonTokenFactory<'input, 'arena>>
 where
@@ -102,12 +103,12 @@ where
     fn get_literal_names(&self) -> &[Option<&str>] { &_LITERAL_NAMES }
     fn get_symbolic_names(&self) -> &[Option<&str>] { &_SYMBOLIC_NAMES }
     fn get_grammar_file_name(&self) -> &'static str { "SimpleLRLexer.g4" }
-    fn get_atn_simulator(&self, arena: &'arena Arena) -> BaseATNSimulatorHandle<'arena, LexerATNConfigSet<'arena>> {
+    fn get_atn_simulator(&self, arena: &'arena Arena) -> BaseATNSimulator<'arena, LexerATNConfigSet<'arena>> {
         ATN_SIMULATOR_MANAGER.get_simulator(arena)
     }
 }
 
-pub static ATN_SIMULATOR_MANAGER: LazyLock<ATNSimulatorManager> = LazyLock::new(|| ATNSimulatorManager::new(&_ATN));
+static ATN_SIMULATOR_MANAGER: LazyLock<ATNSimulatorManager> = LazyLock::new(|| ATNSimulatorManager::new(&_ATN));
 static _ATN: LazyLock<ATN> =
     LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
 static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![

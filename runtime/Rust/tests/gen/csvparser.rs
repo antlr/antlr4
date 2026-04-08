@@ -17,7 +17,8 @@ use dbt_antlr4::rule_context::{CustomRuleContext, RuleContext};
 use dbt_antlr4::recognizer::{Recognizer,Actions};
 use dbt_antlr4::atn_config_set::ATNConfigSet;
 use dbt_antlr4::atn_deserializer::ATNDeserializer;
-use dbt_antlr4::atn_simulator::{ParserATNSimulatorManager as ATNSimulatorManager, BaseATNSimulatorHandle};
+use dbt_antlr4::atn_simulator::BaseATNSimulator;
+use dbt_antlr4::atn_simulator::ParserATNSimulatorManager as ATNSimulatorManager;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
 use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
@@ -60,13 +61,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;7]  = [
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
 pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, CSVParserExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>, Input, TF, dyn CSVListener<'input, 'arena>>;
-
-pub fn reset_simulator() {
-    ATN_SIMULATOR_MANAGER.reset_simulator();
-}
-pub fn set_simulator_cache_threshold_bytes(bytes: usize) {
-    ATN_SIMULATOR_MANAGER.set_total_allocated_threshold_bytes(bytes);
-}
+pub fn parser_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 
 pub struct CSVParser<'input, 'arena, Input, TF>
 where
@@ -645,7 +640,7 @@ where
 	}
 }
 
-pub static ATN_SIMULATOR_MANAGER: LazyLock<ATNSimulatorManager> = LazyLock::new(|| ATNSimulatorManager::new(&_ATN));
+static ATN_SIMULATOR_MANAGER: LazyLock<ATNSimulatorManager> = LazyLock::new(|| ATNSimulatorManager::new(&_ATN));
 static _ATN: LazyLock<ATN> =
     LazyLock::new(|| ATNDeserializer::new(None).deserialize(&mut _serializedATN.iter()));
 static _serializedATN: LazyLock<Vec<i32>> = LazyLock::new(|| vec![

@@ -239,6 +239,9 @@ where
     }
 }
 
+unsafe impl<'sim, CS> Send for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
+unsafe impl<'sim, CS> Sync for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
+
 impl<'sim> DFA<'sim, ATNConfigSet<'sim>> {
     pub fn get_error_state(&self) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
         unsafe {

@@ -6,7 +6,7 @@ use std::cell::Cell;
 use std::rc::Rc;
 
 use crate::atn_config_set::LexerATNConfigSet;
-use crate::atn_simulator::BaseATNSimulatorHandle;
+use crate::atn_simulator::BaseATNSimulator;
 use crate::char_stream::CharStream;
 use crate::error_listener::{ConsoleErrorListener, ErrorListener};
 use crate::errors::ANTLRError;
@@ -89,7 +89,7 @@ where
     fn get_atn_simulator(
         &self,
         _: &'arena Arena,
-    ) -> BaseATNSimulatorHandle<'arena, LexerATNConfigSet<'arena>>;
+    ) -> BaseATNSimulator<'arena, LexerATNConfigSet<'arena>>;
 }
 
 /// Default implementation of Lexer

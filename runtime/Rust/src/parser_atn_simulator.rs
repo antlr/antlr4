@@ -11,7 +11,7 @@ use hashbrown::{DefaultHashBuilder, HashMap, HashSet};
 use crate::atn::{ATN, INVALID_ALT};
 use crate::atn_config::ATNConfig;
 use crate::atn_config_set::ATNConfigSet;
-use crate::atn_simulator::{BaseATNSimulatorHandle, IATNSimulator};
+use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
     ATNDecisionState, ATNState, ATNStateRef, DecisionState, ATNSTATE_BLOCK_END,
 };
@@ -76,7 +76,7 @@ use crate::transition::{
 /// **For more info see Java version**
 #[derive(Debug)]
 pub struct ParserATNSimulator<'sim> {
-    base: BaseATNSimulatorHandle<'sim, ATNConfigSet<'sim>>,
+    base: BaseATNSimulator<'sim, ATNConfigSet<'sim>>,
     prediction_mode: Cell<PredictionMode>,
     start_index: Cell<isize>,
     // pd:PhantomData<P>
@@ -119,7 +119,7 @@ where
 
 impl<'sim> ParserATNSimulator<'sim> {
     /// creates new `ParserATNSimulator`
-    pub fn new(base: BaseATNSimulatorHandle<'sim, ATNConfigSet<'sim>>) -> Self {
+    pub fn new(base: BaseATNSimulator<'sim, ATNConfigSet<'sim>>) -> Self {
         ParserATNSimulator {
             base,
             prediction_mode: Cell::new(PredictionMode::LL),

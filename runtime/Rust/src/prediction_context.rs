@@ -780,6 +780,9 @@ impl<'sim> PredictionContextCache<'sim> {
     }
 }
 
+unsafe impl Send for PredictionContextCache<'_> {}
+unsafe impl Sync for PredictionContextCache<'_> {}
+
 #[derive(Default)]
 pub struct NoopHasher(u64);
 
