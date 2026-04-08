@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::hash::Hasher;
 use std::mem::ManuallyDrop;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicPtr, Ordering};
+use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use std::sync::Mutex;
 
 use crate::arena::{is_ref_in_arena, is_slice_in_arena};
@@ -63,6 +63,8 @@ where
     s0: AtomicPtr<DFAState<'sim, CS>>,
 
     precedence_state: bool,
+
+    allocated_bytes: AtomicUsize,
 }
 
 impl<'sim, CS> DFA<'sim, CS>
@@ -93,6 +95,7 @@ where
                 s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
             })),
             precedence_state,
+            allocated_bytes: AtomicUsize::new(0),
         }
     }
 
@@ -228,14 +231,15 @@ where
         };
 
         let state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
-        state_store.add(state)
+        let res = state_store.add(state);
+
+        // Push the updated memory usage up to the DFA, outside of the lock:
+        self.allocated_bytes.store(state_store.allocated_bytes(), Ordering::Relaxed);
+        res
     }
 
     pub fn allocated_bytes(&self) -> usize {
-        self.states
-            .lock()
-            .expect("StateStore lock poisoned")
-            .allocated_bytes()
+        self.allocated_bytes.load(Ordering::Relaxed)
     }
 }
 

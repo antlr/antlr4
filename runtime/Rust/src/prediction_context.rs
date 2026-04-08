@@ -4,6 +4,7 @@ use std::mem::ManuallyDrop;
 use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::NonNull;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{LazyLock, RwLock};
 
 use fxhash::FxHasher32;
@@ -694,12 +695,15 @@ impl<'sim> PredictionContextCacheInner<'sim> {
     }
 }
 
-pub struct PredictionContextCache<'sim>(RwLock<PredictionContextCacheInner<'sim>>);
+pub struct PredictionContextCache<'sim>(RwLock<PredictionContextCacheInner<'sim>>, AtomicUsize);
 
 impl PredictionContextCache<'static> {
     #[doc(hidden)]
     pub fn new() -> Self {
-        PredictionContextCache(RwLock::new(PredictionContextCacheInner::new()))
+        PredictionContextCache(
+            RwLock::new(PredictionContextCacheInner::new()),
+            AtomicUsize::new(0),
+        )
     }
 }
 
@@ -757,26 +761,22 @@ impl<'sim> PredictionContextCache<'sim> {
             }
         };
 
-        self.0
-            .write()
-            .expect("PredictionContextCache lock poisoned")
-            .get_or_insert(shared)
-    }
-
-    #[doc(hidden)]
-    pub fn length(&self) -> usize {
-        self.0
-            .read()
-            .expect("PredictionContextCache lock poisoned")
-            .cache
-            .len()
+        let (res, new_size) = {
+            let mut inner_locked = self
+                .0
+                .write()
+                .expect("PredictionContextCache lock poisoned");
+            let res = inner_locked.get_or_insert(shared);
+            let new_size = inner_locked.allocated_bytes();
+            // Push the updated memory usage up to the cache, outside of the lock:
+            (res, new_size)
+        };
+        self.1.store(new_size, Ordering::Relaxed);
+        res
     }
 
     pub fn allocated_bytes(&self) -> usize {
-        self.0
-            .read()
-            .expect("PredictionContextCache lock poisoned")
-            .allocated_bytes()
+        self.1.load(Ordering::Relaxed)
     }
 }
 
