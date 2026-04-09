@@ -234,7 +234,8 @@ where
         let res = state_store.add(state);
 
         // Push the updated memory usage up to the DFA, outside of the lock:
-        self.allocated_bytes.store(state_store.allocated_bytes(), Ordering::Relaxed);
+        self.allocated_bytes
+            .store(state_store.allocated_bytes(), Ordering::Relaxed);
         res
     }
 

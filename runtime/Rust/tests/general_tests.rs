@@ -46,6 +46,7 @@ use dbt_antlr4::token_stream::{TokenStream, UnbufferedTokenStream};
 use dbt_antlr4::tree::{ParseTreeListener, TerminalNode};
 use dbt_antlr4::trees::string_tree;
 use dbt_antlr4::{Arena, InputStream, Parser};
+use serial_test::serial;
 
 use crate::gen::csvlexer::*;
 use crate::gen::csvlistener::*;
@@ -379,6 +380,7 @@ fn test_remove_listener() {
 fn test_byte_parser() {}
 
 #[test]
+#[serial(labelsparser)]
 fn test_complex_convert() {
     let input = "(a+4)*2";
     // let codepoints = "(a+4)*2";
@@ -488,6 +490,7 @@ fn test_ast_type_variance() {
 // Deep recursion support requires stacker. Without stacker, the test will
 // fail with stack overflow
 #[test]
+#[serial(labelsparser)]
 fn test_deep_recursion() {
     let input = "(".repeat(1000) + "a" + &(")".repeat(1000));
     Arena::with(|arena| {
@@ -508,4 +511,34 @@ fn test_deep_recursion() {
                 .count()
         );
     });
+}
+
+#[test]
+#[serial(labelsparser)]
+fn test_parser_allocation_limit() {
+    struct LabelParserAllocationLimitGuard;
+
+    impl Drop for LabelParserAllocationLimitGuard {
+        fn drop(&mut self) {
+            labelslexer::lexer_simulator_manager().set_allocation_limit_bytes(0);
+            labelsparser::parser_simulator_manager().set_allocation_limit_bytes(0);
+        }
+    }
+
+    let input = "((a + 4) * 2)";
+    {
+        let _guard = LabelParserAllocationLimitGuard {};
+
+        labelsparser::parser_simulator_manager().set_allocation_limit_bytes(1);
+
+        Arena::with(|arena| {
+            let input = InputStream::new(input);
+            let lexer = LabelsLexer::<_>::new(arena, input);
+            let token_source = CommonTokenStream::new(lexer);
+            let mut parser = LabelsParser::new(arena, token_source);
+
+            let result = parser.s().unwrap_err();
+            assert!(result.to_string().contains("Memory limit of 1B exceeded"));
+        });
+    }
 }

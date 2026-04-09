@@ -25,3 +25,5 @@ hashbrown = "0.16.1"
 bumpalo = { version = "3.19.1", features = ["allocator-api2", "collections", "boxed"]}
 stacker = { version = "0.1.23" } # TODO: make this optional
 
+[dev-dependencies]
+serial_test = "3.4.0"

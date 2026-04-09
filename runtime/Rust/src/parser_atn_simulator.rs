@@ -182,7 +182,9 @@ impl<'sim> ParserATNSimulator<'sim> {
                 }
             };
 
-            let s0 = s0.unwrap_or_else(|| {
+            let s0 = if let Some(s) = s0 {
+                s
+            } else {
                 let s0_closure = self.compute_start_state(
                     local.dfa_ref.borrow().atn_start_state,
                     // PredictionContext::from_rule_context::<'a,T::Node>(self.atn(), empty_ctx::<T::Node>().as_ref()),
@@ -197,18 +199,17 @@ impl<'sim> ParserATNSimulator<'sim> {
                     let s0_closure_updated = self.apply_precedence_filter(&s0_closure, &mut local);
                     dfa_ref.set_s0_configs(s0_closure, self.shared_context_cache());
                     let new_s0 =
-                        self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated));
+                        self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated))?;
 
                     dfa_ref.set_precedence_start_state(local.precedence, new_s0);
                     new_s0
                 } else {
-                    //let mut dfa_mut = local.dfa_ref.borrow_mut();
                     let dfa_ref = local.dfa_ref;
-                    let s0 = self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure));
+                    let s0 = self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure))?;
                     dfa_ref.set_s0(s0);
                     s0
                 }
-            });
+            };
 
             self.exec_atn(&mut local, s0)?
         };
@@ -241,11 +242,9 @@ impl<'sim> ParserATNSimulator<'sim> {
             let D = if let Some(s) = { Self::get_existing_target_state(previousD, token) } {
                 s
             } else {
-                self.compute_target_state(previousD, token, local)
+                self.compute_target_state(previousD, token, local)?
             };
 
-            // let dfa = local.dfa.take().unwrap();
-            // let states = &dfa.states;
             if D.is_error_state() {
                 let err = self.no_viable_alt(local, previousD.configs(), self.start_index.get());
                 local.input().seek(self.start_index.get());
@@ -361,7 +360,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         previousD: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
         t: i32,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-    ) -> &'sim DFAState<'sim, ATNConfigSet<'sim>>
+    ) -> Result<&'sim DFAState<'sim, ATNConfigSet<'sim>>, ANTLRError>
     where
         'input: 'arena,
         'sim: 'scratch,
@@ -377,7 +376,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         let reach = match reach {
             None => {
                 self.add_dfaedge(previousD, t, local.dfa_ref.get_error_state());
-                return local.dfa_ref.get_error_state();
+                return Ok(local.dfa_ref.get_error_state());
             }
             Some(x) => x,
         };
@@ -416,9 +415,9 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
 
         let dfa_ref = local.dfa_ref;
-        let D = dfa_ref.add_state(D, self);
+        let D = self.add_dfastate(dfa_ref, D)?;
         self.add_dfaedge(previousD, t, D);
-        D
+        Ok(D)
     }
 
     fn predicate_dfa_state<'scratch>(
@@ -1499,8 +1498,10 @@ impl<'sim> ParserATNSimulator<'sim> {
         &self,
         dfa: &'sim DFA<'sim, ATNConfigSet<'sim>>,
         state: ProposedDFAState<'scratch, ATNConfigSet<'scratch>>,
-    ) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
-        dfa.add_state(state, self)
+    ) -> Result<&'sim DFAState<'sim, ATNConfigSet<'sim>>, ANTLRError> {
+        self.base.check_allocation_limit()?;
+
+        Ok(dfa.add_state(state, self))
     }
 
     fn report_attempting_full_context<'input, 'arena, TF, P>(

@@ -7,6 +7,7 @@ use std::vec::Vec;
 use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
 use crate::dfa::DFA;
+use crate::errors::ANTLRError;
 use crate::prediction_context::PredictionContextCache;
 use crate::Arena;
 
@@ -29,6 +30,7 @@ where
     pub atn: &'static ATN,
     shared_context_cache: Arc<NotifyOnDrop<PredictionContextCache<'sim>>>,
     decision_to_dfa: Arc<NotifyOnDrop<Vec<DFA<'sim, CS>>>>,
+    allocation_limit_bytes: usize,
 }
 
 impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
@@ -51,6 +53,20 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
             .iter()
             .map(|dfa| dfa.allocated_bytes())
             .sum()
+    }
+
+    pub fn check_allocation_limit(&self) -> Result<(), ANTLRError> {
+        if self.allocation_limit_bytes > 0
+            && self.total_allocated_bytes() > self.allocation_limit_bytes
+        {
+            Err(ANTLRError::memory_limit_exceeded(
+                self.allocation_limit_bytes,
+                self.context_cache_bytes(),
+                self.dfa_bytes(),
+            ))
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -79,7 +95,7 @@ where
     CS: ConfigSet<'static> + 'static,
 {
     atn: &'static ATN,
-    threshold: AtomicUsize,
+    allocation_limit_bytes: AtomicUsize,
     is_resetting: AtomicBool,
     shared_context_cache: RwLock<Arc<NotifyOnDrop<PredictionContextCache<'static>>>>,
     decision_to_dfa: RwLock<Arc<NotifyOnDrop<Vec<DFA<'static, CS>>>>>,
@@ -97,7 +113,7 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
 
         Self {
             atn,
-            threshold: AtomicUsize::new(0),
+            allocation_limit_bytes: AtomicUsize::new(0),
             is_resetting: AtomicBool::new(false),
             shared_context_cache: RwLock::new(Arc::new(shared_context_cache)),
             decision_to_dfa: RwLock::new(Arc::new(decision_to_dfa)),
@@ -112,6 +128,7 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
         _: &'sim Arena,
     ) -> BaseATNSimulator<'sim, CS::FinalizedType<'sim>> {
         let dfa_lock = self.decision_to_dfa.read().unwrap();
+        let allocation_limit_bytes = self.get_allocation_limit_bytes();
 
         BaseATNSimulator {
             atn: self.atn,
@@ -127,15 +144,17 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
                     Arc<NotifyOnDrop<Vec<DFA<'_, <CS as ConfigSet<'_>>::FinalizedType<'_>>>>>,
                 >(dfa_lock.clone())
             },
+            allocation_limit_bytes,
         }
     }
 
-    pub fn set_total_allocated_threshold_bytes(&self, threshold: usize) {
-        self.threshold.store(threshold, Ordering::Release);
+    pub fn set_allocation_limit_bytes(&self, threshold: usize) {
+        self.allocation_limit_bytes
+            .store(threshold, Ordering::Relaxed);
     }
 
-    pub fn get_total_allocated_threshold_bytes(&self) -> usize {
-        self.threshold.load(Ordering::Acquire)
+    pub fn get_allocation_limit_bytes(&self) -> usize {
+        self.allocation_limit_bytes.load(Ordering::Relaxed)
     }
 
     pub fn reset_dfa(&self) {

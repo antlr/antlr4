@@ -194,7 +194,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         let _supress_edge = s0_closure.has_semantic_context();
         s0_closure.set_has_semantic_context(false);
 
-        let next_state = self.add_dfastate(dfa, s0_closure);
+        let next_state = self.add_dfastate(dfa, s0_closure)?;
         if !_supress_edge {
             dfa.set_s0(next_state);
         }
@@ -222,10 +222,11 @@ impl<'sim> LexerATNSimulator<'sim> {
         let mut symbol = lexer.input().la(1);
         let mut s = ds0;
         loop {
-            let target = Self::get_existing_target_state(s, symbol);
-            let target =
-                target.unwrap_or_else(|| self.compute_target_state(dfa, s, symbol, lexer, scratch));
-            //              let target = dfastates.deref().get(s).unwrap() ;x
+            let target = if let Some(target) = Self::get_existing_target_state(s, symbol) {
+                target
+            } else {
+                self.compute_target_state(dfa, s, symbol, lexer, scratch)?
+            };
 
             if target.is_error_state() {
                 break;
@@ -269,7 +270,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         _t: i32,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
         scratch: &'scratch bumpalo::Bump,
-    ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>>
+    ) -> Result<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>, ANTLRError>
     where
         'input: 'arena,
         Input: CharStream<'input>,
@@ -285,19 +286,18 @@ impl<'sim> LexerATNSimulator<'sim> {
                 self.add_dfaedge(s, _t, dfa.get_error_state());
             }
 
-            return dfa.get_error_state();
+            return Ok(dfa.get_error_state());
         }
 
         let supress_edge = reach.has_semantic_context();
         reach.set_has_semantic_context(false);
-        let to = self.add_dfastate(dfa, reach);
+        let to = self.add_dfastate(dfa, reach)?;
         if !supress_edge {
             let from = s;
             self.add_dfaedge(from, _t, to);
         }
         //        println!("target state computed from {:?} to {:?} on symbol {}", _s, to, char::try_from(_t as u32).unwrap());
-        to
-        //        states.get(to).unwrap()
+        Ok(to)
     }
 
     fn get_reachable_config_set<'scratch, 'input, 'arena, Input, TF>(
@@ -688,7 +688,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         &self,
         dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
         configs: LexerATNConfigSet,
-    ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>> {
+    ) -> Result<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>, ANTLRError> {
         assert!(!configs.has_semantic_context());
 
         let mut state = ProposedDFAState::new(configs);
@@ -712,7 +712,8 @@ impl<'sim> LexerATNSimulator<'sim> {
             state.is_accept_state = true;
         }
 
-        dfa.add_state(state, self)
+        self.base.check_allocation_limit()?;
+        Ok(dfa.add_state(state, self))
     }
 
     /// Returns current DFA that is currently used.

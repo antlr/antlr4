@@ -65,7 +65,12 @@ pub struct ANTLRError(pub Box<ANTLRErrorKind>);
 
 impl Display for ANTLRError {
     fn fmt(&self, _f: &mut Formatter<'_>) -> fmt::Result {
-        <Self as Debug>::fmt(self, _f)
+        match self.0.as_ref() {
+            ANTLRErrorKind::FallThrough(err) | ANTLRErrorKind::OtherError(err) => {
+                write!(_f, "{}", err)
+            }
+            _ => <Self as Debug>::fmt(self, _f),
+        }
     }
 }
 
@@ -120,6 +125,19 @@ impl ANTLRError {
 
     pub fn fall_through<E: Error + Send + Sync + 'static>(err: E) -> Self {
         ANTLRErrorKind::FallThrough(Arc::new(err)).into()
+    }
+
+    pub fn memory_limit_exceeded(
+        allocation_limit_bytes: usize,
+        context_cache_bytes: usize,
+        dfa_cache_bytes: usize,
+    ) -> Self {
+        ANTLRErrorKind::FallThrough(Arc::new(MemoryLimitExceededError {
+            allocation_limit_bytes,
+            context_cache_bytes,
+            dfa_cache_bytes,
+        }))
+        .into()
     }
 
     pub fn no_alt<'input, 'arena, TF, P>(recog: &mut P) -> Self
@@ -252,12 +270,28 @@ impl ANTLRError {
     }
 }
 
-//impl ANTLRError {
-//    fn get_expected_tokens(&self, _atn: &ATN) -> IntervalSet {
-//        atn.get_expected_tokens(se)
-//        unimplemented!()
-//    }
-//}
+#[derive(Debug, Clone)]
+pub struct MemoryLimitExceededError {
+    pub context_cache_bytes: usize,
+    pub dfa_cache_bytes: usize,
+    pub allocation_limit_bytes: usize,
+}
+
+impl Display for MemoryLimitExceededError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Memory limit of {}B exceeded: total allocated Antlr cache size {}B\
+            (context cache {}B/DFA {}B)",
+            self.allocation_limit_bytes,
+            self.context_cache_bytes + self.dfa_cache_bytes,
+            self.context_cache_bytes,
+            self.dfa_cache_bytes
+        )
+    }
+}
+
+impl Error for MemoryLimitExceededError {}
 
 /// Common part of ANTLR parser errors
 #[derive(Debug, Clone)]
