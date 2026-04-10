@@ -16,6 +16,7 @@ use crate::PredictionContextCache;
 pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
     type ConfigType: ATNConfigType<'ephemeral>;
     type FinalizedType<'x>: ConfigSet<'x>;
+    type LexerActionExecutorType: Default;
 
     fn new_empty() -> Self;
 
@@ -26,6 +27,13 @@ pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
         cache: &'sim PredictionContextCache<'sim>,
         dfa: &DFAStateStore<'sim, Self::FinalizedType<'sim>>,
     ) -> Self::FinalizedType<'sim>;
+
+    fn set_lexer_action_executor(
+        target: &mut Self::LexerActionExecutorType,
+        value: Self::LexerActionExecutorType,
+    ) {
+        *target = value;
+    }
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -90,6 +98,7 @@ impl<'ephemeral> IntoIterator for ATNConfigSet<'ephemeral> {
 impl<'ephemeral> ConfigSet<'ephemeral> for ATNConfigSet<'ephemeral> {
     type ConfigType = ATNConfig<'ephemeral>;
     type FinalizedType<'x> = ATNConfigSet<'x>;
+    type LexerActionExecutorType = ();
 
     fn new_empty() -> Self {
         ATNConfigSet {
@@ -302,6 +311,8 @@ impl<'ephemeral> IntoIterator for LexerATNConfigSet<'ephemeral> {
 impl<'ephemeral> ConfigSet<'ephemeral> for LexerATNConfigSet<'ephemeral> {
     type ConfigType = LexerATNConfig<'ephemeral>;
     type FinalizedType<'x> = LexerATNConfigSet<'x>;
+    type LexerActionExecutorType =
+        Option<&'ephemeral crate::lexer_action_executor::LexerActionExecutor<'ephemeral>>;
 
     fn new_empty() -> Self {
         LexerATNConfigSet {

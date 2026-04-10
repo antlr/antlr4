@@ -13,6 +13,9 @@ use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
 use crate::PredictionContextCache;
 
+// pub type ParserDFAState<'sim> = DFAState<'sim, ATNConfigSet<'sim>>;
+pub type LexerDFAState<'sim> = DFAState<'sim, LexerATNConfigSet<'sim>>;
+
 #[derive(Eq, PartialEq, Debug)]
 pub struct PredPrediction<'ephemeral> {
     pub(crate) alt: i32,
@@ -45,7 +48,6 @@ where
     pub configs: CS,
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<Box<LexerActionExecutor<'scratch>>>,
     pub requires_full_context: bool,
     pub predicates: &'scratch [PredPrediction<'scratch>],
 
@@ -61,7 +63,6 @@ where
             configs,
             is_accept_state: false,
             prediction: 0,
-            lexer_action_executor: None,
             requires_full_context: false,
             predicates: &[],
             _marker: std::marker::PhantomData,
@@ -82,9 +83,6 @@ where
         let mut state = DFAState::new(atn, dfa, state_number, configs, predicates);
         state.is_accept_state = self.is_accept_state;
         state.prediction = self.prediction;
-        state.lexer_action_executor = self
-            .lexer_action_executor
-            .map(|ex| dfa.alloc_lexer_action_executor(ex.promote(dfa)) as &'sim _);
         state.requires_full_context = self.requires_full_context;
         state
     }
@@ -117,7 +115,7 @@ where
 
     pub is_accept_state: bool,
     pub prediction: i32,
-    pub(crate) lexer_action_executor: Option<&'sim LexerActionExecutor<'sim>>,
+    lexer_action_executor: CS::LexerActionExecutorType,
     pub requires_full_context: bool,
     pub predicates: &'sim [PredPrediction<'sim>],
 }
@@ -208,7 +206,7 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
             edges,
             is_accept_state: false,
             prediction: 0,
-            lexer_action_executor: None,
+            lexer_action_executor: Default::default(),
             requires_full_context: false,
             predicates,
         }
@@ -219,6 +217,16 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     }
 
     // fn set_prediction(&self, _v: i32) { unimplemented!() }
+}
+
+impl<'sim> LexerDFAState<'sim> {
+    pub(crate) fn lexer_action_executor(&self) -> Option<&'sim LexerActionExecutor<'sim>> {
+        self.lexer_action_executor
+    }
+
+    pub(crate) fn set_lexer_action_executor(&mut self, v: Option<&'sim LexerActionExecutor<'sim>>) {
+        self.lexer_action_executor = v;
+    }
 }
 
 fn calc_edge_set_size(atn: &ATN) -> usize {
@@ -235,7 +243,7 @@ pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>>
             edges: &EMPTY_EDGE_SET,
             is_accept_state: false,
             prediction: 0,
-            lexer_action_executor: None,
+            lexer_action_executor: Default::default(),
             requires_full_context: false,
             predicates: &EMPTY_PREDICATES,
         }

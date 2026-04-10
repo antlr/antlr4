@@ -251,6 +251,53 @@ where
     }
 }
 
+impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
+    pub fn add_lexer_state<'ephemeral>(
+        &self,
+        proposed: ProposedDFAState<'ephemeral, LexerATNConfigSet<'ephemeral>>,
+        recog: &impl IATNSimulator<'sim, LexerATNConfigSet<'sim>>,
+    ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>>
+    where
+        'sim: 'ephemeral,
+    {
+        let mut state_store = self.states.lock().expect("StateStore lock poisoned");
+
+        let proposed = {
+            let mut proposed = proposed;
+            if let Some(existing) =
+                state_store.get(ProposedDFAStateKey::from_proposed(&mut proposed))
+            {
+                return existing;
+            }
+            proposed
+        };
+
+        let mut state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
+        let rule_index = state
+            .configs()
+            .get_items()
+            .find(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
+            .map(|c| {
+                let rule_index = c.get_state().get_rule_index();
+                (
+                    recog.atn().rule_to_token_type[rule_index as usize],
+                    c.get_lexer_executor(),
+                )
+            });
+        if let Some((prediction, exec)) = rule_index {
+            state.prediction = prediction;
+            state.set_lexer_action_executor(exec);
+            state.is_accept_state = true;
+        }
+        let res = state_store.add(state);
+
+        // Push the updated memory usage up to the DFA, outside of the lock:
+        self.allocated_bytes
+            .store(state_store.allocated_bytes(), Ordering::Relaxed);
+        res
+    }
+}
+
 unsafe impl<'sim, CS> Send for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 unsafe impl<'sim, CS> Sync for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 

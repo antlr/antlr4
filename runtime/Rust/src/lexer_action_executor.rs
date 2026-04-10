@@ -10,7 +10,7 @@ use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
 use crate::token_factory::TokenFactory;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
-pub(crate) struct LexerActionExecutor<'ephemeral> {
+pub struct LexerActionExecutor<'ephemeral> {
     cached_hash: u64,
     lexer_actions: &'ephemeral [LexerAction<'ephemeral>],
 }

@@ -376,7 +376,7 @@ impl<'sim> LexerATNSimulator<'sim> {
                 //                println!("accepted, prediction = {}, on dfastate {}", dfa_state_prediction.prediction, dfa_state_prediction.state_number);
                 //                lexer_action_executor = dfa_state_prediction.lexer_action_executor.clone();
                 //                let recog = self.recog.clone();
-                if let Some(x) = state.lexer_action_executor.as_ref() {
+                if let Some(x) = state.lexer_action_executor() {
                     x.execute(lexer, self.start_index)
                 }
 
@@ -691,29 +691,10 @@ impl<'sim> LexerATNSimulator<'sim> {
     ) -> Result<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>, ANTLRError> {
         assert!(!configs.has_semantic_context());
 
-        let mut state = ProposedDFAState::new(configs);
-        let rule_index = state
-            .configs
-            .get_items()
-            .find(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
-            .map(|c| {
-                let rule_index = c.get_state().get_rule_index();
-
-                //println!("accepted rule {} on state {}",rule_index,c.get_state());
-                (
-                    self.atn().rule_to_token_type[rule_index as usize],
-                    c.get_lexer_executor().cloned().map(Box::new),
-                )
-            });
-
-        if let Some((prediction, exec)) = rule_index {
-            state.prediction = prediction;
-            state.lexer_action_executor = exec;
-            state.is_accept_state = true;
-        }
+        let state = ProposedDFAState::new(configs);
 
         self.base.check_allocation_limit()?;
-        Ok(dfa.add_state(state, self))
+        Ok(dfa.add_lexer_state(state, self))
     }
 
     /// Returns current DFA that is currently used.

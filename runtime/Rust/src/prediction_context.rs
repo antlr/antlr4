@@ -652,16 +652,6 @@ impl<'sim> PredictionContextCacheInner<'sim> {
         }
     }
 
-    #[allow(dead_code)]
-    pub fn alloc_slice_fill_copy<T: Copy>(&mut self, len: usize, value: T) -> &'sim mut [T] {
-        // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
-        unsafe {
-            std::mem::transmute::<&mut [T], &'sim mut [T]>(
-                self.arena.alloc_slice_fill_copy(len, value),
-            )
-        }
-    }
-
     pub fn alloc_slice_fill_default<T: Default>(&mut self, len: usize) -> &'sim mut [T] {
         // SAFETY: the returned slice is allocated from the 'sim arena, so it must be valid for 'sim:
         unsafe {
