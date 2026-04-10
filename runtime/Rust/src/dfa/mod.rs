@@ -1,7 +1,9 @@
 use std::convert::TryFrom;
 use std::hash::Hasher;
 use std::mem::ManuallyDrop;
+use std::ops::Deref;
 use std::pin::Pin;
+use std::ptr::NonNull;
 use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use std::sync::Mutex;
 
@@ -21,7 +23,7 @@ pub use dfa_serializer::DFASerializer;
 pub use dfa_state::DFAState;
 pub use dfa_state::PredPrediction;
 pub use dfa_state::ProposedDFAState;
-use hashbrown::HashMap;
+use hashbrown::{Equivalent, HashSet};
 
 pub type LexerDFA<'sim> = DFA<'sim, LexerATNConfigSet<'sim>>;
 pub type ParserDFA<'sim> = DFA<'sim, ATNConfigSet<'sim>>;
@@ -140,7 +142,6 @@ where
             .lock()
             .expect("StateStore lock poisoned")
             .values()
-            .copied()
             .collect::<Vec<_>>();
         states.sort_by_key(|s| s.state_number);
         states
@@ -218,13 +219,16 @@ where
         recog: &impl IATNSimulator<'sim, CS>,
     ) -> &'sim DFAState<'sim, CS>
     where
+        'sim: 'ephemeral,
         ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
     {
         let mut state_store = self.states.lock().expect("StateStore lock poisoned");
 
         let proposed = {
             let mut proposed = proposed;
-            if let Some(existing) = state_store.get(&DFAStateKey::from_proposed(&mut proposed)) {
+            if let Some(existing) =
+                state_store.get(ProposedDFAStateKey::from_proposed(&mut proposed))
+            {
                 return existing;
             }
             proposed
@@ -283,50 +287,62 @@ fn is_precedence_atn_state(atn_start_state: ATNStateRef) -> bool {
 }
 
 #[derive(Clone)]
-struct DFAStateKey<CS>(*const CS);
+struct DFAStateKey<'sim, CS>(NonNull<DFAState<'sim, CS>>)
+where
+    CS: ConfigSet<'sim> + 'sim;
 
-unsafe impl<CS> Send for DFAStateKey<CS> {}
+unsafe impl<'sim, CS> Send for DFAStateKey<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 
-impl<'sim, CS> DFAStateKey<CS>
+impl<'sim, CS> DFAStateKey<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
-    pub fn from_state(entry: &'sim DFAState<'sim, CS>) -> Self {
-        DFAStateKey(entry.configs() as *const CS)
+    fn from_state(entry: &'sim DFAState<'sim, CS>) -> Self {
+        DFAStateKey(NonNull::from(entry))
     }
 
-    pub fn from_proposed<'ephemeral, ECS>(state: &mut ProposedDFAState<'ephemeral, ECS>) -> Self
-    where
-        ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
-    {
-        let ptr = &state.configs as *const ECS as *const CS;
-        DFAStateKey(ptr)
+    #[inline(always)]
+    pub fn as_ref(&self) -> &'sim DFAState<'sim, CS> {
+        // SAFETY: `self` can only be constructed from a valid reference to a
+        // DFAState backed by the DFAStateStore arena:
+        unsafe { self.0.as_ref() }
     }
 }
 
-impl<'sim, CS> PartialEq for DFAStateKey<CS>
+impl<'sim, CS> Deref for DFAStateKey<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    type Target = DFAState<'sim, CS>;
+
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+impl<'sim, CS> PartialEq for DFAStateKey<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
     fn eq(&self, other: &Self) -> bool {
-        unsafe { *self.0 == *other.0 }
+        self.as_ref() == other.as_ref()
     }
 }
 
-impl<'sim, CS> Eq for DFAStateKey<CS> where CS: ConfigSet<'sim> + 'sim {}
+impl<'sim, CS> Eq for DFAStateKey<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 
-impl<'sim, CS> std::hash::Hash for DFAStateKey<CS>
+impl<'sim, CS> std::hash::Hash for DFAStateKey<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        let configs = unsafe { &*self.0 };
+        let configs = self.as_ref().configs();
         let hash = configs.hash_code();
         state.write_u64(hash);
     }
 }
 
-impl<'sim, CS> std::fmt::Debug for DFAStateKey<CS>
+impl<'sim, CS> std::fmt::Debug for DFAStateKey<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
@@ -335,14 +351,60 @@ where
     }
 }
 
+struct ProposedDFAStateKey<'scratch, CS>(NonNull<ProposedDFAState<'scratch, CS>>)
+where
+    CS: ConfigSet<'scratch> + 'scratch;
+
+impl<'scratch, CS> ProposedDFAStateKey<'scratch, CS>
+where
+    CS: ConfigSet<'scratch> + 'scratch,
+{
+    fn from_proposed(proposed: &mut ProposedDFAState<'scratch, CS>) -> Self {
+        ProposedDFAStateKey(NonNull::from(proposed))
+    }
+
+    #[inline(always)]
+    fn as_ref(&self) -> &'scratch ProposedDFAState<'scratch, CS> {
+        // SAFETY: `self` can only be constructed from a valid reference to a
+        // ProposedDFAState:
+        unsafe { self.0.as_ref() }
+    }
+}
+
+impl<'scratch, CS> std::hash::Hash for ProposedDFAStateKey<'scratch, CS>
+where
+    CS: ConfigSet<'scratch> + 'scratch,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let proposed = self.as_ref();
+        let hash = proposed.configs.hash_code();
+        state.write_u64(hash);
+    }
+}
+
+impl<'scratch, 'sim, CS> Equivalent<DFAStateKey<'sim, CS::FinalizedType<'sim>>>
+    for ProposedDFAStateKey<'scratch, CS>
+where
+    'sim: 'scratch,
+    CS: ConfigSet<'scratch> + 'scratch,
+{
+    fn equivalent(&self, other: &DFAStateKey<'sim, CS::FinalizedType<'sim>>) -> bool {
+        let proposed = self.as_ref();
+        let other = unsafe {
+            std::mem::transmute::<&DFAState<'sim, CS::FinalizedType<'sim>>, &DFAState<'scratch, CS>>(
+                other.as_ref(),
+            )
+        };
+        &proposed.configs == other.configs()
+    }
+}
+
 #[derive(Debug)]
 pub struct DFAStateStore<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
-    map: ManuallyDrop<
-        HashMap<DFAStateKey<CS>, &'sim DFAState<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>,
-    >,
+    map: ManuallyDrop<HashSet<DFAStateKey<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
     arena: Pin<Box<bumpalo::Bump>>,
 }
 
@@ -356,24 +418,31 @@ where
             // SAFETY: self-reference cast
             unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&arena) };
         DFAStateStore {
-            map: ManuallyDrop::new(HashMap::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
+            map: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
             arena,
         }
     }
 
-    fn get(&self, key: &DFAStateKey<CS>) -> Option<&&'sim DFAState<'sim, CS>> {
-        self.map.get(key)
+    fn get<'scratch, ECS>(
+        &self,
+        key: ProposedDFAStateKey<'scratch, ECS>,
+    ) -> Option<&'sim DFAState<'sim, CS>>
+    where
+        'sim: 'scratch,
+        ECS: ConfigSet<'scratch, FinalizedType<'sim> = CS> + 'scratch,
+    {
+        self.map.get(&key).map(|k| k.as_ref())
     }
 
     pub fn add(&mut self, dfa: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
         let value = self.alloc(dfa);
-        let existing = self.map.insert(DFAStateKey::from_state(value), value);
-        assert!(existing.is_none());
+        let is_new = self.map.insert(DFAStateKey::from_state(value));
+        assert!(is_new);
         value
     }
 
-    pub fn values(&self) -> impl Iterator<Item = &&'sim DFAState<'sim, CS>> {
-        self.map.values()
+    pub fn values<'a>(&'a self) -> impl Iterator<Item = &'sim DFAState<'sim, CS>> + 'a {
+        self.map.iter().map(|key| key.as_ref())
     }
 
     pub fn len(&self) -> usize {
