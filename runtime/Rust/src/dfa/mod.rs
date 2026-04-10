@@ -70,6 +70,13 @@ where
     precedence_state: bool,
 
     allocated_bytes: AtomicUsize,
+    semantic_context_bytes: AtomicUsize,
+    lexer_bytes: AtomicUsize,
+    config_bytes: AtomicUsize,
+    config_set_bytes: AtomicUsize,
+    dfa_state_bytes: AtomicUsize,
+    edge_set_bytes: AtomicUsize,
+    pred_prediction_bytes: AtomicUsize,
 }
 
 impl<'sim, CS> DFA<'sim, CS>
@@ -101,6 +108,13 @@ where
             })),
             precedence_state,
             allocated_bytes: AtomicUsize::new(0),
+            semantic_context_bytes: AtomicUsize::new(0),
+            lexer_bytes: AtomicUsize::new(0),
+            config_bytes: AtomicUsize::new(0),
+            config_set_bytes: AtomicUsize::new(0),
+            dfa_state_bytes: AtomicUsize::new(0),
+            edge_set_bytes: AtomicUsize::new(0),
+            pred_prediction_bytes: AtomicUsize::new(0),
         }
     }
 
@@ -243,11 +257,66 @@ where
         // Push the updated memory usage up to the DFA, outside of the lock:
         self.allocated_bytes
             .store(state_store.allocated_bytes(), Ordering::Relaxed);
+        self.semantic_context_bytes.store(
+            state_store.semantic_context_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+        self.lexer_bytes
+            .store(state_store.lexer_arena.allocated_bytes(), Ordering::Relaxed);
+        self.config_bytes.store(
+            state_store.config_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+        self.config_set_bytes.store(
+            state_store.config_set_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+        self.dfa_state_bytes.store(
+            state_store.dfa_state_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+        self.edge_set_bytes.store(
+            state_store.edge_set_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+        self.pred_prediction_bytes.store(
+            state_store.pred_prediction_arena.allocated_bytes(),
+            Ordering::Relaxed,
+        );
+
         res
     }
 
     pub fn allocated_bytes(&self) -> usize {
         self.allocated_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn semantic_context_bytes(&self) -> usize {
+        self.semantic_context_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn lexer_bytes(&self) -> usize {
+        self.lexer_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn config_bytes(&self) -> usize {
+        self.config_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn config_set_bytes(&self) -> usize {
+        self.config_set_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn dfa_state_bytes(&self) -> usize {
+        self.dfa_state_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn edge_set_bytes(&self) -> usize {
+        self.edge_set_bytes.load(Ordering::Relaxed)
+    }
+
+    pub fn pred_prediction_bytes(&self) -> usize {
+        self.pred_prediction_bytes.load(Ordering::Relaxed)
     }
 }
 
@@ -465,6 +534,15 @@ where
     pred_prediction_arena: Pin<Box<bumpalo::Bump>>,
 }
 
+macro_rules! define_arena {
+    ($method:ident, $field:ident) => {
+        fn $method(&self) -> &'sim bumpalo::Bump {
+            // SAFETY: self-reference cast
+            unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.$field) }
+        }
+    };
+}
+
 impl<'sim, CS> DFAStateStore<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
@@ -606,46 +684,13 @@ where
         self.pred_prediction_store().alloc_slice_fill_iter(iter)
     }
 
-    fn semantic_context_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe {
-            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.semantic_context_arena)
-        }
-    }
-
-    fn lexer_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.lexer_arena) }
-    }
-
-    fn config_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.config_arena) }
-    }
-
-    fn config_set_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe {
-            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.config_set_arena)
-        }
-    }
-
-    fn dfa_state_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.dfa_state_arena) }
-    }
-
-    fn edge_set_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.edge_set_arena) }
-    }
-
-    fn pred_prediction_store(&self) -> &'sim bumpalo::Bump {
-        // SAFETY: self-reference cast
-        unsafe {
-            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.pred_prediction_arena)
-        }
-    }
+    define_arena!(semantic_context_store, semantic_context_arena);
+    define_arena!(lexer_store, lexer_arena);
+    define_arena!(config_store, config_arena);
+    define_arena!(config_set_store, config_set_arena);
+    define_arena!(dfa_state_store, dfa_state_arena);
+    define_arena!(edge_set_store, edge_set_arena);
+    define_arena!(pred_prediction_store, pred_prediction_arena);
 
     pub fn allocated_bytes(&self) -> usize {
         self.arena.allocated_bytes()

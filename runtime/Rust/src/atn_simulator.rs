@@ -39,6 +39,17 @@ impl<'sim, CS: ConfigSet<'sim>> Debug for BaseATNSimulator<'sim, CS> {
     }
 }
 
+macro_rules! dfa_sum_method {
+    ($name:ident, $inner:ident) => {
+        pub fn $name(&self) -> usize {
+            self.decision_to_dfa.iter().map(|dfa| dfa.$inner()).sum()
+        }
+    };
+    ($name:ident) => {
+        dfa_sum_method!($name, $name);
+    };
+}
+
 impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
     pub fn total_allocated_bytes(&self) -> usize {
         self.context_cache_bytes() + self.dfa_bytes()
@@ -48,12 +59,14 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
         self.shared_context_cache.allocated_bytes()
     }
 
-    pub fn dfa_bytes(&self) -> usize {
-        self.decision_to_dfa
-            .iter()
-            .map(|dfa| dfa.allocated_bytes())
-            .sum()
-    }
+    dfa_sum_method!(dfa_bytes, allocated_bytes);
+    dfa_sum_method!(semantic_context_bytes);
+    dfa_sum_method!(lexer_bytes);
+    dfa_sum_method!(config_bytes);
+    dfa_sum_method!(config_set_bytes);
+    dfa_sum_method!(dfa_state_bytes);
+    dfa_sum_method!(edge_set_bytes);
+    dfa_sum_method!(pred_prediction_bytes);
 
     pub fn check_allocation_limit(&self) -> Result<(), ANTLRError> {
         if self.allocation_limit_bytes > 0
