@@ -222,7 +222,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         let mut symbol = lexer.input().la(1);
         let mut s = ds0;
         loop {
-            let target = if let Some(target) = Self::get_existing_target_state(s, symbol) {
+            let target = if let Some(target) = dfa.get_edge(s, (symbol - MIN_DFA_EDGE) as usize) {
                 target
             } else {
                 self.compute_target_state(dfa, s, symbol, lexer, scratch)?
@@ -250,18 +250,6 @@ impl<'sim> LexerATNSimulator<'sim> {
         self.fail_or_accept(symbol, lexer)
     }
 
-    #[inline(always)]
-    fn get_existing_target_state(
-        s: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
-        t: i32,
-    ) -> Option<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>> {
-        // if t < MIN_DFA_EDGE || t > MAX_DFA_EDGE {
-        //     return None;
-        // }
-
-        s.get_edge((t - MIN_DFA_EDGE) as usize)
-    }
-
     #[cold]
     fn compute_target_state<'scratch, 'input, 'arena, Input, TF>(
         &self,
@@ -283,7 +271,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         // let mut states = dfa_mut.states;
         if reach.is_empty() {
             if !reach.has_semantic_context() {
-                self.add_dfaedge(s, _t, dfa.get_error_state());
+                self.add_dfaedge(dfa, s, _t, dfa.get_error_state());
             }
 
             return Ok(dfa.get_error_state());
@@ -294,7 +282,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         let to = self.add_dfastate(dfa, reach)?;
         if !supress_edge {
             let from = s;
-            self.add_dfaedge(from, _t, to);
+            self.add_dfaedge(dfa, from, _t, to);
         }
         //        println!("target state computed from {:?} to {:?} on symbol {}", _s, to, char::try_from(_t as u32).unwrap());
         Ok(to)
@@ -673,15 +661,16 @@ impl<'sim> LexerATNSimulator<'sim> {
 
     fn add_dfaedge(
         &self,
+        dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
         from: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
         t: i32,
-        _to: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
+        to: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
     ) {
         if !(MIN_DFA_EDGE..=MAX_DFA_EDGE).contains(&t) {
             return;
         }
 
-        from.set_edge((t - MIN_DFA_EDGE) as usize, _to);
+        dfa.set_edge(from, (t - MIN_DFA_EDGE) as usize, to);
     }
 
     fn add_dfastate(

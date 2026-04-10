@@ -239,7 +239,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         loop {
             //            println!("exec atn loop previous D {}",previousD as i32 -1);
-            let D = if let Some(s) = { Self::get_existing_target_state(previousD, token) } {
+            let D = if let Some(s) = { local.dfa_ref.get_edge(previousD, (token + 1) as usize) } {
                 s
             } else {
                 self.compute_target_state(previousD, token, local)?
@@ -346,14 +346,6 @@ impl<'sim> ParserATNSimulator<'sim> {
     }
 
     #[allow(non_snake_case)]
-    fn get_existing_target_state(
-        previousD: &DFAState<'sim, ATNConfigSet<'sim>>,
-        t: i32,
-    ) -> Option<&'sim DFAState<'sim, ATNConfigSet<'sim>>> {
-        previousD.get_edge((t + 1) as usize)
-    }
-
-    #[allow(non_snake_case)]
     fn compute_target_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         // dfa: &mut DFA,
@@ -375,7 +367,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         let reach = match reach {
             None => {
-                self.add_dfaedge(previousD, t, local.dfa_ref.get_error_state());
+                self.add_dfaedge(local.dfa_ref, previousD, t, local.dfa_ref.get_error_state());
                 return Ok(local.dfa_ref.get_error_state());
             }
             Some(x) => x,
@@ -416,7 +408,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         let dfa_ref = local.dfa_ref;
         let D = self.add_dfastate(dfa_ref, D)?;
-        self.add_dfaedge(previousD, t, D);
+        self.add_dfaedge(dfa_ref, previousD, t, D);
         Ok(D)
     }
 
@@ -1482,6 +1474,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
     fn add_dfaedge(
         &self,
+        dfa: &'sim DFA<'sim, ATNConfigSet<'sim>>,
         from: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
         t: i32,
         to: &'sim DFAState<'sim, ATNConfigSet<'sim>>,
@@ -1489,7 +1482,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         if t < -1 || t > self.atn().max_token_type {
             return to;
         }
-        from.set_edge((t + 1) as usize, to);
+        dfa.set_edge(from, (t + 1) as usize, to);
 
         to
     }

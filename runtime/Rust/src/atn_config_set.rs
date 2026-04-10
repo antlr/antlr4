@@ -6,8 +6,10 @@ use bit_set::BitSet;
 use fxhash::{hash64, FxHasher64};
 use hashbrown::HashTable;
 
+use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType, LexerATNConfig};
 use crate::dfa::DFAStateStore;
+use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::parser_atn_simulator::MergeCache;
 use crate::prediction_context::PredictionContext;
 use crate::semantic_context::SemanticContext;
@@ -34,6 +36,8 @@ pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
     ) {
         *target = value;
     }
+
+    fn calc_edge_set_size(_atn: &'static ATN) -> usize;
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -126,6 +130,10 @@ impl<'ephemeral> ConfigSet<'ephemeral> for ATNConfigSet<'ephemeral> {
             configs: self.configs.finalize(cache, dfa),
             ..self
         }
+    }
+
+    fn calc_edge_set_size(atn: &'static ATN) -> usize {
+        atn.max_token_type as usize + 2
     }
 }
 
@@ -339,6 +347,10 @@ impl<'ephemeral> ConfigSet<'ephemeral> for LexerATNConfigSet<'ephemeral> {
             configs: self.configs.finalize(cache, dfa),
             ..self
         }
+    }
+
+    fn calc_edge_set_size(_atn: &'static ATN) -> usize {
+        LEXER_DFA_EDGE_SET_SIZE
     }
 }
 

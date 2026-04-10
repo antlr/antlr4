@@ -5,11 +5,9 @@ use std::sync::LazyLock;
 
 use fxhash::hash64;
 
-use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
 use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
-use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::semantic_context::SemanticContext;
 use crate::PredictionContextCache;
 
@@ -71,7 +69,6 @@ where
 
     pub(crate) fn finalize<'sim>(
         self,
-        atn: &ATN,
         cache: &'sim PredictionContextCache<'sim>,
         dfa: &DFAStateStore<'sim, CS::FinalizedType<'sim>>,
     ) -> DFAState<'sim, CS::FinalizedType<'sim>> {
@@ -80,7 +77,7 @@ where
         let predicates =
             dfa.alloc_pred_prediction_slice(self.predicates.iter().map(|p| p.promote(dfa)));
 
-        let mut state = DFAState::new(atn, dfa, state_number, configs, predicates);
+        let mut state = DFAState::new(dfa, state_number, configs, predicates);
         state.is_accept_state = self.is_accept_state;
         state.prediction = self.prediction;
         state.requires_full_context = self.requires_full_context;
@@ -111,8 +108,6 @@ where
 
     configs: AtomicPtr<CS>,
 
-    edges: &'sim [AtomicPtr<DFAState<'sim, CS>>],
-
     pub is_accept_state: bool,
     pub prediction: i32,
     lexer_action_executor: CS::LexerActionExecutorType,
@@ -133,42 +128,9 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
         hash64(self.configs())
     }
 
+    #[inline(always)]
     pub fn is_error_state(&self) -> bool {
         self.state_number == -1
-    }
-
-    pub fn get_edge(&self, index: usize) -> Option<&'sim DFAState<'sim, CS>> {
-        self.edges.get(index).and_then(|ptr| {
-            let v = ptr.load(Ordering::Relaxed);
-            if v.is_null() {
-                None
-            } else {
-                Some(unsafe { &*v })
-            }
-        })
-    }
-
-    pub fn set_edge(&self, index: usize, state_ref: &DFAState<'sim, CS>) {
-        self.edges[index].store(
-            state_ref as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>,
-            Ordering::Relaxed,
-        );
-    }
-
-    pub fn enumerate_edges(&self) -> Vec<(usize, &'sim DFAState<'sim, CS>)> {
-        self.edges
-            .iter()
-            .map(|ptr| ptr.load(Ordering::Relaxed))
-            .enumerate()
-            .filter_map(|(i, v)| {
-                if v.is_null() {
-                    None
-                } else {
-                    Some((i, unsafe { &*v }))
-                }
-            })
-            .filter(|(_, t)| !t.is_error_state())
-            .collect()
     }
 
     pub fn configs(&self) -> &CS {
@@ -186,24 +148,16 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     // ---- Below are private methods only callable by DFA ----
 
     pub(super) fn new(
-        atn: &ATN,
         dfa: &DFAStateStore<'sim, CS>,
         state_number: i32,
         configs: CS,
         predicates: &'sim [PredPrediction<'sim>],
     ) -> Self {
-        let nedges = if state_number >= 0 {
-            calc_edge_set_size(atn)
-        } else {
-            0
-        };
-        let edges = dfa.alloc_edges(nedges);
         let configs = AtomicPtr::new(dfa.alloc_config_set(configs) as *const CS as *mut CS);
 
         DFAState {
             state_number,
             configs,
-            edges,
             is_accept_state: false,
             prediction: 0,
             lexer_action_executor: Default::default(),
@@ -229,40 +183,26 @@ impl<'sim> LexerDFAState<'sim> {
     }
 }
 
-fn calc_edge_set_size(atn: &ATN) -> usize {
-    std::cmp::max(atn.max_token_type as usize + 2, LEXER_DFA_EDGE_SET_SIZE)
-}
-
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>> =
-    LazyLock::new(|| {
-        static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, ATNConfigSet>>; 0] = [];
-
-        DFAState {
-            state_number: -1,
-            configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
-            edges: &EMPTY_EDGE_SET,
-            is_accept_state: false,
-            prediction: 0,
-            lexer_action_executor: Default::default(),
-            requires_full_context: false,
-            predicates: &EMPTY_PREDICATES,
-        }
+    LazyLock::new(|| DFAState {
+        state_number: -1,
+        configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
+        is_accept_state: false,
+        prediction: 0,
+        lexer_action_executor: Default::default(),
+        requires_full_context: false,
+        predicates: &EMPTY_PREDICATES,
     });
 
 pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATNConfigSet>> =
-    LazyLock::new(|| {
-        static EMPTY_EDGE_SET: [AtomicPtr<DFAState<'static, LexerATNConfigSet>>; 0] = [];
-
-        DFAState {
-            state_number: -1,
-            configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
-            edges: &EMPTY_EDGE_SET,
-            is_accept_state: false,
-            prediction: 0,
-            lexer_action_executor: None,
-            requires_full_context: false,
-            predicates: &EMPTY_PREDICATES,
-        }
+    LazyLock::new(|| DFAState {
+        state_number: -1,
+        configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
+        is_accept_state: false,
+        prediction: 0,
+        lexer_action_executor: None,
+        requires_full_context: false,
+        predicates: &EMPTY_PREDICATES,
     });
 
 static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];

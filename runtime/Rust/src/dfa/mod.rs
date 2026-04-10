@@ -5,7 +5,7 @@ use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::NonNull;
 use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
-use std::sync::Mutex;
+use std::sync::{Mutex, RwLock};
 
 use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
@@ -26,6 +26,7 @@ pub use dfa_serializer::DFASerializer;
 pub use dfa_state::DFAState;
 pub use dfa_state::PredPrediction;
 pub use dfa_state::ProposedDFAState;
+use fxhash::FxHashMap;
 use hashbrown::{Equivalent, HashSet};
 
 pub type LexerDFA<'sim> = DFA<'sim, LexerATNConfigSet<'sim>>;
@@ -64,6 +65,9 @@ where
     /// Set of all DFA states.
     states: Mutex<DFAStateStore<'sim, CS>>,
 
+    /// Set of all edges
+    edges: EdgeSetStore<'sim, CS>,
+
     /// Initial DFA state
     s0: AtomicPtr<DFAState<'sim, CS>>,
 
@@ -88,7 +92,7 @@ where
         let state_store = DFAStateStore::new();
 
         let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
-            let mut precedence_state = DFAState::new(atn, &state_store, 0, CS::new_empty(), &[]);
+            let mut precedence_state = DFAState::new(&state_store, 0, CS::new_empty(), &[]);
             precedence_state.is_accept_state = false;
             precedence_state.requires_full_context = false;
 
@@ -103,6 +107,7 @@ where
             atn_start_state,
             decision,
             states: Mutex::new(state_store),
+            edges: EdgeSetStore::new(CS::calc_edge_set_size(atn)),
             s0: AtomicPtr::new(s0.map_or(std::ptr::null_mut(), |s| {
                 s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
             })),
@@ -118,6 +123,32 @@ where
         }
     }
 
+    #[inline]
+    pub fn get_edge(
+        &self,
+        from_state: &'sim DFAState<'sim, CS>,
+        symbol: usize,
+    ) -> Option<&'sim DFAState<'sim, CS>> {
+        if from_state.is_error_state() {
+            return None;
+        }
+        self.edges.get(symbol, from_state)
+    }
+
+    #[inline]
+    pub fn set_edge(
+        &self,
+        from_state: &'sim DFAState<'sim, CS>,
+        symbol: usize,
+        to_state: &'sim DFAState<'sim, CS>,
+    ) {
+        assert!(
+            !from_state.is_error_state(),
+            "cannot set edge from error state"
+        );
+        self.edges.set(symbol, from_state, to_state);
+    }
+
     pub fn is_precedence_dfa(&self) -> bool {
         self.precedence_state
     }
@@ -129,7 +160,7 @@ where
         }
 
         self.s0()
-            .and_then(|state| state.get_edge(precedence as usize))
+            .and_then(|state| self.get_edge(state, precedence as usize))
     }
 
     pub fn set_precedence_start_state(
@@ -147,12 +178,16 @@ where
         }
         let precedence = precedence as usize;
 
-        self.s0()
-            .expect("a precedence dfa's s0 state is never null")
-            .set_edge(precedence, start_state);
+        self.set_edge(
+            self.s0()
+                .expect("a precedence dfa's s0 state is never null"),
+            precedence,
+            start_state,
+        );
     }
 
-    /// Return a list of all states in this DFA, ordered by state number.
+    /// Return a list of all states in this DFA, ordered by state number. (Only
+    /// used by the serializer and test code, not performance-sensitive.)
     pub fn get_states(&self) -> Vec<&'sim DFAState<'sim, CS>> {
         let mut states = self
             .states
@@ -162,6 +197,14 @@ where
             .collect::<Vec<_>>();
         states.sort_by_key(|s| s.state_number);
         states
+    }
+
+    pub fn enumerate_edges(
+        &self,
+    ) -> Vec<(&'sim DFAState<'sim, CS>, usize, &'sim DFAState<'sim, CS>)> {
+        let mut edges = self.edges.enumerate_all();
+        edges.sort_by_key(|(from, symbol, _)| (from.state_number, *symbol));
+        edges
     }
 
     pub fn to_string(&self, vocabulary: &dyn Vocabulary) -> String {
@@ -251,7 +294,7 @@ where
             proposed
         };
 
-        let state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
+        let state = proposed.finalize(recog.shared_context_cache(), &state_store);
         let res = state_store.add(state);
 
         // Push the updated memory usage up to the DFA, outside of the lock:
@@ -341,7 +384,7 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
             proposed
         };
 
-        let mut state = proposed.finalize(recog.atn(), recog.shared_context_cache(), &state_store);
+        let mut state = proposed.finalize(recog.shared_context_cache(), &state_store);
         let rule_index = state
             .configs()
             .get_items()
@@ -671,11 +714,6 @@ where
         self.config_set_store().alloc(set)
     }
 
-    pub(crate) fn alloc_edges(&self, len: usize) -> &'sim [AtomicPtr<DFAState<'sim, CS>>] {
-        self.edge_set_store()
-            .alloc_slice_fill_with(len, |_| AtomicPtr::new(std::ptr::null_mut()))
-    }
-
     pub(crate) fn alloc_pred_prediction_slice<I>(&self, iter: I) -> &'sim [PredPrediction<'sim>]
     where
         I: IntoIterator<Item = PredPrediction<'sim>>,
@@ -689,7 +727,6 @@ where
     define_arena!(config_store, config_arena);
     define_arena!(config_set_store, config_set_arena);
     define_arena!(dfa_state_store, dfa_state_arena);
-    define_arena!(edge_set_store, edge_set_arena);
     define_arena!(pred_prediction_store, pred_prediction_arena);
 
     pub fn allocated_bytes(&self) -> usize {
@@ -710,5 +747,85 @@ where
 {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+struct DFAStateId(usize);
+
+struct EdgeSetStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    store: Vec<RwLock<FxHashMap<DFAStateId, &'sim DFAState<'sim, CS>>>>,
+}
+
+impl<'sim, CS> EdgeSetStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    pub fn new(size: usize) -> Self {
+        EdgeSetStore {
+            store: (0..size)
+                .map(|_| RwLock::new(FxHashMap::default()))
+                .collect(),
+        }
+    }
+
+    #[inline]
+    fn get(
+        &self,
+        index: usize,
+        from_state: &'sim DFAState<'sim, CS>,
+    ) -> Option<&'sim DFAState<'sim, CS>> {
+        let from_state_id = DFAStateId(from_state as *const _ as usize);
+        self.store
+            .get(index)?
+            .read()
+            .unwrap()
+            .get(&from_state_id)
+            .copied()
+    }
+
+    #[inline]
+    fn set(
+        &self,
+        index: usize,
+        from_state: &'sim DFAState<'sim, CS>,
+        target: &'sim DFAState<'sim, CS>,
+    ) {
+        let from_state_id = DFAStateId(from_state as *const _ as usize);
+        if let Some(lock) = self.store.get(index) {
+            lock.write().unwrap().insert(from_state_id, target);
+        } else {
+            panic!("Invalid token index for edge set store");
+        }
+    }
+
+    fn enumerate_all<'a>(
+        &'a self,
+    ) -> Vec<(&'sim DFAState<'sim, CS>, usize, &'sim DFAState<'sim, CS>)> {
+        let mut edges = Vec::new();
+        for (index, lock) in self.store.iter().enumerate() {
+            let map = lock.read().unwrap();
+            for (&state_id, &target) in map.iter() {
+                if !target.is_error_state() {
+                    let from_state = unsafe { &*(state_id.0 as *const DFAState<'sim, CS>) };
+                    edges.push((from_state, index, target));
+                }
+            }
+        }
+        edges
+    }
+}
+
+impl<'sim, CS> std::fmt::Debug for EdgeSetStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EdgeSetStore")
+            .field("store", &"Vec<RwLock<FxHashMap<i32, &'sim DFAState>>>")
+            .finish()
     }
 }
