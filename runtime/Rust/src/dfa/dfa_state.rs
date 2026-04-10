@@ -76,14 +76,15 @@ where
     ) -> DFAState<'sim, CS::FinalizedType<'sim>> {
         let state_number = dfa.len() as i32;
         let configs = self.configs.finalize(cache, dfa);
-        let predicates = dfa.alloc_slice_fill_iter(self.predicates.iter().map(|p| p.promote(dfa)));
+        let predicates =
+            dfa.alloc_pred_prediction_slice(self.predicates.iter().map(|p| p.promote(dfa)));
 
         let mut state = DFAState::new(atn, dfa, state_number, configs, predicates);
         state.is_accept_state = self.is_accept_state;
         state.prediction = self.prediction;
         state.lexer_action_executor = self
             .lexer_action_executor
-            .map(|ex| dfa.alloc(ex.promote(dfa)) as &'sim _);
+            .map(|ex| dfa.alloc_lexer_action_executor(ex.promote(dfa)) as &'sim _);
         state.requires_full_context = self.requires_full_context;
         state
     }
@@ -198,8 +199,8 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
         } else {
             0
         };
-        let edges = dfa.alloc_slice_fill_with(nedges, |_| AtomicPtr::new(std::ptr::null_mut()));
-        let configs = AtomicPtr::new(dfa.alloc(configs) as *mut CS);
+        let edges = dfa.alloc_edges(nedges);
+        let configs = AtomicPtr::new(dfa.alloc_config_set(configs) as *const CS as *mut CS);
 
         DFAState {
             state_number,

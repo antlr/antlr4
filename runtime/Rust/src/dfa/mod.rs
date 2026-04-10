@@ -12,7 +12,10 @@ use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
 use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
+use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
+use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::NoopHasherBuilder;
+use crate::semantic_context::SemanticContext;
 use crate::vocabulary::Vocabulary;
 use crate::PredictionContextCache;
 
@@ -82,7 +85,7 @@ where
             precedence_state.is_accept_state = false;
             precedence_state.requires_full_context = false;
 
-            let precedence_state = state_store.alloc(precedence_state);
+            let precedence_state = state_store.alloc_dfa_state(precedence_state);
 
             (Some(precedence_state as &'sim DFAState<'sim, CS>), true)
         } else {
@@ -210,7 +213,7 @@ where
         let states = self.states.lock().expect("StateStore lock poisoned");
         let configs = configs.finalize(cache, &states);
 
-        s0.set_configs(states.alloc(configs));
+        s0.set_configs(states.alloc_config_set(configs));
     }
 
     pub fn add_state<'ephemeral, ECS>(
@@ -406,6 +409,13 @@ where
 {
     map: ManuallyDrop<HashSet<DFAStateKey<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
     arena: Pin<Box<bumpalo::Bump>>,
+    semantic_context_arena: Pin<Box<bumpalo::Bump>>,
+    lexer_arena: Pin<Box<bumpalo::Bump>>,
+    config_arena: Pin<Box<bumpalo::Bump>>,
+    config_set_arena: Pin<Box<bumpalo::Bump>>,
+    dfa_state_arena: Pin<Box<bumpalo::Bump>>,
+    edge_set_arena: Pin<Box<bumpalo::Bump>>,
+    pred_prediction_arena: Pin<Box<bumpalo::Bump>>,
 }
 
 impl<'sim, CS> DFAStateStore<'sim, CS>
@@ -420,6 +430,13 @@ where
         DFAStateStore {
             map: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
             arena,
+            semantic_context_arena: Box::pin(bumpalo::Bump::new()),
+            lexer_arena: Box::pin(bumpalo::Bump::new()),
+            config_arena: Box::pin(bumpalo::Bump::new()),
+            config_set_arena: Box::pin(bumpalo::Bump::new()),
+            dfa_state_arena: Box::pin(bumpalo::Bump::new()),
+            edge_set_arena: Box::pin(bumpalo::Bump::new()),
+            pred_prediction_arena: Box::pin(bumpalo::Bump::new()),
         }
     }
 
@@ -435,7 +452,7 @@ where
     }
 
     pub fn add(&mut self, dfa: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
-        let value = self.alloc(dfa);
+        let value = self.alloc_dfa_state(dfa);
         let is_new = self.map.insert(DFAStateKey::from_state(value));
         assert!(is_new);
         value
@@ -453,45 +470,145 @@ where
         self.map.is_empty()
     }
 
-    pub fn contains_slice<T>(&self, ptr: &[T]) -> bool {
-        is_slice_in_arena(ptr, &self.arena)
+    pub fn alloc_dfa_state(&self, state: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
+        self.dfa_state_store().alloc(state)
     }
 
-    pub fn contains_ref<T>(&self, ptr: &T) -> bool {
-        is_ref_in_arena(ptr, &self.arena)
+    pub fn alloc_semantic_context(
+        &self,
+        context: SemanticContext<'sim>,
+    ) -> &'sim SemanticContext<'sim> {
+        self.semantic_context_store().alloc(context)
     }
 
-    pub fn alloc_slice_fill_iter<T, I>(&self, iter: I) -> &'sim [T]
+    pub fn contains_semantic_context(&self, context: &SemanticContext) -> bool {
+        is_ref_in_arena(context, self.semantic_context_store())
+    }
+
+    pub fn alloc_semantic_context_slice<I>(&self, iter: I) -> &'sim [SemanticContext<'sim>]
     where
-        I: IntoIterator<Item = T>,
+        I: IntoIterator<Item = SemanticContext<'sim>>,
         I::IntoIter: ExactSizeIterator,
     {
-        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
-        unsafe { std::mem::transmute::<&[T], &'sim [T]>(self.arena.alloc_slice_fill_iter(iter)) }
+        self.semantic_context_store().alloc_slice_fill_iter(iter)
     }
 
-    pub fn alloc_slice_fill_with<T, F>(&self, len: usize, f: F) -> &'sim [T]
+    pub fn contains_semantic_context_slice(&self, slice: &[SemanticContext]) -> bool {
+        is_slice_in_arena(slice, self.semantic_context_store())
+    }
+
+    pub(crate) fn alloc_lexer_action_slice(
+        &self,
+        len: usize,
+        f: impl FnMut(usize) -> LexerAction<'sim>,
+    ) -> &'sim [LexerAction<'sim>] {
+        self.lexer_store().alloc_slice_fill_with(len, f)
+    }
+
+    pub(crate) fn contains_lexer_action_slice(&self, slice: &[LexerAction]) -> bool {
+        is_slice_in_arena(slice, self.lexer_store())
+    }
+
+    pub(crate) fn alloc_lexer_action_executor(
+        &self,
+        executor: LexerActionExecutor<'sim>,
+    ) -> &'sim LexerActionExecutor<'sim> {
+        self.lexer_store().alloc(executor)
+    }
+
+    // pub(crate) fn contains_lexer_action_executor(&self, executor: &LexerActionExecutor) -> bool {
+    //     is_ref_in_arena(executor, self.lexer_store())
+    // }
+
+    pub(crate) fn alloc_lexer_indexed_custom_action(
+        &self,
+        action: LexerIndexedCustomAction<'sim>,
+    ) -> &'sim LexerIndexedCustomAction<'sim> {
+        self.lexer_store().alloc(action)
+    }
+
+    pub(crate) fn contains_lexer_indexed_custom_action(
+        &self,
+        action: &LexerIndexedCustomAction,
+    ) -> bool {
+        is_ref_in_arena(action, self.lexer_store())
+    }
+
+    pub(crate) fn alloc_config_slice<I>(&self, iter: I) -> &'sim [CS::ConfigType]
     where
-        F: FnMut(usize) -> T,
+        I: IntoIterator<Item = CS::ConfigType>,
+        I::IntoIter: ExactSizeIterator,
     {
-        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
-        unsafe { std::mem::transmute::<&[T], &'sim [T]>(self.arena.alloc_slice_fill_with(len, f)) }
+        self.config_store().alloc_slice_fill_iter(iter)
     }
 
-    pub fn alloc_slice_fill_default<T: Default>(&self, len: usize) -> &'sim mut [T] {
-        // SAFETY: the allocated slice is backed by the 'sim-lifetime arena
+    pub(crate) fn alloc_config_set(&self, set: CS) -> &'sim mut CS {
+        self.config_set_store().alloc(set)
+    }
+
+    pub(crate) fn alloc_edges(&self, len: usize) -> &'sim [AtomicPtr<DFAState<'sim, CS>>] {
+        self.edge_set_store()
+            .alloc_slice_fill_with(len, |_| AtomicPtr::new(std::ptr::null_mut()))
+    }
+
+    pub(crate) fn alloc_pred_prediction_slice<I>(&self, iter: I) -> &'sim [PredPrediction<'sim>]
+    where
+        I: IntoIterator<Item = PredPrediction<'sim>>,
+        I::IntoIter: ExactSizeIterator,
+    {
+        self.pred_prediction_store().alloc_slice_fill_iter(iter)
+    }
+
+    fn semantic_context_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
         unsafe {
-            std::mem::transmute::<&mut [T], &'sim mut [T]>(self.arena.alloc_slice_fill_default(len))
+            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.semantic_context_arena)
         }
     }
 
-    pub fn alloc<T>(&self, value: T) -> &'sim mut T {
-        // SAFETY: the allocated value is backed by the 'sim-lifetime arena
-        unsafe { std::mem::transmute::<&mut T, &'sim mut T>(self.arena.alloc(value)) }
+    fn lexer_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.lexer_arena) }
+    }
+
+    fn config_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.config_arena) }
+    }
+
+    fn config_set_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe {
+            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.config_set_arena)
+        }
+    }
+
+    fn dfa_state_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.dfa_state_arena) }
+    }
+
+    fn edge_set_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.edge_set_arena) }
+    }
+
+    fn pred_prediction_store(&self) -> &'sim bumpalo::Bump {
+        // SAFETY: self-reference cast
+        unsafe {
+            std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&self.pred_prediction_arena)
+        }
     }
 
     pub fn allocated_bytes(&self) -> usize {
         self.arena.allocated_bytes()
+            + self.semantic_context_arena.allocated_bytes()
+            + self.lexer_arena.allocated_bytes()
+            + self.config_arena.allocated_bytes()
+            + self.config_set_arena.allocated_bytes()
+            + self.dfa_state_arena.allocated_bytes()
+            + self.edge_set_arena.allocated_bytes()
+            + self.pred_prediction_arena.allocated_bytes()
     }
 }
 

@@ -614,9 +614,8 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>> {
 
                 ConfigSetStore::Final(ImmutableStore {
                     cached_hash,
-                    configs: dfa.alloc_slice_fill_iter(
-                        s.configs.into_iter().map(|c| c.finalize(cache, dfa)),
-                    ),
+                    configs: dfa
+                        .alloc_config_slice(s.configs.into_iter().map(|c| c.finalize(cache, dfa))),
                 })
             }
             ConfigSetStore::Final(_) => unsafe {
@@ -638,9 +637,8 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> {
 
                 ConfigSetStore::Final(ImmutableStore {
                     cached_hash,
-                    configs: dfa.alloc_slice_fill_iter(
-                        s.configs.into_iter().map(|c| c.finalize(cache, dfa)),
-                    ),
+                    configs: dfa
+                        .alloc_config_slice(s.configs.into_iter().map(|c| c.finalize(cache, dfa))),
                 })
             }
             ConfigSetStore::Final(_) => unsafe {

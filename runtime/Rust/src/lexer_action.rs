@@ -78,17 +78,19 @@ impl<'ephemeral> LexerAction<'ephemeral> {
         CS: ConfigSet<'sim> + 'sim,
     {
         match self {
-            LexerAction::IndexedCustom(action) if dfa.contains_ref(action) => {
+            LexerAction::IndexedCustom(action)
+                if dfa.contains_lexer_indexed_custom_action(action) =>
+            {
                 // Safety: the action is already in the target arena, so can
                 // live as long as the target lifetime:
                 unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) }
             }
-            LexerAction::IndexedCustom(action) => {
-                LexerAction::IndexedCustom(dfa.alloc(LexerIndexedCustomAction {
+            LexerAction::IndexedCustom(action) => LexerAction::IndexedCustom(
+                dfa.alloc_lexer_indexed_custom_action(LexerIndexedCustomAction {
                     offset: action.offset,
                     action: action.action.promote(dfa),
-                }))
-            }
+                }),
+            ),
             // Safety: these don't hold any references, so effectively 'static
             _ => unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) },
         }

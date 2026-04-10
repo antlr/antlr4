@@ -113,13 +113,13 @@ impl<'ephemeral> LexerActionExecutor<'ephemeral> {
     where
         CS: ConfigSet<'sim> + 'sim,
     {
-        if dfa.contains_slice(self.lexer_actions) {
+        if dfa.contains_lexer_action_slice(self.lexer_actions) {
             // Safety: the actions are already in the target arena, so can
             // live as long as the target lifetime:
             return unsafe { std::mem::transmute::<Self, LexerActionExecutor<'sim>>(self.clone()) };
         }
 
-        let promoted_actions = dfa.alloc_slice_fill_with(self.lexer_actions.len(), |i| {
+        let promoted_actions = dfa.alloc_lexer_action_slice(self.lexer_actions.len(), |i| {
             self.lexer_actions[i].promote(dfa)
         });
         LexerActionExecutor {

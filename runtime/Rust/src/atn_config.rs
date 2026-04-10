@@ -113,7 +113,8 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
     {
         ATNConfig {
             context: self.context.map(|c| cache.get_shared_context(&c)),
-            semantic_context: dfa.alloc(self.semantic_context.promote(dfa)) as &'sim _,
+            semantic_context: dfa.alloc_semantic_context(self.semantic_context.promote(dfa))
+                as &'sim _,
             ..self
         }
     }
@@ -257,7 +258,7 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
             base: self.base.finalize(cache, dfa),
             lexer_action_executor: self
                 .lexer_action_executor
-                .map(|ex| dfa.alloc(ex.promote(dfa)) as &'sim _),
+                .map(|ex| dfa.alloc_lexer_action_executor(ex.promote(dfa)) as &'sim _),
             ..self
         }
     }

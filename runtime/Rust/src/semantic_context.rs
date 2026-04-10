@@ -235,14 +235,14 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
         CS: ConfigSet<'sim> + 'sim,
     {
         match self {
-            SemanticContext::And(ops) if !dfa.contains_slice(ops) => {
+            SemanticContext::And(ops) if !dfa.contains_semantic_context_slice(ops) => {
                 let promoted: &[_] =
-                    dfa.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(dfa)));
+                    dfa.alloc_semantic_context_slice(ops.iter().map(|it| it.promote(dfa)));
                 SemanticContext::And(promoted)
             }
-            SemanticContext::Or(ops) if !dfa.contains_slice(ops) => {
+            SemanticContext::Or(ops) if !dfa.contains_semantic_context_slice(ops) => {
                 let promoted: &[_] =
-                    dfa.alloc_slice_fill_iter(ops.iter().map(|it| it.promote(dfa)));
+                    dfa.alloc_semantic_context_slice(ops.iter().map(|it| it.promote(dfa)));
                 SemanticContext::Or(promoted)
             }
             _ => unsafe { std::mem::transmute::<Self, SemanticContext<'sim>>(self.clone()) },
