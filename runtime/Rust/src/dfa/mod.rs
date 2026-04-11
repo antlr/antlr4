@@ -722,12 +722,12 @@ where
         self.pred_prediction_store().alloc_slice_fill_iter(iter)
     }
 
-    define_arena!(semantic_context_store, semantic_context_arena);
-    define_arena!(lexer_store, lexer_arena);
+    define_arena!(semantic_context_store, arena);
+    define_arena!(lexer_store, arena);
     define_arena!(config_store, config_arena);
-    define_arena!(config_set_store, config_set_arena);
-    define_arena!(dfa_state_store, dfa_state_arena);
-    define_arena!(pred_prediction_store, pred_prediction_arena);
+    define_arena!(config_set_store, arena);
+    define_arena!(dfa_state_store, arena);
+    define_arena!(pred_prediction_store, arena);
 
     pub fn allocated_bytes(&self) -> usize {
         self.arena.allocated_bytes()
