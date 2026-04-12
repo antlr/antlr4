@@ -1,8 +1,6 @@
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{BuildHasher, Hash, Hasher};
-use std::mem::ManuallyDrop;
 use std::ops::Deref;
-use std::pin::Pin;
 use std::ptr::NonNull;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{LazyLock, RwLock};
@@ -532,7 +530,7 @@ impl<'ephemeral> PredictionContextRef<'ephemeral> {
         unsafe { &*(ptr as *const PredictionContext<'ephemeral>) }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn ref_type(&self) -> RefType {
         if (self.0.as_ptr() as usize) & 1 == 0 {
             RefType::Interned
@@ -541,12 +539,12 @@ impl<'ephemeral> PredictionContextRef<'ephemeral> {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn is_interned(&self) -> bool {
         self.ref_type() == RefType::Interned
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn ptr_eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
@@ -616,28 +614,22 @@ impl<'ephemeral> From<&'ephemeral mut PredictionContext<'ephemeral>>
 }
 
 struct PredictionContextCacheInner<'sim> {
-    cache:
-        ManuallyDrop<HashSet<PredictionContextRef<'sim>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
-    arena: Pin<Box<bumpalo::Bump>>,
+    cache: HashSet<PredictionContextRef<'sim>, NoopHasherBuilder>,
+    arena: bumpalo::Bump,
 }
 
 impl PredictionContextCacheInner<'static> {
     pub fn new() -> Self {
-        let arena = Box::pin(bumpalo::Bump::new());
-        // SAFETY: self-reference cast
-        let arena_ref =
-            unsafe { std::mem::transmute::<&bumpalo::Bump, &'static bumpalo::Bump>(&arena) };
-
         PredictionContextCacheInner {
-            cache: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
-            arena,
+            cache: HashSet::with_hasher(NoopHasherBuilder {}),
+            arena: bumpalo::Bump::new(),
         }
     }
 }
 
 impl<'sim> PredictionContextCacheInner<'sim> {
     pub fn allocated_bytes(&self) -> usize {
-        self.arena.allocated_bytes()
+        self.arena.allocated_bytes() + self.cache.allocation_size()
     }
 
     pub fn alloc<T>(&mut self, value: T) -> &'sim mut T {
@@ -703,7 +695,15 @@ impl<'sim> PredictionContextCache<'sim> {
         &self,
         context: &PredictionContextRef<'a>,
     ) -> PredictionContextRef<'sim> {
-        if context.is_empty() {
+        if context.is_interned() {
+            // SAFETY: the context is already interned, so it must have been
+            // allocated from the 'sim arena and thus be valid for 'sim:
+            return unsafe {
+                std::mem::transmute::<PredictionContextRef<'a>, PredictionContextRef<'sim>>(
+                    *context,
+                )
+            };
+        } else if context.is_empty() {
             return PredictionContextRef::new_empty();
         }
 
