@@ -259,16 +259,16 @@ impl<'sim> ParserATNSimulator<'sim> {
 
             let dfa = local.dfa_ref;
             let Dstate = D;
-            if Dstate.requires_full_context && self.prediction_mode.get() != PredictionMode::SLL {
+            if Dstate.requires_full_context() && self.prediction_mode.get() != PredictionMode::SLL {
                 let mut conflicting_alts = Cow::Borrowed(Dstate.configs().conflicting_alts());
-                if !Dstate.predicates.is_empty() {
+                if !Dstate.predicates().is_empty() {
                     let conflict_index = local.input().index();
                     if conflict_index != self.start_index.get() {
                         local.input().seek(self.start_index.get())
                     }
 
                     conflicting_alts =
-                        Cow::Owned(self.eval_semantic_context(local, Dstate.predicates, true));
+                        Cow::Owned(self.eval_semantic_context(local, Dstate.predicates(), true));
                     //                    println!("conflicting_alts {:?}",&conflicting_alts);
                     if conflicting_alts.len() == 1 {
                         return Ok(conflicting_alts.iter().next().unwrap() as i32);
@@ -303,16 +303,16 @@ impl<'sim> ParserATNSimulator<'sim> {
                 return self.exec_atn_with_full_context(local, s0_closure);
             }
 
-            if Dstate.is_accept_state {
-                if Dstate.predicates.is_empty() {
+            if Dstate.is_accept_state() {
+                if Dstate.predicates().is_empty() {
                     //                    println!("prediction !!{}",Dstate.prediction);
-                    return Ok(Dstate.prediction);
+                    return Ok(Dstate.prediction());
                 }
 
                 let stop_index = local.input().index();
                 local.input().seek(self.start_index.get());
 
-                let alts = self.eval_semantic_context(local, Dstate.predicates, true);
+                let alts = self.eval_semantic_context(local, Dstate.predicates(), true);
                 match alts.len() {
                     0 => {
                         return Err(self.no_viable_alt(

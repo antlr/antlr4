@@ -107,16 +107,16 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     /// Number of this state in corresponding DFA
-    pub state_number: i32,
+    pub(super) state_number: i32,
 
     configs: AtomicPtr<CS>,
     pub(super) edges: super::EdgeSet<'sim, CS>,
 
-    pub is_accept_state: bool,
-    pub prediction: i32,
+    is_accept_state: bool,
+    prediction: i32,
     lexer_action_executor: CS::LexerActionExecutorType,
-    pub requires_full_context: bool,
-    pub predicates: &'sim [PredPrediction<'sim>],
+    requires_full_context: bool,
+    predicates: &'sim [PredPrediction<'sim>],
 }
 
 impl<'sim, CS: ConfigSet<'sim>> PartialEq for DFAState<'sim, CS> {
@@ -128,13 +128,45 @@ impl<'sim, CS: ConfigSet<'sim>> PartialEq for DFAState<'sim, CS> {
 impl<'sim, CS: ConfigSet<'sim>> Eq for DFAState<'sim, CS> {}
 
 impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
-    pub fn default_hash(&self) -> u64 {
-        hash64(self.configs())
+    #[inline(always)]
+    pub fn state_number(&self) -> i32 {
+        self.state_number
     }
 
     #[inline(always)]
     pub fn is_error_state(&self) -> bool {
         self.state_number == -1
+    }
+
+    #[inline(always)]
+    pub fn is_accept_state(&self) -> bool {
+        self.is_accept_state
+    }
+
+    #[inline(always)]
+    pub fn requires_full_context(&self) -> bool {
+        self.requires_full_context
+    }
+
+    #[inline(always)]
+    pub fn prediction(&self) -> i32 {
+        self.prediction
+    }
+
+    pub fn set_accept_state(&mut self, v: bool) {
+        self.is_accept_state = v;
+    }
+
+    pub fn set_requires_full_context(&mut self, v: bool) {
+        self.requires_full_context = v;
+    }
+
+    pub fn set_prediction(&mut self, v: i32) {
+        self.prediction = v;
+    }
+
+    pub fn default_hash(&self) -> u64 {
+        hash64(self.configs())
     }
 
     #[inline]
@@ -179,8 +211,6 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
             std::ptr::drop_in_place(old);
         }
     }
-
-    // fn set_prediction(&self, _v: i32) { unimplemented!() }
 }
 
 impl<'sim, CS> Drop for DFAState<'sim, CS>
@@ -191,6 +221,13 @@ where
         unsafe {
             std::ptr::drop_in_place(self.configs.load(Ordering::Relaxed));
         }
+    }
+}
+
+impl<'sim> ParserDFAState<'sim> {
+    #[inline(always)]
+    pub(crate) fn predicates(&self) -> &'sim [PredPrediction<'sim>] {
+        self.predicates
     }
 }
 

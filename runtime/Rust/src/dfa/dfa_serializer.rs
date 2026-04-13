@@ -7,13 +7,13 @@ use super::DFA;
 
 pub struct DFASerializer<'sim, 'a, CS>
 where
-    CS: ConfigSet<'sim>,
+    CS: ConfigSet<'sim> + 'sim,
 {
     dfa: &'a DFA<'sim, CS>,
     get_edge_label: &'a dyn Fn(usize) -> String,
 }
 
-impl<'sim, CS: ConfigSet<'sim>> Display for DFASerializer<'sim, '_, CS> {
+impl<'sim, CS: ConfigSet<'sim> + 'sim> Display for DFASerializer<'sim, '_, CS> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         for (source, edge, target) in self.dfa.enumerate_edges() {
             f.write_fmt(format_args!(
@@ -28,7 +28,7 @@ impl<'sim, CS: ConfigSet<'sim>> Display for DFASerializer<'sim, '_, CS> {
     }
 }
 
-impl<'sim, 'a, CS: ConfigSet<'sim>> DFASerializer<'sim, 'a, CS> {
+impl<'sim, 'a, CS: ConfigSet<'sim> + 'sim> DFASerializer<'sim, 'a, CS> {
     pub fn new(
         dfa: &'a DFA<'sim, CS>,
         get_edge_label: &'a dyn Fn(usize) -> String,
@@ -42,16 +42,21 @@ impl<'sim, 'a, CS: ConfigSet<'sim>> DFASerializer<'sim, 'a, CS> {
     fn get_state_string(&self, state: &DFAState<'sim, CS>) -> String {
         let mut base_str = format!(
             "{}s{}{}",
-            if state.is_accept_state { ":" } else { "" },
-            state.state_number,
-            if state.requires_full_context { "^" } else { "" },
+            if state.is_accept_state() { ":" } else { "" },
+            state.state_number(),
+            if state.requires_full_context() {
+                "^"
+            } else {
+                ""
+            },
         );
-        if state.is_accept_state {
-            base_str = if !state.predicates.is_empty() {
+        if state.is_accept_state() {
+            base_str = //if !state.predicates().is_empty() {
+            if false {
                 unimplemented!()
             //                format!("{}=>{:?}", base_str, state.predicates)
             } else {
-                format!("{}=>{}", base_str, state.prediction)
+                format!("{}=>{}", base_str, state.prediction())
             };
         }
         base_str

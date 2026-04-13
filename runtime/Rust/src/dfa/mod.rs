@@ -105,8 +105,8 @@ where
                 edge_store_ref.make_edge_set(),
                 &[],
             );
-            precedence_state.is_accept_state = false;
-            precedence_state.requires_full_context = false;
+            precedence_state.set_accept_state(false);
+            precedence_state.set_requires_full_context(false);
             // Pre-allocate edges for the precedence state:
             let _ = precedence_state.edges.as_ref();
 
@@ -431,9 +431,9 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
                 )
             });
         if let Some((prediction, exec)) = rule_index {
-            state.prediction = prediction;
+            state.set_prediction(prediction);
             state.set_lexer_action_executor(exec);
-            state.is_accept_state = true;
+            state.set_accept_state(true);
         }
         let res = state_store.add(state);
 

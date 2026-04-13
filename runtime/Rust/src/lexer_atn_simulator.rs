@@ -368,7 +368,7 @@ impl<'sim> LexerATNSimulator<'sim> {
                     x.execute(lexer, self.start_index)
                 }
 
-                state.prediction
+                state.prediction()
             };
 
             //            self.lexer_action_executor = lexer_action_executor;
@@ -641,7 +641,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         input: &impl IntStream,
         dfa_state: &'sim DFAState<'sim, LexerATNConfigSet<'sim>>,
     ) -> bool {
-        if dfa_state.is_accept_state {
+        if dfa_state.is_accept_state() {
             self.set_prev_accept(SimState {
                 index: input.index(),
                 line: self.current_pos.line.get(),
