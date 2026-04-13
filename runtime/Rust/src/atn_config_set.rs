@@ -56,7 +56,7 @@ pub struct ATNConfigSet<'ephemeral> {
 
     configs: ConfigSetStore<'ephemeral, ATNConfig<'ephemeral>>,
 
-    pub(crate) conflicting_alts: BitSet,
+    conflicting_alts: BitSet,
 }
 
 impl Debug for ATNConfigSet<'_> {
@@ -259,6 +259,14 @@ impl<'ephemeral> ATNConfigSet<'ephemeral> {
 
     pub fn full_context(&self) -> bool {
         self.base.full_ctx
+    }
+
+    pub fn conflicting_alts(&self) -> &BitSet {
+        &self.conflicting_alts
+    }
+
+    pub fn set_conflicting_alts(&mut self, alts: BitSet) {
+        self.conflicting_alts = alts;
     }
 
     //duplicate of the self.conflicting_alts???

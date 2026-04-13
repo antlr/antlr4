@@ -22,6 +22,7 @@ use crate::PredictionContextCache;
 mod dfa_serializer;
 mod dfa_state;
 
+use bit_set::BitSet;
 pub use dfa_serializer::DFASerializer;
 pub use dfa_state::DFAState;
 pub use dfa_state::PredPrediction;
@@ -673,11 +674,19 @@ where
         self.dfa_state_store().alloc(state)
     }
 
+    pub fn alloc_bitset(&self, f: impl FnOnce() -> BitSet) -> &'sim BitSet {
+        self.bitset_store().alloc_with(f)
+    }
+
+    pub fn contains_bitset(&self, bitset: &BitSet) -> bool {
+        is_ref_in_arena(bitset, self.bitset_store())
+    }
+
     pub fn alloc_semantic_context(
         &self,
-        context: SemanticContext<'sim>,
+        f: impl FnOnce() -> SemanticContext<'sim>,
     ) -> &'sim SemanticContext<'sim> {
-        self.semantic_context_store().alloc(context)
+        self.semantic_context_store().alloc_with(f)
     }
 
     pub fn contains_semantic_context(&self, context: &SemanticContext) -> bool {
@@ -710,9 +719,9 @@ where
 
     pub(crate) fn alloc_lexer_action_executor(
         &self,
-        executor: LexerActionExecutor<'sim>,
+        f: impl FnOnce() -> LexerActionExecutor<'sim>,
     ) -> &'sim LexerActionExecutor<'sim> {
-        self.lexer_store().alloc(executor)
+        self.lexer_store().alloc_with(f)
     }
 
     // pub(crate) fn contains_lexer_action_executor(&self, executor: &LexerActionExecutor) -> bool {
@@ -721,9 +730,9 @@ where
 
     pub(crate) fn alloc_lexer_indexed_custom_action(
         &self,
-        action: LexerIndexedCustomAction<'sim>,
+        f: impl FnOnce() -> LexerIndexedCustomAction<'sim>,
     ) -> &'sim LexerIndexedCustomAction<'sim> {
-        self.lexer_store().alloc(action)
+        self.lexer_store().alloc_with(f)
     }
 
     pub(crate) fn contains_lexer_indexed_custom_action(
@@ -753,6 +762,7 @@ where
         self.pred_prediction_store().alloc_slice_fill_iter(iter)
     }
 
+    define_arena!(bitset_store, arena);
     define_arena!(semantic_context_store, arena);
     define_arena!(lexer_store, arena);
     define_arena!(config_store, config_arena);

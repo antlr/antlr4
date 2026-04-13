@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-
 use bit_set::BitSet;
+use fxhash::FxBuildHasher;
+use hashbrown::HashMap;
 
 use crate::atn::INVALID_ALT;
 use crate::atn_config::ATNConfig;
@@ -100,13 +100,15 @@ pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
             dup.add(c);
         });
 
-        let altsets = get_conflicting_alt_subsets(&dup);
+        let altsets = get_conflicting_alt_subsets(ephemerals, &dup);
 
-        has_conflicting_alt_set(&altsets) && !has_state_associated_with_one_alt(&dup)
+        has_conflicting_alt_set(altsets.values())
+            && !has_state_associated_with_one_alt(ephemerals, &dup)
     } else {
-        let altsets = get_conflicting_alt_subsets(configs);
+        let altsets = get_conflicting_alt_subsets(ephemerals, configs);
 
-        has_conflicting_alt_set(&altsets) && !has_state_associated_with_one_alt(configs)
+        has_conflicting_alt_set(altsets.values())
+            && !has_state_associated_with_one_alt(ephemerals, configs)
     }
 }
 
@@ -114,25 +116,26 @@ pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
 //    for co
 //}
 
-pub(crate) fn resolves_to_just_one_viable_alt(altsets: &[BitSet]) -> i32 {
+pub(crate) fn resolves_to_just_one_viable_alt<'a>(
+    altsets: impl Iterator<Item = &'a BitSet>,
+) -> i32 {
     get_single_viable_alt(altsets)
 }
 
-pub(crate) fn all_subsets_conflict(altsets: &[BitSet]) -> bool {
+pub(crate) fn all_subsets_conflict<'a>(altsets: impl Iterator<Item = &'a BitSet>) -> bool {
     !has_non_conflicting_alt_set(altsets)
 }
 
-pub(crate) fn all_subsets_equal(altsets: &[BitSet]) -> bool {
-    let mut iter = altsets.iter();
-    let first = iter.next();
-    iter.all(|it| it == first.unwrap())
+pub(crate) fn all_subsets_equal<'a>(mut altsets: impl Iterator<Item = &'a BitSet>) -> bool {
+    let first = altsets.next();
+    altsets.all(|it| it == first.unwrap())
 }
 
-fn has_non_conflicting_alt_set(altsets: &[BitSet]) -> bool {
-    altsets.iter().any(|it| it.len() == 1)
+fn has_non_conflicting_alt_set<'a>(mut altsets: impl Iterator<Item = &'a BitSet>) -> bool {
+    altsets.any(|it| it.len() == 1)
 }
 
-fn has_conflicting_alt_set(altsets: &[BitSet]) -> bool {
+fn has_conflicting_alt_set<'a>(altsets: impl Iterator<Item = &'a BitSet>) -> bool {
     for alts in altsets {
         if alts.len() > 1 {
             return true;
@@ -143,29 +146,32 @@ fn has_conflicting_alt_set(altsets: &[BitSet]) -> bool {
 
 //fn get_unique_alt(altsets: &[BitSet]) -> int { unimplemented!() }
 //
-pub(crate) fn get_alts(altsets: &[BitSet]) -> BitSet {
-    altsets.iter().fold(BitSet::new(), |mut acc, it| {
-        acc.extend(it);
+pub(crate) fn get_alts(altsets: impl Iterator<Item = BitSet>) -> BitSet {
+    altsets.fold(BitSet::new(), |mut acc, it| {
+        acc.extend(&it);
         acc
     })
 }
 
-pub(crate) fn get_conflicting_alt_subsets(configs: &ATNConfigSet) -> Vec<BitSet> {
-    #[derive(Eq, PartialEq)]
-    struct KeyWrapper<'a> {
-        state: ATNStateRef,
-        context: PredictionContextRef<'a>,
-    }
+#[derive(Eq, PartialEq)]
+pub(crate) struct KeyWrapper<'a> {
+    state: ATNStateRef,
+    context: PredictionContextRef<'a>,
+}
 
-    impl<'a> std::hash::Hash for KeyWrapper<'a> {
-        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-            let ptr = self.state.as_usize() as u64;
-            state.write_u64(ptr ^ (self.context.hash_code() as u64));
-        }
+impl<'a> std::hash::Hash for KeyWrapper<'a> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let ptr = self.state.as_usize() as u64;
+        state.write_u64(ptr ^ (self.context.hash_code() as u64));
     }
+}
 
-    let mut configs_to_alts: HashMap<KeyWrapper, BitSet, _> =
-        HashMap::with_hasher(NoopHasherBuilder {});
+pub(crate) fn get_conflicting_alt_subsets<'ephemeral>(
+    ephemerals: &'ephemeral bumpalo::Bump,
+    configs: &ATNConfigSet<'ephemeral>,
+) -> HashMap<KeyWrapper<'ephemeral>, BitSet, NoopHasherBuilder, &'ephemeral bumpalo::Bump> {
+    let mut configs_to_alts: HashMap<KeyWrapper<'ephemeral>, BitSet, _, _> =
+        HashMap::with_capacity_and_hasher_in(configs.length(), NoopHasherBuilder {}, ephemerals);
     for c in configs.get_items() {
         let alts = configs_to_alts
             .entry(KeyWrapper {
@@ -176,35 +182,35 @@ pub(crate) fn get_conflicting_alt_subsets(configs: &ATNConfigSet) -> Vec<BitSet>
 
         alts.insert(c.get_alt() as usize);
     }
-    configs_to_alts.drain().map(|(_, x)| x).collect()
+    configs_to_alts
 }
 
-fn get_state_to_alt_map(configs: &ATNConfigSet) -> HashMap<ATNStateRef, BitSet> {
-    let mut m = HashMap::new();
+fn has_state_associated_with_one_alt(ephemerals: &bumpalo::Bump, configs: &ATNConfigSet) -> bool {
+    let mut lookup =
+        HashMap::with_capacity_and_hasher_in(configs.length(), FxBuildHasher::new(), ephemerals);
+
     for c in configs.get_items() {
-        let alts = m.entry(c.get_state()).or_insert(BitSet::new());
-        alts.insert(c.get_alt() as usize);
-    }
-    m
-}
-
-fn has_state_associated_with_one_alt(configs: &ATNConfigSet) -> bool {
-    let x = get_state_to_alt_map(configs);
-    for alts in x.values() {
-        if alts.len() == 1 {
-            return true;
+        let state = c.get_state();
+        if let Some((alt, more_than_one)) = lookup.get_mut(&state) {
+            if *alt != c.get_alt() {
+                *more_than_one = true;
+            }
+        } else {
+            lookup.insert(state, (c.get_alt(), false));
         }
     }
-    false
+    lookup
+        .into_values()
+        .any(|(_, more_than_one)| !more_than_one)
 }
 
-pub(crate) fn get_single_viable_alt(altsets: &[BitSet]) -> i32 {
-    let mut viable_alts = BitSet::new();
+pub(crate) fn get_single_viable_alt<'a>(altsets: impl Iterator<Item = &'a BitSet>) -> i32 {
     let mut min_alt = INVALID_ALT as usize;
     for alt in altsets {
-        min_alt = alt.iter().next().unwrap();
-        viable_alts.insert(min_alt);
-        if viable_alts.len() > 1 {
+        let new_alt = alt.iter().next().unwrap();
+        if min_alt == INVALID_ALT as usize {
+            min_alt = new_alt;
+        } else if min_alt != new_alt {
             return INVALID_ALT;
         }
     }

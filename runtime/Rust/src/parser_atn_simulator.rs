@@ -1,5 +1,5 @@
 //! Base parser implementation
-use std::borrow::Borrow;
+use std::borrow::{Borrow, Cow};
 use std::cell::Cell;
 
 use std::hash::Hasher;
@@ -18,7 +18,6 @@ use crate::atn_state::{
 use crate::dfa::{DFAState, PredPrediction, ProposedDFAState, ScopeExt, DFA};
 use crate::errors::ANTLRError;
 use crate::int_stream::EOF;
-use crate::interval_set::IntervalSet;
 use crate::parser::Parser;
 
 use crate::prediction_context::{
@@ -261,14 +260,15 @@ impl<'sim> ParserATNSimulator<'sim> {
             let dfa = local.dfa_ref;
             let Dstate = D;
             if Dstate.requires_full_context && self.prediction_mode.get() != PredictionMode::SLL {
-                let mut conflicting_alts = Dstate.configs().conflicting_alts.clone(); //todo get rid of clone?
+                let mut conflicting_alts = Cow::Borrowed(Dstate.configs().conflicting_alts());
                 if !Dstate.predicates.is_empty() {
                     let conflict_index = local.input().index();
                     if conflict_index != self.start_index.get() {
                         local.input().seek(self.start_index.get())
                     }
 
-                    conflicting_alts = self.eval_semantic_context(local, Dstate.predicates, true);
+                    conflicting_alts =
+                        Cow::Owned(self.eval_semantic_context(local, Dstate.predicates, true));
                     //                    println!("conflicting_alts {:?}",&conflicting_alts);
                     if conflicting_alts.len() == 1 {
                         return Ok(conflicting_alts.iter().next().unwrap() as i32);
@@ -389,9 +389,9 @@ impl<'sim> ParserATNSimulator<'sim> {
                 &D.configs,
             )
         {
-            let alts = self.get_conflicting_alts(&D.configs);
+            let alts = self.get_conflicting_alts(local.scratch(), &D.configs);
             D.prediction = alts.iter().next().unwrap() as i32;
-            D.configs.conflicting_alts = alts;
+            D.configs.set_conflicting_alts(alts);
             D.requires_full_context = true;
             D.is_accept_state = true;
         }
@@ -479,20 +479,22 @@ impl<'sim> ParserATNSimulator<'sim> {
                 Some(x) => x,
             };
 
-            let alt_sub_sets = get_conflicting_alt_subsets(&prev);
+            let alt_sub_sets = get_conflicting_alt_subsets(local.scratch(), &prev);
             prev.set_unique_alt(self.get_unique_alt(&prev));
             if prev.get_unique_alt() != INVALID_ALT {
                 predicted_alt = prev.get_unique_alt();
                 break;
             }
             if self.prediction_mode.get() != PredictionMode::LL_EXACT_AMBIG_DETECTION {
-                predicted_alt = resolves_to_just_one_viable_alt(&alt_sub_sets);
+                predicted_alt = resolves_to_just_one_viable_alt(alt_sub_sets.values());
                 if predicted_alt != INVALID_ALT {
                     break;
                 }
-            } else if all_subsets_conflict(&alt_sub_sets) && all_subsets_equal(&alt_sub_sets) {
+            } else if all_subsets_conflict(alt_sub_sets.values())
+                && all_subsets_equal(alt_sub_sets.values())
+            {
                 found_exact_ambig = true;
-                predicted_alt = get_single_viable_alt(&alt_sub_sets);
+                predicted_alt = get_single_viable_alt(alt_sub_sets.values());
                 break;
             }
 
@@ -903,16 +905,20 @@ impl<'sim> ParserATNSimulator<'sim> {
     }
 
     fn get_alt_that_finished_decision_entry_rule(&self, configs: &ATNConfigSet) -> i32 {
-        let mut alts = IntervalSet::new();
+        let mut min_alt = i32::MAX;
         for c in configs.get_items() {
             let has_empty_path = c.get_context().map(|x| x.has_empty_path()) == Some(true);
             let is_stop = matches!(*c.get_state(), ATNState::RuleStop(_));
             if c.get_reaches_into_outer_context() > 0 || (is_stop && has_empty_path) {
-                alts.add_one(c.get_alt())
+                min_alt = min_alt.min(c.get_alt());
             }
         }
 
-        alts.get_min().unwrap_or(INVALID_ALT)
+        if min_alt == i32::MAX {
+            INVALID_ALT
+        } else {
+            min_alt
+        }
     }
 
     fn eval_semantic_context<'input, 'arena, 'scratch, 'cache, TF, P>(
@@ -1419,19 +1425,25 @@ impl<'sim> ParserATNSimulator<'sim> {
             .with_prediction_context(Some(merge_cache.alloc(new_ctx)))
     }
 
-    fn get_conflicting_alts(&self, configs: &ATNConfigSet) -> BitSet {
-        let altsets = get_conflicting_alt_subsets(configs);
-        get_alts(&altsets)
+    fn get_conflicting_alts<'scratch>(
+        &self,
+        scratch: &'scratch bumpalo::Bump,
+        configs: &ATNConfigSet<'scratch>,
+    ) -> BitSet {
+        let altsets = get_conflicting_alt_subsets(scratch, configs);
+        get_alts(altsets.into_values())
     }
 
-    //todo can return Cow
-    fn get_conflicting_alts_or_unique_alt(&self, configs: &ATNConfigSet) -> BitSet {
+    fn get_conflicting_alts_or_unique_alt<'scratch>(
+        &self,
+        configs: &'scratch ATNConfigSet<'scratch>,
+    ) -> Cow<'scratch, BitSet> {
         if configs.get_unique_alt() != INVALID_ALT {
-            BitSet::new().modify_with(|it| {
-                it.insert(configs.get_unique_alt() as usize);
-            })
+            let mut bitset = BitSet::new();
+            bitset.insert(configs.get_unique_alt() as usize);
+            Cow::Owned(bitset)
         } else {
-            configs.conflicting_alts.clone()
+            Cow::Borrowed(configs.conflicting_alts())
         }
     }
     //

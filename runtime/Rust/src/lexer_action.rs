@@ -85,12 +85,14 @@ impl<'ephemeral> LexerAction<'ephemeral> {
                 // live as long as the target lifetime:
                 unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) }
             }
-            LexerAction::IndexedCustom(action) => LexerAction::IndexedCustom(
-                dfa.alloc_lexer_indexed_custom_action(LexerIndexedCustomAction {
-                    offset: action.offset,
-                    action: action.action.promote(dfa),
-                }),
-            ),
+            LexerAction::IndexedCustom(action) => {
+                LexerAction::IndexedCustom(dfa.alloc_lexer_indexed_custom_action(|| {
+                    LexerIndexedCustomAction {
+                        offset: action.offset,
+                        action: action.action.promote(dfa),
+                    }
+                }))
+            }
             // Safety: these don't hold any references, so effectively 'static
             _ => unsafe { std::mem::transmute::<Self, LexerAction<'sim>>(self.clone()) },
         }
