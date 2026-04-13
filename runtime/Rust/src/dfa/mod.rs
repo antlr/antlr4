@@ -208,7 +208,7 @@ where
             .expect("StateStore lock poisoned")
             .values()
             .collect::<Vec<_>>();
-        states.sort_by_key(|s| s.state_number);
+        states.sort_by_key(|s| s.state_number());
         states
     }
 

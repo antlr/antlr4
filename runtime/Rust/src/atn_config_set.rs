@@ -8,7 +8,7 @@ use hashbrown::HashTable;
 
 use crate::atn::ATN;
 use crate::atn_config::{ATNConfig, ATNConfigType, LexerATNConfig};
-use crate::dfa::DFAStateStore;
+use crate::dfa::{DFAStateStore, PredPrediction};
 use crate::lexer_atn_simulator::LEXER_DFA_EDGE_SET_SIZE;
 use crate::parser_atn_simulator::MergeCache;
 use crate::prediction_context::PredictionContext;
@@ -19,6 +19,7 @@ pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
     type ConfigType: ATNConfigType<'ephemeral>;
     type FinalizedType<'x>: ConfigSet<'x>;
     type LexerActionExecutorType: Default;
+    type PredicatesType: FromProposed<&'ephemeral [PredPrediction<'ephemeral>]>;
 
     fn new_empty() -> Self;
 
@@ -30,14 +31,29 @@ pub trait ConfigSet<'ephemeral>: PartialEq + Eq + Hash {
         dfa: &DFAStateStore<'sim, Self::FinalizedType<'sim>>,
     ) -> Self::FinalizedType<'sim>;
 
+    fn calc_edge_set_size(_atn: &'static ATN) -> usize;
+
     fn set_lexer_action_executor(
         target: &mut Self::LexerActionExecutorType,
         value: Self::LexerActionExecutorType,
     ) {
         *target = value;
     }
+}
 
-    fn calc_edge_set_size(_atn: &'static ATN) -> usize;
+pub trait FromProposed<T> {
+    fn from_proposed(proposed: T) -> Self;
+}
+
+impl<'ephemeral> FromProposed<&'ephemeral [PredPrediction<'ephemeral>]>
+    for &'ephemeral [PredPrediction<'ephemeral>]
+{
+    fn from_proposed(proposed: &'ephemeral [PredPrediction<'ephemeral>]) -> Self {
+        proposed
+    }
+}
+impl<'ephemeral> FromProposed<&'ephemeral [PredPrediction<'ephemeral>]> for () {
+    fn from_proposed(_proposed: &'ephemeral [PredPrediction<'ephemeral>]) -> Self {}
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -103,6 +119,7 @@ impl<'ephemeral> ConfigSet<'ephemeral> for ATNConfigSet<'ephemeral> {
     type ConfigType = ATNConfig<'ephemeral>;
     type FinalizedType<'x> = ATNConfigSet<'x>;
     type LexerActionExecutorType = ();
+    type PredicatesType = &'ephemeral [PredPrediction<'ephemeral>];
 
     fn new_empty() -> Self {
         ATNConfigSet {
@@ -329,6 +346,7 @@ impl<'ephemeral> ConfigSet<'ephemeral> for LexerATNConfigSet<'ephemeral> {
     type FinalizedType<'x> = LexerATNConfigSet<'x>;
     type LexerActionExecutorType =
         Option<&'ephemeral crate::lexer_action_executor::LexerActionExecutor<'ephemeral>>;
+    type PredicatesType = ();
 
     fn new_empty() -> Self {
         LexerATNConfigSet {

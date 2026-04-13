@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 
 use fxhash::hash64;
 
-use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
+use crate::atn_config_set::{ATNConfigSet, ConfigSet, FromProposed as _, LexerATNConfigSet};
 use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::semantic_context::SemanticContext;
@@ -81,9 +81,9 @@ where
             dfa.alloc_pred_prediction_slice(self.predicates.iter().map(|p| p.promote(dfa)));
 
         let mut state = DFAState::new(dfa, state_number, configs, edge_set, predicates);
-        state.is_accept_state = self.is_accept_state;
-        state.prediction = self.prediction;
-        state.requires_full_context = self.requires_full_context;
+        state.set_accept_state(self.is_accept_state);
+        state.set_requires_full_context(self.requires_full_context);
+        state.set_prediction(self.prediction);
         state
     }
 }
@@ -101,22 +101,30 @@ impl<'ephemeral, CS: ConfigSet<'ephemeral>> Hash for ProposedDFAState<'ephemeral
     }
 }
 
+// Coerce the three most significant bits of the state number for
+// is_error_state, is_accept_state and requires_full_context flags. This allows
+// us to fit both ParserDFAState and LexerDFAState within 64 bytes.
+const ERROR_STATE_MASK: u32 = 0x80000000;
+const ACCEPT_STATE_MASK: u32 = 0x40000000;
+const REQUIRES_FULL_CONTEXT_MASK: u32 = 0x20000000;
+const STATE_NUMBER_MASK: u32 = !(ERROR_STATE_MASK | ACCEPT_STATE_MASK | REQUIRES_FULL_CONTEXT_MASK);
+
 #[derive(Debug)]
 pub struct DFAState<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
     /// Number of this state in corresponding DFA
-    pub(super) state_number: i32,
+    state_number: u32,
 
     configs: AtomicPtr<CS>,
     pub(super) edges: super::EdgeSet<'sim, CS>,
 
-    is_accept_state: bool,
     prediction: i32,
+
+    // Parser/Lexer specific fields:
     lexer_action_executor: CS::LexerActionExecutorType,
-    requires_full_context: bool,
-    predicates: &'sim [PredPrediction<'sim>],
+    predicates: CS::PredicatesType,
 }
 
 impl<'sim, CS: ConfigSet<'sim>> PartialEq for DFAState<'sim, CS> {
@@ -130,22 +138,26 @@ impl<'sim, CS: ConfigSet<'sim>> Eq for DFAState<'sim, CS> {}
 impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     #[inline(always)]
     pub fn state_number(&self) -> i32 {
-        self.state_number
+        if self.is_error_state() {
+            -1
+        } else {
+            (self.state_number & STATE_NUMBER_MASK) as i32
+        }
     }
 
     #[inline(always)]
     pub fn is_error_state(&self) -> bool {
-        self.state_number == -1
+        (self.state_number & ERROR_STATE_MASK) != 0
     }
 
     #[inline(always)]
     pub fn is_accept_state(&self) -> bool {
-        self.is_accept_state
+        (self.state_number & ACCEPT_STATE_MASK) != 0
     }
 
     #[inline(always)]
     pub fn requires_full_context(&self) -> bool {
-        self.requires_full_context
+        (self.state_number & REQUIRES_FULL_CONTEXT_MASK) != 0
     }
 
     #[inline(always)]
@@ -154,11 +166,19 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     }
 
     pub fn set_accept_state(&mut self, v: bool) {
-        self.is_accept_state = v;
+        if v {
+            self.state_number |= ACCEPT_STATE_MASK;
+        } else {
+            self.state_number &= !ACCEPT_STATE_MASK;
+        }
     }
 
     pub fn set_requires_full_context(&mut self, v: bool) {
-        self.requires_full_context = v;
+        if v {
+            self.state_number |= REQUIRES_FULL_CONTEXT_MASK;
+        } else {
+            self.state_number &= !REQUIRES_FULL_CONTEXT_MASK;
+        }
     }
 
     pub fn set_prediction(&mut self, v: i32) {
@@ -191,17 +211,27 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
         edge_set: super::EdgeSet<'sim, CS>,
         predicates: &'sim [PredPrediction<'sim>],
     ) -> Self {
+        debug_assert!(
+            state_number >= 0,
+            "State number {} is negative, use ERROR_DFA_STATE_REF instead",
+            state_number
+        );
+        assert!(
+            (state_number as u32) & !STATE_NUMBER_MASK == 0,
+            "State number {} exceeds maximum of {}",
+            state_number,
+            STATE_NUMBER_MASK
+        );
+
         let configs = AtomicPtr::new(dfa.alloc_config_set(configs) as *const CS as *mut CS);
 
         DFAState {
-            state_number,
+            state_number: (state_number as u32) & STATE_NUMBER_MASK,
             configs,
             edges: edge_set,
-            is_accept_state: false,
             prediction: 0,
             lexer_action_executor: Default::default(),
-            requires_full_context: false,
-            predicates,
+            predicates: CS::PredicatesType::from_proposed(predicates),
         }
     }
 
@@ -243,26 +273,22 @@ impl<'sim> LexerDFAState<'sim> {
 
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>> =
     LazyLock::new(|| DFAState {
-        state_number: -1,
+        state_number: ERROR_STATE_MASK,
         configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
         edges: super::EdgeSet::new_invalid(),
-        is_accept_state: false,
         prediction: 0,
         lexer_action_executor: Default::default(),
-        requires_full_context: false,
         predicates: &EMPTY_PREDICATES,
     });
 
 pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATNConfigSet>> =
     LazyLock::new(|| DFAState {
-        state_number: -1,
+        state_number: ERROR_STATE_MASK,
         configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
         edges: super::EdgeSet::new_invalid(),
-        is_accept_state: false,
         prediction: 0,
         lexer_action_executor: None,
-        requires_full_context: false,
-        predicates: &EMPTY_PREDICATES,
+        predicates: (),
     });
 
 static EMPTY_PREDICATES: [PredPrediction<'static>; 0] = [];
