@@ -790,6 +790,19 @@ where
     }
 }
 
+impl<'sim, CS> Drop for DFAStateStore<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    fn drop(&mut self) {
+        self.map.iter().for_each(|key| unsafe {
+            std::ptr::drop_in_place(
+                key.as_ref() as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
+            );
+        });
+    }
+}
+
 // #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 // struct DFAStateId(usize);
 

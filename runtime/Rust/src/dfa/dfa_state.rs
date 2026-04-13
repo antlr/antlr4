@@ -137,6 +137,7 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
         self.state_number == -1
     }
 
+    #[inline]
     pub fn configs(&self) -> &CS {
         // SAFETY:
         // - The only way to instantiate a DFAState is via DFAState::new, which
@@ -173,10 +174,24 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     }
 
     pub(super) fn set_configs(&self, configs: &'sim mut CS) {
-        self.configs.swap(configs as *mut CS, Ordering::Relaxed);
+        let old = self.configs.swap(configs as *mut CS, Ordering::Relaxed);
+        unsafe {
+            std::ptr::drop_in_place(old);
+        }
     }
 
     // fn set_prediction(&self, _v: i32) { unimplemented!() }
+}
+
+impl<'sim, CS> Drop for DFAState<'sim, CS>
+where
+    CS: ConfigSet<'sim> + 'sim,
+{
+    fn drop(&mut self) {
+        unsafe {
+            std::ptr::drop_in_place(self.configs.load(Ordering::Relaxed));
+        }
+    }
 }
 
 impl<'sim> LexerDFAState<'sim> {
