@@ -9,7 +9,9 @@ use std::sync::{Mutex, OnceLock};
 
 use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
-use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
+use crate::atn_config_set::{
+    ATNConfigSet, ConfigSet, LexerATNConfigSet, MutableConfigSet, MutableLexerATNConfigSet,
+};
 use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
 use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
@@ -96,12 +98,8 @@ where
         };
 
         let precedence_state = if is_precedence_atn_state(atn_start_state) {
-            let mut precedence_state = DFAState::new(
-                0,
-                CS::new_empty(),
-                edge_store_ref.make_edge_set(),
-                &[],
-            );
+            let mut precedence_state =
+                DFAState::new(0, CS::new_empty(), edge_store_ref.make_edge_set(), &[]);
             precedence_state.set_accept_state(false);
             precedence_state.set_requires_full_context(false);
             // Pre-allocate edges for the precedence state:
@@ -304,7 +302,7 @@ where
     ) -> &'sim DFAState<'sim, CS>
     where
         'sim: 'ephemeral,
-        ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
+        ECS: MutableConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
     {
         let mut state_store = self.states.lock().expect("StateStore lock poisoned");
 
@@ -400,7 +398,7 @@ where
 impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
     pub fn add_lexer_state<'ephemeral>(
         &self,
-        proposed: ProposedDFAState<'ephemeral, LexerATNConfigSet<'ephemeral>>,
+        proposed: ProposedDFAState<'ephemeral, MutableLexerATNConfigSet<'ephemeral>>,
         recog: &impl IATNSimulator<'sim, LexerATNConfigSet<'sim>>,
     ) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>>
     where
@@ -551,29 +549,29 @@ where
     }
 }
 
-struct ProposedDFAStateKey<'scratch, CS>(NonNull<ProposedDFAState<'scratch, CS>>)
+struct ProposedDFAStateKey<'scratch, MCS>(NonNull<ProposedDFAState<'scratch, MCS>>)
 where
-    CS: ConfigSet<'scratch> + 'scratch;
+    MCS: MutableConfigSet<'scratch> + 'scratch;
 
-impl<'scratch, CS> ProposedDFAStateKey<'scratch, CS>
+impl<'scratch, MCS> ProposedDFAStateKey<'scratch, MCS>
 where
-    CS: ConfigSet<'scratch> + 'scratch,
+    MCS: MutableConfigSet<'scratch> + 'scratch,
 {
-    fn from_proposed(proposed: &mut ProposedDFAState<'scratch, CS>) -> Self {
+    fn from_proposed(proposed: &mut ProposedDFAState<'scratch, MCS>) -> Self {
         ProposedDFAStateKey(NonNull::from(proposed))
     }
 
     #[inline(always)]
-    fn as_ref(&self) -> &'scratch ProposedDFAState<'scratch, CS> {
+    fn as_ref(&self) -> &'scratch ProposedDFAState<'scratch, MCS> {
         // SAFETY: `self` can only be constructed from a valid reference to a
         // ProposedDFAState:
         unsafe { self.0.as_ref() }
     }
 }
 
-impl<'scratch, CS> std::hash::Hash for ProposedDFAStateKey<'scratch, CS>
+impl<'scratch, MCS> std::hash::Hash for ProposedDFAStateKey<'scratch, MCS>
 where
-    CS: ConfigSet<'scratch> + 'scratch,
+    MCS: MutableConfigSet<'scratch> + 'scratch,
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
         let proposed = self.as_ref();
@@ -582,20 +580,17 @@ where
     }
 }
 
-impl<'scratch, 'sim, CS> Equivalent<DFAStateKey<'sim, CS::FinalizedType<'sim>>>
-    for ProposedDFAStateKey<'scratch, CS>
+impl<'scratch, 'sim, MCS> Equivalent<DFAStateKey<'sim, MCS::FinalizedType<'sim>>>
+    for ProposedDFAStateKey<'scratch, MCS>
 where
     'sim: 'scratch,
-    CS: ConfigSet<'scratch> + 'scratch,
+    MCS: MutableConfigSet<'scratch> + 'scratch,
 {
-    fn equivalent(&self, other: &DFAStateKey<'sim, CS::FinalizedType<'sim>>) -> bool {
+    fn equivalent(&self, other: &DFAStateKey<'sim, MCS::FinalizedType<'sim>>) -> bool {
         let proposed = self.as_ref();
-        let other = unsafe {
-            std::mem::transmute::<&DFAState<'sim, CS::FinalizedType<'sim>>, &DFAState<'scratch, CS>>(
-                other.as_ref(),
-            )
-        };
-        &proposed.configs == other.configs()
+        let other = other.as_ref();
+
+        proposed.configs.eq_config_set(other.configs())
     }
 }
 
@@ -650,7 +645,7 @@ where
     ) -> Option<&'sim DFAState<'sim, CS>>
     where
         'sim: 'scratch,
-        ECS: ConfigSet<'scratch, FinalizedType<'sim> = CS> + 'scratch,
+        ECS: MutableConfigSet<'scratch, FinalizedType<'sim> = CS> + 'scratch,
     {
         self.map.get(&key).map(|k| k.as_ref())
     }

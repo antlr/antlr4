@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use crate::atn::ATN;
 use crate::atn_config::LexerATNConfig;
-use crate::atn_config_set::LexerATNConfigSet;
+use crate::atn_config_set::{LexerATNConfigSet, MutableLexerATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{ATNState, ATNStateRef};
 use crate::char_stream::CharStream;
@@ -264,7 +264,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         Input: CharStream<'input>,
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
-        let mut reach = LexerATNConfigSet::new(scratch);
+        let mut reach = MutableLexerATNConfigSet::new(scratch);
         self.get_reachable_config_set(s.configs(), &mut reach, _t, lexer, scratch);
         //        println!(" --- target computed {:?}", reach.configs.iter().map(|it|it.get_state()).collect::<Vec<_>>());
 
@@ -293,7 +293,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         // _states: &V,
         //        _input: &mut dyn CharStream,
         _closure: &'scratch LexerATNConfigSet<'scratch>,
-        _reach: &mut LexerATNConfigSet<'scratch>,
+        _reach: &mut MutableLexerATNConfigSet<'scratch>,
         _t: i32,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
         scratch: &'scratch bumpalo::Bump,
@@ -394,7 +394,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         p: &ATNState,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
         scratch: &'scratch bumpalo::Bump,
-    ) -> LexerATNConfigSet<'scratch>
+    ) -> MutableLexerATNConfigSet<'scratch>
     where
         'input: 'arena,
         'sim: 'scratch,
@@ -402,7 +402,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         TF: TokenFactory<'input, 'arena> + 'arena,
     {
         //        let initial_context = &EMPTY_PREDICTION_CONTEXT;
-        let mut config_set = LexerATNConfigSet::new(scratch);
+        let mut config_set = MutableLexerATNConfigSet::new(scratch);
         for (i, tr) in p.get_transitions().iter().enumerate() {
             let target = tr.get_target();
             let atn_config =
@@ -425,7 +425,7 @@ impl<'sim> LexerATNSimulator<'sim> {
     fn closure<'scratch, 'input, 'arena, Input, TF>(
         &self,
         mut config: LexerATNConfig<'scratch>,
-        config_set: &mut LexerATNConfigSet<'scratch>,
+        config_set: &mut MutableLexerATNConfigSet<'scratch>,
         mut _current_alt_reached_accept_state: bool,
         speculative: bool,
         treat_eofas_epsilon: bool,
@@ -527,7 +527,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         //        _input: &mut dyn CharStream,
         _config: &'scratch LexerATNConfig<'scratch>,
         _trans: &Transition,
-        _configs: &mut LexerATNConfigSet<'scratch>,
+        _configs: &mut MutableLexerATNConfigSet<'scratch>,
         _speculative: bool,
         _treat_eofas_epsilon: bool,
         lexer: &mut impl Lexer<'input, 'arena, Input, TF>,
@@ -673,10 +673,10 @@ impl<'sim> LexerATNSimulator<'sim> {
         dfa.set_edge(from, (t - MIN_DFA_EDGE) as usize, to);
     }
 
-    fn add_dfastate(
+    fn add_dfastate<'scratch>(
         &self,
         dfa: &'sim DFA<LexerATNConfigSet<'sim>>,
-        configs: LexerATNConfigSet,
+        configs: MutableLexerATNConfigSet<'scratch>,
     ) -> Result<&'sim DFAState<'sim, LexerATNConfigSet<'sim>>, ANTLRError> {
         assert!(!configs.has_semantic_context());
 

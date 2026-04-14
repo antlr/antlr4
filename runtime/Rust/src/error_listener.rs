@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 use bit_set::BitSet;
 
-use crate::atn_config_set::ATNConfigSet;
+use crate::atn_config_set::{ATNConfigSet, MutableATNConfigSet};
 use crate::dfa::DFA;
 use crate::errors::ANTLRError;
 
@@ -50,7 +50,7 @@ where
         _stop_index: isize,
         _exact: bool,
         _ambig_alts: &BitSet,
-        _configs: &ATNConfigSet,
+        _configs: &MutableATNConfigSet,
     ) {
     }
 
@@ -76,7 +76,7 @@ where
         _start_index: isize,
         _stop_index: isize,
         _prediction: i32,
-        _configs: &ATNConfigSet,
+        _configs: &MutableATNConfigSet,
     ) {
     }
 }
@@ -140,7 +140,7 @@ where
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet<u32>,
-        configs: &ATNConfigSet,
+        configs: &MutableATNConfigSet,
     ) {
         for listener in self.delegates {
             listener.report_ambiguity(
@@ -183,7 +183,7 @@ where
         start_index: isize,
         stop_index: isize,
         prediction: i32,
-        configs: &ATNConfigSet,
+        configs: &MutableATNConfigSet,
     ) {
         for listener in self.delegates {
             listener.report_context_sensitivity(
@@ -289,7 +289,7 @@ where
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet<u32>,
-        _configs: &ATNConfigSet,
+        _configs: &MutableATNConfigSet,
     ) {
         if self.exact_only && !exact {
             return;
@@ -331,7 +331,7 @@ where
         start_index: isize,
         stop_index: isize,
         _prediction: i32,
-        _configs: &ATNConfigSet,
+        _configs: &MutableATNConfigSet,
     ) {
         let msg = format!(
             "reportContextSensitivity d={}, input='{}'",
@@ -424,7 +424,7 @@ where
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet<u32>,
-        configs: &ATNConfigSet,
+        configs: &MutableATNConfigSet,
     ) {
         self.as_dyn().report_ambiguity(
             recognizer,
@@ -465,7 +465,7 @@ where
         start_index: isize,
         stop_index: isize,
         prediction: i32,
-        configs: &ATNConfigSet,
+        configs: &MutableATNConfigSet,
     ) {
         self.as_dyn().report_context_sensitivity(
             recognizer,

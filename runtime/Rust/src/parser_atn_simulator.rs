@@ -10,7 +10,7 @@ use hashbrown::{DefaultHashBuilder, HashMap, HashSet};
 
 use crate::atn::{ATN, INVALID_ALT};
 use crate::atn_config::ATNConfig;
-use crate::atn_config_set::ATNConfigSet;
+use crate::atn_config_set::{ATNConfigSet, MutableATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
     ATNDecisionState, ATNState, ATNStateRef, DecisionState, ATNSTATE_BLOCK_END,
@@ -245,10 +245,11 @@ impl<'sim> ParserATNSimulator<'sim> {
             };
 
             if D.is_error_state() {
-                let err = self.no_viable_alt(local, previousD.configs(), self.start_index.get());
+                let err = self.no_viable_alt(local, self.start_index.get());
                 local.input().seek(self.start_index.get());
                 let alt = self.get_syn_valid_or_sem_invalid_alt_that_finished_decision_entry_rule(
-                    previousD.configs(),
+                    previousD.configs().get_items(),
+                    previousD.configs().full_context(),
                     local,
                 );
                 if alt != INVALID_ALT {
@@ -314,22 +315,18 @@ impl<'sim> ParserATNSimulator<'sim> {
 
                 let alts = self.eval_semantic_context(local, Dstate.predicates(), true);
                 match alts.len() {
-                    0 => {
-                        return Err(self.no_viable_alt(
-                            local,
-                            Dstate.configs(),
-                            self.start_index.get(),
-                        ))
-                    }
+                    0 => return Err(self.no_viable_alt(local, self.start_index.get())),
                     1 => return Ok(alts.iter().next().unwrap() as i32),
                     _ => {
+                        let ecs =
+                            MutableATNConfigSet::from_config_set(local.scratch(), Dstate.configs());
                         self.report_ambiguity(
                             dfa,
                             self.start_index.get(),
                             stop_index,
                             false,
                             &alts,
-                            Dstate.configs(),
+                            &ecs,
                             local.parser,
                         );
                         return Ok(alts.iter().next().unwrap() as i32);
@@ -362,7 +359,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         //        println!("source config {:?}",dfa.states.read()[previousD].configs.as_ref());
         let reach = {
             let closure = previousD.configs();
-            self.compute_reach_set(closure, t, false, local)
+            self.compute_reach_set(closure.get_items(), t, false, local)
         };
 
         let reach = match reach {
@@ -415,7 +412,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn predicate_dfa_state<'scratch>(
         &self,
         scratch: &'scratch bumpalo::Bump,
-        proposed_state: &mut ProposedDFAState<'scratch, ATNConfigSet<'scratch>>,
+        proposed_state: &mut ProposedDFAState<'scratch, MutableATNConfigSet<'scratch>>,
         decision_state: &ATNState,
     ) {
         let nalts = decision_state.get_transitions().len();
@@ -444,7 +441,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         &self,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
         // _D: &DFAState,
-        s0: ATNConfigSet<'scratch>,
+        s0: MutableATNConfigSet<'scratch>,
     ) -> Result<i32, ANTLRError>
     where
         'input: 'arena,
@@ -463,18 +460,20 @@ impl<'sim> ParserATNSimulator<'sim> {
         loop {
             //            println!("full_ctx loop");
 
-            let reach = self.compute_reach_set(&prev, t, full_ctx, local);
+            let reach = self.compute_reach_set(prev.get_items(), t, full_ctx, local);
             prev = match reach {
                 None => {
                     local.input().seek(self.start_index.get());
                     let alt = self
                         .get_syn_valid_or_sem_invalid_alt_that_finished_decision_entry_rule(
-                            &prev, local,
+                            prev.get_items(),
+                            prev.full_context(),
+                            local,
                         );
                     if alt != INVALID_ALT {
                         return Ok(alt);
                     }
-                    return Err(self.no_viable_alt(local, &prev, self.start_index.get()));
+                    return Err(self.no_viable_alt(local, self.start_index.get()));
                 }
                 Some(x) => x,
             };
@@ -530,25 +529,26 @@ impl<'sim> ParserATNSimulator<'sim> {
     }
 
     // ATNConfigSet is pretty big so should be boxed to move it cheaper
-    fn compute_reach_set<'input, 'arena, 'scratch, 'cache, TF, P>(
+    fn compute_reach_set<'a, 'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        closure: &ATNConfigSet<'scratch>,
+        closure: impl Iterator<Item = &'a ATNConfig<'scratch>>,
         t: i32,
         full_ctx: bool,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-    ) -> Option<ATNConfigSet<'scratch>>
+    ) -> Option<MutableATNConfigSet<'scratch>>
     where
+        'scratch: 'a,
         'input: 'arena,
         'sim: 'scratch,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
         //        println!("in computeReachSet, starting closure: {:?}",closure);
-        let mut intermediate = ATNConfigSet::new(local.scratch(), full_ctx);
+        let mut intermediate = MutableATNConfigSet::new(local.scratch(), full_ctx);
 
         let mut skipped_stop_states = bumpalo::collections::Vec::new_in(local.scratch());
 
-        for c in closure.get_items() {
+        for c in closure {
             let state = c.get_state();
             if let ATNState::RuleStop(_) = *state {
                 assert!(c.get_context().unwrap().is_empty());
@@ -575,7 +575,7 @@ impl<'sim> ParserATNSimulator<'sim> {
             look_to_end_of_rule = true;
             intermediate
         } else {
-            let mut reach = ATNConfigSet::new(local.scratch(), full_ctx);
+            let mut reach = MutableATNConfigSet::new(local.scratch(), full_ctx);
             let mut closure_busy = HashSet::new_in(local.scratch());
             //            println!("calc reach {:?}",intermediate.length());
 
@@ -619,13 +619,13 @@ impl<'sim> ParserATNSimulator<'sim> {
         Some(reach)
     }
 
-    fn has_config_in_rule_stop_state(configs: &ATNConfigSet) -> bool {
+    fn has_config_in_rule_stop_state(configs: &MutableATNConfigSet) -> bool {
         configs
             .get_items()
             .any(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
     }
 
-    fn all_configs_in_rule_stop_state(configs: &ATNConfigSet) -> bool {
+    fn all_configs_in_rule_stop_state(configs: &MutableATNConfigSet) -> bool {
         configs
             .get_items()
             .all(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
@@ -633,17 +633,17 @@ impl<'sim> ParserATNSimulator<'sim> {
 
     fn remove_all_configs_not_in_rule_stop_state<'a>(
         &self,
-        configs: ATNConfigSet<'a>,
+        configs: MutableATNConfigSet<'a>,
         look_to_end_of_rule: bool,
         merge_cache: &mut MergeCache<'a>,
-    ) -> ATNConfigSet<'a> {
+    ) -> MutableATNConfigSet<'a> {
         if Self::all_configs_in_rule_stop_state(&configs) {
             return configs;
         }
 
         // can just remove instead of creating new instance because we own configs
         // it significantly differs from java version though
-        let mut result = ATNConfigSet::new(merge_cache.scratch, configs.full_context());
+        let mut result = MutableATNConfigSet::new(merge_cache.scratch, configs.full_context());
         for c in configs.into_iter() {
             let state = c.get_state();
             if matches!(*state, ATNState::RuleStop(_)) {
@@ -670,7 +670,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         initial_ctx: PredictionContextRef<'scratch>,
         full_ctx: bool,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-    ) -> ATNConfigSet<'scratch>
+    ) -> MutableATNConfigSet<'scratch>
     where
         'input: 'arena,
         'sim: 'scratch,
@@ -678,7 +678,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         P: Parser<'input, 'arena, TF>,
     {
         //        let initial_ctx = PredictionContext::prediction_context_from_rule_context(self.atn(),ctx);
-        let mut configs = ATNConfigSet::new(local.scratch(), full_ctx);
+        let mut configs = MutableATNConfigSet::new(local.scratch(), full_ctx);
         //        println!("initial {:?}",initial_ctx);
         //        println!("initial state {:?}",a);
 
@@ -703,9 +703,9 @@ impl<'sim> ParserATNSimulator<'sim> {
 
     fn apply_precedence_filter<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        configs: &ATNConfigSet<'scratch>,
+        configs: &MutableATNConfigSet<'scratch>,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-    ) -> ATNConfigSet<'scratch>
+    ) -> MutableATNConfigSet<'scratch>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
@@ -713,7 +713,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     {
         //println!("apply_precedence_filter");
         let mut states_from_alt1 = HashMap::new_in(local.scratch());
-        let mut config_set = ATNConfigSet::new(local.scratch(), configs.full_context());
+        let mut config_set = MutableATNConfigSet::new(local.scratch(), configs.full_context());
 
         for config in configs.get_items() {
             if config.get_alt() != 1 {
@@ -771,7 +771,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         &self,
         scratch: &'scratch bumpalo::Bump,
         ambig_alts: &BitSet,
-        configs: &ATNConfigSet<'scratch>,
+        configs: &MutableATNConfigSet<'scratch>,
         nalts: usize,
     ) -> Option<Vec<SemanticContext<'scratch>>> {
         let mut alt_to_pred = bumpalo::collections::Vec::with_capacity_in(nalts + 1, scratch);
@@ -837,6 +837,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     }
 
     fn get_syn_valid_or_sem_invalid_alt_that_finished_decision_entry_rule<
+        'a,
         'input,
         'arena,
         'scratch,
@@ -845,16 +846,18 @@ impl<'sim> ParserATNSimulator<'sim> {
         P,
     >(
         &self,
-        configs: &ATNConfigSet<'scratch>,
+        configs: impl Iterator<Item = &'a ATNConfig<'scratch>>,
+        full_context: bool,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
     ) -> i32
     where
+        'scratch: 'a,
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
         let (sem_valid_configs, sem_invalid_configs) =
-            self.split_according_to_semantic_validity(configs, local);
+            self.split_according_to_semantic_validity(configs, full_context, local);
 
         let alt = self.get_alt_that_finished_decision_entry_rule(&sem_valid_configs);
         if alt != INVALID_ALT {
@@ -871,27 +874,25 @@ impl<'sim> ParserATNSimulator<'sim> {
         INVALID_ALT
     }
 
-    fn split_according_to_semantic_validity<'input, 'arena, 'scratch, 'cache, TF, P>(
+    fn split_according_to_semantic_validity<'a, 'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
-        configs: &ATNConfigSet<'scratch>,
+        configs: impl Iterator<Item = &'a ATNConfig<'scratch>>,
+        full_context: bool,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-    ) -> (ATNConfigSet<'scratch>, ATNConfigSet<'scratch>)
+    ) -> (MutableATNConfigSet<'scratch>, MutableATNConfigSet<'scratch>)
     where
+        'scratch: 'a,
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        let mut succeeded = ATNConfigSet::new(local.scratch(), configs.full_context());
-        let mut failed = ATNConfigSet::new(local.scratch(), configs.full_context());
-        for c in configs.get_items() {
+        let mut succeeded = MutableATNConfigSet::new(local.scratch(), full_context);
+        let mut failed = MutableATNConfigSet::new(local.scratch(), full_context);
+        for c in configs {
             let clone = c.clone();
             if c.semantic_context() != &SemanticContext::NONE {
-                let predicate_eval_result = self.eval_predicate(
-                    local,
-                    c.semantic_context(),
-                    c.get_alt(),
-                    configs.full_context(),
-                );
+                let predicate_eval_result =
+                    self.eval_predicate(local, c.semantic_context(), c.get_alt(), full_context);
                 if predicate_eval_result {
                     succeeded.add(clone);
                 } else {
@@ -904,7 +905,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         (succeeded, failed)
     }
 
-    fn get_alt_that_finished_decision_entry_rule(&self, configs: &ATNConfigSet) -> i32 {
+    fn get_alt_that_finished_decision_entry_rule(&self, configs: &MutableATNConfigSet) -> i32 {
         let mut min_alt = i32::MAX;
         for c in configs.get_items() {
             let has_empty_path = c.get_context().map(|x| x.has_empty_path()) == Some(true);
@@ -976,7 +977,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn closure<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         config: ATNConfig<'scratch>,
-        configs: &mut ATNConfigSet<'scratch>,
+        configs: &mut MutableATNConfigSet<'scratch>,
         closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
@@ -1008,7 +1009,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn closure_checking_stop_state<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         mut config: ATNConfig<'scratch>,
-        configs: &mut ATNConfigSet<'scratch>,
+        configs: &mut MutableATNConfigSet<'scratch>,
         closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
@@ -1093,7 +1094,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn closure_work<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         config: ATNConfig<'scratch>,
-        configs: &mut ATNConfigSet<'scratch>,
+        configs: &mut MutableATNConfigSet<'scratch>,
         closure_busy: &mut HashSet<ATNConfig<'scratch>, DefaultHashBuilder, &bumpalo::Bump>,
         collect_predicates: bool,
         full_ctx: bool,
@@ -1428,7 +1429,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn get_conflicting_alts<'scratch>(
         &self,
         scratch: &'scratch bumpalo::Bump,
-        configs: &ATNConfigSet<'scratch>,
+        configs: &MutableATNConfigSet<'scratch>,
     ) -> BitSet {
         let altsets = get_conflicting_alt_subsets(scratch, configs);
         get_alts(altsets.into_values())
@@ -1436,7 +1437,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
     fn get_conflicting_alts_or_unique_alt<'scratch>(
         &self,
-        configs: &'scratch ATNConfigSet<'scratch>,
+        configs: &'scratch MutableATNConfigSet<'scratch>,
     ) -> Cow<'scratch, BitSet> {
         if configs.get_unique_alt() != INVALID_ALT {
             let mut bitset = BitSet::new();
@@ -1456,7 +1457,6 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn no_viable_alt<'input, 'arena, 'scratch, 'cache, TF, P>(
         &self,
         local: &mut Local<'input, 'arena, 'sim, 'scratch, 'cache, TF, P>,
-        _configs: &ATNConfigSet,
         start_index: isize,
     ) -> ANTLRError
     where
@@ -1471,7 +1471,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         ANTLRError::no_alt_full(local.parser, start_token, offending_token)
     }
 
-    fn get_unique_alt(&self, configs: &ATNConfigSet) -> i32 {
+    fn get_unique_alt(&self, configs: &MutableATNConfigSet) -> i32 {
         let mut alt = INVALID_ALT;
         for c in configs.get_items() {
             if alt == INVALID_ALT {
@@ -1502,7 +1502,7 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn add_dfastate<'scratch>(
         &self,
         dfa: &'sim DFA<'sim, ATNConfigSet<'sim>>,
-        state: ProposedDFAState<'scratch, ATNConfigSet<'scratch>>,
+        state: ProposedDFAState<'scratch, MutableATNConfigSet<'scratch>>,
     ) -> Result<&'sim DFAState<'sim, ATNConfigSet<'sim>>, ANTLRError> {
         self.base.check_allocation_limit()?;
 
@@ -1539,7 +1539,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         &self,
         dfa: &DFA<'sim, ATNConfigSet<'sim>>,
         prediction: i32,
-        configs: &ATNConfigSet<'scratch>,
+        configs: &MutableATNConfigSet<'scratch>,
         start_index: isize,
         stop_index: isize,
         parser: &mut P,
@@ -1561,7 +1561,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         stop_index: isize,
         exact: bool,
         ambig_alts: &BitSet,
-        configs: &ATNConfigSet<'scratch>,
+        configs: &MutableATNConfigSet<'scratch>,
         parser: &mut P,
     ) where
         'input: 'arena,

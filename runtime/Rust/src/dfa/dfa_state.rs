@@ -2,9 +2,9 @@ use std::fmt::{Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::LazyLock;
 
-use fxhash::hash64;
-
-use crate::atn_config_set::{ATNConfigSet, ConfigSet, FromProposed as _, LexerATNConfigSet};
+use crate::atn_config_set::{
+    ATNConfigSet, ConfigSet, FromProposed as _, LexerATNConfigSet, MutableConfigSet,
+};
 use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::semantic_context::SemanticContext;
@@ -40,11 +40,11 @@ impl<'ephemeral> PredPrediction<'ephemeral> {
 }
 
 #[derive(Debug)]
-pub struct ProposedDFAState<'scratch, CS>
+pub struct ProposedDFAState<'scratch, MCS>
 where
-    CS: ConfigSet<'scratch> + 'scratch,
+    MCS: MutableConfigSet<'scratch> + 'scratch,
 {
-    pub configs: CS,
+    pub configs: MCS,
     pub is_accept_state: bool,
     pub prediction: i32,
     pub requires_full_context: bool,
@@ -53,11 +53,11 @@ where
     _marker: std::marker::PhantomData<&'scratch ()>,
 }
 
-impl<'scratch, CS> ProposedDFAState<'scratch, CS>
+impl<'scratch, MCS> ProposedDFAState<'scratch, MCS>
 where
-    CS: ConfigSet<'scratch> + 'scratch,
+    MCS: MutableConfigSet<'scratch> + 'scratch,
 {
-    pub fn new(configs: CS) -> Self {
+    pub fn new(configs: MCS) -> Self {
         ProposedDFAState {
             configs,
             is_accept_state: false,
@@ -71,9 +71,9 @@ where
     pub(super) fn finalize<'sim>(
         self,
         cache: &'sim PredictionContextCache<'sim>,
-        dfa: &DFAStateStore<'sim, CS::FinalizedType<'sim>>,
-        edge_set: super::EdgeSet<'sim, CS::FinalizedType<'sim>>,
-    ) -> DFAState<'sim, CS::FinalizedType<'sim>> {
+        dfa: &DFAStateStore<'sim, MCS::FinalizedType<'sim>>,
+        edge_set: super::EdgeSet<'sim, MCS::FinalizedType<'sim>>,
+    ) -> DFAState<'sim, MCS::FinalizedType<'sim>> {
         let state_number = dfa.len() as i32;
         let configs = self.configs.finalize(cache, dfa);
         let predicates =
@@ -87,14 +87,16 @@ where
     }
 }
 
-impl<'ephemeral, CS: ConfigSet<'ephemeral>> PartialEq for ProposedDFAState<'ephemeral, CS> {
+impl<'ephemeral, MCS: MutableConfigSet<'ephemeral>> PartialEq
+    for ProposedDFAState<'ephemeral, MCS>
+{
     fn eq(&self, other: &Self) -> bool {
         self.configs == other.configs
     }
 }
-impl<'ephemeral, CS: ConfigSet<'ephemeral>> Eq for ProposedDFAState<'ephemeral, CS> {}
+impl<'ephemeral, MCS: MutableConfigSet<'ephemeral>> Eq for ProposedDFAState<'ephemeral, MCS> {}
 
-impl<'ephemeral, CS: ConfigSet<'ephemeral>> Hash for ProposedDFAState<'ephemeral, CS> {
+impl<'ephemeral, MCS: MutableConfigSet<'ephemeral>> Hash for ProposedDFAState<'ephemeral, MCS> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.configs.hash(state);
     }
@@ -182,10 +184,6 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
 
     pub fn set_prediction(&mut self, v: i32) {
         self.prediction = v;
-    }
-
-    pub fn default_hash(&self) -> u64 {
-        hash64(self.configs())
     }
 
     #[inline]

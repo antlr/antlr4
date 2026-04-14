@@ -4,7 +4,7 @@ use hashbrown::HashMap;
 
 use crate::atn::INVALID_ALT;
 use crate::atn_config::ATNConfig;
-use crate::atn_config_set::ATNConfigSet;
+use crate::atn_config_set::MutableATNConfigSet;
 use crate::atn_state::ATNStateRef;
 use crate::prediction_context::{NoopHasherBuilder, PredictionContextRef};
 use crate::semantic_context::SemanticContext;
@@ -86,14 +86,14 @@ impl PredictionMode {
 pub(crate) fn has_sll_conflict_terminating_prediction<'ephemeral>(
     ephemerals: &'ephemeral bumpalo::Bump,
     mode: PredictionMode,
-    configs: &ATNConfigSet<'ephemeral>,
+    configs: &MutableATNConfigSet<'ephemeral>,
 ) -> bool {
     //    if all_configs_in_rule_stop_states(configs) {
     //        return true          checked outside
     //    }
 
     if mode == PredictionMode::SLL && configs.has_semantic_context() {
-        let mut dup = ATNConfigSet::new(ephemerals, true);
+        let mut dup = MutableATNConfigSet::new(ephemerals, true);
         configs.get_items().for_each(|it| {
             let c = ATNConfig::new(it.get_state(), it.get_alt(), it.get_context())
                 .with_semantic_context(&SemanticContext::NONE);
@@ -168,7 +168,7 @@ impl<'a> std::hash::Hash for KeyWrapper<'a> {
 
 pub(crate) fn get_conflicting_alt_subsets<'ephemeral>(
     ephemerals: &'ephemeral bumpalo::Bump,
-    configs: &ATNConfigSet<'ephemeral>,
+    configs: &MutableATNConfigSet<'ephemeral>,
 ) -> HashMap<KeyWrapper<'ephemeral>, BitSet, NoopHasherBuilder, &'ephemeral bumpalo::Bump> {
     let mut configs_to_alts: HashMap<KeyWrapper<'ephemeral>, BitSet, _, _> =
         HashMap::with_capacity_and_hasher_in(configs.length(), NoopHasherBuilder {}, ephemerals);
@@ -185,7 +185,10 @@ pub(crate) fn get_conflicting_alt_subsets<'ephemeral>(
     configs_to_alts
 }
 
-fn has_state_associated_with_one_alt(ephemerals: &bumpalo::Bump, configs: &ATNConfigSet) -> bool {
+fn has_state_associated_with_one_alt(
+    ephemerals: &bumpalo::Bump,
+    configs: &MutableATNConfigSet,
+) -> bool {
     let mut lookup =
         HashMap::with_capacity_and_hasher_in(configs.length(), FxBuildHasher::new(), ephemerals);
 

@@ -139,7 +139,7 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
         &self,
         // Only used to ground the 'sim lifetime:
         _: &'sim Arena,
-    ) -> BaseATNSimulator<'sim, CS::FinalizedType<'sim>> {
+    ) -> BaseATNSimulator<'sim, CS::TransmutedType<'sim>> {
         let dfa_lock = self.decision_to_dfa.read().unwrap();
         let allocation_limit_bytes = self.get_allocation_limit_bytes();
 
@@ -154,7 +154,7 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
             decision_to_dfa: unsafe {
                 std::mem::transmute::<
                     Arc<NotifyOnDrop<Vec<DFA<'_, CS>>>>,
-                    Arc<NotifyOnDrop<Vec<DFA<'_, <CS as ConfigSet<'_>>::FinalizedType<'_>>>>>,
+                    Arc<NotifyOnDrop<Vec<DFA<'_, <CS as ConfigSet<'_>>::TransmutedType<'_>>>>>,
                 >(dfa_lock.clone())
             },
             allocation_limit_bytes,
