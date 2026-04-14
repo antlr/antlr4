@@ -1,6 +1,5 @@
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::sync::atomic::{AtomicPtr, Ordering};
 use std::sync::LazyLock;
 
 use fxhash::hash64;
@@ -80,7 +79,7 @@ where
         let predicates =
             dfa.alloc_pred_prediction_slice(self.predicates.iter().map(|p| p.promote(dfa)));
 
-        let mut state = DFAState::new(dfa, state_number, configs, edge_set, predicates);
+        let mut state = DFAState::new(state_number, configs, edge_set, predicates);
         state.set_accept_state(self.is_accept_state);
         state.set_requires_full_context(self.requires_full_context);
         state.set_prediction(self.prediction);
@@ -117,7 +116,7 @@ where
     /// Number of this state in corresponding DFA
     state_number: u32,
 
-    configs: AtomicPtr<CS>,
+    configs: CS,
     pub(super) edges: super::EdgeSet<'sim, CS>,
 
     prediction: i32,
@@ -191,21 +190,12 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
 
     #[inline]
     pub fn configs(&self) -> &CS {
-        // SAFETY:
-        // - The only way to instantiate a DFAState is via DFAState::new, which
-        //   guarantees that configs is initialized to a valid ATNConfigSet
-        //   pointer.
-        // - The configs pointer is only modifiable via set_configs, which also
-        //   guarantees that it is set to a valid ATNConfigSet pointer.
-        // - The ATNConfigSet is exclusively owned by the DFAState, and is only
-        //   deallocated when the DFAState is dropped.
-        unsafe { &*self.configs.load(Ordering::Relaxed) }
+        &self.configs
     }
 
     // ---- Below are private methods only callable by DFA ----
 
     pub(super) fn new(
-        dfa: &DFAStateStore<'sim, CS>,
         state_number: i32,
         configs: CS,
         edge_set: super::EdgeSet<'sim, CS>,
@@ -223,8 +213,6 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
             STATE_NUMBER_MASK
         );
 
-        let configs = AtomicPtr::new(dfa.alloc_config_set(configs) as *const CS as *mut CS);
-
         DFAState {
             state_number: (state_number as u32) & STATE_NUMBER_MASK,
             configs,
@@ -232,24 +220,6 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
             prediction: 0,
             lexer_action_executor: Default::default(),
             predicates: CS::PredicatesType::from_proposed(predicates),
-        }
-    }
-
-    pub(super) fn set_configs(&self, configs: &'sim mut CS) {
-        let old = self.configs.swap(configs as *mut CS, Ordering::Relaxed);
-        unsafe {
-            std::ptr::drop_in_place(old);
-        }
-    }
-}
-
-impl<'sim, CS> Drop for DFAState<'sim, CS>
-where
-    CS: ConfigSet<'sim> + 'sim,
-{
-    fn drop(&mut self) {
-        unsafe {
-            std::ptr::drop_in_place(self.configs.load(Ordering::Relaxed));
         }
     }
 }
@@ -274,7 +244,7 @@ impl<'sim> LexerDFAState<'sim> {
 pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>> =
     LazyLock::new(|| DFAState {
         state_number: ERROR_STATE_MASK,
-        configs: AtomicPtr::new(Box::into_raw(Box::new(ATNConfigSet::new_empty()))),
+        configs: ATNConfigSet::new_empty(),
         edges: super::EdgeSet::new_invalid(),
         prediction: 0,
         lexer_action_executor: Default::default(),
@@ -284,7 +254,7 @@ pub(super) static ERROR_DFA_STATE_REF: LazyLock<DFAState<'static, ATNConfigSet>>
 pub(super) static ERROR_LEXER_DFA_STATE_REF: LazyLock<DFAState<'static, LexerATNConfigSet>> =
     LazyLock::new(|| DFAState {
         state_number: ERROR_STATE_MASK,
-        configs: AtomicPtr::new(Box::into_raw(Box::new(LexerATNConfigSet::new_empty()))),
+        configs: LexerATNConfigSet::new_empty(),
         edges: super::EdgeSet::new_invalid(),
         prediction: 0,
         lexer_action_executor: None,

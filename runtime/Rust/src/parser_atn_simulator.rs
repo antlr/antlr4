@@ -196,7 +196,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                     let dfa_ref = local.dfa_ref;
 
                     let s0_closure_updated = self.apply_precedence_filter(&s0_closure, &mut local);
-                    dfa_ref.set_s0_configs(s0_closure, self.shared_context_cache());
+                    // dfa_ref.set_s0_configs(s0_closure, self.shared_context_cache());
                     let new_s0 =
                         self.add_dfastate(dfa_ref, ProposedDFAState::new(s0_closure_updated))?;
 

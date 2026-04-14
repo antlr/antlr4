@@ -696,3 +696,6 @@ impl<'ephemeral> ConfigSetStore<'ephemeral, LexerATNConfig<'ephemeral>> {
         }
     }
 }
+
+unsafe impl<'ephemeral, AC> Send for ConfigSetStore<'ephemeral, AC> where AC: ATNConfigType<'ephemeral> + 'ephemeral {}
+unsafe impl<'ephemeral, AC> Sync for ConfigSetStore<'ephemeral, AC> where AC: ATNConfigType<'ephemeral> + 'ephemeral {}

@@ -17,7 +17,6 @@ use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::NoopHasherBuilder;
 use crate::semantic_context::SemanticContext;
 use crate::vocabulary::Vocabulary;
-use crate::PredictionContextCache;
 
 mod dfa_serializer;
 mod dfa_state;
@@ -52,7 +51,6 @@ pub(crate) trait ScopeExt: Sized {
 
 impl<Any: Sized> ScopeExt for Any {}
 
-#[derive(Debug)]
 pub struct DFA<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
@@ -71,7 +69,7 @@ where
     /// Initial DFA state
     s0: AtomicPtr<DFAState<'sim, CS>>,
 
-    precedence_state: bool,
+    precedence_state: Option<Pin<Box<DFAState<'sim, CS>>>>,
 
     allocated_bytes: AtomicUsize,
     semantic_context_bytes: AtomicUsize,
@@ -97,9 +95,8 @@ where
             )
         };
 
-        let (s0, precedence_state) = if is_precedence_atn_state(atn_start_state) {
+        let precedence_state = if is_precedence_atn_state(atn_start_state) {
             let mut precedence_state = DFAState::new(
-                &state_store,
                 0,
                 CS::new_empty(),
                 edge_store_ref.make_edge_set(),
@@ -110,11 +107,9 @@ where
             // Pre-allocate edges for the precedence state:
             let _ = precedence_state.edges.as_ref();
 
-            let precedence_state = state_store.alloc_dfa_state(precedence_state);
-
-            (Some(precedence_state as &'sim DFAState<'sim, CS>), true)
+            Some(Box::pin(precedence_state))
         } else {
-            (None, false)
+            None
         };
 
         DFA {
@@ -122,8 +117,8 @@ where
             decision,
             states: Mutex::new(state_store),
             edges: edge_store,
-            s0: AtomicPtr::new(s0.map_or(std::ptr::null_mut(), |s| {
-                s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
+            s0: AtomicPtr::new(precedence_state.as_ref().map_or(std::ptr::null_mut(), |s| {
+                &**s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
             })),
             precedence_state,
             allocated_bytes: AtomicUsize::new(0),
@@ -163,7 +158,7 @@ where
     }
 
     pub fn is_precedence_dfa(&self) -> bool {
-        self.precedence_state
+        self.precedence_state.is_some()
     }
 
     pub fn get_precedence_start_state(&self, precedence: i32) -> Option<&'sim DFAState<'sim, CS>> {
@@ -279,19 +274,28 @@ where
         );
     }
 
-    pub fn set_s0_configs<'ephemeral, ECS>(
-        &self,
-        configs: ECS,
-        cache: &'sim PredictionContextCache<'sim>,
-    ) where
-        ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
-    {
-        let s0 = self.s0().expect("setting configs on a null s0 state");
-        let states = self.states.lock().expect("StateStore lock poisoned");
-        let configs = configs.finalize(cache, &states);
+    // pub fn set_s0_configs<'ephemeral, ECS>(
+    //     &self,
+    //     configs: ECS,
+    //     cache: &'sim PredictionContextCache<'sim>,
+    // ) where
+    //     ECS: ConfigSet<'ephemeral, FinalizedType<'sim> = CS> + 'ephemeral,
+    // {
+    //     let s0 = self
+    //         .precedence_state
+    //         .as_ref()
+    //         .map(|s| &**s)
+    //         .expect("Can not set s0 configs on a non-precedence DFA");
 
-        s0.set_configs(states.alloc_config_set(configs));
-    }
+    //     let states = self.states.lock().expect("StateStore lock poisoned");
+    //     let configs = configs.finalize(cache, &states);
+
+    //     unsafe {
+    //         // Note: the old configs should be an empty set, so we shouldn't be
+    //         // leaking anything here.
+    //         std::ptr::write(&s0.configs as *const CS as *mut CS, configs);
+    //     }
+    // }
 
     pub fn add_state<'ephemeral, ECS>(
         &self,
@@ -750,9 +754,9 @@ where
         self.config_store().alloc_slice_fill_iter(iter)
     }
 
-    pub(crate) fn alloc_config_set(&self, set: CS) -> &'sim mut CS {
-        self.config_set_store().alloc(set)
-    }
+    // pub(crate) fn alloc_config_set(&self, set: CS) -> &'sim mut CS {
+    //     self.config_set_store().alloc(set)
+    // }
 
     pub(crate) fn alloc_pred_prediction_slice<I>(&self, iter: I) -> &'sim [PredPrediction<'sim>]
     where
@@ -765,8 +769,8 @@ where
     define_arena!(bitset_store, arena);
     define_arena!(semantic_context_store, arena);
     define_arena!(lexer_store, arena);
-    define_arena!(config_store, config_arena);
-    define_arena!(config_set_store, arena);
+    define_arena!(config_store, arena);
+    // define_arena!(config_set_store, arena);
     define_arena!(dfa_state_store, arena);
     define_arena!(pred_prediction_store, arena);
 
