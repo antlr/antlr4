@@ -733,7 +733,7 @@ where
         };
 
         let is_new = self.map.insert(DFAStateKey::from_state(value));
-        assert!(is_new);
+        debug_assert!(is_new);
         value
     }
 
@@ -878,7 +878,6 @@ where
     }
 }
 
-// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct DFAStateId(u32);
 
 impl DFAStateId {
@@ -886,6 +885,7 @@ impl DFAStateId {
         DFAStateId(state_number as u32)
     }
 
+    #[inline(always)]
     fn split_index(&self) -> (u32, u32) {
         if self.0 < (1 << INITIAL_CHUNK_BITS) {
             (0, self.0)
@@ -897,6 +897,7 @@ impl DFAStateId {
         }
     }
 
+    #[inline(always)]
     unsafe fn deref<'sim, CS>(
         &self,
         roots: *const StateStoreRoots<'sim, CS>,
@@ -912,6 +913,7 @@ impl DFAStateId {
         }
     }
 
+    #[inline(always)]
     fn chunk_size(chunk_index: u32) -> usize {
         if chunk_index == 0 {
             1 << INITIAL_CHUNK_BITS
