@@ -258,13 +258,7 @@ where
             return false;
         }
 
-        for (a, b) in self.iter().zip(other.iter()) {
-            if a != b {
-                return false;
-            }
-        }
-
-        true
+        self.iter().zip(other.iter()).all(|(a, b)| a == b)
     }
 }
 

@@ -176,7 +176,9 @@ impl Debug for LexerATNConfig<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.write_fmt(format_args!(
             "LexerATNConfig({:?},lexer_action_executor={:?},passed_through_non_greedy_decision={})",
-            self.base, self.lexer_action_executor, self.passed_through_non_greedy_decision
+            self.base,
+            self.get_lexer_executor(),
+            self.has_passed_through_non_greedy_decision()
         ))
     }
 }
@@ -185,12 +187,12 @@ impl Hash for LexerATNConfig<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.base.hash(state);
 
-        state.write_i32(if self.passed_through_non_greedy_decision {
+        state.write_i32(if self.has_passed_through_non_greedy_decision() {
             1
         } else {
             0
         });
-        match self.lexer_action_executor {
+        match self.get_lexer_executor() {
             None => state.write_i32(0),
             Some(ex) => ex.hash(state),
         }
@@ -200,8 +202,9 @@ impl Hash for LexerATNConfig<'_> {
 impl<'ephemeral> PartialEq for LexerATNConfig<'ephemeral> {
     fn eq(&self, other: &Self) -> bool {
         self.base == other.base
-            && self.passed_through_non_greedy_decision == other.passed_through_non_greedy_decision
-            && self.lexer_action_executor == other.lexer_action_executor
+            && self.has_passed_through_non_greedy_decision()
+                == other.has_passed_through_non_greedy_decision()
+            && self.get_lexer_executor() == other.get_lexer_executor()
     }
 }
 
@@ -219,12 +222,8 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         }
     }
 
-    pub(crate) fn get_lexer_executor(&self) -> Option<&'ephemeral LexerActionExecutor<'ephemeral>> {
-        self.lexer_action_executor
-    }
-
     pub fn with_state(self, state: ATNStateRef) -> Self {
-        let passed_through_non_greedy_decision = self.passed_through_non_greedy_decision
+        let passed_through_non_greedy_decision = self.has_passed_through_non_greedy_decision()
             || matches!(
                 *state,
                 ATNState::Decision(DecisionState {
@@ -314,6 +313,12 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self.base.set_precedence_filter_suppressed(v);
     }
 
+    #[inline]
+    pub(crate) fn get_lexer_executor(&self) -> Option<&'ephemeral LexerActionExecutor<'ephemeral>> {
+        self.lexer_action_executor
+    }
+
+    #[inline]
     pub fn has_passed_through_non_greedy_decision(&self) -> bool {
         self.passed_through_non_greedy_decision
     }
