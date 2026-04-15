@@ -1,10 +1,10 @@
 use std::convert::TryFrom;
 use std::hash::Hasher;
-use std::mem::ManuallyDrop;
+use std::mem::{ManuallyDrop, MaybeUninit};
 use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::NonNull;
-use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicI32, AtomicPtr, AtomicUsize, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use crate::arena::{is_ref_in_arena, is_slice_in_arena};
@@ -14,6 +14,7 @@ use crate::atn_config_set::{
 };
 use crate::atn_simulator::IATNSimulator;
 use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
+use crate::dfa::dfa_state::{LexerDFAState, ParserDFAState};
 use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::NoopHasherBuilder;
@@ -53,6 +54,11 @@ pub(crate) trait ScopeExt: Sized {
 
 impl<Any: Sized> ScopeExt for Any {}
 
+// 16 chunks should be enough for anyone
+const CHUNK_INDEX_BIT_COUNT: u32 = 4;
+const MAX_NUM_CHUNKS: u32 = 1 << CHUNK_INDEX_BIT_COUNT;
+const INITIAL_CHUNK_BITS: u32 = 5;
+
 pub struct DFA<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
@@ -64,6 +70,7 @@ where
 
     /// Set of all DFA states.
     states: Mutex<DFAStateStore<'sim, CS>>,
+    chunks: *const StateStoreRoots<'sim, CS>,
 
     /// Backing store for all edges
     edges: EdgeSetStore<'sim, CS>,
@@ -89,6 +96,7 @@ where
     // ---- Begin direct Java port ----
     pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA<'sim, CS> {
         let state_store = DFAStateStore::new();
+        let chunks = &*state_store.chunks as *const StateStoreRoots<'sim, CS>;
         let edge_store = EdgeSetStore::new(atn);
         // SAFETY: self-reference cast
         let edge_store_ref = unsafe {
@@ -114,6 +122,7 @@ where
             atn_start_state,
             decision,
             states: Mutex::new(state_store),
+            chunks,
             edges: edge_store,
             s0: AtomicPtr::new(precedence_state.as_ref().map_or(std::ptr::null_mut(), |s| {
                 &**s as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
@@ -127,18 +136,6 @@ where
             dfa_state_bytes: AtomicUsize::new(0),
             pred_prediction_bytes: AtomicUsize::new(0),
         }
-    }
-
-    #[inline]
-    pub fn get_edge(
-        &self,
-        from_state: &'sim DFAState<'sim, CS>,
-        symbol: usize,
-    ) -> Option<&'sim DFAState<'sim, CS>> {
-        if from_state.is_error_state() {
-            return None;
-        }
-        from_state.edges.get(symbol)
     }
 
     #[inline]
@@ -157,39 +154,6 @@ where
 
     pub fn is_precedence_dfa(&self) -> bool {
         self.precedence_state.is_some()
-    }
-
-    pub fn get_precedence_start_state(&self, precedence: i32) -> Option<&'sim DFAState<'sim, CS>> {
-        if !self.is_precedence_dfa() {
-            // FIXME: this should return ANTLRError
-            panic!("dfa is supposed to be precedence here");
-        }
-
-        self.s0()
-            .and_then(|state| self.get_edge(state, precedence as usize))
-    }
-
-    pub fn set_precedence_start_state(
-        &self,
-        precedence: i32,
-        start_state: &'sim DFAState<'sim, CS>,
-    ) {
-        if !self.is_precedence_dfa() {
-            // FIXME: this should return ANTLRError
-            panic!("set_precedence_start_state called for not precedence dfa")
-        }
-
-        if precedence < 0 {
-            return;
-        }
-        let precedence = precedence as usize;
-
-        self.set_edge(
-            self.s0()
-                .expect("a precedence dfa's s0 state is never null"),
-            precedence,
-            start_state,
-        );
     }
 
     /// Return a list of all states in this DFA, ordered by state number. (Only
@@ -216,6 +180,11 @@ where
                     .enumerate()
                     .into_iter()
                     .map(move |(symbol, target)| (state, symbol, target))
+            })
+            .map(|(state, symbol, target)| {
+                let target =
+                    unsafe { (*DFAStateId::new(target).deref(self.chunks)).assume_init_ref() };
+                (state, symbol, target)
             })
             .collect()
     }
@@ -450,6 +419,59 @@ unsafe impl<'sim, CS> Send for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 unsafe impl<'sim, CS> Sync for DFA<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 
 impl<'sim> DFA<'sim, ATNConfigSet<'sim>> {
+    pub fn get_precedence_start_state(
+        &self,
+        precedence: i32,
+    ) -> Option<&'sim ParserDFAState<'sim>> {
+        if !self.is_precedence_dfa() {
+            // FIXME: this should return ANTLRError
+            panic!("dfa is supposed to be precedence here");
+        }
+
+        self.s0()
+            .and_then(|state| self.get_edge(state, precedence as usize))
+    }
+
+    pub fn set_precedence_start_state(
+        &self,
+        precedence: i32,
+        start_state: &'sim ParserDFAState<'sim>,
+    ) {
+        if !self.is_precedence_dfa() {
+            // FIXME: this should return ANTLRError
+            panic!("set_precedence_start_state called for not precedence dfa")
+        }
+
+        if precedence < 0 {
+            return;
+        }
+        let precedence = precedence as usize;
+
+        self.set_edge(
+            self.s0()
+                .expect("a precedence dfa's s0 state is never null"),
+            precedence,
+            start_state,
+        );
+    }
+
+    #[inline]
+    pub fn get_edge(
+        &self,
+        from_state: &'sim ParserDFAState<'sim>,
+        symbol: usize,
+    ) -> Option<&'sim ParserDFAState<'sim>> {
+        if from_state.is_error_state() {
+            return None;
+        }
+        let target = from_state.edges.get(symbol)?;
+        if target == -1 {
+            return Some(self.get_error_state());
+        }
+        let target = unsafe { (*DFAStateId::new(target).deref(self.chunks)).assume_init_ref() };
+        Some(target)
+    }
+
     pub fn get_error_state(&self) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
         unsafe {
             std::mem::transmute::<
@@ -461,6 +483,23 @@ impl<'sim> DFA<'sim, ATNConfigSet<'sim>> {
 }
 
 impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
+    #[inline]
+    pub fn get_edge(
+        &self,
+        from_state: &'sim LexerDFAState<'sim>,
+        symbol: usize,
+    ) -> Option<&'sim LexerDFAState<'sim>> {
+        if from_state.is_error_state() {
+            return None;
+        }
+        let target = from_state.edges.get(symbol)?;
+        if target == -1 {
+            return Some(self.get_error_state());
+        }
+        let target = unsafe { (*DFAStateId::new(target).deref(self.chunks)).assume_init_ref() };
+        Some(target)
+    }
+
     pub fn get_error_state(&self) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>> {
         unsafe {
             std::mem::transmute::<
@@ -594,13 +633,17 @@ where
     }
 }
 
+type StateStoreRoots<'sim, CS> = [*mut MaybeUninit<DFAState<'sim, CS>>; MAX_NUM_CHUNKS as usize];
+
 #[derive(Debug)]
 pub struct DFAStateStore<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
     map: ManuallyDrop<HashSet<DFAStateKey<'sim, CS>, NoopHasherBuilder, &'sim bumpalo::Bump>>,
+    chunks: Pin<Box<StateStoreRoots<'sim, CS>>>,
     arena: Pin<Box<bumpalo::Bump>>,
+
     semantic_context_arena: Pin<Box<bumpalo::Bump>>,
     lexer_arena: Pin<Box<bumpalo::Bump>>,
     config_arena: Pin<Box<bumpalo::Bump>>,
@@ -629,6 +672,7 @@ where
             unsafe { std::mem::transmute::<&bumpalo::Bump, &'sim bumpalo::Bump>(&arena) };
         DFAStateStore {
             map: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
+            chunks: Box::pin([std::ptr::null_mut(); MAX_NUM_CHUNKS as usize]),
             arena,
             semantic_context_arena: Box::pin(bumpalo::Bump::new()),
             lexer_arena: Box::pin(bumpalo::Bump::new()),
@@ -651,7 +695,39 @@ where
     }
 
     pub fn add(&mut self, dfa: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
-        let value = self.alloc_dfa_state(dfa);
+        let state_number = self.map.len() as i32;
+        debug_assert!(
+            state_number == dfa.state_number(),
+            "DFAState added to store has state number {}, but expected {}",
+            dfa.state_number(),
+            state_number
+        );
+
+        let id = DFAStateId::new(state_number);
+        let (chunk_index, offset) = id.split_index();
+
+        if offset == 0 {
+            // This is a new chunk, so we need to allocate it:
+            assert!(
+                chunk_index < MAX_NUM_CHUNKS,
+                "exceeded maximum number of DFA states ({})",
+                MAX_NUM_CHUNKS
+            );
+            let chunk_size = DFAStateId::chunk_size(chunk_index);
+            let layout = std::alloc::Layout::array::<MaybeUninit<DFAState<'sim, CS>>>(chunk_size)
+                .expect("layout should be valid since chunk_size is bounded");
+            let chunk_ptr = self.dfa_state_store().alloc_layout(layout).as_ptr()
+                as *mut MaybeUninit<DFAState<'sim, CS>>;
+            self.chunks[chunk_index as usize] = chunk_ptr;
+        }
+
+        let value = unsafe {
+            let chunk_ptr = self.chunks[chunk_index as usize];
+            let slot_ptr = &mut *chunk_ptr.add(offset as usize);
+            slot_ptr.write(dfa);
+            slot_ptr.assume_init_ref()
+        };
+
         let is_new = self.map.insert(DFAStateKey::from_state(value));
         assert!(is_new);
         value
@@ -667,10 +743,6 @@ where
 
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
-    }
-
-    pub fn alloc_dfa_state(&self, state: DFAState<'sim, CS>) -> &'sim DFAState<'sim, CS> {
-        self.dfa_state_store().alloc(state)
     }
 
     pub fn alloc_bitset(&self, f: impl FnOnce() -> BitSet) -> &'sim BitSet {
@@ -766,7 +838,7 @@ where
     define_arena!(lexer_store, arena);
     define_arena!(config_store, arena);
     // define_arena!(config_set_store, arena);
-    define_arena!(dfa_state_store, arena);
+    define_arena!(dfa_state_store, dfa_state_arena);
     define_arena!(pred_prediction_store, arena);
 
     pub fn allocated_bytes(&self) -> usize {
@@ -803,14 +875,84 @@ where
 }
 
 // #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// struct DFAStateId(usize);
+struct DFAStateId(u32);
+
+impl DFAStateId {
+    fn new(state_number: i32) -> Self {
+        DFAStateId(state_number as u32)
+    }
+
+    fn split_index(&self) -> (u32, u32) {
+        if self.0 < (1 << INITIAL_CHUNK_BITS) {
+            (0, self.0)
+        } else {
+            let k = self.0.ilog2();
+            let chunk_index = k - INITIAL_CHUNK_BITS + 1;
+            let index_in_chunk = self.0 & !(1 << k);
+            (chunk_index, index_in_chunk)
+        }
+    }
+
+    unsafe fn deref<'sim, CS>(
+        &self,
+        roots: *const StateStoreRoots<'sim, CS>,
+    ) -> *mut MaybeUninit<DFAState<'sim, CS>>
+    where
+        CS: ConfigSet<'sim> + 'sim,
+    {
+        let (chunk_index, index_in_chunk) = self.split_index();
+        unsafe {
+            (*roots)
+                .get_unchecked(chunk_index as usize)
+                .add(index_in_chunk as usize)
+        }
+    }
+
+    fn chunk_size(chunk_index: u32) -> usize {
+        if chunk_index == 0 {
+            1 << INITIAL_CHUNK_BITS
+        } else {
+            1 << (chunk_index + INITIAL_CHUNK_BITS - 1)
+        }
+    }
+}
+
+#[cfg(test)]
+mod dfa_state_id_tests {
+    use super::*;
+
+    #[test]
+    fn test_dfa_state_id() {
+        let test_cases = [
+            (0, (0, 0)),
+            (1, (0, 1)),
+            (31, (0, 31)),
+            (32, (1, 0)),
+            (33, (1, 1)),
+            (63, (1, 31)),
+            (64, (2, 0)),
+            (65, (2, 1)),
+            (127, (2, 63)),
+            (128, (3, 0)),
+            (255, (3, 127)),
+            (256, (4, 0)),
+        ];
+
+        for (input, expected) in test_cases.iter() {
+            let id = DFAStateId::new(*input);
+            assert_eq!(id.split_index(), *expected);
+        }
+    }
+}
+
+type EdgeRepr = AtomicI32;
 
 #[derive(Debug)]
 struct EdgeSet<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
-    edges: OnceLock<&'sim [AtomicPtr<DFAState<'sim, CS>>]>,
+    edges: OnceLock<&'sim [EdgeRepr]>,
     store: *const EdgeSetStore<'sim, CS>,
 }
 
@@ -833,7 +975,7 @@ where
         }
     }
 
-    fn as_ref(&self) -> &'sim [AtomicPtr<DFAState<'sim, CS>>] {
+    fn as_ref(&self) -> &'sim [EdgeRepr] {
         self.edges.get_or_init(|| {
             if self.store.is_null() {
                 panic!("Attempted to access edge set for invalid DFA state");
@@ -842,41 +984,38 @@ where
         })
     }
 
-    fn get(&self, index: usize) -> Option<&'sim DFAState<'sim, CS>> {
-        self.as_ref().get(index).and_then(|ptr| {
-            let ptr = ptr.load(Ordering::Acquire);
-            if ptr.is_null() {
+    fn get(&self, index: usize) -> Option<i32> {
+        self.as_ref().get(index).and_then(|n| {
+            let value = n.load(Ordering::Acquire);
+            if value == i32::MIN {
                 None
             } else {
-                Some(unsafe { &*ptr })
+                Some(value)
             }
         })
     }
 
     fn set(&self, index: usize, target: &'sim DFAState<'sim, CS>) {
         if let Some(slot) = self.as_ref().get(index) {
-            slot.store(
-                target as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>,
-                Ordering::Release,
-            );
+            slot.store(target.state_number(), Ordering::Release);
         } else {
             panic!("Invalid token index for edge set");
         }
     }
 
-    fn enumerate(&self) -> Vec<(usize, &'sim DFAState<'sim, CS>)> {
+    fn enumerate(&self) -> Vec<(usize, i32)> {
         self.as_ref()
             .iter()
             .enumerate()
-            .filter_map(|(index, ptr)| {
-                let ptr = ptr.load(Ordering::Acquire);
-                if ptr.is_null() {
+            .filter_map(|(index, n)| {
+                let value = n.load(Ordering::Acquire);
+                if value == i32::MIN {
                     None
                 } else {
-                    Some((index, unsafe { &*ptr }))
+                    Some((index, value))
                 }
             })
-            .filter(|(_, state)| !state.is_error_state())
+            .filter(|(_, state_number)| *state_number != -1)
             .collect()
     }
 }
@@ -885,7 +1024,7 @@ impl<'sim, CS> Deref for EdgeSet<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
-    type Target = [AtomicPtr<DFAState<'sim, CS>>];
+    type Target = [EdgeRepr];
 
     fn deref(&self) -> &Self::Target {
         self.as_ref()
@@ -924,22 +1063,16 @@ where
         EdgeSet::new(self)
     }
 
-    fn alloc_edge_set(&self) -> &'sim [AtomicPtr<DFAState<'sim, CS>>] {
+    fn alloc_edge_set(&self) -> &'sim [EdgeRepr] {
         let store = self.store.lock().expect("EdgeSetStore lock poisoned");
-        let edge_set =
-            store.alloc_slice_fill_with(self.set_size, |_| AtomicPtr::new(std::ptr::null_mut()));
+        let edge_set = store.alloc_slice_fill_with(self.set_size, |_| AtomicI32::new(i32::MIN));
 
         // Push the size info out of the lock:
         self.allocated_bytes
             .store(store.allocated_bytes(), Ordering::Relaxed);
 
         // SAFETY: self-reference cast
-        unsafe {
-            std::mem::transmute::<
-                &[AtomicPtr<DFAState<'sim, CS>>],
-                &'sim [AtomicPtr<DFAState<'sim, CS>>],
-            >(edge_set)
-        }
+        unsafe { std::mem::transmute::<&[EdgeRepr], &'sim [EdgeRepr]>(edge_set) }
     }
 
     pub fn allocated_bytes(&self) -> usize {
