@@ -5,7 +5,7 @@ use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::NonNull;
 use std::sync::atomic::{AtomicI32, AtomicPtr, AtomicUsize, Ordering};
-use std::sync::{Mutex, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use crate::arena::{is_ref_in_arena, is_slice_in_arena};
 use crate::atn::ATN;
@@ -73,7 +73,7 @@ where
     chunks: *const StateStoreRoots<'sim, CS>,
 
     /// Backing store for all edges
-    edges: EdgeSetStore<'sim, CS>,
+    edges: Arc<EdgeSetStore<'sim, CS>>,
 
     /// Initial DFA state
     s0: AtomicPtr<DFAState<'sim, CS>>,
@@ -94,10 +94,14 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     // ---- Begin direct Java port ----
-    pub fn new(atn: &'static ATN, atn_start_state: ATNStateRef, decision: i32) -> DFA<'sim, CS> {
+    pub fn new(
+        atn_start_state: ATNStateRef,
+        decision: i32,
+        edge_store: Arc<EdgeSetStore<'sim, CS>>,
+    ) -> DFA<'sim, CS> {
         let state_store = DFAStateStore::new();
         let chunks = &*state_store.chunks as *const StateStoreRoots<'sim, CS>;
-        let edge_store = EdgeSetStore::new(atn);
+
         // SAFETY: self-reference cast
         let edge_store_ref = unsafe {
             std::mem::transmute::<&EdgeSetStore<'sim, CS>, &'sim EdgeSetStore<'sim, CS>>(
@@ -1035,7 +1039,7 @@ where
 unsafe impl<'sim, CS> Send for EdgeSet<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 unsafe impl<'sim, CS> Sync for EdgeSet<'sim, CS> where CS: ConfigSet<'sim> + 'sim {}
 
-struct EdgeSetStore<'sim, CS>
+pub struct EdgeSetStore<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
@@ -1059,7 +1063,7 @@ where
         }
     }
 
-    pub fn make_edge_set(&'sim self) -> EdgeSet<'sim, CS> {
+    fn make_edge_set(&'sim self) -> EdgeSet<'sim, CS> {
         EdgeSet::new(self)
     }
 

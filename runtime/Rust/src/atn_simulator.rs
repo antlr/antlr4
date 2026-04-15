@@ -6,7 +6,7 @@ use std::vec::Vec;
 
 use crate::atn::ATN;
 use crate::atn_config_set::{ATNConfigSet, ConfigSet, LexerATNConfigSet};
-use crate::dfa::DFA;
+use crate::dfa::{EdgeSetStore, DFA};
 use crate::errors::ANTLRError;
 use crate::prediction_context::PredictionContextCache;
 use crate::Arena;
@@ -222,12 +222,13 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
 }
 
 fn make_dfa_vec<'x, CS: ConfigSet<'x>>(atn: &'static ATN) -> Vec<DFA<'x, CS>> {
+    let edge_store = Arc::new(EdgeSetStore::new(atn));
     (0..atn.decision_to_state.len())
         .map(|decision| {
             DFA::<CS>::new(
-                atn,
                 atn.get_decision_state(decision as i32),
                 decision as i32,
+                Arc::clone(&edge_store),
             )
         })
         .collect()
