@@ -114,9 +114,9 @@ where
         };
         self.arena.alloc(CommonToken {
             token_type: ttype,
-            channel,
-            start,
-            stop,
+            channel: channel as i16,
+            start: start as i32,
+            stop: stop as i32,
             token_index: -1,
             line,
             column,

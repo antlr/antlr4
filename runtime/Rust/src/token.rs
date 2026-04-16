@@ -97,10 +97,10 @@ pub type OwningToken = CommonToken<'static>;
 pub struct CommonToken<'input> {
     //    source: Option<(Box<TokenSource>,Box<CharStream>)>,
     pub token_type: i32,
-    pub channel: i32,
-    pub start: isize,
-    pub stop: isize,
-    pub token_index: isize,
+    pub channel: i16,
+    pub start: i32,
+    pub stop: i32,
+    pub token_index: i32,
     pub line: u32,
     pub column: i32,
     pub text: Cow<'input, str>,
@@ -137,19 +137,19 @@ impl Display for CommonToken<'_> {
 
 impl<'input> Token for CommonToken<'input> {
     fn get_token_type(&self) -> i32 {
-        self.token_type
+        self.token_type as i32
     }
 
     fn get_channel(&self) -> i32 {
-        self.channel
+        self.channel as i32
     }
 
     fn get_start_index(&self) -> isize {
-        self.start
+        self.start as isize
     }
 
     fn get_stop_index(&self) -> isize {
-        self.stop
+        self.stop as isize
     }
 
     fn get_line(&self) -> u32 {
@@ -173,11 +173,11 @@ impl<'input> Token for CommonToken<'input> {
     }
 
     fn get_token_index(&self) -> isize {
-        self.token_index
+        self.token_index as isize
     }
 
     fn set_token_index(&mut self, _v: isize) {
-        self.token_index = _v;
+        self.token_index = _v as i32;
     }
 
     fn set_text(&mut self, _text: String) {
@@ -197,7 +197,7 @@ impl<'input> Token for CommonToken<'input> {
     }
 
     fn set_channel(&mut self, _channel: i32) {
-        self.channel = _channel;
+        self.channel = _channel as i16;
     }
 }
 
@@ -211,10 +211,10 @@ impl From<&dyn Token> for CommonToken<'static> {
     fn from(value: &dyn Token) -> Self {
         CommonToken {
             token_type: value.get_token_type(),
-            channel: value.get_channel(),
-            start: value.get_start_index(),
-            stop: value.get_stop_index(),
-            token_index: value.get_token_index(),
+            channel: value.get_channel() as i16,
+            start: value.get_start_index() as i32,
+            stop: value.get_stop_index() as i32,
+            token_index: value.get_token_index() as i32,
             line: value.get_line(),
             column: value.get_char_position_in_line(),
             text: value.get_text().to_string().into(),
