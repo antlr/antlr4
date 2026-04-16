@@ -118,7 +118,7 @@ fn test_visit_error_node() {
 #[test]
 fn test_should_not_visit_eof() {
     Arena::with(|arena| {
-        let lexer = VisitorBasicLexer::<_, CommonTokenFactory>::new(arena, InputStream::new("A"));
+        let lexer = VisitorBasicLexer::<_, OwningTokenFactory>::new(arena, InputStream::new("A"));
         let mut parser = VisitorBasicParser::new(arena, CommonTokenStream::new(lexer));
 
         let root = parser.s().unwrap();

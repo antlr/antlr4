@@ -282,23 +282,8 @@ where
 
         self.markers_count -= 1;
         if self.markers_count == 0 && self.p > 0 {
-            self.tokens.drain(0..self.p as usize);
-            //todo drain assembly is almost 2x longer than
-            // unsafe manual copy but need to bench before using unsafe
-            //let new_len = self.tokens.len() - self.p as usize;
-            // unsafe {
-            //     // drop first p elements
-            //     for i in 0..(self.p as usize) {
-            //         drop_in_place(&mut self.tokens[i]);
-            //     }
-            //     // move len-p elements to beginning
-            //     std::intrinsics::copy(
-            //         &self.tokens[self.p as usize],
-            //         &mut self.tokens[0],
-            //         new_len,
-            //     );
-            //     self.tokens.set_len(new_len);
-            // }
+            self.tokens.copy_within(self.p as usize.., 0);
+            self.tokens.truncate(self.tokens.len() - self.p as usize);
 
             self.p = 0;
         }
