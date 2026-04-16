@@ -476,6 +476,7 @@ impl<'sim> DFA<'sim, ATNConfigSet<'sim>> {
         Some(target)
     }
 
+    #[inline]
     pub fn get_error_state(&self) -> &'sim DFAState<'sim, ATNConfigSet<'sim>> {
         unsafe {
             std::mem::transmute::<
@@ -504,6 +505,7 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
         Some(target)
     }
 
+    #[inline]
     pub fn get_error_state(&self) -> &'sim DFAState<'sim, LexerATNConfigSet<'sim>> {
         unsafe {
             std::mem::transmute::<
@@ -720,9 +722,13 @@ where
             let chunk_size = DFAStateId::chunk_size(chunk_index);
             let layout = std::alloc::Layout::array::<MaybeUninit<DFAState<'sim, CS>>>(chunk_size)
                 .expect("layout should be valid since chunk_size is bounded");
-            let chunk_ptr = self.dfa_state_store().alloc_layout(layout).as_ptr()
-                as *mut MaybeUninit<DFAState<'sim, CS>>;
-            self.chunks[chunk_index as usize] = chunk_ptr;
+            self.chunks[chunk_index as usize] = unsafe {
+                let ptr = std::alloc::alloc(layout);
+                if ptr.is_null() {
+                    std::alloc::handle_alloc_error(layout);
+                }
+                ptr as *mut MaybeUninit<DFAState<'sim, CS>>
+            };
         }
 
         let value = unsafe {
@@ -842,7 +848,7 @@ where
     define_arena!(lexer_store, arena);
     define_arena!(config_store, arena);
     // define_arena!(config_set_store, arena);
-    define_arena!(dfa_state_store, dfa_state_arena);
+    // define_arena!(dfa_state_store, dfa_state_arena);
     define_arena!(pred_prediction_store, arena);
 
     pub fn allocated_bytes(&self) -> usize {
@@ -870,11 +876,27 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     fn drop(&mut self) {
+        // First drop all DFAState objects
         self.map.iter().for_each(|key| unsafe {
             std::ptr::drop_in_place(
                 key.as_ref() as *const DFAState<'sim, CS> as *mut DFAState<'sim, CS>
             );
         });
+        // Then deallocate all chunks
+        let nstates = self.map.len() as i32;
+        if nstates > 0 {
+            let last_id = DFAStateId::new(nstates - 1);
+            let last_chunk_index = last_id.split_index().0;
+            for chunk_index in 0..=last_chunk_index {
+                let chunk_size = DFAStateId::chunk_size(chunk_index);
+                let layout =
+                    std::alloc::Layout::array::<MaybeUninit<DFAState<'sim, CS>>>(chunk_size)
+                        .expect("layout should be valid since chunk_size is bounded");
+                unsafe {
+                    std::alloc::dealloc(self.chunks[chunk_index as usize] as *mut u8, layout);
+                }
+            }
+        }
     }
 }
 
