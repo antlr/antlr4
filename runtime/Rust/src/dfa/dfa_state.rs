@@ -105,9 +105,12 @@ impl<'ephemeral, MCS: MutableConfigSet<'ephemeral>> Hash for ProposedDFAState<'e
 // Coerce the three most significant bits of the state number for
 // is_error_state, is_accept_state and requires_full_context flags. This allows
 // us to fit both ParserDFAState and LexerDFAState within 64 bytes.
-const ERROR_STATE_MASK: u32 = 0x80000000;
-const ACCEPT_STATE_MASK: u32 = 0x40000000;
-const REQUIRES_FULL_CONTEXT_MASK: u32 = 0x20000000;
+const ERROR_STATE_BIT_INDEX: u32 = 31;
+const ERROR_STATE_MASK: u32 = 1 << ERROR_STATE_BIT_INDEX;
+const ACCEPT_STATE_BIT_INDEX: u32 = 30;
+const ACCEPT_STATE_MASK: u32 = 1 << ACCEPT_STATE_BIT_INDEX;
+const REQUIRES_FULL_CONTEXT_BIT_INDEX: u32 = 29;
+const REQUIRES_FULL_CONTEXT_MASK: u32 = 1 << REQUIRES_FULL_CONTEXT_BIT_INDEX;
 const STATE_NUMBER_MASK: u32 = !(ERROR_STATE_MASK | ACCEPT_STATE_MASK | REQUIRES_FULL_CONTEXT_MASK);
 
 #[derive(Debug)]
@@ -167,19 +170,15 @@ impl<'sim, CS: ConfigSet<'sim>> DFAState<'sim, CS> {
     }
 
     pub fn set_accept_state(&mut self, v: bool) {
-        if v {
-            self.state_number |= ACCEPT_STATE_MASK;
-        } else {
-            self.state_number &= !ACCEPT_STATE_MASK;
-        }
+        let v = v as u32;
+        self.state_number =
+            (self.state_number & !ACCEPT_STATE_MASK) | (v << ACCEPT_STATE_BIT_INDEX);
     }
 
     pub fn set_requires_full_context(&mut self, v: bool) {
-        if v {
-            self.state_number |= REQUIRES_FULL_CONTEXT_MASK;
-        } else {
-            self.state_number &= !REQUIRES_FULL_CONTEXT_MASK;
-        }
+        let v = v as u32;
+        self.state_number = (self.state_number & !REQUIRES_FULL_CONTEXT_MASK)
+            | (v << REQUIRES_FULL_CONTEXT_BIT_INDEX);
     }
 
     pub fn set_prediction(&mut self, v: i32) {

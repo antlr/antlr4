@@ -168,8 +168,8 @@ impl<'ephemeral> ATNConfig<'ephemeral> {
 #[derive(Clone)]
 pub struct LexerATNConfig<'ephemeral> {
     base: ATNConfig<'ephemeral>,
-    lexer_action_executor: Option<&'ephemeral LexerActionExecutor<'ephemeral>>,
-    passed_through_non_greedy_decision: bool,
+    lexer_action_executor: usize, // Option<&'ephemeral LexerActionExecutor<'ephemeral>>,
+                                  // passed_through_non_greedy_decision: bool,
 }
 
 impl Debug for LexerATNConfig<'_> {
@@ -217,8 +217,8 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         let base = ATNConfig::new(state, alt, Some(context));
         LexerATNConfig {
             base,
-            lexer_action_executor: None,
-            passed_through_non_greedy_decision: false,
+            lexer_action_executor: 0,
+            // passed_through_non_greedy_decision: false,
         }
     }
 
@@ -233,8 +233,8 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
             );
         Self {
             base: self.base.with_state(state),
-            passed_through_non_greedy_decision,
-            ..self
+            lexer_action_executor: self.lexer_action_executor & !1
+                | (passed_through_non_greedy_decision as usize),
         }
     }
 
@@ -253,12 +253,16 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         cache: &'sim PredictionContextCache,
         dfa: &DFAStateStore<'sim, LexerATNConfigSet<'sim>>,
     ) -> LexerATNConfig<'sim> {
+        let has_passed_through_non_greedy_decision = self.has_passed_through_non_greedy_decision();
+        let lexer_action_executor = self
+            .get_lexer_executor()
+            .map(|ex| dfa.alloc_lexer_action_executor(|| ex.promote(dfa)));
         LexerATNConfig {
             base: self.base.finalize(cache, dfa),
-            lexer_action_executor: self
-                .lexer_action_executor
-                .map(|ex| dfa.alloc_lexer_action_executor(|| ex.promote(dfa)) as &'sim _),
-            ..self
+            lexer_action_executor: lexer_action_executor
+                .map(|ex| (ex as *const LexerActionExecutor) as usize)
+                .unwrap_or(0)
+                | (has_passed_through_non_greedy_decision as usize),
         }
     }
 
@@ -266,8 +270,13 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
         self,
         lexer_action_executor: Option<&'ephemeral LexerActionExecutor>,
     ) -> Self {
+        let has_passed_through_non_greedy_decision = self.has_passed_through_non_greedy_decision();
+        let lexer_action_executor = lexer_action_executor
+            .map(|ex| (ex as *const LexerActionExecutor) as usize)
+            .unwrap_or(0);
         Self {
-            lexer_action_executor,
+            lexer_action_executor: lexer_action_executor
+                | (has_passed_through_non_greedy_decision as usize),
             ..self
         }
     }
@@ -315,11 +324,16 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
 
     #[inline]
     pub(crate) fn get_lexer_executor(&self) -> Option<&'ephemeral LexerActionExecutor<'ephemeral>> {
-        self.lexer_action_executor
+        let ptr = self.lexer_action_executor & !1;
+        if ptr == 0 {
+            None
+        } else {
+            Some(unsafe { &*(ptr as *const LexerActionExecutor) })
+        }
     }
 
     #[inline]
     pub fn has_passed_through_non_greedy_decision(&self) -> bool {
-        self.passed_through_non_greedy_decision
+        (self.lexer_action_executor & 1) != 0
     }
 }
