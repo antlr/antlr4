@@ -68,12 +68,7 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
     }
 
     dfa_sum_method!(dfa_bytes, allocated_bytes);
-    dfa_sum_method!(semantic_context_bytes);
-    dfa_sum_method!(lexer_bytes);
-    dfa_sum_method!(config_bytes);
-    dfa_sum_method!(config_set_bytes);
     dfa_sum_method!(dfa_state_bytes);
-    dfa_sum_method!(pred_prediction_bytes);
 
     pub fn check_allocation_limit(&self) -> Result<(), ANTLRError> {
         if self.allocation_limit_bytes > 0

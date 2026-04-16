@@ -81,12 +81,7 @@ where
     precedence_state: Option<Pin<Box<DFAState<'sim, CS>>>>,
 
     allocated_bytes: AtomicUsize,
-    semantic_context_bytes: AtomicUsize,
-    lexer_bytes: AtomicUsize,
-    config_bytes: AtomicUsize,
-    config_set_bytes: AtomicUsize,
     dfa_state_bytes: AtomicUsize,
-    pred_prediction_bytes: AtomicUsize,
 }
 
 impl<'sim, CS> DFA<'sim, CS>
@@ -133,12 +128,7 @@ where
             })),
             precedence_state,
             allocated_bytes: AtomicUsize::new(0),
-            semantic_context_bytes: AtomicUsize::new(0),
-            lexer_bytes: AtomicUsize::new(0),
-            config_bytes: AtomicUsize::new(0),
-            config_set_bytes: AtomicUsize::new(0),
             dfa_state_bytes: AtomicUsize::new(0),
-            pred_prediction_bytes: AtomicUsize::new(0),
         }
     }
 
@@ -299,28 +289,8 @@ where
         // Push the updated memory usage up to the DFA, outside of the lock:
         self.allocated_bytes
             .store(state_store.allocated_bytes(), Ordering::Relaxed);
-        self.semantic_context_bytes.store(
-            state_store.semantic_context_arena.allocated_bytes(),
-            Ordering::Relaxed,
-        );
-        self.lexer_bytes
-            .store(state_store.lexer_arena.allocated_bytes(), Ordering::Relaxed);
-        self.config_bytes.store(
-            state_store.config_arena.allocated_bytes(),
-            Ordering::Relaxed,
-        );
-        self.config_set_bytes.store(
-            state_store.config_set_arena.allocated_bytes(),
-            Ordering::Relaxed,
-        );
-        self.dfa_state_bytes.store(
-            state_store.dfa_state_arena.allocated_bytes(),
-            Ordering::Relaxed,
-        );
-        self.pred_prediction_bytes.store(
-            state_store.pred_prediction_arena.allocated_bytes(),
-            Ordering::Relaxed,
-        );
+        self.dfa_state_bytes
+            .store(state_store.allocated_chunk_bytes, Ordering::Relaxed);
 
         res
     }
@@ -339,32 +309,12 @@ where
         self.allocated_bytes.load(Ordering::Relaxed)
     }
 
-    pub fn semantic_context_bytes(&self) -> usize {
-        self.semantic_context_bytes.load(Ordering::Relaxed)
-    }
-
-    pub fn lexer_bytes(&self) -> usize {
-        self.lexer_bytes.load(Ordering::Relaxed)
-    }
-
-    pub fn config_bytes(&self) -> usize {
-        self.config_bytes.load(Ordering::Relaxed)
-    }
-
-    pub fn config_set_bytes(&self) -> usize {
-        self.config_set_bytes.load(Ordering::Relaxed)
-    }
-
     pub fn dfa_state_bytes(&self) -> usize {
         self.dfa_state_bytes.load(Ordering::Relaxed)
     }
 
     pub fn edge_set_bytes(&self) -> usize {
         self.edge_store().allocated_bytes()
-    }
-
-    pub fn pred_prediction_bytes(&self) -> usize {
-        self.pred_prediction_bytes.load(Ordering::Relaxed)
     }
 }
 
@@ -415,6 +365,9 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
         // Push the updated memory usage up to the DFA, outside of the lock:
         self.allocated_bytes
             .store(state_store.allocated_bytes(), Ordering::Relaxed);
+        self.dfa_state_bytes
+            .store(state_store.allocated_chunk_bytes, Ordering::Relaxed);
+
         res
     }
 }
@@ -650,12 +603,7 @@ where
     chunks: Pin<Box<StateStoreRoots<'sim, CS>>>,
     arena: Pin<Box<bumpalo::Bump>>,
 
-    semantic_context_arena: Pin<Box<bumpalo::Bump>>,
-    lexer_arena: Pin<Box<bumpalo::Bump>>,
-    config_arena: Pin<Box<bumpalo::Bump>>,
-    config_set_arena: Pin<Box<bumpalo::Bump>>,
-    dfa_state_arena: Pin<Box<bumpalo::Bump>>,
-    pred_prediction_arena: Pin<Box<bumpalo::Bump>>,
+    allocated_chunk_bytes: usize,
 }
 
 macro_rules! define_arena {
@@ -680,15 +628,11 @@ where
             map: ManuallyDrop::new(HashSet::with_hasher_in(NoopHasherBuilder {}, arena_ref)),
             chunks: Box::pin([std::ptr::null_mut(); MAX_NUM_CHUNKS as usize]),
             arena,
-            semantic_context_arena: Box::pin(bumpalo::Bump::new()),
-            lexer_arena: Box::pin(bumpalo::Bump::new()),
-            config_arena: Box::pin(bumpalo::Bump::new()),
-            config_set_arena: Box::pin(bumpalo::Bump::new()),
-            dfa_state_arena: Box::pin(bumpalo::Bump::new()),
-            pred_prediction_arena: Box::pin(bumpalo::Bump::new()),
+            allocated_chunk_bytes: 0,
         }
     }
 
+    #[inline]
     fn get<'scratch, ECS>(
         &self,
         key: ProposedDFAStateKey<'scratch, ECS>,
@@ -729,6 +673,7 @@ where
                 }
                 ptr as *mut MaybeUninit<DFAState<'sim, CS>>
             };
+            self.allocated_chunk_bytes += layout.size();
         }
 
         let value = unsafe {
@@ -831,10 +776,6 @@ where
         self.config_store().alloc_slice_fill_iter(iter)
     }
 
-    // pub(crate) fn alloc_config_set(&self, set: CS) -> &'sim mut CS {
-    //     self.config_set_store().alloc(set)
-    // }
-
     pub(crate) fn alloc_pred_prediction_slice<I>(&self, iter: I) -> &'sim [PredPrediction<'sim>]
     where
         I: IntoIterator<Item = PredPrediction<'sim>>,
@@ -847,18 +788,10 @@ where
     define_arena!(semantic_context_store, arena);
     define_arena!(lexer_store, arena);
     define_arena!(config_store, arena);
-    // define_arena!(config_set_store, arena);
-    // define_arena!(dfa_state_store, dfa_state_arena);
     define_arena!(pred_prediction_store, arena);
 
     pub fn allocated_bytes(&self) -> usize {
-        self.arena.allocated_bytes()
-            + self.semantic_context_arena.allocated_bytes()
-            + self.lexer_arena.allocated_bytes()
-            + self.config_arena.allocated_bytes()
-            + self.config_set_arena.allocated_bytes()
-            + self.dfa_state_arena.allocated_bytes()
-            + self.pred_prediction_arena.allocated_bytes()
+        self.arena.allocated_bytes() + self.map.allocation_size() + self.allocated_chunk_bytes
     }
 }
 
