@@ -1,31 +1,16 @@
 //! How Lexer should produce tokens
-use std::borrow::Cow::{self, Borrowed, Owned};
+use std::borrow::Cow;
 
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
-use std::sync::LazyLock;
-
 use crate::char_stream::CharStream;
 use crate::token::Token;
-use crate::token::{CommonToken, OwningToken, TOKEN_INVALID_TYPE};
+use crate::token::{CommonToken, OwningToken};
 use crate::Arena;
 
-pub(crate) static INVALID_COMMON: LazyLock<Box<CommonToken<'static>>> = LazyLock::new(|| {
-    Box::new(CommonToken {
-        token_type: TOKEN_INVALID_TYPE,
-        channel: 0,
-        start: -1,
-        stop: -1,
-        token_index: -1,
-        line: 0,
-        column: 0,
-        text: "<invalid>".into(),
-    })
-});
-
 pub fn invalid() -> &'static CommonToken<'static> {
-    &INVALID_COMMON
+    Default::default()
 }
 
 /// Trait for creating tokens.
@@ -102,26 +87,41 @@ where
         T: CharStream<'input> + ?Sized,
     {
         let text = match (text, source) {
-            (Some(t), _) => Owned(t),
+            // Safety: obviously unsafe AF -- we're masquerading a string backed
+            // by 'arena as one that can live for 'input. The reason this won't blow up, is
+            //   1) Overriding text is only used by the error recovery mechanism
+            //      in the parser, not the lexer;
+            //   2) When we're in the parser, the lexer is no longer exposed to the user;
+            //   3) The parser, along with the AST created by it, never return
+            //      any &'input references to the user, thus any references to
+            //      this text can never be held more than 'arena.
+            (Some(t), _) => unsafe {
+                std::mem::transmute::<&'arena str, &'input str>(self.arena.alloc_string(t))
+            },
             (None, Some(x)) => {
                 if stop >= x.size() || start >= x.size() {
-                    Borrowed("<EOF>")
+                    "<EOF>"
                 } else {
-                    x.get_text(start, stop)
+                    match x.get_text(start, stop) {
+                        Cow::Borrowed(t) => t,
+                        Cow::Owned(_) => panic!(
+                            "CommonTokenFactory can not be used with CharStream implementations that return owned strings from get_text()"
+                        ),
+                    }
                 }
             }
-            _ => Borrowed(""),
+            _ => "",
         };
-        self.arena.alloc(CommonToken {
-            token_type: ttype,
-            channel: channel as i16,
-            start: start as i32,
-            stop: stop as i32,
-            token_index: -1,
+        self.arena.alloc(CommonToken::new(
+            ttype,
+            channel as i16,
+            start as i32,
+            stop as i32,
+            -1,
             line,
             column,
             text,
-        })
+        ))
     }
 }
 
@@ -154,11 +154,26 @@ where
     where
         T: CharStream<'input> + ?Sized,
     {
-        let tok = self
-            .0
-            .create(source, ttype, text, channel, start, stop, line, column);
-        tok.text = Cow::from(tok.text.to_string());
-        // SAFETY: the only use of 'input lifetime is for the text field which is now owned
-        unsafe { std::mem::transmute::<&mut CommonToken, &mut OwningToken>(tok) }
+        let text = match (text, source) {
+            (Some(t), _) => t,
+            (None, Some(x)) => {
+                if stop >= x.size() || start >= x.size() {
+                    "<EOF>".to_string()
+                } else {
+                    x.get_text(start, stop).to_string()
+                }
+            }
+            _ => "".to_string(),
+        };
+        self.0.arena.alloc(OwningToken::new(
+            ttype,
+            channel as i16,
+            start as i32,
+            stop as i32,
+            -1,
+            line,
+            column,
+            text,
+        ))
     }
 }

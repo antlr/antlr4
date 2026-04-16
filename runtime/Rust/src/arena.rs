@@ -39,6 +39,10 @@ impl Arena {
         self.tokens.alloc(value)
     }
 
+    pub fn alloc_string(&self, value: String) -> &str {
+        self.tokens.alloc(value)
+    }
+
     pub fn alloc_context<'input, 'a, T>(&'a self, value: T) -> &'a mut T
     where
         'input: 'a,

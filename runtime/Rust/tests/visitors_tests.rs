@@ -19,7 +19,7 @@ use dbt_antlr4::common_token_stream::CommonTokenStream;
 use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::parser_rule_context::ParserRuleContext;
 use dbt_antlr4::recognizer::Recognizer;
-use dbt_antlr4::token_factory::CommonTokenFactory;
+use dbt_antlr4::token_factory::{CommonTokenFactory, OwningTokenFactory};
 use dbt_antlr4::tree::{ErrorNode, TerminalNode};
 use dbt_antlr4::trees::string_tree;
 use dbt_antlr4::{Arena, InputStream};
@@ -77,7 +77,7 @@ fn test_visit_terminal_node() {
 #[test]
 fn test_visit_error_node() {
     Arena::with(|arena| {
-        let lexer = VisitorBasicLexer::<_, CommonTokenFactory>::new(arena, InputStream::new(""));
+        let lexer = VisitorBasicLexer::<_>::new(arena, InputStream::new(""));
         let mut parser = VisitorBasicParser::new(arena, CommonTokenStream::new(lexer));
 
         let root = parser.s().unwrap();

@@ -1,10 +1,7 @@
 //! Symbols that parser works on
-use std::borrow::{Borrow, Cow};
-
 use std::fmt::Formatter;
 use std::fmt::{Debug, Display};
-
-use crate::token_factory::INVALID_COMMON;
+use std::sync::LazyLock;
 
 /// Type of tokens that parser considers invalid
 pub const TOKEN_INVALID_TYPE: i32 = 0;
@@ -88,13 +85,31 @@ pub trait Token: Debug + Display {
 }
 
 /// Token that owns its data
-pub type OwningToken = CommonToken<'static>;
+pub type OwningToken = TokenImpl<'static, String>;
+
 /// Most versatile Token that uses Cow to save data
 /// Can be used seamlessly switch from owned to zero-copy parsing
+pub type CommonToken<'input> = TokenImpl<'input, &'input str>;
+
+pub trait TextType<'input>: AsRef<str> + Debug + Display {
+    fn set_text(&mut self, _text: String);
+}
+
+impl<'input> TextType<'input> for &'input str {
+    fn set_text(&mut self, _text: String) {
+        panic!("Cannot set text of &str, it is immutable");
+    }
+}
+
+impl<'input> TextType<'input> for String {
+    fn set_text(&mut self, text: String) {
+        *self = text;
+    }
+}
 
 #[derive(Clone, Debug)]
 #[allow(missing_docs)]
-pub struct CommonToken<'input> {
+pub struct TokenImpl<'input, T: TextType<'input>> {
     //    source: Option<(Box<TokenSource>,Box<CharStream>)>,
     pub token_type: i32,
     pub channel: i16,
@@ -103,15 +118,44 @@ pub struct CommonToken<'input> {
     pub token_index: i32,
     pub line: u32,
     pub column: i32,
-    pub text: Cow<'input, str>,
+    pub text: T,
+
+    _input: std::marker::PhantomData<&'input str>,
 }
 
-impl Display for CommonToken<'_> {
+impl<'input, T: TextType<'input>> TokenImpl<'input, T> {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        token_type: i32,
+        channel: i16,
+        start: i32,
+        stop: i32,
+        token_index: i32,
+        line: u32,
+        column: i32,
+        text: T,
+    ) -> Self {
+        Self {
+            token_type,
+            channel,
+            start,
+            stop,
+            token_index,
+            line,
+            column,
+            text,
+
+            _input: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<'input, T: TextType<'input>> Display for TokenImpl<'input, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let txt = if self.token_type == TOKEN_EOF {
             "<EOF>"
         } else {
-            self.text.borrow()
+            self.text.as_ref()
         };
         let txt = txt.replace("\n", "\\n");
         let txt = txt.replace("\r", "\\r");
@@ -135,9 +179,9 @@ impl Display for CommonToken<'_> {
     }
 }
 
-impl<'input> Token for CommonToken<'input> {
+impl<'input, T: TextType<'input>> Token for TokenImpl<'input, T> {
     fn get_token_type(&self) -> i32 {
-        self.token_type as i32
+        self.token_type
     }
 
     fn get_channel(&self) -> i32 {
@@ -168,7 +212,7 @@ impl<'input> Token for CommonToken<'input> {
         if self.token_type == TOKEN_EOF {
             "<EOF>"
         } else {
-            self.text.borrow()
+            self.text.as_ref()
         }
     }
 
@@ -181,7 +225,7 @@ impl<'input> Token for CommonToken<'input> {
     }
 
     fn set_text(&mut self, _text: String) {
-        self.text = Cow::from(_text);
+        panic!("Cannot set text of TokenImpl, it is immutable");
     }
 
     fn set_type(&mut self, _ttype: i32) {
@@ -207,9 +251,9 @@ impl Default for &'_ CommonToken<'_> {
     }
 }
 
-impl From<&dyn Token> for CommonToken<'static> {
+impl From<&dyn Token> for OwningToken {
     fn from(value: &dyn Token) -> Self {
-        CommonToken {
+        OwningToken {
             token_type: value.get_token_type(),
             channel: value.get_channel() as i16,
             start: value.get_start_index() as i32,
@@ -217,7 +261,23 @@ impl From<&dyn Token> for CommonToken<'static> {
             token_index: value.get_token_index() as i32,
             line: value.get_line(),
             column: value.get_char_position_in_line(),
-            text: value.get_text().to_string().into(),
+            text: value.get_text().to_string(),
+            _input: std::marker::PhantomData,
         }
     }
 }
+
+pub(crate) static INVALID_COMMON: LazyLock<Box<CommonToken<'static>>> = LazyLock::new(|| {
+    Box::new(CommonToken {
+        token_type: TOKEN_INVALID_TYPE,
+        channel: 0,
+        start: -1,
+        stop: -1,
+        token_index: -1,
+        line: 0,
+        column: 0,
+        text: "<invalid>",
+
+        _input: std::marker::PhantomData,
+    })
+});
