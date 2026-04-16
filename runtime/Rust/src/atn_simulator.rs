@@ -59,13 +59,20 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
         self.shared_context_cache.allocated_bytes()
     }
 
+    pub fn edge_set_bytes(&self) -> usize {
+        self.decision_to_dfa
+            .iter()
+            .next()
+            .map(|dfa| dfa.edge_set_bytes())
+            .unwrap_or(0)
+    }
+
     dfa_sum_method!(dfa_bytes, allocated_bytes);
     dfa_sum_method!(semantic_context_bytes);
     dfa_sum_method!(lexer_bytes);
     dfa_sum_method!(config_bytes);
     dfa_sum_method!(config_set_bytes);
     dfa_sum_method!(dfa_state_bytes);
-    dfa_sum_method!(edge_set_bytes);
     dfa_sum_method!(pred_prediction_bytes);
 
     pub fn check_allocation_limit(&self) -> Result<(), ANTLRError> {

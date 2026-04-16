@@ -958,7 +958,7 @@ struct EdgeSet<'sim, CS>
 where
     CS: ConfigSet<'sim> + 'sim,
 {
-    edges: OnceLock<&'sim [EdgeRepr]>,
+    edges: OnceLock<Box<[EdgeRepr]>>,
     store: *const EdgeSetStore<'sim, CS>,
 }
 
@@ -981,7 +981,8 @@ where
         }
     }
 
-    fn as_ref(&self) -> &'sim [EdgeRepr] {
+    #[inline(always)]
+    fn as_ref(&self) -> &[EdgeRepr] {
         self.edges.get_or_init(|| {
             if self.store.is_null() {
                 panic!("Attempted to access edge set for invalid DFA state");
@@ -990,6 +991,7 @@ where
         })
     }
 
+    #[inline]
     fn get(&self, index: usize) -> Option<i32> {
         self.as_ref().get(index).and_then(|n| {
             let value = n.load(Ordering::Acquire);
@@ -1046,7 +1048,6 @@ where
     CS: ConfigSet<'sim> + 'sim,
 {
     set_size: usize,
-    store: Mutex<bumpalo::Bump>,
     allocated_bytes: AtomicUsize,
 
     _marker: std::marker::PhantomData<&'sim CS>,
@@ -1059,7 +1060,6 @@ where
     pub fn new(atn: &'static ATN) -> Self {
         EdgeSetStore {
             set_size: CS::calc_edge_set_size(atn),
-            store: Mutex::new(bumpalo::Bump::new()),
             allocated_bytes: AtomicUsize::new(0),
             _marker: std::marker::PhantomData,
         }
@@ -1069,16 +1069,16 @@ where
         EdgeSet::new(self)
     }
 
-    fn alloc_edge_set(&self) -> &'sim [EdgeRepr] {
-        let store = self.store.lock().expect("EdgeSetStore lock poisoned");
-        let edge_set = store.alloc_slice_fill_with(self.set_size, |_| AtomicI32::new(i32::MIN));
-
-        // Push the size info out of the lock:
-        self.allocated_bytes
-            .store(store.allocated_bytes(), Ordering::Relaxed);
-
-        // SAFETY: self-reference cast
-        unsafe { std::mem::transmute::<&[EdgeRepr], &'sim [EdgeRepr]>(edge_set) }
+    fn alloc_edge_set(&self) -> Box<[EdgeRepr]> {
+        let mut edge_set = Box::new_uninit_slice(self.set_size);
+        edge_set.iter_mut().for_each(|slot| {
+            slot.write(AtomicI32::new(i32::MIN));
+        });
+        self.allocated_bytes.fetch_add(
+            std::mem::size_of::<EdgeRepr>() * self.set_size,
+            Ordering::Relaxed,
+        );
+        unsafe { edge_set.assume_init() }
     }
 
     pub fn allocated_bytes(&self) -> usize {
