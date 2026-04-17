@@ -145,7 +145,7 @@ where
     }
 
     fn report_no_viable_alternative(&self, recognizer: &mut P, e: &NoViableAltError) -> String {
-        let input = if e.start_token.token_type == TOKEN_EOF {
+        let input = if e.start_token.get_token_type() == TOKEN_EOF {
             "<EOF>".to_owned()
         } else {
             recognizer.get_input_stream_mut().get_text_from_interval(

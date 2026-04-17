@@ -114,7 +114,7 @@ where
         };
         self.arena.alloc_token(CommonToken::new(
             ttype,
-            channel as i16,
+            channel,
             start as i32,
             stop as i32,
             -1,
@@ -167,7 +167,7 @@ where
         };
         self.0.arena.alloc_token(OwningToken::new(
             ttype,
-            channel as i16,
+            channel,
             start as i32,
             stop as i32,
             -1,

@@ -107,12 +107,20 @@ impl<'input> TextType<'input> for String {
     }
 }
 
+const TOKEN_TYPE_BITS: u32 = 22;
+const TOKEN_CHANNEL_BITS: u32 = 32 - TOKEN_TYPE_BITS;
+const TOKEN_TYPE_MASK: i32 = (1 << TOKEN_TYPE_BITS) - 1;
+const TOKEN_CHANNEL_MASK: i32 = !TOKEN_TYPE_MASK;
+const TOKEN_TYPE_MAX: i32 = (TOKEN_TYPE_MASK as u32 >> 1) as i32;
+const TOKEN_TYPE_MIN: i32 = -TOKEN_TYPE_MAX;
+const TOKEN_CHANNEL_MAX: i32 = 1i32 << (TOKEN_CHANNEL_BITS - 1);
+const TOKEN_CHANNEL_MIN: i32 = -TOKEN_CHANNEL_MAX;
+
 #[derive(Clone, Debug)]
 #[allow(missing_docs)]
 pub struct TokenImpl<'input, T: TextType<'input>> {
     //    source: Option<(Box<TokenSource>,Box<CharStream>)>,
-    pub token_type: i32,
-    pub channel: i16,
+    type_and_channel: i32,
     pub start: i32,
     pub stop: i32,
     pub token_index: i32,
@@ -127,7 +135,7 @@ impl<'input, T: TextType<'input>> TokenImpl<'input, T> {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         token_type: i32,
-        channel: i16,
+        channel: i32,
         start: i32,
         stop: i32,
         token_index: i32,
@@ -136,8 +144,7 @@ impl<'input, T: TextType<'input>> TokenImpl<'input, T> {
         text: T,
     ) -> Self {
         Self {
-            token_type,
-            channel,
+            type_and_channel: (channel << TOKEN_TYPE_BITS) | (token_type & TOKEN_TYPE_MASK),
             start,
             stop,
             token_index,
@@ -152,11 +159,7 @@ impl<'input, T: TextType<'input>> TokenImpl<'input, T> {
 
 impl<'input, T: TextType<'input>> Display for TokenImpl<'input, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let txt = if self.token_type == TOKEN_EOF {
-            "<EOF>"
-        } else {
-            self.text.as_ref()
-        };
+        let txt = self.get_text();
         let txt = txt.replace("\n", "\\n");
         let txt = txt.replace("\r", "\\r");
         let txt = txt.replace("\t", "\\t");
@@ -167,9 +170,9 @@ impl<'input, T: TextType<'input>> Display for TokenImpl<'input, T> {
             self.start,
             self.stop,
             txt,
-            self.token_type,
-            if self.channel > 0 {
-                ",channel=".to_string() + self.channel.to_string().as_str()
+            self.get_token_type(),
+            if self.get_channel() > 0 {
+                ",channel=".to_string() + self.get_channel().to_string().as_str()
             } else {
                 String::new()
             },
@@ -180,26 +183,32 @@ impl<'input, T: TextType<'input>> Display for TokenImpl<'input, T> {
 }
 
 impl<'input, T: TextType<'input>> Token for TokenImpl<'input, T> {
+    #[inline(always)]
     fn get_token_type(&self) -> i32 {
-        self.token_type
+        (self.type_and_channel << TOKEN_CHANNEL_BITS) >> TOKEN_CHANNEL_BITS
     }
 
+    #[inline(always)]
     fn get_channel(&self) -> i32 {
-        self.channel as i32
+        self.type_and_channel >> TOKEN_TYPE_BITS
     }
 
+    #[inline(always)]
     fn get_start_index(&self) -> isize {
         self.start as isize
     }
 
+    #[inline(always)]
     fn get_stop_index(&self) -> isize {
         self.stop as isize
     }
 
+    #[inline(always)]
     fn get_line(&self) -> u32 {
         self.line
     }
 
+    #[inline(always)]
     fn get_char_position_in_line(&self) -> i32 {
         self.column
     }
@@ -208,14 +217,16 @@ impl<'input, T: TextType<'input>> Token for TokenImpl<'input, T> {
     //     unimplemented!()
     // }
 
+    #[inline(always)]
     fn get_text(&self) -> &str {
-        if self.token_type == TOKEN_EOF {
+        if self.get_token_type() == TOKEN_EOF {
             "<EOF>"
         } else {
             self.text.as_ref()
         }
     }
 
+    #[inline(always)]
     fn get_token_index(&self) -> isize {
         self.token_index as isize
     }
@@ -224,12 +235,22 @@ impl<'input, T: TextType<'input>> Token for TokenImpl<'input, T> {
         self.token_index = _v as i32;
     }
 
-    fn set_text(&mut self, _text: String) {
-        panic!("Cannot set text of TokenImpl, it is immutable");
+    fn set_text(&mut self, text: String) {
+        TextType::set_text(&mut self.text, text);
     }
 
-    fn set_type(&mut self, _ttype: i32) {
-        self.token_type = _ttype;
+    #[inline]
+    fn set_type(&mut self, ttype: i32) {
+        debug_assert!(
+            (TOKEN_TYPE_MIN..=TOKEN_TYPE_MAX).contains(&ttype),
+            "Token type {} is out of range ({}..={})",
+            ttype,
+            TOKEN_TYPE_MIN,
+            TOKEN_TYPE_MAX
+        );
+
+        self.type_and_channel =
+            (self.type_and_channel & !(TOKEN_TYPE_MASK)) | (ttype & TOKEN_TYPE_MASK);
     }
 
     fn set_line(&mut self, _line: u32) {
@@ -240,8 +261,18 @@ impl<'input, T: TextType<'input>> Token for TokenImpl<'input, T> {
         self.column = _pos;
     }
 
-    fn set_channel(&mut self, _channel: i32) {
-        self.channel = _channel as i16;
+    #[inline]
+    fn set_channel(&mut self, channel: i32) {
+        debug_assert!(
+            (TOKEN_CHANNEL_MIN..=TOKEN_CHANNEL_MAX).contains(&channel),
+            "Token channel {} is out of range ({}..={})",
+            channel,
+            TOKEN_CHANNEL_MIN,
+            TOKEN_CHANNEL_MAX
+        );
+
+        self.type_and_channel =
+            (self.type_and_channel & !(TOKEN_CHANNEL_MASK)) | (channel << TOKEN_TYPE_BITS);
     }
 }
 
@@ -253,31 +284,28 @@ impl Default for &'_ CommonToken<'_> {
 
 impl From<&dyn Token> for OwningToken {
     fn from(value: &dyn Token) -> Self {
-        OwningToken {
-            token_type: value.get_token_type(),
-            channel: value.get_channel() as i16,
-            start: value.get_start_index() as i32,
-            stop: value.get_stop_index() as i32,
-            token_index: value.get_token_index() as i32,
-            line: value.get_line(),
-            column: value.get_char_position_in_line(),
-            text: value.get_text().to_string(),
-            _input: std::marker::PhantomData,
-        }
+        OwningToken::new(
+            value.get_token_type(),
+            value.get_channel(),
+            value.get_start_index() as i32,
+            value.get_stop_index() as i32,
+            value.get_token_index() as i32,
+            value.get_line(),
+            value.get_char_position_in_line(),
+            value.get_text().to_string(),
+        )
     }
 }
 
 pub(crate) static INVALID_COMMON: LazyLock<Box<CommonToken<'static>>> = LazyLock::new(|| {
-    Box::new(CommonToken {
-        token_type: TOKEN_INVALID_TYPE,
-        channel: 0,
-        start: -1,
-        stop: -1,
-        token_index: -1,
-        line: 0,
-        column: 0,
-        text: "<invalid>",
-
-        _input: std::marker::PhantomData,
-    })
+    Box::new(CommonToken::new(
+        TOKEN_INVALID_TYPE,
+        0,
+        -1,
+        -1,
+        -1,
+        0,
+        0,
+        "<invalid>",
+    ))
 });
