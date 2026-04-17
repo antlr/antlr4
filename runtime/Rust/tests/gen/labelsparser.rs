@@ -143,9 +143,10 @@ impl LabelsTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum LabelsParserContextNode<'input, 'arena> {
-    SContext(SContext<'input, 'arena>),
-    EContext(EContextAll<'input, 'arena>),
+    SContext(&'arena mut SContext<'input, 'arena>),
+    EContext(&'arena mut EContextAll<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -156,8 +157,8 @@ dbt_antlr4::impl_defaults! { LabelsParserContextNode }
 dbt_antlr4::impl_from_contexts! { LabelsParserContextNode { SContext(SContext),   EContext(EContextAll), } }
 dbt_antlr4::impl_tree! { LabelsParserContextNode { SContext, EContext, } }
 dbt_antlr4::impl_parse_tree! { LabelsParserContextNode { SContext, EContext, } }
-dbt_antlr4::impl_rule_context! { LabelsParserContextNode { SContext, EContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { LabelsParserContextNode { SContext, EContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { LabelsParserContextNode { SContext, EContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { LabelsParserContextNode { SContext, EContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { LabelsParserContextNode {
     EContext, ; SContext(enter_s, exit_s, ), 
     }; listener = dyn LabelsListener<'input, 'arena>,
@@ -251,15 +252,16 @@ where
 }
 
 impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserContextNode<'input, 'arena>>, invoking_state: i32) -> SContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				q: None, 
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -314,6 +316,7 @@ where
 }
 //------------------- e ----------------
 #[derive(Debug)]
+#[repr(C)]
 pub enum EContextAll<'input, 'arena> {
 	AddContext(AddContext<'input, 'arena>),
 	ParensContext(ParensContext<'input, 'arena>),
@@ -327,8 +330,8 @@ pub enum EContextAll<'input, 'arena> {
 }
 
 dbt_antlr4::impl_into_base_ext! { EContextAll::EContext { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext,  } }
-dbt_antlr4::impl_rule_context! { EContextAll { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
-dbt_antlr4::impl_parser_rule_context! { EContextAll { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
+dbt_antlr4::impl_rule_context! { EContextAll { } { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
+dbt_antlr4::impl_parser_rule_context! { EContextAll { } { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
 dbt_antlr4::impl_tree_trait_delegates! { LabelsParserContextNode::EContextAll { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
 dbt_antlr4::impl_node_inner! { LabelsParserContextNode::EContext::EContextAll { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
 dbt_antlr4::impl_listener_dispatch! { LabelsListener::LabelsParserContextNode::EContextAll { AddContext(enter_add, exit_add), ParensContext(enter_parens, exit_parens), MultContext(enter_mult, exit_mult), DecContext(enter_dec, exit_dec), AnIDContext(enter_anID, exit_anID), AnIntContext(enter_anInt, exit_anInt), IncContext(enter_inc, exit_inc), } }
@@ -377,18 +380,18 @@ where
 }
 
 impl<'input, 'arena> EContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserContextNode<'input, 'arena>>, invoking_state: i32) -> EContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut EContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
 		let mut _init_v = String::new();
 
-		EContextAll::Error(
+		arena.alloc_context(EContextAll::Error(
         BaseParserRuleContext::new(arena, parent, invoking_state, EContextExt {
 				v: _init_v, 
 				ph: PhantomData
 			}),
-		)
+		))
 	}
 }
 
@@ -474,14 +477,16 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::AddContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::AddContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -546,14 +551,16 @@ impl<'input, 'arena> ParensContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::ParensContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::ParensContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -625,14 +632,16 @@ impl<'input, 'arena> MultContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::MultContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::MultContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -697,14 +706,16 @@ impl<'input, 'arena> DecContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::DecContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::DecContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -773,14 +784,16 @@ impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::AnIDContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::AnIDContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -849,14 +862,16 @@ impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::AnIntContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::AnIntContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -921,14 +936,16 @@ impl<'input, 'arena> IncContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> EContextAll<'input, 'arena>
+	fn copy_from(src: LabelsParserContextNode<'input, 'arena>) -> LabelsParserContextNode<'input, 'arena>
     {
         let LabelsParserContextNode::EContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        EContextAll::IncContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = EContextAll::IncContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -968,7 +985,7 @@ where
 			        {
 			        recog.base.with_mut_ctx(|ctx| {
 			            let tmp = std::mem::take(ctx);
-			            *ctx = AnIntContextExt::copy_from(tmp).into();
+			            *ctx = AnIntContextExt::copy_from(tmp);
 			        });
 			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIntContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 
@@ -982,7 +999,7 @@ where
 			        {
 			        recog.base.with_mut_ctx(|ctx| {
 			            let tmp = std::mem::take(ctx);
-			            *ctx = ParensContextExt::copy_from(tmp).into();
+			            *ctx = ParensContextExt::copy_from(tmp);
 			        });
 			        let _local_ctx_fn = |recog: &Self| -> &'arena ParensContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 			        recog.base.set_state(9);
@@ -1000,7 +1017,7 @@ where
 			        {
 			        recog.base.with_mut_ctx(|ctx| {
 			            let tmp = std::mem::take(ctx);
-			            *ctx = AnIDContextExt::copy_from(tmp).into();
+			            *ctx = AnIDContextExt::copy_from(tmp);
 			        });
 			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIDContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 			        recog.base.set_state(14);

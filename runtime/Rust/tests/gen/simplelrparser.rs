@@ -134,9 +134,10 @@ impl SimpleLRTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum SimpleLRParserContextNode<'input, 'arena> {
-    SContext(SContext<'input, 'arena>),
-    AContext(AContext<'input, 'arena>),
+    SContext(&'arena mut SContext<'input, 'arena>),
+    AContext(&'arena mut AContext<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -147,8 +148,8 @@ dbt_antlr4::impl_defaults! { SimpleLRParserContextNode }
 dbt_antlr4::impl_from_contexts! { SimpleLRParserContextNode { SContext(SContext),  AContext(AContext),  } }
 dbt_antlr4::impl_tree! { SimpleLRParserContextNode { SContext, AContext, } }
 dbt_antlr4::impl_parse_tree! { SimpleLRParserContextNode { SContext, AContext, } }
-dbt_antlr4::impl_rule_context! { SimpleLRParserContextNode { SContext, AContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { SimpleLRParserContextNode { SContext, AContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { SimpleLRParserContextNode { SContext, AContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { SimpleLRParserContextNode { SContext, AContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { SimpleLRParserContextNode {
 ; SContext(enter_s, exit_s, ), AContext(enter_a, exit_a, ), 
     }; listener = dyn SimpleLRListener<'input, 'arena>,
@@ -232,14 +233,15 @@ where
 }
 
 impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> SContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -322,14 +324,15 @@ where
 }
 
 impl<'input, 'arena> AContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> AContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut AContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 

@@ -141,8 +141,9 @@ impl VisitorBasicTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum VisitorBasicParserContextNode<'input, 'arena> {
-    SContext(SContext<'input, 'arena>),
+    SContext(&'arena mut SContext<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -153,8 +154,8 @@ dbt_antlr4::impl_defaults! { VisitorBasicParserContextNode }
 dbt_antlr4::impl_from_contexts! { VisitorBasicParserContextNode { SContext(SContext),  } }
 dbt_antlr4::impl_tree! { VisitorBasicParserContextNode { SContext, } }
 dbt_antlr4::impl_parse_tree! { VisitorBasicParserContextNode { SContext, } }
-dbt_antlr4::impl_rule_context! { VisitorBasicParserContextNode { SContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { VisitorBasicParserContextNode { SContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { VisitorBasicParserContextNode { SContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { VisitorBasicParserContextNode { SContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { VisitorBasicParserContextNode {
 ; SContext(enter_s, exit_s,  visit_s), 
     }; listener = dyn VisitorBasicListener<'input, 'arena>, visitor = VisitorBasicVisitor,
@@ -214,14 +215,15 @@ where
 }
 
 impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserContextNode<'input, 'arena>>, invoking_state: i32) -> SContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 

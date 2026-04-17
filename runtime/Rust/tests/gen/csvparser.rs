@@ -149,11 +149,12 @@ impl CSVTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum CSVParserContextNode<'input, 'arena> {
-    CsvFileContext(CsvFileContext<'input, 'arena>),
-    HdrContext(HdrContext<'input, 'arena>),
-    RowContext(RowContext<'input, 'arena>),
-    FieldContext(FieldContext<'input, 'arena>),
+    CsvFileContext(&'arena mut CsvFileContext<'input, 'arena>),
+    HdrContext(&'arena mut HdrContext<'input, 'arena>),
+    RowContext(&'arena mut RowContext<'input, 'arena>),
+    FieldContext(&'arena mut FieldContext<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -164,8 +165,8 @@ dbt_antlr4::impl_defaults! { CSVParserContextNode }
 dbt_antlr4::impl_from_contexts! { CSVParserContextNode { CsvFileContext(CsvFileContext),  HdrContext(HdrContext),  RowContext(RowContext),  FieldContext(FieldContext),  } }
 dbt_antlr4::impl_tree! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext, } }
 dbt_antlr4::impl_parse_tree! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext, } }
-dbt_antlr4::impl_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { CSVParserContextNode {
 ; CsvFileContext(enter_csvFile, exit_csvFile,  visit_csvFile), HdrContext(enter_hdr, exit_hdr,  visit_hdr), RowContext(enter_row, exit_row,  visit_row), FieldContext(enter_field, exit_field,  visit_field), 
     }; listener = dyn CSVListener<'input, 'arena>, visitor = CSVVisitor,
@@ -225,14 +226,15 @@ where
 }
 
 impl<'input, 'arena> CsvFileContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> CsvFileContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CsvFileContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, CsvFileContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -339,14 +341,15 @@ where
 }
 
 impl<'input, 'arena> HdrContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> HdrContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut HdrContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, HdrContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -428,14 +431,15 @@ where
 }
 
 impl<'input, 'arena> RowContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> RowContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut RowContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, RowContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -551,14 +555,15 @@ where
 }
 
 impl<'input, 'arena> FieldContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> FieldContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut FieldContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, FieldContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 

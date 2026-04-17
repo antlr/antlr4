@@ -229,7 +229,7 @@ macro_rules! impl_rule_node_common {
         fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
             match self {
                 // Generate a match arm for every variant
-                $( $enum_name::$variant(inner) => inner as &dyn ParserRuleContext<'input, 'arena>, )+
+                $( $enum_name::$variant(inner) => *inner as &dyn ParserRuleContext<'input, 'arena>, )+
                 $enum_name::Terminal(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
                 $enum_name::Error(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
             }
@@ -504,36 +504,41 @@ macro_rules! impl_visitable {
 #[macro_export]
 macro_rules! impl_rule_context {
     // Pattern: EnumName { Variant1, Variant2, ... }
-    ($enum_name:ident { $($variant:ident,)+ }) => {
+    ($enum_name:ident { $($ref_variant:ident,)* } $({ $($inline_variant:ident,)+ })?) => {
         impl<'input, 'arena> RuleContext<'arena> for $enum_name<'input, 'arena> {
             fn get_rule_index(&self) -> usize {
                 match self {
                     // Generate a match arm for every variant
-                    $( $enum_name::$variant(inner) => RuleContext::get_rule_index(inner), )+
+                    $( $enum_name::$ref_variant(inner) => RuleContext::get_rule_index(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => RuleContext::get_rule_index(inner), )+)?
                 }
             }
 
             fn get_alt_number(&self) -> i32 {
                 match self {
-                    $( $enum_name::$variant(inner) => RuleContext::get_alt_number(inner), )+
+                    $( $enum_name::$ref_variant(inner) => RuleContext::get_alt_number(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => RuleContext::get_alt_number(inner), )+)?
                 }
             }
 
             fn get_invoking_state(&self) -> i32 {
                 match self {
-                    $( $enum_name::$variant(inner) => RuleContext::get_invoking_state(inner), )+
+                    $( $enum_name::$ref_variant(inner) => RuleContext::get_invoking_state(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => RuleContext::get_invoking_state(inner), )+)?
                 }
             }
 
             fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
                 match self {
-                    $( $enum_name::$variant(inner) => RuleContext::get_parent_ctx(inner), )+
+                    $( $enum_name::$ref_variant(inner) => RuleContext::get_parent_ctx(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => RuleContext::get_parent_ctx(inner), )+)?
                 }
             }
 
             fn get_node_text(&self, rule_names: &[&str]) -> String {
                 match self {
-                    $( $enum_name::$variant(inner) => RuleContext::get_node_text(inner, rule_names), )+
+                    $( $enum_name::$ref_variant(inner) => RuleContext::get_node_text(&**inner, rule_names), )*
+                    $($( $enum_name::$inline_variant(inner) => RuleContext::get_node_text(inner, rule_names), )+)?
                 }
             }
 
@@ -544,35 +549,40 @@ macro_rules! impl_rule_context {
 #[macro_export]
 macro_rules! impl_parser_rule_context {
     // Pattern: EnumName { Variant1, Variant2, ... }
-    ($enum_name:ident { $($variant:ident,)+ }) => {
+    ($enum_name:ident { $($ref_variant:ident,)* } $({ $($inline_variant:ident,)+ })?) => {
         impl<'input, 'arena> ParserRuleContext<'input, 'arena> for $enum_name<'input, 'arena> {
             fn start(&self) -> &'arena dyn $crate::token::Token {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::start(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::start(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::start(inner), )+)?
                 }
             }
 
             fn stop(&self) -> &'arena dyn $crate::token::Token {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::stop(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::stop(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::stop(inner), )+)?
                 }
             }
 
             fn get_parent_ctx(&self) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_parent_ctx(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_parent_ctx(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_parent_ctx(inner), )+)?
                 }
             }
 
             fn get_child_ctx(&self, _i: usize) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_child_ctx(inner, _i), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_child_ctx(&**inner, _i), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_child_ctx(inner, _i), )+)?
                 }
             }
 
             fn get_child_count(&self) -> usize {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_child_count(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_child_count(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_child_count(inner), )+)?
                 }
             }
 
@@ -584,25 +594,29 @@ macro_rules! impl_parser_rule_context {
                 'arena: 'a,
             {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::iter_children(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::iter_children(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::iter_children(inner), )+)?
                 }
             }
 
             fn get_token(&self, _ttype: i32, _pos: usize) -> Option<&TerminalNode<'input, 'arena>> {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_token(inner, _ttype, _pos), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_token(&**inner, _ttype, _pos), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_token(inner, _ttype, _pos), )+)?
                 }
             }
 
             fn get_tokens(&self, _ttype: i32) -> Vec<&TerminalNode<'input, 'arena>> {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_tokens(inner, _ttype), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_tokens(&**inner, _ttype), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_tokens(inner, _ttype), )+)?
                 }
             }
 
             fn get_text(&self) -> String {
                 match self {
-                    $( $enum_name::$variant(inner) => ParserRuleContext::get_text(inner), )+
+                    $( $enum_name::$ref_variant(inner) => ParserRuleContext::get_text(&**inner), )*
+                    $($( $enum_name::$inline_variant(inner) => ParserRuleContext::get_text(inner), )+)?
                 }
             }
        }
@@ -613,8 +627,8 @@ macro_rules! impl_parser_rule_context {
 macro_rules! impl_from_contexts {
     ($enum_name:ident { $($variant:ident($inner:ident)),+ $(,)? }) => {
         $(
-            impl<'input, 'arena> From<$inner<'input, 'arena>> for $enum_name<'input, 'arena> {
-                fn from(ctx: $inner<'input, 'arena>) -> Self {
+            impl<'input, 'arena> From<&'arena mut $inner<'input, 'arena>> for $enum_name<'input, 'arena> {
+                fn from(ctx: &'arena mut $inner<'input, 'arena>) -> Self {
                     $enum_name::$variant(ctx)
                 }
             }

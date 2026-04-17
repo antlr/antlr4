@@ -353,8 +353,9 @@ impl <file.grammarName>TreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum <parser.name>ContextNode\<'input, 'arena> {
-    <parser.funcs:{f | <f.ruleCtx:{r | <r.name>(<r.escapedName><if(r.provideCopyFrom)>All<endif>\<'input, 'arena\>),
+    <parser.funcs:{f | <f.ruleCtx:{r | <r.name>(&'arena mut <r.escapedName><if(r.provideCopyFrom)>All<endif>\<'input, 'arena\>),
     }>}>
     Terminal(TerminalNode\<'input, 'arena>),
     Error(ErrorNode\<'input, 'arena>),
@@ -365,8 +366,8 @@ dbt_antlr4::impl_defaults! { <parser.name>ContextNode }
 dbt_antlr4::impl_from_contexts! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <if(r.provideCopyFrom)> <r.escapedName>(<r.escapedName>All),<else><r.escapedName>(<r.escapedName>), <endif> }>}>} }
 dbt_antlr4::impl_tree! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}>} }
 dbt_antlr4::impl_parse_tree! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}>} }
-dbt_antlr4::impl_rule_context! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}> Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}> Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}> } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { <parser.name>ContextNode { <parser.funcs:{f | <f.ruleCtx:{r | <r.escapedName>, }>}> } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { <parser.name>ContextNode {
     <parser.funcs:{f | <f.ruleCtx:{r | <if(r.provideCopyFrom)><r.escapedName>, <endif>}>}>; <parser.funcs:{f | <f.ruleCtx:{r | <if(!r.provideCopyFrom)><r.escapedName>(<if(file.genListener)>enter_<r.derivedFromName>, exit_<r.derivedFromName>, <endif><if(file.genVisitor)> visit_<r.derivedFromName><endif>), <endif>}>}>
     }; <if(file.genListener)>listener = dyn <parser.grammarName>Listener\<'input, 'arena>,<endif><if(file.genVisitor)> visitor = <parser.grammarName>Visitor,<endif>
@@ -498,6 +499,7 @@ fn <r.escapedName>_sempred(_ctx: Option\<&'arena <r.ctxType>\<'input, 'arena>\>,
 RuleTypeForAlt(currentRule,ruleCtx,altLabelCtxs) ::= <<
 <if(ruleCtx.struct.provideCopyFrom)>
 #[derive(Debug)]
+#[repr(C)]
 pub enum <currentRule.ctxType>All\<'input, 'arena> {
 	<altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(<altLabelCtxs.(l).struct.escapedName>\<'input, 'arena>),
 	}>
@@ -505,8 +507,8 @@ pub enum <currentRule.ctxType>All\<'input, 'arena> {
 }
 
 dbt_antlr4::impl_into_base_ext! { <currentRule.ctxType>All::<currentRule.ctxType> { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }> } }
-dbt_antlr4::impl_rule_context! { <currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
-dbt_antlr4::impl_parser_rule_context! { <currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
+dbt_antlr4::impl_rule_context! { <currentRule.ctxType>All { } { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
+dbt_antlr4::impl_parser_rule_context! { <currentRule.ctxType>All { } { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
 dbt_antlr4::impl_tree_trait_delegates! { <parser.name>ContextNode::<currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
 dbt_antlr4::impl_node_inner! { <parser.name>ContextNode::<currentRule.ctxType>::<currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
 <if(file.genListener)>dbt_antlr4::impl_listener_dispatch! { <parser.grammarName>Listener::<parser.name>ContextNode::<currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(enter_<altLabelCtxs.(l).struct.derivedFromName>, exit_<altLabelCtxs.(l).struct.derivedFromName>), }>} }<endif>
@@ -631,7 +633,7 @@ CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::
 <self()>.base.with_mut_ctx(|ctx| {
     let mut tmp = std::mem::take(ctx);
     tmp.set_alt_number(<currentOuterMostAltCodeBlock.alt.altNum>);
-    *ctx = <currentOuterMostAltCodeBlock.altLabel; format="cap">ContextExt::copy_from(tmp).into();
+    *ctx = <currentOuterMostAltCodeBlock.altLabel; format="cap">ContextExt::copy_from(tmp);
 });
 let _local_ctx_fn = |recog: &Self| -> &'arena <currentOuterMostAltCodeBlock.altLabel; format="cap">Context {recog.ctx().unwrap().as_rule_context().unwrap()};
 <else>
@@ -1013,7 +1015,7 @@ where
 }
 
 impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>ContextNode\<'input, 'arena>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> <struct.escapedName>All\<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>ContextNode\<'input, 'arena>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> &'arena mut <struct.escapedName>All\<'input, 'arena>
     where
         'input: 'arena,
     {
@@ -1021,7 +1023,7 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
 		 }>
 		 <struct.ctorAttrs:{a | _init_<a.escapedName> = <a.escapedName>;
 		 }>
-		<if(struct.provideCopyFrom)><struct.escapedName>All::Error(<endif>
+		arena.alloc_context(<if(struct.provideCopyFrom)><struct.escapedName>All::Error(<endif>
         <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::new(arena, parent, invoking_state, <struct.escapedName>Ext {
 			<!<attrs:{a | <a.escapedName>:None,}>!>
 				<struct.tokenDecls:{a | <a.escapedName>: None, }>
@@ -1032,7 +1034,7 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
 				<struct.ruleContextListDecls:{a | <a.escapedName>: Vec::new(), }>
 				ph: PhantomData
 			}<if(struct.provideCopyFrom)>)<endif>,
-		)
+		))
 	}
 }
 
@@ -1122,14 +1124,16 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: <parser.name>ContextNode\<'input, 'arena>) -> <currentRule.name; format="cap">ContextAll\<'input, 'arena\>
+	fn copy_from(src: <parser.name>ContextNode\<'input, 'arena>) -> <parser.name>ContextNode\<'input, 'arena\>
     {
         let <parser.name>ContextNode::<currentRule.name; format="cap">Context(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        <currentRule.name; format="cap">ContextAll::<struct.escapedName>(
-            <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = <currentRule.name; format="cap">ContextAll::<struct.escapedName>(
+            <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 >>
@@ -1199,7 +1203,7 @@ ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\>().unwrap().<
 recRuleReplaceContext(ctxName) ::= <<
 <self()>.base.with_mut_ctx(|ctx| {
     let tmp = std::mem::take(ctx);
-    *ctx = <ctxName>ContextExt::copy_from(tmp).into();
+    *ctx = <ctxName>ContextExt::copy_from(tmp);
 });
 let _local_ctx_fn = |recog: &Self| -> &'arena <ctxName>Context {recog.ctx().unwrap().as_rule_context().unwrap()};
 >>

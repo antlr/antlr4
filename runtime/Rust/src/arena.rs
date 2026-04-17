@@ -1,5 +1,5 @@
 #![allow(clippy::mut_from_ref)]
-use crate::{token::Token, tree::RuleNode};
+use crate::{rule_context::RuleContext, token::Token, tree::RuleNode};
 
 #[derive(Debug)]
 pub struct Arena {
@@ -43,7 +43,14 @@ impl Arena {
         self.tokens.alloc(value)
     }
 
-    pub fn alloc_context<'input, 'a, T>(&'a self, value: T) -> &'a mut T
+    pub fn alloc_context<'a, T>(&self, value: T) -> &mut T
+    where
+        T: RuleContext<'a>,
+    {
+        self.contexts.alloc(value)
+    }
+
+    pub fn alloc_node<'input, 'a, T>(&'a self, value: T) -> &'a mut T
     where
         'input: 'a,
         T: RuleNode<'input, 'a>,
@@ -61,10 +68,6 @@ impl Arena {
     }
 
     pub fn alloc_payload<T>(&self, value: T) -> &mut T {
-        self.payloads.alloc(value)
-    }
-
-    pub fn alloc<T>(&self, value: T) -> &mut T {
         self.payloads.alloc(value)
     }
 }

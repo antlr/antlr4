@@ -134,8 +134,9 @@ impl ReferenceToATNTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum ReferenceToATNParserContextNode<'input, 'arena> {
-    AContext(AContext<'input, 'arena>),
+    AContext(&'arena mut AContext<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -146,8 +147,8 @@ dbt_antlr4::impl_defaults! { ReferenceToATNParserContextNode }
 dbt_antlr4::impl_from_contexts! { ReferenceToATNParserContextNode { AContext(AContext),  } }
 dbt_antlr4::impl_tree! { ReferenceToATNParserContextNode { AContext, } }
 dbt_antlr4::impl_parse_tree! { ReferenceToATNParserContextNode { AContext, } }
-dbt_antlr4::impl_rule_context! { ReferenceToATNParserContextNode { AContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { ReferenceToATNParserContextNode { AContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { ReferenceToATNParserContextNode { AContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { ReferenceToATNParserContextNode { AContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { ReferenceToATNParserContextNode {
 ; AContext(enter_a, exit_a, ), 
     }; listener = dyn ReferenceToATNListener<'input, 'arena>,
@@ -206,14 +207,15 @@ where
 }
 
 impl<'input, 'arena> AContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserContextNode<'input, 'arena>>, invoking_state: i32) -> AContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut AContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 

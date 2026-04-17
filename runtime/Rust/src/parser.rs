@@ -612,7 +612,7 @@ where
         state: i32,
         _rule_index: usize,
     ) -> Result<(), ANTLRError> {
-        let child = self.arena.alloc_context(localctx);
+        let child = self.arena.alloc_node(localctx);
         if self.build_parse_trees {
             self.set_current_ctx(child.get_parent());
             self.add_child_to_ctx(child);
@@ -667,7 +667,7 @@ where
         _rule_index: usize,
         precedence: i32,
     ) -> Result<(), ANTLRError> {
-        let localctx = self.arena.alloc_context(localctx);
+        let localctx = self.arena.alloc_node(localctx);
 
         self.set_state(state);
         self.precedence_stack.push(precedence);
@@ -690,7 +690,7 @@ where
         state: i32,
         _rule_index: usize,
     ) -> Result<&'arena Node, ANTLRError> {
-        let localctx = self.arena.alloc_context(localctx);
+        let localctx = self.arena.alloc_node(localctx);
 
         let stop = self.input.lt(-1).map(|it| it as _);
         self.with_mut_ctx(|ctx| {
@@ -750,11 +750,11 @@ where
     }
 
     fn create_token_node(&self, token: &'arena TF::Tok) -> &'arena mut Node {
-        self.arena.alloc_context(TerminalNode::new(token).into())
+        self.arena.alloc_node(TerminalNode::new(token).into())
     }
 
     fn create_error_node(&self, token: &'arena TF::Tok) -> &'arena mut Node {
-        self.arena.alloc_context(ErrorNode::new(token).into())
+        self.arena.alloc_node(ErrorNode::new(token).into())
     }
 
     /// Text representation of generated DFA for debugging purposes

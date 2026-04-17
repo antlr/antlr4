@@ -125,25 +125,21 @@ where
         Self: Sized;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[doc(hidden)]
 pub struct EmptyCustomRuleContext<'input, 'arena>(pub(crate) PhantomData<(&'arena (), &'input ())>);
 
 #[derive(Debug)]
 pub enum EmptyRuleNode<'input, 'arena> {
-    Empty(EmptyParserRuleContext<'input, 'arena>),
+    Empty(&'arena mut EmptyParserRuleContext<'input, 'arena>),
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
 }
 
 impl_tree! { EmptyRuleNode { Empty, } }
 impl_parse_tree! { EmptyRuleNode { Empty, } }
-impl_rule_context! { EmptyRuleNode { Empty, Terminal, Error, } }
-impl_parser_rule_context!(EmptyRuleNode {
-    Empty,
-    Terminal,
-    Error,
-});
+impl_rule_context! { EmptyRuleNode { Empty, } { Terminal, Error, } }
+impl_parser_rule_context! { EmptyRuleNode { Empty, } { Terminal, Error, } }
 
 pub trait EmptyListener<'input, 'arena>:
     ParseTreeListener<'input, 'arena, EmptyRuleNode<'input, 'arena>>

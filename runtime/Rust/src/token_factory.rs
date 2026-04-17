@@ -112,7 +112,7 @@ where
             }
             _ => "",
         };
-        self.arena.alloc(CommonToken::new(
+        self.arena.alloc_token(CommonToken::new(
             ttype,
             channel as i16,
             start as i32,
@@ -165,7 +165,7 @@ where
             }
             _ => "".to_string(),
         };
-        self.0.arena.alloc(OwningToken::new(
+        self.0.arena.alloc_token(OwningToken::new(
             ttype,
             channel as i16,
             start as i32,

@@ -148,9 +148,10 @@ impl VisitorCalcTreeWalker
 }
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum VisitorCalcParserContextNode<'input, 'arena> {
-    SContext(SContext<'input, 'arena>),
-    ExprContext(ExprContextAll<'input, 'arena>),
+    SContext(&'arena mut SContext<'input, 'arena>),
+    ExprContext(&'arena mut ExprContextAll<'input, 'arena>),
 
     Terminal(TerminalNode<'input, 'arena>),
     Error(ErrorNode<'input, 'arena>),
@@ -161,8 +162,8 @@ dbt_antlr4::impl_defaults! { VisitorCalcParserContextNode }
 dbt_antlr4::impl_from_contexts! { VisitorCalcParserContextNode { SContext(SContext),   ExprContext(ExprContextAll), } }
 dbt_antlr4::impl_tree! { VisitorCalcParserContextNode { SContext, ExprContext, } }
 dbt_antlr4::impl_parse_tree! { VisitorCalcParserContextNode { SContext, ExprContext, } }
-dbt_antlr4::impl_rule_context! { VisitorCalcParserContextNode { SContext, ExprContext,  Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { VisitorCalcParserContextNode { SContext, ExprContext,  Terminal, Error, } }
+dbt_antlr4::impl_rule_context! { VisitorCalcParserContextNode { SContext, ExprContext,  } { Terminal, Error, } }
+dbt_antlr4::impl_parser_rule_context! { VisitorCalcParserContextNode { SContext, ExprContext,  } { Terminal, Error, } }
 dbt_antlr4::impl_rule_node! { VisitorCalcParserContextNode {
     ExprContext, ; SContext(enter_s, exit_s,  visit_s), 
     }; listener = dyn VisitorCalcListener<'input, 'arena>, visitor = VisitorCalcVisitor,
@@ -250,14 +251,15 @@ where
 }
 
 impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserContextNode<'input, 'arena>>, invoking_state: i32) -> SContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
+		arena.alloc_context(
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
 			},
-		)
+		))
 	}
 }
 
@@ -321,6 +323,7 @@ where
 }
 //------------------- expr ----------------
 #[derive(Debug)]
+#[repr(C)]
 pub enum ExprContextAll<'input, 'arena> {
 	AddContext(AddContext<'input, 'arena>),
 	NumberContext(NumberContext<'input, 'arena>),
@@ -330,8 +333,8 @@ pub enum ExprContextAll<'input, 'arena> {
 }
 
 dbt_antlr4::impl_into_base_ext! { ExprContextAll::ExprContext { AddContext, NumberContext, MultiplyContext,  } }
-dbt_antlr4::impl_rule_context! { ExprContextAll { AddContext, NumberContext, MultiplyContext, Error, } }
-dbt_antlr4::impl_parser_rule_context! { ExprContextAll { AddContext, NumberContext, MultiplyContext, Error, } }
+dbt_antlr4::impl_rule_context! { ExprContextAll { } { AddContext, NumberContext, MultiplyContext, Error, } }
+dbt_antlr4::impl_parser_rule_context! { ExprContextAll { } { AddContext, NumberContext, MultiplyContext, Error, } }
 dbt_antlr4::impl_tree_trait_delegates! { VisitorCalcParserContextNode::ExprContextAll { AddContext, NumberContext, MultiplyContext, Error, } }
 dbt_antlr4::impl_node_inner! { VisitorCalcParserContextNode::ExprContext::ExprContextAll { AddContext, NumberContext, MultiplyContext, Error, } }
 dbt_antlr4::impl_listener_dispatch! { VisitorCalcListener::VisitorCalcParserContextNode::ExprContextAll { AddContext(enter_add, exit_add), NumberContext(enter_number, exit_number), MultiplyContext(enter_multiply, exit_multiply), } }
@@ -376,15 +379,15 @@ where
 }
 
 impl<'input, 'arena> ExprContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserContextNode<'input, 'arena>>, invoking_state: i32) -> ExprContextAll<'input, 'arena>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut ExprContextAll<'input, 'arena>
     where
         'input: 'arena,
     {
-		ExprContextAll::Error(
+		arena.alloc_context(ExprContextAll::Error(
         BaseParserRuleContext::new(arena, parent, invoking_state, ExprContextExt {
 				ph: PhantomData
 			}),
-		)
+		))
 	}
 }
 
@@ -477,14 +480,16 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> VisitorCalcParserContextNode<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        ExprContextAll::AddContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = ExprContextAll::AddContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -549,14 +554,16 @@ impl<'input, 'arena> NumberContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> VisitorCalcParserContextNode<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        ExprContextAll::NumberContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = ExprContextAll::NumberContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -637,14 +644,16 @@ impl<'input, 'arena> MultiplyContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> ExprContextAll<'input, 'arena>
+	fn copy_from(src: VisitorCalcParserContextNode<'input, 'arena>) -> VisitorCalcParserContextNode<'input, 'arena>
     {
         let VisitorCalcParserContextNode::ExprContext(src) = src else {
             panic!("invalid node type for copy_from!");
         };
-        ExprContextAll::MultiplyContext(
-            BaseParserRuleContext::copy_from(src.into_base_ext(), |ext_src| Self::new(ext_src))
-        )
+        let tmp = unsafe { std::ptr::read(src) };
+        *src = ExprContextAll::MultiplyContext(
+            BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
+        );
+        src.into()
 	}
 }
 
@@ -680,7 +689,7 @@ where
 			{
 			recog.base.with_mut_ctx(|ctx| {
 			    let tmp = std::mem::take(ctx);
-			    *ctx = NumberContextExt::copy_from(tmp).into();
+			    *ctx = NumberContextExt::copy_from(tmp);
 			});
 			let _local_ctx_fn = |recog: &Self| -> &'arena NumberContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 
