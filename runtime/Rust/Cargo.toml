@@ -22,7 +22,7 @@ byteorder = "^1"
 fxhash = "0.2.1"
 bit-set = "0.8.0"
 hashbrown = "0.16.1"
-bumpalo = { version = "3.19.1", features = ["allocator-api2", "collections", "boxed"]}
+bumpalo = { version = "3.20.2", features = ["allocator-api2", "collections", "boxed"]}
 stacker = { version = "0.1.23" } # TODO: make this optional
 
 [dev-dependencies]
