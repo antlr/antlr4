@@ -230,11 +230,11 @@ impl<'input, 'arena> CsvFileContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, CsvFileContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 
@@ -345,11 +345,11 @@ impl<'input, 'arena> HdrContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, HdrContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 
@@ -435,11 +435,11 @@ impl<'input, 'arena> RowContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, RowContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 
@@ -559,11 +559,11 @@ impl<'input, 'arena> FieldContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, FieldContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 

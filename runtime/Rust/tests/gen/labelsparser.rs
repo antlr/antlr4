@@ -256,12 +256,12 @@ impl<'input, 'arena> SContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				q: None, 
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 
@@ -386,12 +386,12 @@ impl<'input, 'arena> EContextExt<'input, 'arena>{
     {
 		let mut _init_v = String::new();
 
-		arena.alloc_context(EContextAll::Error(
+		arena.alloc_context( unsafe { EContextAll::Error(
         BaseParserRuleContext::new(arena, parent, invoking_state, EContextExt {
 				v: _init_v, 
 				ph: PhantomData
 			}),
-		))
+		)})
 	}
 }
 
@@ -483,9 +483,9 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::AddContext(
+        *src = EContextAll::AddContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -557,9 +557,9 @@ impl<'input, 'arena> ParensContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::ParensContext(
+        *src = EContextAll::ParensContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -638,9 +638,9 @@ impl<'input, 'arena> MultContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::MultContext(
+        *src = EContextAll::MultContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -712,9 +712,9 @@ impl<'input, 'arena> DecContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::DecContext(
+        *src = EContextAll::DecContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -790,9 +790,9 @@ impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::AnIDContext(
+        *src = EContextAll::AnIDContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -868,9 +868,9 @@ impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::AnIntContext(
+        *src = EContextAll::AnIntContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -942,9 +942,9 @@ impl<'input, 'arena> IncContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = EContextAll::IncContext(
+        *src = EContextAll::IncContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }

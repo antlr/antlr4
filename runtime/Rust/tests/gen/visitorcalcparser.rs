@@ -255,11 +255,11 @@ impl<'input, 'arena> SContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 
@@ -383,11 +383,11 @@ impl<'input, 'arena> ExprContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(ExprContextAll::Error(
+		arena.alloc_context( unsafe { ExprContextAll::Error(
         BaseParserRuleContext::new(arena, parent, invoking_state, ExprContextExt {
 				ph: PhantomData
 			}),
-		))
+		)})
 	}
 }
 
@@ -486,9 +486,9 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = ExprContextAll::AddContext(
+        *src = ExprContextAll::AddContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -560,9 +560,9 @@ impl<'input, 'arena> NumberContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = ExprContextAll::NumberContext(
+        *src = ExprContextAll::NumberContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
@@ -650,9 +650,9 @@ impl<'input, 'arena> MultiplyContextExt<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = ExprContextAll::MultiplyContext(
+        *src = ExprContextAll::MultiplyContext( unsafe { 
             BaseParserRuleContext::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }

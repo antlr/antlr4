@@ -390,6 +390,11 @@ where
         self.self_ref = self_ref;
     }
 
+    #[inline]
+    pub(crate) fn get_self_ref(&self) -> *const Node {
+        self.self_ref
+    }
+
     pub(crate) fn set_parent(&mut self, parent: Option<&'arena Node>) {
         self.parent = parent;
     }

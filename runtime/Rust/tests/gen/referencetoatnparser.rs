@@ -211,11 +211,11 @@ impl<'input, 'arena> AContextExt<'input, 'arena>{
     where
         'input: 'arena,
     {
-		arena.alloc_context(
+		arena.alloc_context( unsafe { 
         BaseParserRuleContext::new(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
 			},
-		))
+		)})
 	}
 }
 

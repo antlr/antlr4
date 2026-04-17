@@ -1,10 +1,8 @@
 //! Full parser node
 use std::any::type_name;
 use std::borrow::{Borrow, BorrowMut};
-use std::cell::Cell;
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
-use std::ptr::NonNull;
 
 use crate::errors::ANTLRError;
 use crate::rule_context::{
@@ -111,14 +109,12 @@ where
 
     /// List of children of current node
     pub(crate) children: bumpalo::collections::Vec<'arena, &'arena Node>,
-    start: &'arena dyn Token,
-    stop: &'arena dyn Token,
+    start: *const (),
+    stop: *const (),
 
-    // Need a `Cell` here because this field has to be mutatable by client code,
-    // which is not allowed to obtain a `&mut self`. As such, we store a
-    // type-erased pointer here, to avoid having `'arena` appear inside a
-    // `Cell`, which would make it invariant.
-    exception: Cell<Option<NonNull<ANTLRError>>>,
+    // TODO: figure out what on earth this is used for and whether we can get
+    // rid of it
+    exception: (),
 }
 
 /// Convenience alias — resolves the `Node` parameter automatically from `Ext::Node`.
@@ -220,12 +216,32 @@ where
 {
     #[inline]
     fn start(&self) -> &'arena dyn Token {
-        self.start
+        if self.start.is_null() {
+            token_factory::invalid()
+        } else {
+            let vtable = self.get_token_vtable();
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &dyn Token>((
+                    self.start,
+                    vtable as *const (),
+                ))
+            }
+        }
     }
 
     #[inline]
     fn stop(&self) -> &'arena dyn Token {
-        self.stop
+        if self.stop.is_null() {
+            token_factory::invalid()
+        } else {
+            let vtable = self.get_token_vtable();
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &dyn Token>((
+                    self.stop,
+                    vtable as *const (),
+                ))
+            }
+        }
     }
 
     fn get_parent_ctx(&self) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
@@ -321,7 +337,11 @@ where
     Ext: CustomRuleContext<'input, 'arena, Node = Node> + 'arena,
     Node: RuleNode<'input, 'arena>,
 {
-    pub fn new(
+    /// # Safety
+    ///
+    /// This is an internal method only meant to be called by generated code --
+    /// there is NO safe way to construct these types outside of the parser!
+    pub unsafe fn new(
         arena: &'arena Arena,
         parent: Option<&'arena Node>,
         invoking_state: i32,
@@ -329,14 +349,18 @@ where
     ) -> Self {
         Self {
             base: BaseRuleContextInner::new(parent, invoking_state, ext),
-            start: token_factory::invalid(),
-            stop: token_factory::invalid(),
-            exception: Cell::new(None),
+            start: Default::default(),
+            stop: Default::default(),
+            exception: (),
             children: bumpalo::vec![in arena.children_arena()],
         }
     }
 
-    pub fn copy_from<Src>(
+    /// # Safety
+    ///
+    /// This is an internal method only meant to be called by generated code --
+    /// there is NO safe way to construct these types outside of the parser!
+    pub unsafe fn copy_from<Src>(
         node: BaseParserRuleContextInner<'input, 'arena, Src, Node>,
         ctor: impl FnOnce(Src) -> Ext,
     ) -> Self
@@ -347,7 +371,7 @@ where
             base: BaseRuleContextInner::copy_from(node.base, ctor),
             start: node.start,
             stop: node.stop,
-            exception: Cell::new(None),
+            exception: (),
             children: node.children,
         }
     }
@@ -384,11 +408,11 @@ where
         self.base.set_parent(parent);
     }
 
-    pub fn set_exception(&self, e: ANTLRError, arena: &'arena Arena) {
+    pub fn set_exception(&self, _e: ANTLRError, _arena: &'arena Arena) {
         // alloc returns &mut T from the bump arena; converting to NonNull is
         // always non-null and the allocation lives for 'arena.
-        let ptr = NonNull::from(arena.alloc_payload(e));
-        self.exception.set(Some(ptr));
+        // let ptr = NonNull::from(arena.alloc_payload(e));
+        // self.exception.set(Some(ptr));
     }
 
     pub fn set_invoking_state(&mut self, t: i32) {
@@ -400,11 +424,25 @@ where
     }
 
     pub fn set_start(&mut self, t: Option<&'arena dyn Token>) {
-        self.start = t.unwrap_or_else(|| token_factory::invalid());
+        if let Some(t) = t {
+            let (ptr, vtable) =
+                unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
+            self.set_token_vtable(vtable as usize);
+            self.start = ptr;
+        } else {
+            self.start = std::ptr::null();
+        }
     }
 
     pub fn set_stop(&mut self, t: Option<&'arena dyn Token>) {
-        self.stop = t.unwrap_or_else(|| token_factory::invalid());
+        if let Some(t) = t {
+            let (ptr, vtable) =
+                unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
+            self.set_token_vtable(vtable as usize);
+            self.stop = ptr;
+        } else {
+            self.stop = std::ptr::null();
+        }
     }
 
     pub fn remove_last_child(&mut self) {
@@ -497,5 +535,15 @@ where
 
         result.push(']');
         result
+    }
+
+    fn get_token_vtable(&self) -> usize {
+        let node_ptr = self.base.get_self_ref() as *const usize;
+        unsafe { std::ptr::read(node_ptr.add(2)) }
+    }
+
+    fn set_token_vtable(&mut self, vtable: usize) {
+        let node_ptr = self.base.get_self_ref() as *const usize as *mut usize;
+        unsafe { std::ptr::write(node_ptr.add(2), vtable) }
     }
 }

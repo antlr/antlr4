@@ -1023,7 +1023,7 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
 		 }>
 		 <struct.ctorAttrs:{a | _init_<a.escapedName> = <a.escapedName>;
 		 }>
-		arena.alloc_context(<if(struct.provideCopyFrom)><struct.escapedName>All::Error(<endif>
+		arena.alloc_context( unsafe { <if(struct.provideCopyFrom)><struct.escapedName>All::Error(<endif>
         <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::new(arena, parent, invoking_state, <struct.escapedName>Ext {
 			<!<attrs:{a | <a.escapedName>:None,}>!>
 				<struct.tokenDecls:{a | <a.escapedName>: None, }>
@@ -1034,7 +1034,7 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
 				<struct.ruleContextListDecls:{a | <a.escapedName>: Vec::new(), }>
 				ph: PhantomData
 			}<if(struct.provideCopyFrom)>)<endif>,
-		))
+		)})
 	}
 }
 
@@ -1130,9 +1130,9 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
             panic!("invalid node type for copy_from!");
         };
         let tmp = unsafe { std::ptr::read(src) };
-        *src = <currentRule.name; format="cap">ContextAll::<struct.escapedName>(
+        *src = <currentRule.name; format="cap">ContextAll::<struct.escapedName>( unsafe { 
             <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>::copy_from(tmp.into_base_ext(), |ext_src| Self::new(ext_src))
-        );
+        });
         src.into()
 	}
 }
