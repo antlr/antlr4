@@ -1,8 +1,7 @@
 use std::fmt::Debug;
-use std::sync::OnceLock;
 
 use crate::atn_state::ATNStateRef;
-use crate::interval_set::IntervalSet;
+use crate::interval_set::{Interval, IntervalSet};
 use crate::lexer::{LEXER_MAX_CHAR_VALUE, LEXER_MIN_CHAR_VALUE};
 use crate::semantic_context::SemanticContext;
 
@@ -145,16 +144,14 @@ pub trait ConcreteTransition {
 #[derive(Debug)]
 pub struct AtomTransition {
     pub target: ATNStateRef,
-    pub label: i32,
-    label_set: OnceLock<IntervalSet>,
+    label: Interval,
 }
 
 impl AtomTransition {
     pub fn new(target: ATNStateRef, label: i32) -> Self {
         AtomTransition {
             target,
-            label,
-            label_set: OnceLock::new(),
+            label: Interval::new(label, label),
         }
     }
 
@@ -167,15 +164,11 @@ impl AtomTransition {
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
-        Some(self.label_set.get_or_init(|| {
-            let mut r = IntervalSet::new();
-            r.add_one(self.label);
-            r
-        }))
+        Some(IntervalSet::from_interval(&self.label))
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
-        _symbol == self.label
+        _symbol == self.label.a
     }
 }
 
@@ -276,19 +269,23 @@ impl ConcreteTransition for EpsilonTransition {
 #[derive(Debug)]
 pub struct RangeTransition {
     pub target: ATNStateRef,
-    pub start: i32,
-    pub stop: i32,
-    label_set: OnceLock<IntervalSet>,
+    range: Interval,
 }
 
 impl RangeTransition {
     pub fn new(target: ATNStateRef, start: i32, stop: i32) -> Self {
         RangeTransition {
             target,
-            start,
-            stop,
-            label_set: OnceLock::new(),
+            range: Interval::new(start, stop),
         }
+    }
+
+    pub fn start(&self) -> i32 {
+        self.range.a
+    }
+
+    pub fn stop(&self) -> i32 {
+        self.range.b
     }
 
     fn get_target(&self) -> ATNStateRef {
@@ -299,15 +296,11 @@ impl RangeTransition {
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
-        Some(self.label_set.get_or_init(|| {
-            let mut r = IntervalSet::new();
-            r.add_range(self.start, self.stop);
-            r
-        }))
+        Some(IntervalSet::from_interval(&self.range))
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
-        _symbol >= self.start && _symbol <= self.stop
+        _symbol >= self.start() && _symbol <= self.stop()
     }
 }
 
@@ -372,7 +365,7 @@ impl ConcreteTransition for ActionTransition {
 #[derive(Debug)]
 pub struct SetTransition {
     pub target: ATNStateRef,
-    pub set: IntervalSet,
+    pub set: &'static IntervalSet,
 }
 
 impl SetTransition {
@@ -384,7 +377,7 @@ impl SetTransition {
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
-        Some(&self.set)
+        Some(self.set)
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -413,7 +406,7 @@ impl ConcreteTransition for SetTransition {
 #[derive(Debug)]
 pub struct NotSetTransition {
     pub target: ATNStateRef,
-    pub set: IntervalSet,
+    pub set: &'static IntervalSet,
 }
 
 impl NotSetTransition {
@@ -425,7 +418,7 @@ impl NotSetTransition {
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
-        Some(&self.set)
+        Some(self.set)
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {

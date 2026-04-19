@@ -11,7 +11,7 @@ use crate::interval_set::Interval;
 use crate::parser_rule_context::ParserRuleContext;
 use crate::rule_context::RuleContext;
 use crate::token::Token;
-use crate::{interval_set, token_factory, Arena};
+use crate::{token_factory, Arena};
 
 #[allow(missing_docs)]
 pub trait Tree<'arena>: Sized {
@@ -41,7 +41,7 @@ pub trait ParseTree<'input, 'arena>: Tree<'arena> {
     /// subtree. If this node is a leaf, then the interval represents a single
     /// token and has interval i..i for token index i.
     fn get_source_interval(&self) -> Interval {
-        interval_set::INVALID
+        Interval::invalid()
     }
 
     /// Return combined text of this AST node.

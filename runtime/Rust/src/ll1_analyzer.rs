@@ -6,7 +6,7 @@ use crate::atn::ATN;
 use crate::atn_config::ATNConfig;
 use crate::atn_state::ATNState;
 use crate::atn_state::ATNStateRef;
-use crate::interval_set::IntervalSet;
+use crate::interval_set::IntervalSetBuf;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::PredictionContextRef;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
@@ -29,14 +29,14 @@ impl LL1Analyzer<'_> {
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
         ctx: Option<&'arena Node>,
-    ) -> IntervalSet
+    ) -> IntervalSetBuf
     where
         'input: 'arena,
         Node: RuleNode<'input, 'arena>,
     {
         let arena = bumpalo::Bump::new();
 
-        let mut r = IntervalSet::new();
+        let mut r = IntervalSetBuf::new();
         let look_ctx = ctx.map(|x| PredictionContext::from_rule_context(self.atn, x, &arena));
         let mut looks_busy: HashSet<ATNConfig<'_>, _, &bumpalo::Bump> = HashSet::new_in(&arena);
         let mut called_rule_stack = BitSet::new();
@@ -62,7 +62,7 @@ impl LL1Analyzer<'_> {
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
         ctx: Option<PredictionContextRef<'ephemeral>>,
-        look: &mut IntervalSet,
+        look: &mut IntervalSetBuf,
         look_busy: &mut HashSet<ATNConfig<'ephemeral>, DefaultHashBuilder, &bumpalo::Bump>,
         called_rule_stack: &mut BitSet,
         see_thru_preds: bool,

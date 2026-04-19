@@ -10,6 +10,7 @@ use crate::atn_state::*;
 use crate::atn_type::ATNType;
 use crate::int_stream::EOF;
 use crate::interval_set::IntervalSet;
+use crate::interval_set::IntervalSetBuf;
 use crate::lexer_action::*;
 use crate::transition::Transition;
 use crate::transition::*;
@@ -56,7 +57,11 @@ impl ATNDeserializer {
         self.read_rules(&mut atn, data);
         self.read_modes(&mut atn, data);
 
-        let sets = self.read_sets(&mut atn, data);
+        let sets = self
+            .read_sets(&mut atn, data)
+            .into_iter()
+            .map(|x| x.into_static() as &'static _)
+            .collect::<Vec<_>>();
 
         self.read_edges(&mut atn, data, &sets);
         self.read_decisions(&mut atn, data);
@@ -207,13 +212,13 @@ impl ATNDeserializer {
         }
     }
 
-    fn read_sets(&self, _atn: &mut ATN, data: &mut Iter<i32>) -> Vec<IntervalSet> {
+    fn read_sets(&self, _atn: &mut ATN, data: &mut Iter<i32>) -> Vec<IntervalSetBuf> {
         let nsets = *data.next().unwrap();
         let mut sets = Vec::new();
         for _i in 0..nsets {
             let intervals = *data.next().unwrap();
 
-            let mut set = IntervalSet::new();
+            let mut set = IntervalSetBuf::new();
 
             // check if contains eof
             if *data.next().unwrap() != 0 {
@@ -229,7 +234,7 @@ impl ATNDeserializer {
         sets
     }
 
-    fn read_edges(&self, atn: &mut ATN, data: &mut Iter<i32>, sets: &[IntervalSet]) {
+    fn read_edges(&self, atn: &mut ATN, data: &mut Iter<i32>, sets: &[&'static IntervalSet]) {
         let nedges = *data.next().unwrap();
 
         for _i in 0..nedges {
@@ -417,7 +422,7 @@ impl ATNDeserializer {
         arg1: i32,
         arg2: i32,
         arg3: i32,
-        sets: &[IntervalSet],
+        sets: &[&'static IntervalSet],
     ) -> Transition {
         //        //        let target = atn.states.get
         //        let mut base = BaseTransition {
@@ -473,12 +478,12 @@ impl ATNDeserializer {
             .into(),
             TRANSITION_SET => SetTransition {
                 target,
-                set: sets[arg1 as usize].clone(),
+                set: sets[arg1 as usize],
             }
             .into(),
             TRANSITION_NOTSET => NotSetTransition {
                 target,
-                set: sets[arg1 as usize].clone(),
+                set: sets[arg1 as usize],
             }
             .into(),
             TRANSITION_WILDCARD => WildcardTransition { target }.into(),

@@ -83,16 +83,16 @@ impl ATNState {
         }
     }
 
-    pub fn get_next_tokens_within_rule(&self) -> &OnceLock<IntervalSet> {
+    fn next_tokens_within_rule(&self) -> &OnceLock<&'static IntervalSet> {
         match self {
-            ATNState::RuleStart(s) => s.get_next_tokens_within_rule(),
-            ATNState::RuleStop(s) => s.get_next_tokens_within_rule(),
-            ATNState::BlockEnd(s) => s.get_next_tokens_within_rule(),
-            ATNState::LoopEnd(s) => s.get_next_tokens_within_rule(),
-            ATNState::StarLoopback(s) => s.get_next_tokens_within_rule(),
-            ATNState::Basic(s) => s.get_next_tokens_within_rule(),
-            ATNState::Decision(s) => s.get_next_tokens_within_rule(),
-            ATNState::Invalid(s) => s.get_next_tokens_within_rule(),
+            ATNState::RuleStart(s) => &s.next_tokens_within_rule,
+            ATNState::RuleStop(s) => &s.next_tokens_within_rule,
+            ATNState::BlockEnd(s) => &s.next_tokens_within_rule,
+            ATNState::LoopEnd(s) => &s.next_tokens_within_rule,
+            ATNState::StarLoopback(s) => &s.next_tokens_within_rule,
+            ATNState::Basic(s) => &s.next_tokens_within_rule,
+            ATNState::Decision(s) => &s.next_tokens_within_rule,
+            ATNState::Invalid(s) => &s.next_tokens_within_rule,
         }
     }
 
@@ -161,7 +161,7 @@ impl Default for ATNState {
 
 #[derive(Debug)]
 pub struct BaseATNState {
-    next_tokens_within_rule: OnceLock<IntervalSet>,
+    next_tokens_within_rule: OnceLock<&'static IntervalSet>,
 
     epsilon_only_transitions: bool,
 
@@ -193,10 +193,6 @@ impl BaseATNState {
     }
     pub fn get_rule_index(&self) -> i32 {
         self.rule_index
-    }
-
-    pub fn get_next_tokens_within_rule(&self) -> &OnceLock<IntervalSet> {
-        &self.next_tokens_within_rule
     }
 
     pub fn get_state_type_id(&self) -> i32 {
@@ -499,6 +495,13 @@ impl ATNStateRef {
 
     pub fn as_usize(&self) -> usize {
         self.0.as_ptr() as usize
+    }
+
+    pub fn get_next_tokens_within_rule(&self, atn: &crate::atn::ATN) -> &'static IntervalSet {
+        self.next_tokens_within_rule().get_or_init(|| {
+            atn.next_tokens_in_ctx::<crate::rule_context::EmptyRuleNode>(*self, None)
+                .into_static()
+        })
     }
 }
 

@@ -6,6 +6,7 @@ use crate::rule_context::states_stack;
 use crate::token::{OwningToken, Token};
 use crate::token_factory::TokenFactory;
 use crate::transition::Transition;
+use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
 use std::fmt::Formatter;
@@ -307,7 +308,10 @@ pub struct BaseRecognitionError {
 
 impl BaseRecognitionError {
     /// Returns tokens that were expected by parser in error place
-    pub fn get_expected_tokens<'input, 'arena, TF, P>(&self, recognizer: &P) -> IntervalSet
+    pub fn get_expected_tokens<'a, 'input, 'arena, TF, P>(
+        &'a self,
+        recognizer: &P,
+    ) -> Cow<'a, IntervalSet>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,

@@ -1,5 +1,5 @@
 //! Error handling and recovery
-use std::borrow::Borrow;
+use std::borrow::{Borrow, Cow};
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -13,7 +13,7 @@ use crate::dfa::ScopeExt;
 use crate::errors::{
     ANTLRError, ANTLRErrorKind, FailedPredicateError, InputMisMatchError, NoViableAltError,
 };
-use crate::interval_set::IntervalSet;
+use crate::interval_set::{IntervalSet, IntervalSetBuf};
 use crate::parser::Parser;
 use crate::rule_context::RuleContext as _;
 use crate::token::{Token, TOKEN_DEFAULT_CHANNEL, TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE};
@@ -99,7 +99,7 @@ where
 {
     error_recovery_mode: bool,
     last_error_index: isize,
-    last_error_states: Option<IntervalSet>,
+    last_error_states: Option<IntervalSetBuf>,
     next_tokens_state: i32,
     next_tokens_ctx: Option<&'arena P::Node>,
     pd: PhantomData<(TF, P)>,
@@ -279,7 +279,7 @@ where
         // .modify_with(|it| it.text = token_text)
     }
 
-    fn get_expected_tokens(&self, recognizer: &P) -> IntervalSet {
+    fn get_expected_tokens<'r>(&self, recognizer: &'r P) -> Cow<'r, IntervalSet> {
         recognizer.get_expected_tokens()
     }
 
@@ -292,10 +292,10 @@ where
         format!("'{}'", escape_whitespaces(s, false))
     }
 
-    fn get_error_recovery_set(&self, recognizer: &P) -> IntervalSet {
+    fn get_error_recovery_set(&self, recognizer: &P) -> IntervalSetBuf {
         let atn = recognizer.get_interpreter().atn();
         let mut ctx = Some(recognizer.get_current_context());
-        let mut recover_set = IntervalSet::new();
+        let mut recover_set = IntervalSetBuf::new();
         while let Some(c) = ctx {
             if c.get_invoking_state() < 0 {
                 break;
@@ -372,7 +372,7 @@ where
 
         self.last_error_index = recognizer.get_input_stream_mut().index();
         self.last_error_states
-            .get_or_insert(IntervalSet::new())
+            .get_or_insert(IntervalSetBuf::new())
             .apply(|x| x.add_one(recognizer.get_state()));
         let follow_set = self.get_error_recovery_set(recognizer);
         self.consume_until(recognizer, &follow_set)?;
@@ -417,7 +417,7 @@ where
             }
             ATNSTATE_PLUS_LOOP_BACK | ATNSTATE_STAR_LOOP_BACK => {
                 self.report_unwanted_token(recognizer);
-                let mut expecting = recognizer.get_expected_tokens();
+                let mut expecting = recognizer.get_expected_tokens().into_owned();
                 expecting.add_set(&self.get_error_recovery_set(recognizer));
                 self.consume_until(recognizer, &expecting)?;
             }

@@ -1,14 +1,14 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::pin::Pin;
 
 use crate::atn_state::ATNState;
 use crate::atn_state::ATNStateRef;
 use crate::atn_type::ATNType;
-use crate::dfa::ScopeExt;
 use crate::interval_set::IntervalSet;
+use crate::interval_set::IntervalSetBuf;
 use crate::lexer_action::LexerAction;
 use crate::ll1_analyzer::LL1Analyzer;
-use crate::rule_context::EmptyRuleNode;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON};
 use crate::transition::RuleTransition;
 use crate::tree::RuleNode;
@@ -73,11 +73,8 @@ impl ATN {
     ///Compute the set of valid tokens that can occur starting in `s` and
     ///staying in same rule. `Token::EPSILON` is in set if we reach end of
     ///rule.
-    pub fn next_tokens<'a>(&self, s: &'a ATNStateRef) -> &'a IntervalSet {
-        s.get_next_tokens_within_rule().get_or_init(|| {
-            self.next_tokens_in_ctx::<EmptyRuleNode>(*s, None)
-                .modify_with(|r| r.read_only = true)
-        })
+    pub fn next_tokens<'a>(&'a self, s: &ATNStateRef) -> &'a IntervalSet {
+        s.get_next_tokens_within_rule(self)
     }
 
     /// Compute the set of valid tokens that can occur starting in state `s`.
@@ -88,7 +85,7 @@ impl ATN {
         &self,
         s: ATNStateRef,
         ctx: Option<&'arena Node>,
-    ) -> IntervalSet
+    ) -> IntervalSetBuf
     where
         'input: 'arena,
         Node: RuleNode<'input, 'arena>,
@@ -167,17 +164,17 @@ impl ATN {
     /// specified state in the specified context.
     /// Panics if the ATN does not contain a state with
     /// number {@code stateNumber}
-    pub fn get_expected_tokens(
-        &self,
+    pub fn get_expected_tokens<'a>(
+        &'a self,
         state_number: i32,
         states_stack: impl Iterator<Item = i32>, // _ctx: &Rc<Ctx::Type>,
-    ) -> IntervalSet {
+    ) -> Cow<'a, IntervalSet> {
         let s = self.make_state_ref(state_number);
         let mut following = self.next_tokens(&s);
         if !following.contains(TOKEN_EPSILON) {
-            return following.clone();
+            return Cow::Borrowed(following);
         }
-        let mut expected = IntervalSet::new();
+        let mut expected = IntervalSetBuf::new();
         expected.add_set(following);
         expected.remove_one(TOKEN_EPSILON);
         // let mut ctx = Some(Rc::clone(_ctx));
@@ -199,6 +196,6 @@ impl ATN {
         if following.contains(TOKEN_EPSILON) {
             expected.add_one(TOKEN_EOF);
         }
-        expected
+        Cow::Owned(expected)
     }
 }

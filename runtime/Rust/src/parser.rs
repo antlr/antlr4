@@ -1,5 +1,5 @@
 //! Base parser implementation
-use std::borrow::Borrow;
+use std::borrow::{Borrow, Cow};
 use std::cell::Cell;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -53,7 +53,7 @@ where
     fn get_input_stream_mut(&mut self) -> &mut dyn TokenStream<'input, 'arena, TF>;
     fn get_input_stream(&self) -> &dyn TokenStream<'input, 'arena, TF>;
     fn get_current_token(&self) -> &'arena TF::Tok;
-    fn get_expected_tokens(&self) -> IntervalSet;
+    fn get_expected_tokens<'a>(&'a self) -> Cow<'a, IntervalSet>;
 
     fn add_error_listener(
         &mut self,
@@ -297,7 +297,7 @@ where
         self.input.get(self.input.index())
     }
 
-    fn get_expected_tokens(&self) -> IntervalSet {
+    fn get_expected_tokens<'a>(&'a self) -> Cow<'a, IntervalSet> {
         let states_stack = states_stack(self.ctx().unwrap());
         self.interp
             .atn()
