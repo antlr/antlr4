@@ -6,7 +6,7 @@ use crate::atn::ATN;
 use crate::atn_config::LexerATNConfig;
 use crate::atn_config_set::{LexerATNConfigSet, MutableLexerATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
-use crate::atn_state::{ATNState, ATNStateRef};
+use crate::atn_state::{ATNState, ATNStateRef, ATNStateType};
 use crate::char_stream::CharStream;
 use crate::dfa::{DFAState, ProposedDFAState, DFA};
 use crate::errors::ANTLRError;
@@ -441,7 +441,7 @@ impl<'sim> LexerATNSimulator<'sim> {
         let state = config.get_state();
         //        println!("closure called on state {} {:?}", state.get_state_number(), state.get_state_type());
 
-        if let ATNState::RuleStop(_) = *state {
+        if state.state_type() == ATNStateType::RuleStop {
             //            println!("reached rulestopstate {}",state.get_state_number());
             if config.get_context().map(|x| x.has_empty_path()) != Some(false) {
                 if config.get_context().map(|x| x.is_empty()) != Some(false) {

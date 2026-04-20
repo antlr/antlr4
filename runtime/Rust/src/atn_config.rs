@@ -2,7 +2,7 @@ use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
 use crate::atn_config_set::{ConfigSet, LexerATNConfigSet};
-use crate::atn_state::{ATNState, ATNStateRef, DecisionState};
+use crate::atn_state::{ATNStateRef, DecisionState};
 use crate::dfa::DFAStateStore;
 use crate::lexer_action_executor::LexerActionExecutor;
 use crate::prediction_context::PredictionContextRef;
@@ -225,8 +225,8 @@ impl<'ephemeral> LexerATNConfig<'ephemeral> {
     pub fn with_state(self, state: ATNStateRef) -> Self {
         let passed_through_non_greedy_decision = self.has_passed_through_non_greedy_decision()
             || matches!(
-                *state,
-                ATNState::Decision(DecisionState {
+                state.try_as(),
+                Some(DecisionState {
                     nongreedy: true,
                     ..
                 })

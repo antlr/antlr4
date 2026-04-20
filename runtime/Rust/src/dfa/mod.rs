@@ -13,7 +13,7 @@ use crate::atn_config_set::{
     ATNConfigSet, ConfigSet, LexerATNConfigSet, MutableConfigSet, MutableLexerATNConfigSet,
 };
 use crate::atn_simulator::IATNSimulator;
-use crate::atn_state::{ATNDecisionState, ATNState, ATNStateRef, DecisionState};
+use crate::atn_state::{ATNDecisionState, ATNStateRef, ATNStateType, DecisionState};
 use crate::dfa::dfa_state::{LexerDFAState, ParserDFAState};
 use crate::lexer_action::{LexerAction, LexerIndexedCustomAction};
 use crate::lexer_action_executor::LexerActionExecutor;
@@ -347,7 +347,7 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
         let rule_index = state
             .configs()
             .get_items()
-            .find(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
+            .find(|c| c.get_state().state_type() == ATNStateType::RuleStop)
             .map(|c| {
                 let rule_index = c.get_state().get_rule_index();
                 (
@@ -471,8 +471,8 @@ impl<'sim> DFA<'sim, LexerATNConfigSet<'sim>> {
 
 fn is_precedence_atn_state(atn_start_state: ATNStateRef) -> bool {
     matches!(
-        *atn_start_state,
-        ATNState::Decision(DecisionState {
+        atn_start_state.try_as(),
+        Some(DecisionState {
             state: ATNDecisionState::StarLoopEntry {
                 is_precedence: true,
                 ..

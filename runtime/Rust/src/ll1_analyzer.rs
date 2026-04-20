@@ -4,8 +4,8 @@ use hashbrown::HashSet;
 
 use crate::atn::ATN;
 use crate::atn_config::ATNConfig;
-use crate::atn_state::ATNState;
 use crate::atn_state::ATNStateRef;
+use crate::atn_state::ATNStateType;
 use crate::interval_set::IntervalSetBuf;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::PredictionContextRef;
@@ -87,7 +87,7 @@ impl LL1Analyzer<'_> {
             }
         }
 
-        if let ATNState::RuleStop(_) = *s {
+        if s.state_type() == ATNStateType::RuleStop {
             match ctx {
                 None => {
                     look.add_one(TOKEN_EPSILON);

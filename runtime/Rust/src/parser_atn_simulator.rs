@@ -13,7 +13,7 @@ use crate::atn_config::ATNConfig;
 use crate::atn_config_set::{ATNConfigSet, MutableATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
-    ATNDecisionState, ATNState, ATNStateRef, DecisionState, ATNSTATE_BLOCK_END,
+    ATNDecisionState, ATNState, ATNStateRef, ATNStateType, DecisionState, ATNSTATE_BLOCK_END,
 };
 use crate::dfa::{DFAState, PredPrediction, ProposedDFAState, ScopeExt, DFA};
 use crate::errors::ANTLRError;
@@ -550,7 +550,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         for c in closure {
             let state = c.get_state();
-            if let ATNState::RuleStop(_) = *state {
+            if state.state_type() == ATNStateType::RuleStop {
                 assert!(c.get_context().unwrap().is_empty());
                 if full_ctx || t == TOKEN_EOF {
                     skipped_stop_states.push(c);
@@ -622,13 +622,13 @@ impl<'sim> ParserATNSimulator<'sim> {
     fn has_config_in_rule_stop_state(configs: &MutableATNConfigSet) -> bool {
         configs
             .get_items()
-            .any(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
+            .any(|c| c.get_state().state_type() == ATNStateType::RuleStop)
     }
 
     fn all_configs_in_rule_stop_state(configs: &MutableATNConfigSet) -> bool {
         configs
             .get_items()
-            .all(|c| matches!(*c.get_state(), ATNState::RuleStop(_)))
+            .all(|c| c.get_state().state_type() == ATNStateType::RuleStop)
     }
 
     fn remove_all_configs_not_in_rule_stop_state<'a>(
@@ -646,7 +646,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         let mut result = MutableATNConfigSet::new(merge_cache.scratch, configs.full_context());
         for c in configs.into_iter() {
             let state = c.get_state();
-            if matches!(*state, ATNState::RuleStop(_)) {
+            if state.state_type() == ATNStateType::RuleStop {
                 result.add_cached(c, merge_cache);
                 continue;
             }
@@ -909,7 +909,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         let mut min_alt = i32::MAX;
         for c in configs.get_items() {
             let has_empty_path = c.get_context().map(|x| x.has_empty_path()) == Some(true);
-            let is_stop = matches!(*c.get_state(), ATNState::RuleStop(_));
+            let is_stop = c.get_state().state_type() == ATNStateType::RuleStop;
             if c.get_reaches_into_outer_context() > 0 || (is_stop && has_empty_path) {
                 min_alt = min_alt.min(c.get_alt());
             }
@@ -1022,7 +1022,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         P: Parser<'input, 'arena, TF>,
     {
         //        println!("closure({:?})",config);
-        if matches!(*config.get_state(), ATNState::RuleStop(_)) {
+        if config.get_state().state_type() == ATNStateType::RuleStop {
             if !config.get_context().unwrap().is_empty() {
                 config.get_context().unwrap().run(|temp| {
                     if temp.get_return_state(temp.length() - 1) == ATNStateRef::invalid() {
@@ -1131,7 +1131,7 @@ impl<'sim> ParserATNSimulator<'sim> {
             );
             if let Some(mut c) = c {
                 let mut new_depth = depth;
-                if matches!(*config.get_state(), ATNState::RuleStop(_)) {
+                if config.get_state().state_type() == ATNStateType::RuleStop {
                     assert!(!full_ctx);
 
                     let dfa = local.dfa_ref;
@@ -1184,10 +1184,10 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         let state = _config.get_state();
 
-        if let ATNState::Decision(DecisionState {
+        if let Some(DecisionState {
             state: ATNDecisionState::StarLoopEntry { is_precedence, .. },
             ..
-        }) = *state
+        }) = state.try_as()
         {
             if !is_precedence
                 || _config.get_context().unwrap().is_empty()
@@ -1209,12 +1209,12 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
 
         let decision_start_state = state.get_transitions()[0].get_target();
-        let block_end_state = if let ATNState::Decision(DecisionState {
+        let block_end_state = if let Some(DecisionState {
             state: ATNDecisionState::BlockStartState { end_state, .. },
             ..
-        }) = *decision_start_state
+        }) = decision_start_state.try_as()
         {
-            end_state
+            *end_state
         } else {
             unreachable!("cast error")
         };

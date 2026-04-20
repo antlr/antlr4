@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+use std::mem::ManuallyDrop;
 use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 use std::ptr::NonNull;
@@ -22,15 +23,100 @@ pub(crate) const ATNSTATE_PLUS_LOOP_BACK: i32 = 11;
 pub(crate) const ATNSTATE_LOOP_END: i32 = 12;
 pub(crate) const ATNSTATE_INVALID_STATE_NUMBER: i32 = -1;
 
-pub enum ATNState {
-    RuleStart(RuleStartState),
-    RuleStop(RuleStopState),
-    BlockEnd(BlockEndState),
-    LoopEnd(LoopEndState),
-    StarLoopback(StarLoopbackState),
-    Basic(BasicState),
-    Decision(DecisionState),
-    Invalid(BaseATNState),
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum ATNStateType {
+    RuleStart,
+    RuleStop,
+    BlockEnd,
+    LoopEnd,
+    StarLoopback,
+    Basic,
+    Decision,
+    Invalid,
+}
+
+#[repr(C)]
+pub struct ATNState {
+    state_type: ATNStateType,
+    epsilon_only_transitions: bool,
+    rule_index: i32,
+    state_number: i32,
+    state_type_id: i32,
+    next_tokens_within_rule: OnceLock<&'static IntervalSet>,
+    transitions: Vec<Transition>,
+    ext: ATNStateExt,
+}
+
+pub trait ATNStateExtTrait {
+    fn self_type() -> ATNStateType;
+
+    fn try_cast(state: &ATNState) -> Option<&Self>;
+
+    fn try_cast_mut(state: &mut ATNState) -> Option<&mut Self>;
+}
+
+const EXT_OFFSET: usize = std::mem::offset_of!(ATNState, ext);
+
+macro_rules! impl_deref_for_state {
+    ($state_struct:ident, $state_type:ident, $field:ident) => {
+        impl Deref for $state_struct {
+            type Target = ATNState;
+
+            fn deref(&self) -> &Self::Target {
+                unsafe { &*((self as *const _ as *const u8).sub(EXT_OFFSET) as *const ATNState) }
+            }
+        }
+
+        impl DerefMut for $state_struct {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                unsafe {
+                    &mut *((self as *mut _ as *mut u8).sub(EXT_OFFSET) as *const ATNState
+                        as *mut ATNState)
+                }
+            }
+        }
+
+        impl ATNStateExtTrait for $state_struct {
+            fn self_type() -> ATNStateType {
+                ATNStateType::$state_type
+            }
+
+            fn try_cast(state: &ATNState) -> Option<&Self> {
+                if state.state_type == Self::self_type() {
+                    Some(unsafe { &state.ext.$field })
+                } else {
+                    None
+                }
+            }
+
+            fn try_cast_mut(state: &mut ATNState) -> Option<&mut Self> {
+                if state.state_type == Self::self_type() {
+                    Some(unsafe { &mut state.ext.$field })
+                } else {
+                    None
+                }
+            }
+        }
+    };
+}
+
+impl_deref_for_state!(RuleStartState, RuleStart, rule_start);
+impl_deref_for_state!(RuleStopState, RuleStop, rule_stop);
+impl_deref_for_state!(BlockEndState, BlockEnd, block_end);
+impl_deref_for_state!(LoopEndState, LoopEnd, loop_end);
+impl_deref_for_state!(StarLoopbackState, StarLoopback, star_loopback);
+impl_deref_for_state!(BasicState, Basic, basic);
+impl_deref_for_state!(DecisionState, Decision, decision);
+
+pub union ATNStateExt {
+    rule_start: ManuallyDrop<RuleStartState>,
+    rule_stop: ManuallyDrop<RuleStopState>,
+    block_end: ManuallyDrop<BlockEndState>,
+    loop_end: ManuallyDrop<LoopEndState>,
+    star_loopback: ManuallyDrop<StarLoopbackState>,
+    basic: ManuallyDrop<BasicState>,
+    decision: ManuallyDrop<DecisionState>,
+    invalid: (),
 }
 
 #[doc(hidden)]
@@ -57,142 +143,33 @@ pub enum ATNBlockStart {
 }
 
 impl ATNState {
-    pub fn has_epsilon_only_transitions(&self) -> bool {
-        match self {
-            ATNState::RuleStart(s) => s.has_epsilon_only_transitions(),
-            ATNState::RuleStop(s) => s.has_epsilon_only_transitions(),
-            ATNState::BlockEnd(s) => s.has_epsilon_only_transitions(),
-            ATNState::LoopEnd(s) => s.has_epsilon_only_transitions(),
-            ATNState::StarLoopback(s) => s.has_epsilon_only_transitions(),
-            ATNState::Basic(s) => s.has_epsilon_only_transitions(),
-            ATNState::Decision(s) => s.has_epsilon_only_transitions(),
-            ATNState::Invalid(s) => s.has_epsilon_only_transitions(),
-        }
-    }
-
-    pub fn get_rule_index(&self) -> i32 {
-        match self {
-            ATNState::RuleStart(s) => s.get_rule_index(),
-            ATNState::RuleStop(s) => s.get_rule_index(),
-            ATNState::BlockEnd(s) => s.get_rule_index(),
-            ATNState::LoopEnd(s) => s.get_rule_index(),
-            ATNState::StarLoopback(s) => s.get_rule_index(),
-            ATNState::Basic(s) => s.get_rule_index(),
-            ATNState::Decision(s) => s.get_rule_index(),
-            ATNState::Invalid(s) => s.get_rule_index(),
-        }
-    }
-
-    fn next_tokens_within_rule(&self) -> &OnceLock<&'static IntervalSet> {
-        match self {
-            ATNState::RuleStart(s) => &s.next_tokens_within_rule,
-            ATNState::RuleStop(s) => &s.next_tokens_within_rule,
-            ATNState::BlockEnd(s) => &s.next_tokens_within_rule,
-            ATNState::LoopEnd(s) => &s.next_tokens_within_rule,
-            ATNState::StarLoopback(s) => &s.next_tokens_within_rule,
-            ATNState::Basic(s) => &s.next_tokens_within_rule,
-            ATNState::Decision(s) => &s.next_tokens_within_rule,
-            ATNState::Invalid(s) => &s.next_tokens_within_rule,
-        }
-    }
-
-    pub fn get_state_type_id(&self) -> i32 {
-        match self {
-            ATNState::RuleStart(s) => s.get_state_type_id(),
-            ATNState::RuleStop(s) => s.get_state_type_id(),
-            ATNState::BlockEnd(s) => s.get_state_type_id(),
-            ATNState::LoopEnd(s) => s.get_state_type_id(),
-            ATNState::StarLoopback(s) => s.get_state_type_id(),
-            ATNState::Basic(s) => s.get_state_type_id(),
-            ATNState::Decision(s) => s.get_state_type_id(),
-            ATNState::Invalid(s) => s.get_state_type_id(),
-        }
-    }
-
-    pub fn get_state_number(&self) -> i32 {
-        match self {
-            ATNState::RuleStart(s) => s.get_state_number(),
-            ATNState::RuleStop(s) => s.get_state_number(),
-            ATNState::BlockEnd(s) => s.get_state_number(),
-            ATNState::LoopEnd(s) => s.get_state_number(),
-            ATNState::StarLoopback(s) => s.get_state_number(),
-            ATNState::Basic(s) => s.get_state_number(),
-            ATNState::Decision(s) => s.get_state_number(),
-            ATNState::Invalid(s) => s.get_state_number(),
-        }
-    }
-
-    pub fn get_transitions(&self) -> &Vec<Transition> {
-        match self {
-            ATNState::RuleStart(s) => s.get_transitions(),
-            ATNState::RuleStop(s) => s.get_transitions(),
-            ATNState::BlockEnd(s) => s.get_transitions(),
-            ATNState::LoopEnd(s) => s.get_transitions(),
-            ATNState::StarLoopback(s) => s.get_transitions(),
-            ATNState::Basic(s) => s.get_transitions(),
-            ATNState::Decision(s) => s.get_transitions(),
-            ATNState::Invalid(s) => s.get_transitions(),
-        }
-    }
-
-    pub fn add_transition(&mut self, trans: Transition) {
-        match self {
-            ATNState::RuleStart(s) => s.add_transition(trans),
-            ATNState::RuleStop(s) => s.add_transition(trans),
-            ATNState::BlockEnd(s) => s.add_transition(trans),
-            ATNState::LoopEnd(s) => s.add_transition(trans),
-            ATNState::StarLoopback(s) => s.add_transition(trans),
-            ATNState::Basic(s) => s.add_transition(trans),
-            ATNState::Decision(s) => s.add_transition(trans),
-            ATNState::Invalid(s) => s.add_transition(trans),
-        }
-    }
-}
-
-impl Default for ATNState {
-    fn default() -> Self {
-        ATNState::Invalid(BaseATNState::new(
-            ATNSTATE_INVALID_STATE_NUMBER,
-            -1,
-            ATNSTATE_INVALID_TYPE,
-        ))
-    }
-}
-
-#[derive(Debug)]
-pub struct BaseATNState {
-    next_tokens_within_rule: OnceLock<&'static IntervalSet>,
-
-    epsilon_only_transitions: bool,
-
-    pub rule_index: i32,
-
-    pub state_number: i32,
-
-    pub state_type_id: i32,
-
-    transitions: Vec<Transition>,
-}
-
-impl BaseATNState {
-    pub fn new(state_number: i32, rule_index: i32, state_type_id: i32) -> Self {
-        BaseATNState {
-            next_tokens_within_rule: OnceLock::new(),
+    fn new(base: BaseATNState, state_type: ATNStateType, ext: ATNStateExt) -> Self {
+        ATNState {
+            state_type,
             epsilon_only_transitions: false,
-            rule_index,
-            state_number,
-            state_type_id,
+            rule_index: base.rule_index,
+            state_number: base.state_number,
+            state_type_id: base.state_type_id,
+            next_tokens_within_rule: OnceLock::new(),
             transitions: Vec::new(),
+            ext,
         }
     }
-}
 
-impl BaseATNState {
+    pub fn state_type(&self) -> ATNStateType {
+        self.state_type
+    }
+
     pub fn has_epsilon_only_transitions(&self) -> bool {
         self.epsilon_only_transitions
     }
+
     pub fn get_rule_index(&self) -> i32 {
         self.rule_index
+    }
+
+    fn next_tokens_within_rule(&self) -> &OnceLock<&'static IntervalSet> {
+        &self.next_tokens_within_rule
     }
 
     pub fn get_state_type_id(&self) -> i32 {
@@ -203,7 +180,7 @@ impl BaseATNState {
         self.state_number
     }
 
-    pub fn get_transitions(&self) -> &Vec<Transition> {
+    pub fn get_transitions(&self) -> &[Transition] {
         &self.transitions
     }
 
@@ -234,239 +211,197 @@ impl BaseATNState {
             self.transitions.push(trans);
         }
     }
-}
 
-pub struct RuleStartState {
-    base: BaseATNState,
-    pub stop_state: ATNStateRef,
-    pub is_left_recursive: bool,
-}
+    pub fn try_as<T: ATNStateExtTrait>(&self) -> Option<&T> {
+        T::try_cast(self)
+    }
 
-impl RuleStartState {
-    pub fn new(base: BaseATNState, stop_state: ATNStateRef, is_left_recursive: bool) -> Self {
-        RuleStartState {
-            base,
-            stop_state,
-            is_left_recursive,
+    pub fn try_as_mut<T: ATNStateExtTrait>(&mut self) -> Option<&mut T> {
+        T::try_cast_mut(self)
+    }
+
+    const fn invalid() -> Self {
+        ATNState {
+            state_type: ATNStateType::Invalid,
+            epsilon_only_transitions: false,
+            rule_index: -1,
+            state_number: ATNSTATE_INVALID_STATE_NUMBER,
+            state_type_id: ATNSTATE_INVALID_TYPE,
+            next_tokens_within_rule: OnceLock::new(),
+            transitions: Vec::new(),
+            ext: ATNStateExt { invalid: () },
         }
     }
 }
 
-pub struct RuleStopState {
-    base: BaseATNState,
+impl Default for ATNState {
+    fn default() -> Self {
+        Self::invalid()
+    }
 }
 
+#[derive(Debug)]
+pub struct BaseATNState {
+    pub rule_index: i32,
+    pub state_number: i32,
+    pub state_type_id: i32,
+}
+
+impl BaseATNState {
+    pub fn new(state_number: i32, rule_index: i32, state_type_id: i32) -> Self {
+        BaseATNState {
+            rule_index,
+            state_number,
+            state_type_id,
+        }
+    }
+}
+
+pub struct RuleStartState {
+    pub stop_state: ATNStateRef,
+    pub is_left_recursive: bool,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl RuleStartState {
+    pub fn create(
+        base: BaseATNState,
+        stop_state: ATNStateRef,
+        is_left_recursive: bool,
+    ) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::RuleStart,
+            ATNStateExt {
+                rule_start: ManuallyDrop::new(RuleStartState {
+                    stop_state,
+                    is_left_recursive,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct RuleStopState {}
+
 impl RuleStopState {
-    pub fn new(base: BaseATNState) -> Self {
-        RuleStopState { base }
+    pub fn create(base: BaseATNState) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::RuleStop,
+            ATNStateExt {
+                rule_stop: ManuallyDrop::new(RuleStopState {}),
+            },
+        )
     }
 }
 
 pub struct BlockEndState {
-    base: BaseATNState,
     pub end_state: ATNStateRef,
+
+    _marker: std::marker::PhantomData<()>,
 }
 
 impl BlockEndState {
-    pub fn new(base: BaseATNState, end_state: ATNStateRef) -> Self {
-        BlockEndState { base, end_state }
+    pub fn create(base: BaseATNState, end_state: ATNStateRef) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::BlockEnd,
+            ATNStateExt {
+                block_end: ManuallyDrop::new(BlockEndState {
+                    end_state,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
     }
 }
 
 pub struct LoopEndState {
-    base: BaseATNState,
     pub loop_back_state: ATNStateRef,
+
+    _marker: std::marker::PhantomData<()>,
 }
 
 impl LoopEndState {
-    pub fn new(base: BaseATNState, loop_back_state: ATNStateRef) -> Self {
-        LoopEndState {
+    pub fn create(base: BaseATNState, loop_back_state: ATNStateRef) -> ATNState {
+        ATNState::new(
             base,
-            loop_back_state,
-        }
+            ATNStateType::LoopEnd,
+            ATNStateExt {
+                loop_end: ManuallyDrop::new(LoopEndState {
+                    loop_back_state,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
     }
 }
 
 pub struct StarLoopbackState {
-    base: BaseATNState,
+    _marker: std::marker::PhantomData<()>,
 }
 
 impl StarLoopbackState {
-    pub fn new(base: BaseATNState) -> Self {
-        StarLoopbackState { base }
+    pub fn create(base: BaseATNState) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::StarLoopback,
+            ATNStateExt {
+                star_loopback: ManuallyDrop::new(StarLoopbackState {
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
     }
 }
 
 pub struct BasicState {
-    base: BaseATNState,
+    _marker: std::marker::PhantomData<()>,
 }
 
 impl BasicState {
-    pub fn new(base: BaseATNState) -> Self {
-        BasicState { base }
+    pub fn create(base: BaseATNState) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::Basic,
+            ATNStateExt {
+                basic: ManuallyDrop::new(BasicState {
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
     }
 }
 
 pub struct DecisionState {
-    base: BaseATNState,
     pub decision: i32,
     pub nongreedy: bool,
     pub state: ATNDecisionState,
+    _marker: std::marker::PhantomData<()>,
 }
 
 impl DecisionState {
-    pub fn new(
+    pub fn create(
         base: BaseATNState,
         decision: i32,
         nongreedy: bool,
         state: ATNDecisionState,
-    ) -> Self {
-        DecisionState {
+    ) -> ATNState {
+        ATNState::new(
             base,
-            decision,
-            nongreedy,
-            state,
-        }
-    }
-}
-
-impl Deref for RuleStartState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for RuleStartState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<RuleStartState> for ATNState {
-    fn from(value: RuleStartState) -> Self {
-        ATNState::RuleStart(value)
-    }
-}
-
-impl Deref for RuleStopState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for RuleStopState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<RuleStopState> for ATNState {
-    fn from(value: RuleStopState) -> Self {
-        ATNState::RuleStop(value)
-    }
-}
-
-impl Deref for BlockEndState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for BlockEndState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<BlockEndState> for ATNState {
-    fn from(value: BlockEndState) -> Self {
-        ATNState::BlockEnd(value)
-    }
-}
-
-impl Deref for LoopEndState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for LoopEndState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<LoopEndState> for ATNState {
-    fn from(value: LoopEndState) -> Self {
-        ATNState::LoopEnd(value)
-    }
-}
-
-impl Deref for StarLoopbackState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for StarLoopbackState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<StarLoopbackState> for ATNState {
-    fn from(value: StarLoopbackState) -> Self {
-        ATNState::StarLoopback(value)
-    }
-}
-
-impl Deref for BasicState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for BasicState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<BasicState> for ATNState {
-    fn from(value: BasicState) -> Self {
-        ATNState::Basic(value)
-    }
-}
-
-impl Deref for DecisionState {
-    type Target = BaseATNState;
-
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-impl DerefMut for DecisionState {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.base
-    }
-}
-
-impl From<DecisionState> for ATNState {
-    fn from(value: DecisionState) -> Self {
-        ATNState::Decision(value)
+            ATNStateType::Decision,
+            ATNStateExt {
+                decision: ManuallyDrop::new(DecisionState {
+                    decision,
+                    nongreedy,
+                    state,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
     }
 }
 
@@ -475,14 +410,7 @@ pub struct ATNStateRef(NonNull<ATNState>);
 impl ATNStateRef {
     #[inline]
     pub fn invalid() -> Self {
-        static INVALID_STATE: ATNState = ATNState::Invalid(BaseATNState {
-            next_tokens_within_rule: OnceLock::new(),
-            epsilon_only_transitions: false,
-            rule_index: -1,
-            state_number: ATNSTATE_INVALID_STATE_NUMBER,
-            state_type_id: ATNSTATE_INVALID_TYPE,
-            transitions: Vec::new(),
-        });
+        static INVALID_STATE: ATNState = ATNState::invalid();
 
         ATNStateRef(NonNull::from(&INVALID_STATE))
     }
