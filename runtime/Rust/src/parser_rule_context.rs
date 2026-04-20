@@ -221,10 +221,7 @@ where
         } else {
             let vtable = self.get_token_vtable();
             unsafe {
-                std::mem::transmute::<(*const (), *const ()), &dyn Token>((
-                    self.start,
-                    vtable as *const (),
-                ))
+                std::mem::transmute::<(*const (), *const ()), &dyn Token>((self.start, vtable))
             }
         }
     }
@@ -236,10 +233,7 @@ where
         } else {
             let vtable = self.get_token_vtable();
             unsafe {
-                std::mem::transmute::<(*const (), *const ()), &dyn Token>((
-                    self.stop,
-                    vtable as *const (),
-                ))
+                std::mem::transmute::<(*const (), *const ()), &dyn Token>((self.stop, vtable))
             }
         }
     }

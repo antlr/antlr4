@@ -1,4 +1,6 @@
 use std::fmt::Debug;
+use std::mem::ManuallyDrop;
+use std::ops::{Deref, DerefMut};
 
 use crate::atn_state::ATNStateRef;
 use crate::interval_set::{Interval, IntervalSet};
@@ -31,93 +33,167 @@ pub const TRANSITION_WILDCARD: i32 = 9;
 pub const TRANSITION_PRECEDENCE: i32 = 10;
 
 /// Transition between ATNStates
-#[derive(Debug)]
-pub enum Transition {
-    Atom(AtomTransition),
-    Rule(RuleTransition),
-    Epsilon(EpsilonTransition),
-    Range(RangeTransition),
-    Action(ActionTransition),
-    Set(SetTransition),
-    NotSet(NotSetTransition),
-    Wildcard(WildcardTransition),
-    Predicate(PredicateTransition),
-    PrecedencePredicate(PrecedencePredicateTransition),
+#[derive(Debug, Clone, Copy)]
+pub enum TransitionType {
+    Atom,
+    Rule,
+    Epsilon,
+    Range,
+    Action,
+    Set,
+    NotSet,
+    Wildcard,
+    Predicate,
+    PrecedencePredicate,
+}
+
+#[repr(C)]
+pub struct Transition {
+    transition_type: TransitionType,
+    target: ATNStateRef,
+    payload: TransitionPayload,
+}
+
+const PAYLOAD_OFFSET: usize = std::mem::offset_of!(Transition, payload);
+
+impl Debug for Transition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Transition")
+            .field("type", &self.transition_type)
+            .field("target", &self.target)
+            .finish()
+    }
+}
+
+union TransitionPayload {
+    atom: ManuallyDrop<AtomTransition>,
+    rule: ManuallyDrop<RuleTransition>,
+    epsilon: ManuallyDrop<EpsilonTransition>,
+    range: ManuallyDrop<RangeTransition>,
+    action: ManuallyDrop<ActionTransition>,
+    set: ManuallyDrop<SetTransition>,
+    not_set: ManuallyDrop<NotSetTransition>,
+    wildcard: ManuallyDrop<WildcardTransition>,
+    predicate: ManuallyDrop<PredicateTransition>,
+    precedence_predicate: ManuallyDrop<PrecedencePredicateTransition>,
 }
 
 impl Transition {
+    #[inline]
+    pub fn transition_type(&self) -> TransitionType {
+        self.transition_type
+    }
+
+    #[inline]
     pub fn get_target(&self) -> ATNStateRef {
-        match self {
-            Transition::Atom(t) => t.get_target(),
-            Transition::Rule(t) => t.get_target(),
-            Transition::Epsilon(t) => t.get_target(),
-            Transition::Range(t) => t.get_target(),
-            Transition::Action(t) => t.get_target(),
-            Transition::Set(t) => t.get_target(),
-            Transition::NotSet(t) => t.get_target(),
-            Transition::Wildcard(t) => t.get_target(),
-            Transition::Predicate(t) => t.get_target(),
-            Transition::PrecedencePredicate(t) => t.get_target(),
-        }
+        self.target
     }
 
     pub fn set_target(&mut self, s: ATNStateRef) {
-        match self {
-            Transition::Atom(t) => t.set_target(s),
-            Transition::Rule(t) => t.set_target(s),
-            Transition::Epsilon(t) => t.set_target(s),
-            Transition::Range(t) => t.set_target(s),
-            Transition::Action(t) => t.set_target(s),
-            Transition::Set(t) => t.set_target(s),
-            Transition::NotSet(t) => t.set_target(s),
-            Transition::Wildcard(t) => t.set_target(s),
-            Transition::Predicate(t) => t.set_target(s),
-            Transition::PrecedencePredicate(t) => t.set_target(s),
-        }
+        self.target = s;
     }
 
     pub fn is_epsilon(&self) -> bool {
         matches!(
-            self,
-            Transition::Rule(_)
-                | Transition::Epsilon(_)
-                | Transition::Action(_)
-                | Transition::Predicate(_)
-                | Transition::PrecedencePredicate(_)
+            self.transition_type,
+            TransitionType::Rule
+                | TransitionType::Epsilon
+                | TransitionType::Action
+                | TransitionType::Predicate
+                | TransitionType::PrecedencePredicate
         )
     }
 
     pub fn get_label(&self) -> Option<&IntervalSet> {
         match self {
-            Transition::Atom(t) => t.get_label(),
-            Transition::Range(t) => t.get_label(),
-            Transition::Set(t) => t.get_label(),
-            Transition::NotSet(t) => t.get_label(),
+            Transition {
+                transition_type: TransitionType::Atom,
+                payload,
+                ..
+            } => unsafe { payload.atom.get_label() },
+            Transition {
+                transition_type: TransitionType::Range,
+                payload,
+                ..
+            } => unsafe { payload.range.get_label() },
+            Transition {
+                transition_type: TransitionType::Set,
+                payload,
+                ..
+            } => unsafe { payload.set.get_label() },
+            Transition {
+                transition_type: TransitionType::NotSet,
+                payload,
+                ..
+            } => unsafe { payload.not_set.get_label() },
+
             _ => None,
         }
     }
 
     pub fn matches(&self, symbol: i32, min_vocab_symbol: i32, max_vocab_symbol: i32) -> bool {
-        match self {
-            Transition::Atom(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Rule(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Epsilon(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Range(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Action(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Set(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::NotSet(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Wildcard(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::Predicate(t) => t.matches(symbol, min_vocab_symbol, max_vocab_symbol),
-            Transition::PrecedencePredicate(t) => {
-                t.matches(symbol, min_vocab_symbol, max_vocab_symbol)
-            }
+        match self.transition_type {
+            TransitionType::Atom => unsafe {
+                self.payload
+                    .atom
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Rule => unsafe {
+                self.payload
+                    .rule
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Epsilon => unsafe {
+                self.payload
+                    .epsilon
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Range => unsafe {
+                self.payload
+                    .range
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Action => unsafe {
+                self.payload
+                    .action
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Set => unsafe {
+                self.payload
+                    .set
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::NotSet => unsafe {
+                self.payload
+                    .not_set
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Wildcard => unsafe {
+                self.payload
+                    .wildcard
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::Predicate => unsafe {
+                self.payload
+                    .predicate
+                    .matches(symbol, min_vocab_symbol, max_vocab_symbol)
+            },
+            TransitionType::PrecedencePredicate => unsafe {
+                self.payload.precedence_predicate.matches(
+                    symbol,
+                    min_vocab_symbol,
+                    max_vocab_symbol,
+                )
+            },
         }
     }
 
     pub fn get_predicate(&self) -> Option<SemanticContext<'static>> {
-        match self {
-            Transition::Predicate(t) => t.get_predicate(),
-            Transition::PrecedencePredicate(t) => t.get_predicate(),
+        match self.transition_type {
+            TransitionType::Predicate => unsafe { self.payload.predicate.get_predicate() },
+            TransitionType::PrecedencePredicate => unsafe {
+                self.payload.precedence_predicate.get_predicate()
+            },
             _ => None,
         }
     }
@@ -133,34 +209,59 @@ impl Transition {
     pub fn try_as<T: ConcreteTransition>(&self) -> Option<&T> {
         T::cast_from(self)
     }
+
+    #[inline(always)]
+    fn self_ptr(payload_ptr: *const u8) -> *const Transition {
+        unsafe { payload_ptr.sub(PAYLOAD_OFFSET) as *const Transition }
+    }
 }
 
-pub trait ConcreteTransition {
+pub trait ConcreteTransition: Deref<Target = Transition> {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized;
 }
 
+macro_rules! impl_deref_for_transition {
+    ($struct_name:ident) => {
+        impl Deref for $struct_name {
+            type Target = Transition;
+
+            fn deref(&self) -> &Self::Target {
+                unsafe { &*Transition::self_ptr(self as *const _ as *const u8) }
+            }
+        }
+
+        impl DerefMut for $struct_name {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                unsafe {
+                    &mut *(Transition::self_ptr(self as *const _ as *const u8) as *mut Transition)
+                }
+            }
+        }
+    };
+}
+
 #[derive(Debug)]
 pub struct AtomTransition {
-    pub target: ATNStateRef,
     label: Interval,
 }
 
 impl AtomTransition {
-    pub fn new(target: ATNStateRef, label: i32) -> Self {
-        AtomTransition {
+    pub fn create(target: ATNStateRef, label: i32) -> Transition {
+        Transition {
+            transition_type: TransitionType::Atom,
             target,
-            label: Interval::new(label, label),
+            payload: TransitionPayload {
+                atom: ManuallyDrop::new(AtomTransition {
+                    label: Interval::new(label, label),
+                }),
+            },
         }
     }
 
-    fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn label(&self) -> i32 {
+        self.label.a
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
@@ -168,23 +269,19 @@ impl AtomTransition {
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
-        _symbol == self.label.a
+        _symbol == self.label()
     }
 }
 
-impl From<AtomTransition> for Transition {
-    fn from(t: AtomTransition) -> Self {
-        Transition::Atom(t)
-    }
-}
+impl_deref_for_transition!(AtomTransition);
 
 impl ConcreteTransition for AtomTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Atom(at) => Some(at),
+        match t.transition_type {
+            TransitionType::Atom => Some(unsafe { &t.payload.atom }),
             _ => None,
         }
     }
@@ -192,38 +289,53 @@ impl ConcreteTransition for AtomTransition {
 
 #[derive(Debug)]
 pub struct RuleTransition {
-    pub target: ATNStateRef,
     pub follow_state: ATNStateRef,
-    pub rule_index: i32,
-    pub precedence: i32,
+    rule_index: i32,
+    precedence: i32,
 }
 
 impl RuleTransition {
-    pub fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-    pub fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn create(
+        target: ATNStateRef,
+        follow_state: ATNStateRef,
+        rule_index: i32,
+        precedence: i32,
+    ) -> Transition {
+        Transition {
+            transition_type: TransitionType::Rule,
+            target,
+            payload: TransitionPayload {
+                rule: ManuallyDrop::new(RuleTransition {
+                    follow_state,
+                    rule_index,
+                    precedence,
+                }),
+            },
+        }
     }
 
-    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    pub fn rule_index(&self) -> i32 {
+        self.rule_index
+    }
+
+    pub fn precedence(&self) -> i32 {
+        self.precedence
+    }
+
+    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         unimplemented!()
     }
 }
 
-impl From<RuleTransition> for Transition {
-    fn from(t: RuleTransition) -> Self {
-        Transition::Rule(t)
-    }
-}
+impl_deref_for_transition!(RuleTransition);
 
 impl ConcreteTransition for RuleTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Rule(rt) => Some(rt),
+        match t.transition_type {
+            TransitionType::Rule => Some(unsafe { &t.payload.rule }),
             _ => None,
         }
     }
@@ -231,16 +343,24 @@ impl ConcreteTransition for RuleTransition {
 
 #[derive(Debug)]
 pub struct EpsilonTransition {
-    pub target: ATNStateRef,
-    pub outermost_precedence_return: i32,
+    outermost_precedence_return: i32,
 }
 
 impl EpsilonTransition {
-    fn get_target(&self) -> ATNStateRef {
-        self.target
+    pub fn create(target: ATNStateRef, outermost_precedence_return: i32) -> Transition {
+        Transition {
+            transition_type: TransitionType::Epsilon,
+            target,
+            payload: TransitionPayload {
+                epsilon: ManuallyDrop::new(EpsilonTransition {
+                    outermost_precedence_return,
+                }),
+            },
+        }
     }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+
+    pub fn outermost_precedence_return(&self) -> i32 {
+        self.outermost_precedence_return
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -248,19 +368,15 @@ impl EpsilonTransition {
     }
 }
 
-impl From<EpsilonTransition> for Transition {
-    fn from(t: EpsilonTransition) -> Self {
-        Transition::Epsilon(t)
-    }
-}
+impl_deref_for_transition!(EpsilonTransition);
 
 impl ConcreteTransition for EpsilonTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Epsilon(et) => Some(et),
+        match t.transition_type {
+            TransitionType::Epsilon => Some(unsafe { &t.payload.epsilon }),
             _ => None,
         }
     }
@@ -268,15 +384,19 @@ impl ConcreteTransition for EpsilonTransition {
 
 #[derive(Debug)]
 pub struct RangeTransition {
-    pub target: ATNStateRef,
     range: Interval,
 }
 
 impl RangeTransition {
-    pub fn new(target: ATNStateRef, start: i32, stop: i32) -> Self {
-        RangeTransition {
+    pub fn create(target: ATNStateRef, start: i32, stop: i32) -> Transition {
+        Transition {
+            transition_type: TransitionType::Range,
             target,
-            range: Interval::new(start, stop),
+            payload: TransitionPayload {
+                range: ManuallyDrop::new(RangeTransition {
+                    range: Interval::new(start, stop),
+                }),
+            },
         }
     }
 
@@ -288,13 +408,6 @@ impl RangeTransition {
         self.range.b
     }
 
-    fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
-    }
-
     fn get_label(&self) -> Option<&IntervalSet> {
         Some(IntervalSet::from_interval(&self.range))
     }
@@ -304,19 +417,15 @@ impl RangeTransition {
     }
 }
 
-impl From<RangeTransition> for Transition {
-    fn from(t: RangeTransition) -> Self {
-        Transition::Range(t)
-    }
-}
+impl_deref_for_transition!(RangeTransition);
 
 impl ConcreteTransition for RangeTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Range(rt) => Some(rt),
+        match t.transition_type {
+            TransitionType::Range => Some(unsafe { &t.payload.range }),
             _ => None,
         }
     }
@@ -324,19 +433,44 @@ impl ConcreteTransition for RangeTransition {
 
 #[derive(Debug)]
 pub struct ActionTransition {
-    pub target: ATNStateRef,
     pub is_ctx_dependent: bool,
-    pub rule_index: i32,
-    pub action_index: i32,
-    pub pred_index: i32,
+    rule_index: i32,
+    action_index: i32,
+    pred_index: i32,
 }
 
 impl ActionTransition {
-    fn get_target(&self) -> ATNStateRef {
-        self.target
+    pub fn create(
+        target: ATNStateRef,
+        is_ctx_dependent: bool,
+        rule_index: i32,
+        action_index: i32,
+        pred_index: i32,
+    ) -> Transition {
+        Transition {
+            transition_type: TransitionType::Action,
+            target,
+            payload: TransitionPayload {
+                action: ManuallyDrop::new(ActionTransition {
+                    is_ctx_dependent,
+                    rule_index,
+                    action_index,
+                    pred_index,
+                }),
+            },
+        }
     }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+
+    pub fn rule_index(&self) -> i32 {
+        self.rule_index
+    }
+
+    pub fn action_index(&self) -> i32 {
+        self.action_index
+    }
+
+    pub fn pred_index(&self) -> i32 {
+        self.pred_index
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -344,19 +478,15 @@ impl ActionTransition {
     }
 }
 
-impl From<ActionTransition> for Transition {
-    fn from(t: ActionTransition) -> Self {
-        Transition::Action(t)
-    }
-}
+impl_deref_for_transition!(ActionTransition);
 
 impl ConcreteTransition for ActionTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Action(at) => Some(at),
+        match t.transition_type {
+            TransitionType::Action => Some(unsafe { &t.payload.action }),
             _ => None,
         }
     }
@@ -364,16 +494,18 @@ impl ConcreteTransition for ActionTransition {
 
 #[derive(Debug)]
 pub struct SetTransition {
-    pub target: ATNStateRef,
-    pub set: &'static IntervalSet,
+    set: &'static IntervalSet,
 }
 
 impl SetTransition {
-    fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn create(target: ATNStateRef, set: &'static IntervalSet) -> Transition {
+        Transition {
+            transition_type: TransitionType::Set,
+            target,
+            payload: TransitionPayload {
+                set: ManuallyDrop::new(SetTransition { set }),
+            },
+        }
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
@@ -385,19 +517,15 @@ impl SetTransition {
     }
 }
 
-impl From<SetTransition> for Transition {
-    fn from(t: SetTransition) -> Self {
-        Transition::Set(t)
-    }
-}
+impl_deref_for_transition!(SetTransition);
 
 impl ConcreteTransition for SetTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Set(st) => Some(st),
+        match t.transition_type {
+            TransitionType::Set => Some(unsafe { &t.payload.set }),
             _ => None,
         }
     }
@@ -405,16 +533,18 @@ impl ConcreteTransition for SetTransition {
 
 #[derive(Debug)]
 pub struct NotSetTransition {
-    pub target: ATNStateRef,
-    pub set: &'static IntervalSet,
+    set: &'static IntervalSet,
 }
 
 impl NotSetTransition {
-    fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn create(target: ATNStateRef, set: &'static IntervalSet) -> Transition {
+        Transition {
+            transition_type: TransitionType::NotSet,
+            target,
+            payload: TransitionPayload {
+                not_set: ManuallyDrop::new(NotSetTransition { set }),
+            },
+        }
     }
 
     fn get_label(&self) -> Option<&IntervalSet> {
@@ -426,35 +556,33 @@ impl NotSetTransition {
     }
 }
 
-impl From<NotSetTransition> for Transition {
-    fn from(t: NotSetTransition) -> Self {
-        Transition::NotSet(t)
-    }
-}
+impl_deref_for_transition!(NotSetTransition);
 
 impl ConcreteTransition for NotSetTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::NotSet(nt) => Some(nt),
+        match t.transition_type {
+            TransitionType::NotSet => Some(unsafe { &t.payload.not_set }),
             _ => None,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct WildcardTransition {
-    pub target: ATNStateRef,
-}
+#[non_exhaustive]
+pub struct WildcardTransition {}
 
 impl WildcardTransition {
-    fn get_target(&self) -> ATNStateRef {
-        self.target
-    }
-    fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn create(target: ATNStateRef) -> Transition {
+        Transition {
+            transition_type: TransitionType::Wildcard,
+            target,
+            payload: TransitionPayload {
+                wildcard: ManuallyDrop::new(WildcardTransition {}),
+            },
+        }
     }
 
     fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
@@ -462,19 +590,15 @@ impl WildcardTransition {
     }
 }
 
-impl From<WildcardTransition> for Transition {
-    fn from(t: WildcardTransition) -> Self {
-        Transition::Wildcard(t)
-    }
-}
+impl_deref_for_transition!(WildcardTransition);
 
 impl ConcreteTransition for WildcardTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Wildcard(wt) => Some(wt),
+        match t.transition_type {
+            TransitionType::Wildcard => Some(unsafe { &t.payload.wildcard }),
             _ => None,
         }
     }
@@ -482,22 +606,44 @@ impl ConcreteTransition for WildcardTransition {
 
 #[derive(Debug)]
 pub struct PredicateTransition {
-    pub target: ATNStateRef,
-    pub is_ctx_dependent: bool,
-    pub rule_index: i32,
-    pub pred_index: i32,
+    is_ctx_dependent: bool,
+    rule_index: i32,
+    pred_index: i32,
 }
 
 impl PredicateTransition {
-    pub fn get_target(&self) -> ATNStateRef {
-        self.target
+    pub fn create(
+        target: ATNStateRef,
+        is_ctx_dependent: bool,
+        rule_index: i32,
+        pred_index: i32,
+    ) -> Transition {
+        Transition {
+            transition_type: TransitionType::Predicate,
+            target,
+            payload: TransitionPayload {
+                predicate: ManuallyDrop::new(PredicateTransition {
+                    is_ctx_dependent,
+                    rule_index,
+                    pred_index,
+                }),
+            },
+        }
     }
 
-    pub fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn is_ctx_dependent(&self) -> bool {
+        self.is_ctx_dependent
     }
 
-    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    pub fn rule_index(&self) -> i32 {
+        self.rule_index
+    }
+
+    pub fn pred_index(&self) -> i32 {
+        self.pred_index
+    }
+
+    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
     }
 
@@ -510,19 +656,15 @@ impl PredicateTransition {
     }
 }
 
-impl From<PredicateTransition> for Transition {
-    fn from(t: PredicateTransition) -> Self {
-        Transition::Predicate(t)
-    }
-}
+impl_deref_for_transition!(PredicateTransition);
 
 impl ConcreteTransition for PredicateTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::Predicate(pt) => Some(pt),
+        match t.transition_type {
+            TransitionType::Predicate => Some(unsafe { &t.payload.predicate }),
             _ => None,
         }
     }
@@ -530,20 +672,27 @@ impl ConcreteTransition for PredicateTransition {
 
 #[derive(Debug)]
 pub struct PrecedencePredicateTransition {
-    pub target: ATNStateRef,
-    pub precedence: i32,
+    precedence: i32,
 }
 
 impl PrecedencePredicateTransition {
-    pub fn get_target(&self) -> ATNStateRef {
-        self.target
+    pub fn create(target: ATNStateRef, precedence: i32) -> Transition {
+        Transition {
+            transition_type: TransitionType::PrecedencePredicate,
+            target,
+            payload: TransitionPayload {
+                precedence_predicate: ManuallyDrop::new(PrecedencePredicateTransition {
+                    precedence,
+                }),
+            },
+        }
     }
 
-    pub fn set_target(&mut self, s: ATNStateRef) {
-        self.target = s
+    pub fn precedence(&self) -> i32 {
+        self.precedence
     }
 
-    pub fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
+    fn matches(&self, _symbol: i32, _min_vocab_symbol: i32, _max_vocab_symbol: i32) -> bool {
         false
     }
 
@@ -552,19 +701,15 @@ impl PrecedencePredicateTransition {
     }
 }
 
-impl From<PrecedencePredicateTransition> for Transition {
-    fn from(t: PrecedencePredicateTransition) -> Self {
-        Transition::PrecedencePredicate(t)
-    }
-}
+impl_deref_for_transition!(PrecedencePredicateTransition);
 
 impl ConcreteTransition for PrecedencePredicateTransition {
     fn cast_from(t: &Transition) -> Option<&Self>
     where
         Self: Sized,
     {
-        match t {
-            Transition::PrecedencePredicate(pt) => Some(pt),
+        match t.transition_type {
+            TransitionType::PrecedencePredicate => Some(unsafe { &t.payload.precedence_predicate }),
             _ => None,
         }
     }

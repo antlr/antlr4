@@ -30,8 +30,8 @@ use crate::token::{OwningToken, Token, TOKEN_EOF, TOKEN_EPSILON};
 use crate::token_factory::TokenFactory;
 use crate::token_stream::TokenStream;
 use crate::transition::{
-    ActionTransition, EpsilonTransition, PrecedencePredicateTransition, PredicateTransition,
-    RuleTransition, Transition,
+    ActionTransition, PrecedencePredicateTransition, PredicateTransition, RuleTransition,
+    Transition, TransitionType,
 };
 
 /// ### The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -1118,7 +1118,8 @@ impl<'sim> ParserATNSimulator<'sim> {
                 continue;
             }
 
-            let continue_collecting = !matches!(tr, Transition::Action(_)) && collect_predicates;
+            let continue_collecting =
+                !matches!(tr.transition_type(), TransitionType::Action) && collect_predicates;
             let c = self.get_epsilon_target(
                 &config,
                 tr,
@@ -1136,9 +1137,9 @@ impl<'sim> ParserATNSimulator<'sim> {
                     let dfa = local.dfa_ref;
                     if dfa.is_precedence_dfa() {
                         let outermost_precedence_return = tr
-                            .try_as::<EpsilonTransition>()
+                            .try_as::<crate::transition::EpsilonTransition>()
                             .unwrap()
-                            .outermost_precedence_return;
+                            .outermost_precedence_return();
                         if outermost_precedence_return == dfa.atn_start_state.get_rule_index() {
                             c.set_precedence_filter_suppressed(true);
                         }
@@ -1156,7 +1157,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                         continue;
                     }
 
-                    if matches!(tr, Transition::Rule(_)) && new_depth >= 0 {
+                    if matches!(tr.transition_type(), TransitionType::Rule) && new_depth >= 0 {
                         new_depth += 1
                     }
                 }
@@ -1271,14 +1272,14 @@ impl<'sim> ParserATNSimulator<'sim> {
         TF: TokenFactory<'input, 'arena> + 'arena,
         P: Parser<'input, 'arena, TF>,
     {
-        match t {
-            Transition::Epsilon(_) => Some(config.clone().with_state(t.get_target())),
-            Transition::Rule(_) => Some(self.rule_transition(
+        match t.transition_type() {
+            TransitionType::Epsilon => Some(config.clone().with_state(t.get_target())),
+            TransitionType::Rule => Some(self.rule_transition(
                 config,
                 t.try_as::<RuleTransition>().unwrap(),
                 local.merge_cache,
             )),
-            Transition::Predicate(_) => self.pred_transition(
+            TransitionType::Predicate => self.pred_transition(
                 config,
                 t.try_as::<PredicateTransition>().unwrap(),
                 collect_predicates,
@@ -1286,10 +1287,10 @@ impl<'sim> ParserATNSimulator<'sim> {
                 full_ctx,
                 local,
             ),
-            Transition::Action(_) => {
+            TransitionType::Action => {
                 Some(self.action_transition(config, t.try_as::<ActionTransition>().unwrap()))
             }
-            Transition::PrecedencePredicate(_) => self.precedence_transition(
+            TransitionType::PrecedencePredicate => self.precedence_transition(
                 config,
                 t.try_as::<PrecedencePredicateTransition>().unwrap(),
                 collect_predicates,
@@ -1297,19 +1298,19 @@ impl<'sim> ParserATNSimulator<'sim> {
                 full_ctx,
                 local,
             ),
-            Transition::Atom(_) | Transition::Set(_) | Transition::Range(_) => {
+            TransitionType::Atom | TransitionType::Set | TransitionType::Range => {
                 if treat_eofas_epsilon && t.matches(TOKEN_EOF, 0, 1) {
                     Some(config.clone().with_state(t.get_target()))
                 } else {
                     None
                 }
             }
-            Transition::NotSet(_) | Transition::Wildcard(_) => None,
+            TransitionType::NotSet | TransitionType::Wildcard => None,
         }
     }
 
     fn action_transition<'a>(&self, config: &ATNConfig<'a>, t: &ActionTransition) -> ATNConfig<'a> {
-        config.clone().with_state(t.target)
+        config.clone().with_state(t.get_target())
     }
 
     fn precedence_transition<'input, 'arena, 'scratch, 'cache, TF, P>(
@@ -1338,7 +1339,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                 );
                 local.input().seek(curr_pos);
                 if prec_succeeds {
-                    return Some(config.clone().with_state(pt.target));
+                    return Some(config.clone().with_state(pt.get_target()));
                 }
             } else {
                 let new_sem_ctx = SemanticContext::and(
@@ -1350,12 +1351,12 @@ impl<'sim> ParserATNSimulator<'sim> {
                 return Some(
                     config
                         .clone()
-                        .with_state(pt.target)
+                        .with_state(pt.get_target())
                         .with_semantic_context(local.scratch().alloc(new_sem_ctx)),
                 );
             }
         } else {
-            return Some(config.clone().with_state(pt.target));
+            return Some(config.clone().with_state(pt.get_target()));
         }
 
         None
@@ -1376,7 +1377,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         P: Parser<'input, 'arena, TF>,
     {
         #[allow(clippy::nonminimal_bool)]
-        if collect_predicates && (!pt.is_ctx_dependent || (pt.is_ctx_dependent && in_context)) {
+        if collect_predicates && (!pt.is_ctx_dependent() || (pt.is_ctx_dependent() && in_context)) {
             if full_ctx {
                 let curr_pos = local.input().index();
                 local.input().seek(self.start_index.get());
@@ -1388,7 +1389,7 @@ impl<'sim> ParserATNSimulator<'sim> {
                 );
                 local.input().seek(curr_pos);
                 if prec_succeeds {
-                    return Some(config.clone().with_state(pt.target));
+                    return Some(config.clone().with_state(pt.get_target()));
                 }
             } else {
                 let new_sem_ctx = SemanticContext::and(
@@ -1400,12 +1401,12 @@ impl<'sim> ParserATNSimulator<'sim> {
                 return Some(
                     config
                         .clone()
-                        .with_state(pt.target)
+                        .with_state(pt.get_target())
                         .with_semantic_context(local.scratch().alloc(new_sem_ctx)),
                 );
             }
         } else {
-            return Some(config.clone().with_state(pt.target));
+            return Some(config.clone().with_state(pt.get_target()));
         }
 
         None
@@ -1422,7 +1423,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         let new_ctx = PredictionContext::new_singleton(config.get_context(), t.follow_state);
         config
             .clone()
-            .with_state(t.target)
+            .with_state(t.get_target())
             .with_prediction_context(Some(merge_cache.alloc(new_ctx)))
     }
 

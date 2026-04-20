@@ -18,7 +18,7 @@ use crate::prediction_context::{PredictionContext, PredictionContextCache};
 use crate::token::TOKEN_EOF;
 
 use crate::token_factory::TokenFactory;
-use crate::transition::{ActionTransition, Transition};
+use crate::transition::{Transition, TransitionType};
 use crate::utils::cell_update;
 
 // todo rewrite this to be actually usable
@@ -542,11 +542,14 @@ impl<'sim> LexerATNSimulator<'sim> {
         let mut result = None;
         let target = _trans.get_target();
         //        println!("epsilon target for {:?} is {:?}", _trans, target.get_state_type());
-        match _trans {
-            Transition::Epsilon(_) => {
+        match _trans.transition_type() {
+            TransitionType::Epsilon => {
                 result = Some(_config.clone().with_state(target));
             }
-            Transition::Rule(rt) => {
+            TransitionType::Rule => {
+                let rt = _trans
+                    .try_as::<crate::transition::RuleTransition>()
+                    .unwrap();
                 //println!("rule transition follow state{}", rt.follow_state);
                 let pred_ctx = PredictionContext::new_singleton(
                     Some(_config.get_context().unwrap()),
@@ -559,17 +562,22 @@ impl<'sim> LexerATNSimulator<'sim> {
                         .with_prediction_context(Some(scratch.alloc(pred_ctx))),
                 );
             }
-            Transition::Predicate(tr) => {
+            TransitionType::Predicate => {
+                let tr = _trans
+                    .try_as::<crate::transition::PredicateTransition>()
+                    .unwrap();
                 _configs.set_has_semantic_context(true);
-                if self.evaluate_predicate(tr.rule_index, tr.pred_index, _speculative, lexer) {
+                if self.evaluate_predicate(tr.rule_index(), tr.pred_index(), _speculative, lexer) {
                     result = Some(_config.clone().with_state(target));
                 }
             }
-            Transition::Action(_) => {
+            TransitionType::Action => {
                 //println!("action transition");
                 if _config.get_context().map(|x| x.has_empty_path()) != Some(false) {
-                    let tr = _trans.try_as::<ActionTransition>().unwrap();
-                    let lexer_action = self.atn().lexer_actions[tr.action_index as usize].clone();
+                    let tr = _trans
+                        .try_as::<crate::transition::ActionTransition>()
+                        .unwrap();
+                    let lexer_action = self.atn().lexer_actions[tr.action_index() as usize].clone();
                     //dbg!(&lexer_action);
                     let lexer_action_executor = LexerActionExecutor::new_copy_append(
                         scratch,
@@ -586,7 +594,7 @@ impl<'sim> LexerATNSimulator<'sim> {
                     result = Some(_config.clone().with_state(target));
                 }
             }
-            Transition::Range(_) | Transition::Set(_) | Transition::Atom(_) => {
+            TransitionType::Range | TransitionType::Set | TransitionType::Atom => {
                 if _treat_eofas_epsilon
                     && _trans.matches(EOF, LEXER_MIN_CHAR_VALUE, LEXER_MAX_CHAR_VALUE)
                 {
@@ -594,9 +602,9 @@ impl<'sim> LexerATNSimulator<'sim> {
                     result = Some(_config.clone().with_state(target));
                 }
             }
-            Transition::Wildcard(_) => {}
-            Transition::NotSet(_) => {}
-            Transition::PrecedencePredicate(_) => {
+            TransitionType::Wildcard => {}
+            TransitionType::NotSet => {}
+            TransitionType::PrecedencePredicate => {
                 panic!("precedence predicates are not supposed to be in lexer");
             }
         }

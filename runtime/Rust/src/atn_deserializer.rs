@@ -261,8 +261,8 @@ impl ATNDeserializer {
 
         for i in atn.iter_states() {
             for tr in i.get_transitions() {
-                match tr {
-                    Transition::Rule(tr) => {
+                match tr.try_as::<RuleTransition>() {
+                    Some(tr) => {
                         //                        println!("TRANSITION_RULE");
                         let target = tr.get_target();
 
@@ -272,7 +272,7 @@ impl ATNDeserializer {
                         }) =
                             *atn.rule_to_start_state[target.get_rule_index() as usize]
                         {
-                            if tr.precedence == 0 {
+                            if tr.precedence() == 0 {
                                 target.get_rule_index()
                             } else {
                                 -1
@@ -281,15 +281,13 @@ impl ATNDeserializer {
                             -1
                         };
 
-                        let return_tr = EpsilonTransition {
-                            target: tr.follow_state,
-                            outermost_precedence_return: outermost_prec_return,
-                        };
+                        let return_tr =
+                            EpsilonTransition::create(tr.follow_state, outermost_prec_return);
 
                         unsafe {
                             atn.rule_to_stop_state[target.get_rule_index() as usize]
                                 .as_mut()
-                                .add_transition(return_tr.into());
+                                .add_transition(return_tr);
                         }
                     }
                     _ => continue,
@@ -433,12 +431,8 @@ impl ATNDeserializer {
         //        };
 
         match type_index {
-            TRANSITION_EPSILON => EpsilonTransition {
-                target,
-                outermost_precedence_return: 0,
-            }
-            .into(),
-            TRANSITION_RANGE => RangeTransition::new(
+            TRANSITION_EPSILON => EpsilonTransition::create(target, 0),
+            TRANSITION_RANGE => RangeTransition::create(
                 target,
                 if arg3 != 0 {
                     super::token::TOKEN_EOF
@@ -446,52 +440,16 @@ impl ATNDeserializer {
                     arg1
                 },
                 arg2,
-            )
-            .into(),
-            TRANSITION_RULE => {
-                //                base.set_target(arg1 as usize);
-                RuleTransition {
-                    target: atn.make_state_ref(arg1),
-                    follow_state: target,
-                    rule_index: arg2,
-                    precedence: arg3,
-                }
-            }
-            .into(),
-            TRANSITION_PREDICATE => PredicateTransition {
-                target,
-                is_ctx_dependent: arg3 != 0,
-                rule_index: arg1,
-                pred_index: arg2,
-            }
-            .into(),
-            TRANSITION_ATOM => {
-                AtomTransition::new(target, if arg3 != 0 { EOF } else { arg1 }).into()
-            }
-            TRANSITION_ACTION => ActionTransition {
-                target,
-                is_ctx_dependent: arg3 != 0,
-                rule_index: arg1,
-                action_index: arg2,
-                pred_index: 0,
-            }
-            .into(),
-            TRANSITION_SET => SetTransition {
-                target,
-                set: sets[arg1 as usize],
-            }
-            .into(),
-            TRANSITION_NOTSET => NotSetTransition {
-                target,
-                set: sets[arg1 as usize],
-            }
-            .into(),
-            TRANSITION_WILDCARD => WildcardTransition { target }.into(),
-            TRANSITION_PRECEDENCE => PrecedencePredicateTransition {
-                target,
-                precedence: arg1,
-            }
-            .into(),
+            ),
+            TRANSITION_RULE => RuleTransition::create(atn.make_state_ref(arg1), target, arg2, arg3),
+            TRANSITION_PREDICATE => PredicateTransition::create(target, arg3 != 0, arg1, arg2),
+            TRANSITION_ATOM => AtomTransition::create(target, if arg3 != 0 { EOF } else { arg1 }),
+            TRANSITION_ACTION => ActionTransition::create(target, arg3 != 0, arg1, arg2, 0),
+            TRANSITION_SET => SetTransition::create(target, sets[arg1 as usize]),
+            TRANSITION_NOTSET => NotSetTransition::create(target, sets[arg1 as usize]),
+            TRANSITION_WILDCARD => WildcardTransition::create(target),
+            TRANSITION_PRECEDENCE => PrecedencePredicateTransition::create(target, arg1),
+
             _ => panic!("invalid transition type"),
         }
     }

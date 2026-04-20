@@ -5,7 +5,7 @@ use crate::parser::Parser;
 use crate::rule_context::states_stack;
 use crate::token::{OwningToken, Token};
 use crate::token_factory::TokenFactory;
-use crate::transition::Transition;
+use crate::transition::PredicateTransition;
 use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
@@ -232,8 +232,8 @@ impl ANTLRError {
             .get_transitions()
             .first()
             .unwrap();
-        let (rule_index, _) = if let Transition::Predicate(pr) = tr {
-            (pr.rule_index, pr.pred_index)
+        let (rule_index, _) = if let Some(pr) = tr.try_as::<PredicateTransition>() {
+            (pr.rule_index(), pr.pred_index())
         } else {
             (0, 0)
         };

@@ -10,7 +10,7 @@ use crate::interval_set::IntervalSetBuf;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::PredictionContextRef;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
-use crate::transition::Transition;
+use crate::transition::TransitionType;
 use crate::tree::RuleNode;
 
 pub struct LL1Analyzer<'a> {
@@ -125,8 +125,10 @@ impl LL1Analyzer<'_> {
 
         for tr in s.get_transitions() {
             let target = tr.get_target();
-            match tr {
-                Transition::Rule(rule_tr) => {
+            match tr.transition_type() {
+                TransitionType::Rule => {
+                    let rule_tr = tr.try_as::<crate::transition::RuleTransition>().unwrap();
+
                     if called_rule_stack.contains(target.get_rule_index() as usize) {
                         continue;
                     }
@@ -148,7 +150,7 @@ impl LL1Analyzer<'_> {
                     );
                     called_rule_stack.remove(target.get_rule_index() as usize);
                 }
-                Transition::Predicate(_) | Transition::PrecedencePredicate(_) => {
+                TransitionType::Predicate | TransitionType::PrecedencePredicate => {
                     if see_thru_preds {
                         self.look_work(
                             arena,
@@ -165,7 +167,7 @@ impl LL1Analyzer<'_> {
                         look.add_one(TOKEN_INVALID_TYPE);
                     }
                 }
-                Transition::Wildcard(_) => {
+                TransitionType::Wildcard => {
                     look.add_range(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type)
                 }
                 _ if tr.is_epsilon() => self.look_work(
@@ -179,15 +181,15 @@ impl LL1Analyzer<'_> {
                     see_thru_preds,
                     add_eof,
                 ),
+                TransitionType::NotSet => {
+                    let set = tr.get_label().unwrap();
+                    look.add_set(
+                        &set.complement(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type),
+                    )
+                }
                 _ => {
                     if let Some(set) = tr.get_label() {
-                        if matches!(tr, Transition::NotSet(_)) {
-                            look.add_set(
-                                &set.complement(TOKEN_MIN_USER_TOKEN_TYPE, self.atn.max_token_type),
-                            );
-                        } else {
-                            look.add_set(set)
-                        }
+                        look.add_set(set)
                     }
                 }
             }
