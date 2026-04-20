@@ -427,7 +427,7 @@ where
         if let Some(t) = t {
             let (ptr, vtable) =
                 unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
-            self.set_token_vtable(vtable as usize);
+            self.set_token_vtable(vtable);
             self.start = ptr;
         } else {
             self.start = std::ptr::null();
@@ -438,7 +438,7 @@ where
         if let Some(t) = t {
             let (ptr, vtable) =
                 unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
-            self.set_token_vtable(vtable as usize);
+            self.set_token_vtable(vtable);
             self.stop = ptr;
         } else {
             self.stop = std::ptr::null();
@@ -537,13 +537,13 @@ where
         result
     }
 
-    fn get_token_vtable(&self) -> usize {
+    fn get_token_vtable(&self) -> *const () {
         let node_ptr = self.base.get_self_ref() as *const usize;
-        unsafe { std::ptr::read(node_ptr.add(2)) }
+        unsafe { std::ptr::read(node_ptr.add(2)) as *const () }
     }
 
-    fn set_token_vtable(&mut self, vtable: usize) {
+    fn set_token_vtable(&mut self, vtable: *const ()) {
         let node_ptr = self.base.get_self_ref() as *const usize as *mut usize;
-        unsafe { std::ptr::write(node_ptr.add(2), vtable) }
+        unsafe { std::ptr::write(node_ptr.add(2), vtable as usize) }
     }
 }
