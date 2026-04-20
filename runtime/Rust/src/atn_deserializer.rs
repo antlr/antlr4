@@ -2,8 +2,6 @@ use std::slice::Iter;
 
 use crate::atn::ATN;
 use crate::atn_deserialization_options::ATNDeserializationOptions;
-use crate::atn_state::ATNBlockStart;
-use crate::atn_state::ATNDecisionState;
 use crate::atn_state::ATNState;
 use crate::atn_state::BaseATNState;
 use crate::atn_state::*;
@@ -122,17 +120,11 @@ impl ATNDeserializer {
             let mut state = self.state_factory(state_type, rule_index, i);
 
             match state.state_type() {
-                ATNStateType::Decision => {
-                    if let DecisionState {
-                        state:
-                            ATNDecisionState::BlockStartState {
-                                ref mut end_state, ..
-                            },
-                        ..
-                    } = state.try_as_mut().unwrap()
-                    {
-                        *end_state = atn.make_state_ref(*data.next().unwrap());
-                    }
+                ATNStateType::BasicBlockStart
+                | ATNStateType::StarBlockStart
+                | ATNStateType::PlusBlockStart => {
+                    let end_state = state.get_decision_end_state_mut().unwrap();
+                    *end_state = atn.make_state_ref(*data.next().unwrap());
                 }
                 ATNStateType::LoopEnd => {
                     let LoopEndState {
@@ -151,10 +143,7 @@ impl ATNDeserializer {
         //println!("num_non_greedy {}", num_non_greedy);
         for _ in 0..num_non_greedy {
             let st = *data.next().unwrap();
-            if let Some(DecisionState {
-                ref mut nongreedy, ..
-            }) = atn.get_state_mut(st).try_as_mut()
-            {
+            if let Some(nongreedy) = atn.get_state_mut(st).get_nongreedy_decision_mut() {
                 *nongreedy = true
             }
         }
@@ -344,13 +333,8 @@ impl ATNDeserializer {
         for i in 0..ndecisions {
             let s = atn.make_state_ref(*_data.next().unwrap());
             atn.decision_to_state.push(s);
-            unsafe {
-                if let Some(DecisionState {
-                    ref mut decision, ..
-                }) = s.as_mut().try_as_mut()
-                {
-                    *decision = i
-                }
+            if let Some(decision) = unsafe { s.as_mut() }.get_decision_mut() {
+                *decision = i
             }
         }
     }
@@ -374,11 +358,7 @@ impl ATNDeserializer {
     fn mark_precedence_decisions(&self, _atn: &mut ATN, _data: &mut Iter<i32>) {
         let mut precedence_states = Vec::new();
         for state in _atn.iter_states() {
-            if let Some(DecisionState {
-                state: ATNDecisionState::StarLoopEntry { .. },
-                ..
-            }) = state.try_as()
-            {
+            if let Some(StarLoopEntryState { .. }) = state.try_as() {
                 if let Some(RuleStartState {
                     is_left_recursive: true,
                     ..
@@ -399,12 +379,8 @@ impl ATNDeserializer {
             }
         }
         for st in precedence_states.into_iter() {
-            if let Some(DecisionState {
-                state:
-                    ATNDecisionState::StarLoopEntry {
-                        loop_back_state: _,
-                        ref mut is_precedence,
-                    },
+            if let Some(StarLoopEntryState {
+                ref mut is_precedence,
                 ..
             }) = _atn.get_state_mut(st).try_as_mut()
             {
@@ -469,51 +445,27 @@ impl ATNDeserializer {
             ATNSTATE_INVALID_TYPE => ATNState::default(),
             ATNSTATE_BASIC => BasicState::create(base),
             ATNSTATE_RULE_START => RuleStartState::create(base, ATNStateRef::invalid(), false),
-            ATNSTATE_BLOCK_START => DecisionState::create(
-                base,
-                -1,
-                false,
-                ATNDecisionState::BlockStartState {
-                    end_state: ATNStateRef::invalid(),
-                    en: ATNBlockStart::BasicBlockStart,
-                },
-            ),
-            ATNSTATE_PLUS_BLOCK_START => DecisionState::create(
-                base,
-                -1,
-                false,
-                ATNDecisionState::BlockStartState {
-                    end_state: ATNStateRef::invalid(),
-                    en: ATNBlockStart::PlusBlockStart(ATNStateRef::invalid()),
-                },
-            ),
-            ATNSTATE_STAR_BLOCK_START => DecisionState::create(
-                base,
-                -1,
-                false,
-                ATNDecisionState::BlockStartState {
-                    end_state: ATNStateRef::invalid(),
-                    en: ATNBlockStart::StarBlockStart,
-                },
-            ),
-            ATNSTATE_TOKEN_START => {
-                DecisionState::create(base, -1, false, ATNDecisionState::TokenStartState)
+            ATNSTATE_BLOCK_START => {
+                BasicBlockStartState::create(base, -1, false, ATNStateRef::invalid())
             }
+            ATNSTATE_PLUS_BLOCK_START => PlusBlockStartState::create(
+                base,
+                -1,
+                false,
+                ATNStateRef::invalid(),
+                ATNStateRef::invalid(),
+            ),
+            ATNSTATE_STAR_BLOCK_START => {
+                StarBlockStartState::create(base, -1, false, ATNStateRef::invalid())
+            }
+            ATNSTATE_TOKEN_START => TokenStartState::create(base, -1, false),
             ATNSTATE_RULE_STOP => RuleStopState::create(base),
             ATNSTATE_BLOCK_END => BlockEndState::create(base, ATNStateRef::invalid()),
             ATNSTATE_STAR_LOOP_BACK => StarLoopbackState::create(base),
-            ATNSTATE_STAR_LOOP_ENTRY => DecisionState::create(
-                base,
-                -1,
-                false,
-                ATNDecisionState::StarLoopEntry {
-                    loop_back_state: ATNStateRef::invalid(),
-                    is_precedence: false,
-                },
-            ),
-            ATNSTATE_PLUS_LOOP_BACK => {
-                DecisionState::create(base, -1, false, ATNDecisionState::PlusLoopBack)
+            ATNSTATE_STAR_LOOP_ENTRY => {
+                StarLoopEntryState::create(base, -1, false, ATNStateRef::invalid(), false)
             }
+            ATNSTATE_PLUS_LOOP_BACK => PlusLoopBackState::create(base, -1, false),
             ATNSTATE_LOOP_END => LoopEndState::create(base, ATNStateRef::invalid()),
             t => panic!("invalid ATN state type {}", t),
         }

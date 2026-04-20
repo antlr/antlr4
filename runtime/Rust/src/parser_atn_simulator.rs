@@ -13,7 +13,8 @@ use crate::atn_config::ATNConfig;
 use crate::atn_config_set::{ATNConfigSet, MutableATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
-    ATNDecisionState, ATNState, ATNStateRef, ATNStateType, DecisionState, ATNSTATE_BLOCK_END,
+    ATNState, ATNStateRef, ATNStateType, StarLoopEntryState,
+    ATNSTATE_BLOCK_END,
 };
 use crate::dfa::{DFAState, PredPrediction, ProposedDFAState, ScopeExt, DFA};
 use crate::errors::ANTLRError;
@@ -1184,11 +1185,7 @@ impl<'sim> ParserATNSimulator<'sim> {
 
         let state = _config.get_state();
 
-        if let Some(DecisionState {
-            state: ATNDecisionState::StarLoopEntry { is_precedence, .. },
-            ..
-        }) = state.try_as()
-        {
+        if let Some(StarLoopEntryState { is_precedence, .. }) = state.try_as() {
             if !is_precedence
                 || _config.get_context().unwrap().is_empty()
                 || _config.get_context().unwrap().has_empty_path()
@@ -1209,15 +1206,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
 
         let decision_start_state = state.get_transitions()[0].get_target();
-        let block_end_state = if let Some(DecisionState {
-            state: ATNDecisionState::BlockStartState { end_state, .. },
-            ..
-        }) = decision_start_state.try_as()
-        {
-            *end_state
-        } else {
-            unreachable!("cast error")
-        };
+        let block_end_state = decision_start_state.get_decision_end_state().expect("should be decision state");
 
         for i in 0..ctx_len {
             let return_state = pred_ctx.get_return_state(i);

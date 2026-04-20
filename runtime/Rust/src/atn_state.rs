@@ -31,7 +31,12 @@ pub enum ATNStateType {
     LoopEnd,
     StarLoopback,
     Basic,
-    Decision,
+    StarLoopEntry,
+    TokenStart,
+    PlusLoopBack,
+    BasicBlockStart,
+    StarBlockStart,
+    PlusBlockStart,
     Invalid,
 }
 
@@ -106,7 +111,12 @@ impl_deref_for_state!(BlockEndState, BlockEnd, block_end);
 impl_deref_for_state!(LoopEndState, LoopEnd, loop_end);
 impl_deref_for_state!(StarLoopbackState, StarLoopback, star_loopback);
 impl_deref_for_state!(BasicState, Basic, basic);
-impl_deref_for_state!(DecisionState, Decision, decision);
+impl_deref_for_state!(StarLoopEntryState, StarLoopEntry, star_loop_entry);
+impl_deref_for_state!(TokenStartState, TokenStart, token_start);
+impl_deref_for_state!(PlusLoopBackState, PlusLoopBack, plus_loop_back);
+impl_deref_for_state!(BasicBlockStartState, BasicBlockStart, basic_block_start);
+impl_deref_for_state!(StarBlockStartState, StarBlockStart, star_block_start);
+impl_deref_for_state!(PlusBlockStartState, PlusBlockStart, plus_block_start);
 
 pub union ATNStateExt {
     rule_start: ManuallyDrop<RuleStartState>,
@@ -115,31 +125,14 @@ pub union ATNStateExt {
     loop_end: ManuallyDrop<LoopEndState>,
     star_loopback: ManuallyDrop<StarLoopbackState>,
     basic: ManuallyDrop<BasicState>,
-    decision: ManuallyDrop<DecisionState>,
+    star_loop_entry: ManuallyDrop<StarLoopEntryState>,
+    token_start: ManuallyDrop<TokenStartState>,
+    plus_loop_back: ManuallyDrop<PlusLoopBackState>,
+    basic_block_start: ManuallyDrop<BasicBlockStartState>,
+    star_block_start: ManuallyDrop<StarBlockStartState>,
+    plus_block_start: ManuallyDrop<PlusBlockStartState>,
+
     invalid: (),
-}
-
-#[doc(hidden)]
-#[derive(Eq, PartialEq)]
-pub enum ATNDecisionState {
-    StarLoopEntry {
-        loop_back_state: ATNStateRef,
-        is_precedence: bool,
-    },
-    TokenStartState,
-    PlusLoopBack,
-    BlockStartState {
-        end_state: ATNStateRef,
-        en: ATNBlockStart,
-    },
-}
-
-#[doc(hidden)]
-#[derive(Eq, PartialEq)]
-pub enum ATNBlockStart {
-    BasicBlockStart,
-    StarBlockStart,
-    PlusBlockStart(ATNStateRef),
 }
 
 impl ATNState {
@@ -158,6 +151,108 @@ impl ATNState {
 
     pub fn state_type(&self) -> ATNStateType {
         self.state_type
+    }
+
+    pub fn is_decision_state(&self) -> bool {
+        matches!(
+            self.state_type,
+            ATNStateType::StarLoopEntry
+                | ATNStateType::TokenStart
+                | ATNStateType::PlusLoopBack
+                | ATNStateType::BasicBlockStart
+                | ATNStateType::StarBlockStart
+                | ATNStateType::PlusBlockStart
+        )
+    }
+
+    pub fn is_nongreedy_decision(&self) -> Option<bool> {
+        match self.state_type {
+            ATNStateType::StarLoopEntry => Some(unsafe { self.ext.star_loop_entry.nongreedy }),
+            ATNStateType::TokenStart => Some(unsafe { self.ext.token_start.nongreedy }),
+            ATNStateType::PlusLoopBack => Some(unsafe { self.ext.plus_loop_back.nongreedy }),
+            ATNStateType::BasicBlockStart => Some(unsafe { self.ext.basic_block_start.nongreedy }),
+            ATNStateType::StarBlockStart => Some(unsafe { self.ext.star_block_start.nongreedy }),
+            ATNStateType::PlusBlockStart => Some(unsafe { self.ext.plus_block_start.nongreedy }),
+            _ => None,
+        }
+    }
+
+    pub fn get_nongreedy_decision_mut(&mut self) -> Option<&mut bool> {
+        match self.state_type {
+            ATNStateType::StarLoopEntry => {
+                Some(unsafe { &mut (*self.ext.star_loop_entry).nongreedy })
+            }
+            ATNStateType::TokenStart => Some(unsafe { &mut (*self.ext.token_start).nongreedy }),
+            ATNStateType::PlusLoopBack => {
+                Some(unsafe { &mut (*self.ext.plus_loop_back).nongreedy })
+            }
+            ATNStateType::BasicBlockStart => {
+                Some(unsafe { &mut (*self.ext.basic_block_start).nongreedy })
+            }
+            ATNStateType::StarBlockStart => {
+                Some(unsafe { &mut (*self.ext.star_block_start).nongreedy })
+            }
+            ATNStateType::PlusBlockStart => {
+                Some(unsafe { &mut (*self.ext.plus_block_start).nongreedy })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn get_decision_end_state(&self) -> Option<ATNStateRef> {
+        match self.state_type {
+            ATNStateType::BasicBlockStart => Some(unsafe { self.ext.basic_block_start.end_state }),
+            ATNStateType::StarBlockStart => Some(unsafe { self.ext.star_block_start.end_state }),
+            ATNStateType::PlusBlockStart => Some(unsafe { self.ext.plus_block_start.end_state }),
+            _ => None,
+        }
+    }
+
+    pub fn get_decision_end_state_mut(&mut self) -> Option<&mut ATNStateRef> {
+        match self.state_type {
+            ATNStateType::BasicBlockStart => {
+                Some(unsafe { &mut (*self.ext.basic_block_start).end_state })
+            }
+            ATNStateType::StarBlockStart => {
+                Some(unsafe { &mut (*self.ext.star_block_start).end_state })
+            }
+            ATNStateType::PlusBlockStart => {
+                Some(unsafe { &mut (*self.ext.plus_block_start).end_state })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn get_decision(&self) -> Option<i32> {
+        match self.state_type {
+            ATNStateType::StarLoopEntry => Some(unsafe { self.ext.star_loop_entry.decision }),
+            ATNStateType::TokenStart => Some(unsafe { self.ext.token_start.decision }),
+            ATNStateType::PlusLoopBack => Some(unsafe { self.ext.plus_loop_back.decision }),
+            ATNStateType::BasicBlockStart => Some(unsafe { self.ext.basic_block_start.decision }),
+            ATNStateType::StarBlockStart => Some(unsafe { self.ext.star_block_start.decision }),
+            ATNStateType::PlusBlockStart => Some(unsafe { self.ext.plus_block_start.decision }),
+            _ => None,
+        }
+    }
+
+    pub fn get_decision_mut(&mut self) -> Option<&mut i32> {
+        match self.state_type {
+            ATNStateType::StarLoopEntry => {
+                Some(unsafe { &mut (*self.ext.star_loop_entry).decision })
+            }
+            ATNStateType::TokenStart => Some(unsafe { &mut (*self.ext.token_start).decision }),
+            ATNStateType::PlusLoopBack => Some(unsafe { &mut (*self.ext.plus_loop_back).decision }),
+            ATNStateType::BasicBlockStart => {
+                Some(unsafe { &mut (*self.ext.basic_block_start).decision })
+            }
+            ATNStateType::StarBlockStart => {
+                Some(unsafe { &mut (*self.ext.star_block_start).decision })
+            }
+            ATNStateType::PlusBlockStart => {
+                Some(unsafe { &mut (*self.ext.plus_block_start).decision })
+            }
+            _ => None,
+        }
     }
 
     pub fn has_epsilon_only_transitions(&self) -> bool {
@@ -376,28 +471,171 @@ impl BasicState {
     }
 }
 
-pub struct DecisionState {
+pub struct StarLoopEntryState {
     pub decision: i32,
     pub nongreedy: bool,
-    pub state: ATNDecisionState,
+    pub loop_back_state: ATNStateRef,
+    pub is_precedence: bool,
+
     _marker: std::marker::PhantomData<()>,
 }
 
-impl DecisionState {
+impl StarLoopEntryState {
     pub fn create(
         base: BaseATNState,
         decision: i32,
         nongreedy: bool,
-        state: ATNDecisionState,
+        loop_back_state: ATNStateRef,
+        is_precedence: bool,
     ) -> ATNState {
         ATNState::new(
             base,
-            ATNStateType::Decision,
+            ATNStateType::StarLoopEntry,
             ATNStateExt {
-                decision: ManuallyDrop::new(DecisionState {
+                star_loop_entry: ManuallyDrop::new(StarLoopEntryState {
                     decision,
                     nongreedy,
-                    state,
+                    loop_back_state,
+                    is_precedence,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct TokenStartState {
+    pub decision: i32,
+    pub nongreedy: bool,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl TokenStartState {
+    pub fn create(base: BaseATNState, decision: i32, nongreedy: bool) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::TokenStart,
+            ATNStateExt {
+                token_start: ManuallyDrop::new(TokenStartState {
+                    decision,
+                    nongreedy,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct PlusLoopBackState {
+    pub decision: i32,
+    pub nongreedy: bool,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl PlusLoopBackState {
+    pub fn create(base: BaseATNState, decision: i32, nongreedy: bool) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::PlusLoopBack,
+            ATNStateExt {
+                plus_loop_back: ManuallyDrop::new(PlusLoopBackState {
+                    decision,
+                    nongreedy,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct BasicBlockStartState {
+    pub decision: i32,
+    pub nongreedy: bool,
+    pub end_state: ATNStateRef,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl BasicBlockStartState {
+    pub fn create(
+        base: BaseATNState,
+        decision: i32,
+        nongreedy: bool,
+        end_state: ATNStateRef,
+    ) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::BasicBlockStart,
+            ATNStateExt {
+                basic_block_start: ManuallyDrop::new(BasicBlockStartState {
+                    decision,
+                    nongreedy,
+                    end_state,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct StarBlockStartState {
+    pub decision: i32,
+    pub nongreedy: bool,
+    pub end_state: ATNStateRef,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl StarBlockStartState {
+    pub fn create(
+        base: BaseATNState,
+        decision: i32,
+        nongreedy: bool,
+        end_state: ATNStateRef,
+    ) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::StarBlockStart,
+            ATNStateExt {
+                star_block_start: ManuallyDrop::new(StarBlockStartState {
+                    decision,
+                    nongreedy,
+                    end_state,
+                    _marker: std::marker::PhantomData,
+                }),
+            },
+        )
+    }
+}
+
+pub struct PlusBlockStartState {
+    pub decision: i32,
+    pub nongreedy: bool,
+    pub end_state: ATNStateRef,
+    pub loop_back_state: ATNStateRef,
+
+    _marker: std::marker::PhantomData<()>,
+}
+
+impl PlusBlockStartState {
+    pub fn create(
+        base: BaseATNState,
+        decision: i32,
+        nongreedy: bool,
+        end_state: ATNStateRef,
+        loop_back_state: ATNStateRef,
+    ) -> ATNState {
+        ATNState::new(
+            base,
+            ATNStateType::PlusBlockStart,
+            ATNStateExt {
+                plus_block_start: ManuallyDrop::new(PlusBlockStartState {
+                    decision,
+                    nongreedy,
+                    end_state,
+                    loop_back_state,
                     _marker: std::marker::PhantomData,
                 }),
             },
