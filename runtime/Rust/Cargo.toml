@@ -1,6 +1,6 @@
 [package]
 name = "dbt-antlr4"
-version = "1.2.3"
+version = "1.2.4"
 authors = ["Konstantin Anisimov <rrevenantt@gmail.com>", "Alex Snaps <alex@wcgw.dev>", "Bo Lin <bo@dreamsphere.org>"]
 homepage = "https://github.com/sdf-labs/antlr4"
 repository = "https://github.com/sdf-labs/antlr4"
@@ -22,7 +22,6 @@ byteorder = "^1"
 fxhash = "0.2.1"
 bit-set = "0.8.0"
 hashbrown = "0.16.1"
-int-enum = "1.2.0"
 bumpalo = { version = "3.20.2", features = ["allocator-api2", "collections", "boxed"]}
 stacker = { version = "0.1.23" } # TODO: make this optional
 
