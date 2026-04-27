@@ -44,7 +44,7 @@ impl Arena {
     }
 
     pub fn alloc_string(&self, value: String) -> &str {
-        self.tokens.alloc(value)
+        self.tokens.alloc_str(value.as_str())
     }
 
     pub fn alloc_labeled_node<'input, 'a, N, T>(&self, value: T) -> *mut TreeNode<'input, 'a, N>

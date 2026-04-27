@@ -102,11 +102,18 @@ where
                 if stop >= x.size() || start >= x.size() {
                     "<EOF>"
                 } else {
+                    // TODO: change this API to return &'input str directly, so
+                    // we don't have to do this dance with Cow and String --
+                    // force the CharStream implementors to figure out how to
+                    // hold on to the text for at least 'input:
                     match x.get_text(start, stop) {
                         Cow::Borrowed(t) => t,
-                        Cow::Owned(_) => panic!(
-                            "CommonTokenFactory can not be used with CharStream implementations that return owned strings from get_text()"
-                        ),
+                        Cow::Owned(t) => unsafe {
+                            // Safety: see 3) in the above comment
+                            std::mem::transmute::<&'arena str, &'input str>(
+                                self.arena.alloc_string(t),
+                            )
+                        },
                     }
                 }
             }
