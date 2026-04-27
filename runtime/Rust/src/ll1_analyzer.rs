@@ -11,7 +11,8 @@ use crate::prediction_context::PredictionContext;
 use crate::prediction_context::PredictionContextRef;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
 use crate::transition::TransitionType;
-use crate::tree::RuleNode;
+use crate::tree::NodeKindType;
+use crate::tree::TreeNode;
 
 pub struct LL1Analyzer<'a> {
     atn: &'a ATN,
@@ -28,11 +29,11 @@ impl LL1Analyzer<'_> {
         &self,
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
-        ctx: Option<&'arena Node>,
+        ctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
     ) -> IntervalSetBuf
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         let arena = bumpalo::Bump::new();
 

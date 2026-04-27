@@ -1,5 +1,9 @@
 #![allow(clippy::mut_from_ref)]
-use crate::{rule_context::RuleContext, token::Token, tree::RuleNode};
+use crate::{
+    cast_unchecked,
+    token::Token,
+    tree::{NodeInner, NodeKindType, TreeNode},
+};
 
 #[derive(Debug)]
 pub struct Arena {
@@ -43,24 +47,39 @@ impl Arena {
         self.tokens.alloc(value)
     }
 
-    pub fn alloc_context<'a, T>(&self, value: T) -> &mut T
-    where
-        T: RuleContext<'a>,
-    {
-        self.contexts.alloc(value)
-    }
-
-    pub fn alloc_node<'input, 'a, T>(&'a self, value: T) -> &'a mut T
+    pub fn alloc_labeled_node<'input, 'a, N, T>(&self, value: T) -> *mut TreeNode<'input, 'a, N>
     where
         'input: 'a,
-        T: RuleNode<'input, 'a>,
+        N: NodeKindType<'a>,
+        T: NodeInner<'input, 'a, N>,
     {
-        let res = self.contexts.alloc(value);
-        let self_ref: *const T = res;
-        unsafe {
-            res.set_self_ref(self_ref);
-        }
-        res
+        self.contexts.alloc(value) as *mut _ as *mut TreeNode<'input, 'a, N>
+    }
+
+    pub fn alloc_zeroed_node<'input, 'a, N, I>(&'a self, body: I) -> *mut TreeNode<'input, 'a, N>
+    where
+        'input: 'a,
+        N: NodeKindType<'a>,
+        I: NodeInner<'input, 'a, N>,
+    {
+        let zeroed_header = unsafe { std::mem::zeroed::<TreeNode<'input, 'a, N>>() };
+        let ptr = self.contexts.alloc((zeroed_header, body));
+        ptr as *mut _ as *mut TreeNode<'input, 'a, N>
+    }
+
+    pub fn alloc_node<'input, 'a, N, I>(
+        &'a self,
+        header: TreeNode<'input, 'a, N>,
+        body: I,
+    ) -> &'a mut TreeNode<'input, 'a, N>
+    where
+        'input: 'a,
+        N: NodeKindType<'a>,
+        I: NodeInner<'input, 'a, N>,
+    {
+        let ptr = self.contexts.alloc((header, body));
+        // Safety: casting to the header portion:
+        cast_unchecked!(ptr => mut TreeNode<'input, 'a, N>)
     }
 
     pub fn alloc_exception<'a, T>(&'a self, value: T) -> bumpalo::boxed::Box<'a, T> {

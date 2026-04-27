@@ -201,164 +201,103 @@ macro_rules! impl_tree {
 }
 
 #[macro_export]
-macro_rules! impl_parse_tree {
+macro_rules! impl_node_kind_common {
     // Pattern: EnumName { Variant1, Variant2, ... }
-    ($enum_name:ident { $($variant:ident,)+ }) => {
-        impl<'input, 'arena> ParseTree<'input, 'arena> for $enum_name<'input, 'arena> {
-            // fn get_source_interval(&self) -> crate::interval_set::Interval {
-            //     match self {
-            //         $( $enum_name::$variant(inner) => inner.get_source_interval(), )+
-            //         _ => crate::interval_set::Interval::new_empty(),
-            //     }
-            // }
+    ($node_kind:ident { $($labeled_variant:ident($inner:ident),)* ; $($variant:ident),* }) => {
+        fn cast_to_ctx<'n, 'input: 'arena>(
+            node: &'n TreeNode<'input, 'arena, Self>,
+        ) -> &'n dyn ParserRuleContext<'input, 'arena> {
+            match node.node_tag() {
+                $( $node_kind::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>), )*
+                $( $node_kind::$variant => $crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>), )*
+                $node_kind::Terminal => $crate::cast_unchecked!(node.ctx_ptr() => TerminalNode<'input, 'arena>),
+                $node_kind::Error => $crate::cast_unchecked!(node.ctx_ptr() => ErrorNode<'input, 'arena>),
+            }
+        }
 
-            // fn get_text(&self) -> String {
-            //     match self {
-            //         $( $enum_name::$variant(inner) => inner.get_text(), )+
-            //         _ => String::new(),
-            //     }
-            // }
+        fn cast_to_ctx_mut<'n, 'input: 'arena>(
+            node: &'n mut TreeNode<'input, 'arena, Self>,
+        ) -> &'n mut dyn ParserRuleContext<'input, 'arena> {
+            match node.node_tag() {
+                $( $node_kind::$labeled_variant => $crate::cast_unchecked!(node => mut $inner<'input, 'arena>), )*
+                $( $node_kind::$variant => $crate::cast_unchecked!(node.ctx_ptr() => mut $variant<'input, 'arena>), )*
+                $node_kind::Terminal => $crate::cast_unchecked!(node.ctx_ptr() => mut TerminalNode<'input, 'arena>),
+                $node_kind::Error => $crate::cast_unchecked!(node.ctx_ptr() => mut ErrorNode<'input, 'arena>),
+            }
+        }
+
+        fn set_alt_number<'input: 'arena>(node: &mut TreeNode<'input, 'arena, Self>, alt_number: i32) {
+            match node.node_tag() {
+                $( $node_kind::$labeled_variant => $crate::cast_unchecked!(node => mut $inner<'input, 'arena>).set_alt_number(alt_number), )*
+                $( $node_kind::$variant => $crate::cast_unchecked!(node.ctx_ptr() => mut $variant<'input, 'arena>).set_alt_number(alt_number), )*
+                _ => {}
+            }
+        }
+
+        fn get_rule_index<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>) -> usize {
+            match node.node_tag() {
+                $( $node_kind::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).get_rule_index(), )*
+                $( $node_kind::$variant => $crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>).get_rule_index(), )*
+                _ => 0,
+            }
+        }
+
+        fn get_alt_number<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>) -> i32 {
+            match node.node_tag() {
+                $( $node_kind::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).get_alt_number(), )*
+                $( $node_kind::$variant => $crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>).get_alt_number(), )*
+                _ => INVALID_ALT,
+            }
+        }
+
+        #[inline]
+        fn terminal() -> Self {
+            Self::Terminal
+        }
+
+        #[inline]
+        fn error() -> Self {
+            Self::Error
+        }
+
+        #[inline]
+        fn is_context(&self) -> bool {
+            !matches!(self, Self::Terminal | Self::Error)
         }
     };
 }
 
 #[macro_export]
-macro_rules! impl_rule_node_common {
-    // Pattern: EnumName { Variant1, Variant2, ... }
-    ($enum_name:ident { $($variant:ident,)+ }) => {
-        fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
-            match self {
-                // Generate a match arm for every variant
-                $( $enum_name::$variant(inner) => *inner as &dyn ParserRuleContext<'input, 'arena>, )+
-                $enum_name::Terminal(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
-                $enum_name::Error(inner) => { inner as &dyn ParserRuleContext<'input, 'arena> },
-            }
-        }
-
-        fn as_terminal_node(&self) -> Option<&TerminalNode<'input, 'arena>> {
-            match self {
-                $enum_name::Terminal(inner) => Some(inner),
-                _ => None,
-            }
-        }
-
-        fn as_terminal_node_mut(&mut self) -> Option<&mut TerminalNode<'input, 'arena>> {
-            match self {
-                $enum_name::Terminal(inner) => Some(inner),
-                _ => None,
-            }
-        }
-
-        fn as_error_node(&self) -> Option<&ErrorNode<'input, 'arena>> {
-            match self {
-                $enum_name::Error(inner) => Some(inner),
-                _ => None,
-            }
-        }
-
-        fn as_error_node_mut(&mut self) -> Option<&mut ErrorNode<'input, 'arena>> {
-            match self {
-                $enum_name::Error(inner) => Some(inner),
-                _ => None,
-            }
-        }
-
-        fn set_exception(&self, e: $crate::errors::ANTLRError, arena: &'arena $crate::Arena) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_exception(e, arena), )+
-                _ => {}
-            }
-        }
-
-        fn set_invoking_state(&mut self, t: i32) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_invoking_state(t), )+
-                _ => {}
-            }
-        }
-
-        fn set_alt_number(&mut self, alt_number: i32) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_alt_number(alt_number), )+
-                _ => {}
-            }
-        }
-
-        fn set_start(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_start(t), )+
-                _ => {}
-            }
-        }
-
-        fn set_stop(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_stop(t), )+
-                _ => {}
-            }
-        }
-
-        fn remove_last_child(&mut self) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.remove_last_child(), )+
-                _ => {}
-            }
-        }
-
-        fn add_child(&mut self, child: &'arena Self) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.add_child(child), )+
-                _ => {}
-            }
-        }
-
-        fn set_parent(&mut self, parent: Option<&'arena Self>) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_parent(parent), )+
-                _ => {}
-            }
-        }
-
-        unsafe fn set_self_ref(&mut self, self_ref: *const Self) {
-            match self {
-                $( $enum_name::$variant(inner) => inner.set_self_ref(self_ref), )+
-                _ => {}
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_rule_node {
+macro_rules! impl_node_kind {
     // No Listener and no Visitor
-    ($enum_name:ident { $($variant:ident,)+ }; ) => {
-        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
-            type Listener = dyn ParseTreeListener<'input, 'arena, Self>;
+    ($enum_name:ident { $($labeled_variant:ident($inner:ident),)* ; $($variant:ident),* }; ) => {
+        impl<'arena> NodeKindType<'arena> for $enum_name {
+            type Listener = dyn ParseTreeListener<'arena, Self>;
 
-            $crate::impl_rule_node_common! { $enum_name { $($variant,)+ } }
+            $crate::impl_node_kind_common! { $enum_name { $($labeled_variant($inner),)* ; $($variant),* } }
 
-            fn enter_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+            fn enter_rule<'input: 'arena>(_node: &TreeNode<'input, 'arena, Self>, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
                 Ok(())
             }
 
-            fn exit_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+            fn exit_rule<'input: 'arena>(_node: &TreeNode<'input, 'arena, Self>, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
                 Ok(())
             }
         }
     };
 
     // Just Visitor
-    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($visit_method:ident),)* }; visitor = $visitor:ty, ) => {
-        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
-            type listener = dyn ParseTreeListener<'input, 'arena, Self>;
+    ($enum_name:ident { $($labeled_variant:ident($inner:ident),)*; $($variant:ident($visit_method:ident),)* }; visitor = $visitor:ty, ) => {
+        impl<'arena> NodeKindType<'arena> for $enum_name {
+            type Listener = dyn ParseTreeListener<'arena, Self>;
 
-            $crate::impl_rule_node_common! { $enum_name { $( $labeled_variant,)* $($variant,)* } }
+            $crate::impl_node_kind_common! { $enum_name { $( $labeled_variant($inner),)*; $($variant),* } }
 
-            fn enter_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+            fn enter_rule(_node: &TreeNode<'input, 'arena, Self>, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
                 Ok(())
             }
 
-            fn exit_rule(&self, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+            fn exit_rule(_node: &TreeNode<'input, 'arena, Self>, _listener: &mut Self::Listener) -> Result<(), ANTLRError> {
                 Ok(())
             }
 
@@ -375,59 +314,59 @@ macro_rules! impl_rule_node {
     };
 
     // Just Listener
-    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($enter_method:ident, $exit_method:ident, ),)* }; listener = $listener:ty, ) => {
-        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+    ($enum_name:ident { $($labeled_variant:ident($inner:ident),)*; $($variant:ident($enter_method:ident, $exit_method:ident, ),)* }; listener = $listener:ty, ) => {
+        impl<'arena> NodeKindType<'arena> for $enum_name {
             type Listener = $listener;
 
-            $crate::impl_rule_node_common! { $enum_name { $( $labeled_variant,)* $($variant,)* } }
+            $crate::impl_node_kind_common! { $enum_name { $( $labeled_variant($inner),)*; $($variant),* } }
 
-            fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
-                match self {
-                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_enter(listener), )*
-                    $( $enum_name::$variant(inner) => listener.$enter_method(inner), )*
-                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
-                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+            fn enter_rule<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match node.node_tag() {
+                    $( $enum_name::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).dispatch_enter(listener), )*
+                    $( $enum_name::$variant => listener.$enter_method($crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>)), )*
+                    $enum_name::Terminal => { listener.visit_terminal($crate::cast_unchecked!(node.ctx_ptr() => TerminalNode<'input, 'arena>)) },
+                    $enum_name::Error => { listener.visit_error_node($crate::cast_unchecked!(node.ctx_ptr() => ErrorNode<'input, 'arena>)) },
                 }
             }
 
-            fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
-                match self {
-                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_exit(listener), )*
-                    $( $enum_name::$variant(inner) => listener.$exit_method(inner), )*
-                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
-                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+            fn exit_rule<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match node.node_tag() {
+                    $( $enum_name::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).dispatch_exit(listener), )*
+                    $( $enum_name::$variant => listener.$exit_method($crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>)), )*
+                    $enum_name::Terminal => { listener.visit_terminal($crate::cast_unchecked!(node.ctx_ptr() => TerminalNode<'input, 'arena>)) },
+                    $enum_name::Error => { listener.visit_error_node($crate::cast_unchecked!(node.ctx_ptr() => ErrorNode<'input, 'arena>)) },
                 }
             }
         }
     };
 
     // Both listener and visitor
-    ($enum_name:ident { $($labeled_variant:ident,)*; $($variant:ident($enter_method:ident, $exit_method:ident, $visit_method:ident),)* }; listener = $listener:ty, visitor = $visitor:ident, ) => {
-        impl<'input, 'arena> RuleNode<'input, 'arena> for $enum_name<'input, 'arena> {
+    ($enum_name:ident { $($labeled_variant:ident($inner:ident),)*; $($variant:ident($enter_method:ident, $exit_method:ident, $visit_method:ident),)* }; listener = $listener:ty, visitor = $visitor:ident, ) => {
+        impl<'arena> NodeKindType<'arena> for $enum_name {
             type Listener = $listener;
 
-            $crate::impl_rule_node_common! { $enum_name { $($labeled_variant,)* $($variant,)* } }
+            $crate::impl_node_kind_common! { $enum_name { $($labeled_variant($inner),)*; $($variant),* } }
 
-            fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
-                match self {
-                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_enter(listener), )*
-                    $( $enum_name::$variant(inner) => listener.$enter_method(inner), )*
-                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
-                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+            fn enter_rule<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match node.node_tag() {
+                    $( $enum_name::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).dispatch_enter(listener), )*
+                    $( $enum_name::$variant => listener.$enter_method($crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>)), )*
+                    $enum_name::Terminal => { listener.visit_terminal($crate::cast_unchecked!(node.ctx_ptr() => TerminalNode<'input, 'arena>)) },
+                    $enum_name::Error => { listener.visit_error_node($crate::cast_unchecked!(node.ctx_ptr() => ErrorNode<'input, 'arena>)) },
                 }
             }
 
-            fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
-                match self {
-                    $( $enum_name::$labeled_variant(inner) => inner.dispatch_exit(listener), )*
-                    $( $enum_name::$variant(inner) => listener.$exit_method(inner), )*
-                    $enum_name::Terminal(inner) => { listener.visit_terminal(inner) },
-                    $enum_name::Error(inner) => { listener.visit_error_node(inner) },
+            fn exit_rule<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>, listener: &mut Self::Listener) -> Result<(), ANTLRError> {
+                match node.node_tag() {
+                    $( $enum_name::$labeled_variant => $crate::cast_unchecked!(node => $inner<'input, 'arena>).dispatch_exit(listener), )*
+                    $( $enum_name::$variant => listener.$exit_method($crate::cast_unchecked!(node.ctx_ptr() => $variant<'input, 'arena>)), )*
+                    $enum_name::Terminal => { listener.visit_terminal($crate::cast_unchecked!(node.ctx_ptr() => TerminalNode<'input, 'arena>)) },
+                    $enum_name::Error => { listener.visit_error_node($crate::cast_unchecked!(node.ctx_ptr() => ErrorNode<'input, 'arena>)) },
                 }
             }
         }
 
-        impl<'input, 'arena> Visitable<'input, 'arena> for $enum_name<'input, 'arena>
+        impl<'input, 'arena> Visitable<'input, 'arena> for TreeNode<'input, 'arena, $enum_name>
         where
             'input: 'arena,
         {
@@ -435,11 +374,11 @@ macro_rules! impl_rule_node {
             where
                 V: $visitor<'input, 'arena> + ?Sized,
             {
-                match self {
-                    $( $enum_name::$labeled_variant(inner) => inner.accept(visitor), )*
-                    $( $enum_name::$variant(inner) => visitor.$visit_method(inner), )+
-                    $enum_name::Terminal(inner) => { visitor.visit_terminal(inner) },
-                    $enum_name::Error(inner) => { visitor.visit_error_node(inner) },
+                match self.node_tag() {
+                    $( $enum_name::$labeled_variant => $crate::cast_unchecked!(self => $inner<'input, 'arena>).accept(visitor), )*
+                    $( $enum_name::$variant => visitor.$visit_method($crate::cast_unchecked!(self.ctx_ptr() => $variant<'input, 'arena>)), )+
+                    $enum_name::Terminal => { visitor.visit_terminal($crate::cast_unchecked!(self.ctx_ptr() => TerminalNode<'input, 'arena>)) },
+                    $enum_name::Error => { visitor.visit_error_node($crate::cast_unchecked!(self.ctx_ptr() => ErrorNode<'input, 'arena>)) },
                 }
             }
         }
@@ -454,7 +393,7 @@ macro_rules! impl_listener_dispatch {
         where
             'input: 'arena,
         {
-            fn dispatch_enter(&self, listener: &mut (dyn $listener<'input, 'arena> + 'static)) -> Result<(), ANTLRError>
+            fn dispatch_enter(&self, listener: &mut (dyn $listener<'arena> + 'static)) -> Result<(), ANTLRError>
             {
                 match self {
                     $( $enum_name::$variant(inner) => listener.$enter_method(inner), )+
@@ -462,7 +401,7 @@ macro_rules! impl_listener_dispatch {
                 }
             }
 
-            fn dispatch_exit(&self, listener: &mut (dyn $listener<'input, 'arena> + 'static)) -> Result<(), ANTLRError>
+            fn dispatch_exit(&self, listener: &mut (dyn $listener<'arena> + 'static)) -> Result<(), ANTLRError>
             {
                 match self {
                     $( $enum_name::$variant(inner) => listener.$exit_method(inner), )+
@@ -624,114 +563,62 @@ macro_rules! impl_parser_rule_context {
 }
 
 #[macro_export]
-macro_rules! impl_from_contexts {
-    ($enum_name:ident { $($variant:ident($inner:ident)),+ $(,)? }) => {
-        $(
-            impl<'input, 'arena> From<&'arena mut $inner<'input, 'arena>> for $enum_name<'input, 'arena> {
-                fn from(ctx: &'arena mut $inner<'input, 'arena>) -> Self {
-                    $enum_name::$variant(ctx)
-                }
-            }
-        )+
-    };
-}
-
-#[macro_export]
-macro_rules! impl_defaults {
-    ($enum_name:ident) => {
-        impl<'input, 'arena> From<TerminalNode<'input, 'arena>> for $enum_name<'input, 'arena> {
-            fn from(node: TerminalNode<'input, 'arena>) -> Self {
-                $enum_name::Terminal(node)
-            }
-        }
-
-        impl<'input, 'arena> From<ErrorNode<'input, 'arena>> for $enum_name<'input, 'arena> {
-            fn from(node: ErrorNode<'input, 'arena>) -> Self {
-                $enum_name::Error(node)
-            }
-        }
-
-        impl<'input, 'arena> Default for $enum_name<'input, 'arena> {
-            fn default() -> Self {
-                Self::Error(ErrorNode::default())
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! impl_into_base_ext {
-    ($enum_name:ident::$base_name:ident { $($variant:ident),+ $(,)? }) => {
-        impl<'input, 'arena> $enum_name<'input, 'arena> {
-            fn into_base_ext(self) -> $base_name<'input, 'arena> {
-                match self {
-                    $(
-                        $enum_name::$variant(inner) => inner.morph(|ctx| ctx.base),
-                    )+
-                    $enum_name::Error(inner) => inner,
-                }
-            }
-        }
-    };
-}
-
-#[macro_export]
 macro_rules! impl_tree_trait_delegates {
-    ($node_name:ident::$enum_name:ident { $($variant:ident),+ $(,)? }) => {
+    ($node_kind:ident::$enum_name:ident { $($variant:ident),+ $(,)? }) => {
         impl<'input, 'arena> $enum_name<'input, 'arena> {
-            fn get_parent(&self) -> Option<&'arena $node_name<'input, 'arena>> {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.get_parent(), )+
-                }
-            }
+            // fn get_parent(&self) -> Option<&'arena TreeNode<'input, 'arena, $node_kind>> {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_parent(), )+
+            //     }
+            // }
 
-            fn has_parent(&self) -> bool {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.has_parent(), )+
-                }
-            }
+            // fn has_parent(&self) -> bool {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.has_parent(), )+
+            //     }
+            // }
 
-            fn get_child(&self, i: usize) -> Option<&'arena $node_name<'input, 'arena>> {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.get_child(i), )+
-                }
-            }
+            // fn get_child(&self, i: usize) -> Option<&'arena TreeNode<'input, 'arena, $node_kind>> {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_child(i), )+
+            //     }
+            // }
 
-            fn get_child_count(&self) -> usize {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.get_child_count(), )+
-                }
-            }
+            // fn get_child_count(&self) -> usize {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_child_count(), )+
+            //     }
+            // }
 
-            fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena $node_name<'input, 'arena>> + 'a> {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.get_children(), )+
-                }
-            }
+            // fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena TreeNode<'input, 'arena, $node_kind>> + 'a> {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.get_children(), )+
+            //     }
+            // }
 
-            fn set_start(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_start(t), )+
-                }
-            }
+            // fn set_start(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.set_start(t), )+
+            //     }
+            // }
 
-            fn set_stop(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_stop(t), )+
-                }
-            }
+            // fn set_stop(&mut self, t: Option<&'arena dyn $crate::token::Token>) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.set_stop(t), )+
+            //     }
+            // }
 
-            fn set_parent(&mut self, parent: Option<&'arena $node_name<'input, 'arena>>) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_parent(parent), )+
-                }
-            }
+            // fn set_parent(&mut self, parent: Option<&'arena TreeNode<'input, 'arena, $node_kind>>) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.set_parent(parent), )+
+            //     }
+            // }
 
-            fn set_invoking_state(&mut self, t: i32) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_invoking_state(t), )+
-                }
-            }
+            // fn set_invoking_state(&mut self, t: i32) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.set_invoking_state(t), )+
+            //     }
+            // }
 
             fn set_alt_number(&mut self, alt_number: i32) {
                 match self {
@@ -739,65 +626,61 @@ macro_rules! impl_tree_trait_delegates {
                 }
             }
 
-            fn set_exception(&self, e: $crate::errors::ANTLRError, arena: &'arena $crate::Arena) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_exception(e, arena), )+
-                }
-            }
+            // fn set_exception(&self, e: $crate::errors::ANTLRError, arena: &'arena $crate::Arena) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.set_exception(e, arena), )+
+            //     }
+            // }
 
-            fn remove_last_child(&mut self) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.remove_last_child(), )+
-                }
-            }
+            // fn remove_last_child(&mut self) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.remove_last_child(), )+
+            //     }
+            // }
 
-            fn add_child(&mut self, child: &'arena $node_name<'input, 'arena>) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.add_child(child), )+
-                }
-            }
-
-            unsafe fn set_self_ref(&mut self, self_ref: *const $node_name<'input, 'arena>) {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.set_self_ref(self_ref), )+
-                }
-            }
+            // fn add_child(&mut self, child: &'arena TreeNode<'input, 'arena, $node_kind>) {
+            //     match self {
+            //         $( $enum_name::$variant(inner) => inner.add_child(child), )+
+            //     }
+            // }
         }
     };
 }
 
 #[macro_export]
 macro_rules! impl_node_inner {
-    ($node_name:ident::$variant_name:ident::$enum_name:ident { $($variant:ident),+ $(,)? }) => {
-        impl<'input, 'arena> NodeInner<'input, 'arena, $node_name<'input, 'arena>>
-            for $enum_name<'input, 'arena>
+    ($node_kind:ident::$node_variant:ident::$context_all:ident { $($variant:ident),+ $(,)? }) => {
+        impl<'input, 'arena> NodeInner<'input, 'arena, $node_kind>
+            for $context_all<'input, 'arena>
         {
-            fn cast_from<'a>(node: &'a $node_name<'input, 'arena>) -> Option<&'a Self> {
-                match node {
-                    $node_name::$variant_name(inner) => Some(inner),
+            fn cast_from<'a>(node: &'a TreeNode<'input, 'arena, $node_kind>) -> Option<&'a Self> {
+                match node.node_tag() {
+                    $node_kind::$node_variant => Some($crate::cast_unchecked!(node => Self)),
                     _ => None,
                 }
             }
 
-            fn cast_from_mut<'a>(node: &'a mut $node_name<'input, 'arena>) -> Option<&'a mut Self>
+            fn cast_from_mut<'a>(node: &'a mut TreeNode<'input, 'arena, $node_kind>) -> Option<&'a mut Self>
             where
                 Self: Sized,
             {
-                match node {
-                    $node_name::$variant_name(inner) => Some(inner),
+                match node.node_tag() {
+                    $node_kind::$node_variant => Some($crate::cast_unchecked!(node => mut Self)),
                     _ => None,
                 }
             }
 
-            fn try_as_node(&'arena self) -> Option<&'arena $node_name<'input, 'arena>> {
-                match self {
-                    $( $enum_name::$variant(inner) => inner.try_as_node(), )+
-                }
+            fn as_node(&self) -> &TreeNode<'input, 'arena, $node_kind> {
+                $crate::cast_unchecked!(self => TreeNode<'input, 'arena, $node_kind>)
             }
 
-            fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena $node_name<'input, 'arena>> + 'a> {
+            fn as_node_mut(&mut self) -> &mut TreeNode<'input, 'arena, $node_kind> {
+                $crate::cast_unchecked!(self => mut TreeNode<'input, 'arena, $node_kind>)
+            }
+
+            fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena TreeNode<'input, 'arena, $node_kind>> + 'a> {
                 match self {
-                    $( $enum_name::$variant(inner) => inner.get_children(), )+
+                    $( $context_all::$variant(inner) => inner.get_children(), )+
                 }
             }
         }
@@ -894,4 +777,16 @@ macro_rules! impl_deref {
             }
         }
     };
+}
+
+#[macro_export]
+macro_rules! cast_unchecked {
+    ($ptr:expr => $target:ty) => {{
+        let ptr = ($ptr as *const _ as *const ()).cast::<$target>();
+        unsafe { &*ptr }
+    }};
+    ($ptr:expr => mut $target:ty) => {{
+        let ptr = ($ptr as *mut _ as *mut ()).cast::<$target>();
+        unsafe { &mut *ptr }
+    }};
 }

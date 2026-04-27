@@ -13,8 +13,7 @@ use crate::atn_config::ATNConfig;
 use crate::atn_config_set::{ATNConfigSet, MutableATNConfigSet};
 use crate::atn_simulator::{BaseATNSimulator, IATNSimulator};
 use crate::atn_state::{
-    ATNState, ATNStateRef, ATNStateType, StarLoopEntryState,
-    ATNSTATE_BLOCK_END,
+    ATNState, ATNStateRef, ATNStateType, StarLoopEntryState, ATNSTATE_BLOCK_END,
 };
 use crate::dfa::{DFAState, PredPrediction, ProposedDFAState, ScopeExt, DFA};
 use crate::errors::ANTLRError;
@@ -34,6 +33,7 @@ use crate::transition::{
     ActionTransition, PrecedencePredicateTransition, PredicateTransition, RuleTransition,
     Transition, TransitionType,
 };
+use crate::tree::TreeNode;
 
 /// ### The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
 ///
@@ -89,7 +89,7 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     P: Parser<'input, 'arena, TF>,
 {
-    outer_context: &'arena P::Node,
+    outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
     dfa_ref: &'sim DFA<'sim, ATNConfigSet<'sim>>,
     merge_cache: &'cache mut MergeCache<'scratch>,
     precedence: i32,
@@ -108,7 +108,7 @@ where
         self.parser.get_input_stream_mut()
     }
     // fn seek(&mut self, i: isize) { self.input().seek(i) }
-    fn outer_context(&self) -> &'arena P::Node {
+    fn outer_context(&self) -> &'arena TreeNode<'input, 'arena, P::Node> {
         self.outer_context
     }
 
@@ -1206,7 +1206,9 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
 
         let decision_start_state = state.get_transitions()[0].get_target();
-        let block_end_state = decision_start_state.get_decision_end_state().expect("should be decision state");
+        let block_end_state = decision_start_state
+            .get_decision_end_state()
+            .expect("should be decision state");
 
         for i in 0..ctx_len {
             let return_state = pred_ctx.get_return_state(i);

@@ -16,7 +16,7 @@ use crate::parser_atn_simulator::{MergeCache, MergeKey};
 use crate::prediction_context::PredictionContext::{Array, Singleton};
 
 use crate::transition::RuleTransition;
-use crate::tree::RuleNode;
+use crate::tree::{NodeKindType, Tree as _, TreeNode};
 
 #[derive(Eq, Debug)]
 pub enum PredictionContext<'ephemeral> {
@@ -448,12 +448,12 @@ impl<'ephemeral> PredictionContext<'ephemeral> {
 
     pub fn from_rule_context<'input, 'arena, Node>(
         atn: &ATN,
-        outer_context: &'arena Node,
+        outer_context: &'arena TreeNode<'input, 'arena, Node>,
         arena: &'ephemeral bumpalo::Bump,
     ) -> PredictionContextRef<'ephemeral>
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         if outer_context.get_parent().is_none() || outer_context.get_rule_context().is_empty()
         /*ptr::eq(outer_context, empty_ctx().as_ref())*/

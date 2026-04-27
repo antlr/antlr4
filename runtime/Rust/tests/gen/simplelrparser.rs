@@ -21,7 +21,7 @@ use dbt_antlr4::atn_simulator::BaseATNSimulator;
 use dbt_antlr4::atn_simulator::ParserATNSimulatorManager as ATNSimulatorManager;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -51,7 +51,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;3]  = [
 
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
-pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, SimpleLRParserExt<'input, 'arena>, SimpleLRParserContextNode<'input, 'arena>, Input, TF, dyn SimpleLRListener<'input, 'arena>>;
+pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, SimpleLRParserExt<'input, 'arena>, SimpleLRParserNodeKind, Input, TF>;
 pub fn parser_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 
 pub struct SimpleLRParser<'input, 'arena, Input, TF>
@@ -104,7 +104,7 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: SimpleLRListener<'input, 'arena> + 'static,
+        L: SimpleLRListener<'arena> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -120,39 +120,30 @@ impl SimpleLRTreeWalker
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: SimpleLRListener<'input, 'arena> + 'static,
-        T: NodeInner<'input, 'arena, SimpleLRParserContextNode<'input, 'arena>>,
+        L: SimpleLRListener<'arena> + 'static,
+        T: NodeInner<'input, 'arena, SimpleLRParserNodeKind>,
     {
-        let Some(node) = tree.try_as_node() else {
-            return Err(ANTLRError::custom_error("TreeWalker can only walk non-leaf nodes".to_string()));
-        };
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <SimpleLRParserContextNode as RuleNode>::Listener) };
-        let listener = ParseTreeWalker::walk(listener, node)?;
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <SimpleLRParserNodeKind as NodeKindType>::Listener) };
+        let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
 }
 
-#[derive(Debug)]
-#[repr(C)]
-pub enum SimpleLRParserContextNode<'input, 'arena> {
-    SContext(&'arena mut SContext<'input, 'arena>),
-    AContext(&'arena mut AContext<'input, 'arena>),
-
-    Terminal(TerminalNode<'input, 'arena>),
-    Error(ErrorNode<'input, 'arena>),
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[repr(u16)]
+pub enum SimpleLRParserNodeKind {
+    SContext,
+    AContext,
+    Terminal,
+    Error,
 }
+pub type SimpleLRParserNode<'input, 'arena> = TreeNode<'input, 'arena, SimpleLRParserNodeKind>;
 
 dbt_antlr4::impl_deref! { parser => SimpleLRParser }
-dbt_antlr4::impl_defaults! { SimpleLRParserContextNode }
-dbt_antlr4::impl_from_contexts! { SimpleLRParserContextNode { SContext(SContext),  AContext(AContext),  } }
-dbt_antlr4::impl_tree! { SimpleLRParserContextNode { SContext, AContext, } }
-dbt_antlr4::impl_parse_tree! { SimpleLRParserContextNode { SContext, AContext, } }
-dbt_antlr4::impl_rule_context! { SimpleLRParserContextNode { SContext, AContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { SimpleLRParserContextNode { SContext, AContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_rule_node! { SimpleLRParserContextNode {
+dbt_antlr4::impl_node_kind! { SimpleLRParserNodeKind {
 ; SContext(enter_s, exit_s, ), AContext(enter_a, exit_a, ), 
-    }; listener = dyn SimpleLRListener<'input, 'arena>,
+    }; listener = dyn SimpleLRListener<'arena>,
 }
 
 pub struct SimpleLRParserExt<'input, 'arena> {
@@ -178,7 +169,7 @@ where
 	fn get_grammar_file_name(&self) -> & str{ "SimpleLR.g4" }
    	fn get_rule_names(&self) -> &[& str] { &ruleNames }
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
-	fn sempred(_localctx: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, rule_index: i32, pred_index: i32,
+	fn sempred(_localctx: Option<&'arena SimpleLRParserNode<'input, 'arena>>, rule_index: i32, pred_index: i32,
 			   recog:&mut BaseParserType<'input, 'arena, Input, TF>
 	) -> bool {
 		match rule_index {
@@ -207,41 +198,49 @@ where
 //------------------- s ----------------
 pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, SContextExt<'input, 'arena>, SimpleLRParserContextNode<'input, 'arena>>;
+pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>, SimpleLRParserNodeKind>;
+#[derive(Debug)]
 pub struct SContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for SContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for SContextExt<'input, 'arena>
 {
-	type Node = SimpleLRParserContextNode<'input, 'arena>;
+	type NodeKind = SimpleLRParserNodeKind;
+    fn node_tag() -> SimpleLRParserNodeKind { SimpleLRParserNodeKind::SContext }
 	fn get_rule_index(&self) -> usize { RULE_s }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            SimpleLRParserContextNode::SContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: SContext<'input, 'arena>,
+    ) -> *mut SimpleLRParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a SimpleLRParserNode<'input, 'arena>,
+    ) -> Option<&'a SContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            SimpleLRParserContextNode::SContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut SimpleLRParserNode<'input, 'arena>,
+    ) -> Option<&'a mut SContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SimpleLRParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, SContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -270,7 +269,7 @@ where
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 0, RULE_s)?;
+        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena SContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
@@ -298,41 +297,49 @@ where
 //------------------- a ----------------
 pub type AContextAll<'input, 'arena> = AContext<'input, 'arena>;
 
-pub type AContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, AContextExt<'input, 'arena>, SimpleLRParserContextNode<'input, 'arena>>;
+pub type AContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AContextExt<'input, 'arena>, SimpleLRParserNodeKind>;
+#[derive(Debug)]
 pub struct AContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for AContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AContextExt<'input, 'arena>
 {
-	type Node = SimpleLRParserContextNode<'input, 'arena>;
+	type NodeKind = SimpleLRParserNodeKind;
+    fn node_tag() -> SimpleLRParserNodeKind { SimpleLRParserNodeKind::AContext }
 	fn get_rule_index(&self) -> usize { RULE_a }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            SimpleLRParserContextNode::AContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: AContext<'input, 'arena>,
+    ) -> *mut SimpleLRParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a SimpleLRParserNode<'input, 'arena>,
+    ) -> Option<&'a AContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => AContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            SimpleLRParserContextNode::AContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut SimpleLRParserNode<'input, 'arena>,
+    ) -> Option<&'a mut AContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut AContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> AContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut AContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena SimpleLRParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut SimpleLRParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, AContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -380,7 +387,7 @@ where
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
-		recog.base.enter_recursion_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 2, RULE_a, _p)?;
+		recog.base.enter_recursion_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_a, _p)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena AContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = 2;
 		let result: Result<(), ANTLRError> = (|| {

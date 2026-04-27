@@ -19,7 +19,7 @@ use crate::rule_context::RuleContext as _;
 use crate::token::{Token, TOKEN_DEFAULT_CHANNEL, TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE};
 use crate::token_factory::TokenFactory;
 use crate::transition::RuleTransition;
-use crate::tree::{RuleNode, Tree as _};
+use crate::tree::{Tree as _, TreeNode};
 use crate::utils::escape_whitespaces;
 
 /// The interface for defining strategies to deal with syntax errors encountered
@@ -101,7 +101,7 @@ where
     last_error_index: isize,
     last_error_states: Option<IntervalSetBuf>,
     next_tokens_state: i32,
-    next_tokens_ctx: Option<&'arena P::Node>,
+    next_tokens_ctx: Option<&'arena TreeNode<'input, 'arena, P::Node>>,
     pd: PhantomData<(TF, P)>,
 }
 

@@ -8,14 +8,14 @@ use dbt_antlr4::int_stream::IntStream;
 use dbt_antlr4::lexer::LEXER_DEFAULT_MODE;
 use dbt_antlr4::PredictionMode;
 use dbt_antlr4::token_stream::TokenStream;
-use dbt_antlr4::tree::{IsError, LeafNode, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
+use dbt_antlr4::tree::{IsError, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
 use dbt_antlr4::trees::string_tree;
 mod <lexerName; format="lower">;
 use <lexerName; format="lower">::<lexerName>;
 <if(parserName)>
 mod <parserName; format="lower">;
 use <parserName; format="lower">::<parserName>;
-use <parserName; format="lower">::<grammarName>ParserContextNode;
+use <parserName; format="lower">::<grammarName>ParserNodeKind;
 use dbt_antlr4::errors::ANTLRError;
 <endif>
 <if(useListener)>
@@ -75,6 +75,6 @@ fn main() {
 struct TreeShapeListener {
 }
 
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, <grammarName>ParserContextNode\<'input, 'arena> > for TreeShapeListener {
+impl\<'arena> ParseTreeListener\<'arena, <grammarName>ParserNodeKind> for TreeShapeListener {
 }
 <endif>

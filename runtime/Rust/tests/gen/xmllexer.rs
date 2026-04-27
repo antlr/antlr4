@@ -19,7 +19,7 @@ use dbt_antlr4::lexer_atn_simulator::{LexerATNSimulator, ILexerATNSimulator};
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::recognizer::Actions;
 use dbt_antlr4::token_factory::{CommonTokenFactory, TokenFactory};
-use dbt_antlr4::rule_context::{BaseRuleContext,EmptyCustomRuleContext,EmptyRuleNode};
+use dbt_antlr4::rule_context::{BaseRuleContext,EmptyNodeKind,EmptyCustomRuleContext,EmptyRuleNode};
 use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 
 use std::ops::{DerefMut, Deref};
@@ -72,7 +72,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;19]  = [
 
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
-pub type LexerContext<'input, 'arena> = BaseRuleContext<'input, 'arena, EmptyCustomRuleContext<'input, 'arena>>;
+pub type LexerContext<'input, 'arena> = BaseRuleContext<'input, 'arena, EmptyNodeKind, EmptyCustomRuleContext<'input, 'arena>>;
 pub type BaseLexerType<'input, 'arena, Input, TF> = BaseLexer<'input, 'arena, XMLLexerActions, Input, TF>;
 pub fn lexer_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 

@@ -11,7 +11,7 @@ use crate::interval_set::Interval;
 use crate::parser_rule_context::ParserRuleContext;
 use crate::rule_context::RuleContext;
 use crate::token::Token;
-use crate::{token_factory, Arena};
+use crate::{cast_unchecked, token_factory, Arena};
 
 #[allow(missing_docs)]
 pub trait Tree<'arena>: Sized {
@@ -23,13 +23,9 @@ pub trait Tree<'arena>: Sized {
         unimplemented!()
     }
 
-    fn get_child(&self, _i: usize) -> Option<&'arena Self> {
-        None
-    }
+    fn get_child(&self, _i: usize) -> Option<&'arena Self>;
 
-    fn get_child_count(&self) -> usize {
-        0
-    }
+    fn get_child_count(&self) -> usize;
 
     fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Self> + 'a>;
 }
@@ -40,9 +36,7 @@ pub trait ParseTree<'input, 'arena>: Tree<'arena> {
     /// {@link TokenStream} of the first and last token associated with this
     /// subtree. If this node is a leaf, then the interval represents a single
     /// token and has interval i..i for token index i.
-    fn get_source_interval(&self) -> Interval {
-        Interval::invalid()
-    }
+    fn get_source_interval(&self) -> Interval;
 
     /// Return combined text of this AST node.
     /// To create resulting string it does traverse whole subtree,
@@ -51,118 +45,581 @@ pub trait ParseTree<'input, 'arena>: Tree<'arena> {
     /// Since tokens on hidden channels (e.g. whitespace or comments) are not
     /// added to the parse trees, they will not appear in the output of this
     /// method.
-    fn get_text(&self) -> String {
-        String::new()
+    fn get_text(&self) -> String;
+}
+
+/// Helper trait, implemented for all rule context types that can be wrapped
+/// inside [TreeNode].
+pub trait NodeInner<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: NodeKindType<'arena>,
+{
+    /// Extract a reference to self from a reference to [TreeNode].
+    ///
+    /// Used for safe downcasting.
+    fn cast_from<'a>(node: &'a TreeNode<'input, 'arena, Node>) -> Option<&'a Self>
+    where
+        Self: Sized;
+
+    /// Extract a mutable reference to self from a mutable reference to
+    /// [TreeNode].
+    ///
+    /// Used for safe downcasting.
+    fn cast_from_mut<'a>(node: &'a mut TreeNode<'input, 'arena, Node>) -> Option<&'a mut Self>
+    where
+        Self: Sized;
+
+    /// Upcast &self back to a `&'arena Node`.
+    fn as_node(&self) -> &TreeNode<'input, 'arena, Node>;
+
+    fn as_node_mut(&mut self) -> &mut TreeNode<'input, 'arena, Node>;
+
+    /// Iterate over children as [TreeNode]s
+    fn iter_child_nodes<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'arena TreeNode<'input, 'arena, Node>> + 'a>;
+}
+
+pub type CtxPtr<'input, 'arena> = *mut (&'input (), *mut &'arena ());
+
+pub trait NodeKindType<'arena>: Copy + Debug + PartialEq + Eq + 'static {
+    type Listener: ParseTreeListener<'arena, Self> + ?Sized;
+
+    fn cast_to_ctx<'n, 'input: 'arena>(
+        node: &'n TreeNode<'input, 'arena, Self>,
+    ) -> &'n dyn ParserRuleContext<'input, 'arena>;
+
+    fn cast_to_ctx_mut<'n, 'input: 'arena>(
+        node: &'n mut TreeNode<'input, 'arena, Self>,
+    ) -> &'n mut dyn ParserRuleContext<'input, 'arena>;
+
+    fn set_alt_number<'input: 'arena>(node: &mut TreeNode<'input, 'arena, Self>, alt_number: i32);
+
+    fn get_rule_index<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>) -> usize;
+
+    fn get_alt_number<'input: 'arena>(node: &TreeNode<'input, 'arena, Self>) -> i32;
+
+    fn terminal() -> Self;
+
+    fn error() -> Self;
+
+    fn is_context(&self) -> bool;
+
+    fn enter_rule<'input: 'arena>(
+        node: &TreeNode<'input, 'arena, Self>,
+        listener: &mut Self::Listener,
+    ) -> Result<(), ANTLRError>;
+
+    fn exit_rule<'input: 'arena>(
+        node: &TreeNode<'input, 'arena, Self>,
+        listener: &mut Self::Listener,
+    ) -> Result<(), ANTLRError>;
+
+    #[inline]
+    fn is_terminal(&self) -> bool {
+        *self == Self::terminal()
+    }
+
+    #[inline]
+    fn is_error(&self) -> bool {
+        *self == Self::error()
+    }
+}
+#[repr(C, align(8))]
+struct ParserRuleContextCommonLayout<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: NodeKindType<'arena>,
+{
+    // --- BaseParserRuleContext fields ---
+    start: *const (),
+    stop: *const (),
+    vtable: *const (),
+    children: bumpalo::collections::Vec<'arena, &'arena TreeNode<'input, 'arena, Node>>,
+    // --- BaseRuleContext fields ---
+    parent: Option<&'arena TreeNode<'input, 'arena, Node>>,
+}
+
+impl<'input, 'arena, Node> ParserRuleContextCommonLayout<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: NodeKindType<'arena>,
+{
+    fn start(&self) -> &'arena dyn Token {
+        if self.start.is_null() {
+            token_factory::invalid()
+        } else {
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &'arena dyn Token>((
+                    self.start,
+                    self.vtable,
+                ))
+            }
+        }
+    }
+
+    fn stop(&self) -> &'arena dyn Token {
+        if self.stop.is_null() {
+            token_factory::invalid()
+        } else {
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &'arena dyn Token>((
+                    self.stop,
+                    self.vtable,
+                ))
+            }
+        }
     }
 }
 
-pub trait RuleNode<'input, 'arena>:
-    ParseTree<'input, 'arena>
-    + ParserRuleContext<'input, 'arena>
-    + From<TerminalNode<'input, 'arena>>
-    + From<ErrorNode<'input, 'arena>>
+#[derive(Debug)]
+#[repr(C, align(8))]
+pub struct TreeNode<'input, 'arena, NodeKind>
 where
     'input: 'arena,
-    Self: 'arena,
+    NodeKind: NodeKindType<'arena>,
 {
-    type Listener: ParseTreeListener<'input, 'arena, Self> + ?Sized;
+    pub(crate) label_tag: u16,
+    pub node_tag: NodeKind,
+    invoking_state: i32,
+    body: (),
+
+    _mark: PhantomData<(&'input (), *mut &'arena ())>,
+}
+
+impl<'input, 'arena, NodeKind> TreeNode<'input, 'arena, NodeKind>
+where
+    'input: 'arena,
+    NodeKind: NodeKindType<'arena>,
+{
+    pub fn create_token_node(
+        arena: &'arena Arena,
+        symbol: &'arena (dyn Token + 'input),
+    ) -> &'arena mut Self {
+        let header = TreeNode {
+            node_tag: NodeKind::terminal(),
+            label_tag: 0,
+            invoking_state: -1,
+            body: (),
+            _mark: PhantomData,
+        };
+        let leaf = TerminalNode::new(symbol);
+        arena.alloc_node(header, leaf)
+    }
+
+    pub fn create_error_node(
+        arena: &'arena Arena,
+        symbol: &'arena (dyn Token + 'input),
+    ) -> &'arena mut Self {
+        let header = TreeNode {
+            node_tag: NodeKind::error(),
+            label_tag: 0,
+            invoking_state: -1,
+            body: (),
+            _mark: PhantomData,
+        };
+        let leaf = ErrorNode::new(symbol);
+        arena.alloc_node(header, leaf)
+    }
+
+    #[inline]
+    pub fn node_tag(&self) -> NodeKind {
+        self.node_tag
+    }
 
     /// Return the [ParserRuleContext] object associated with this rule node.
-    fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
-        self
+    pub fn get_rule_context(&self) -> &dyn ParserRuleContext<'input, 'arena> {
+        NodeKind::cast_to_ctx(self)
     }
 
     /// Return mutable reference to the [ParserRuleContext] object associated
     /// with this rule node.
-    fn get_rule_context_mut(&mut self) -> &mut dyn ParserRuleContext<'input, 'arena> {
-        self
+    pub fn get_rule_context_mut(&mut self) -> &mut dyn ParserRuleContext<'input, 'arena> {
+        NodeKind::cast_to_ctx_mut(self)
+    }
+
+    #[inline]
+    pub fn ctx_ptr(&self) -> CtxPtr<'input, 'arena> {
+        &self.body as *const _ as *mut (&'input (), *mut &'arena ())
+    }
+
+    /// # Safety
+    /// Caller must ensure that the provided pointer is a valid pointer to a
+    /// properly instantiated [NodeInner] object:
+    /// - For leaf nodes, it must be created via [TreeNode::create_token_node]
+    ///   or [TreeNode::create_error_node];
+    /// - For rule context nodes, it must be created via
+    ///   [BaseParserRuleContext::create].
+    #[inline]
+    pub unsafe fn from_ctx_ptr(ctx_ptr: CtxPtr<'input, 'arena>) -> &'arena Self {
+        &*((ctx_ptr as *const u8).sub(std::mem::offset_of!(Self, body)) as *const Self)
+    }
+
+    /// # Safety
+    /// Caller must ensure that the provided pointer is a valid pointer to a
+    /// properly instantiated [NodeInner] object:
+    /// - For leaf nodes, it must be created via [TreeNode::create_token_node]
+    ///   or [TreeNode::create_error_node];
+    /// - For rule context nodes, it must be created via
+    ///   [BaseParserRuleContext::create].
+    #[inline]
+    pub unsafe fn from_ctx_ptr_mut(ctx_ptr: CtxPtr<'input, 'arena>) -> &'arena mut Self {
+        &mut *((ctx_ptr as *const u8).sub(std::mem::offset_of!(Self, body)) as *mut Self)
+    }
+
+    #[inline]
+    fn as_rule_context_common(
+        &self,
+    ) -> Option<&ParserRuleContextCommonLayout<'input, 'arena, NodeKind>> {
+        if self.node_tag.is_context() {
+            Some(
+                cast_unchecked!(self.ctx_ptr() => ParserRuleContextCommonLayout<'input, 'arena, NodeKind>),
+            )
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    fn as_rule_context_common_mut(
+        &mut self,
+    ) -> Option<&mut ParserRuleContextCommonLayout<'input, 'arena, NodeKind>> {
+        if self.node_tag.is_context() {
+            Some(
+                cast_unchecked!(self.ctx_ptr() => mut ParserRuleContextCommonLayout<'input, 'arena, NodeKind>),
+            )
+        } else {
+            None
+        }
     }
 
     /// Attempt to downcast this node to specific [ParserRuleContext] type
-    fn as_rule_context<T>(&self) -> Option<&T>
+    pub fn as_rule_context<T>(&self) -> Option<&T>
     where
-        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Self>,
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, NodeKind>,
     {
         T::cast_from(self)
     }
 
-    fn as_rule_context_mut<T>(&mut self) -> Option<&mut T>
+    /// Attempt to downcast this node to specific [ParserRuleContext] type
+    pub fn as_rule_context_mut<T>(&mut self) -> Option<&mut T>
     where
-        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, Self>,
+        T: ParserRuleContext<'input, 'arena> + NodeInner<'input, 'arena, NodeKind>,
     {
         T::cast_from_mut(self)
     }
 
     /// Downcast this node to terminal node, if the associated context is a
     /// terminal node
-    fn as_terminal_node(&self) -> Option<&TerminalNode<'input, 'arena>>;
-    fn as_terminal_node_mut(&mut self) -> Option<&mut TerminalNode<'input, 'arena>>;
+    pub fn as_terminal_node(&self) -> Option<&TerminalNode<'input, 'arena>> {
+        TerminalNode::cast_from(self)
+    }
+
+    /// Downcast this node to terminal node, if the associated context is a
+    /// terminal node
+    pub fn as_terminal_node_mut(&mut self) -> Option<&mut TerminalNode<'input, 'arena>> {
+        TerminalNode::cast_from_mut(self)
+    }
 
     /// Downcast this node to error node, if the associated context is an error
     /// node
-    fn as_error_node(&self) -> Option<&ErrorNode<'input, 'arena>>;
-    fn as_error_node_mut(&mut self) -> Option<&mut ErrorNode<'input, 'arena>>;
+    pub fn as_error_node(&self) -> Option<&ErrorNode<'input, 'arena>> {
+        ErrorNode::cast_from(self)
+    }
 
-    // fn add_token_node(&self, token: TerminalNode<'input, Self::TF>) { }
-    // fn add_error_node(&self, bad_token: ErrorNode<'input, Self::TF>) { }
+    /// Downcast this node to error node, if the associated context is an error
+    /// node
+    pub fn as_error_node_mut(&mut self) -> Option<&mut ErrorNode<'input, 'arena>> {
+        ErrorNode::cast_from_mut(self)
+    }
 
-    fn set_exception(&self, _e: ANTLRError, arena: &'arena Arena);
+    // pub fn add_token_node(&self, token: TerminalNode<'input, Self::TF>) { }
+    // pub fn add_error_node(&self, bad_token: ErrorNode<'input, Self::TF>) { }
+
+    pub fn set_exception(&self, _e: ANTLRError, _arena: &'arena Arena) {}
 
     /// Sets internal parser state
-    fn set_invoking_state(&mut self, _t: i32);
+    pub fn set_invoking_state(&mut self, s: i32) {
+        self.invoking_state = s;
+    }
 
-    fn set_alt_number(&mut self, _alt_number: i32);
+    pub fn set_alt_number(&mut self, _alt_number: i32) {
+        NodeKind::set_alt_number(self, _alt_number);
+    }
 
-    fn set_start(&mut self, _t: Option<&'arena dyn Token>);
+    pub fn set_start(&mut self, t: Option<&'arena dyn Token>) {
+        let Some(ctx) = self.as_rule_context_common_mut() else {
+            return;
+        };
 
-    fn set_stop(&mut self, _t: Option<&'arena dyn Token>);
+        if let Some(t) = t {
+            let (ptr, vtable) =
+                unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
+            ctx.start = ptr;
+            ctx.vtable = vtable;
+        } else {
+            ctx.start = std::ptr::null();
+        }
+    }
 
-    fn remove_last_child(&mut self);
+    pub fn set_stop(&mut self, _t: Option<&'arena dyn Token>) {
+        let Some(ctx) = self.as_rule_context_common_mut() else {
+            return;
+        };
 
-    fn add_child(&mut self, _child: &'arena Self);
+        if let Some(t) = _t {
+            let (ptr, vtable) =
+                unsafe { std::mem::transmute::<&'arena dyn Token, (*const (), *const ())>(t) };
+            ctx.stop = ptr;
+            ctx.vtable = vtable;
+        } else {
+            ctx.stop = std::ptr::null();
+        }
+    }
 
-    fn set_parent(&mut self, _parent: Option<&'arena Self>);
+    pub fn remove_last_child(&mut self) {
+        let Some(ctx) = self.as_rule_context_common_mut() else {
+            return;
+        };
+        ctx.children.pop();
+    }
 
-    /// Sets self-reference pointer to allow upcasting from context to RuleNode
-    ///
-    /// # Safety
-    /// DO NOT CALL -- internal method, only meant to be called by [Arena]
-    unsafe fn set_self_ref(&mut self, _self_ref: *const Self);
+    pub fn add_child(&mut self, _child: &'arena Self) {
+        let Some(ctx) = self.as_rule_context_common_mut() else {
+            return;
+        };
+        ctx.children.push(_child);
+    }
 
-    fn enter_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError>;
+    pub fn set_parent(&mut self, parent: Option<&'arena Self>) {
+        let Some(ctx) = self.as_rule_context_common_mut() else {
+            return;
+        };
+        ctx.parent = parent;
+    }
 
-    fn exit_rule(&self, listener: &mut Self::Listener) -> Result<(), ANTLRError>;
+    pub fn enter_rule(&self, listener: &mut NodeKind::Listener) -> Result<(), ANTLRError> {
+        NodeKind::enter_rule(self, listener)
+    }
+
+    pub fn exit_rule(&self, listener: &mut NodeKind::Listener) -> Result<(), ANTLRError> {
+        NodeKind::exit_rule(self, listener)
+    }
 }
 
-/// Helper trait, implemented for all rule context types that can be wrapped
-/// inside [RuleNode].
-pub trait NodeInner<'input, 'arena, Node>
+impl<'input, 'arena, NodeKind> Tree<'arena> for TreeNode<'input, 'arena, NodeKind>
 where
     'input: 'arena,
-    Node: RuleNode<'input, 'arena>,
+    NodeKind: NodeKindType<'arena>,
 {
-    /// Extract a reference to self from a reference to [RuleNode].
-    ///
-    /// Used for safe downcasting.
-    fn cast_from(node: &Node) -> Option<&Self>
+    #[inline]
+    fn get_parent(&self) -> Option<&'arena Self> {
+        self.as_rule_context_common().and_then(|ctx| ctx.parent)
+    }
+
+    fn has_parent(&self) -> bool {
+        self.get_parent().is_some()
+    }
+
+    fn get_child(&self, i: usize) -> Option<&'arena Self> {
+        self.as_rule_context_common()
+            .and_then(|ctx| ctx.children.get(i).copied())
+    }
+
+    #[inline]
+    fn get_child_count(&self) -> usize {
+        self.as_rule_context_common()
+            .map_or(0, |ctx| ctx.children.len())
+    }
+
+    #[inline]
+    fn get_children<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Self> + 'a> {
+        if let Some(ctx) = self.as_rule_context_common() {
+            Box::new(ctx.children.iter().copied())
+        } else {
+            Box::new(std::iter::empty())
+        }
+    }
+}
+
+impl<'input, 'arena, Node> ParseTree<'input, 'arena> for TreeNode<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: NodeKindType<'arena>,
+{
+    fn get_source_interval(&self) -> Interval {
+        if let Some(terminal) = self.as_terminal_node() {
+            Interval::new(
+                terminal.symbol.get_start_index() as i32,
+                terminal.symbol.get_stop_index() as i32,
+            )
+        } else if let Some(error) = self.as_error_node() {
+            Interval::new(
+                error.symbol.get_start_index() as i32,
+                error.symbol.get_stop_index() as i32,
+            )
+        } else {
+            let ctx = self
+                .as_rule_context_common()
+                .expect("Can only be rule context at this point");
+            if ctx.start.is_null() || ctx.stop.is_null() {
+                Interval::invalid()
+            } else {
+                Interval::new(
+                    ctx.start().get_start_index() as i32,
+                    ctx.stop().get_stop_index() as i32,
+                )
+            }
+        }
+    }
+
+    fn get_text(&self) -> String {
+        if let Some(terminal) = self.as_terminal_node() {
+            return terminal.get_text();
+        } else if let Some(error) = self.as_error_node() {
+            return error.get_text();
+        }
+
+        let mut result = String::new();
+        for child in self.get_children() {
+            result.push_str(&ParseTree::get_text(child));
+        }
+        result
+    }
+}
+
+impl<'input, 'arena, NodeKind> RuleContext<'arena> for TreeNode<'input, 'arena, NodeKind>
+where
+    'input: 'arena,
+    NodeKind: NodeKindType<'arena>,
+{
+    fn get_rule_index(&self) -> usize {
+        NodeKind::get_rule_index(self)
+    }
+
+    fn get_alt_number(&self) -> i32 {
+        NodeKind::get_alt_number(self)
+    }
+
+    #[inline]
+    fn get_invoking_state(&self) -> i32 {
+        self.invoking_state
+    }
+
+    fn get_parent_ctx(&self) -> Option<&'arena dyn RuleContext<'arena>> {
+        self.get_parent()
+            .map(|p| p as &'arena dyn RuleContext<'arena>)
+    }
+
+    fn get_node_text(&self, rule_names: &[&str]) -> String {
+        NodeKind::cast_to_ctx(self).get_node_text(rule_names)
+    }
+}
+
+impl<'input, 'arena, Node> ParserRuleContext<'input, 'arena> for TreeNode<'input, 'arena, Node>
+where
+    'input: 'arena,
+    Node: NodeKindType<'arena>,
+{
+    fn get_text(&self) -> String {
+        ParseTree::get_text(self)
+    }
+
+    fn get_child_count(&self) -> usize {
+        Tree::get_child_count(self)
+    }
+
+    fn start(&self) -> &'arena dyn Token {
+        if let Some(terminal) = self.as_terminal_node() {
+            return terminal.symbol;
+        } else if let Some(error) = self.as_error_node() {
+            return error.symbol;
+        }
+        let ctx = self
+            .as_rule_context_common()
+            .expect("Can only be rule context at this point");
+        if ctx.start.is_null() {
+            token_factory::invalid()
+        } else {
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &'arena dyn Token>((
+                    ctx.start, ctx.vtable,
+                ))
+            }
+        }
+    }
+
+    fn stop(&self) -> &'arena dyn Token {
+        if let Some(terminal) = self.as_terminal_node() {
+            return terminal.symbol;
+        } else if let Some(error) = self.as_error_node() {
+            return error.symbol;
+        }
+        let ctx = self
+            .as_rule_context_common()
+            .expect("Can only be rule context at this point");
+        if ctx.stop.is_null() {
+            token_factory::invalid()
+        } else {
+            unsafe {
+                std::mem::transmute::<(*const (), *const ()), &'arena dyn Token>((
+                    ctx.stop, ctx.vtable,
+                ))
+            }
+        }
+    }
+
+    fn get_parent_ctx(&self) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
+        self.get_parent()
+            .map(|p| p as &'arena dyn ParserRuleContext<'input, 'arena>)
+    }
+
+    fn get_child_ctx(&self, i: usize) -> Option<&'arena dyn ParserRuleContext<'input, 'arena>> {
+        self.get_child(i)
+            .map(|child| child.get_rule_context() as &dyn ParserRuleContext<'input, 'arena>)
+    }
+
+    fn iter_children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'arena dyn ParserRuleContext<'input, 'arena>> + 'a>
     where
-        Self: Sized;
+        'input: 'a,
+        'arena: 'a,
+    {
+        let Some(ctx) = self.as_rule_context_common() else {
+            return Box::new(std::iter::empty());
+        };
+        Box::new(
+            ctx.children
+                .iter()
+                .map(|child| child.get_rule_context() as &dyn ParserRuleContext<'input, 'arena>),
+        )
+    }
 
-    /// Extract a mutable reference to self from a mutable reference to
-    /// [RuleNode].
-    ///
-    /// Used for safe downcasting.
-    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
-    where
-        Self: Sized;
+    fn get_token(&self, _ttype: i32, _pos: usize) -> Option<&TerminalNode<'input, 'arena>> {
+        let ctx = self.as_rule_context_common()?;
+        ctx.children
+            .iter()
+            .filter_map(|child| child.as_terminal_node())
+            .filter(|t| t.symbol.get_token_type() == _ttype)
+            .nth(_pos)
+    }
 
-    /// Upcast &self back to a `&'arena Node`.
-    ///
-    /// Only works on non-leaf nodes.
-    fn try_as_node(&'arena self) -> Option<&'arena Node>;
+    fn get_tokens(&self, _ttype: i32) -> Vec<&TerminalNode<'input, 'arena>> {
+        let Some(ctx) = self.as_rule_context_common() else {
+            return vec![];
+        };
+        ctx.children
+            .iter()
+            .filter_map(|child| child.as_terminal_node())
+            .filter(|t| t.symbol.get_token_type() == _ttype)
+            .collect()
+    }
 
-    /// Iterate over children as [RuleNode]s
-    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a>;
+    fn to_string_tree(&self, rule_names: &[&str]) -> String {
+        crate::trees::string_tree(self, rule_names)
+    }
 }
 
 #[doc(hidden)]
@@ -174,7 +631,7 @@ pub struct NoError;
 pub struct IsError;
 
 /// Generic leaf AST node
-pub struct LeafNode<'input, 'arena, E>
+pub struct LeafNodeInner<'input, 'arena, E>
 where
     'input: 'arena,
     E: 'static,
@@ -184,7 +641,7 @@ where
     iserror: PhantomData<E>,
 }
 
-impl<'input, 'arena, E> RuleContext<'arena> for LeafNode<'input, 'arena, E>
+impl<'input, 'arena, E> RuleContext<'arena> for LeafNodeInner<'input, 'arena, E>
 where
     'input: 'arena,
     E: 'static,
@@ -210,7 +667,7 @@ where
     }
 }
 
-impl<'input, 'arena, E> ParserRuleContext<'input, 'arena> for LeafNode<'input, 'arena, E>
+impl<'input, 'arena, E> ParserRuleContext<'input, 'arena> for LeafNodeInner<'input, 'arena, E>
 where
     'input: 'arena,
     E: 'static,
@@ -222,75 +679,113 @@ where
     fn get_child_count(&self) -> usize {
         0
     }
-}
 
-impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node> for LeafNode<'input, 'arena, NoError>
-where
-    'input: 'arena,
-    Node: RuleNode<'input, 'arena>,
-{
-    fn cast_from(node: &Node) -> Option<&Self>
+    fn iter_children<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'arena dyn ParserRuleContext<'input, 'arena>> + 'a>
     where
-        Self: Sized,
+        'input: 'a,
+        'arena: 'a,
     {
-        node.as_terminal_node()
-    }
-
-    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
-    where
-        Self: Sized,
-    {
-        node.as_terminal_node_mut()
-    }
-
-    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
         Box::new(std::iter::empty())
     }
-
-    fn try_as_node(&'arena self) -> Option<&'arena Node> {
-        None
-    }
 }
 
-impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node> for LeafNode<'input, 'arena, IsError>
+impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node>
+    for LeafNodeInner<'input, 'arena, NoError>
 where
     'input: 'arena,
-    Node: RuleNode<'input, 'arena>,
+    Node: NodeKindType<'arena>,
 {
-    fn cast_from(node: &Node) -> Option<&Self>
+    fn cast_from<'a>(node: &'a TreeNode<'input, 'arena, Node>) -> Option<&'a Self>
     where
         Self: Sized,
     {
-        node.as_error_node()
+        if node.node_tag.is_terminal() {
+            Some(unsafe { &*(node.ctx_ptr() as *const Self) })
+        } else {
+            None
+        }
     }
 
-    fn cast_from_mut(node: &mut Node) -> Option<&mut Self>
+    fn cast_from_mut<'a>(node: &'a mut TreeNode<'input, 'arena, Node>) -> Option<&'a mut Self>
     where
         Self: Sized,
     {
-        node.as_error_node_mut()
+        if node.node_tag.is_terminal() {
+            Some(unsafe { &mut *(node.ctx_ptr() as *mut Self) })
+        } else {
+            None
+        }
     }
 
-    fn iter_child_nodes<'a>(&'a self) -> Box<dyn Iterator<Item = &'arena Node> + 'a> {
+    fn as_node(&self) -> &TreeNode<'input, 'arena, Node> {
+        // SAFETY: All [NodeInner] instances are allocated by
+        // [Arena::alloc_node] with a valid [RuleNodeImpl] header
+        unsafe { TreeNode::from_ctx_ptr(self as *const Self as CtxPtr<'input, 'arena>) }
+    }
+
+    fn as_node_mut(&mut self) -> &mut TreeNode<'input, 'arena, Node> {
+        // SAFETY: All [NodeInner] instances are allocated by
+        // [Arena::alloc_node] with a valid [RuleNodeImpl] header
+        unsafe { TreeNode::from_ctx_ptr_mut(self as *mut Self as CtxPtr<'input, 'arena>) }
+    }
+
+    fn iter_child_nodes<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'arena TreeNode<'input, 'arena, Node>> + 'a> {
         Box::new(std::iter::empty())
     }
-
-    fn try_as_node(&'arena self) -> Option<&'arena Node> {
-        None
-    }
 }
 
-impl<'input, 'arena, E> Default for LeafNode<'input, 'arena, E>
+impl<'input, 'arena, Node> NodeInner<'input, 'arena, Node>
+    for LeafNodeInner<'input, 'arena, IsError>
 where
     'input: 'arena,
-    E: 'static,
+    Node: NodeKindType<'arena>,
 {
-    fn default() -> Self {
-        Self::new(token_factory::invalid())
+    fn cast_from<'a>(node: &'a TreeNode<'input, 'arena, Node>) -> Option<&'a Self>
+    where
+        Self: Sized,
+    {
+        if node.node_tag.is_error() {
+            Some(unsafe { &*(node.ctx_ptr() as *const Self) })
+        } else {
+            None
+        }
+    }
+
+    fn cast_from_mut<'a>(node: &'a mut TreeNode<'input, 'arena, Node>) -> Option<&'a mut Self>
+    where
+        Self: Sized,
+    {
+        if node.node_tag.is_error() {
+            Some(unsafe { &mut *(node.ctx_ptr() as *mut Self) })
+        } else {
+            None
+        }
+    }
+
+    fn as_node(&self) -> &TreeNode<'input, 'arena, Node> {
+        // SAFETY: All [NodeInner] instances are allocated by
+        // [Arena::alloc_node] with a valid [RuleNodeImpl] header
+        unsafe { TreeNode::from_ctx_ptr(self as *const Self as CtxPtr<'input, 'arena>) }
+    }
+
+    fn as_node_mut(&mut self) -> &mut TreeNode<'input, 'arena, Node> {
+        // SAFETY: All [NodeInner] instances are allocated by
+        // [Arena::alloc_node] with a valid [RuleNodeImpl] header
+        unsafe { TreeNode::from_ctx_ptr_mut(self as *mut Self as CtxPtr<'input, 'arena>) }
+    }
+
+    fn iter_child_nodes<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'arena TreeNode<'input, 'arena, Node>> + 'a> {
+        Box::new(std::iter::empty())
     }
 }
 
-impl<'input, 'arena, E> Debug for LeafNode<'input, 'arena, E>
+impl<'input, 'arena, E> Debug for LeafNodeInner<'input, 'arena, E>
 where
     E: 'static,
 {
@@ -304,13 +799,17 @@ where
     }
 }
 
-impl<'input, 'arena, E> LeafNode<'input, 'arena, E>
+impl<'input, 'arena, E> LeafNodeInner<'input, 'arena, E>
 where
     'input: 'arena,
     E: 'static,
 {
-    /// creates new leaf node
-    pub fn new(symbol: &'arena (dyn Token + 'input)) -> Self {
+    /// Creates new leaf node
+    ///
+    /// Note: [LeafNodeInner] can not exist as a standalone entity, this
+    /// constructor can only be called from [RuleNodeImpl::create_token_node] or
+    /// [RuleNodeImpl::create_error_node]
+    fn new(symbol: &'arena (dyn Token + 'input)) -> Self {
         Self {
             symbol,
             iserror: Default::default(),
@@ -319,20 +818,20 @@ where
 }
 
 /// non-error AST leaf node
-pub type TerminalNode<'input, 'arena> = LeafNode<'input, 'arena, NoError>;
+pub type TerminalNode<'input, 'arena> = LeafNodeInner<'input, 'arena, NoError>;
 
 /// # Error Leaf
 /// Created for each token created or consumed during recovery
-pub type ErrorNode<'input, 'arena> = LeafNode<'input, 'arena, IsError>;
+pub type ErrorNode<'input, 'arena> = LeafNodeInner<'input, 'arena, IsError>;
 
 pub trait ParseTreeVisitor<'input, 'arena, Node>
 where
     'input: 'arena,
-    Node: RuleNode<'input, 'arena>,
+    Node: NodeKindType<'arena>,
 {
     type Return: Default;
 
-    fn visit(&mut self, node: &Node) -> Result<Self::Return, ANTLRError>;
+    fn visit(&mut self, node: &TreeNode<'input, 'arena, Node>) -> Result<Self::Return, ANTLRError>;
 
     /// Called on terminal(leaf) node
     fn visit_terminal(
@@ -374,34 +873,37 @@ where
         Ok(next)
     }
 
-    fn should_visit_next_child(&self, _node: &Node, _current: &Self::Return) -> bool {
+    fn should_visit_next_child(
+        &self,
+        _node: &TreeNode<'input, 'arena, Node>,
+        _current: &Self::Return,
+    ) -> bool {
         true
     }
 }
 
 /// Base parse listener interface
-pub trait ParseTreeListener<'input, 'arena, Node>
+pub trait ParseTreeListener<'arena, Node>
 where
-    'input: 'arena,
-    Node: RuleNode<'input, 'arena>,
+    Node: NodeKindType<'arena>,
 {
     /// Called when parser creates terminal node
-    fn visit_terminal(&mut self, _node: &TerminalNode<'input, 'arena>) -> Result<(), ANTLRError> {
+    fn visit_terminal(&mut self, _node: &TerminalNode<'_, 'arena>) -> Result<(), ANTLRError> {
         Ok(())
     }
 
     /// Called when parser creates error node
-    fn visit_error_node(&mut self, _node: &ErrorNode<'input, 'arena>) -> Result<(), ANTLRError> {
+    fn visit_error_node(&mut self, _node: &ErrorNode<'_, 'arena>) -> Result<(), ANTLRError> {
         Ok(())
     }
 
     /// Called when parser enters any rule node
-    fn enter_every_rule(&mut self, _ctx: &Node) -> Result<(), ANTLRError> {
+    fn enter_every_rule(&mut self, _ctx: &TreeNode<'_, 'arena, Node>) -> Result<(), ANTLRError> {
         Ok(())
     }
 
     /// Called when parser exits any rule node
-    fn exit_every_rule(&mut self, _ctx: &Node) -> Result<(), ANTLRError> {
+    fn exit_every_rule(&mut self, _ctx: &TreeNode<'_, 'arena, Node>) -> Result<(), ANTLRError> {
         Ok(())
     }
 }
@@ -414,11 +916,11 @@ impl ParseTreeWalker {
     /// Walks recursively over tree `t` with `listener`
     pub fn walk<'input, 'arena, Node>(
         mut listener: Box<Node::Listener>,
-        t: &Node,
+        t: &TreeNode<'input, 'arena, Node>,
     ) -> Result<Box<Node::Listener>, ANTLRError>
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         if let Some(terminal) = t.as_terminal_node() {
             listener.visit_terminal(terminal)?;
@@ -440,11 +942,11 @@ impl ParseTreeWalker {
 
     fn enter_rule<'input, 'arena, Node>(
         listener: &mut Node::Listener,
-        t: &Node,
+        t: &TreeNode<'input, 'arena, Node>,
     ) -> Result<(), ANTLRError>
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         listener.enter_every_rule(t)?;
         t.enter_rule(listener)
@@ -452,11 +954,11 @@ impl ParseTreeWalker {
 
     fn exit_rule<'input, 'arena, Node>(
         listener: &mut Node::Listener,
-        t: &Node,
+        t: &TreeNode<'input, 'arena, Node>,
     ) -> Result<(), ANTLRError>
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         t.exit_rule(listener)?;
         listener.exit_every_rule(t)

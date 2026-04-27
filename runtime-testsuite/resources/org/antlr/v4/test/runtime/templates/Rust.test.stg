@@ -183,13 +183,13 @@ BasicListener(X) ::= <<
 @parser::definitions {
 struct TestListener;
 
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{
-	fn visit_terminal(&mut self, node: &TerminalNode\<'input, 'arena> ) -> Result\<(), ANTLRError> {
+impl\<'arena> ParseTreeListener\<'arena, TParserNodeKind\> for TestListener{
+	fn visit_terminal(&mut self, node: &TerminalNode\<'_, 'arena> ) -> Result\<(), ANTLRError> {
 		println!("{}", node.symbol.get_text());
 		Ok(())
 	}
 }
-impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {}
+impl\<'arena> TListener\<'arena> for TestListener {}
 }
 >>
 
@@ -202,11 +202,9 @@ TokenGetterListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener
-where
-    'input: 'arena,
+impl\<'arena> TListener\<'arena> for TestListener
 {
-	fn exit_a(&mut self, node: &AContext\<'input,'arena>) -> Result\<(), ANTLRError> {
+	fn exit_a\<'input: 'arena>(&mut self, node: &AContext\<'input, 'arena>) -> Result\<(), ANTLRError> {
 		if node.get_child_count() == 2 {
 			println!("{} {} {:?}",node.INT(0).unwrap().symbol.get_text(),node.INT(1).unwrap().symbol.get_text(),node.INT_all())
 		} else {
@@ -215,7 +213,7 @@ where
         Ok(())
 	}
 }
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener {}
+impl\<'arena> ParseTreeListener\<'arena, TParserNodeKind\> for TestListener {}
 }
 >>
 
@@ -225,11 +223,9 @@ RuleGetterListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener
-where
-    'input: 'arena,
+impl\<'arena> TListener\<'arena> for TestListener
 {
-	fn exit_a(&mut self, node: &AContext\<'input,'arena>) -> Result\<(), ANTLRError> {
+	fn exit_a\<'input: 'arena>(&mut self, node: &AContext\<'input, 'arena>) -> Result\<(), ANTLRError> {
 		if node.get_child_count() == 2 {
 			println!("{} {} {}",
 				node.b(0).unwrap().start().get_text(),
@@ -242,7 +238,7 @@ where
         Ok(())
 	}
 }
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
+impl\<'arena> ParseTreeListener\<'arena, TParserNodeKind\> for TestListener{}
 }
 >>
 
@@ -252,9 +248,9 @@ LRListener(X) ::= <<
 use dbt_antlr4::tree::Tree;
 struct TestListener;
 
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
-impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {
-	fn exit_e(&mut self, ctx: &EContext\<'input,'arena>) -> Result\<(), ANTLRError> {
+impl\<'arena> ParseTreeListener\<'arena, TParserNodeKind\> for TestListener{}
+impl\<'arena> TListener\<'arena> for TestListener {
+	fn exit_e\<'input: 'arena>(&mut self, ctx: &EContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		if ctx.get_child_count() == 3 {
 			println!("{} {} {}",ctx.e(0).unwrap().start().get_text(),ctx.e(1).unwrap().start().get_text(),ctx.e_all()[0].start().get_text());
 		} else {
@@ -272,13 +268,13 @@ use dbt_antlr4::tree::Tree;
 
 struct TestListener;
 
-impl\<'input, 'arena> ParseTreeListener\<'input, 'arena, TParserContextNode\<'input, 'arena>\> for TestListener{}
-impl\<'input, 'arena> TListener\<'input, 'arena> for TestListener where 'input: 'arena {
-	fn exit_Call(&mut self, ctx: &CallContext\<'input,'arena>) -> Result\<(), ANTLRError> {
+impl\<'arena> ParseTreeListener\<'arena, TParserNodeKind\> for TestListener{}
+impl\<'arena> TListener\<'arena> for TestListener {
+	fn exit_Call\<'input: 'arena>(&mut self, ctx: &CallContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		println!("{} {}",ctx.e().unwrap().start().get_text(),ctx.eList().unwrap().to_string(None,None));
         Ok(())
 	}
-	fn exit_Int(&mut self, ctx: &IntContext\<'input,'arena>) -> Result\<(), ANTLRError> {
+	fn exit_Int\<'input: 'arena>(&mut self, ctx: &IntContext\<'input,'arena>) -> Result\<(), ANTLRError> {
 		println!("{}",ctx.INT().unwrap().symbol.get_text());
         Ok(())
 	}

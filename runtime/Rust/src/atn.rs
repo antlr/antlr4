@@ -11,7 +11,8 @@ use crate::lexer_action::LexerAction;
 use crate::ll1_analyzer::LL1Analyzer;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON};
 use crate::transition::RuleTransition;
-use crate::tree::RuleNode;
+use crate::tree::NodeKindType;
+use crate::tree::TreeNode;
 use std::fmt::{Debug, Formatter};
 
 pub const INVALID_ALT: i32 = 0;
@@ -84,11 +85,11 @@ impl ATN {
     pub fn next_tokens_in_ctx<'input, 'arena, Node>(
         &self,
         s: ATNStateRef,
-        ctx: Option<&'arena Node>,
+        ctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
     ) -> IntervalSetBuf
     where
         'input: 'arena,
-        Node: RuleNode<'input, 'arena>,
+        Node: NodeKindType<'arena>,
     {
         let analyzer = LL1Analyzer::new(self);
         analyzer.look(s, None, ctx)

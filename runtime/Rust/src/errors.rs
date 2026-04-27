@@ -6,6 +6,7 @@ use crate::rule_context::states_stack;
 use crate::token::{OwningToken, Token};
 use crate::token_factory::TokenFactory;
 use crate::transition::PredicateTransition;
+use crate::tree::TreeNode;
 use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
@@ -199,7 +200,7 @@ impl ANTLRError {
     pub fn input_mismatch_with_state<'input, 'arena, TF, P>(
         recognizer: &mut P,
         offending_state: i32,
-        ctx: &'arena P::Node,
+        ctx: &'arena TreeNode<'input, 'arena, P::Node>,
     ) -> Self
     where
         'input: 'arena,

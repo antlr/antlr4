@@ -6,6 +6,7 @@ use crate::atn_config_set::ConfigSet;
 use crate::dfa::DFAStateStore;
 use crate::parser::Parser;
 use crate::token_factory::TokenFactory;
+use crate::tree::TreeNode;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub enum SemanticContext<'ephemeral> {
@@ -33,7 +34,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
     pub(crate) fn evaluate<'input, 'arena, TF, P>(
         &self,
         parser: &mut P,
-        outer_context: &'arena P::Node,
+        outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
     ) -> bool
     where
         'input: 'arena,
@@ -63,7 +64,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
         &'a self,
         scratch: &'scratch bumpalo::Bump,
         parser: &P,
-        outer_context: &'arena P::Node,
+        outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
     ) -> Option<&'scratch SemanticContext<'scratch>>
     where
         'a: 'scratch,

@@ -25,7 +25,7 @@ use dbt_antlr4::trees::string_tree;
 use dbt_antlr4::{Arena, InputStream};
 
 use crate::gen::visitorbasiclexer::VisitorBasicLexer;
-use crate::gen::visitorbasicparser::{VisitorBasicParser, VisitorBasicParserContextNode};
+use crate::gen::visitorbasicparser::{VisitorBasicParser, VisitorBasicParserNode};
 use crate::gen::visitorbasicvisitor::VisitorBasicVisitor;
 use crate::gen::visitorcalclexer::VisitorCalcLexer;
 use crate::gen::visitorcalcparser::{
@@ -140,7 +140,7 @@ fn test_should_not_visit_eof() {
 
             fn should_visit_next_child(
                 &self,
-                _node: &VisitorBasicParserContextNode<'input, 'arena>,
+                _node: &VisitorBasicParserNode<'input, 'arena>,
                 current: &Self::Return,
             ) -> bool {
                 current.is_empty()
@@ -200,7 +200,7 @@ fn test_should_not_visit_anything() {
 
             fn should_visit_next_child(
                 &self,
-                _node: &VisitorBasicParserContextNode<'input, 'arena>,
+                _node: &VisitorBasicParserNode<'input, 'arena>,
                 _current: &Self::Return,
             ) -> bool {
                 false

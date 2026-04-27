@@ -21,7 +21,7 @@ use dbt_antlr4::atn_simulator::BaseATNSimulator;
 use dbt_antlr4::atn_simulator::ParserATNSimulatorManager as ATNSimulatorManager;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -60,7 +60,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;7]  = [
 
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
-pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, CSVParserExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>, Input, TF, dyn CSVListener<'input, 'arena>>;
+pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, CSVParserExt<'input, 'arena>, CSVParserNodeKind, Input, TF>;
 pub fn parser_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 
 pub struct CSVParser<'input, 'arena, Input, TF>
@@ -113,7 +113,7 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: CSVListener<'input, 'arena> + 'static,
+        L: CSVListener<'arena> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -135,41 +135,32 @@ impl CSVTreeWalker
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: CSVListener<'input, 'arena> + 'static,
-        T: NodeInner<'input, 'arena, CSVParserContextNode<'input, 'arena>>,
+        L: CSVListener<'arena> + 'static,
+        T: NodeInner<'input, 'arena, CSVParserNodeKind>,
     {
-        let Some(node) = tree.try_as_node() else {
-            return Err(ANTLRError::custom_error("TreeWalker can only walk non-leaf nodes".to_string()));
-        };
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <CSVParserContextNode as RuleNode>::Listener) };
-        let listener = ParseTreeWalker::walk(listener, node)?;
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <CSVParserNodeKind as NodeKindType>::Listener) };
+        let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
 }
 
-#[derive(Debug)]
-#[repr(C)]
-pub enum CSVParserContextNode<'input, 'arena> {
-    CsvFileContext(&'arena mut CsvFileContext<'input, 'arena>),
-    HdrContext(&'arena mut HdrContext<'input, 'arena>),
-    RowContext(&'arena mut RowContext<'input, 'arena>),
-    FieldContext(&'arena mut FieldContext<'input, 'arena>),
-
-    Terminal(TerminalNode<'input, 'arena>),
-    Error(ErrorNode<'input, 'arena>),
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[repr(u16)]
+pub enum CSVParserNodeKind {
+    CsvFileContext,
+    HdrContext,
+    RowContext,
+    FieldContext,
+    Terminal,
+    Error,
 }
+pub type CSVParserNode<'input, 'arena> = TreeNode<'input, 'arena, CSVParserNodeKind>;
 
 dbt_antlr4::impl_deref! { parser => CSVParser }
-dbt_antlr4::impl_defaults! { CSVParserContextNode }
-dbt_antlr4::impl_from_contexts! { CSVParserContextNode { CsvFileContext(CsvFileContext),  HdrContext(HdrContext),  RowContext(RowContext),  FieldContext(FieldContext),  } }
-dbt_antlr4::impl_tree! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext, } }
-dbt_antlr4::impl_parse_tree! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext, } }
-dbt_antlr4::impl_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { CSVParserContextNode { CsvFileContext, HdrContext, RowContext, FieldContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_rule_node! { CSVParserContextNode {
+dbt_antlr4::impl_node_kind! { CSVParserNodeKind {
 ; CsvFileContext(enter_csvFile, exit_csvFile,  visit_csvFile), HdrContext(enter_hdr, exit_hdr,  visit_hdr), RowContext(enter_row, exit_row,  visit_row), FieldContext(enter_field, exit_field,  visit_field), 
-    }; listener = dyn CSVListener<'input, 'arena>, visitor = CSVVisitor,
+    }; listener = dyn CSVListener<'arena>, visitor = CSVVisitor,
 }
 
 pub struct CSVParserExt<'input, 'arena> {
@@ -199,42 +190,50 @@ where
 //------------------- csvFile ----------------
 pub type CsvFileContextAll<'input, 'arena> = CsvFileContext<'input, 'arena>;
 
-pub type CsvFileContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, CsvFileContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
+pub type CsvFileContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, CsvFileContextExt<'input, 'arena>, CSVParserNodeKind>;
 dbt_antlr4::impl_visitable! { CSVVisitor::CsvFileContext(visit_csvFile) }
+#[derive(Debug)]
 pub struct CsvFileContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for CsvFileContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for CsvFileContextExt<'input, 'arena>
 {
-	type Node = CSVParserContextNode<'input, 'arena>;
+	type NodeKind = CSVParserNodeKind;
+    fn node_tag() -> CSVParserNodeKind { CSVParserNodeKind::CsvFileContext }
 	fn get_rule_index(&self) -> usize { RULE_csvFile }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::CsvFileContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: CsvFileContext<'input, 'arena>,
+    ) -> *mut CSVParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a CsvFileContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => CsvFileContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::CsvFileContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a mut CsvFileContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut CsvFileContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> CsvFileContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CsvFileContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, CsvFileContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, CsvFileContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -271,7 +270,7 @@ where
 	pub fn csvFile(&mut self,) -> Result<&'arena CsvFileContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(CsvFileContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 0, RULE_csvFile)?;
+        recog.base.enter_rule(CsvFileContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_csvFile)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena CsvFileContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
@@ -314,42 +313,50 @@ where
 //------------------- hdr ----------------
 pub type HdrContextAll<'input, 'arena> = HdrContext<'input, 'arena>;
 
-pub type HdrContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, HdrContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
+pub type HdrContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, HdrContextExt<'input, 'arena>, CSVParserNodeKind>;
 dbt_antlr4::impl_visitable! { CSVVisitor::HdrContext(visit_hdr) }
+#[derive(Debug)]
 pub struct HdrContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for HdrContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for HdrContextExt<'input, 'arena>
 {
-	type Node = CSVParserContextNode<'input, 'arena>;
+	type NodeKind = CSVParserNodeKind;
+    fn node_tag() -> CSVParserNodeKind { CSVParserNodeKind::HdrContext }
 	fn get_rule_index(&self) -> usize { RULE_hdr }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::HdrContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: HdrContext<'input, 'arena>,
+    ) -> *mut CSVParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a HdrContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => HdrContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::HdrContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a mut HdrContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut HdrContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> HdrContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut HdrContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, HdrContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, HdrContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -378,7 +385,7 @@ where
 	pub fn hdr(&mut self,) -> Result<&'arena HdrContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(HdrContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 2, RULE_hdr)?;
+        recog.base.enter_rule(HdrContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_hdr)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena HdrContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
@@ -404,42 +411,50 @@ where
 //------------------- row ----------------
 pub type RowContextAll<'input, 'arena> = RowContext<'input, 'arena>;
 
-pub type RowContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, RowContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
+pub type RowContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, RowContextExt<'input, 'arena>, CSVParserNodeKind>;
 dbt_antlr4::impl_visitable! { CSVVisitor::RowContext(visit_row) }
+#[derive(Debug)]
 pub struct RowContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for RowContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for RowContextExt<'input, 'arena>
 {
-	type Node = CSVParserContextNode<'input, 'arena>;
+	type NodeKind = CSVParserNodeKind;
+    fn node_tag() -> CSVParserNodeKind { CSVParserNodeKind::RowContext }
 	fn get_rule_index(&self) -> usize { RULE_row }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::RowContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: RowContext<'input, 'arena>,
+    ) -> *mut CSVParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a RowContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => RowContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::RowContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a mut RowContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut RowContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> RowContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut RowContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, RowContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, RowContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -472,7 +487,7 @@ where
 	pub fn row(&mut self,) -> Result<&'arena RowContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(RowContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 4, RULE_row)?;
+        recog.base.enter_rule(RowContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 4, RULE_row)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena RowContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
@@ -528,42 +543,50 @@ where
 //------------------- field ----------------
 pub type FieldContextAll<'input, 'arena> = FieldContext<'input, 'arena>;
 
-pub type FieldContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, FieldContextExt<'input, 'arena>, CSVParserContextNode<'input, 'arena>>;
+pub type FieldContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, FieldContextExt<'input, 'arena>, CSVParserNodeKind>;
 dbt_antlr4::impl_visitable! { CSVVisitor::FieldContext(visit_field) }
+#[derive(Debug)]
 pub struct FieldContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for FieldContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for FieldContextExt<'input, 'arena>
 {
-	type Node = CSVParserContextNode<'input, 'arena>;
+	type NodeKind = CSVParserNodeKind;
+    fn node_tag() -> CSVParserNodeKind { CSVParserNodeKind::FieldContext }
 	fn get_rule_index(&self) -> usize { RULE_field }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::FieldContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: FieldContext<'input, 'arena>,
+    ) -> *mut CSVParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a FieldContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => FieldContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            CSVParserContextNode::FieldContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut CSVParserNode<'input, 'arena>,
+    ) -> Option<&'a mut FieldContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut FieldContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> FieldContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut FieldContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, FieldContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, FieldContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -604,7 +627,7 @@ where
 	pub fn field(&mut self,) -> Result<&'arena FieldContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(FieldContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 6, RULE_field)?;
+        recog.base.enter_rule(FieldContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 6, RULE_field)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena FieldContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			recog.base.set_state(32);

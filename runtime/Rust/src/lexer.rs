@@ -15,7 +15,7 @@ use crate::lexer_atn_simulator::{ILexerATNSimulator, LexerATNSimulator};
 use crate::Arena;
 
 use crate::recognizer::{Actions, Recognizer};
-use crate::rule_context::EmptyRuleNode;
+use crate::rule_context::{EmptyNodeKind, EmptyRuleNode};
 use crate::token::TOKEN_INVALID_TYPE;
 use crate::token_factory::TokenFactory;
 use crate::token_source::TokenSource;
@@ -169,7 +169,7 @@ where
     Input: CharStream<'input>,
     TF: TokenFactory<'input, 'arena> + 'arena,
 {
-    type Node = EmptyRuleNode<'input, 'arena>;
+    type Node = EmptyNodeKind;
 
     fn sempred(
         &mut self,

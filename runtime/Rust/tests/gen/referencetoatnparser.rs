@@ -21,7 +21,7 @@ use dbt_antlr4::atn_simulator::BaseATNSimulator;
 use dbt_antlr4::atn_simulator::ParserATNSimulatorManager as ATNSimulatorManager;
 use dbt_antlr4::atn::{ATN, INVALID_ALT};
 use dbt_antlr4::error_strategy::{DefaultErrorStrategy, ErrorStrategyDelegate, ErrorStrategy};
-use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, BaseParserRuleContextInner, ParserRuleContext};
+use dbt_antlr4::parser_rule_context::{BaseParserRuleContext, ParserRuleContext};
 use dbt_antlr4::tree::*;
 use dbt_antlr4::token::{TOKEN_EOF,Token};
 use dbt_antlr4::int_stream::EOF;
@@ -51,7 +51,7 @@ pub const _SYMBOLIC_NAMES: [Option<&'static str>;4]  = [
 
 static VOCABULARY: LazyLock<Box<dyn Vocabulary>> = LazyLock::new(|| Box::new(VocabularyImpl::new(_LITERAL_NAMES.iter(), _SYMBOLIC_NAMES.iter(), None)));
 
-pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, ReferenceToATNParserExt<'input, 'arena>, ReferenceToATNParserContextNode<'input, 'arena>, Input, TF, dyn ReferenceToATNListener<'input, 'arena>>;
+pub type BaseParserType<'input, 'arena, Input, TF> = BaseParser<'input, 'arena, ReferenceToATNParserExt<'input, 'arena>, ReferenceToATNParserNodeKind, Input, TF>;
 pub fn parser_simulator_manager() -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 
 pub struct ReferenceToATNParser<'input, 'arena, Input, TF>
@@ -104,7 +104,7 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: ReferenceToATNListener<'input, 'arena> + 'static,
+        L: ReferenceToATNListener<'arena> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -120,38 +120,29 @@ impl ReferenceToATNTreeWalker
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: ReferenceToATNListener<'input, 'arena> + 'static,
-        T: NodeInner<'input, 'arena, ReferenceToATNParserContextNode<'input, 'arena>>,
+        L: ReferenceToATNListener<'arena> + 'static,
+        T: NodeInner<'input, 'arena, ReferenceToATNParserNodeKind>,
     {
-        let Some(node) = tree.try_as_node() else {
-            return Err(ANTLRError::custom_error("TreeWalker can only walk non-leaf nodes".to_string()));
-        };
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <ReferenceToATNParserContextNode as RuleNode>::Listener) };
-        let listener = ParseTreeWalker::walk(listener, node)?;
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <ReferenceToATNParserNodeKind as NodeKindType>::Listener) };
+        let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
 }
 
-#[derive(Debug)]
-#[repr(C)]
-pub enum ReferenceToATNParserContextNode<'input, 'arena> {
-    AContext(&'arena mut AContext<'input, 'arena>),
-
-    Terminal(TerminalNode<'input, 'arena>),
-    Error(ErrorNode<'input, 'arena>),
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[repr(u16)]
+pub enum ReferenceToATNParserNodeKind {
+    AContext,
+    Terminal,
+    Error,
 }
+pub type ReferenceToATNParserNode<'input, 'arena> = TreeNode<'input, 'arena, ReferenceToATNParserNodeKind>;
 
 dbt_antlr4::impl_deref! { parser => ReferenceToATNParser }
-dbt_antlr4::impl_defaults! { ReferenceToATNParserContextNode }
-dbt_antlr4::impl_from_contexts! { ReferenceToATNParserContextNode { AContext(AContext),  } }
-dbt_antlr4::impl_tree! { ReferenceToATNParserContextNode { AContext, } }
-dbt_antlr4::impl_parse_tree! { ReferenceToATNParserContextNode { AContext, } }
-dbt_antlr4::impl_rule_context! { ReferenceToATNParserContextNode { AContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_parser_rule_context! { ReferenceToATNParserContextNode { AContext,  } { Terminal, Error, } }
-dbt_antlr4::impl_rule_node! { ReferenceToATNParserContextNode {
+dbt_antlr4::impl_node_kind! { ReferenceToATNParserNodeKind {
 ; AContext(enter_a, exit_a, ), 
-    }; listener = dyn ReferenceToATNListener<'input, 'arena>,
+    }; listener = dyn ReferenceToATNListener<'arena>,
 }
 
 pub struct ReferenceToATNParserExt<'input, 'arena> {
@@ -181,41 +172,49 @@ where
 //------------------- a ----------------
 pub type AContextAll<'input, 'arena> = AContext<'input, 'arena>;
 
-pub type AContext<'input, 'arena> = BaseParserRuleContextInner<'input, 'arena, AContextExt<'input, 'arena>, ReferenceToATNParserContextNode<'input, 'arena>>;
+pub type AContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AContextExt<'input, 'arena>, ReferenceToATNParserNodeKind>;
+#[derive(Debug)]
 pub struct AContextExt<'input, 'arena> {
     ph: PhantomData<(&'arena (), &'input ())>,
 }
 
-impl<'input, 'arena> CustomRuleContext<'input, 'arena> for AContextExt<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AContextExt<'input, 'arena>
 {
-	type Node = ReferenceToATNParserContextNode<'input, 'arena>;
+	type NodeKind = ReferenceToATNParserNodeKind;
+    fn node_tag() -> ReferenceToATNParserNodeKind { ReferenceToATNParserNodeKind::AContext }
 	fn get_rule_index(&self) -> usize { RULE_a }
-    fn base_ref_from_node(node: &Self::Node) -> Option<&BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            ReferenceToATNParserContextNode::AContext(inner) => Some(inner),
-            _ => None,
+    fn make_node(
+        arena: &'arena Arena,
+        ctx: AContext<'input, 'arena>,
+    ) -> *mut ReferenceToATNParserNode<'input, 'arena> {
+        arena.alloc_zeroed_node(ctx)}
+    fn cast_from<'a>(
+        node: &'a ReferenceToATNParserNode<'input, 'arena>,
+    ) -> Option<&'a AContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => AContext<'input, 'arena>))
+        } else {
+            None
         }
     }
-    fn base_mut_ref_from_node(node: &mut Self::Node) -> Option<&mut BaseParserRuleContext<'input, 'arena, Self>> {
-        match node {
-            ReferenceToATNParserContextNode::AContext(inner) => Some(inner),
-            _ => None,
+    fn cast_from_mut<'a>(
+        node: &'a mut ReferenceToATNParserNode<'input, 'arena>,
+    ) -> Option<&'a mut AContext<'input, 'arena>> {
+        if node.node_tag() == Self::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut AContext<'input, 'arena>))
+        } else {
+            None
         }
     }
 }
 
 impl<'input, 'arena> AContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserContextNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut AContextAll<'input, 'arena>
-    where
-        'input: 'arena,
+	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut ReferenceToATNParserNode<'input, 'arena>
     {
-		arena.alloc_context( unsafe { 
-        BaseParserRuleContext::new(arena, parent, invoking_state, AContextExt {
+        BaseParserRuleContext::create(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
-			},
-		)})
+			}
+		)
 	}
 }
 
@@ -268,7 +267,7 @@ where
 	pub fn a(&mut self,) -> Result<&'arena AContextAll<'input, 'arena>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()).into(), 0, RULE_a)?;
+        recog.base.enter_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_a)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena AContext {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {

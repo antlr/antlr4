@@ -4,16 +4,14 @@ use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::tree::ParseTreeListener;
 use super::referencetoatnparser::*;
 
-pub trait ReferenceToATNListener<'input, 'arena> : ParseTreeListener<'input, 'arena, ReferenceToATNParserContextNode<'input, 'arena>>
-where
-    'input: 'arena,
+pub trait ReferenceToATNListener<'arena> : ParseTreeListener<'arena, ReferenceToATNParserNodeKind>
 {
     /// Enter a parse tree produced by {@link ReferenceToATNParser#a}.
     /// @param ctx the parse tree
-    fn enter_a(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn enter_a<'input: 'arena>(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
     /// Exit a parse tree produced by {@link ReferenceToATNParser#a}.
     /// @param ctx the parse tree
-    fn exit_a(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn exit_a<'input: 'arena>(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
 }

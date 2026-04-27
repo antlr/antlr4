@@ -30,20 +30,17 @@ where
         _node: &'arena ErrorNode<'input, 'arena>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
-    fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserContextNode<'input, 'arena>>) -> Result<Self::Return, ANTLRError> {
-        let Some(node) = tree.try_as_node() else {
-            return Err(ANTLRError::custom_error("Visitor can only visit non-leaf nodes".to_string()));
-        };
-        self.visit_node(node)
+    fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserNodeKind>) -> Result<Self::Return, ANTLRError> {
+        self.visit_node(tree.as_node())
     }
 
-    fn visit_node(&mut self, node: &'arena VisitorBasicParserContextNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
+    fn visit_node(&mut self, node: &'arena VisitorBasicParserNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
         node.accept(self)
     }
 
     fn visit_children(
         &mut self,
-        node: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserContextNode<'input, 'arena>>,
+        node: &'arena dyn NodeInner<'input, 'arena, VisitorBasicParserNodeKind>,
     ) -> Result<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
         for child in node.iter_child_nodes() {
@@ -63,5 +60,5 @@ where
         next: Self::Return,
     ) -> Result<Self::Return, ANTLRError> { Ok(next) }
 
-    fn should_visit_next_child(&self, _node: &'arena VisitorBasicParserContextNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
+    fn should_visit_next_child(&self, _node: &'arena VisitorBasicParserNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
 }

@@ -50,19 +50,20 @@ use serial_test::serial;
 
 use crate::gen::csvlexer::*;
 use crate::gen::csvlistener::*;
-use crate::gen::csvparser::CSVParser;
-use crate::gen::csvparser::CSVParserContextNode;
+use crate::gen::csvparser::CSVParserNode;
+use crate::gen::csvparser::{CSVParser, CSVParserNodeKind};
 use crate::gen::labelslexer::LabelsLexer;
 use crate::gen::labelsparser::{EContextAll, LabelsParser};
 use crate::gen::referencetoatnlexer::ReferenceToATNLexer;
 use crate::gen::referencetoatnlistener::ReferenceToATNListener;
-use crate::gen::referencetoatnparser::ReferenceToATNParser;
-use crate::gen::referencetoatnparser::ReferenceToATNParserContextNode;
+use crate::gen::referencetoatnparser::ReferenceToATNParserNode;
+use crate::gen::referencetoatnparser::{ReferenceToATNParser, ReferenceToATNParserNodeKind};
 use crate::gen::simplelrlexer::SimpleLRLexer;
 use crate::gen::simplelrlistener::SimpleLRListener;
-use crate::gen::simplelrparser::{SimpleLRParser, SimpleLRParserContextNode, SimpleLRTreeWalker};
+use crate::gen::simplelrparser::{SimpleLRParser, SimpleLRParserNodeKind, SimpleLRTreeWalker};
 use crate::gen::xmllexer::XMLLexer;
 use crate::gen::*;
+use crate::r#gen::simplelrparser::SimpleLRParserNode;
 
 #[test]
 fn lexer_test_xml() -> std::io::Result<()> {
@@ -171,13 +172,8 @@ fn lexer_test_csv() {
 
 struct Listener {}
 
-impl<'input, 'arena> ParseTreeListener<'input, 'arena, CSVParserContextNode<'input, 'arena>>
-    for Listener
-{
-    fn enter_every_rule(
-        &mut self,
-        ctx: &CSVParserContextNode<'input, 'arena>,
-    ) -> Result<(), ANTLRError> {
+impl<'arena> ParseTreeListener<'arena, CSVParserNodeKind> for Listener {
+    fn enter_every_rule(&mut self, ctx: &CSVParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             csvparser::ruleNames
@@ -188,7 +184,7 @@ impl<'input, 'arena> ParseTreeListener<'input, 'arena, CSVParserContextNode<'inp
     }
 }
 
-impl<'input, 'arena> CSVListener<'input, 'arena> for Listener where 'input: 'arena {}
+impl<'arena> CSVListener<'arena> for Listener {}
 
 #[test]
 fn parser_test_csv() {
@@ -211,13 +207,10 @@ fn parser_test_csv() {
 
 struct Listener2 {}
 
-impl<'input, 'arena>
-    ParseTreeListener<'input, 'arena, ReferenceToATNParserContextNode<'input, 'arena>>
-    for Listener2
-{
+impl<'arena> ParseTreeListener<'arena, ReferenceToATNParserNodeKind> for Listener2 {
     fn enter_every_rule(
         &mut self,
-        ctx: &ReferenceToATNParserContextNode<'input, 'arena>,
+        ctx: &ReferenceToATNParserNode<'_, 'arena>,
     ) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
@@ -229,7 +222,7 @@ impl<'input, 'arena>
     }
 }
 
-impl<'input, 'arena> ReferenceToATNListener<'input, 'arena> for Listener2 where 'input: 'arena {}
+impl<'arena> ReferenceToATNListener<'arena> for Listener2 {}
 
 #[test]
 fn test_adaptive_predict_and_tree() {
@@ -250,18 +243,13 @@ fn test_adaptive_predict_and_tree() {
 
 struct Listener3;
 
-impl<'input, 'arena> ParseTreeListener<'input, 'arena, SimpleLRParserContextNode<'input, 'arena>>
-    for Listener3
-{
-    fn visit_terminal(&mut self, node: &TerminalNode<'input, 'arena>) -> Result<(), ANTLRError> {
+impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener3 {
+    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!("terminal node {}", node.symbol.get_text());
         Ok(())
     }
 
-    fn enter_every_rule(
-        &mut self,
-        ctx: &SimpleLRParserContextNode<'input, 'arena>,
-    ) -> Result<(), ANTLRError> {
+    fn enter_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             simplelrparser::ruleNames
@@ -271,10 +259,7 @@ impl<'input, 'arena> ParseTreeListener<'input, 'arena, SimpleLRParserContextNode
         Ok(())
     }
 
-    fn exit_every_rule(
-        &mut self,
-        ctx: &SimpleLRParserContextNode<'input, 'arena>,
-    ) -> Result<(), ANTLRError> {
+    fn exit_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!(
             "rule exited {}",
             simplelrparser::ruleNames
@@ -285,7 +270,7 @@ impl<'input, 'arena> ParseTreeListener<'input, 'arena, SimpleLRParserContextNode
     }
 }
 
-impl<'input, 'arena> SimpleLRListener<'input, 'arena> for Listener3 where 'input: 'arena {}
+impl<'arena> SimpleLRListener<'arena> for Listener3 {}
 
 #[test]
 fn test_lr() {
@@ -323,18 +308,13 @@ struct Listener4 {
     data: String,
 }
 
-impl<'input, 'arena> ParseTreeListener<'input, 'arena, SimpleLRParserContextNode<'input, 'arena>>
-    for Listener4
-{
-    fn visit_terminal(&mut self, node: &TerminalNode<'input, 'arena>) -> Result<(), ANTLRError> {
+impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener4 {
+    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!("enter terminal");
         let _ = writeln!(&mut self.data, "terminal node {}", node.symbol.get_text());
         Ok(())
     }
-    fn enter_every_rule(
-        &mut self,
-        ctx: &SimpleLRParserContextNode<'input, 'arena>,
-    ) -> Result<(), ANTLRError> {
+    fn enter_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             simplelrparser::ruleNames
@@ -345,7 +325,7 @@ impl<'input, 'arena> ParseTreeListener<'input, 'arena, SimpleLRParserContextNode
     }
 }
 
-impl<'input, 'arena> SimpleLRListener<'input, 'arena> for Listener4 where 'input: 'arena {}
+impl<'arena> SimpleLRListener<'arena> for Listener4 {}
 
 #[test]
 fn test_remove_listener() {

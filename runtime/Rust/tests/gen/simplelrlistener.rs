@@ -4,24 +4,22 @@ use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::tree::ParseTreeListener;
 use super::simplelrparser::*;
 
-pub trait SimpleLRListener<'input, 'arena> : ParseTreeListener<'input, 'arena, SimpleLRParserContextNode<'input, 'arena>>
-where
-    'input: 'arena,
+pub trait SimpleLRListener<'arena> : ParseTreeListener<'arena, SimpleLRParserNodeKind>
 {
     /// Enter a parse tree produced by {@link SimpleLRParser#s}.
     /// @param ctx the parse tree
-    fn enter_s(&mut self, _ctx: &SContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn enter_s<'input: 'arena>(&mut self, _ctx: &SContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
     /// Exit a parse tree produced by {@link SimpleLRParser#s}.
     /// @param ctx the parse tree
-    fn exit_s(&mut self, _ctx: &SContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn exit_s<'input: 'arena>(&mut self, _ctx: &SContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
     /// Enter a parse tree produced by {@link SimpleLRParser#a}.
     /// @param ctx the parse tree
-    fn enter_a(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn enter_a<'input: 'arena>(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
     /// Exit a parse tree produced by {@link SimpleLRParser#a}.
     /// @param ctx the parse tree
-    fn exit_a(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
+    fn exit_a<'input: 'arena>(&mut self, _ctx: &AContext<'input, 'arena>) -> Result<(), ANTLRError> { Ok(()) }
 
 }
