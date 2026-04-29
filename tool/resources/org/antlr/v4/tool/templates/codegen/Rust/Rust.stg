@@ -543,7 +543,7 @@ where
 	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub <endif>fn <currentRule.escapedName>(&mut self,<args; separator=",">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = <self()>.base.take_ctx();
-        <self()>.base.enter_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>), <currentRule.startState>, RULE_<currentRule.name>)?;
+        <self()>.base.enter_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>)?, <currentRule.startState>, RULE_<currentRule.name>)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType>\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		<namedActions.init>
 		<locals; separator="\n">
@@ -598,7 +598,7 @@ where
 		let recog = self;
 		let _parentctx = <self()>.base.take_ctx();
 		let _parentState = <self()>.base.get_state();
-		<self()>.base.enter_recursion_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>), <currentRule.startState>, RULE_<currentRule.name>, _p)?;
+		<self()>.base.enter_recursion_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>)?, <currentRule.startState>, RULE_<currentRule.name>, _p)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType>\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = <currentRule.startState>;
 		<namedActions.init>
@@ -1030,7 +1030,7 @@ where
 }
 
 impl\<'input: 'arena, 'arena, Tok: Token + 'input> <struct.escapedName>Ext\<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>Node\<'input, 'arena, Tok\>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> &'arena mut <parser.name>Node\<'input, 'arena, Tok\>
+	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>Node\<'input, 'arena, Tok\>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> Result\<&'arena mut <parser.name>Node\<'input, 'arena, Tok>, ANTLRError\>
     {
 		<struct.attributeDecls:{a | let mut _init_<a.escapedName> = <rustTypeInitMap.(a.type)>;
 		 }>
@@ -1203,7 +1203,7 @@ let tmp = <self()>.input.lt(-1);
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 /*recRuleAltStartAction*/
-let tmp = <ctxName>ContextExt::create(<self()>.get_arena(), _parentctx, _parentState);
+let tmp = <ctxName>ContextExt::create(<self()>.get_arena(), _parentctx, _parentState)?;
 let _prevctx = <self()>.push_new_recursion_context(tmp.into(), _startState, RULE_<ruleName>)?;
 <if(label)>
 <self()>.base.with_mut_ctx(|ctx| {
@@ -1218,7 +1218,7 @@ ctx.as_rule_context_mut::\<<ctxName>Context\<TF::Tok>\>().unwrap().<label> = Som
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
 /*recRuleLabeledAltStartAction*/
-let tmp = <ruleName; format="cap">ContextExt::create(<self()>.get_arena(), _parentctx, _parentState);
+let tmp = <ruleName; format="cap">ContextExt::create(<self()>.get_arena(), _parentctx, _parentState)?;
 <currentAltLabel; format="cap">ContextExt::copy_from(tmp);
 let _prevctx = <self()>.push_new_recursion_context(tmp, _startState, RULE_<ruleName>)?;
 let _local_ctx_fn = |recog: &Self| -> &'arena <currentAltLabel; format="cap">Context\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};

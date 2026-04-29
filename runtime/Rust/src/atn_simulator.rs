@@ -52,7 +52,7 @@ macro_rules! dfa_sum_method {
 
 impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
     pub fn total_allocated_bytes(&self) -> usize {
-        self.context_cache_bytes() + self.dfa_bytes()
+        self.context_cache_bytes() + self.dfa_bytes() + self.edge_set_bytes()
     }
 
     pub fn context_cache_bytes(&self) -> usize {
@@ -74,7 +74,7 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
         if self.allocation_limit_bytes > 0
             && self.total_allocated_bytes() > self.allocation_limit_bytes
         {
-            Err(ANTLRError::memory_limit_exceeded(
+            Err(ANTLRError::dfa_cache_limit_exceeded(
                 self.allocation_limit_bytes,
                 self.context_cache_bytes(),
                 self.dfa_bytes(),

@@ -127,6 +127,10 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
     }
 
+    pub fn get_atn_total_allocated_bytes(&self) -> usize {
+        self.base.total_allocated_bytes()
+    }
+
     /// Returns current prediction mode
     pub fn get_prediction_mode(&self) -> PredictionMode {
         self.prediction_mode.get()

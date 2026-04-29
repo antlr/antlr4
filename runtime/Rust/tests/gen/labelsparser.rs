@@ -258,7 +258,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut LabelsParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				q: None, 
@@ -294,7 +294,7 @@ where
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
+        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_s)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
@@ -404,7 +404,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> EContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut LabelsParserNode<'input, 'arena, Tok>, ANTLRError>
     {
 		let mut _init_v = String::new();
 
@@ -1125,7 +1125,7 @@ where
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
-		recog.base.enter_recursion_rule(EContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_e, _p)?;
+		recog.base.enter_recursion_rule(EContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 2, RULE_e, _p)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena EContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = 2;
 		let result: Result<(), ANTLRError> = (|| {
@@ -1189,7 +1189,7 @@ where
 						1 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							MultContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena MultContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
@@ -1216,7 +1216,7 @@ where
 						2 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							AddContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
@@ -1242,7 +1242,7 @@ where
 						3 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							IncContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena IncContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
@@ -1264,7 +1264,7 @@ where
 						4 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							DecContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena DecContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};

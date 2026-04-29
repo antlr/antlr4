@@ -232,7 +232,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> CsvFileContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut CSVParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, CsvFileContextExt {
 				ph: PhantomData
@@ -275,7 +275,7 @@ where
 	pub fn csvFile(&mut self,) -> Result<&'arena CsvFileContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(CsvFileContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_csvFile)?;
+        recog.base.enter_rule(CsvFileContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_csvFile)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena CsvFileContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
@@ -358,7 +358,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> HdrContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut CSVParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, HdrContextExt {
 				ph: PhantomData
@@ -393,7 +393,7 @@ where
 	pub fn hdr(&mut self,) -> Result<&'arena HdrContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(HdrContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_hdr)?;
+        recog.base.enter_rule(HdrContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 2, RULE_hdr)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena HdrContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
@@ -459,7 +459,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> RowContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut CSVParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, RowContextExt {
 				ph: PhantomData
@@ -498,7 +498,7 @@ where
 	pub fn row(&mut self,) -> Result<&'arena RowContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(RowContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 4, RULE_row)?;
+        recog.base.enter_rule(RowContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 4, RULE_row)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena RowContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
@@ -594,7 +594,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> FieldContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut CSVParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena CSVParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut CSVParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, FieldContextExt {
 				ph: PhantomData
@@ -641,7 +641,7 @@ where
 	pub fn field(&mut self,) -> Result<&'arena FieldContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(FieldContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 6, RULE_field)?;
+        recog.base.enter_rule(FieldContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 6, RULE_field)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena FieldContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			recog.base.set_state(32);

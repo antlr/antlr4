@@ -788,7 +788,7 @@ where
     define_arena!(pred_prediction_store, arena);
 
     pub fn allocated_bytes(&self) -> usize {
-        self.arena.allocated_bytes() + self.map.allocation_size() + self.allocated_chunk_bytes
+        self.arena.allocated_bytes() + self.allocated_chunk_bytes
     }
 }
 

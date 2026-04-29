@@ -213,7 +213,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> AContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut ReferenceToATNParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut ReferenceToATNParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
@@ -272,7 +272,7 @@ where
 	pub fn a(&mut self,) -> Result<&'arena AContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_a)?;
+        recog.base.enter_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_a)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena AContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {

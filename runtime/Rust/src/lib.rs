@@ -49,6 +49,9 @@ pub use prediction_mode::PredictionMode;
 
 #[doc(inline)]
 pub use arena::Arena;
+#[cfg(feature = "arena-allocation-limit")]
+#[doc(inline)]
+pub use arena::{get_default_arena_alloc_limit, set_default_arena_alloc_limit};
 
 mod arena;
 #[doc(hidden)]

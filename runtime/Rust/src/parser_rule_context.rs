@@ -339,10 +339,7 @@ where
         parent: Option<&'arena TreeNode<'input, 'arena, Ext::NodeKind, Tok>>,
         invoking_state: i32,
         ext: Ext,
-    ) -> &'arena mut TreeNode<'input, 'arena, Ext::NodeKind, Tok> {
-        // let header = unsafe {
-        //     TreeNode::<'input, 'arena, Ext>::new(Ext::node_tag(), Ext::label_tag(), invoking_state)
-        // };
+    ) -> Result<&'arena mut TreeNode<'input, 'arena, Ext::NodeKind, Tok>, ANTLRError> {
         let ctx = Self {
             start: None,
             stop: None,
@@ -350,10 +347,16 @@ where
             base: BaseRuleContext::new(parent, ext),
             exception: (),
         };
-        let node = unsafe { &mut *Ext::make_node(arena, ctx) };
+        let node = Ext::make_node(arena, ctx);
+        if node.is_null() {
+            return Err(ANTLRError::dfa_cache_limit_exceeded(0, 0, 0));
+        }
+        // SAFETY: The node is allocated by the arena and lives for 'arena, and the
+        // header is properly initialized by make_node.
+        let node = unsafe { &mut *node };
         node.node_tag = Ext::node_tag();
         node.set_invoking_state(invoking_state);
-        node
+        Ok(node)
     }
 
     pub fn morph<Tgt>(

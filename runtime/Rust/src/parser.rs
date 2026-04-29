@@ -266,7 +266,7 @@ where
         if self.build_parse_trees || !self.parse_listeners.is_empty() {
             if err_handler.in_error_recovery_mode(self) {
                 // todo report ructc inference issue
-                let node = self.create_error_node(o);
+                let node = self.create_error_node(o)?;
                 self.add_child_to_ctx(node);
                 for listener in &mut self.parse_listeners {
                     listener.visit_error_node(
@@ -275,7 +275,7 @@ where
                     )?
                 }
             } else {
-                let node = self.create_token_node(o);
+                let node = self.create_token_node(o)?;
                 self.add_child_to_ctx(node);
                 for listener in &mut self.parse_listeners {
                     listener.visit_terminal(
@@ -546,7 +546,7 @@ where
         } else {
             token = err_handler.recover_inline(self)?;
             if self.build_parse_trees && token.get_token_index() == -1 {
-                self.add_child_to_ctx(self.create_error_node(token));
+                self.add_child_to_ctx(self.create_error_node(token)?);
             }
         }
         Ok(token)
@@ -564,7 +564,7 @@ where
         } else {
             token = err_handler.recover_inline(self)?;
             if self.build_parse_trees && token.get_token_index() == -1 {
-                self.add_child_to_ctx(self.create_error_node(token));
+                self.add_child_to_ctx(self.create_error_node(token)?);
             }
         }
         Ok(token)
@@ -764,18 +764,42 @@ where
         Ok(unsafe { &*(retctx as *const TreeNode<'input, 'arena, Node, TF::Tok>) })
     }
 
+    #[allow(clippy::mut_from_ref)] // &mut is from the arena allocation
     fn create_token_node(
         &self,
         token: &'arena TF::Tok,
-    ) -> &'arena mut TreeNode<'input, 'arena, Node, TF::Tok> {
-        TreeNode::create_token_node(self.arena, token)
+    ) -> Result<&'arena mut TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
+        let ptr = TreeNode::create_token_node(self.arena, token);
+        if ptr.is_null() {
+            #[cfg(feature = "arena-allocation-limit")]
+            {
+                Err(ANTLRError::arena_allocation_limit_exceeded(
+                    self.arena.allocation_limit_bytes(),
+                    self.arena.total_allocated_bytes(),
+                ))
+            }
+            #[cfg(not(feature = "arena-allocation-limit"))]
+            {
+                std::alloc::handle_alloc_error(std::alloc::Layout::new::<
+                    TreeNode<'input, 'arena, Node, TF::Tok>,
+                >())
+            }
+        } else {
+            Ok(unsafe { &mut *ptr })
+        }
     }
 
+    #[allow(clippy::mut_from_ref)] // &mut is from the arena allocation
     fn create_error_node(
         &self,
         token: &'arena TF::Tok,
-    ) -> &'arena mut TreeNode<'input, 'arena, Node, TF::Tok> {
-        TreeNode::create_error_node(self.arena, token)
+    ) -> Result<&'arena mut TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
+        let ptr = TreeNode::create_error_node(self.arena, token);
+        if ptr.is_null() {
+            Err(ANTLRError::dfa_cache_limit_exceeded(0, 0, 0))
+        } else {
+            Ok(unsafe { &mut *ptr })
+        }
     }
 
     /// Text representation of generated DFA for debugging purposes

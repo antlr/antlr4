@@ -170,7 +170,7 @@ where
     NodeKind: NodeKindType<'arena, Tok>,
     Tok: Token + 'input,
 {
-    pub fn create_token_node(arena: &'arena Arena, symbol: &'arena Tok) -> &'arena mut Self {
+    pub fn create_token_node(arena: &'arena Arena, symbol: &'arena Tok) -> *mut Self {
         let header = TreeNode {
             node_tag: NodeKind::terminal(),
             label_tag: 0,
@@ -182,7 +182,7 @@ where
         arena.alloc_node(header, leaf)
     }
 
-    pub fn create_error_node(arena: &'arena Arena, symbol: &'arena Tok) -> &'arena mut Self {
+    pub fn create_error_node(arena: &'arena Arena, symbol: &'arena Tok) -> *mut Self {
         let header = TreeNode {
             node_tag: NodeKind::error(),
             label_tag: 0,

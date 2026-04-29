@@ -221,7 +221,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorBasicParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut VisitorBasicParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
@@ -268,7 +268,7 @@ where
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
+        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_s)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/

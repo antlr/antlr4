@@ -257,7 +257,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut VisitorCalcParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
@@ -300,7 +300,7 @@ where
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
-        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
+        recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_s)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
@@ -403,7 +403,7 @@ where
 }
 
 impl<'input: 'arena, 'arena, Tok: Token + 'input> ExprContextExt<'input, 'arena, Tok>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena, Tok>
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> Result<&'arena mut VisitorCalcParserNode<'input, 'arena, Tok>, ANTLRError>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, ExprContextExt {
 				ph: PhantomData
@@ -756,7 +756,7 @@ where
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
-		recog.base.enter_recursion_rule(ExprContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_expr, _p)?;
+		recog.base.enter_recursion_rule(ExprContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 2, RULE_expr, _p)?;
         let _local_ctx_fn = |recog: &Self| -> &'arena ExprContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = 2;
 		let mut _la: i32 = -1;
@@ -787,7 +787,7 @@ where
 						1 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							MultiplyContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_expr)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena MultiplyContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
@@ -815,7 +815,7 @@ where
 						2 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
-							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState);
+							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState)?;
 							AddContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_expr)?;
 							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};

@@ -129,12 +129,23 @@ impl ANTLRError {
         ANTLRErrorKind::FallThrough(Arc::new(err)).into()
     }
 
-    pub fn memory_limit_exceeded(
+    pub fn arena_allocation_limit_exceeded(
+        allocation_limit_bytes: usize,
+        allocated_bytes: usize,
+    ) -> Self {
+        ANTLRErrorKind::FallThrough(Arc::new(ArenaAllocationLimitExceededError {
+            allocation_limit_bytes,
+            allocated_bytes,
+        }))
+        .into()
+    }
+
+    pub fn dfa_cache_limit_exceeded(
         allocation_limit_bytes: usize,
         context_cache_bytes: usize,
         dfa_cache_bytes: usize,
     ) -> Self {
-        ANTLRErrorKind::FallThrough(Arc::new(MemoryLimitExceededError {
+        ANTLRErrorKind::FallThrough(Arc::new(DFACacheLimitExceededError {
             allocation_limit_bytes,
             context_cache_bytes,
             dfa_cache_bytes,
@@ -273,13 +284,31 @@ impl ANTLRError {
 }
 
 #[derive(Debug, Clone)]
-pub struct MemoryLimitExceededError {
+pub struct ArenaAllocationLimitExceededError {
+    pub allocation_limit_bytes: usize,
+    pub allocated_bytes: usize,
+}
+
+impl Display for ArenaAllocationLimitExceededError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Arena allocation exceeded limit of {}B: total allocated size {}B",
+            self.allocation_limit_bytes, self.allocated_bytes
+        )
+    }
+}
+
+impl Error for ArenaAllocationLimitExceededError {}
+
+#[derive(Debug, Clone)]
+pub struct DFACacheLimitExceededError {
     pub context_cache_bytes: usize,
     pub dfa_cache_bytes: usize,
     pub allocation_limit_bytes: usize,
 }
 
-impl Display for MemoryLimitExceededError {
+impl Display for DFACacheLimitExceededError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -293,7 +322,7 @@ impl Display for MemoryLimitExceededError {
     }
 }
 
-impl Error for MemoryLimitExceededError {}
+impl Error for DFACacheLimitExceededError {}
 
 /// Common part of ANTLR parser errors
 #[derive(Debug, Clone)]

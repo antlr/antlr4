@@ -14,7 +14,7 @@ categories = ["parsing"]
 exclude = ["/build.rs","/grammars","/templates"]
 
 [features]
-debug = []
+arena-allocation-limit = []
 
 [dependencies]
 uuid = "1.16.0"
