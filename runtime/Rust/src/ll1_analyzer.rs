@@ -9,6 +9,7 @@ use crate::atn_state::ATNStateType;
 use crate::interval_set::IntervalSetBuf;
 use crate::prediction_context::PredictionContext;
 use crate::prediction_context::PredictionContextRef;
+use crate::token::Token;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON, TOKEN_INVALID_TYPE, TOKEN_MIN_USER_TOKEN_TYPE};
 use crate::transition::TransitionType;
 use crate::tree::NodeKindType;
@@ -25,15 +26,16 @@ impl LL1Analyzer<'_> {
 
     //    fn get_decision_lookahead(&self, _s: &dyn ATNState) -> &Vec<IntervalSet> { unimplemented!() }
 
-    pub fn look<'input, 'arena, Node>(
+    pub fn look<'input, 'arena, Node, Tok>(
         &self,
         s: ATNStateRef,
         stop_state: Option<ATNStateRef>,
-        ctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
+        ctx: Option<&'arena TreeNode<'input, 'arena, Node, Tok>>,
     ) -> IntervalSetBuf
     where
         'input: 'arena,
-        Node: NodeKindType<'arena>,
+        Node: NodeKindType<'arena, Tok>,
+        Tok: Token + 'input,
     {
         let arena = bumpalo::Bump::new();
 

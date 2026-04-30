@@ -9,6 +9,7 @@ use crate::interval_set::IntervalSet;
 use crate::interval_set::IntervalSetBuf;
 use crate::lexer_action::LexerAction;
 use crate::ll1_analyzer::LL1Analyzer;
+use crate::token::Token;
 use crate::token::{TOKEN_EOF, TOKEN_EPSILON};
 use crate::transition::RuleTransition;
 use crate::tree::NodeKindType;
@@ -74,22 +75,23 @@ impl ATN {
     ///Compute the set of valid tokens that can occur starting in `s` and
     ///staying in same rule. `Token::EPSILON` is in set if we reach end of
     ///rule.
-    pub fn next_tokens<'a>(&'a self, s: &ATNStateRef) -> &'a IntervalSet {
-        s.get_next_tokens_within_rule(self)
+    pub fn next_tokens<'a, Tok: Token>(&'a self, s: &ATNStateRef) -> &'a IntervalSet {
+        s.get_next_tokens_within_rule::<Tok>(self)
     }
 
     /// Compute the set of valid tokens that can occur starting in state `s`.
     /// If `ctx` is null, the set of tokens will not include what can follow
     /// the rule surrounding `s`. In other words, the set will be
     /// restricted to tokens reachable staying within `s`'s rule.
-    pub fn next_tokens_in_ctx<'input, 'arena, Node>(
+    pub fn next_tokens_in_ctx<'input, 'arena, Node, Tok>(
         &self,
         s: ATNStateRef,
-        ctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
+        ctx: Option<&'arena TreeNode<'input, 'arena, Node, Tok>>,
     ) -> IntervalSetBuf
     where
         'input: 'arena,
-        Node: NodeKindType<'arena>,
+        Node: NodeKindType<'arena, Tok>,
+        Tok: Token + 'input,
     {
         let analyzer = LL1Analyzer::new(self);
         analyzer.look(s, None, ctx)
@@ -165,13 +167,13 @@ impl ATN {
     /// specified state in the specified context.
     /// Panics if the ATN does not contain a state with
     /// number {@code stateNumber}
-    pub fn get_expected_tokens<'a>(
+    pub fn get_expected_tokens<'a, Tok: Token>(
         &'a self,
         state_number: i32,
         states_stack: impl Iterator<Item = i32>, // _ctx: &Rc<Ctx::Type>,
     ) -> Cow<'a, IntervalSet> {
         let s = self.make_state_ref(state_number);
-        let mut following = self.next_tokens(&s);
+        let mut following = self.next_tokens::<Tok>(&s);
         if !following.contains(TOKEN_EPSILON) {
             return Cow::Borrowed(following);
         }
@@ -188,7 +190,7 @@ impl ATN {
             let invoking_state = &self.states[state as usize];
             let tr = invoking_state.get_transitions().first().unwrap();
             let tr = tr.try_as::<RuleTransition>().unwrap();
-            following = self.next_tokens(&tr.follow_state);
+            following = self.next_tokens::<Tok>(&tr.follow_state);
             expected.add_set(following);
             expected.remove_one(TOKEN_EPSILON);
             // ctx = c.get_parent_ctx();

@@ -200,7 +200,7 @@ impl ANTLRError {
     pub fn input_mismatch_with_state<'input, 'arena, TF, P>(
         recognizer: &mut P,
         offending_state: i32,
-        ctx: &'arena TreeNode<'input, 'arena, P::Node>,
+        ctx: &'arena TreeNode<'input, 'arena, P::Node, TF::Tok>,
     ) -> Self
     where
         'input: 'arena,
@@ -321,7 +321,7 @@ impl BaseRecognitionError {
         recognizer
             .get_interpreter()
             .atn()
-            .get_expected_tokens(self.offending_state, self.states_stack.iter().copied())
+            .get_expected_tokens::<TF::Tok>(self.offending_state, self.states_stack.iter().copied())
     }
 
     fn new<'input, 'arena, TF, P>(recog: &mut P) -> BaseRecognitionError

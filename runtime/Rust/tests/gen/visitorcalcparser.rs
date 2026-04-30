@@ -9,6 +9,7 @@
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
+use dbt_antlr4::token::CommonToken;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
@@ -112,33 +113,34 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: VisitorCalcListener<'arena> + 'static,
+        L: VisitorCalcListener<'arena, TF::Tok> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
         id
     }
 }
-pub trait Visitable<'input, 'arena> {
+pub trait Visitable<'input: 'arena, 'arena, Tok: Token + 'input> {
     fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
     where
         'input: 'arena,
-        V: VisitorCalcVisitor<'input, 'arena> + ?Sized;
+        V: VisitorCalcVisitor<'input, 'arena, Tok> + ?Sized;
 }
 pub struct VisitorCalcTreeWalker;
 impl VisitorCalcTreeWalker
 {
-    pub fn walk<'input,'arena, L, T>(
+    pub fn walk<'input, 'arena, Tok, L, T>(
         listener: Box<L>,
         tree: &'arena T,
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: VisitorCalcListener<'arena> + 'static,
-        T: NodeInner<'input, 'arena, VisitorCalcParserNodeKind>,
+        L: VisitorCalcListener<'arena, Tok> + 'static,
+        T: NodeInner<'input, 'arena, VisitorCalcParserNodeKind, Tok>,
+        Tok: Token + 'input,
     {
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <VisitorCalcParserNodeKind as NodeKindType>::Listener) };
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <VisitorCalcParserNodeKind as NodeKindType<Tok>>::Listener) };
         let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
@@ -152,12 +154,12 @@ pub enum VisitorCalcParserNodeKind {
     Terminal,
     Error,
 }
-pub type VisitorCalcParserNode<'input, 'arena> = TreeNode<'input, 'arena, VisitorCalcParserNodeKind>;
+pub type VisitorCalcParserNode<'input, 'arena, Tok = CommonToken<'input>> = TreeNode<'input, 'arena, VisitorCalcParserNodeKind, Tok>;
 
 dbt_antlr4::impl_deref! { parser => VisitorCalcParser }
 dbt_antlr4::impl_node_kind! { VisitorCalcParserNodeKind {
     ExprContext(ExprContextAll), ; SContext(enter_s, exit_s,  visit_s), 
-    }; listener = dyn VisitorCalcListener<'arena>, visitor = VisitorCalcVisitor,
+    }; listener = dyn VisitorCalcListener<'arena, Tok>, visitor = VisitorCalcVisitor,
 }
 
 pub struct VisitorCalcParserExt<'input, 'arena> {
@@ -167,14 +169,14 @@ pub struct VisitorCalcParserExt<'input, 'arena> {
 impl<'input, 'arena> VisitorCalcParserExt<'input, 'arena> {
 }
 
-impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for VisitorCalcParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for VisitorCalcParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {}
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for VisitorCalcParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for VisitorCalcParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -183,7 +185,7 @@ where
 	fn get_grammar_file_name(&self) -> & str{ "VisitorCalc.g4" }
    	fn get_rule_names(&self) -> &[& str] { &ruleNames }
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
-	fn sempred(_localctx: Option<&'arena VisitorCalcParserNode<'input, 'arena>>, rule_index: i32, pred_index: i32,
+	fn sempred(_localctx: Option<&'arena VisitorCalcParserNode<'input, 'arena, TF::Tok>>, rule_index: i32, pred_index: i32,
 			   recog:&mut BaseParserType<'input, 'arena, Input, TF>
 	) -> bool {
 		match rule_index {
@@ -199,7 +201,7 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	fn expr_sempred(_ctx: Option<&'arena ExprContext<'input, 'arena>>, pred_index:i32, recog: &mut <Self as Deref>::Target) -> bool
+	fn expr_sempred(_ctx: Option<&'arena ExprContext<'input, 'arena, TF::Tok>>, pred_index:i32, recog: &mut <Self as Deref>::Target) -> bool
 	 {
 		match pred_index {
 	        0 => {
@@ -213,47 +215,49 @@ where
 	}
 }
 //------------------- s ----------------
-pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
+pub type SContextAll<'input, 'arena, Tok = CommonToken<'input>> = SContext<'input, 'arena, Tok>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>, VisitorCalcParserNodeKind>;
+pub type SContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena, Tok>, VisitorCalcParserNodeKind, Tok>;
 dbt_antlr4::impl_visitable! { VisitorCalcVisitor::SContext(visit_s) }
 #[derive(Debug)]
-pub struct SContextExt<'input, 'arena> {
-    ph: PhantomData<(&'arena (), &'input ())>,
+pub struct SContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for SContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for SContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = VisitorCalcParserNodeKind;
     fn node_tag() -> VisitorCalcParserNodeKind { VisitorCalcParserNodeKind::SContext }
 	fn get_rule_index(&self) -> usize { RULE_s }
     fn make_node(
         arena: &'arena Arena,
-        ctx: SContext<'input, 'arena>,
-    ) -> *mut VisitorCalcParserNode<'input, 'arena> {
+        ctx: SContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorCalcParserNode<'input, 'arena, Tok> {
         arena.alloc_zeroed_node(ctx)}
     fn cast_from<'a>(
-        node: &'a VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena>))
+        node: &'a VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a mut SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena>))
+        node: &'a mut VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena, Tok>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
@@ -262,27 +266,28 @@ impl<'input, 'arena> SContextExt<'input, 'arena>{
 	}
 }
 
-pub trait SContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait SContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-    fn expr(&self) -> Option<&'arena ExprContextAll<'input, 'arena>>;
+    fn expr(&self) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>>;
     /// Retrieves first TerminalNode corresponding to token EOF
     /// Returns `None` if there is no child corresponding to token EOF
-    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena>>;
+    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> SContextAttrs<'input, 'arena> for SContext<'input, 'arena>
+impl<'input, 'arena, Tok: Token + 'input> SContextAttrs<'input, 'arena, Tok> for SContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
-    fn expr(&self) -> Option<&'arena ExprContextAll<'input, 'arena>> {
+    fn expr(&self) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>> {
         self.child_of_type(0)
     }
     /// Retrieves first TerminalNode corresponding to token EOF
     /// Returns `None` if there is no child corresponding to token EOF
-    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_EOF, 0)
+    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_EOF)
     }
 }
 
@@ -292,11 +297,11 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena>, ANTLRError> {
+	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena SContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
 			unsafe { recog.ctx_mut().unwrap().set_alt_number(1); }
@@ -323,11 +328,15 @@ where
 //------------------- expr ----------------
 #[derive(Debug)]
 #[repr(C, u16)]
-pub enum ExprContextAll<'input, 'arena> {
-	AddContext(AddContext<'input, 'arena>),
-	NumberContext(NumberContext<'input, 'arena>),
-	MultiplyContext(MultiplyContext<'input, 'arena>),
-    Error(ExprContext<'input, 'arena>)
+pub enum ExprContextAll<'input, 'arena, Tok = CommonToken<'input>>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	AddContext(AddContext<'input, 'arena, Tok>),
+	NumberContext(NumberContext<'input, 'arena, Tok>),
+	MultiplyContext(MultiplyContext<'input, 'arena, Tok>),
+    Error(ExprContext<'input, 'arena, Tok>)
 }
 
 dbt_antlr4::impl_rule_context! { ExprContextAll { } { AddContext, NumberContext, MultiplyContext, Error, } }
@@ -337,8 +346,12 @@ dbt_antlr4::impl_node_inner! { VisitorCalcParserNodeKind::ExprContext::ExprConte
 dbt_antlr4::impl_listener_dispatch! { VisitorCalcListener::VisitorCalcParserNodeKind::ExprContextAll { AddContext(enter_add, exit_add), NumberContext(enter_number, exit_number), MultiplyContext(enter_multiply, exit_multiply), } }
 dbt_antlr4::impl_visitable! { VisitorCalcVisitor::ExprContextAll { AddContext(visit_add), NumberContext(visit_number), MultiplyContext(visit_multiply), } }
 
-impl<'input, 'arena> Deref for ExprContextAll<'input, 'arena>{
-	type Target = dyn ExprContextAttrs<'input, 'arena> + 'arena;
+impl<'input, 'arena, Tok> Deref for ExprContextAll<'input, 'arena, Tok>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	type Target = dyn ExprContextAttrs<'input, 'arena, Tok> + 'arena;
 	fn deref(&self) -> &Self::Target{
 		use ExprContextAll::*;
 		match self{
@@ -350,45 +363,47 @@ impl<'input, 'arena> Deref for ExprContextAll<'input, 'arena>{
 	}
 }
 
-pub type ExprContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, ExprContextExt<'input, 'arena>, VisitorCalcParserNodeKind>;
+pub type ExprContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, ExprContextExt<'input, 'arena, Tok>, VisitorCalcParserNodeKind, Tok>;
 #[derive(Debug)]
-pub struct ExprContextExt<'input, 'arena> {
-    ph: PhantomData<(&'arena (), &'input ())>,
+pub struct ExprContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for ExprContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for ExprContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = VisitorCalcParserNodeKind;
     fn node_tag() -> VisitorCalcParserNodeKind { VisitorCalcParserNodeKind::ExprContext }
 	fn get_rule_index(&self) -> usize { RULE_expr }
     fn make_node(
         arena: &'arena Arena,
-        ctx: ExprContext<'input, 'arena>,
-    ) -> *mut VisitorCalcParserNode<'input, 'arena> {
+        ctx: ExprContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorCalcParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(ExprContextAll::Error(ctx))
     }
     fn cast_from<'a>(
-        node: &'a VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a ExprContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => ExprContext<'input, 'arena>))
+        node: &'a VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a ExprContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => ExprContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a mut ExprContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut ExprContext<'input, 'arena>))
+        node: &'a mut VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut ExprContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut ExprContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> ExprContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> ExprContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorCalcParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorCalcParserNode<'input, 'arena, Tok>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, ExprContextExt {
 				ph: PhantomData
@@ -397,77 +412,77 @@ impl<'input, 'arena> ExprContextExt<'input, 'arena>{
 	}
 }
 
-pub trait ExprContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait ExprContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+}
+
+impl<'input, 'arena, Tok: Token + 'input> ExprContextAttrs<'input, 'arena, Tok> for ExprContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
 }
 
-impl<'input, 'arena> ExprContextAttrs<'input, 'arena> for ExprContext<'input, 'arena>
+pub type AddContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, AddContextExt<'input, 'arena, Tok>, VisitorCalcParserNodeKind, Tok>;
+
+pub trait AddContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-}
-
-pub type AddContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AddContextExt<'input, 'arena>, VisitorCalcParserNodeKind>;
-
-pub trait AddContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
-where
-    'input: 'arena,
-{
-	fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena>>;
-	fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena>>;
+	fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena, Tok>>;
+	fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>>;
 	/// Retrieves first TerminalNode corresponding to token ADD
 	/// Returns `None` if there is no child corresponding to token ADD
-	fn ADD(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn ADD(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 	/// Retrieves first TerminalNode corresponding to token SUB
 	/// Returns `None` if there is no child corresponding to token SUB
-	fn SUB(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn SUB(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> AddContextAttrs<'input, 'arena> for AddContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AddContextAttrs<'input, 'arena, Tok> for AddContext<'input, 'arena, Tok>
 {
-    fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena>> {
+    fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena, Tok>> {
         self.children_of_type()
     }
-    fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena>> {
+    fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>> {
         self.child_of_type(i)
     }
     /// Retrieves first TerminalNode corresponding to token ADD
     /// Returns `None` if there is no child corresponding to token ADD
-    fn ADD(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_ADD, 0)
+    fn ADD(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_ADD)
     }
     /// Retrieves first TerminalNode corresponding to token SUB
     /// Returns `None` if there is no child corresponding to token SUB
-    fn SUB(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_SUB, 0)
+    fn SUB(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_SUB)
     }
 }
 #[derive(Debug)]
-pub struct AddContextExt<'input, 'arena> {
-	base: ExprContextExt<'input, 'arena>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct AddContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: ExprContextExt<'input, 'arena, Tok>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for AddContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = VisitorCalcParserNodeKind;
     fn node_tag() -> VisitorCalcParserNodeKind { VisitorCalcParserNodeKind::ExprContext }
 	fn get_rule_index(&self) -> usize { RULE_expr }
     fn make_node(
         arena: &'arena Arena,
-        ctx: AddContext<'input, 'arena>,
-    ) -> *mut VisitorCalcParserNode<'input, 'arena> {
+        ctx: AddContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorCalcParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(ExprContextAll::AddContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a AddContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena>) {
+        node: &'a VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a AddContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::AddContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -476,10 +491,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a mut AddContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena>) {
+        node: &'a mut VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut AddContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::AddContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -489,79 +504,78 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt
     }
 }
 
-impl<'input, 'arena> ExprContextAttrs<'input, 'arena> for AddContext<'input, 'arena>
+impl<'input, 'arena, Tok> ExprContextAttrs<'input, 'arena, Tok> for AddContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 }
 
-impl<'input, 'arena> AddContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AddContextExt<'input, 'arena, Tok> {
+	fn new(base: ExprContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             ExprContextAll::AddContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type NumberContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, NumberContextExt<'input, 'arena>, VisitorCalcParserNodeKind>;
+pub type NumberContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, NumberContextExt<'input, 'arena, Tok>, VisitorCalcParserNodeKind, Tok>;
 
-pub trait NumberContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait NumberContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 	/// Retrieves first TerminalNode corresponding to token INT
 	/// Returns `None` if there is no child corresponding to token INT
-	fn INT(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn INT(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> NumberContextAttrs<'input, 'arena> for NumberContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> NumberContextAttrs<'input, 'arena, Tok> for NumberContext<'input, 'arena, Tok>
 {
     /// Retrieves first TerminalNode corresponding to token INT
     /// Returns `None` if there is no child corresponding to token INT
-    fn INT(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_INT, 0)
+    fn INT(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_INT)
     }
 }
 #[derive(Debug)]
-pub struct NumberContextExt<'input, 'arena> {
-	base: ExprContextExt<'input, 'arena>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct NumberContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: ExprContextExt<'input, 'arena, Tok>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for NumberContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for NumberContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = VisitorCalcParserNodeKind;
     fn node_tag() -> VisitorCalcParserNodeKind { VisitorCalcParserNodeKind::ExprContext }
 	fn get_rule_index(&self) -> usize { RULE_expr }
     fn make_node(
         arena: &'arena Arena,
-        ctx: NumberContext<'input, 'arena>,
-    ) -> *mut VisitorCalcParserNode<'input, 'arena> {
+        ctx: NumberContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorCalcParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(ExprContextAll::NumberContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a NumberContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena>) {
+        node: &'a VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a NumberContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::NumberContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -570,10 +584,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for NumberContext
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a mut NumberContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena>) {
+        node: &'a mut VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut NumberContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::NumberContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -583,95 +597,94 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for NumberContext
     }
 }
 
-impl<'input, 'arena> ExprContextAttrs<'input, 'arena> for NumberContext<'input, 'arena>
+impl<'input, 'arena, Tok> ExprContextAttrs<'input, 'arena, Tok> for NumberContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 }
 
-impl<'input, 'arena> NumberContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> NumberContextExt<'input, 'arena, Tok> {
+	fn new(base: ExprContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             ExprContextAll::NumberContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type MultiplyContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, MultiplyContextExt<'input, 'arena>, VisitorCalcParserNodeKind>;
+pub type MultiplyContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, MultiplyContextExt<'input, 'arena, Tok>, VisitorCalcParserNodeKind, Tok>;
 
-pub trait MultiplyContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait MultiplyContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena>>;
-	fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena>>;
+	fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena, Tok>>;
+	fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>>;
 	/// Retrieves first TerminalNode corresponding to token MUL
 	/// Returns `None` if there is no child corresponding to token MUL
-	fn MUL(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn MUL(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 	/// Retrieves first TerminalNode corresponding to token DIV
 	/// Returns `None` if there is no child corresponding to token DIV
-	fn DIV(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn DIV(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> MultiplyContextAttrs<'input, 'arena> for MultiplyContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> MultiplyContextAttrs<'input, 'arena, Tok> for MultiplyContext<'input, 'arena, Tok>
 {
-    fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena>> {
+    fn expr_all(&self) -> Vec<&'arena ExprContextAll<'input, 'arena, Tok>> {
         self.children_of_type()
     }
-    fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena>> {
+    fn expr(&self, i: usize) -> Option<&'arena ExprContextAll<'input, 'arena, Tok>> {
         self.child_of_type(i)
     }
     /// Retrieves first TerminalNode corresponding to token MUL
     /// Returns `None` if there is no child corresponding to token MUL
-    fn MUL(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_MUL, 0)
+    fn MUL(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_MUL)
     }
     /// Retrieves first TerminalNode corresponding to token DIV
     /// Returns `None` if there is no child corresponding to token DIV
-    fn DIV(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorCalc_DIV, 0)
+    fn DIV(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorCalc_DIV)
     }
 }
 #[derive(Debug)]
-pub struct MultiplyContextExt<'input, 'arena> {
-	base: ExprContextExt<'input, 'arena>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct MultiplyContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: ExprContextExt<'input, 'arena, Tok>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultiplyContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for MultiplyContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = VisitorCalcParserNodeKind;
     fn node_tag() -> VisitorCalcParserNodeKind { VisitorCalcParserNodeKind::ExprContext }
 	fn get_rule_index(&self) -> usize { RULE_expr }
     fn make_node(
         arena: &'arena Arena,
-        ctx: MultiplyContext<'input, 'arena>,
-    ) -> *mut VisitorCalcParserNode<'input, 'arena> {
+        ctx: MultiplyContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorCalcParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(ExprContextAll::MultiplyContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a MultiplyContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena>) {
+        node: &'a VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a MultiplyContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::MultiplyContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -680,10 +693,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultiplyConte
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorCalcParserNode<'input, 'arena>,
-    ) -> Option<&'a mut MultiplyContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena>) {
+        node: &'a mut VisitorCalcParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut MultiplyContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut ExprContextAll<'input, 'arena, Tok>) {
                 ExprContextAll::MultiplyContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -693,33 +706,33 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultiplyConte
     }
 }
 
-impl<'input, 'arena> ExprContextAttrs<'input, 'arena> for MultiplyContext<'input, 'arena>
+impl<'input, 'arena, Tok> ExprContextAttrs<'input, 'arena, Tok> for MultiplyContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 }
 
-impl<'input, 'arena> MultiplyContextExt<'input, 'arena> {
-	fn new(base: ExprContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> MultiplyContextExt<'input, 'arena, Tok> {
+	fn new(base: ExprContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             pd: PhantomData
         }
     }
 
-	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut VisitorCalcParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut ExprContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             ExprContextAll::MultiplyContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut ExprContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
@@ -730,21 +743,21 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     #[inline]
-	pub fn  expr(&mut self,) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
+	pub fn  expr(&mut self,) -> Result<&'arena ExprContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		self.expr_rec(0)
 	}
 
     #[inline]
-	fn expr_rec(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
+	fn expr_rec(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
         self.expr_rec_inner(_p)
     }
 
-	fn expr_rec_inner(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena>, ANTLRError> {
+	fn expr_rec_inner(&mut self, _p: i32) -> Result<&'arena ExprContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
 		recog.base.enter_recursion_rule(ExprContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_expr, _p)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena ExprContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena ExprContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = 2;
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
@@ -754,7 +767,7 @@ where
 			{
 			{
 			recog.base.with_mut_ctx(|ctx| { NumberContextExt::copy_from(ctx); });
-			let _local_ctx_fn = |recog: &Self| -> &'arena NumberContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+			let _local_ctx_fn = |recog: &Self| -> &'arena NumberContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 
 			recog.base.set_state(8);
 			recog.base.match_token(VisitorCalc_INT,&mut recog.err_handler)?;
@@ -777,7 +790,7 @@ where
 							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							MultiplyContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_expr)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena MultiplyContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena MultiplyContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 
 							recog.base.set_state(10);
 							if !({recog.precpred(None, 2)}) {
@@ -805,7 +818,7 @@ where
 							let tmp = ExprContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							AddContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_expr)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 
 							recog.base.set_state(13);
 							if !({recog.precpred(None, 1)}) {

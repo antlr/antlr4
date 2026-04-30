@@ -84,7 +84,7 @@ pub struct SimpleLRLexerActions {
 impl SimpleLRLexerActions {
 }
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>, TF::Tok>
     for SimpleLRLexerActions
 where
     'input: 'arena,

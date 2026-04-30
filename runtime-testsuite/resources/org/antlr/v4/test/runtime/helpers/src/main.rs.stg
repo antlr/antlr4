@@ -7,6 +7,7 @@ use dbt_antlr4::error_listener::DiagnosticErrorListener;
 use dbt_antlr4::int_stream::IntStream;
 use dbt_antlr4::lexer::LEXER_DEFAULT_MODE;
 use dbt_antlr4::PredictionMode;
+use dbt_antlr4::token::Token;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::tree::{IsError, NoError, ParseTreeListener, ParseTreeWalker, TerminalNode};
 use dbt_antlr4::trees::string_tree;
@@ -75,6 +76,6 @@ fn main() {
 struct TreeShapeListener {
 }
 
-impl\<'arena> ParseTreeListener\<'arena, <grammarName>ParserNodeKind> for TreeShapeListener {
+impl\<'arena, Tok: Token + 'arena> ParseTreeListener\<'arena, <grammarName>ParserNodeKind, Tok> for TreeShapeListener {
 }
 <endif>

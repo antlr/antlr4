@@ -47,39 +47,48 @@ impl Arena {
         self.tokens.alloc_str(value.as_str())
     }
 
-    pub fn alloc_labeled_node<'input, 'a, N, T>(&self, value: T) -> *mut TreeNode<'input, 'a, N>
+    pub fn alloc_labeled_node<'input, 'a, N, I, Tok>(
+        &self,
+        value: I,
+    ) -> *mut TreeNode<'input, 'a, N, Tok>
     where
         'input: 'a,
-        N: NodeKindType<'a>,
-        T: NodeInner<'input, 'a, N>,
+        N: NodeKindType<'a, Tok>,
+        I: NodeInner<'input, 'a, N, Tok>,
+        Tok: Token + 'input,
     {
-        self.contexts.alloc(value) as *mut _ as *mut TreeNode<'input, 'a, N>
+        self.contexts.alloc(value) as *mut _ as *mut TreeNode<'input, 'a, N, Tok>
     }
 
-    pub fn alloc_zeroed_node<'input, 'a, N, I>(&'a self, body: I) -> *mut TreeNode<'input, 'a, N>
-    where
-        'input: 'a,
-        N: NodeKindType<'a>,
-        I: NodeInner<'input, 'a, N>,
-    {
-        let zeroed_header = unsafe { std::mem::zeroed::<TreeNode<'input, 'a, N>>() };
-        let ptr = self.contexts.alloc((zeroed_header, body));
-        ptr as *mut _ as *mut TreeNode<'input, 'a, N>
-    }
-
-    pub fn alloc_node<'input, 'a, N, I>(
+    pub fn alloc_zeroed_node<'input, 'a, N, I, Tok>(
         &'a self,
-        header: TreeNode<'input, 'a, N>,
         body: I,
-    ) -> &'a mut TreeNode<'input, 'a, N>
+    ) -> *mut TreeNode<'input, 'a, N, Tok>
     where
         'input: 'a,
-        N: NodeKindType<'a>,
-        I: NodeInner<'input, 'a, N>,
+        N: NodeKindType<'a, Tok>,
+        I: NodeInner<'input, 'a, N, Tok>,
+        Tok: Token + 'input,
+    {
+        let zeroed_header = unsafe { std::mem::zeroed::<TreeNode<'input, 'a, N, Tok>>() };
+        let ptr = self.contexts.alloc((zeroed_header, body));
+        ptr as *mut _ as *mut TreeNode<'input, 'a, N, Tok>
+    }
+
+    pub fn alloc_node<'input, 'a, N, I, Tok>(
+        &'a self,
+        header: TreeNode<'input, 'a, N, Tok>,
+        body: I,
+    ) -> &'a mut TreeNode<'input, 'a, N, Tok>
+    where
+        'input: 'a,
+        N: NodeKindType<'a, Tok>,
+        I: NodeInner<'input, 'a, N, Tok>,
+        Tok: Token + 'input,
     {
         let ptr = self.contexts.alloc((header, body));
         // Safety: casting to the header portion:
-        cast_unchecked!(ptr => mut TreeNode<'input, 'a, N>)
+        cast_unchecked!(ptr => mut TreeNode<'input, 'a, N, Tok>)
     }
 
     pub fn alloc_exception<'a, T>(&'a self, value: T) -> bumpalo::boxed::Box<'a, T> {

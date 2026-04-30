@@ -172,8 +172,8 @@ fn lexer_test_csv() {
 
 struct Listener {}
 
-impl<'arena> ParseTreeListener<'arena, CSVParserNodeKind> for Listener {
-    fn enter_every_rule(&mut self, ctx: &CSVParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
+impl<'arena, Tok: Token + 'arena> ParseTreeListener<'arena, CSVParserNodeKind, Tok> for Listener {
+    fn enter_every_rule(&mut self, ctx: &CSVParserNode<'_, 'arena, Tok>) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             csvparser::ruleNames
@@ -184,7 +184,7 @@ impl<'arena> ParseTreeListener<'arena, CSVParserNodeKind> for Listener {
     }
 }
 
-impl<'arena> CSVListener<'arena> for Listener {}
+impl<'arena, Tok: Token + 'arena> CSVListener<'arena, Tok> for Listener {}
 
 #[test]
 fn parser_test_csv() {
@@ -207,10 +207,12 @@ fn parser_test_csv() {
 
 struct Listener2 {}
 
-impl<'arena> ParseTreeListener<'arena, ReferenceToATNParserNodeKind> for Listener2 {
+impl<'arena, Tok: Token + 'arena> ParseTreeListener<'arena, ReferenceToATNParserNodeKind, Tok>
+    for Listener2
+{
     fn enter_every_rule(
         &mut self,
-        ctx: &ReferenceToATNParserNode<'_, 'arena>,
+        ctx: &ReferenceToATNParserNode<'_, 'arena, Tok>,
     ) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
@@ -222,7 +224,7 @@ impl<'arena> ParseTreeListener<'arena, ReferenceToATNParserNodeKind> for Listene
     }
 }
 
-impl<'arena> ReferenceToATNListener<'arena> for Listener2 {}
+impl<'arena, Tok: Token + 'arena> ReferenceToATNListener<'arena, Tok> for Listener2 {}
 
 #[test]
 fn test_adaptive_predict_and_tree() {
@@ -243,13 +245,18 @@ fn test_adaptive_predict_and_tree() {
 
 struct Listener3;
 
-impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener3 {
-    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena>) -> Result<(), ANTLRError> {
+impl<'arena, Tok: Token + 'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind, Tok>
+    for Listener3
+{
+    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena, Tok>) -> Result<(), ANTLRError> {
         println!("terminal node {}", node.symbol.get_text());
         Ok(())
     }
 
-    fn enter_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
+    fn enter_every_rule(
+        &mut self,
+        ctx: &SimpleLRParserNode<'_, 'arena, Tok>,
+    ) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             simplelrparser::ruleNames
@@ -259,7 +266,10 @@ impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener3 {
         Ok(())
     }
 
-    fn exit_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
+    fn exit_every_rule(
+        &mut self,
+        ctx: &SimpleLRParserNode<'_, 'arena, Tok>,
+    ) -> Result<(), ANTLRError> {
         println!(
             "rule exited {}",
             simplelrparser::ruleNames
@@ -270,7 +280,7 @@ impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener3 {
     }
 }
 
-impl<'arena> SimpleLRListener<'arena> for Listener3 {}
+impl<'arena, Tok: Token + 'arena> SimpleLRListener<'arena, Tok> for Listener3 {}
 
 #[test]
 fn test_lr() {
@@ -308,13 +318,18 @@ struct Listener4 {
     data: String,
 }
 
-impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener4 {
-    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena>) -> Result<(), ANTLRError> {
+impl<'arena, Tok: Token + 'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind, Tok>
+    for Listener4
+{
+    fn visit_terminal(&mut self, node: &TerminalNode<'_, 'arena, Tok>) -> Result<(), ANTLRError> {
         println!("enter terminal");
         let _ = writeln!(&mut self.data, "terminal node {}", node.symbol.get_text());
         Ok(())
     }
-    fn enter_every_rule(&mut self, ctx: &SimpleLRParserNode<'_, 'arena>) -> Result<(), ANTLRError> {
+    fn enter_every_rule(
+        &mut self,
+        ctx: &SimpleLRParserNode<'_, 'arena, Tok>,
+    ) -> Result<(), ANTLRError> {
         println!(
             "rule entered {}",
             simplelrparser::ruleNames
@@ -325,7 +340,7 @@ impl<'arena> ParseTreeListener<'arena, SimpleLRParserNodeKind> for Listener4 {
     }
 }
 
-impl<'arena> SimpleLRListener<'arena> for Listener4 {}
+impl<'arena, Tok: Token + 'arena> SimpleLRListener<'arena, Tok> for Listener4 {}
 
 #[test]
 fn test_remove_listener() {
@@ -441,8 +456,12 @@ fn test_ast_type_variance() {
     }
 
     impl<'input, 'arena, Input, TF>
-        ErrorListener<'input, 'arena, visitorcalcparser::BaseParserType<'input, 'arena, Input, TF>>
-        for ErrorListenerImpl<'input>
+        ErrorListener<
+            'input,
+            'arena,
+            visitorcalcparser::BaseParserType<'input, 'arena, Input, TF>,
+            TF::Tok,
+        > for ErrorListenerImpl<'input>
     where
         'input: 'arena,
         TF: TokenFactory<'input, 'arena> + 'arena,

@@ -9,6 +9,7 @@
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
+use dbt_antlr4::token::CommonToken;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
@@ -113,7 +114,7 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: LabelsListener<'arena> + 'static,
+        L: LabelsListener<'arena, TF::Tok> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -123,17 +124,18 @@ where
 pub struct LabelsTreeWalker;
 impl LabelsTreeWalker
 {
-    pub fn walk<'input,'arena, L, T>(
+    pub fn walk<'input, 'arena, Tok, L, T>(
         listener: Box<L>,
         tree: &'arena T,
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: LabelsListener<'arena> + 'static,
-        T: NodeInner<'input, 'arena, LabelsParserNodeKind>,
+        L: LabelsListener<'arena, Tok> + 'static,
+        T: NodeInner<'input, 'arena, LabelsParserNodeKind, Tok>,
+        Tok: Token + 'input,
     {
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <LabelsParserNodeKind as NodeKindType>::Listener) };
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <LabelsParserNodeKind as NodeKindType<Tok>>::Listener) };
         let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
@@ -147,12 +149,12 @@ pub enum LabelsParserNodeKind {
     Terminal,
     Error,
 }
-pub type LabelsParserNode<'input, 'arena> = TreeNode<'input, 'arena, LabelsParserNodeKind>;
+pub type LabelsParserNode<'input, 'arena, Tok = CommonToken<'input>> = TreeNode<'input, 'arena, LabelsParserNodeKind, Tok>;
 
 dbt_antlr4::impl_deref! { parser => LabelsParser }
 dbt_antlr4::impl_node_kind! { LabelsParserNodeKind {
     EContext(EContextAll), ; SContext(enter_s, exit_s, ), 
-    }; listener = dyn LabelsListener<'arena>,
+    }; listener = dyn LabelsListener<'arena, Tok>,
 }
 
 pub struct LabelsParserExt<'input, 'arena> {
@@ -162,14 +164,14 @@ pub struct LabelsParserExt<'input, 'arena> {
 impl<'input, 'arena> LabelsParserExt<'input, 'arena> {
 }
 
-impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for LabelsParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for LabelsParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {}
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for LabelsParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for LabelsParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -178,7 +180,7 @@ where
 	fn get_grammar_file_name(&self) -> & str{ "Labels.g4" }
    	fn get_rule_names(&self) -> &[& str] { &ruleNames }
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
-	fn sempred(_localctx: Option<&'arena LabelsParserNode<'input, 'arena>>, rule_index: i32, pred_index: i32,
+	fn sempred(_localctx: Option<&'arena LabelsParserNode<'input, 'arena, TF::Tok>>, rule_index: i32, pred_index: i32,
 			   recog:&mut BaseParserType<'input, 'arena, Input, TF>
 	) -> bool {
 		match rule_index {
@@ -194,7 +196,7 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	fn e_sempred(_ctx: Option<&'arena EContext<'input, 'arena>>, pred_index:i32, recog: &mut <Self as Deref>::Target) -> bool
+	fn e_sempred(_ctx: Option<&'arena EContext<'input, 'arena, TF::Tok>>, pred_index:i32, recog: &mut <Self as Deref>::Target) -> bool
 	 {
 		match pred_index {
 	        0 => {
@@ -214,47 +216,49 @@ where
 	}
 }
 //------------------- s ----------------
-pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
+pub type SContextAll<'input, 'arena, Tok = CommonToken<'input>> = SContext<'input, 'arena, Tok>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type SContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 #[derive(Debug)]
-pub struct SContextExt<'input, 'arena> {
-	pub q: Option<&'arena EContextAll<'input, 'arena>>,
-    ph: PhantomData<(&'arena (), &'input ())>,
+pub struct SContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	pub q: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for SContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for SContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::SContext }
 	fn get_rule_index(&self) -> usize { RULE_s }
     fn make_node(
         arena: &'arena Arena,
-        ctx: SContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: SContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_zeroed_node(ctx)}
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena>))
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena>))
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena, Tok>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				q: None, 
@@ -264,18 +268,19 @@ impl<'input, 'arena> SContextExt<'input, 'arena>{
 	}
 }
 
-pub trait SContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait SContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>>;
+    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> SContextAttrs<'input, 'arena> for SContext<'input, 'arena>
+impl<'input, 'arena, Tok: Token + 'input> SContextAttrs<'input, 'arena, Tok> for SContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
-    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(0)
     }
 }
@@ -286,11 +291,11 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena>, ANTLRError> {
+	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena SContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
 			unsafe { recog.ctx_mut().unwrap().set_alt_number(1); }
@@ -298,7 +303,7 @@ where
 			/*InvokeRule e*/
 			recog.base.set_state(4);
 			let tmp = recog.e_rec(0)?;
-			unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<SContext>().unwrap().q = Some(tmp); } 
+			unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<SContext<TF::Tok>>().unwrap().q = Some(tmp); } 
 			}
 			Ok(())
 		})();
@@ -316,15 +321,19 @@ where
 //------------------- e ----------------
 #[derive(Debug)]
 #[repr(C, u16)]
-pub enum EContextAll<'input, 'arena> {
-	AddContext(AddContext<'input, 'arena>),
-	ParensContext(ParensContext<'input, 'arena>),
-	MultContext(MultContext<'input, 'arena>),
-	DecContext(DecContext<'input, 'arena>),
-	AnIDContext(AnIDContext<'input, 'arena>),
-	AnIntContext(AnIntContext<'input, 'arena>),
-	IncContext(IncContext<'input, 'arena>),
-    Error(EContext<'input, 'arena>)
+pub enum EContextAll<'input, 'arena, Tok = CommonToken<'input>>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	AddContext(AddContext<'input, 'arena, Tok>),
+	ParensContext(ParensContext<'input, 'arena, Tok>),
+	MultContext(MultContext<'input, 'arena, Tok>),
+	DecContext(DecContext<'input, 'arena, Tok>),
+	AnIDContext(AnIDContext<'input, 'arena, Tok>),
+	AnIntContext(AnIntContext<'input, 'arena, Tok>),
+	IncContext(IncContext<'input, 'arena, Tok>),
+    Error(EContext<'input, 'arena, Tok>)
 }
 
 dbt_antlr4::impl_rule_context! { EContextAll { } { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
@@ -333,8 +342,12 @@ dbt_antlr4::impl_tree_trait_delegates! { LabelsParserNodeKind::EContextAll { Add
 dbt_antlr4::impl_node_inner! { LabelsParserNodeKind::EContext::EContextAll { AddContext, ParensContext, MultContext, DecContext, AnIDContext, AnIntContext, IncContext, Error, } }
 dbt_antlr4::impl_listener_dispatch! { LabelsListener::LabelsParserNodeKind::EContextAll { AddContext(enter_add, exit_add), ParensContext(enter_parens, exit_parens), MultContext(enter_mult, exit_mult), DecContext(enter_dec, exit_dec), AnIDContext(enter_anID, exit_anID), AnIntContext(enter_anInt, exit_anInt), IncContext(enter_inc, exit_inc), } }
 
-impl<'input, 'arena> Deref for EContextAll<'input, 'arena>{
-	type Target = dyn EContextAttrs<'input, 'arena> + 'arena;
+impl<'input, 'arena, Tok> Deref for EContextAll<'input, 'arena, Tok>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	type Target = dyn EContextAttrs<'input, 'arena, Tok> + 'arena;
 	fn deref(&self) -> &Self::Target{
 		use EContextAll::*;
 		match self{
@@ -350,46 +363,48 @@ impl<'input, 'arena> Deref for EContextAll<'input, 'arena>{
 	}
 }
 
-pub type EContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, EContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type EContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, EContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 #[derive(Debug)]
-pub struct EContextExt<'input, 'arena> {
+pub struct EContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
 	pub v: String,
-    ph: PhantomData<(&'arena (), &'input ())>,
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for EContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for EContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: EContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: EContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::Error(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a EContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => EContext<'input, 'arena>))
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a EContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => EContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut EContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut EContext<'input, 'arena>))
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut EContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut EContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> EContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> EContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena LabelsParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut LabelsParserNode<'input, 'arena, Tok>
     {
 		let mut _init_v = String::new();
 
@@ -401,15 +416,16 @@ impl<'input, 'arena> EContextExt<'input, 'arena>{
 	}
 }
 
-pub trait EContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait EContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String; 
     fn set_v(&mut self,attr: String); 
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for EContext<'input, 'arena>
+impl<'input, 'arena, Tok: Token + 'input> EContextAttrs<'input, 'arena, Tok> for EContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
@@ -417,51 +433,50 @@ where
     fn set_v(&mut self,attr: String) { self.deref_mut().v = attr; }  
 }
 
-pub type AddContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AddContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type AddContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, AddContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait AddContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait AddContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena>>;
-	fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena>>;
+	fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena, Tok>>;
+	fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> AddContextAttrs<'input, 'arena> for AddContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AddContextAttrs<'input, 'arena, Tok> for AddContext<'input, 'arena, Tok>
 {
-    fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena>> {
+    fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena, Tok>> {
         self.children_of_type()
     }
-    fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(i)
     }
 }
 #[derive(Debug)]
-pub struct AddContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
-	pub a: Option<&'arena EContextAll<'input, 'arena>>,
-	pub b: Option<&'arena EContextAll<'input, 'arena>>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct AddContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
+	pub a: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+	pub b: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for AddContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: AddContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: AddContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::AddContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a AddContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a AddContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AddContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -470,10 +485,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut AddContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut AddContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AddContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -483,16 +498,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AddContextExt
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for AddContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for AddContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> AddContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AddContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             a:None, b:None, 
@@ -500,62 +516,60 @@ impl<'input, 'arena> AddContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::AddContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type ParensContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, ParensContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type ParensContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, ParensContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait ParensContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait ParensContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>>;
+	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> ParensContextAttrs<'input, 'arena> for ParensContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> ParensContextAttrs<'input, 'arena, Tok> for ParensContext<'input, 'arena, Tok>
 {
-    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(0)
     }
 }
 #[derive(Debug)]
-pub struct ParensContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
-	pub x: Option<&'arena EContextAll<'input, 'arena>>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct ParensContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
+	pub x: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for ParensContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for ParensContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: ParensContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: ParensContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::ParensContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a ParensContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a ParensContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::ParensContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -564,10 +578,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for ParensContext
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut ParensContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut ParensContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::ParensContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -577,16 +591,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for ParensContext
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for ParensContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for ParensContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> ParensContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> ParensContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             x:None, 
@@ -594,68 +609,66 @@ impl<'input, 'arena> ParensContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::ParensContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type MultContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, MultContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type MultContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, MultContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait MultContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait MultContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena>>;
-	fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena>>;
+	fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena, Tok>>;
+	fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> MultContextAttrs<'input, 'arena> for MultContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> MultContextAttrs<'input, 'arena, Tok> for MultContext<'input, 'arena, Tok>
 {
-    fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena>> {
+    fn e_all(&self) -> Vec<&'arena EContextAll<'input, 'arena, Tok>> {
         self.children_of_type()
     }
-    fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self, i: usize) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(i)
     }
 }
 #[derive(Debug)]
-pub struct MultContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
-	pub a: Option<&'arena EContextAll<'input, 'arena>>,
+pub struct MultContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
+	pub a: Option<&'arena EContextAll<'input, 'arena, Tok>>,
 	pub op: Option<&'arena dyn Token >,
-	pub b: Option<&'arena EContextAll<'input, 'arena>>,
-    pd: PhantomData<(&'arena (), &'input ())>
+	pub b: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for MultContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: MultContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: MultContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::MultContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a MultContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a MultContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::MultContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -664,10 +677,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultContextEx
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut MultContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut MultContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::MultContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -677,16 +690,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for MultContextEx
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for MultContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for MultContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> MultContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> MultContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             op:None, 
@@ -695,62 +709,60 @@ impl<'input, 'arena> MultContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::MultContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type DecContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, DecContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type DecContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, DecContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait DecContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait DecContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>>;
+	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> DecContextAttrs<'input, 'arena> for DecContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> DecContextAttrs<'input, 'arena, Tok> for DecContext<'input, 'arena, Tok>
 {
-    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(0)
     }
 }
 #[derive(Debug)]
-pub struct DecContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
-	pub x: Option<&'arena EContextAll<'input, 'arena>>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct DecContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
+	pub x: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for DecContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for DecContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: DecContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: DecContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::DecContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a DecContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a DecContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::DecContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -759,10 +771,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for DecContextExt
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut DecContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut DecContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::DecContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -772,16 +784,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for DecContextExt
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for DecContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for DecContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> DecContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> DecContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             x:None, 
@@ -789,66 +802,64 @@ impl<'input, 'arena> DecContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::DecContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type AnIDContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AnIDContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type AnIDContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, AnIDContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait AnIDContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait AnIDContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 	/// Retrieves first TerminalNode corresponding to token ID
 	/// Returns `None` if there is no child corresponding to token ID
-	fn ID(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn ID(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> AnIDContextAttrs<'input, 'arena> for AnIDContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AnIDContextAttrs<'input, 'arena, Tok> for AnIDContext<'input, 'arena, Tok>
 {
     /// Retrieves first TerminalNode corresponding to token ID
     /// Returns `None` if there is no child corresponding to token ID
-    fn ID(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(Labels_ID, 0)
+    fn ID(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == Labels_ID)
     }
 }
 #[derive(Debug)]
-pub struct AnIDContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
+pub struct AnIDContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
 	pub ID: Option<&'arena dyn Token >,
-    pd: PhantomData<(&'arena (), &'input ())>
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIDContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for AnIDContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: AnIDContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: AnIDContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::AnIDContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a AnIDContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a AnIDContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AnIDContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -857,10 +868,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIDContextEx
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut AnIDContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut AnIDContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AnIDContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -870,16 +881,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIDContextEx
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for AnIDContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for AnIDContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AnIDContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             ID:None, 
@@ -887,66 +899,64 @@ impl<'input, 'arena> AnIDContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::AnIDContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type AnIntContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AnIntContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type AnIntContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, AnIntContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait AnIntContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait AnIntContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 	/// Retrieves first TerminalNode corresponding to token INT
 	/// Returns `None` if there is no child corresponding to token INT
-	fn INT(&self) -> Option<&TerminalNode<'input, 'arena>>;
+	fn INT(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> AnIntContextAttrs<'input, 'arena> for AnIntContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AnIntContextAttrs<'input, 'arena, Tok> for AnIntContext<'input, 'arena, Tok>
 {
     /// Retrieves first TerminalNode corresponding to token INT
     /// Returns `None` if there is no child corresponding to token INT
-    fn INT(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(Labels_INT, 0)
+    fn INT(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == Labels_INT)
     }
 }
 #[derive(Debug)]
-pub struct AnIntContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
+pub struct AnIntContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
 	pub INT: Option<&'arena dyn Token >,
-    pd: PhantomData<(&'arena (), &'input ())>
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIntContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for AnIntContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: AnIntContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: AnIntContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::AnIntContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a AnIntContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a AnIntContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AnIntContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -955,10 +965,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIntContextE
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut AnIntContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut AnIntContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::AnIntContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -968,16 +978,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AnIntContextE
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for AnIntContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for AnIntContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AnIntContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             INT:None, 
@@ -985,62 +996,60 @@ impl<'input, 'arena> AnIntContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::AnIntContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
-pub type IncContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, IncContextExt<'input, 'arena>, LabelsParserNodeKind>;
+pub type IncContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, IncContextExt<'input, 'arena, Tok>, LabelsParserNodeKind, Tok>;
 
-pub trait IncContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait IncContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
-	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>>;
+	fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> IncContextAttrs<'input, 'arena> for IncContext<'input, 'arena>
-where
-    'input: 'arena,
+impl<'input: 'arena, 'arena, Tok: Token + 'input> IncContextAttrs<'input, 'arena, Tok> for IncContext<'input, 'arena, Tok>
 {
-    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena>> {
+    fn e(&self) -> Option<&'arena EContextAll<'input, 'arena, Tok>> {
         self.child_of_type(0)
     }
 }
 #[derive(Debug)]
-pub struct IncContextExt<'input, 'arena> {
-	base: EContextExt<'input, 'arena>,
-	pub x: Option<&'arena EContextAll<'input, 'arena>>,
-    pd: PhantomData<(&'arena (), &'input ())>
+pub struct IncContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+	base: EContextExt<'input, 'arena, Tok>,
+	pub x: Option<&'arena EContextAll<'input, 'arena, Tok>>,
+    pd: PhantomData<(&'arena (), &'input Tok)>
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for IncContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext<'input, 'arena, Tok> for IncContextExt<'input, 'arena, Tok>
 {
 	type NodeKind = LabelsParserNodeKind;
     fn node_tag() -> LabelsParserNodeKind { LabelsParserNodeKind::EContext }
 	fn get_rule_index(&self) -> usize { RULE_e }
     fn make_node(
         arena: &'arena Arena,
-        ctx: IncContext<'input, 'arena>,
-    ) -> *mut LabelsParserNode<'input, 'arena> {
+        ctx: IncContext<'input, 'arena, Tok>,
+    ) -> *mut LabelsParserNode<'input, 'arena, Tok> {
         arena.alloc_labeled_node(EContextAll::IncContext(ctx))
     }
     fn cast_from<'a>(
-        node: &'a LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a IncContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena>) {
+        node: &'a LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a IncContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => EContextAll<'input, 'arena, Tok>) {
                 EContextAll::IncContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -1049,10 +1058,10 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for IncContextExt
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut LabelsParserNode<'input, 'arena>,
-    ) -> Option<&'a mut IncContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena>) {
+        node: &'a mut LabelsParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut IncContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut EContextAll<'input, 'arena, Tok>) {
                 EContextAll::IncContext(ctx) => Some(ctx),
                 _ => None
             }
@@ -1062,16 +1071,17 @@ impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for IncContextExt
     }
 }
 
-impl<'input, 'arena> EContextAttrs<'input, 'arena> for IncContext<'input, 'arena>
+impl<'input, 'arena, Tok> EContextAttrs<'input, 'arena, Tok> for IncContext<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     fn get_v(&self) -> &String { &self.deref().base.v }  
     fn set_v(&mut self,attr: String) { self.deref_mut().base.v = attr; }  
 }
 
-impl<'input, 'arena> IncContextExt<'input, 'arena> {
-	fn new(base: EContextExt<'input, 'arena>) -> Self {
+impl<'input: 'arena, 'arena, Tok: Token + 'input> IncContextExt<'input, 'arena, Tok> {
+	fn new(base: EContextExt<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             x:None, 
@@ -1079,19 +1089,18 @@ impl<'input, 'arena> IncContextExt<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut LabelsParserNode<'input, 'arena>)
-    {
+	fn copy_from(src: &mut LabelsParserNode<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option<&mut EContext<'input, 'arena>> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option<&mut EContext<'input, 'arena, Tok>> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             EContextAll::IncContext(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut EContextAll<'input, 'arena, Tok>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag();
 	}
 }
 
@@ -1102,22 +1111,22 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     #[inline]
-	pub fn  e(&mut self,) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
+	pub fn  e(&mut self,) -> Result<&'arena EContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		self.e_rec(0)
 	}
 
     #[inline]
-	fn e_rec(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
+	fn e_rec(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
         dbt_antlr4::stacker::maybe_grow(100 * 1024, 2 * 1024 * 1024,
                       || self.e_rec_inner(_p))
     }
 
-	fn e_rec_inner(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena>, ANTLRError> {
+	fn e_rec_inner(&mut self, _p: i32) -> Result<&'arena EContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
 		recog.base.enter_recursion_rule(EContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 2, RULE_e, _p)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena EContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena EContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = 2;
 		let result: Result<(), ANTLRError> = (|| {
 	        let mut _alt: i32;
@@ -1130,38 +1139,38 @@ where
 			    Labels_INT  => {
 			        {
 			        recog.base.with_mut_ctx(|ctx| { AnIntContextExt::copy_from(ctx); });
-			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIntContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIntContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 
 			        recog.base.set_state(7);
 			        let tmp = recog.base.match_token(Labels_INT,&mut recog.err_handler)?;
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIntContext>().unwrap().INT = Some(tmp); } 
-			        let tmp = { if let Some(it) = &recog.ctx().unwrap().as_rule_context::<AnIntContext>().unwrap().INT { it.get_text() } else { "null" } .to_owned()}.to_owned();
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIntContext>().unwrap().set_v(tmp); }
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIntContext<TF::Tok>>().unwrap().INT = Some(tmp); } 
+			        let tmp = { if let Some(it) = &recog.ctx().unwrap().as_rule_context::<AnIntContext<TF::Tok>>().unwrap().INT { it.get_text() } else { "null" } .to_owned()}.to_owned();
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIntContext<TF::Tok>>().unwrap().set_v(tmp); }
 			        }}
 			    Labels_T__2  => {
 			        {
 			        recog.base.with_mut_ctx(|ctx| { ParensContextExt::copy_from(ctx); });
-			        let _local_ctx_fn = |recog: &Self| -> &'arena ParensContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+			        let _local_ctx_fn = |recog: &Self| -> &'arena ParensContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 			        recog.base.set_state(9);
 			        recog.base.match_token(Labels_T__2,&mut recog.err_handler)?;
 			        /*InvokeRule e*/
 			        recog.base.set_state(10);
 			        let tmp = recog.e_rec(0)?;
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<ParensContext>().unwrap().x = Some(tmp); } 
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<ParensContext<TF::Tok>>().unwrap().x = Some(tmp); } 
 			        recog.base.set_state(11);
 			        recog.base.match_token(Labels_T__3,&mut recog.err_handler)?;
-			        let tmp = { recog.ctx().unwrap().as_rule_context::<ParensContext>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<ParensContext>().unwrap().set_v(tmp); }
+			        let tmp = { recog.ctx().unwrap().as_rule_context::<ParensContext<TF::Tok>>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<ParensContext<TF::Tok>>().unwrap().set_v(tmp); }
 			        }}
 			    Labels_ID  => {
 			        {
 			        recog.base.with_mut_ctx(|ctx| { AnIDContextExt::copy_from(ctx); });
-			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIDContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+			        let _local_ctx_fn = |recog: &Self| -> &'arena AnIDContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 			        recog.base.set_state(14);
 			        let tmp = recog.base.match_token(Labels_ID,&mut recog.err_handler)?;
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIDContext>().unwrap().ID = Some(tmp); } 
-			        let tmp = { if let Some(it) = &recog.ctx().unwrap().as_rule_context::<AnIDContext>().unwrap().ID { it.get_text() } else { "null" } .to_owned()}.to_owned();
-			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIDContext>().unwrap().set_v(tmp); }
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIDContext<TF::Tok>>().unwrap().ID = Some(tmp); } 
+			        let tmp = { if let Some(it) = &recog.ctx().unwrap().as_rule_context::<AnIDContext<TF::Tok>>().unwrap().ID { it.get_text() } else { "null" } .to_owned()}.to_owned();
+			        unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AnIDContext<TF::Tok>>().unwrap().set_v(tmp); }
 			        }}
 				_ => Err(ANTLRError::no_alt(&mut recog.base))?
 			}
@@ -1183,9 +1192,9 @@ where
 							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							MultContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena MultContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena MultContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 							recog.base.with_mut_ctx(|ctx| {
-							ctx.as_rule_context_mut::<MultContext>().unwrap().a = Some(_prevctx.as_rule_context().unwrap());
+							ctx.as_rule_context_mut::<MultContext<TF::Tok>>().unwrap().a = Some(_prevctx.as_rule_context().unwrap());
 							});
 
 							recog.base.set_state(18);
@@ -1194,13 +1203,13 @@ where
 							}
 							recog.base.set_state(19);
 							let tmp = recog.base.match_token(Labels_T__0,&mut recog.err_handler)?;
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext>().unwrap().op = Some(tmp); } 
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext<TF::Tok>>().unwrap().op = Some(tmp); } 
 							/*InvokeRule e*/
 							recog.base.set_state(20);
 							let tmp = recog.e_rec(8)?;
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext>().unwrap().b = Some(tmp); } 
-							let tmp = { "* ".to_owned() + recog.ctx().unwrap().as_rule_context::<MultContext>().unwrap().a.as_ref().unwrap().get_v() + " " + recog.ctx().unwrap().as_rule_context::<MultContext>().unwrap().b.as_ref().unwrap().get_v()}.to_owned();
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext>().unwrap().set_v(tmp); }
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext<TF::Tok>>().unwrap().b = Some(tmp); } 
+							let tmp = { "* ".to_owned() + recog.ctx().unwrap().as_rule_context::<MultContext<TF::Tok>>().unwrap().a.as_ref().unwrap().get_v() + " " + recog.ctx().unwrap().as_rule_context::<MultContext<TF::Tok>>().unwrap().b.as_ref().unwrap().get_v()}.to_owned();
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<MultContext<TF::Tok>>().unwrap().set_v(tmp); }
 							}
 						}
 					,
@@ -1210,9 +1219,9 @@ where
 							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							AddContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena AddContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 							recog.base.with_mut_ctx(|ctx| {
-							ctx.as_rule_context_mut::<AddContext>().unwrap().a = Some(_prevctx.as_rule_context().unwrap());
+							ctx.as_rule_context_mut::<AddContext<TF::Tok>>().unwrap().a = Some(_prevctx.as_rule_context().unwrap());
 							});
 
 							recog.base.set_state(23);
@@ -1224,9 +1233,9 @@ where
 							/*InvokeRule e*/
 							recog.base.set_state(25);
 							let tmp = recog.e_rec(7)?;
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AddContext>().unwrap().b = Some(tmp); } 
-							let tmp = { "+ ".to_owned() + recog.ctx().unwrap().as_rule_context::<AddContext>().unwrap().a.as_ref().unwrap().get_v() + " " + recog.ctx().unwrap().as_rule_context::<AddContext>().unwrap().b.as_ref().unwrap().get_v()}.to_owned();
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AddContext>().unwrap().set_v(tmp); }
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AddContext<TF::Tok>>().unwrap().b = Some(tmp); } 
+							let tmp = { "+ ".to_owned() + recog.ctx().unwrap().as_rule_context::<AddContext<TF::Tok>>().unwrap().a.as_ref().unwrap().get_v() + " " + recog.ctx().unwrap().as_rule_context::<AddContext<TF::Tok>>().unwrap().b.as_ref().unwrap().get_v()}.to_owned();
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<AddContext<TF::Tok>>().unwrap().set_v(tmp); }
 							}
 						}
 					,
@@ -1236,9 +1245,9 @@ where
 							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							IncContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena IncContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena IncContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 							recog.base.with_mut_ctx(|ctx| {
-							ctx.as_rule_context_mut::<IncContext>().unwrap().x = Some(_prevctx.as_rule_context().unwrap());
+							ctx.as_rule_context_mut::<IncContext<TF::Tok>>().unwrap().x = Some(_prevctx.as_rule_context().unwrap());
 							});
 
 							recog.base.set_state(28);
@@ -1247,8 +1256,8 @@ where
 							}
 							recog.base.set_state(29);
 							recog.base.match_token(Labels_T__4,&mut recog.err_handler)?;
-							let tmp = { " ++".to_owned() + recog.ctx().unwrap().as_rule_context::<IncContext>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<IncContext>().unwrap().set_v(tmp); }
+							let tmp = { " ++".to_owned() + recog.ctx().unwrap().as_rule_context::<IncContext<TF::Tok>>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<IncContext<TF::Tok>>().unwrap().set_v(tmp); }
 							}
 						}
 					,
@@ -1258,9 +1267,9 @@ where
 							let tmp = EContextExt::create(recog.get_arena(), _parentctx, _parentState);
 							DecContextExt::copy_from(tmp);
 							let _prevctx = recog.push_new_recursion_context(tmp, _startState, RULE_e)?;
-							let _local_ctx_fn = |recog: &Self| -> &'arena DecContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+							let _local_ctx_fn = |recog: &Self| -> &'arena DecContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 							recog.base.with_mut_ctx(|ctx| {
-							ctx.as_rule_context_mut::<DecContext>().unwrap().x = Some(_prevctx.as_rule_context().unwrap());
+							ctx.as_rule_context_mut::<DecContext<TF::Tok>>().unwrap().x = Some(_prevctx.as_rule_context().unwrap());
 							});
 
 							recog.base.set_state(31);
@@ -1269,8 +1278,8 @@ where
 							}
 							recog.base.set_state(32);
 							recog.base.match_token(Labels_T__5,&mut recog.err_handler)?;
-							let tmp = { " --".to_owned() + recog.ctx().unwrap().as_rule_context::<DecContext>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
-							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<DecContext>().unwrap().set_v(tmp); }
+							let tmp = { " --".to_owned() + recog.ctx().unwrap().as_rule_context::<DecContext<TF::Tok>>().unwrap().x.as_ref().unwrap().get_v()}.to_owned();
+							unsafe { recog.ctx_mut().unwrap().as_rule_context_mut::<DecContext<TF::Tok>>().unwrap().set_v(tmp); }
 							}
 						}
 

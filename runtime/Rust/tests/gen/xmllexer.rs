@@ -132,20 +132,20 @@ impl XMLLexerActions {
 	}
 }
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>, TF::Tok>
     for XMLLexerActions
 where
     'input: 'arena,
     Input: CharStream<'input>,
     TF: TokenFactory<'input, 'arena> + 'arena,
 {
-    fn action(_localctx: Option<&EmptyRuleNode<'input, 'arena>>, rule_index: i32, action_index: i32, recog:&mut BaseLexerType<'input, 'arena, Input, TF>) {
+    fn action(_localctx: Option<&EmptyRuleNode<'input, 'arena, TF::Tok>>, rule_index: i32, action_index: i32, recog:&mut BaseLexerType<'input, 'arena, Input, TF>) {
         match rule_index {
             10 => XMLLexerActions::CLOSE_action(action_index, recog), 
             _ => {}
         }
     }
-    fn sempred(_localctx: Option<&EmptyRuleNode<'input, 'arena>>, rule_index: i32, pred_index: i32, recog:&mut BaseLexerType<'input, 'arena, Input, TF>) -> bool {
+    fn sempred(_localctx: Option<&EmptyRuleNode<'input, 'arena, TF::Tok>>, rule_index: i32, pred_index: i32, recog:&mut BaseLexerType<'input, 'arena, Input, TF>) -> bool {
         match rule_index {
             0 => XMLLexerActions::COMMENT_sempred(pred_index, recog), 
             _ => true

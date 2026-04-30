@@ -61,6 +61,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
+use dbt_antlr4::token::CommonToken;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
@@ -99,10 +100,13 @@ ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <header>
 use dbt_antlr4::errors::ANTLRError;
+use dbt_antlr4::token::Token;
 use dbt_antlr4::tree::ParseTreeListener;
 use super::<file.parserName; format="lower">::*;
 
-pub trait <file.grammarName>Listener\<'arena> : ParseTreeListener\<'arena, <file.parserName>NodeKind>
+pub trait <file.grammarName>Listener\<'arena, Tok> : ParseTreeListener\<'arena, <file.parserName>NodeKind, Tok>
+where
+    Tok: Token + 'arena,
 {
 <file.listenerNames:{lname |
     <if(file.listenerLabelRuleNames.(lname))>
@@ -112,7 +116,7 @@ pub trait <file.grammarName>Listener\<'arena> : ParseTreeListener\<'arena, <file
     /// Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
     <endif>
     /// @param ctx the parse tree
-    fn enter_<lname>\<'input: 'arena>(&mut self, _ctx: &<lname; format="cap">Context\<'input, 'arena>) -> Result\<(), ANTLRError> { Ok(()) \}
+    fn enter_<lname>\<'input: 'arena>(&mut self, _ctx: &<lname; format="cap">Context\<'input, 'arena, Tok>) -> Result\<(), ANTLRError> { Ok(()) \}
 
     <if(file.listenerLabelRuleNames.(lname))>
     /// Exit a parse tree produced by the {@code <lname>\}
@@ -121,7 +125,7 @@ pub trait <file.grammarName>Listener\<'arena> : ParseTreeListener\<'arena, <file
     /// Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
     <endif>
     /// @param ctx the parse tree
-    fn exit_<lname>\<'input: 'arena>(&mut self, _ctx: &<lname; format="cap">Context\<'input, 'arena>) -> Result\<(), ANTLRError> { Ok(()) \}
+    fn exit_<lname>\<'input: 'arena>(&mut self, _ctx: &<lname; format="cap">Context\<'input, 'arena, Tok>) -> Result\<(), ANTLRError> { Ok(()) \}
 }; separator="\n">
 }
 
@@ -164,15 +168,17 @@ VisitorFile(file, header, namedActions) ::= <<
 #![allow(dead_code)]
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <header>
+use dbt_antlr4::token::Token;
 use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::tree::*;
 use super::<file.parserName; format="lower">::*;
 
 /// This interface defines a complete generic visitor for a parse tree produced
 /// by {@link <file.parserName>}.
-pub trait <file.grammarName>Visitor\<'input, 'arena>
+pub trait <file.grammarName>Visitor\<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     type Return: Default;
 
@@ -184,32 +190,32 @@ where
     /// Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
     <endif>
     /// @param ctx the parse tree
-    fn visit_<lname>(&mut self, ctx: &'arena <lname; format="cap">Context\<'input, 'arena>) -> Result\<Self::Return, ANTLRError> { self.visit_children(ctx) \}
+    fn visit_<lname>(&mut self, ctx: &'arena <lname; format="cap">Context\<'input, 'arena, Tok>) -> Result\<Self::Return, ANTLRError> { self.visit_children(ctx) \}
 }; separator="\n">
 
     /// Called on terminal(leaf) node
     fn visit_terminal(
         &mut self,
-        _node: &'arena TerminalNode\<'input, 'arena>,
+        _node: &'arena TerminalNode\<'input, 'arena, Tok>,
     ) -> Result\<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     /// Called on error node
     fn visit_error_node(
         &mut self,
-        _node: &'arena ErrorNode\<'input, 'arena>,
+        _node: &'arena ErrorNode\<'input, 'arena, Tok>,
     ) -> Result\<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
-    fn visit(&mut self, tree: &'arena dyn NodeInner\<'input, 'arena, <file.parserName>NodeKind\>) -> Result\<Self::Return, ANTLRError> {
+    fn visit(&mut self, tree: &'arena dyn NodeInner\<'input, 'arena, <file.parserName>NodeKind, Tok>) -> Result\<Self::Return, ANTLRError> {
         self.visit_node(tree.as_node())
     }
 
-    fn visit_node(&mut self, node: &'arena <file.parserName>Node\<'input, 'arena>) -> Result\<Self::Return, ANTLRError> {
+    fn visit_node(&mut self, node: &'arena <file.parserName>Node\<'input, 'arena, Tok>) -> Result\<Self::Return, ANTLRError> {
         node.accept(self)
     }
 
     fn visit_children(
         &mut self,
-        node: &'arena dyn NodeInner\<'input, 'arena, <file.parserName>NodeKind\>,
+        node: &'arena dyn NodeInner\<'input, 'arena, <file.parserName>NodeKind, Tok>,
     ) -> Result\<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
         for child in node.iter_child_nodes() {
@@ -229,7 +235,7 @@ where
         next: Self::Return,
     ) -> Result\<Self::Return, ANTLRError> { Ok(next) }
 
-    fn should_visit_next_child(&self, _node: &'arena <file.parserName>Node\<'input, 'arena>, _current: &Self::Return) -> bool { true }
+    fn should_visit_next_child(&self, _node: &'arena <file.parserName>Node\<'input, 'arena, Tok>, _current: &Self::Return) -> bool { true }
 }
 >>
 
@@ -310,7 +316,7 @@ where
         listener: Box\<L>,
     ) -> ListenerId\<L>
     where
-        L: <if(file.genListener)><parser.grammarName>Listener\<'arena><else>ParseTreeListener\<'arena, <parser.name>NodeKind\><endif> + 'static,
+        L: <if(file.genListener)><parser.grammarName>Listener\<'arena, TF::Tok><else>ParseTreeListener\<'arena, <parser.name>NodeKind, TF::Tok><endif> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -318,27 +324,28 @@ where
     }
 }
 <if(file.genVisitor)>
-pub trait Visitable\<'input, 'arena> {
+pub trait Visitable\<'input: 'arena, 'arena, Tok: Token + 'input> {
     fn accept\<V>(&'arena self, visitor: &mut V) -> Result\<V::Return, ANTLRError>
     where
         'input: 'arena,
-        V: <file.grammarName>Visitor\<'input, 'arena> + ?Sized;
+        V: <file.grammarName>Visitor\<'input, 'arena, Tok> + ?Sized;
 }
 <endif>
 pub struct <file.grammarName>TreeWalker;
 impl <file.grammarName>TreeWalker
 {
-    pub fn walk\<'input,'arena, L, T\>(
+    pub fn walk\<'input, 'arena, Tok, L, T\>(
         listener: Box\<L\>,
         tree: &'arena T,
     ) -> Result\<Box\<L\>, ANTLRError>
     where
         'input: 'arena,
-        L: <if(file.genListener)><parser.grammarName>Listener\<'arena><else>ParseTreeListener\<'arena, <parser.name>NodeKind\><endif> + 'static,
-        T: NodeInner\<'input, 'arena, <parser.name>NodeKind\>,
+        L: <if(file.genListener)><parser.grammarName>Listener\<'arena, Tok><else>ParseTreeListener\<'arena, <parser.name>NodeKind, Tok><endif> + 'static,
+        T: NodeInner\<'input, 'arena, <parser.name>NodeKind, Tok\>,
+        Tok: Token + 'input,
     {
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut \<<parser.name>NodeKind as NodeKindType>::Listener) };
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut \<<parser.name>NodeKind as NodeKindType\<Tok>\>::Listener) };
         let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
@@ -351,12 +358,12 @@ pub enum <parser.name>NodeKind {
     }>}>    Terminal,
     Error,
 }
-pub type <parser.name>Node\<'input, 'arena> = TreeNode\<'input, 'arena, <parser.name>NodeKind\>;
+pub type <parser.name>Node\<'input, 'arena, Tok = CommonToken\<'input\>\> = TreeNode\<'input, 'arena, <parser.name>NodeKind, Tok\>;
 
 dbt_antlr4::impl_deref! { parser => <parser.name> }
 dbt_antlr4::impl_node_kind! { <parser.name>NodeKind {
     <parser.funcs:{f | <f.ruleCtx:{r | <if(r.provideCopyFrom)><r.escapedName>(<r.escapedName>All), <endif>}>}>; <parser.funcs:{f | <f.ruleCtx:{r | <if(!r.provideCopyFrom)><r.escapedName>(<if(file.genListener)>enter_<r.derivedFromName>, exit_<r.derivedFromName>, <endif><if(file.genVisitor)> visit_<r.derivedFromName><endif>), <endif>}>}>
-    }; <if(file.genListener)>listener = dyn <parser.grammarName>Listener\<'arena>,<endif><if(file.genVisitor)> visitor = <parser.grammarName>Visitor,<endif>
+    }; <if(file.genListener)>listener = dyn <parser.grammarName>Listener\<'arena, Tok>,<endif><if(file.genVisitor)> visitor = <parser.grammarName>Visitor,<endif>
 }
 
 pub struct <parser.name>Ext\<'input, 'arena> {
@@ -368,14 +375,14 @@ impl\<'input, 'arena> <parser.name>Ext\<'input, 'arena> {
 	<namedActions.members>
 }
 
-impl\<'input, 'arena, Input, TF\> ParserRecog\<'input, 'arena, BaseParserType\<'input, 'arena, Input, TF>\> for <parser.name>Ext\<'input, 'arena>
+impl\<'input, 'arena, Input, TF\> ParserRecog\<'input, 'arena, BaseParserType\<'input, 'arena, Input, TF>, TF::Tok\> for <parser.name>Ext\<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory\<'input, 'arena> + 'arena,
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {}
 
-impl\<'input, 'arena, Input, TF\> Actions\<'input, 'arena, BaseParserType\<'input, 'arena, Input, TF>\> for <parser.name>Ext\<'input, 'arena>
+impl\<'input, 'arena, Input, TF\> Actions\<'input, 'arena, BaseParserType\<'input, 'arena, Input, TF>, TF::Tok\> for <parser.name>Ext\<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory\<'input, 'arena> + 'arena,
@@ -385,7 +392,7 @@ where
    	fn get_rule_names(&self) -> &[& str] { &ruleNames }
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
 <if(sempredFuncs)>
-	fn sempred(_localctx: Option\<&'arena <parser.name>Node\<'input, 'arena\>\>, rule_index: i32, pred_index: i32,
+	fn sempred(_localctx: Option\<&'arena <parser.name>Node\<'input, 'arena, TF::Tok\>\>, rule_index: i32, pred_index: i32,
 			   recog:&mut BaseParserType\<'input, 'arena, Input, TF>
 	) -> bool {
 		match rule_index {
@@ -423,7 +430,7 @@ static VOCABULARY: LazyLock\<Box\<dyn Vocabulary>\> = LazyLock::new(|| Box::new(
 dumpLexerActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 {
 <if(actionFuncs)>
-    fn action(_localctx: Option\<&EmptyRuleNode\<'input, 'arena\>\>, rule_index: i32, action_index: i32, recog:&mut BaseLexerType\<'input, 'arena, Input, TF>) {
+    fn action(_localctx: Option\<&EmptyRuleNode\<'input, 'arena, TF::Tok\>\>, rule_index: i32, action_index: i32, recog:&mut BaseLexerType\<'input, 'arena, Input, TF>) {
         match rule_index {
 <recog.actionFuncs.values:{f|
             <f.ruleIndex> => <recog.name>Actions::<f.escapedName>_action(action_index, recog), }; separator="\n">
@@ -432,7 +439,7 @@ dumpLexerActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
     }
 <endif>
 <if(sempredFuncs)>
-    fn sempred(_localctx: Option\<&EmptyRuleNode\<'input, 'arena\>\>, rule_index: i32, pred_index: i32, recog:&mut BaseLexerType\<'input, 'arena, Input, TF>) -> bool {
+    fn sempred(_localctx: Option\<&EmptyRuleNode\<'input, 'arena, TF::Tok\>\>, rule_index: i32, pred_index: i32, recog:&mut BaseLexerType\<'input, 'arena, Input, TF>) -> bool {
         match rule_index {
 <recog.sempredFuncs.values:{f|
             <f.ruleIndex> => <recog.name>Actions::<f.escapedName>_sempred(pred_index, recog), }; separator="\n">
@@ -470,7 +477,7 @@ where
     TF: TokenFactory\<'input, 'arena> + 'arena,
     Input: CharStream\<'input>,
 <else>
-fn <r.escapedName>_sempred(_ctx: Option\<&'arena <r.ctxType>\<'input, 'arena>\>, pred_index:i32, recog: &mut \<Self as Deref>::Target) -> bool
+fn <r.escapedName>_sempred(_ctx: Option\<&'arena <r.ctxType>\<'input, 'arena, TF::Tok\>\>, pred_index:i32, recog: &mut \<Self as Deref>::Target) -> bool
 <endif> {
 	match pred_index {
 <actions:{index|
@@ -486,9 +493,13 @@ RuleTypeForAlt(currentRule,ruleCtx,altLabelCtxs) ::= <<
 <if(ruleCtx.struct.provideCopyFrom)>
 #[derive(Debug)]
 #[repr(C, u16)]
-pub enum <currentRule.ctxType>All\<'input, 'arena> {
-	<altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(<altLabelCtxs.(l).struct.escapedName>\<'input, 'arena>),
-	}>    Error(<ruleCtx.struct.escapedName>\<'input, 'arena>)
+pub enum <currentRule.ctxType>All\<'input, 'arena, Tok = CommonToken\<'input\>\>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	<altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(<altLabelCtxs.(l).struct.escapedName>\<'input, 'arena, Tok>),
+	}>    Error(<ruleCtx.struct.escapedName>\<'input, 'arena, Tok>)
 }
 
 dbt_antlr4::impl_rule_context! { <currentRule.ctxType>All { } { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>, }>Error, } }
@@ -498,8 +509,12 @@ dbt_antlr4::impl_node_inner! { <parser.name>NodeKind::<currentRule.ctxType>::<cu
 <if(file.genListener)>dbt_antlr4::impl_listener_dispatch! { <parser.grammarName>Listener::<parser.name>NodeKind::<currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(enter_<altLabelCtxs.(l).struct.derivedFromName>, exit_<altLabelCtxs.(l).struct.derivedFromName>), }>} }<endif>
 <if(file.genVisitor)>dbt_antlr4::impl_visitable! { <parser.grammarName>Visitor::<currentRule.ctxType>All { <altLabelCtxs:{l | <altLabelCtxs.(l).struct.escapedName>(visit_<altLabelCtxs.(l).struct.derivedFromName>), }>} }<endif>
 
-impl\<'input, 'arena> Deref for <currentRule.ctxType>All\<'input, 'arena>{
-	type Target = dyn <currentRule.ctxType>Attrs\<'input, 'arena> + 'arena;
+impl\<'input, 'arena, Tok> Deref for <currentRule.ctxType>All\<'input, 'arena, Tok>
+where
+    'input: 'arena,
+    Tok: Token + 'input,
+{
+	type Target = dyn <currentRule.ctxType>Attrs\<'input, 'arena, Tok> + 'arena;
 	fn deref(&self) -> &Self::Target{
 		use <currentRule.ctxType>All::*;
 		match self{
@@ -509,7 +524,7 @@ impl\<'input, 'arena> Deref for <currentRule.ctxType>All\<'input, 'arena>{
 	}
 }
 <else>
-pub type <currentRule.ctxType>All\<'input, 'arena> = <ruleCtx.struct.escapedName>\<'input, 'arena>;
+pub type <currentRule.ctxType>All\<'input, 'arena, Tok = CommonToken\<'input\>\> = <ruleCtx.struct.escapedName>\<'input, 'arena, Tok>;
 <endif>
 >>
 
@@ -525,11 +540,11 @@ where
     TF: TokenFactory\<'input, 'arena\> + 'arena,
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
-	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub <endif>fn <currentRule.escapedName>(&mut self,<args; separator=",">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena>, ANTLRError> {
+	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub <endif>fn <currentRule.escapedName>(&mut self,<args; separator=",">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = <self()>.base.take_ctx();
         <self()>.base.enter_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>), <currentRule.startState>, RULE_<currentRule.name>)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType> {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType>\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		<namedActions.init>
 		<locals; separator="\n">
 		let result: Result\<(), ANTLRError> = (|| {
@@ -567,24 +582,24 @@ where
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
     #[inline]
-	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub fn <endif> <currentRule.escapedName>(&mut self,<args; separator=", ">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
+	<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>pub fn <endif> <currentRule.escapedName>(&mut self,<args; separator=", ">) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena, TF::Tok\>, ANTLRError> {
 		self.<currentRule.escapedName>_rec(0<currentRule.args:{a | , <a.escapedName>}>)
 	}
 
     #[inline]
-	fn <currentRule.escapedName>_rec(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
+	fn <currentRule.escapedName>_rec(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena, TF::Tok\>, ANTLRError> {
         <if(file.genStacker)>dbt_antlr4::stacker::maybe_grow(100 * 1024, 2 * 1024 * 1024,
               || self.<currentRule.escapedName>_rec_inner(_p<args:{a | , <a>}>))
         <else>self.<currentRule.escapedName>_rec_inner(_p<args:{a | , <a>}>)
         <endif>
     }
 
-	fn <currentRule.escapedName>_rec_inner(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena\>, ANTLRError> {
+	fn <currentRule.escapedName>_rec_inner(&mut self, _p: i32<args:{a | , <a>}>) -> Result\<&'arena <currentRule.ctxType>All\<'input, 'arena, TF::Tok\>, ANTLRError> {
 		let recog = self;
 		let _parentctx = <self()>.base.take_ctx();
 		let _parentState = <self()>.base.get_state();
 		<self()>.base.enter_recursion_rule(<currentRule.ctxType>Ext::create(<self()>.get_arena(), _parentctx, <self()>.get_state()<currentRule.args:{a | , <a.escapedName>}>), <currentRule.startState>, RULE_<currentRule.name>, _p)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType> {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena <currentRule.ctxType>\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let _startState = <currentRule.startState>;
 		<namedActions.init>
 		<locals; separator="\n">
@@ -618,7 +633,7 @@ CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::
     <currentOuterMostAltCodeBlock.altLabel; format="cap">ContextExt::copy_from(ctx);
     ctx.set_alt_number(<currentOuterMostAltCodeBlock.alt.altNum>);
 });
-let _local_ctx_fn = |recog: &Self| -> &'arena <currentOuterMostAltCodeBlock.altLabel; format="cap">Context {recog.ctx().unwrap().as_rule_context().unwrap()};
+let _local_ctx_fn = |recog: &Self| -> &'arena <currentOuterMostAltCodeBlock.altLabel; format="cap">Context\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 <else>
 unsafe { <self()>.ctx_mut().unwrap().set_alt_number(<currentOuterMostAltCodeBlock.alt.altNum>); }
 <endif>
@@ -915,41 +930,41 @@ let temp = <labelref(a.label,{.clone().unwrap()})>;
 TokenDecl(t) ::= << <t.escapedName>: Option\<<RustTypeMap.(TokenLabelType())>\>>>
 TokenTypeDecl(t) ::= "let mut <t.name>: i32 = -1;"
 TokenListDecl(t) ::= << <t.escapedName>:Vec\<<TokenLabelType()>\>>>
-RuleContextDecl(r) ::= << <r.escapedName>: Option\<&'arena <r.ctxName>All\<'input, 'arena>\>>>
-RuleContextListDecl(rdecl) ::= << <rdecl.escapedName>:Vec\<&'arena <rdecl.ctxName>All\<'input, 'arena>\>>>
+RuleContextDecl(r) ::= << <r.escapedName>: Option\<&'arena <r.ctxName>All\<'input, 'arena, Tok>\>>>
+RuleContextListDecl(rdecl) ::= << <rdecl.escapedName>:Vec\<&'arena <rdecl.ctxName>All\<'input, 'arena, Tok>\>>>
 
 ContextTokenGetterDecl(t)      ::= <<
 /// Retrieves first TerminalNode corresponding to token <t.name>
 /// Returns `None` if there is no child corresponding to token <t.name>
-fn <t.name>(&self) -> Option\<&TerminalNode\<'input, 'arena\>\><if(t.signature)>;<else> {
-	self.get_token(<parser.grammarName>_<t.name>, 0)
+fn <t.name>(&self) -> Option\<&TerminalNode\<'input, 'arena, Tok\>\><if(t.signature)>;<else> {
+    self.children_of_type::\<TerminalNode\<Tok\>\>().into_iter().find(|child| child.symbol.get_token_type() == <parser.grammarName>_<t.name>)
 }<endif>
 >>
 ContextTokenListGetterDecl(t)  ::=<<
 /// Retrieves all `TerminalNode`s corresponding to token <t.name> in current rule
-fn <t.name>_all(&self) -> Vec\<&TerminalNode\<'input, 'arena\>\><if(t.signature)>;<else> {
-	self.children_of_type()
+fn <t.name>_all(&self) -> Vec\<&TerminalNode\<'input, 'arena, Tok\>\><if(t.signature)>;<else> {
+	self.children_of_type::\<TerminalNode\<Tok\>\>().into_iter().filter(|child| child.symbol.get_token_type() == <parser.grammarName>_<t.name>).collect()
 }<endif>
 >>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-/// Retrieves 'i's TerminalNode corresponding to token <t.name>, starting from 0.
-/// Returns `None` if number of children corresponding to token <t.name> is less or equal than `i`.
-fn <t.name>(&self, i: usize) -> Option\<&TerminalNode\<'input, 'arena\>\><if(t.signature)>;<else> {
-	self.get_token(<parser.grammarName>_<t.name>, i)
+/// Retrieves 'i'th TerminalNode corresponding to token <t.name>, starting from 0.
+/// Returns `None` if number of children corresponding to token <t.name> is less than or equal to `i`.
+fn <t.name>(&self, i: usize) -> Option\<&TerminalNode\<'input, 'arena, Tok\>\><if(t.signature)>;<else> {
+	self.children_of_type::\<TerminalNode\<Tok\>\>().into_iter().filter(|child| child.symbol.get_token_type() == <parser.grammarName>_<t.name>).nth(i)
 }<endif>
 >>
 ContextRuleGetterDecl(r)       ::= <<
-fn <r.escapedName>(&self) -> Option\<&'arena <r.ctxName>All\<'input, 'arena\>\><if(r.signature)>;<else> {
+fn <r.escapedName>(&self) -> Option\<&'arena <r.ctxName>All\<'input, 'arena, Tok\>\><if(r.signature)>;<else> {
     self.child_of_type(0)
 }<endif>
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-fn <r.name>_all(&self) -> Vec\<&'arena <r.ctxName>All\<'input, 'arena\>\><if(r.signature)>;<else> {
+fn <r.name>_all(&self) -> Vec\<&'arena <r.ctxName>All\<'input, 'arena, Tok\>\><if(r.signature)>;<else> {
     self.children_of_type()
 }<endif>
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-fn <r.escapedName>(&self, i: usize) -> Option\<&'arena <r.ctxName>All\<'input, 'arena\>\><if(r.signature)>;<else> {
+fn <r.escapedName>(&self, i: usize) -> Option\<&'arena <r.ctxName>All\<'input, 'arena, Tok\>\><if(r.signature)>;<else> {
     self.child_of_type(i)
 }<endif>
 >>
@@ -970,50 +985,52 @@ CaptureNextToken(d) ::= "<d.varName> = <self()>.base.input.lt(1).unwrap();"
 CaptureNextTokenType(d) ::= "<d.varName> = <self()>.base.input.la(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures) ::= <<
-pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena\>, <parser.name>NodeKind\>;
+pub type <struct.escapedName>\<'input, 'arena, Tok = CommonToken\<'input>\> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena, Tok\>, <parser.name>NodeKind, Tok\>;
 <if(file.genVisitor && !struct.provideCopyFrom)>dbt_antlr4::impl_visitable! { <parser.grammarName>Visitor::<struct.escapedName>(visit_<struct.derivedFromName>) }<endif>
 #[derive(Debug)]
-pub struct <struct.escapedName>Ext\<'input, 'arena> {
+pub struct <struct.escapedName>Ext\<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken\<'input\>\> {
 	<attrs:{a | pub <a>,}; separator="\n">
-    ph: PhantomData\<(&'arena (), &'input ())\>,
+    ph: PhantomData\<(&'arena (), &'input Tok)\>,
 }
 
-impl\<'input: 'arena, 'arena> CustomRuleContext\<'input, 'arena> for <struct.escapedName>Ext\<'input, 'arena>
+impl\<'input: 'arena, 'arena, Tok> CustomRuleContext\<'input, 'arena, Tok> for <struct.escapedName>Ext\<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = <parser.name>NodeKind;
     fn node_tag() -> <parser.name>NodeKind { <parser.name>NodeKind::<struct.derivedFromName; format="cap">Context }
 	fn get_rule_index(&self) -> usize { RULE_<struct.derivedFromName> }
     fn make_node(
         arena: &'arena Arena,
-        ctx: <struct.escapedName>\<'input, 'arena>,
-    ) -> *mut <parser.name>Node\<'input, 'arena> {
+        ctx: <struct.escapedName>\<'input, 'arena, Tok\>,
+    ) -> *mut <parser.name>Node\<'input, 'arena, Tok\> {
 <if(struct.provideCopyFrom)>
         arena.alloc_labeled_node(<struct.escapedName>All::Error(ctx))
 <else>
         arena.alloc_zeroed_node(ctx)<endif>
     }
     fn cast_from\<'a>(
-        node: &'a <parser.name>Node\<'input, 'arena>,
-    ) -> Option\<&'a <struct.escapedName>\<'input, 'arena\>\> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => <struct.escapedName>\<'input, 'arena\>))
+        node: &'a <parser.name>Node\<'input, 'arena, Tok\>,
+    ) -> Option\<&'a <struct.escapedName>\<'input, 'arena, Tok\>\> {
+        if node.node_tag() == \<Self as CustomRuleContext\<'input, 'arena, Tok>\>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => <struct.escapedName>\<'input, 'arena, Tok\>))
         } else {
             None
         }
     }
     fn cast_from_mut\<'a>(
-        node: &'a mut <parser.name>Node\<'input, 'arena>,
-    ) -> Option\<&'a mut <struct.escapedName>\<'input, 'arena\>\> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut <struct.escapedName>\<'input, 'arena\>))
+        node: &'a mut <parser.name>Node\<'input, 'arena, Tok\>,
+    ) -> Option\<&'a mut <struct.escapedName>\<'input, 'arena, Tok\>\> {
+        if node.node_tag() == \<Self as CustomRuleContext\<'input, 'arena, Tok>\>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut <struct.escapedName>\<'input, 'arena, Tok\>))
         } else {
             None
         }
     }
 }
 
-impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>Node\<'input, 'arena\>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> &'arena mut <parser.name>Node\<'input, 'arena>
+impl\<'input: 'arena, 'arena, Tok: Token + 'input> <struct.escapedName>Ext\<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option\<&'arena <parser.name>Node\<'input, 'arena, Tok\>\>, invoking_state: i32<ctorAttrs:{a | , <a>}>) -> &'arena mut <parser.name>Node\<'input, 'arena, Tok\>
     {
 		<struct.attributeDecls:{a | let mut _init_<a.escapedName> = <rustTypeInitMap.(a.type)>;
 		 }>
@@ -1033,9 +1050,10 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena>{
 	}
 }
 
-pub trait <struct.escapedName>Attrs\<'input, 'arena>: ParserRuleContext\<'input, 'arena>
+pub trait <struct.escapedName>Attrs\<'input, 'arena, Tok>: ParserRuleContext\<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     <struct.attributeDecls:{a | fn get_<a.escapedName>(&self) -> &<RustTypeMap.(a.type)>; }; separator = "\n">
     <struct.attributeDecls:{a | fn set_<a.escapedName>(&mut self,attr: <RustTypeMap.(a.type)>); }; separator = "\n">
@@ -1043,7 +1061,7 @@ where
     <extensionMembers; separator="\n">
 }
 
-impl\<'input, 'arena> <struct.escapedName>Attrs\<'input, 'arena> for <struct.escapedName>\<'input, 'arena>
+impl\<'input, 'arena, Tok: Token + 'input> <struct.escapedName>Attrs\<'input, 'arena, Tok> for <struct.escapedName>\<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
@@ -1056,44 +1074,43 @@ where
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods,signatures) ::= <<
 
-pub type <struct.escapedName>\<'input, 'arena> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena\>, <parser.name>NodeKind\>;
+pub type <struct.escapedName>\<'input, 'arena, Tok = CommonToken\<'input\>\> = <if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif>\<'input, 'arena, <struct.escapedName>Ext\<'input, 'arena, Tok\>, <parser.name>NodeKind, Tok\>;
 
-pub trait <struct.escapedName>Attrs\<'input, 'arena>: ParserRuleContext\<'input, 'arena>
+pub trait <struct.escapedName>Attrs\<'input, 'arena, Tok>: ParserRuleContext\<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
 	<signatures:{s | <s>}; separator="\n">
 }
 
-impl\<'input, 'arena> <struct.escapedName>Attrs\<'input, 'arena> for <struct.escapedName>\<'input, 'arena>
-where
-    'input: 'arena,
+impl\<'input: 'arena, 'arena, Tok: Token + 'input> <struct.escapedName>Attrs\<'input, 'arena, Tok> for <struct.escapedName>\<'input, 'arena, Tok>
 {
     <getters:{g | <g>}; separator="\n">
 }
 #[derive(Debug)]
-pub struct <struct.escapedName>Ext\<'input, 'arena> {
-	base: <currentRule.name; format="cap">ContextExt\<'input, 'arena>,
+pub struct <struct.escapedName>Ext\<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken\<'input\>\> {
+	base: <currentRule.name; format="cap">ContextExt\<'input, 'arena, Tok>,
 	<attrs:{a | pub <a>,}; separator="\n">
-    pd: PhantomData\<(&'arena (), &'input ())\>
+    pd: PhantomData\<(&'arena (), &'input Tok)\>
 }
 
-impl\<'input: 'arena, 'arena> CustomRuleContext\<'input, 'arena> for <struct.escapedName>Ext\<'input, 'arena>
+impl\<'input: 'arena, 'arena, Tok: Token + 'input> CustomRuleContext\<'input, 'arena, Tok> for <struct.escapedName>Ext\<'input, 'arena, Tok>
 {
 	type NodeKind = <parser.name>NodeKind;
     fn node_tag() -> <parser.name>NodeKind { <parser.name>NodeKind::<currentRule.name; format="cap">Context }
 	fn get_rule_index(&self) -> usize { RULE_<currentRule.name> }
     fn make_node(
         arena: &'arena Arena,
-        ctx: <struct.escapedName>\<'input, 'arena>,
-    ) -> *mut <parser.name>Node\<'input, 'arena> {
+        ctx: <struct.escapedName>\<'input, 'arena, Tok>,
+    ) -> *mut <parser.name>Node\<'input, 'arena, Tok> {
         arena.alloc_labeled_node(<currentRule.name; format="cap">ContextAll::<struct.escapedName>(ctx))
     }
     fn cast_from\<'a>(
-        node: &'a <parser.name>Node\<'input, 'arena>,
-    ) -> Option\<&'a <struct.escapedName>\<'input, 'arena\>\> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => <currentRule.name; format="cap">ContextAll\<'input, 'arena\>) {
+        node: &'a <parser.name>Node\<'input, 'arena, Tok>,
+    ) -> Option\<&'a <struct.escapedName>\<'input, 'arena, Tok\>\> {
+        if node.node_tag() == \<Self as CustomRuleContext\<'input, 'arena, Tok>\>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => <currentRule.name; format="cap">ContextAll\<'input, 'arena, Tok\>) {
                 <currentRule.name; format="cap">ContextAll::<struct.escapedName>(ctx) => Some(ctx),
                 _ => None
             }
@@ -1102,10 +1119,10 @@ impl\<'input: 'arena, 'arena> CustomRuleContext\<'input, 'arena> for <struct.esc
         }
     }
     fn cast_from_mut\<'a>(
-        node: &'a mut <parser.name>Node\<'input, 'arena>,
-    ) -> Option\<&'a mut <struct.escapedName>\<'input, 'arena\>\> {
-        if node.node_tag() == Self::node_tag() {
-            match dbt_antlr4::cast_unchecked!(node => mut <currentRule.name; format="cap">ContextAll\<'input, 'arena\>) {
+        node: &'a mut <parser.name>Node\<'input, 'arena, Tok>,
+    ) -> Option\<&'a mut <struct.escapedName>\<'input, 'arena, Tok\>\> {
+        if node.node_tag() == \<Self as CustomRuleContext\<'input, 'arena, Tok>\>::node_tag() {
+            match dbt_antlr4::cast_unchecked!(node => mut <currentRule.name; format="cap">ContextAll\<'input, 'arena, Tok\>) {
                 <currentRule.name; format="cap">ContextAll::<struct.escapedName>(ctx) => Some(ctx),
                 _ => None
             }
@@ -1115,16 +1132,17 @@ impl\<'input: 'arena, 'arena> CustomRuleContext\<'input, 'arena> for <struct.esc
     }
 }
 
-impl\<'input, 'arena> <currentRule.name; format="cap">ContextAttrs\<'input, 'arena> for <struct.escapedName>\<'input, 'arena>
+impl\<'input, 'arena, Tok> <currentRule.name; format="cap">ContextAttrs\<'input, 'arena, Tok> for <struct.escapedName>\<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     <currentRule.ruleCtx.attributeDecls:{a | fn get_<a.escapedName>(&self) -> &<RustTypeMap.(a.type)> { &self.deref().base.<a.escapedName> \}  }; separator = "\n">
     <currentRule.ruleCtx.attributeDecls:{a | fn set_<a.escapedName>(&mut self,attr: <RustTypeMap.(a.type)>) { self.deref_mut().base.<a.escapedName> = attr; \}  }; separator = "\n">
 }
 
-impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
-	fn new(base: <currentRule.name; format="cap">ContextExt\<'input, 'arena>) -> Self {
+impl\<'input: 'arena, 'arena, Tok: Token + 'input> <struct.escapedName>Ext\<'input, 'arena, Tok> {
+	fn new(base: <currentRule.name; format="cap">ContextExt\<'input, 'arena, Tok>) -> Self {
         Self {
             base,
             <struct.tokenDecls:{a | <a.escapedName>:None, }>
@@ -1136,19 +1154,18 @@ impl\<'input, 'arena> <struct.escapedName>Ext\<'input, 'arena> {
         }
     }
 
-	fn copy_from(src: &mut <parser.name>Node\<'input, 'arena>)
-    {
+	fn copy_from(src: &mut <parser.name>Node\<'input, 'arena, Tok>) {
         let invoking_state = src.get_invoking_state();
         let ctx = {
-            let Some(base_ctx): Option\<&mut <currentRule.name; format="cap">Context\<'input, 'arena>\> = src.as_rule_context_mut() else {
+            let Some(base_ctx): Option\<&mut <currentRule.name; format="cap">Context\<'input, 'arena, Tok>\> = src.as_rule_context_mut() else {
                 panic!("invalid node type for copy_from!");
             };
             let tmp = unsafe { std::ptr::read(base_ctx) };
             <currentRule.name; format="cap">ContextAll::<struct.escapedName>(tmp.morph(|ext_src| Self::new(ext_src)))
         };
-        *dbt_antlr4::cast_unchecked!(src => mut <currentRule.name; format="cap">ContextAll\<'input, 'arena\>) = ctx;
+        *dbt_antlr4::cast_unchecked!(src => mut <currentRule.name; format="cap">ContextAll\<'input, 'arena, Tok\>) = ctx;
         src.set_invoking_state(invoking_state);
-        src.node_tag = Self::node_tag();
+        src.node_tag = \<Self as CustomRuleContext\<'input, 'arena, Tok>\>::node_tag();
 	}
 }
 >>
@@ -1172,9 +1189,9 @@ AttributeDeclInit(d) ::= "<d.escapedName>: <RustTypeMap.(d.type)>"
 labelref(x,action) ::= "<if(!x.isLocal)><ctx_mut_action(x,{.<x.escapedName><action>})><else><x.escapedName><action><endif>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= <<<self()>.ctx().unwrap().as_rule_context::\<<actionChunk.ctx.escapedName>\>().unwrap()>>
-ctx_action(actionChunk,actionText) ::= << <self()>.ctx().unwrap().as_rule_context::\<<actionChunk.ctx.escapedName>\>().unwrap()<actionText> >>
-ctx_mut_action(actionChunk,actionText) ::= <<unsafe { <self()>.ctx_mut().unwrap().as_rule_context_mut::\<<actionChunk.ctx.escapedName>\>().unwrap()<actionText> }>>
+ctx(actionChunk) ::= <<<self()>.ctx().unwrap().as_rule_context::\<<actionChunk.ctx.escapedName>\<TF::Tok>\>().unwrap()>>
+ctx_action(actionChunk,actionText) ::= << <self()>.ctx().unwrap().as_rule_context::\<<actionChunk.ctx.escapedName>\<TF::Tok>\>().unwrap()<actionText> >>
+ctx_mut_action(actionChunk,actionText) ::= <<unsafe { <self()>.ctx_mut().unwrap().as_rule_context_mut::\<<actionChunk.ctx.escapedName>\<TF::Tok>\>().unwrap()<actionText> }>>
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "recog.precpred(None<!todo proper ctx?!>, <opPrec>)"
@@ -1191,9 +1208,9 @@ let _prevctx = <self()>.push_new_recursion_context(tmp.into(), _startState, RULE
 <if(label)>
 <self()>.base.with_mut_ctx(|ctx| {
 <if(isListLabel)>
-ctx.as_rule_context_mut::\<<ctxName>Context\>().unwrap().<label>.push(_prevctx.as_rule_context().unwrap());
+ctx.as_rule_context_mut::\<<ctxName>Context\<TF::Tok>\>().unwrap().<label>.push(_prevctx.as_rule_context().unwrap());
 <else>
-ctx.as_rule_context_mut::\<<ctxName>Context\>().unwrap().<label> = Some(_prevctx.as_rule_context().unwrap());
+ctx.as_rule_context_mut::\<<ctxName>Context\<TF::Tok>\>().unwrap().<label> = Some(_prevctx.as_rule_context().unwrap());
 <endif>
 });
 <endif>
@@ -1204,13 +1221,13 @@ recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= 
 let tmp = <ruleName; format="cap">ContextExt::create(<self()>.get_arena(), _parentctx, _parentState);
 <currentAltLabel; format="cap">ContextExt::copy_from(tmp);
 let _prevctx = <self()>.push_new_recursion_context(tmp, _startState, RULE_<ruleName>)?;
-let _local_ctx_fn = |recog: &Self| -> &'arena <currentAltLabel; format="cap">Context {recog.ctx().unwrap().as_rule_context().unwrap()};
+let _local_ctx_fn = |recog: &Self| -> &'arena <currentAltLabel; format="cap">Context\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 <if(label)>
 <self()>.base.with_mut_ctx(|ctx| {
 <if(isListLabel)>
-ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\>().unwrap().<label>.push(_prevctx.as_rule_context().unwrap());
+ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\<TF::Tok>\>().unwrap().<label>.push(_prevctx.as_rule_context().unwrap());
 <else>
-ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\>().unwrap().<label> = Some(_prevctx.as_rule_context().unwrap());
+ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\<TF::Tok>\>().unwrap().<label> = Some(_prevctx.as_rule_context().unwrap());
 <endif>
 });
 <endif>
@@ -1218,7 +1235,7 @@ ctx.as_rule_context_mut::\<<currentAltLabel; format="cap">Context\>().unwrap().<
 
 recRuleReplaceContext(ctxName) ::= <<
 <self()>.base.with_mut_ctx(|ctx| { <ctxName>ContextExt::copy_from(ctx); });
-let _local_ctx_fn = |recog: &Self| -> &'arena <ctxName>Context {recog.ctx().unwrap().as_rule_context().unwrap()};
+let _local_ctx_fn = |recog: &Self| -> &'arena <ctxName>Context\<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 >>
 
 recRuleSetPrevCtx() ::= <<
@@ -1323,7 +1340,7 @@ impl <lexer.name>Actions {
 <endif>
 }
 
-impl\<'input, 'arena, Input, TF\> Actions\<'input, 'arena, BaseLexerType\<'input, 'arena, Input, TF\>\>
+impl\<'input, 'arena, Input, TF\> Actions\<'input, 'arena, BaseLexerType\<'input, 'arena, Input, TF\>, TF::Tok\>
     for <lexer.name>Actions
 where
     'input: 'arena,

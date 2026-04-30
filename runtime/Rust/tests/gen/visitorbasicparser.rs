@@ -9,6 +9,7 @@
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
+use dbt_antlr4::token::CommonToken;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
@@ -105,33 +106,34 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: VisitorBasicListener<'arena> + 'static,
+        L: VisitorBasicListener<'arena, TF::Tok> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
         id
     }
 }
-pub trait Visitable<'input, 'arena> {
+pub trait Visitable<'input: 'arena, 'arena, Tok: Token + 'input> {
     fn accept<V>(&'arena self, visitor: &mut V) -> Result<V::Return, ANTLRError>
     where
         'input: 'arena,
-        V: VisitorBasicVisitor<'input, 'arena> + ?Sized;
+        V: VisitorBasicVisitor<'input, 'arena, Tok> + ?Sized;
 }
 pub struct VisitorBasicTreeWalker;
 impl VisitorBasicTreeWalker
 {
-    pub fn walk<'input,'arena, L, T>(
+    pub fn walk<'input, 'arena, Tok, L, T>(
         listener: Box<L>,
         tree: &'arena T,
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: VisitorBasicListener<'arena> + 'static,
-        T: NodeInner<'input, 'arena, VisitorBasicParserNodeKind>,
+        L: VisitorBasicListener<'arena, Tok> + 'static,
+        T: NodeInner<'input, 'arena, VisitorBasicParserNodeKind, Tok>,
+        Tok: Token + 'input,
     {
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <VisitorBasicParserNodeKind as NodeKindType>::Listener) };
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <VisitorBasicParserNodeKind as NodeKindType<Tok>>::Listener) };
         let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
@@ -144,12 +146,12 @@ pub enum VisitorBasicParserNodeKind {
     Terminal,
     Error,
 }
-pub type VisitorBasicParserNode<'input, 'arena> = TreeNode<'input, 'arena, VisitorBasicParserNodeKind>;
+pub type VisitorBasicParserNode<'input, 'arena, Tok = CommonToken<'input>> = TreeNode<'input, 'arena, VisitorBasicParserNodeKind, Tok>;
 
 dbt_antlr4::impl_deref! { parser => VisitorBasicParser }
 dbt_antlr4::impl_node_kind! { VisitorBasicParserNodeKind {
 ; SContext(enter_s, exit_s,  visit_s), 
-    }; listener = dyn VisitorBasicListener<'arena>, visitor = VisitorBasicVisitor,
+    }; listener = dyn VisitorBasicListener<'arena, Tok>, visitor = VisitorBasicVisitor,
 }
 
 pub struct VisitorBasicParserExt<'input, 'arena> {
@@ -159,14 +161,14 @@ pub struct VisitorBasicParserExt<'input, 'arena> {
 impl<'input, 'arena> VisitorBasicParserExt<'input, 'arena> {
 }
 
-impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for VisitorBasicParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for VisitorBasicParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {}
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for VisitorBasicParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for VisitorBasicParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -177,47 +179,49 @@ where
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
 }
 //------------------- s ----------------
-pub type SContextAll<'input, 'arena> = SContext<'input, 'arena>;
+pub type SContextAll<'input, 'arena, Tok = CommonToken<'input>> = SContext<'input, 'arena, Tok>;
 
-pub type SContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena>, VisitorBasicParserNodeKind>;
+pub type SContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, SContextExt<'input, 'arena, Tok>, VisitorBasicParserNodeKind, Tok>;
 dbt_antlr4::impl_visitable! { VisitorBasicVisitor::SContext(visit_s) }
 #[derive(Debug)]
-pub struct SContextExt<'input, 'arena> {
-    ph: PhantomData<(&'arena (), &'input ())>,
+pub struct SContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for SContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for SContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = VisitorBasicParserNodeKind;
     fn node_tag() -> VisitorBasicParserNodeKind { VisitorBasicParserNodeKind::SContext }
 	fn get_rule_index(&self) -> usize { RULE_s }
     fn make_node(
         arena: &'arena Arena,
-        ctx: SContext<'input, 'arena>,
-    ) -> *mut VisitorBasicParserNode<'input, 'arena> {
+        ctx: SContext<'input, 'arena, Tok>,
+    ) -> *mut VisitorBasicParserNode<'input, 'arena, Tok> {
         arena.alloc_zeroed_node(ctx)}
     fn cast_from<'a>(
-        node: &'a VisitorBasicParserNode<'input, 'arena>,
-    ) -> Option<&'a SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena>))
+        node: &'a VisitorBasicParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut VisitorBasicParserNode<'input, 'arena>,
-    ) -> Option<&'a mut SContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena>))
+        node: &'a mut VisitorBasicParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut SContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut SContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> SContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut VisitorBasicParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> SContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena VisitorBasicParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut VisitorBasicParserNode<'input, 'arena, Tok>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, SContextExt {
 				ph: PhantomData
@@ -226,31 +230,32 @@ impl<'input, 'arena> SContextExt<'input, 'arena>{
 	}
 }
 
-pub trait SContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait SContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     /// Retrieves first TerminalNode corresponding to token A
     /// Returns `None` if there is no child corresponding to token A
-    fn A(&self) -> Option<&TerminalNode<'input, 'arena>>;
+    fn A(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
     /// Retrieves first TerminalNode corresponding to token EOF
     /// Returns `None` if there is no child corresponding to token EOF
-    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena>>;
+    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> SContextAttrs<'input, 'arena> for SContext<'input, 'arena>
+impl<'input, 'arena, Tok: Token + 'input> SContextAttrs<'input, 'arena, Tok> for SContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
     /// Retrieves first TerminalNode corresponding to token A
     /// Returns `None` if there is no child corresponding to token A
-    fn A(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorBasic_A, 0)
+    fn A(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorBasic_A)
     }
     /// Retrieves first TerminalNode corresponding to token EOF
     /// Returns `None` if there is no child corresponding to token EOF
-    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(VisitorBasic_EOF, 0)
+    fn EOF(&self) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+        self.children_of_type::<TerminalNode<Tok>>().into_iter().find(|child| child.symbol.get_token_type() == VisitorBasic_EOF)
     }
 }
 
@@ -260,11 +265,11 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena>, ANTLRError> {
+	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_s)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena SContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena SContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let result: Result<(), ANTLRError> = (|| {
 			/*------- Outer Most Alt 1 -------*/
 			unsafe { recog.ctx_mut().unwrap().set_alt_number(1); }

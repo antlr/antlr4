@@ -1,61 +1,63 @@
 #![allow(nonstandard_style)]
 #![allow(dead_code)]
 // Generated from VisitorCalc.g4 by ANTLR 4.13.2
+use dbt_antlr4::token::Token;
 use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::tree::*;
 use super::visitorcalcparser::*;
 
 /// This interface defines a complete generic visitor for a parse tree produced
 /// by {@link VisitorCalcParser}.
-pub trait VisitorCalcVisitor<'input, 'arena>
+pub trait VisitorCalcVisitor<'input, 'arena, Tok>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     type Return: Default;
 
     /// Visit a parse tree produced by {@link VisitorCalcParser#s}.
     /// @param ctx the parse tree
-    fn visit_s(&mut self, ctx: &'arena SContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_s(&mut self, ctx: &'arena SContext<'input, 'arena, Tok>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by the {@code add}
     /// labeled alternative in {@link VisitorCalcParser#expr}.
     /// @param ctx the parse tree
-    fn visit_add(&mut self, ctx: &'arena AddContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_add(&mut self, ctx: &'arena AddContext<'input, 'arena, Tok>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by the {@code number}
     /// labeled alternative in {@link VisitorCalcParser#expr}.
     /// @param ctx the parse tree
-    fn visit_number(&mut self, ctx: &'arena NumberContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_number(&mut self, ctx: &'arena NumberContext<'input, 'arena, Tok>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
     /// Visit a parse tree produced by the {@code multiply}
     /// labeled alternative in {@link VisitorCalcParser#expr}.
     /// @param ctx the parse tree
-    fn visit_multiply(&mut self, ctx: &'arena MultiplyContext<'input, 'arena>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
+    fn visit_multiply(&mut self, ctx: &'arena MultiplyContext<'input, 'arena, Tok>) -> Result<Self::Return, ANTLRError> { self.visit_children(ctx) }
 
 
     /// Called on terminal(leaf) node
     fn visit_terminal(
         &mut self,
-        _node: &'arena TerminalNode<'input, 'arena>,
+        _node: &'arena TerminalNode<'input, 'arena, Tok>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
     /// Called on error node
     fn visit_error_node(
         &mut self,
-        _node: &'arena ErrorNode<'input, 'arena>,
+        _node: &'arena ErrorNode<'input, 'arena, Tok>,
     ) -> Result<Self::Return, ANTLRError> { Ok(Self::Return::default()) }
 
-    fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, VisitorCalcParserNodeKind>) -> Result<Self::Return, ANTLRError> {
+    fn visit(&mut self, tree: &'arena dyn NodeInner<'input, 'arena, VisitorCalcParserNodeKind, Tok>) -> Result<Self::Return, ANTLRError> {
         self.visit_node(tree.as_node())
     }
 
-    fn visit_node(&mut self, node: &'arena VisitorCalcParserNode<'input, 'arena>) -> Result<Self::Return, ANTLRError> {
+    fn visit_node(&mut self, node: &'arena VisitorCalcParserNode<'input, 'arena, Tok>) -> Result<Self::Return, ANTLRError> {
         node.accept(self)
     }
 
     fn visit_children(
         &mut self,
-        node: &'arena dyn NodeInner<'input, 'arena, VisitorCalcParserNodeKind>,
+        node: &'arena dyn NodeInner<'input, 'arena, VisitorCalcParserNodeKind, Tok>,
     ) -> Result<Self::Return, ANTLRError> {
         let mut result = Self::Return::default();
         for child in node.iter_child_nodes() {
@@ -75,5 +77,5 @@ where
         next: Self::Return,
     ) -> Result<Self::Return, ANTLRError> { Ok(next) }
 
-    fn should_visit_next_child(&self, _node: &'arena VisitorCalcParserNode<'input, 'arena>, _current: &Self::Return) -> bool { true }
+    fn should_visit_next_child(&self, _node: &'arena VisitorCalcParserNode<'input, 'arena, Tok>, _current: &Self::Return) -> bool { true }
 }

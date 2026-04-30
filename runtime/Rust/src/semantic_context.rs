@@ -34,7 +34,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
     pub(crate) fn evaluate<'input, 'arena, TF, P>(
         &self,
         parser: &mut P,
-        outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
+        outer_context: &'arena TreeNode<'input, 'arena, P::Node, TF::Tok>,
     ) -> bool
     where
         'input: 'arena,
@@ -64,7 +64,7 @@ impl<'ephemeral> SemanticContext<'ephemeral> {
         &'a self,
         scratch: &'scratch bumpalo::Bump,
         parser: &P,
-        outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
+        outer_context: &'arena TreeNode<'input, 'arena, P::Node, TF::Tok>,
     ) -> Option<&'scratch SemanticContext<'scratch>>
     where
         'a: 'scratch,

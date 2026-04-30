@@ -101,7 +101,7 @@ where
     last_error_index: isize,
     last_error_states: Option<IntervalSetBuf>,
     next_tokens_state: i32,
-    next_tokens_ctx: Option<&'arena TreeNode<'input, 'arena, P::Node>>,
+    next_tokens_ctx: Option<&'arena TreeNode<'input, 'arena, P::Node, TF::Tok>>,
     pd: PhantomData<(TF, P)>,
 }
 
@@ -304,7 +304,7 @@ where
             let invoking_state = atn.get_state(c.get_invoking_state());
             let tr = invoking_state.get_transitions().first().unwrap();
             let tr = tr.try_as::<RuleTransition>().unwrap();
-            let follow = atn.next_tokens(&tr.follow_state);
+            let follow = atn.next_tokens::<TF::Tok>(&tr.follow_state);
             recover_set.add_set(follow);
             ctx = c.get_parent();
         }
@@ -389,7 +389,10 @@ where
             .atn()
             .make_state_ref(recognizer.get_state());
 
-        let next_tokens = recognizer.get_interpreter().atn().next_tokens(&state);
+        let next_tokens = recognizer
+            .get_interpreter()
+            .atn()
+            .next_tokens::<TF::Tok>(&state);
         //        println!("{:?}",next_tokens);
 
         if next_tokens.contains(next) {

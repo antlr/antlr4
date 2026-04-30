@@ -89,7 +89,7 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     P: Parser<'input, 'arena, TF>,
 {
-    outer_context: &'arena TreeNode<'input, 'arena, P::Node>,
+    outer_context: &'arena TreeNode<'input, 'arena, P::Node, TF::Tok>,
     dfa_ref: &'sim DFA<'sim, ATNConfigSet<'sim>>,
     merge_cache: &'cache mut MergeCache<'scratch>,
     precedence: i32,
@@ -108,7 +108,7 @@ where
         self.parser.get_input_stream_mut()
     }
     // fn seek(&mut self, i: isize) { self.input().seek(i) }
-    fn outer_context(&self) -> &'arena TreeNode<'input, 'arena, P::Node> {
+    fn outer_context(&self) -> &'arena TreeNode<'input, 'arena, P::Node, TF::Tok> {
         self.outer_context
     }
 
@@ -597,7 +597,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         };
 
         if t == TOKEN_EOF {
-            reach = self.remove_all_configs_not_in_rule_stop_state(
+            reach = self.remove_all_configs_not_in_rule_stop_state::<TF::Tok>(
                 reach,
                 look_to_end_of_rule,
                 local.merge_cache,
@@ -632,7 +632,7 @@ impl<'sim> ParserATNSimulator<'sim> {
             .all(|c| c.get_state().state_type() == ATNStateType::RuleStop)
     }
 
-    fn remove_all_configs_not_in_rule_stop_state<'a>(
+    fn remove_all_configs_not_in_rule_stop_state<'a, Tok: Token>(
         &self,
         configs: MutableATNConfigSet<'a>,
         look_to_end_of_rule: bool,
@@ -653,7 +653,7 @@ impl<'sim> ParserATNSimulator<'sim> {
             }
 
             if look_to_end_of_rule && state.has_epsilon_only_transitions() {
-                let next_tokens = self.atn().next_tokens(&state);
+                let next_tokens = self.atn().next_tokens::<Tok>(&state);
                 if next_tokens.contains(TOKEN_EPSILON) {
                     let end_of_rule_state =
                         self.atn().rule_to_stop_state[state.get_rule_index() as usize];

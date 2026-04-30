@@ -9,6 +9,7 @@
 use dbt_antlr4::Arena;
 use dbt_antlr4::PredictionContextCache;
 use dbt_antlr4::parser::{Parser, BaseParser, ParserRecog, ListenerId};
+use dbt_antlr4::token::CommonToken;
 use dbt_antlr4::token_stream::TokenStream;
 use dbt_antlr4::TokenSource;
 use dbt_antlr4::parser_atn_simulator::ParserATNSimulator;
@@ -104,7 +105,7 @@ where
         listener: Box<L>,
     ) -> ListenerId<L>
     where
-        L: ReferenceToATNListener<'arena> + 'static,
+        L: ReferenceToATNListener<'arena, TF::Tok> + 'static,
     {
         let id = ListenerId::new(&listener);
         self.base.add_dyn_parse_listener(listener);
@@ -114,17 +115,18 @@ where
 pub struct ReferenceToATNTreeWalker;
 impl ReferenceToATNTreeWalker
 {
-    pub fn walk<'input,'arena, L, T>(
+    pub fn walk<'input, 'arena, Tok, L, T>(
         listener: Box<L>,
         tree: &'arena T,
     ) -> Result<Box<L>, ANTLRError>
     where
         'input: 'arena,
-        L: ReferenceToATNListener<'arena> + 'static,
-        T: NodeInner<'input, 'arena, ReferenceToATNParserNodeKind>,
+        L: ReferenceToATNListener<'arena, Tok> + 'static,
+        T: NodeInner<'input, 'arena, ReferenceToATNParserNodeKind, Tok>,
+        Tok: Token + 'input,
     {
         let listener_ptr = Box::into_raw(listener);
-        let listener = unsafe { Box::from_raw(listener_ptr as *mut <ReferenceToATNParserNodeKind as NodeKindType>::Listener) };
+        let listener = unsafe { Box::from_raw(listener_ptr as *mut <ReferenceToATNParserNodeKind as NodeKindType<Tok>>::Listener) };
         let listener = ParseTreeWalker::walk(listener, tree.as_node())?;
         Ok(unsafe { Box::from_raw(Box::into_raw(listener) as *mut L) } )
     }
@@ -137,12 +139,12 @@ pub enum ReferenceToATNParserNodeKind {
     Terminal,
     Error,
 }
-pub type ReferenceToATNParserNode<'input, 'arena> = TreeNode<'input, 'arena, ReferenceToATNParserNodeKind>;
+pub type ReferenceToATNParserNode<'input, 'arena, Tok = CommonToken<'input>> = TreeNode<'input, 'arena, ReferenceToATNParserNodeKind, Tok>;
 
 dbt_antlr4::impl_deref! { parser => ReferenceToATNParser }
 dbt_antlr4::impl_node_kind! { ReferenceToATNParserNodeKind {
 ; AContext(enter_a, exit_a, ), 
-    }; listener = dyn ReferenceToATNListener<'arena>,
+    }; listener = dyn ReferenceToATNListener<'arena, Tok>,
 }
 
 pub struct ReferenceToATNParserExt<'input, 'arena> {
@@ -152,14 +154,14 @@ pub struct ReferenceToATNParserExt<'input, 'arena> {
 impl<'input, 'arena> ReferenceToATNParserExt<'input, 'arena> {
 }
 
-impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for ReferenceToATNParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for ReferenceToATNParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {}
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>> for ReferenceToATNParserExt<'input, 'arena>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for ReferenceToATNParserExt<'input, 'arena>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -170,46 +172,48 @@ where
    	fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
 }
 //------------------- a ----------------
-pub type AContextAll<'input, 'arena> = AContext<'input, 'arena>;
+pub type AContextAll<'input, 'arena, Tok = CommonToken<'input>> = AContext<'input, 'arena, Tok>;
 
-pub type AContext<'input, 'arena> = BaseParserRuleContext<'input, 'arena, AContextExt<'input, 'arena>, ReferenceToATNParserNodeKind>;
+pub type AContext<'input, 'arena, Tok = CommonToken<'input>> = BaseParserRuleContext<'input, 'arena, AContextExt<'input, 'arena, Tok>, ReferenceToATNParserNodeKind, Tok>;
 #[derive(Debug)]
-pub struct AContextExt<'input, 'arena> {
-    ph: PhantomData<(&'arena (), &'input ())>,
+pub struct AContextExt<'input: 'arena, 'arena, Tok: Token + 'input = CommonToken<'input>> {
+    ph: PhantomData<(&'arena (), &'input Tok)>,
 }
 
-impl<'input: 'arena, 'arena> CustomRuleContext<'input, 'arena> for AContextExt<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok> CustomRuleContext<'input, 'arena, Tok> for AContextExt<'input, 'arena, Tok>
+where
+    Tok: Token + 'input,
 {
 	type NodeKind = ReferenceToATNParserNodeKind;
     fn node_tag() -> ReferenceToATNParserNodeKind { ReferenceToATNParserNodeKind::AContext }
 	fn get_rule_index(&self) -> usize { RULE_a }
     fn make_node(
         arena: &'arena Arena,
-        ctx: AContext<'input, 'arena>,
-    ) -> *mut ReferenceToATNParserNode<'input, 'arena> {
+        ctx: AContext<'input, 'arena, Tok>,
+    ) -> *mut ReferenceToATNParserNode<'input, 'arena, Tok> {
         arena.alloc_zeroed_node(ctx)}
     fn cast_from<'a>(
-        node: &'a ReferenceToATNParserNode<'input, 'arena>,
-    ) -> Option<&'a AContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => AContext<'input, 'arena>))
+        node: &'a ReferenceToATNParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a AContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => AContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
     fn cast_from_mut<'a>(
-        node: &'a mut ReferenceToATNParserNode<'input, 'arena>,
-    ) -> Option<&'a mut AContext<'input, 'arena>> {
-        if node.node_tag() == Self::node_tag() {
-            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut AContext<'input, 'arena>))
+        node: &'a mut ReferenceToATNParserNode<'input, 'arena, Tok>,
+    ) -> Option<&'a mut AContext<'input, 'arena, Tok>> {
+        if node.node_tag() == <Self as CustomRuleContext<'input, 'arena, Tok>>::node_tag() {
+            Some(dbt_antlr4::cast_unchecked!(node.ctx_ptr() => mut AContext<'input, 'arena, Tok>))
         } else {
             None
         }
     }
 }
 
-impl<'input, 'arena> AContextExt<'input, 'arena>{
-	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserNode<'input, 'arena>>, invoking_state: i32) -> &'arena mut ReferenceToATNParserNode<'input, 'arena>
+impl<'input: 'arena, 'arena, Tok: Token + 'input> AContextExt<'input, 'arena, Tok>{
+	fn create(arena: &'arena Arena, parent: Option<&'arena ReferenceToATNParserNode<'input, 'arena, Tok>>, invoking_state: i32) -> &'arena mut ReferenceToATNParserNode<'input, 'arena, Tok>
     {
         BaseParserRuleContext::create(arena, parent, invoking_state, AContextExt {
 				ph: PhantomData
@@ -218,43 +222,44 @@ impl<'input, 'arena> AContextExt<'input, 'arena>{
 	}
 }
 
-pub trait AContextAttrs<'input, 'arena>: ParserRuleContext<'input, 'arena>
+pub trait AContextAttrs<'input, 'arena, Tok>: ParserRuleContext<'input, 'arena>
 where
     'input: 'arena,
+    Tok: Token + 'input,
 {
     /// Retrieves all `TerminalNode`s corresponding to token ATN in current rule
-    fn ATN_all(&self) -> Vec<&TerminalNode<'input, 'arena>>;
-    /// Retrieves 'i's TerminalNode corresponding to token ATN, starting from 0.
-    /// Returns `None` if number of children corresponding to token ATN is less or equal than `i`.
-    fn ATN(&self, i: usize) -> Option<&TerminalNode<'input, 'arena>>;
+    fn ATN_all(&self) -> Vec<&TerminalNode<'input, 'arena, Tok>>;
+    /// Retrieves 'i'th TerminalNode corresponding to token ATN, starting from 0.
+    /// Returns `None` if number of children corresponding to token ATN is less than or equal to `i`.
+    fn ATN(&self, i: usize) -> Option<&TerminalNode<'input, 'arena, Tok>>;
     /// Retrieves all `TerminalNode`s corresponding to token ID in current rule
-    fn ID_all(&self) -> Vec<&TerminalNode<'input, 'arena>>;
-    /// Retrieves 'i's TerminalNode corresponding to token ID, starting from 0.
-    /// Returns `None` if number of children corresponding to token ID is less or equal than `i`.
-    fn ID(&self, i: usize) -> Option<&TerminalNode<'input, 'arena>>;
+    fn ID_all(&self) -> Vec<&TerminalNode<'input, 'arena, Tok>>;
+    /// Retrieves 'i'th TerminalNode corresponding to token ID, starting from 0.
+    /// Returns `None` if number of children corresponding to token ID is less than or equal to `i`.
+    fn ID(&self, i: usize) -> Option<&TerminalNode<'input, 'arena, Tok>>;
 }
 
-impl<'input, 'arena> AContextAttrs<'input, 'arena> for AContext<'input, 'arena>
+impl<'input, 'arena, Tok: Token + 'input> AContextAttrs<'input, 'arena, Tok> for AContext<'input, 'arena, Tok>
 where
     'input: 'arena,
 {
     /// Retrieves all `TerminalNode`s corresponding to token ATN in current rule
-    fn ATN_all(&self) -> Vec<&TerminalNode<'input, 'arena>> {
-    	self.children_of_type()
+    fn ATN_all(&self) -> Vec<&TerminalNode<'input, 'arena, Tok>> {
+    	self.children_of_type::<TerminalNode<Tok>>().into_iter().filter(|child| child.symbol.get_token_type() == ReferenceToATN_ATN).collect()
     }
-    /// Retrieves 'i's TerminalNode corresponding to token ATN, starting from 0.
-    /// Returns `None` if number of children corresponding to token ATN is less or equal than `i`.
-    fn ATN(&self, i: usize) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(ReferenceToATN_ATN, i)
+    /// Retrieves 'i'th TerminalNode corresponding to token ATN, starting from 0.
+    /// Returns `None` if number of children corresponding to token ATN is less than or equal to `i`.
+    fn ATN(&self, i: usize) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+    	self.children_of_type::<TerminalNode<Tok>>().into_iter().filter(|child| child.symbol.get_token_type() == ReferenceToATN_ATN).nth(i)
     }
     /// Retrieves all `TerminalNode`s corresponding to token ID in current rule
-    fn ID_all(&self) -> Vec<&TerminalNode<'input, 'arena>> {
-    	self.children_of_type()
+    fn ID_all(&self) -> Vec<&TerminalNode<'input, 'arena, Tok>> {
+    	self.children_of_type::<TerminalNode<Tok>>().into_iter().filter(|child| child.symbol.get_token_type() == ReferenceToATN_ID).collect()
     }
-    /// Retrieves 'i's TerminalNode corresponding to token ID, starting from 0.
-    /// Returns `None` if number of children corresponding to token ID is less or equal than `i`.
-    fn ID(&self, i: usize) -> Option<&TerminalNode<'input, 'arena>> {
-    	self.get_token(ReferenceToATN_ID, i)
+    /// Retrieves 'i'th TerminalNode corresponding to token ID, starting from 0.
+    /// Returns `None` if number of children corresponding to token ID is less than or equal to `i`.
+    fn ID(&self, i: usize) -> Option<&TerminalNode<'input, 'arena, Tok>> {
+    	self.children_of_type::<TerminalNode<Tok>>().into_iter().filter(|child| child.symbol.get_token_type() == ReferenceToATN_ID).nth(i)
     }
 }
 
@@ -264,11 +269,11 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
-	pub fn a(&mut self,) -> Result<&'arena AContextAll<'input, 'arena>, ANTLRError> {
+	pub fn a(&mut self,) -> Result<&'arena AContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(AContextExt::create(recog.get_arena(), _parentctx, recog.get_state()), 0, RULE_a)?;
-        let _local_ctx_fn = |recog: &Self| -> &'arena AContext {recog.ctx().unwrap().as_rule_context().unwrap()};
+        let _local_ctx_fn = |recog: &Self| -> &'arena AContext<TF::Tok> {recog.ctx().unwrap().as_rule_context().unwrap()};
 		let mut _la: i32 = -1;
 		let result: Result<(), ANTLRError> = (|| {
 	        let mut _alt: i32;

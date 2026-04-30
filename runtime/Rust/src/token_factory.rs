@@ -9,6 +9,7 @@ use crate::token::Token;
 use crate::token::{CommonToken, OwningToken};
 use crate::Arena;
 
+#[inline]
 pub fn invalid() -> &'static CommonToken<'static> {
     Default::default()
 }

@@ -84,7 +84,7 @@ pub struct VisitorBasicLexerActions {
 impl VisitorBasicLexerActions {
 }
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>, TF::Tok>
     for VisitorBasicLexerActions
 where
     'input: 'arena,

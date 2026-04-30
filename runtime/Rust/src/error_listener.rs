@@ -17,10 +17,11 @@ use std::fmt::Debug;
 
 /// Describes interface for listening on parser/lexer errors.
 /// Should only listen for errors, for processing/recovering from errors use `ErrorStrategy`
-pub trait ErrorListener<'input, 'arena, R>
+pub trait ErrorListener<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     /// Called when parser/lexer encounter hard error.
     ///
@@ -85,10 +86,11 @@ where
 #[derive(Debug)]
 pub struct ConsoleErrorListener;
 
-impl<'input, 'arena, R> ErrorListener<'input, 'arena, R> for ConsoleErrorListener
+impl<'input, 'arena, R, Tok> ErrorListener<'input, 'arena, R, Tok> for ConsoleErrorListener
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     fn syntax_error(
         &self,
@@ -104,19 +106,21 @@ where
 }
 
 // #[derive(Debug)]
-pub(crate) struct ProxyErrorListener<'a, 'input, 'arena, R>
+pub(crate) struct ProxyErrorListener<'a, 'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
-    pub delegates: &'a [ErrorListenerDelegate<'input, 'arena, R>],
+    pub delegates: &'a [ErrorListenerDelegate<'input, 'arena, R, Tok>],
 }
 
-impl<'input, 'arena, R> ErrorListener<'input, 'arena, R>
-    for ProxyErrorListener<'_, 'input, 'arena, R>
+impl<'input, 'arena, R, Tok> ErrorListener<'input, 'arena, R, Tok>
+    for ProxyErrorListener<'_, 'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     fn syntax_error(
         &self,
@@ -242,7 +246,7 @@ where
     ) -> String
     where
         'input: 'arena,
-        R: Recognizer<'input, 'arena>,
+        R: Recognizer<'input, 'arena, TF::Tok>,
     {
         let decision = dfa.decision;
         let rule_index = dfa.atn_start_state.get_rule_index();
@@ -274,7 +278,7 @@ where
     }
 }
 
-impl<'input, 'arena, TF, P> ErrorListener<'input, 'arena, P>
+impl<'input, 'arena, TF, P> ErrorListener<'input, 'arena, P, TF::Tok>
     for DiagnosticErrorListener<'input, 'arena, TF>
 where
     'input: 'arena,
@@ -347,24 +351,26 @@ where
 /// Essentially a compile-time replacement for `Box<dyn ErrorListener<'input,
 /// 'arena, R>>`, that has covariant type parameters. Used to workaround the
 /// fact that `Box<dyn Trait>` is invariant over the trait's type parameters.
-pub(crate) struct ErrorListenerDelegate<'input, 'arena, R>
+pub(crate) struct ErrorListenerDelegate<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     data: *mut (),
     vtable: *const (),
 
     // Invariant over 'arena, covariant over 'input, R
-    _marker: PhantomData<(&'input (), *mut &'arena (), R)>,
+    _marker: PhantomData<(&'input (), *mut &'arena (), R, Tok)>,
 }
 
-impl<'input, 'arena, R> ErrorListenerDelegate<'input, 'arena, R>
+impl<'input, 'arena, R, Tok> ErrorListenerDelegate<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
-    pub(crate) fn new(inner: Box<dyn ErrorListener<'input, 'arena, R> + 'input>) -> Self {
+    pub(crate) fn new(inner: Box<dyn ErrorListener<'input, 'arena, R, Tok> + 'input>) -> Self {
         let raw = Box::into_raw(inner);
         // SAFETY: *mut dyn Trait is a fat pointer (data_ptr, vtable_ptr).
         let (data, vtable): (*mut (), *const ()) = unsafe { std::mem::transmute(raw) };
@@ -376,30 +382,32 @@ where
     }
 
     #[inline(always)]
-    fn as_dyn(&self) -> &(dyn ErrorListener<'input, 'arena, R> + 'input) {
+    fn as_dyn(&self) -> &(dyn ErrorListener<'input, 'arena, R, Tok> + 'input) {
         unsafe { std::mem::transmute((self.data as *const (), self.vtable)) }
     }
 }
 
-impl<'input, 'arena, R> Drop for ErrorListenerDelegate<'input, 'arena, R>
+impl<'input, 'arena, R, Tok> Drop for ErrorListenerDelegate<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     fn drop(&mut self) {
         unsafe {
-            let ptr: *mut (dyn ErrorListener<'input, 'arena, R> + 'input) =
+            let ptr: *mut (dyn ErrorListener<'input, 'arena, R, Tok> + 'input) =
                 std::mem::transmute((self.data, self.vtable));
             drop(Box::from_raw(ptr));
         }
     }
 }
 
-impl<'input, 'arena, R> ErrorListener<'input, 'arena, R>
-    for ErrorListenerDelegate<'input, 'arena, R>
+impl<'input, 'arena, R, Tok> ErrorListener<'input, 'arena, R, Tok>
+    for ErrorListenerDelegate<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
     #[inline(always)]
     fn syntax_error(

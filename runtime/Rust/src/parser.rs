@@ -15,7 +15,6 @@ use crate::error_strategy::ErrorStrategy;
 use crate::errors::ANTLRError;
 use crate::interval_set::IntervalSet;
 use crate::parser_atn_simulator::ParserATNSimulator;
-use crate::parser_rule_context::ParserRuleContext as _;
 use crate::recognizer::{Actions, Recognizer};
 use crate::rule_context::{states_stack, RuleContext as _};
 use crate::token::{Token, TOKEN_EOF};
@@ -29,7 +28,7 @@ const DEFAULT_RECURSION_LIMIT: u32 = 1000;
 
 /// parser functionality required for `ParserATNSimulator` to work
 #[allow(missing_docs)]
-pub trait Parser<'input, 'arena, TF>: Recognizer<'input, 'arena>
+pub trait Parser<'input, 'arena, TF>: Recognizer<'input, 'arena, TF::Tok>
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
@@ -40,7 +39,7 @@ where
 
     fn get_token_factory(&self) -> &TF;
 
-    fn get_current_context(&self) -> &'arena TreeNode<'input, 'arena, Self::Node>;
+    fn get_current_context(&self) -> &'arena TreeNode<'input, 'arena, Self::Node, TF::Tok>;
 
     fn consume(
         &mut self,
@@ -51,7 +50,7 @@ where
 
     fn precpred(
         &self,
-        localctx: Option<&TreeNode<'input, 'arena, Self::Node>>,
+        localctx: Option<&TreeNode<'input, 'arena, Self::Node, TF::Tok>>,
         precedence: i32,
     ) -> bool;
 
@@ -62,7 +61,7 @@ where
 
     fn add_error_listener(
         &mut self,
-        listener: Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+        listener: Box<dyn ErrorListener<'input, 'arena, Self, TF::Tok> + 'input>,
     ) where
         Self: Sized;
 
@@ -74,7 +73,9 @@ where
         offending_token: Option<isize>,
         err: Option<&ANTLRError>,
     );
-    fn get_error_lister_dispatch<'a>(&'a self) -> Box<dyn ErrorListener<'input, 'arena, Self> + 'a>
+    fn get_error_lister_dispatch<'a>(
+        &'a self,
+    ) -> Box<dyn ErrorListener<'input, 'arena, Self, TF::Tok> + 'a>
     where
         Self: Sized;
 
@@ -97,12 +98,12 @@ where
     'input: 'arena,
     // Grammar-specific implementation of parser functionality required for
     // `ParserATNSimulator` to work
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     // Token factory used by the input stream
     TF: TokenFactory<'input, 'arena> + 'arena,
     // Token stream (lexer)
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     pub interp: Rc<ParserATNSimulator<'arena>>,
 
@@ -138,14 +139,14 @@ where
 
     parse_listeners: Vec<Box<Node::Listener>>,
     _syntax_errors: Cell<i32>,
-    error_listeners: Vec<ErrorListenerDelegate<'input, 'arena, Self>>,
+    error_listeners: Vec<ErrorListenerDelegate<'input, 'arena, Self, TF::Tok>>,
 
     pub arena: &'arena Arena,
     ext: Ext,
     pd: PhantomData<(
         &'input (),
         &'arena TF,
-        &'arena TreeNode<'input, 'arena, Node>,
+        //        &'arena TreeNode<'input, 'arena, Node, TF::Tok>,
     )>,
 }
 
@@ -153,10 +154,10 @@ impl<'input, 'arena, Ext, Node, Input, TF> Deref
     for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     'input: 'arena,
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     type Target = Ext;
 
@@ -169,37 +170,38 @@ impl<'input, 'arena, Ext, Node, Input, TF> DerefMut
     for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     'input: 'arena,
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.ext
     }
 }
 
-pub trait ParserRecog<'input, 'arena, R>: Actions<'input, 'arena, R>
+pub trait ParserRecog<'input, 'arena, R, Tok>: Actions<'input, 'arena, R, Tok>
 where
     'input: 'arena,
-    R: Recognizer<'input, 'arena>,
+    R: Recognizer<'input, 'arena, Tok>,
+    Tok: Token + 'input,
 {
 }
 
-impl<'input, 'arena, Ext, Node, Input, TF> Recognizer<'input, 'arena>
+impl<'input, 'arena, Ext, Node, Input, TF> Recognizer<'input, 'arena, TF::Tok>
     for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     'input: 'arena,
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     type Node = Node;
 
     fn sempred(
         &mut self,
-        localctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
+        localctx: Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>>,
         rule_index: i32,
         action_index: i32,
     ) -> bool {
@@ -227,10 +229,10 @@ impl<'input, 'arena, Ext, Node, Input, TF> Parser<'input, 'arena, TF>
     for BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     'input: 'arena,
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     fn get_arena(&self) -> &'arena Arena {
         self.arena
@@ -249,7 +251,7 @@ where
     }
 
     #[inline(always)]
-    fn get_current_context(&self) -> &'arena TreeNode<'input, 'arena, Node> {
+    fn get_current_context(&self) -> &'arena TreeNode<'input, 'arena, Node, TF::Tok> {
         self.ctx().unwrap()
     }
 
@@ -288,7 +290,7 @@ where
 
     fn precpred(
         &self,
-        _localctx: Option<&TreeNode<'input, 'arena, Node>>,
+        _localctx: Option<&TreeNode<'input, 'arena, Node, TF::Tok>>,
         precedence: i32,
     ) -> bool {
         //        localctx.map(|it|println!("check at{}",it.to_string_tree(self)));
@@ -313,12 +315,12 @@ where
         let states_stack = states_stack(self.ctx().unwrap());
         self.interp
             .atn()
-            .get_expected_tokens(self.state, states_stack)
+            .get_expected_tokens::<TF::Tok>(self.state, states_stack)
     }
 
     fn add_error_listener(
         &mut self,
-        listener: Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+        listener: Box<dyn ErrorListener<'input, 'arena, Self, TF::Tok> + 'input>,
     ) {
         self.error_listeners
             .push(ErrorListenerDelegate::new(listener))
@@ -358,7 +360,7 @@ where
 
     fn get_error_lister_dispatch<'a>(
         &'a self,
-    ) -> Box<dyn ErrorListener<'input, 'arena, Self> + 'a> {
+    ) -> Box<dyn ErrorListener<'input, 'arena, Self, TF::Tok> + 'a> {
         Box::new(ProxyErrorListener {
             delegates: self.error_listeners.borrow(),
         })
@@ -415,10 +417,10 @@ where
 impl<'input, 'arena, Ext, Node, Input, TF> BaseParser<'input, 'arena, Ext, Node, Input, TF>
 where
     'input: 'arena,
-    Ext: ParserRecog<'input, 'arena, Self>,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
     TF: TokenFactory<'input, 'arena> + 'arena,
     Input: TokenStream<'input, 'arena, TF>,
-    Node: NodeKindType<'arena>,
+    Node: NodeKindType<'arena, TF::Tok>,
 {
     pub fn new_base_parser(
         arena: &'arena Arena,
@@ -439,7 +441,7 @@ where
             _syntax_errors: Cell::new(0),
             error_listeners: vec![ErrorListenerDelegate::new(
                 Box::new(ConsoleErrorListener {})
-                    as Box<dyn ErrorListener<'input, 'arena, Self> + 'input>,
+                    as Box<dyn ErrorListener<'input, 'arena, Self, TF::Tok> + 'input>,
             )],
             arena,
             ext,
@@ -449,7 +451,7 @@ where
 
     /// If current context is same as the given one by pointer comparison
     #[inline]
-    pub fn ctx_is(&self, other: Option<&'arena TreeNode<'input, 'arena, Node>>) -> bool {
+    pub fn ctx_is(&self, other: Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>>) -> bool {
         if self.ctx.is_null() && other.is_none() {
             true
         } else if self.ctx.is_null() || other.is_none() {
@@ -461,11 +463,11 @@ where
 
     /// Gets a reference to current context.
     #[inline]
-    pub fn ctx(&self) -> Option<&'arena TreeNode<'input, 'arena, Node>> {
+    pub fn ctx(&self) -> Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>> {
         if self.ctx.is_null() {
             None
         } else {
-            unsafe { Some(&*(self.ctx as *const TreeNode<'input, 'arena, Node>)) }
+            unsafe { Some(&*(self.ctx as *const TreeNode<'input, 'arena, Node, TF::Tok>)) }
         }
     }
 
@@ -474,44 +476,46 @@ where
     /// # Safety
     /// Follows the same safety rules as dereferencing *mut to &mut
     #[inline]
-    pub unsafe fn ctx_mut(&mut self) -> Option<&'arena mut TreeNode<'input, 'arena, Node>> {
+    pub unsafe fn ctx_mut(
+        &mut self,
+    ) -> Option<&'arena mut TreeNode<'input, 'arena, Node, TF::Tok>> {
         if self.ctx.is_null() {
             None
         } else {
-            Some(&mut *(self.ctx as *mut TreeNode<'input, 'arena, Node>))
+            Some(&mut *(self.ctx as *mut TreeNode<'input, 'arena, Node, TF::Tok>))
         }
     }
 
     #[inline]
-    fn parent_ctx(&self) -> Option<&'arena TreeNode<'input, 'arena, Node>> {
+    fn parent_ctx(&self) -> Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>> {
         self.ctx().and_then(|it| it.get_parent())
     }
 
     #[inline]
-    fn set_current_ctx(&mut self, ctx: Option<&'arena TreeNode<'input, 'arena, Node>>) {
+    fn set_current_ctx(&mut self, ctx: Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>>) {
         if let Some(ctx) = ctx {
-            self.ctx = ctx as *const TreeNode<'input, 'arena, Node>
-                as *mut TreeNode<'input, 'arena, Node> as *mut ();
+            self.ctx = ctx as *const TreeNode<'input, 'arena, Node, TF::Tok>
+                as *mut TreeNode<'input, 'arena, Node, TF::Tok> as *mut ();
         } else {
             self.ctx = std::ptr::null_mut();
         }
     }
 
-    pub fn take_ctx(&mut self) -> Option<&'arena TreeNode<'input, 'arena, Node>> {
+    pub fn take_ctx(&mut self) -> Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>> {
         if self.ctx.is_null() {
             None
         } else {
-            let ret = unsafe { &*(self.ctx as *const TreeNode<'input, 'arena, Node>) };
+            let ret = unsafe { &*(self.ctx as *const TreeNode<'input, 'arena, Node, TF::Tok>) };
             self.ctx = std::ptr::null_mut();
             Some(ret)
         }
     }
 
     #[inline]
-    fn add_child_to_ctx(&mut self, child: &'arena TreeNode<'input, 'arena, Node>) {
+    fn add_child_to_ctx(&mut self, child: &'arena TreeNode<'input, 'arena, Node, TF::Tok>) {
         if !self.ctx.is_null() {
             unsafe {
-                (*(self.ctx as *mut TreeNode<'input, 'arena, Node>)).add_child(child);
+                (*(self.ctx as *mut TreeNode<'input, 'arena, Node, TF::Tok>)).add_child(child);
             }
         }
     }
@@ -519,10 +523,10 @@ where
     #[inline]
     pub fn with_mut_ctx<F, R>(&mut self, f: F) -> R
     where
-        F: FnOnce(&mut TreeNode<'input, 'arena, Node>) -> R,
+        F: FnOnce(&mut TreeNode<'input, 'arena, Node, TF::Tok>) -> R,
     {
         assert!(!self.ctx.is_null());
-        unsafe { f(&mut *(self.ctx as *mut TreeNode<'input, 'arena, Node>)) }
+        unsafe { f(&mut *(self.ctx as *mut TreeNode<'input, 'arena, Node, TF::Tok>)) }
     }
 
     #[inline]
@@ -579,7 +583,7 @@ where
     /// `listener_id` is returned when listener is added via `add_parse_listener`
     pub fn remove_parse_listener<L>(&mut self, listener_id: ListenerId<L>) -> Box<L>
     where
-        L: ParseTreeListener<'arena, Node>,
+        L: ParseTreeListener<'arena, Node, TF::Tok>,
     {
         let index = self
             .parse_listeners
@@ -619,7 +623,7 @@ where
     #[inline]
     pub fn enter_rule(
         &mut self,
-        localctx: &'arena mut TreeNode<'input, 'arena, Node>,
+        localctx: &'arena mut TreeNode<'input, 'arena, Node, TF::Tok>,
         state: i32,
         _rule_index: usize,
     ) -> Result<(), ANTLRError> {
@@ -631,7 +635,7 @@ where
 
         self.set_state(state);
         self.set_current_ctx(Some(child));
-        let start = self.input.lt(1).map(|it| it as _);
+        let start = self.input.lt(1);
         self.with_mut_ctx(|ctx| {
             ctx.set_start(start);
         });
@@ -644,18 +648,20 @@ where
     }
 
     #[inline]
-    pub fn exit_rule(&mut self) -> Result<&'arena TreeNode<'input, 'arena, Node>, ANTLRError> {
+    pub fn exit_rule(
+        &mut self,
+    ) -> Result<&'arena TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
         assert!(self.ctx().is_some());
 
         if self.matched_eof {
             // if we have matched EOF, it cannot consume past EOF so we use LT(1) here
-            let stop = self.input.lt(1).map(|it| it as _);
+            let stop = self.input.lt(1);
             self.with_mut_ctx(|ctx| {
                 ctx.set_stop(stop);
             });
         } else {
             // stop node is what we just matched
-            let stop = self.input.lt(-1).map(|it| it as _);
+            let stop = self.input.lt(-1);
             self.with_mut_ctx(|ctx| {
                 ctx.set_stop(stop);
             });
@@ -673,7 +679,7 @@ where
 
     pub fn enter_recursion_rule(
         &mut self,
-        localctx: &'arena mut TreeNode<'input, 'arena, Node>,
+        localctx: &'arena mut TreeNode<'input, 'arena, Node, TF::Tok>,
         state: i32,
         _rule_index: usize,
         precedence: i32,
@@ -681,7 +687,7 @@ where
         self.set_state(state);
         self.precedence_stack.push(precedence);
         self.set_current_ctx(Some(localctx));
-        let start = self.input.lt(1).map(|it| it as _);
+        let start = self.input.lt(1);
         self.with_mut_ctx(|ctx| {
             ctx.set_start(start);
         });
@@ -695,11 +701,11 @@ where
 
     pub fn push_new_recursion_context(
         &mut self,
-        localctx: &'arena mut TreeNode<'input, 'arena, Node>,
+        localctx: &'arena mut TreeNode<'input, 'arena, Node, TF::Tok>,
         state: i32,
         _rule_index: usize,
-    ) -> Result<&'arena TreeNode<'input, 'arena, Node>, ANTLRError> {
-        let stop = self.input.lt(-1).map(|it| it as _);
+    ) -> Result<&'arena TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
+        let stop = self.input.lt(-1);
         self.with_mut_ctx(|ctx| {
             ctx.set_parent(Some(localctx));
             ctx.set_invoking_state(state);
@@ -708,7 +714,7 @@ where
 
         let prev = self.take_ctx().unwrap();
         self.set_current_ctx(Some(localctx));
-        let start = Some(prev.start());
+        let start = prev.get_start_token();
         self.with_mut_ctx(|ctx| {
             ctx.set_start(start);
         });
@@ -723,12 +729,12 @@ where
 
     pub fn unroll_recursion_context(
         &mut self,
-        parent_ctx: Option<&'arena TreeNode<'input, 'arena, Node>>,
-    ) -> Result<&'arena TreeNode<'input, 'arena, Node>, ANTLRError> {
+        parent_ctx: Option<&'arena TreeNode<'input, 'arena, Node, TF::Tok>>,
+    ) -> Result<&'arena TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
         assert!(self.ctx().is_some());
 
         self.precedence_stack.pop();
-        let stop = self.input.lt(-1).map(|it| it as _);
+        let stop = self.input.lt(-1);
         self.with_mut_ctx(|ctx| {
             ctx.set_stop(stop);
         });
@@ -746,27 +752,29 @@ where
 
         // hook into tree
         unsafe {
-            (*(retctx as *mut TreeNode<'input, 'arena, Node>)).set_parent(parent_ctx);
+            (*(retctx as *mut TreeNode<'input, 'arena, Node, TF::Tok>)).set_parent(parent_ctx);
         }
 
         //        println!("{:?}",self.ctx.as_ref().map(|it|it.to_string_tree(self)));
         if self.build_parse_trees && parent_ctx.is_some() {
-            self.add_child_to_ctx(unsafe { &*(retctx as *const TreeNode<'input, 'arena, Node>) });
+            self.add_child_to_ctx(unsafe {
+                &*(retctx as *const TreeNode<'input, 'arena, Node, TF::Tok>)
+            });
         }
-        Ok(unsafe { &*(retctx as *const TreeNode<'input, 'arena, Node>) })
+        Ok(unsafe { &*(retctx as *const TreeNode<'input, 'arena, Node, TF::Tok>) })
     }
 
     fn create_token_node(
         &self,
         token: &'arena TF::Tok,
-    ) -> &'arena mut TreeNode<'input, 'arena, Node> {
+    ) -> &'arena mut TreeNode<'input, 'arena, Node, TF::Tok> {
         TreeNode::create_token_node(self.arena, token)
     }
 
     fn create_error_node(
         &self,
         token: &'arena TF::Tok,
-    ) -> &'arena mut TreeNode<'input, 'arena, Node> {
+    ) -> &'arena mut TreeNode<'input, 'arena, Node, TF::Tok> {
         TreeNode::create_error_node(self.arena, token)
     }
 

@@ -663,9 +663,12 @@ impl ATNStateRef {
         self.0.as_ptr() as usize
     }
 
-    pub fn get_next_tokens_within_rule(&self, atn: &crate::atn::ATN) -> &'static IntervalSet {
+    pub fn get_next_tokens_within_rule<Tok: crate::token::Token>(
+        &self,
+        atn: &crate::atn::ATN,
+    ) -> &'static IntervalSet {
         self.next_tokens_within_rule().get_or_init(|| {
-            atn.next_tokens_in_ctx::<crate::rule_context::EmptyNodeKind>(*self, None)
+            atn.next_tokens_in_ctx::<crate::rule_context::EmptyNodeKind, Tok>(*self, None)
                 .into_static()
         })
     }

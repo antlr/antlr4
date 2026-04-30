@@ -85,7 +85,7 @@ pub struct ReferenceToATNLexerActions {
 impl ReferenceToATNLexerActions {
 }
 
-impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>>
+impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseLexerType<'input, 'arena, Input, TF>, TF::Tok>
     for ReferenceToATNLexerActions
 where
     'input: 'arena,
