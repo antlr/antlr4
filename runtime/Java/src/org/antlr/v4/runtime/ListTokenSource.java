@@ -150,6 +150,29 @@ public class ListTokenSource implements TokenSource {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getFile() {
+		if (i < tokens.size()) {
+			return tokens.get(i).getFile();
+		}
+		else if (eofToken != null) {
+			return eofToken.getFile();
+		}
+		else if (tokens.size() > 0) {
+			// have to calculate the result from the line/column of the previous
+			// token, along with the text of the token.
+			Token lastToken = tokens.get(tokens.size() - 1);
+			return lastToken.getFile();
+		}
+
+		// only reach this if tokens is empty, meaning EOF occurs at the first
+		// position in the input
+		return "";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getLine() {
 		if (i < tokens.size()) {
 			return tokens.get(i).getLine();

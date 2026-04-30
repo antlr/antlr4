@@ -42,12 +42,14 @@ public class LexerATNSimulator extends ATNSimulator {
 	 */
 	protected static class SimState {
 		protected int index = -1;
+		protected String file = "";
 		protected int line = 0;
 		protected int charPos = -1;
 		protected DFAState dfaState;
 
 		protected void reset() {
 			index = -1;
+			file = "";
 			line = 0;
 			charPos = -1;
 			dfaState = null;
@@ -66,6 +68,11 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** line number 1..n within the input */
 	protected int line = 1;
+
+	/** Optional file (or other source name) currently being lexed. Empty
+	 *  string when not set; surfaced through {@link Lexer#getFile()} and
+	 *  copied into each token via {@link org.antlr.v4.runtime.CommonToken}. */
+	protected String file = "";
 
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
@@ -95,6 +102,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public void copyState(LexerATNSimulator simulator) {
 		this.charPositionInLine = simulator.charPositionInLine;
+		this.file = simulator.file;
 		this.line = simulator.line;
 		this.mode = simulator.mode;
 		this.startIndex = simulator.startIndex;
@@ -123,6 +131,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	public void reset() {
 		prevAccept.reset();
 		startIndex = -1;
+		file = "";
 		line = 1;
 		charPositionInLine = 0;
 		mode = Lexer.DEFAULT_MODE;
@@ -296,6 +305,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	{
 		if (prevAccept.dfaState != null) {
 			LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
+			// Restore the saved file before invoking accept so subclass overrides
+			// of the original 6-arg accept signature continue to see the right
+			// value through the simulator's `file` field.
+			this.file = prevAccept.file;
 			accept(input, lexerActionExecutor, startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
 			return prevAccept.dfaState.prediction;
@@ -585,6 +598,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		int savedCharPositionInLine = charPositionInLine;
+		String savedFile = file;
 		int savedLine = line;
 		int index = input.index();
 		int marker = input.mark();
@@ -594,6 +608,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 		finally {
 			charPositionInLine = savedCharPositionInLine;
+			file = savedFile;
 			line = savedLine;
 			input.seek(index);
 			input.release(marker);
@@ -605,6 +620,7 @@ public class LexerATNSimulator extends ATNSimulator {
 								   DFAState dfaState)
 	{
 		settings.index = input.index();
+		settings.file = file;
 		settings.line = line;
 		settings.charPos = charPositionInLine;
 		settings.dfaState = dfaState;
@@ -712,6 +728,14 @@ public class LexerATNSimulator extends ATNSimulator {
 	public String getText(CharStream input) {
 		// index is first lookahead char, don't include.
 		return input.getText(Interval.of(startIndex, input.index()-1));
+	}
+
+	public String getFile() {
+		return file;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
 	}
 
 	public int getLine() {
