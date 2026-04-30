@@ -258,6 +258,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	@Override
+	public String getFile() {
+		return getInterpreter().getFile();
+	}
+
+	@Override
 	public int getLine() {
 		return getInterpreter().getLine();
 	}
@@ -265,6 +270,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	@Override
 	public int getCharPositionInLine() {
 		return getInterpreter().getCharPositionInLine();
+	}
+
+	public void setFile(String file) {
+		getInterpreter().setFile(file);
 	}
 
 	public void setLine(int line) {

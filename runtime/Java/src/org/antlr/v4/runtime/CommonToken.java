@@ -24,6 +24,11 @@ public class CommonToken implements WritableToken, Serializable {
 	protected int type;
 
 	/**
+	 * This is the backing field for {@link #getFile} and {@link #setFile}.
+	 */
+	protected String file;
+
+	/**
 	 * This is the backing field for {@link #getLine} and {@link #setLine}.
 	 */
 	protected int line;
@@ -96,6 +101,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.start = start;
 		this.stop = stop;
 		if (source.a != null) {
+			this.file = source.a.getFile();
 			this.line = source.a.getLine();
 			this.charPositionInLine = source.a.getCharPositionInLine();
 		}
@@ -130,6 +136,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 */
 	public CommonToken(Token oldToken) {
 		type = oldToken.getType();
+		file = oldToken.getFile();
 		line = oldToken.getLine();
 		index = oldToken.getTokenIndex();
 		charPositionInLine = oldToken.getCharPositionInLine();
@@ -150,6 +157,11 @@ public class CommonToken implements WritableToken, Serializable {
 	@Override
 	public int getType() {
 		return type;
+	}
+
+	@Override
+	public void setFile(String file) {
+		this.file = file;
 	}
 
 	@Override
@@ -186,6 +198,11 @@ public class CommonToken implements WritableToken, Serializable {
 	@Override
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	@Override
+	public String getFile() {
+		return file;
 	}
 
 	@Override

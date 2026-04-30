@@ -39,6 +39,13 @@ public interface TokenSource {
 	public int getLine();
 
 	/**
+	 * Get the file (or other source name) currently being tokenized.
+	 * Returns the empty string by default for backwards compatibility
+	 * with implementations that predate this method.
+	 */
+	default String getFile() { return ""; }
+
+	/**
 	 * Get the index into the current line for the current position in the input
 	 * stream. The first character on a line has position 0.
 	 *

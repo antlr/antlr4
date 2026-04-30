@@ -11,6 +11,13 @@ public interface WritableToken extends Token {
 
 	public void setType(int ttype);
 
+	/**
+	 * Set the file (or other source name) this token came from.
+	 * The default implementation is a no-op for backwards compatibility
+	 * with implementations that predate this method.
+	 */
+	default void setFile(String file) { /* no-op */ }
+
 	public void setLine(int line);
 
 	public void setCharPositionInLine(int pos);
