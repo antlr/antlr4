@@ -243,7 +243,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-dbt_antlr4::check_version!("1","2");
+dbt_antlr4::check_version!("1","3");
 <if(parser.tokens)>
 <parser.tokens:{k | pub const <parser.grammarName>_<k>:i32=<parser.tokens.(k)>;}; separator=" \n">
 <endif>
@@ -1259,7 +1259,7 @@ use std::sync::LazyLock;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-dbt_antlr4::check_version!("1","2");
+dbt_antlr4::check_version!("1","3");
 <if(lexer.tokens)>
 <lexer.tokens:{k | pub const <k>:i32=<lexer.tokens.(k)>}; separator="; \n", wrap, anchor>;
 <endif>

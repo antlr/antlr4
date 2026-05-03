@@ -35,7 +35,7 @@ use std::sync::LazyLock;
 use std::rc::Rc;
 use std::ops::{DerefMut, Deref};
 
-dbt_antlr4::check_version!("1","2");
+dbt_antlr4::check_version!("1","3");
 pub const VisitorBasic_A:i32=1;
 pub const VisitorBasic_EOF:i32=EOF;
 pub const RULE_s:usize = 0;

@@ -25,7 +25,7 @@ use dbt_antlr4::vocabulary::{Vocabulary,VocabularyImpl};
 use std::ops::{DerefMut, Deref};
 use std::sync::LazyLock;
 
-dbt_antlr4::check_version!("1","2");
+dbt_antlr4::check_version!("1","3");
 pub const A:i32=1;
 
 pub const channelNames: [&'static str;0+2] = [

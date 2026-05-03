@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.13.3-DBT123</version>
+	<version>4.13.3-DBT130</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
