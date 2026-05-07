@@ -1,11 +1,11 @@
 #![allow(nonstandard_style)]
 // Generated from CSV.g4 by ANTLR 4.13.2
 use dbt_antlr4::errors::ANTLRError;
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::tree::ParseTreeListener;
 use super::csvparser::*;
 
-pub trait CSVListener<'arena, Tok> : ParseTreeListener<'arena, CSVParserNodeKind, Tok>
+pub trait CSVListener<'arena, Tok = CommonToken<'arena>> : ParseTreeListener<'arena, CSVParserNodeKind, Tok>
 where
     Tok: Token + 'arena,
 {

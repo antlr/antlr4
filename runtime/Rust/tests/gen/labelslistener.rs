@@ -1,11 +1,11 @@
 #![allow(nonstandard_style)]
 // Generated from Labels.g4 by ANTLR 4.13.2
 use dbt_antlr4::errors::ANTLRError;
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::tree::ParseTreeListener;
 use super::labelsparser::*;
 
-pub trait LabelsListener<'arena, Tok> : ParseTreeListener<'arena, LabelsParserNodeKind, Tok>
+pub trait LabelsListener<'arena, Tok = CommonToken<'arena>> : ParseTreeListener<'arena, LabelsParserNodeKind, Tok>
 where
     Tok: Token + 'arena,
 {

@@ -1,11 +1,11 @@
 #![allow(nonstandard_style)]
 // Generated from SimpleLR.g4 by ANTLR 4.13.2
 use dbt_antlr4::errors::ANTLRError;
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::tree::ParseTreeListener;
 use super::simplelrparser::*;
 
-pub trait SimpleLRListener<'arena, Tok> : ParseTreeListener<'arena, SimpleLRParserNodeKind, Tok>
+pub trait SimpleLRListener<'arena, Tok = CommonToken<'arena>> : ParseTreeListener<'arena, SimpleLRParserNodeKind, Tok>
 where
     Tok: Token + 'arena,
 {

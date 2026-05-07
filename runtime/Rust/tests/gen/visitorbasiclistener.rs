@@ -1,11 +1,11 @@
 #![allow(nonstandard_style)]
 // Generated from VisitorBasic.g4 by ANTLR 4.13.2
 use dbt_antlr4::errors::ANTLRError;
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::tree::ParseTreeListener;
 use super::visitorbasicparser::*;
 
-pub trait VisitorBasicListener<'arena, Tok> : ParseTreeListener<'arena, VisitorBasicParserNodeKind, Tok>
+pub trait VisitorBasicListener<'arena, Tok = CommonToken<'arena>> : ParseTreeListener<'arena, VisitorBasicParserNodeKind, Tok>
 where
     Tok: Token + 'arena,
 {

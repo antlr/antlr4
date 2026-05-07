@@ -39,7 +39,7 @@ use crate::gen::*;
 #[test]
 fn test_visit_terminal_node() {
     struct TestVisitor;
-    impl<'input, 'arena, Tok: Token + 'input> VisitorBasicVisitor<'input, 'arena, Tok> for TestVisitor
+    impl<'input, 'arena> VisitorBasicVisitor<'input, 'arena> for TestVisitor
     where
         'input: 'arena,
     {
@@ -47,7 +47,7 @@ fn test_visit_terminal_node() {
 
         fn visit_terminal(
             &mut self,
-            _node: &TerminalNode<'input, 'arena, Tok>,
+            _node: &TerminalNode<'input, 'arena>,
         ) -> Result<Self::Return, ANTLRError> {
             Ok(_node.symbol.to_string() + "\n")
         }

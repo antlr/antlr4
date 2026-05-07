@@ -1,14 +1,14 @@
 #![allow(nonstandard_style)]
 #![allow(dead_code)]
 // Generated from VisitorCalc.g4 by ANTLR 4.13.2
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::errors::ANTLRError;
 use dbt_antlr4::tree::*;
 use super::visitorcalcparser::*;
 
 /// This interface defines a complete generic visitor for a parse tree produced
 /// by {@link VisitorCalcParser}.
-pub trait VisitorCalcVisitor<'input, 'arena, Tok>
+pub trait VisitorCalcVisitor<'input, 'arena, Tok = CommonToken<'input>>
 where
     'input: 'arena,
     Tok: Token + 'input,

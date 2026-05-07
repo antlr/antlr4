@@ -1,11 +1,11 @@
 #![allow(nonstandard_style)]
 // Generated from ReferenceToATN.g4 by ANTLR 4.13.2
 use dbt_antlr4::errors::ANTLRError;
-use dbt_antlr4::token::Token;
+use dbt_antlr4::token::{CommonToken, Token};
 use dbt_antlr4::tree::ParseTreeListener;
 use super::referencetoatnparser::*;
 
-pub trait ReferenceToATNListener<'arena, Tok> : ParseTreeListener<'arena, ReferenceToATNParserNodeKind, Tok>
+pub trait ReferenceToATNListener<'arena, Tok = CommonToken<'arena>> : ParseTreeListener<'arena, ReferenceToATNParserNodeKind, Tok>
 where
     Tok: Token + 'arena,
 {
