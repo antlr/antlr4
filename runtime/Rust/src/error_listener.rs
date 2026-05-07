@@ -10,14 +10,14 @@ use crate::errors::ANTLRError;
 use crate::parser::Parser;
 use crate::recognizer::Recognizer;
 
-use crate::token::Token;
+use crate::token::{CommonToken, Token};
 use crate::token_factory::TokenFactory;
 use std::borrow::Cow;
 use std::fmt::Debug;
 
 /// Describes interface for listening on parser/lexer errors.
 /// Should only listen for errors, for processing/recovering from errors use `ErrorStrategy`
-pub trait ErrorListener<'input, 'arena, R, Tok>
+pub trait ErrorListener<'input, 'arena, R, Tok = CommonToken<'input>>
 where
     'input: 'arena,
     R: Recognizer<'input, 'arena, Tok>,

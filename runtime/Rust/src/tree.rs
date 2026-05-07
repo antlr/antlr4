@@ -50,7 +50,7 @@ pub trait ParseTree<'input, 'arena>: Tree<'arena> {
 
 /// Helper trait, implemented for all rule context types that can be wrapped
 /// inside [TreeNode].
-pub trait NodeInner<'input, 'arena, Node, Tok>
+pub trait NodeInner<'input, 'arena, Node, Tok = CommonToken<'input>>
 where
     'input: 'arena,
     Node: NodeKindType<'arena, Tok>,
@@ -84,7 +84,8 @@ where
 
 pub type CtxPtr<'input, 'arena> = *mut (&'input (), *mut &'arena ());
 
-pub trait NodeKindType<'arena, Tok>: Copy + Debug + PartialEq + Eq + 'static
+pub trait NodeKindType<'arena, Tok = CommonToken<'arena>>:
+    Copy + Debug + PartialEq + Eq + 'static
 where
     Tok: Token + 'arena,
 {
