@@ -71,7 +71,6 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	base: BaseParserType<'input, 'arena, Input, TF>,
-    interpreter: Rc<ParserATNSimulator<'arena>>,
     err_handler: ErrorStrategyDelegate<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>>,
 }
 
@@ -82,16 +81,13 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-        let base_simulator = ATN_SIMULATOR_MANAGER.get_simulator(arena);
-		let interpreter = Rc::new(ParserATNSimulator::new(base_simulator));
 		Self {
 			base: BaseParser::new_base_parser(
-				arena, input, Rc::clone(&interpreter),
+				arena, input,
 				CSVParserExt {
 					_pd: Default::default(),
 				}
 			),
-			interpreter,
             err_handler: unsafe { ErrorStrategyDelegate::new(strategy) },
         }
     }
@@ -176,8 +172,9 @@ impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'inpu
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{}
+    Input: TokenStream<'input, 'arena, TF> + 'arena {
+    fn get_atn_simulator_man(&self) -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }        
+}
 
 impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for CSVParserExt<'input, 'arena>
 where

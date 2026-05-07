@@ -272,7 +272,6 @@ where
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
 	base: BaseParserType\<'input, 'arena, Input, TF>,
-    interpreter: Rc\<ParserATNSimulator\<'arena>\>,
     err_handler: ErrorStrategyDelegate\<'input, 'arena, TF, BaseParserType\<'input, 'arena, Input, TF>\>,
 }
 
@@ -283,17 +282,14 @@ where
     Input: TokenStream\<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box\<dyn ErrorStrategy\<'input, 'arena, TF, BaseParserType\<'input, 'arena, Input, TF>\> + 'arena>) -> Self {
-        let base_simulator = ATN_SIMULATOR_MANAGER.get_simulator(arena);
-		let interpreter = Rc::new(ParserATNSimulator::new(base_simulator));
 		Self {
 			base: BaseParser::new_base_parser(
-				arena, input, Rc::clone(&interpreter),
+				arena, input,
 				<parser.name>Ext {
 					_pd: Default::default(),
 					<namedActions.init>
 				}
 			),
-			interpreter,
             err_handler: unsafe { ErrorStrategyDelegate::new(strategy) },
         }
     }
@@ -379,8 +375,9 @@ impl\<'input, 'arena, Input, TF\> ParserRecog\<'input, 'arena, BaseParserType\<'
 where
     'input: 'arena,
     TF: TokenFactory\<'input, 'arena> + 'arena,
-    Input: TokenStream\<'input, 'arena, TF> + 'arena,
-{}
+    Input: TokenStream\<'input, 'arena, TF> + 'arena {
+    fn get_atn_simulator_man(&self) -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }        
+}
 
 impl\<'input, 'arena, Input, TF\> Actions\<'input, 'arena, BaseParserType\<'input, 'arena, Input, TF>, TF::Tok\> for <parser.name>Ext\<'input, 'arena>
 where
@@ -714,7 +711,7 @@ AltBlock(choice, preamble, alts, error) ::= <<
 <self()>.err_handler.sync(&mut <self()>.base)?;
 <if(choice.label)><labelref(choice.label,{ = <self()>.base.input.lt(1).map(|t| t as _);})><endif>
 <preamble; separator="\n">
-match <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base)? {
+match <self()>.get_interpreter().adaptive_predict(<choice.decision>,&mut <self()>.base)? {
 <alts:{alt |
 	<i> =>{
 		<alt>
@@ -727,7 +724,7 @@ match <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base
 OptionalBlock(choice, alts, error) ::= <<
 <self()>.base.set_state(<choice.stateNumber>);
 <self()>.err_handler.sync(&mut <self()>.base)?;
-match <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base)? {
+match <self()>.get_interpreter().adaptive_predict(<choice.decision>,&mut <self()>.base)? {
 <alts:{alt |
 	x if x == <i><if(!choice.ast.greedy)>+1<endif>=>{
 		<alt>
@@ -740,7 +737,7 @@ match <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base
 StarBlock(choice, alts, sync, iteration) ::= <<
 <self()>.base.set_state(<choice.stateNumber>);
 <self()>.err_handler.sync(&mut <self()>.base)?;
-_alt = <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base)?;
+_alt = <self()>.get_interpreter().adaptive_predict(<choice.decision>,&mut <self()>.base)?;
 while { _alt!=<choice.exitAlt> && _alt!=INVALID_ALT } {
 	if _alt==1<if(!choice.ast.greedy)>+1<endif> {
 		<iteration>
@@ -748,7 +745,7 @@ while { _alt!=<choice.exitAlt> && _alt!=INVALID_ALT } {
 	}
 	<self()>.base.set_state(<choice.loopBackStateNumber>);
 	<self()>.err_handler.sync(&mut <self()>.base)?;
-	_alt = <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base)?;
+	_alt = <self()>.get_interpreter().adaptive_predict(<choice.decision>,&mut <self()>.base)?;
 }
 >>
 
@@ -766,7 +763,7 @@ loop {
 	}
 	<self()>.base.set_state(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	<self()>.err_handler.sync(&mut <self()>.base)?;
-	_alt = <self()>.interpreter.adaptive_predict(<choice.decision>,&mut <self()>.base)?;
+	_alt = <self()>.get_interpreter().adaptive_predict(<choice.decision>,&mut <self()>.base)?;
 	if _alt==<choice.exitAlt> || _alt==INVALID_ALT { break }
 }
 >>
@@ -1362,9 +1359,7 @@ where
     fn get_literal_names(&self) -> &[Option\<&str>] { &_LITERAL_NAMES }
     fn get_symbolic_names(&self) -> &[Option\<&str>] { &_SYMBOLIC_NAMES }
     fn get_grammar_file_name(&self) -> &'static str { "<lexer.name>.g4" }
-    fn get_atn_simulator(&self, arena: &'arena Arena) -> BaseATNSimulator\<'arena, LexerATNConfigSet\<'arena>\> {
-        ATN_SIMULATOR_MANAGER.get_simulator(arena)
-    }
+    fn get_atn_simulator_man(&self) -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 }
 
 <atn>

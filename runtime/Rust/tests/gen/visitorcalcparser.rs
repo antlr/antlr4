@@ -70,7 +70,6 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	base: BaseParserType<'input, 'arena, Input, TF>,
-    interpreter: Rc<ParserATNSimulator<'arena>>,
     err_handler: ErrorStrategyDelegate<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>>,
 }
 
@@ -81,16 +80,13 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
     pub fn with_strategy(arena: &'arena Arena, input: Input, strategy: Box<dyn ErrorStrategy<'input, 'arena, TF, BaseParserType<'input, 'arena, Input, TF>> + 'arena>) -> Self {
-        let base_simulator = ATN_SIMULATOR_MANAGER.get_simulator(arena);
-		let interpreter = Rc::new(ParserATNSimulator::new(base_simulator));
 		Self {
 			base: BaseParser::new_base_parser(
-				arena, input, Rc::clone(&interpreter),
+				arena, input,
 				VisitorCalcParserExt {
 					_pd: Default::default(),
 				}
 			),
-			interpreter,
             err_handler: unsafe { ErrorStrategyDelegate::new(strategy) },
         }
     }
@@ -173,8 +169,9 @@ impl<'input, 'arena, Input, TF> ParserRecog<'input, 'arena, BaseParserType<'inpu
 where
     'input: 'arena,
     TF: TokenFactory<'input, 'arena> + 'arena,
-    Input: TokenStream<'input, 'arena, TF> + 'arena,
-{}
+    Input: TokenStream<'input, 'arena, TF> + 'arena {
+    fn get_atn_simulator_man(&self) -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }        
+}
 
 impl<'input, 'arena, Input, TF> Actions<'input, 'arena, BaseParserType<'input, 'arena, Input, TF>, TF::Tok> for VisitorCalcParserExt<'input, 'arena>
 where
@@ -776,14 +773,14 @@ where
 			recog.base.with_mut_ctx(|ctx| { ctx.set_stop(tmp.map(|t| t as _)); });
 			recog.base.set_state(18);
 			recog.err_handler.sync(&mut recog.base)?;
-			_alt = recog.interpreter.adaptive_predict(1,&mut recog.base)?;
+			_alt = recog.get_interpreter().adaptive_predict(1,&mut recog.base)?;
 			while { _alt!=2 && _alt!=INVALID_ALT } {
 				if _alt==1 {
 					recog.trigger_exit_rule_event()?;
 					{
 					recog.base.set_state(16);
 					recog.err_handler.sync(&mut recog.base)?;
-					match recog.interpreter.adaptive_predict(0,&mut recog.base)? {
+					match recog.get_interpreter().adaptive_predict(0,&mut recog.base)? {
 						1 =>{
 							{
 							/*recRuleLabeledAltStartAction*/
@@ -846,7 +843,7 @@ where
 				}
 				recog.base.set_state(20);
 				recog.err_handler.sync(&mut recog.base)?;
-				_alt = recog.interpreter.adaptive_predict(1,&mut recog.base)?;
+				_alt = recog.get_interpreter().adaptive_predict(1,&mut recog.base)?;
 			}
 			}
 			Ok(())

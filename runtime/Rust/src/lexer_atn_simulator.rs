@@ -52,7 +52,6 @@ pub trait ILexerATNSimulator<'sim>: IATNSimulator<'sim, LexerATNConfigSet<'sim>>
 pub struct LexerATNSimulator<'sim> {
     base: BaseATNSimulator<'sim, LexerATNConfigSet<'sim>>,
 
-    //    merge_cache: DoubleDict,
     start_index: isize,
     pub(crate) current_pos: Rc<LexerPosition>,
     mode: usize,
@@ -703,6 +702,11 @@ impl<'sim> LexerATNSimulator<'sim> {
     /// Returns current DFA for particular lexer mode
     pub fn get_dfa_for_mode(&self, mode: usize) -> &'sim DFA<'sim, LexerATNConfigSet<'sim>> {
         self.decision_to_dfa(mode).expect("mode should be valid")
+    }
+
+    /// Returns the current size of the DFA cache in bytes.
+    pub fn total_allocated_bytes(&self) -> usize {
+        self.base.total_allocated_bytes()
     }
 
     // fn get_token_name(&self, _tt: i32) -> String { unimplemented!() }

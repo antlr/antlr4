@@ -127,7 +127,7 @@ impl<'sim> ParserATNSimulator<'sim> {
         }
     }
 
-    pub fn get_atn_total_allocated_bytes(&self) -> usize {
+    pub fn total_allocated_bytes(&self) -> usize {
         self.base.total_allocated_bytes()
     }
 

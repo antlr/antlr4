@@ -112,9 +112,7 @@ where
     fn get_literal_names(&self) -> &[Option<&str>] { &_LITERAL_NAMES }
     fn get_symbolic_names(&self) -> &[Option<&str>] { &_SYMBOLIC_NAMES }
     fn get_grammar_file_name(&self) -> &'static str { "LabelsLexer.g4" }
-    fn get_atn_simulator(&self, arena: &'arena Arena) -> BaseATNSimulator<'arena, LexerATNConfigSet<'arena>> {
-        ATN_SIMULATOR_MANAGER.get_simulator(arena)
-    }
+    fn get_atn_simulator_man(&self) -> &'static ATNSimulatorManager { &ATN_SIMULATOR_MANAGER }
 }
 
 static ATN_SIMULATOR_MANAGER: LazyLock<ATNSimulatorManager> = LazyLock::new(|| ATNSimulatorManager::new(&_ATN));

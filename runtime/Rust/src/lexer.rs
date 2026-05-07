@@ -5,8 +5,7 @@ use std::cell::Cell;
 
 use std::rc::Rc;
 
-use crate::atn_config_set::LexerATNConfigSet;
-use crate::atn_simulator::BaseATNSimulator;
+use crate::atn_simulator::LexerATNSimulatorManager;
 use crate::char_stream::CharStream;
 use crate::error_listener::{ConsoleErrorListener, ErrorListener};
 use crate::errors::ANTLRError;
@@ -87,10 +86,7 @@ where
 
     fn get_grammar_file_name(&self) -> &'static str;
 
-    fn get_atn_simulator(
-        &self,
-        _: &'arena Arena,
-    ) -> BaseATNSimulator<'arena, LexerATNConfigSet<'arena>>;
+    fn get_atn_simulator_man(&self) -> &'static LexerATNSimulatorManager;
 }
 
 /// Default implementation of Lexer
@@ -105,7 +101,8 @@ where
     TF: TokenFactory<'input, 'arena> + 'arena,
 {
     /// `LexerATNSimulator` instance of this lexer
-    pub interpreter: Option<Box<LexerATNSimulator<'arena>>>,
+    pub interpreter: Option<LexerATNSimulator<'arena>>,
+
     /// `CharStream` used by this lexer
     pub input: Option<Input>,
     recog: Ext,
@@ -298,10 +295,11 @@ where
     /// Creates new lexer instance
     pub fn new_base_lexer(input: Input, recog: Ext, arena: &'arena Arena) -> Self {
         let factory = TF::new(arena);
-        let interpreter = LexerATNSimulator::new(recog.get_atn_simulator(arena));
+        let atn_manager = recog.get_atn_simulator_man();
+        let interpreter = LexerATNSimulator::new(atn_manager.get_simulator(arena));
 
         let mut lexer = Self {
-            interpreter: Some(Box::new(interpreter)),
+            interpreter: Some(interpreter),
             input: Some(input),
             recog,
             factory,
@@ -325,6 +323,10 @@ where
         let pos = lexer.current_pos.clone();
         lexer.interpreter.as_mut().unwrap().current_pos = pos;
         lexer
+    }
+
+    pub fn get_interpreter_mut(&mut self) -> &mut LexerATNSimulator<'arena> {
+        self.interpreter.as_mut().unwrap()
     }
 }
 
@@ -516,6 +518,6 @@ where
     }
 
     fn get_interpreter(&self) -> Option<&'arena LexerATNSimulator<'arena>> {
-        unsafe { std::mem::transmute(self.interpreter.as_deref()) }
+        unsafe { std::mem::transmute(self.interpreter.as_ref()) }
     }
 }

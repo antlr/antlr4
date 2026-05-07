@@ -70,6 +70,7 @@ impl<'sim, CS: ConfigSet<'sim>> BaseATNSimulator<'sim, CS> {
     dfa_sum_method!(dfa_bytes, allocated_bytes);
     dfa_sum_method!(dfa_state_bytes);
 
+    #[inline]
     pub fn check_allocation_limit(&self) -> Result<(), ANTLRError> {
         if self.allocation_limit_bytes > 0
             && self.total_allocated_bytes() > self.allocation_limit_bytes
@@ -172,7 +173,8 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
         self.allocation_limit_bytes.load(Ordering::Relaxed)
     }
 
-    pub fn reset_dfa(&self) {
+    #[allow(dead_code)]
+    pub(crate) fn reset_dfa(&self) {
         let is_resetting = self.is_resetting.swap(true, Ordering::AcqRel);
         if is_resetting {
             return;
@@ -191,7 +193,7 @@ impl<CS: ConfigSet<'static> + 'static> ATNSimulatorMan<CS> {
         self.is_resetting.store(false, Ordering::Release);
     }
 
-    pub fn reset_all(&self) {
+    pub(crate) fn reset_all(&self) {
         let is_resetting = self.is_resetting.swap(true, Ordering::AcqRel);
         if is_resetting {
             return;

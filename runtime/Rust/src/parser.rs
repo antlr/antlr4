@@ -3,11 +3,10 @@ use std::borrow::{Borrow, Cow};
 use std::cell::Cell;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
-use std::rc::Rc;
 
 use crate::arena::Arena;
 use crate::atn::ATN;
-use crate::atn_simulator::IATNSimulator;
+use crate::atn_simulator::{IATNSimulator, ParserATNSimulatorManager};
 use crate::error_listener::{
     ConsoleErrorListener, ErrorListener, ErrorListenerDelegate, ProxyErrorListener,
 };
@@ -105,7 +104,9 @@ where
     Input: TokenStream<'input, 'arena, TF>,
     Node: NodeKindType<'arena, TF::Tok>,
 {
-    pub interp: Rc<ParserATNSimulator<'arena>>,
+    interp: Option<ParserATNSimulator<'arena>>,
+    atn_manager: &'static ParserATNSimulatorManager,
+    global_cache_threshold: usize,
 
     /// Rule context parser is currently processing
     ctx: *mut (),
@@ -186,6 +187,7 @@ where
     R: Recognizer<'input, 'arena, Tok>,
     Tok: Token + 'input,
 {
+    fn get_atn_simulator_man(&self) -> &'static ParserATNSimulatorManager;
 }
 
 impl<'input, 'arena, Ext, Node, Input, TF> Recognizer<'input, 'arena, TF::Tok>
@@ -221,7 +223,7 @@ where
     }
 
     fn get_atn(&self) -> &ATN {
-        self.interp.atn()
+        self.interp.as_ref().unwrap().atn()
     }
 }
 
@@ -238,10 +240,11 @@ where
         self.arena
     }
 
+    #[inline(always)]
     fn get_interpreter(&self) -> &'arena ParserATNSimulator<'arena> {
         unsafe {
             std::mem::transmute::<&ParserATNSimulator<'arena>, &'arena ParserATNSimulator<'arena>>(
-                &*self.interp,
+                self.interp.as_ref().unwrap(),
             )
         }
     }
@@ -314,6 +317,8 @@ where
     fn get_expected_tokens<'a>(&'a self) -> Cow<'a, IntervalSet> {
         let states_stack = states_stack(self.ctx().unwrap());
         self.interp
+            .as_ref()
+            .unwrap()
             .atn()
             .get_expected_tokens::<TF::Tok>(self.state, states_stack)
     }
@@ -422,14 +427,13 @@ where
     Input: TokenStream<'input, 'arena, TF>,
     Node: NodeKindType<'arena, TF::Tok>,
 {
-    pub fn new_base_parser(
-        arena: &'arena Arena,
-        input: Input,
-        interp: Rc<ParserATNSimulator<'arena>>,
-        ext: Ext,
-    ) -> Self {
+    pub fn new_base_parser(arena: &'arena Arena, input: Input, ext: Ext) -> Self {
+        let atn_manager = ext.get_atn_simulator_man();
+        let interp = ParserATNSimulator::new(atn_manager.get_simulator(arena));
         Self {
-            interp,
+            atn_manager,
+            interp: Some(interp),
+            global_cache_threshold: 0,
             ctx: std::ptr::null_mut(),
             build_parse_trees: true,
             matched_eof: false,
@@ -447,6 +451,14 @@ where
             ext,
             pd: PhantomData,
         }
+    }
+
+    pub fn set_global_cache_threshold(&mut self, threshold: usize) {
+        self.global_cache_threshold = threshold;
+    }
+
+    pub fn get_interpreter_mut(&mut self) -> &mut ParserATNSimulator<'arena> {
+        self.interp.as_mut().unwrap()
     }
 
     /// If current context is same as the given one by pointer comparison
@@ -805,9 +817,9 @@ where
     /// Text representation of generated DFA for debugging purposes
     pub fn dump_dfa(&self) {
         let mut seen_one = false;
-        for i in 0..self.interp.atn().decision_to_state.len() {
+        for i in 0..self.get_atn().decision_to_state.len() {
             let dfa = self
-                .interp
+                .get_interpreter()
                 .decision_to_dfa(i)
                 .expect("dfa should exist for each decision");
             if !dfa.is_empty() {
@@ -818,6 +830,31 @@ where
                 print!("{}", dfa.to_string(self.get_vocabulary()));
                 seen_one = true;
             }
+        }
+    }
+}
+
+impl<'input, 'arena, Ext, Node, Input, TF> Drop for BaseParser<'input, 'arena, Ext, Node, Input, TF>
+where
+    'input: 'arena,
+    Ext: ParserRecog<'input, 'arena, Self, TF::Tok>,
+    TF: TokenFactory<'input, 'arena> + 'arena,
+    Input: TokenStream<'input, 'arena, TF>,
+    Node: NodeKindType<'arena, TF::Tok>,
+{
+    fn drop(&mut self) {
+        if self.global_cache_threshold == 0 {
+            return;
+        }
+
+        let Some(interp) = self.interp.take() else {
+            return;
+        };
+        let cache_bytes = interp.total_allocated_bytes();
+        drop(interp);
+
+        if cache_bytes > self.global_cache_threshold {
+            self.atn_manager.reset_all();
         }
     }
 }
