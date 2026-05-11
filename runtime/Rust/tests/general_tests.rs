@@ -53,7 +53,7 @@ use crate::gen::csvlistener::*;
 use crate::gen::csvparser::CSVParserNode;
 use crate::gen::csvparser::{CSVParser, CSVParserNodeKind};
 use crate::gen::labelslexer::LabelsLexer;
-use crate::gen::labelsparser::{EContextAll, LabelsParser, SContextAttrs};
+use crate::gen::labelsparser::{EContextAll, LabelsParser};
 use crate::gen::referencetoatnlexer::ReferenceToATNLexer;
 use crate::gen::referencetoatnlistener::ReferenceToATNListener;
 use crate::gen::referencetoatnparser::ReferenceToATNParserNode;
@@ -492,6 +492,8 @@ fn test_ast_type_variance() {
 #[test]
 #[serial(labelsparser)]
 fn test_deep_recursion() {
+    use crate::gen::labelsparser::SContextAttrs as _;
+
     let input = "{".repeat(2000) + "a" + &("}".repeat(2000));
     Arena::with(|arena| {
         let input = InputStream::new(input.as_str());
@@ -500,6 +502,16 @@ fn test_deep_recursion() {
         let mut parser = LabelsParser::new(arena, token_source);
         let result = parser.s().expect("parser error");
         assert!(result.blk().is_some());
+    });
+
+    let input = "(".repeat(2000) + "a" + &(")".repeat(2000));
+    Arena::with(|arena| {
+        let input = InputStream::new(input.as_str());
+        let lexer = LabelsLexer::<_>::new(arena, input);
+        let token_source = CommonTokenStream::new(lexer);
+        let mut parser = LabelsParser::new(arena, token_source);
+        let result = parser.s().expect("parser error");
+        assert!(result.q.is_some());
     });
 }
 

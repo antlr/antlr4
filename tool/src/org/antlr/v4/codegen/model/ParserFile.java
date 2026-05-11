@@ -19,7 +19,6 @@ public class ParserFile extends OutputFile {
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
-	public boolean genStacker; // from -stacker cmd-line
 	public boolean genLean; // from -split-parser cmd-line
 	public boolean genContexts; // from -split-parser cmd-line
 	public boolean genDFA; // from -split-parser cmd-line
@@ -37,7 +36,6 @@ public class ParserFile extends OutputFile {
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;
 		genVisitor = g.tool.gen_visitor;
-		genStacker = g.tool.gen_stacker;
 		grammarName = g.name;
 
 		if (g.getOptionString("contextSuperClass") != null) {

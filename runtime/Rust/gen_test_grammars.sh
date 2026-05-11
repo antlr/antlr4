@@ -23,7 +23,7 @@ declare -a ADDITIONAL_ARGS=(
     ""
     ""
     ""
-    "-stacker"
+    ""
 )
 
 for i in "${!GRAMMARS[@]}"; do

@@ -107,7 +107,6 @@ public class Tool {
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean gen_split_parser = false;
-	public boolean gen_stacker = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
@@ -130,8 +129,6 @@ public class Tool {
 		new Option("gen_dependencies",            "-depend", "generate file dependencies"),
 		new Option("gen_split_parser",           "-split-parser", "generate separate files for parser serialized DFA and context classes"),
 		new Option("gen_split_parser",           "-no-split-parser", "generate parser serialized DFA and context classes locally (default)"),
-		new Option("gen_stacker",                "-stacker", "use stacker for stack overflow protection in recursive rules"),
-		new Option("gen_stacker",                "-no-stacker", "do not use stacker for stack overflow protection (default)"),
 		new Option("",                            "-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors",         "-Werror", "treat warnings as errors"),
 		new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),
