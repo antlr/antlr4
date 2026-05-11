@@ -113,6 +113,7 @@ pub mod rule_context;
 pub mod vocabulary;
 
 // ======= Re-exports ========
+#[cfg(feature = "stacker")]
 pub use stacker;
 
 pub const VERSION_MAJOR: &str = env!("CARGO_PKG_VERSION_MAJOR");
@@ -794,6 +795,28 @@ macro_rules! impl_deref {
                 &mut self.base
             }
         }
+    };
+}
+
+pub const STACKER_RED_ZONE_BYTES: usize = 64 * 1024;
+pub const STACKER_GROWTH_BYTES: usize = 1024 * 1024;
+
+#[cfg(feature = "stacker")]
+#[macro_export]
+macro_rules! maybe_grow_stack {
+    ($body:block) => {
+        $crate::stacker::maybe_grow(
+            $crate::STACKER_RED_ZONE_BYTES,
+            $crate::STACKER_GROWTH_BYTES,
+            || $body,
+        )
+    };
+}
+#[cfg(not(feature = "stacker"))]
+#[macro_export]
+macro_rules! maybe_grow_stack {
+    ($body:block) => {
+        $body
     };
 }
 

@@ -269,6 +269,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_s)?;
@@ -294,6 +295,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 //------------------- a ----------------
@@ -383,12 +385,8 @@ where
 		self.a_rec(0)
 	}
 
-    #[inline]
 	fn a_rec(&mut self, _p: i32) -> Result<&'arena AContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
-        self.a_rec_inner(_p)
-    }
-
-	fn a_rec_inner(&mut self, _p: i32) -> Result<&'arena AContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
 		let _parentctx = recog.base.take_ctx();
 		let _parentState = recog.base.get_state();
@@ -442,6 +440,7 @@ where
 	        recog.err_handler.recover(&mut recog.base, re)?;}
 		}
 		recog.base.unroll_recursion_context(_parentctx).map(|ctx| { ctx.as_rule_context().unwrap() } )
+        })
 	}
 }
 

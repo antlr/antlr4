@@ -104,4 +104,16 @@ pub trait LabelsBaseListener<'arena>:
     fn exit_inc(&mut self, _ctx: &IncContext<'input, 'arena>) {}
 
 
+    /**
+     * Enter a parse tree produced by \{@link LabelsBaseParser#s}.
+     * @param ctx the parse tree
+,      */
+    fn enter_blk(&mut self, _ctx: &BlkContext<'input, 'arena>) {}
+    /**
+     * Exit a parse tree produced by \{@link  LabelsBaseParser#s}.
+     * @param ctx the parse tree
+     */
+    fn exit_blk(&mut self, _ctx: &BlkContext<'input, 'arena>) {}
+
+
 }

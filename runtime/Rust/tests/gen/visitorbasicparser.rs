@@ -263,6 +263,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn s(&mut self,) -> Result<&'arena SContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(SContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_s)?;
@@ -287,6 +288,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 

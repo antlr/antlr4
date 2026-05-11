@@ -87,4 +87,12 @@ where
     /// @param ctx the parse tree
     fn exit_inc<'input: 'arena>(&mut self, _ctx: &IncContext<'input, 'arena, Tok>) -> Result<(), ANTLRError> { Ok(()) }
 
+    /// Enter a parse tree produced by {@link LabelsParser#blk}.
+    /// @param ctx the parse tree
+    fn enter_blk<'input: 'arena>(&mut self, _ctx: &BlkContext<'input, 'arena, Tok>) -> Result<(), ANTLRError> { Ok(()) }
+
+    /// Exit a parse tree produced by {@link LabelsParser#blk}.
+    /// @param ctx the parse tree
+    fn exit_blk<'input: 'arena>(&mut self, _ctx: &BlkContext<'input, 'arena, Tok>) -> Result<(), ANTLRError> { Ok(()) }
+
 }

@@ -270,6 +270,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn csvFile(&mut self,) -> Result<&'arena CsvFileContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(CsvFileContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 0, RULE_csvFile)?;
@@ -310,6 +311,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 //------------------- hdr ----------------
@@ -388,6 +390,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn hdr(&mut self,) -> Result<&'arena HdrContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(HdrContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 2, RULE_hdr)?;
@@ -411,6 +414,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 //------------------- row ----------------
@@ -493,6 +497,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn row(&mut self,) -> Result<&'arena RowContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(RowContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 4, RULE_row)?;
@@ -546,6 +551,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 //------------------- field ----------------
@@ -636,6 +642,7 @@ where
     Input: TokenStream<'input, 'arena, TF> + 'arena,
 {
 	pub fn field(&mut self,) -> Result<&'arena FieldContextAll<'input, 'arena, TF::Tok>, ANTLRError> {
+        dbt_antlr4::maybe_grow_stack!({
 		let recog = self;
         let _parentctx = recog.base.take_ctx();
         recog.base.enter_rule(FieldContextExt::create(recog.get_arena(), _parentctx, recog.get_state())?, 6, RULE_field)?;
@@ -676,6 +683,7 @@ where
 			}
 		}
 		recog.base.exit_rule().map(|ctx: &'arena _| { ctx.as_rule_context().unwrap() })
+        })
 	}
 }
 

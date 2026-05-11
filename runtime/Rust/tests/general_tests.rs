@@ -53,7 +53,7 @@ use crate::gen::csvlistener::*;
 use crate::gen::csvparser::CSVParserNode;
 use crate::gen::csvparser::{CSVParser, CSVParserNodeKind};
 use crate::gen::labelslexer::LabelsLexer;
-use crate::gen::labelsparser::{EContextAll, LabelsParser};
+use crate::gen::labelsparser::{EContextAll, LabelsParser, SContextAttrs};
 use crate::gen::referencetoatnlexer::ReferenceToATNLexer;
 use crate::gen::referencetoatnlistener::ReferenceToATNListener;
 use crate::gen::referencetoatnparser::ReferenceToATNParserNode;
@@ -488,27 +488,18 @@ fn test_ast_type_variance() {
 
 // Deep recursion support requires stacker. Without stacker, the test will
 // fail with stack overflow
+#[cfg(feature = "stacker")]
 #[test]
 #[serial(labelsparser)]
 fn test_deep_recursion() {
-    let input = "(".repeat(1000) + "a" + &(")".repeat(1000));
+    let input = "{".repeat(2000) + "a" + &("}".repeat(2000));
     Arena::with(|arena| {
         let input = InputStream::new(input.as_str());
         let lexer = LabelsLexer::<_>::new(arena, input);
         let token_source = CommonTokenStream::new(lexer);
         let mut parser = LabelsParser::new(arena, token_source);
-        parser.set_recursion_limit(1500);
         let result = parser.s().expect("parser error");
-        assert_eq!(
-            1,
-            result
-                .q
-                .as_ref()
-                .unwrap()
-                .get_v()
-                .split_whitespace()
-                .count()
-        );
+        assert!(result.blk().is_some());
     });
 }
 

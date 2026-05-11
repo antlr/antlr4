@@ -1,5 +1,7 @@
 grammar Labels;
-s : q=e ;
+s : q=e
+ | '{' blk '}'  
+ ;
 e returns [String v]
   : a=e op='*' b=e  {$v = "* ".to_owned() + $a.v + " " + $b.v;}  # mult
   | a=e '+' b=e     {$v = "+ ".to_owned() + $a.v + " " + $b.v;}     # add
@@ -9,6 +11,9 @@ e returns [String v]
   | x=e '--'        {$v = " --".to_owned() + $x.v;}              # dec
   | ID              {$v = $ID.text.to_owned();}               # anID
   ;
+// Mutually recursive:
+blk : s ;
+
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+ ;
 WS : (' '|'\n') -> skip ;
