@@ -494,24 +494,60 @@ fn test_ast_type_variance() {
 fn test_deep_recursion() {
     use crate::gen::labelsparser::SContextAttrs as _;
 
-    let input = "{".repeat(2000) + "a" + &("}".repeat(2000));
+    let input = "(".repeat(2500) + "a" + &(")".repeat(2500));
     Arena::with(|arena| {
         let input = InputStream::new(input.as_str());
         let lexer = LabelsLexer::<_>::new(arena, input);
         let token_source = CommonTokenStream::new(lexer);
         let mut parser = LabelsParser::new(arena, token_source);
+        #[cfg(feature = "recursion-limit")]
+        {
+            parser.set_recursion_limit(2502);
+        }
+        let result = parser.s().expect("parser error");
+        assert!(result.q.is_some());
+    });
+
+    let input = "{".repeat(2500) + "a" + &("}".repeat(2500));
+    Arena::with(|arena| {
+        let input = InputStream::new(input.as_str());
+        let lexer = LabelsLexer::<_>::new(arena, input);
+        let token_source = CommonTokenStream::new(lexer);
+        let mut parser = LabelsParser::new(arena, token_source);
+        #[cfg(feature = "recursion-limit")]
+        {
+            parser.set_recursion_limit(5002);
+        }
         let result = parser.s().expect("parser error");
         assert!(result.blk().is_some());
     });
+}
 
-    let input = "(".repeat(2000) + "a" + &(")".repeat(2000));
+#[cfg(feature = "recursion-limit")]
+#[test]
+#[serial(labelsparser)]
+fn test_recursion_limit() {
+    let input = "(".repeat(1998) + "a" + &(")".repeat(1998));
     Arena::with(|arena| {
         let input = InputStream::new(input.as_str());
         let lexer = LabelsLexer::<_>::new(arena, input);
         let token_source = CommonTokenStream::new(lexer);
         let mut parser = LabelsParser::new(arena, token_source);
-        let result = parser.s().expect("parser error");
-        assert!(result.q.is_some());
+        let result = parser.s();
+        assert!(result.is_ok());
+    });
+
+    Arena::with(|arena| {
+        let input = InputStream::new(input.as_str());
+        let lexer = LabelsLexer::<_>::new(arena, input);
+        let token_source = CommonTokenStream::new(lexer);
+        let mut parser = LabelsParser::new(arena, token_source);
+        parser.set_recursion_limit(100);
+        let result = parser.s().unwrap_err();
+        eprintln!("result: {}", result.to_string());
+        assert!(result
+            .to_string()
+            .contains("Recursion limit of 100 exceeded"));
     });
 }
 

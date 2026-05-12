@@ -153,6 +153,11 @@ impl ANTLRError {
         .into()
     }
 
+    pub fn recursion_limit_exceeded(recursion_limit: u32) -> Self {
+        ANTLRErrorKind::FallThrough(Arc::new(RecursionLimitExceededError { recursion_limit }))
+            .into()
+    }
+
     pub fn no_alt<'input, 'arena, TF, P>(recog: &mut P) -> Self
     where
         'input: 'arena,
@@ -323,6 +328,19 @@ impl Display for DFACacheLimitExceededError {
 }
 
 impl Error for DFACacheLimitExceededError {}
+
+#[derive(Debug, Clone)]
+pub struct RecursionLimitExceededError {
+    pub recursion_limit: u32,
+}
+
+impl Display for RecursionLimitExceededError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Recursion limit of {} exceeded", self.recursion_limit)
+    }
+}
+
+impl Error for RecursionLimitExceededError {}
 
 /// Common part of ANTLR parser errors
 #[derive(Debug, Clone)]

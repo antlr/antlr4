@@ -23,7 +23,8 @@ use crate::tree::{NodeKindType, ParseTreeListener, Tree as _, TreeNode};
 use crate::utils::cell_update;
 use crate::vocabulary::Vocabulary;
 
-const DEFAULT_RECURSION_LIMIT: u32 = 1000;
+#[cfg(feature = "recursion-limit")]
+const DEFAULT_RECURSION_LIMIT: u32 = 2000;
 
 /// parser functionality required for `ParserATNSimulator` to work
 #[allow(missing_docs)]
@@ -85,7 +86,9 @@ where
     fn set_state(&mut self, v: i32);
     fn get_rule_invocation_stack(&self) -> Vec<String>;
 
+    #[cfg(feature = "recursion-limit")]
     fn get_recursion_limit(&self) -> u32;
+    #[cfg(feature = "recursion-limit")]
     fn set_recursion_limit(&mut self, v: u32);
 }
 
@@ -136,7 +139,10 @@ where
     /// Token stream that is currently used by this parser
     pub input: Input,
     precedence_stack: Vec<i32>,
+    #[cfg(feature = "recursion-limit")]
     pub recursion_limit: u32,
+    #[cfg(feature = "recursion-limit")]
+    current_recursion_depth: u32,
 
     parse_listeners: Vec<Box<Node::Listener>>,
     _syntax_errors: Cell<i32>,
@@ -405,10 +411,12 @@ where
         vec
     }
 
+    #[cfg(feature = "recursion-limit")]
     fn get_recursion_limit(&self) -> u32 {
         self.recursion_limit
     }
 
+    #[cfg(feature = "recursion-limit")]
     fn set_recursion_limit(&mut self, v: u32) {
         self.recursion_limit = v;
     }
@@ -440,7 +448,10 @@ where
             state: -1,
             input,
             precedence_stack: vec![0],
+            #[cfg(feature = "recursion-limit")]
             recursion_limit: DEFAULT_RECURSION_LIMIT,
+            #[cfg(feature = "recursion-limit")]
+            current_recursion_depth: 0,
             parse_listeners: vec![],
             _syntax_errors: Cell::new(0),
             error_listeners: vec![ErrorListenerDelegate::new(
@@ -656,6 +667,13 @@ where
             self.trigger_enter_rule_event()?;
         }
 
+        #[cfg(feature = "recursion-limit")]
+        {
+            self.current_recursion_depth += 1;
+            if self.current_recursion_depth > self.recursion_limit {
+                return Err(ANTLRError::recursion_limit_exceeded(self.recursion_limit));
+            }
+        }
         Ok(())
     }
 
@@ -665,6 +683,10 @@ where
     ) -> Result<&'arena TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
         assert!(self.ctx().is_some());
 
+        #[cfg(feature = "recursion-limit")]
+        {
+            self.current_recursion_depth -= 1;
+        }
         if self.matched_eof {
             // if we have matched EOF, it cannot consume past EOF so we use LT(1) here
             let stop = self.input.lt(1);
@@ -708,6 +730,13 @@ where
         }
         //println!("{}",self.input.lt(1).map(Token::to_owned).unwrap());
 
+        #[cfg(feature = "recursion-limit")]
+        {
+            self.current_recursion_depth += 1;
+            if self.current_recursion_depth > self.recursion_limit {
+                return Err(ANTLRError::recursion_limit_exceeded(self.recursion_limit));
+            }
+        }
         Ok(())
     }
 
@@ -745,6 +774,10 @@ where
     ) -> Result<&'arena TreeNode<'input, 'arena, Node, TF::Tok>, ANTLRError> {
         assert!(self.ctx().is_some());
 
+        #[cfg(feature = "recursion-limit")]
+        {
+            self.current_recursion_depth -= 1;
+        }
         self.precedence_stack.pop();
         let stop = self.input.lt(-1);
         self.with_mut_ctx(|ctx| {

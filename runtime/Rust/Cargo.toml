@@ -15,6 +15,7 @@ exclude = ["/build.rs","/grammars","/templates"]
 
 [features]
 arena-allocation-limit = []
+recursion-limit = []
 
 [dependencies]
 uuid = "1.16.0"
