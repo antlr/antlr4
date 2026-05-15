@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -653,7 +654,10 @@ namespace Antlr4.Runtime
             {
                 stop = tokens.Count - 1;
             }
-            StringBuilder buf = new StringBuilder();
+            // Use stack-allocated ValueStringBuilder to avoid StringBuilder heap alloc.
+            // 512 chars covers most token spans without renting from ArrayPool.
+            Span<char> initialBuffer = stackalloc char[512];
+            var buf = new ValueStringBuilder(initialBuffer);
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];

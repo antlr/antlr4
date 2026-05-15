@@ -281,6 +281,36 @@ namespace Antlr4.Runtime.Atn
 			configLookup.Clear();
 		}
 
+		/// <summary>
+		/// Fully resets this config set to a clean, reusable state.
+		/// Unlike <see cref="Clear"/>, this also resets all auxiliary fields
+		/// and restores the lookup table if it was nulled by <see cref="IsReadOnly"/>.
+		/// Intended for use by object pooling.
+		/// </summary>
+		internal void PoolReset()
+		{
+			configs.Clear();
+			cachedHashCode = -1;
+			uniqueAlt = 0;
+			conflictingAlts = null;
+			hasSemanticContext = false;
+			dipsIntoOuterContext = false;
+			readOnly = false;
+			if (configLookup == null)
+				configLookup = CreateLookup();
+			else
+				configLookup.Clear();
+		}
+
+		/// <summary>
+		/// Creates the appropriate lookup table for this config set type.
+		/// Overridden by <see cref="OrderedATNConfigSet"/> to use a different comparer.
+		/// </summary>
+		protected virtual ConfigHashSet CreateLookup()
+		{
+			return new ConfigHashSet();
+		}
+
 		public bool IsReadOnly
 		{
 			get
@@ -332,6 +362,11 @@ namespace Antlr4.Runtime.Atn
 		public OrderedATNConfigSet()
 		{
 			this.configLookup = new LexerConfigHashSet();
+		}
+
+		protected override ConfigHashSet CreateLookup()
+		{
+			return new LexerConfigHashSet();
 		}
 
 		public class LexerConfigHashSet : ConfigHashSet

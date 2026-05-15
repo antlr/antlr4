@@ -64,6 +64,59 @@ namespace Antlr4.Runtime.Atn
             return atn;
         }
 
+#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+        /// <summary>
+        /// Overload accepting <see cref="ReadOnlySpan{T}"/> to avoid keeping a static
+        /// <c>int[]</c> on the heap. On net8.0+ the generated parser can expose
+        /// the serialized ATN as a <c>ReadOnlySpan&lt;int&gt;</c> backed by RVA static data.
+        /// </summary>
+        public virtual ATN Deserialize(ReadOnlySpan<int> spanData)
+        {
+            // The internal methods use the int[] field, so we copy into a pooled array.
+            // This is a one-time cost at parser startup and the array is short-lived.
+            int[] rented = System.Buffers.ArrayPool<int>.Shared.Rent(spanData.Length);
+            try
+            {
+                spanData.CopyTo(rented.AsSpan());
+                // We need to set the length properly — rented may be larger.
+                // Since internal methods use `data[p]` with p < spanData.Length,
+                // the extra slots are harmless.
+                this.data = rented;
+                this.p = 0;
+                CheckVersion();
+                ATN atn = ReadATN();
+                ReadStates(atn);
+                ReadRules(atn);
+                ReadModes(atn);
+                IList<IntervalSet> sets = new List<IntervalSet>();
+                ReadSets(atn, sets);
+                ReadEdges(atn, sets);
+                ReadDecisions(atn);
+                ReadLexerActions(atn);
+                MarkPrecedenceDecisions(atn);
+                if (deserializationOptions.VerifyAtn)
+                {
+                    VerifyATN(atn);
+                }
+                if (deserializationOptions.GenerateRuleBypassTransitions && atn.grammarType == ATNType.Parser)
+                {
+                    GenerateRuleBypassTransitions(atn);
+                }
+                if (deserializationOptions.Optimize)
+                {
+                    OptimizeATN(atn);
+                }
+                IdentifyTailCalls(atn);
+                return atn;
+            }
+            finally
+            {
+                System.Buffers.ArrayPool<int>.Shared.Return(rented);
+                this.data = null;
+            }
+        }
+#endif
+
 		protected internal virtual void OptimizeATN(ATN atn)
 		{
 			while (true)

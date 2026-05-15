@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
@@ -20,6 +21,8 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class UnbufferedCharStream : ICharStream
     {
+        /// <summary>Tracks whether <see cref="data"/> was rented from <see cref="ArrayPool{T}"/>.</summary>
+        private bool _rentedFromPool;
         /// <summary>A moving window buffer of the data being scanned.</summary>
         /// <remarks>
         /// A moving window buffer of the data being scanned. While there's a marker,
@@ -277,7 +280,20 @@ namespace Antlr4.Runtime
         {
             if (n >= data.Length)
             {
-                data = Arrays.CopyOf(data, data.Length * 2);
+                // Rent from ArrayPool instead of raw alloc + copy
+                int newSize = data.Length * 2;
+                int[] newData = ArrayPool<int>.Shared.Rent(newSize);
+                Array.Copy(data, 0, newData, 0, data.Length);
+                // Return old buffer if it was rented (length > initial alloc).
+                // We can't know for certain if it was rented, but ArrayPool.Return
+                // is safe to call on any array — worst case it's a no-op if the
+                // array didn't come from the pool. However, to be safe we track it.
+                if (_rentedFromPool)
+                {
+                    ArrayPool<int>.Shared.Return(data);
+                }
+                data = newData;
+                _rentedFromPool = true;
             }
             data[n++] = c;
         }

@@ -34,5 +34,10 @@ namespace Antlr4.Runtime.Atn
 			}
 			first[b] = value;
 		}
+
+		public void Clear()
+		{
+			data.Clear();
+		}
 	}
 }
