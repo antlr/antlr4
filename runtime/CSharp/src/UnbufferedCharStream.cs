@@ -21,8 +21,6 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class UnbufferedCharStream : ICharStream
     {
-        /// <summary>Tracks whether <see cref="data"/> was rented from <see cref="ArrayPool{T}"/>.</summary>
-        private bool _rentedFromPool;
         /// <summary>A moving window buffer of the data being scanned.</summary>
         /// <remarks>
         /// A moving window buffer of the data being scanned. While there's a marker,
@@ -123,7 +121,7 @@ namespace Antlr4.Runtime
         public UnbufferedCharStream(int bufferSize)
         {
             n = 0;
-            data = new int[bufferSize];
+            data = ArrayPool<int>.Shared.Rent(bufferSize);
         }
 
         public UnbufferedCharStream(Stream input)
@@ -284,16 +282,10 @@ namespace Antlr4.Runtime
                 int newSize = data.Length * 2;
                 int[] newData = ArrayPool<int>.Shared.Rent(newSize);
                 Array.Copy(data, 0, newData, 0, data.Length);
-                // Return old buffer if it was rented (length > initial alloc).
-                // We can't know for certain if it was rented, but ArrayPool.Return
-                // is safe to call on any array — worst case it's a no-op if the
-                // array didn't come from the pool. However, to be safe we track it.
-                if (_rentedFromPool)
-                {
-                    ArrayPool<int>.Shared.Return(data);
-                }
+                // Return old buffer to pool. ArrayPool.Return is already a no-op
+                // if the array didn't come from the pool.
+                ArrayPool<int>.Shared.Return(data);
                 data = newData;
-                _rentedFromPool = true;
             }
             data[n++] = c;
         }
