@@ -52,7 +52,7 @@ namespace Antlr4.Runtime
         /// <see langword="true"/>
         /// .
         /// </remarks>
-        protected internal IList<IToken> tokens = new List<IToken>(100);
+        protected internal IList<IToken> tokens = new List<IToken>(1024);
 
         /// <summary>
         /// The index into
@@ -239,10 +239,7 @@ namespace Antlr4.Runtime
             for (int i = 0; i < n; i++)
             {
                 IToken t = _tokenSource.NextToken();
-                if (t is IWritableToken)
-                {
-                    ((IWritableToken)t).TokenIndex = tokens.Count;
-                }
+                ((IWritableToken)t).TokenIndex = tokens.Count;
                 tokens.Add(t);
                 if (t.Type == TokenConstants.EOF)
                 {
@@ -271,7 +268,7 @@ namespace Antlr4.Runtime
                 return null;
             }
             LazyInit();
-            IList<IToken> subset = new List<IToken>();
+            IList<IToken> subset = new List<IToken>(stop - start + 1);
             if (stop >= tokens.Count)
             {
                 stop = tokens.Count - 1;
@@ -408,7 +405,7 @@ namespace Antlr4.Runtime
                 return null;
             }
             // list = tokens[start:stop]:{T t, t.getType() in types}
-            IList<IToken> filteredTokens = new List<IToken>();
+            IList<IToken> filteredTokens = new List<IToken>(stop - start + 1);
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
@@ -597,7 +594,7 @@ namespace Antlr4.Runtime
 
         protected internal virtual IList<IToken> FilterForChannel(int from, int to, int channel)
         {
-            IList<IToken> hidden = new List<IToken>();
+            IList<IToken> hidden = new List<IToken>(to - from + 1);
             for (int i = from; i <= to; i++)
             {
                 IToken t = tokens[i];

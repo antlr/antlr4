@@ -195,6 +195,9 @@ namespace Antlr4.Runtime.Atn
 
 		public override int GetHashCode()
 		{
+#if NET8_0_OR_GREATER
+			return System.HashCode.Combine(state.stateNumber, alt, context, semanticContext);
+#else
 			int hashCode = MurmurHash.Initialize(7);
 			hashCode = MurmurHash.Update(hashCode, state.stateNumber);
 			hashCode = MurmurHash.Update(hashCode, alt);
@@ -202,6 +205,7 @@ namespace Antlr4.Runtime.Atn
 			hashCode = MurmurHash.Update(hashCode, semanticContext);
 			hashCode = MurmurHash.Finish(hashCode, 4);
 			return hashCode;
+#endif
 		}
 
 		public override String ToString()

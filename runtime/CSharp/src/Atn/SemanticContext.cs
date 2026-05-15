@@ -62,12 +62,16 @@ namespace Antlr4.Runtime.Atn
 
             public override int GetHashCode()
             {
+#if NET8_0_OR_GREATER
+                return System.HashCode.Combine(ruleIndex, predIndex, isCtxDependent);
+#else
                 int hashCode = MurmurHash.Initialize();
                 hashCode = MurmurHash.Update(hashCode, ruleIndex);
                 hashCode = MurmurHash.Update(hashCode, predIndex);
                 hashCode = MurmurHash.Update(hashCode, isCtxDependent ? 1 : 0);
                 hashCode = MurmurHash.Finish(hashCode, 3);
                 return hashCode;
+#endif
             }
 
             public override bool Equals(object obj)
@@ -219,9 +223,11 @@ namespace Antlr4.Runtime.Atn
                 return Arrays.Equals(this.opnds, other.opnds);
             }
 
+            private static readonly int AndTypeHash = typeof(SemanticContext.AND).GetHashCode();
+
             public override int GetHashCode()
             {
-                return MurmurHash.HashCode(opnds, typeof(SemanticContext.AND).GetHashCode());
+                return MurmurHash.HashCode(opnds, AndTypeHash);
             }
 
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext parserCallStack)
@@ -337,9 +343,11 @@ namespace Antlr4.Runtime.Atn
                 return Arrays.Equals(this.opnds, other.opnds);
             }
 
+            private static readonly int OrTypeHash = typeof(SemanticContext.OR).GetHashCode();
+
             public override int GetHashCode()
             {
-                return MurmurHash.HashCode(opnds, typeof(SemanticContext.OR).GetHashCode());
+                return MurmurHash.HashCode(opnds, OrTypeHash);
             }
 
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext parserCallStack)
@@ -441,10 +449,13 @@ namespace Antlr4.Runtime.Atn
 
         private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates(HashSet<SemanticContext> collection)
         {
-            if (!collection.OfType<PrecedencePredicate>().Any())
-                Collections.EmptyList<PrecedencePredicate>();
-
-            List<PrecedencePredicate> result = collection.OfType<PrecedencePredicate>().ToList();
+            List<PrecedencePredicate> result = null;
+            foreach (var item in collection)
+            {
+                if (item is PrecedencePredicate pp)
+                    (result ??= new List<PrecedencePredicate>()).Add(pp);
+            }
+            if (result == null) return Collections.EmptyList<PrecedencePredicate>();
             collection.ExceptWith(result);
             return result;
         }

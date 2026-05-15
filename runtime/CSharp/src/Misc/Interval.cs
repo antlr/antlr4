@@ -8,7 +8,7 @@ namespace Antlr4.Runtime.Misc
 {
     /// <summary>An immutable inclusive interval a..b.</summary>
     /// <remarks>An immutable inclusive interval a..b.</remarks>
-    public struct Interval
+    public struct Interval : IEquatable<Interval>
     {
         public static readonly Antlr4.Runtime.Misc.Interval Invalid = new Antlr4.Runtime.Misc.Interval(-1, -2);
 
@@ -59,15 +59,14 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
+        public bool Equals(Antlr4.Runtime.Misc.Interval other)
+        {
+            return this.a == other.a && this.b == other.b;
+        }
+
         public override bool Equals(object o)
         {
-            if (!(o is Antlr4.Runtime.Misc.Interval))
-            {
-                return false;
-            }
-
-            Antlr4.Runtime.Misc.Interval other = (Antlr4.Runtime.Misc.Interval)o;
-            return this.a == other.a && this.b == other.b;
+            return o is Antlr4.Runtime.Misc.Interval other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -76,6 +75,16 @@ namespace Antlr4.Runtime.Misc
             hash = hash * 31 + a;
             hash = hash * 31 + b;
             return hash;
+        }
+
+        public static bool operator ==(Interval left, Interval right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Interval left, Interval right)
+        {
+            return !left.Equals(right);
         }
 
         /// <summary>Does this start completely before other? Disjoint</summary>

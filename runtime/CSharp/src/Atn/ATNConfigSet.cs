@@ -372,14 +372,15 @@ namespace Antlr4.Runtime.Atn
 		public class LexerConfigHashSet : ConfigHashSet
 		{
 			public LexerConfigHashSet()
-				: base(new ObjectEqualityComparator())
+				: base(ObjectEqualityComparator.Instance)
 			{
 			}
 		}
 	}
 
-	public class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
+	public sealed class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
 	{
+		public static readonly ObjectEqualityComparator Instance = new ObjectEqualityComparator();
 
 
 		public int GetHashCode(ATNConfig o)
@@ -414,7 +415,7 @@ namespace Antlr4.Runtime.Atn
 
 
 		public ConfigHashSet()
-			: base(new ConfigEqualityComparator())
+			: base(ConfigEqualityComparator.Instance)
 		{
 		}
 
@@ -432,17 +433,22 @@ namespace Antlr4.Runtime.Atn
 
 	}
 
-	public class ConfigEqualityComparator : IEqualityComparer<ATNConfig>
+	public sealed class ConfigEqualityComparator : IEqualityComparer<ATNConfig>
 	{
+		public static readonly ConfigEqualityComparator Instance = new ConfigEqualityComparator();
 
 
 		public int GetHashCode(ATNConfig o)
 		{
+#if NET8_0_OR_GREATER
+			return System.HashCode.Combine(o.state.stateNumber, o.alt, o.semanticContext);
+#else
 			int hashCode = 7;
 			hashCode = 31 * hashCode + o.state.stateNumber;
 			hashCode = 31 * hashCode + o.alt;
 			hashCode = 31 * hashCode + o.semanticContext.GetHashCode();
 			return hashCode;
+#endif
 		}
 
 		public bool Equals(ATNConfig a, ATNConfig b)
