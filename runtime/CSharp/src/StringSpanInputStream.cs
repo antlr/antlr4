@@ -179,17 +179,6 @@ namespace Antlr4.Runtime
             return new StringSpanInputStream(contents) { name = path };
         }
 
-        /// <summary>
-        /// Returns the backing data as a <see cref="ReadOnlySpan{T}"/> — zero allocation,
-        /// zero copy.
-        /// </summary>
-        public ReadOnlySpan<char> Data => _data.AsSpan(0, n);
-
-        /// <summary>
-        /// Returns the backing data as a <see cref="ReadOnlyMemory{T}"/>.
-        /// </summary>
-        public ReadOnlyMemory<char> AsMemory() => _data.AsMemory(0, n);
-
         protected override int ValueAt(int i) => _data[i];
 
         protected override string ConvertDataToString(int start, int count)

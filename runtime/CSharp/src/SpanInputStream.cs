@@ -266,11 +266,6 @@ namespace Antlr4.Runtime
             return new SpanInputStream(contents) { name = path };
         }
 
-        /// <summary>
-        /// Returns the backing data as a <see cref="ReadOnlySpan{T}"/>.
-        /// </summary>
-        public ReadOnlySpan<char> Data => _data.AsSpan(0, n);
-
         protected override int ValueAt(int i) => _data[i];
 
         protected override string ConvertDataToString(int start, int count) => new string(_data, start, count);

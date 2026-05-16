@@ -44,8 +44,11 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// An empty source pair for tokens that have no source.
+        /// Only available on platforms that support ValueTuple.
         /// </summary>
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
         public static readonly (ITokenSource, ICharStream) EmptySource = (null, null);
+#endif
 
         private int _type;
         private int _line;
@@ -79,6 +82,7 @@ namespace Antlr4.Runtime
             _source = new TokenSourcePair(null, null);
         }
 
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
         public OptimizedToken((ITokenSource, ICharStream) source, int type, int channel, int start, int stop)
         {
             _source = new TokenSourcePair(source.Item1, source.Item2);
@@ -93,6 +97,22 @@ namespace Antlr4.Runtime
             }
             // Text is NOT materialized here — deferred until .Text is read
         }
+#else
+        public OptimizedToken(ITokenSource tokenSource, ICharStream inputStream, int type, int channel, int start, int stop)
+        {
+            _source = new TokenSourcePair(tokenSource, inputStream);
+            _type = type;
+            _channel = channel;
+            _start = start;
+            _stop = stop;
+            if (tokenSource != null)
+            {
+                _line = tokenSource.Line;
+                _charPositionInLine = tokenSource.Column;
+            }
+            // Text is NOT materialized here — deferred until .Text is read
+        }
+#endif
 
         public OptimizedToken(int type, string text)
         {

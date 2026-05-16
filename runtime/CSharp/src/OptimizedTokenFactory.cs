@@ -42,7 +42,11 @@ namespace Antlr4.Runtime
             int start, int stop, int line, int charPositionInLine)
         {
             var t = new OptimizedToken(
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
                 (source.Item1, source.Item2),
+#else
+                source.Item1, source.Item2,
+#endif
                 type, channel, start, stop);
             t.Line = line;
             t.Column = charPositionInLine;
