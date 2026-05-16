@@ -19,7 +19,7 @@ namespace Antlr4.Runtime
     /// The benefits are in allocations in all other regions, and performance of GetText().
     /// </summary>
 #if NET8_0_OR_GREATER
-    public class SpanInputStream : ICharStream
+    public class CharSpanInputStream : ICharStream
     {
         private readonly char[] _data;
         private readonly int _length;
@@ -29,22 +29,10 @@ namespace Antlr4.Runtime
         public string name;
 
         /// <summary>
-        /// Creates a stream from a string. The string's internal buffer is copied
-        /// into a <c>char[]</c> for span-based access.
-        /// </summary>
-        public SpanInputStream(string input)
-        {
-            if (input == null) throw new ArgumentNullException(nameof(input));
-            _data = input.ToCharArray();
-            _length = _data.Length;
-            _index = 0;
-        }
-
-        /// <summary>
         /// Creates a stream directly from a <c>char[]</c>. The array is used
         /// directly (no copy) — caller must not mutate it after construction.
         /// </summary>
-        public SpanInputStream(char[] data, int length)
+        public CharSpanInputStream(char[] data, int length)
         {
             _data = data ?? throw new ArgumentNullException(nameof(data));
             if (length < 0 || length > data.Length)
@@ -57,7 +45,7 @@ namespace Antlr4.Runtime
         /// Creates a stream by reading the entire contents of a
         /// <see cref="TextReader"/>, then closing it.
         /// </summary>
-        public SpanInputStream(TextReader reader)
+        public CharSpanInputStream(TextReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
             _data = reader.ReadToEnd().ToCharArray();
@@ -69,7 +57,7 @@ namespace Antlr4.Runtime
         /// Creates a stream by reading the entire contents of a
         /// <see cref="Stream"/> using the specified encoding.
         /// </summary>
-        public SpanInputStream(Stream stream, Encoding encoding)
+        public CharSpanInputStream(Stream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (encoding == null) throw new ArgumentNullException(nameof(encoding));
@@ -84,7 +72,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream by reading a UTF-8 encoded <see cref="Stream"/>.
         /// </summary>
-        public SpanInputStream(Stream stream)
+        public CharSpanInputStream(Stream stream)
             : this(stream, Encoding.UTF8)
         {
         }
@@ -92,7 +80,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream from a UTF-8 encoded file on disk.
         /// </summary>
-        public static SpanInputStream FromPath(string path)
+        public static CharSpanInputStream FromPath(string path)
         {
             return FromPath(path, Encoding.UTF8);
         }
@@ -100,10 +88,10 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream from a file on disk with the specified encoding.
         /// </summary>
-        public static SpanInputStream FromPath(string path, Encoding encoding)
+        public static CharSpanInputStream FromPath(string path, Encoding encoding)
         {
             var contents = File.ReadAllText(path, encoding);
-            return new SpanInputStream(contents) { name = path };
+            var chars = contents.ToCharArray(); return new CharSpanInputStream(chars, chars.Length) { name = path };
         }
 
         /// <summary>
@@ -188,26 +176,15 @@ namespace Antlr4.Runtime
 
         public override string ToString() => new string(Data);
 #else
-    public class SpanInputStream : BaseInputCharStream
+    public class CharSpanInputStream : BaseInputCharStream
     {
         private readonly char[] _data;
-
-        /// <summary>
-        /// Creates a stream from a string. The string's internal buffer is copied
-        /// into a <c>char[]</c> for span-based access.
-        /// </summary>
-        public SpanInputStream(string input)
-        {
-            if (input == null) throw new ArgumentNullException(nameof(input));
-            _data = input.ToCharArray();
-            n = _data.Length;
-        }
 
         /// <summary>
         /// Creates a stream directly from a <c>char[]</c>. The array is used
         /// directly (no copy) — caller must not mutate it after construction.
         /// </summary>
-        public SpanInputStream(char[] data, int length)
+        public CharSpanInputStream(char[] data, int length)
         {
             _data = data ?? throw new ArgumentNullException(nameof(data));
             if (length < 0 || length > data.Length)
@@ -219,7 +196,7 @@ namespace Antlr4.Runtime
         /// Creates a stream by reading the entire contents of a
         /// <see cref="TextReader"/>, then closing it.
         /// </summary>
-        public SpanInputStream(TextReader reader)
+        public CharSpanInputStream(TextReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
             _data = reader.ReadToEnd().ToCharArray();
@@ -230,7 +207,7 @@ namespace Antlr4.Runtime
         /// Creates a stream by reading the entire contents of a
         /// <see cref="Stream"/> using the specified encoding.
         /// </summary>
-        public SpanInputStream(Stream stream, Encoding encoding)
+        public CharSpanInputStream(Stream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (encoding == null) throw new ArgumentNullException(nameof(encoding));
@@ -244,7 +221,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream by reading a UTF-8 encoded <see cref="Stream"/>.
         /// </summary>
-        public SpanInputStream(Stream stream)
+        public CharSpanInputStream(Stream stream)
             : this(stream, Encoding.UTF8)
         {
         }
@@ -252,7 +229,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream from a UTF-8 encoded file on disk.
         /// </summary>
-        public static SpanInputStream FromPath(string path)
+        public static CharSpanInputStream FromPath(string path)
         {
             return FromPath(path, Encoding.UTF8);
         }
@@ -260,10 +237,10 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Creates a stream from a file on disk with the specified encoding.
         /// </summary>
-        public static SpanInputStream FromPath(string path, Encoding encoding)
+        public static CharSpanInputStream FromPath(string path, Encoding encoding)
         {
             var contents = File.ReadAllText(path, encoding);
-            return new SpanInputStream(contents) { name = path };
+            var chars = contents.ToCharArray(); return new CharSpanInputStream(chars, chars.Length) { name = path };
         }
 
         /// <summary>

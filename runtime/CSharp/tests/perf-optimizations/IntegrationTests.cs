@@ -11,21 +11,27 @@ namespace PerfOptimizations
 {
     /// <summary>
     /// Integration tests that exercise the optimized types together in
-    /// realistic scenarios: SpanInputStream + OptimizedTokenFactory piped
+    /// realistic scenarios: CharSpanInputStream + OptimizedTokenFactory piped
     /// through the same ICharStream / IToken interfaces that parsers use.
     /// Also validates BufferedTokenStream.GetText (which uses ValueStringBuilder
     /// internally).
     /// </summary>
     public class IntegrationTests
     {
-        // ── SpanInputStream as ICharStream ───────────────────────────────
+        private static CharSpanInputStream S(string s)
+        {
+            var c = s.ToCharArray();
+            return new CharSpanInputStream(c, c.Length);
+        }
+
+        // ── CharSpanInputStream as ICharStream ───────────────────────────────
 
         [Fact]
-        public void SpanInputStream_FullWalk_MatchesAntlrInputStream()
+        public void CharSpanInputStream_FullWalk_MatchesAntlrInputStream()
         {
             string input = "SELECT id, name FROM users WHERE active = 1;";
             var antlr = new AntlrInputStream(input);
-            var span = new SpanInputStream(input);
+            var span = S(input);
 
             // Walk entire stream comparing every LA(1) + Consume pair
             while (true)
@@ -41,11 +47,11 @@ namespace PerfOptimizations
         }
 
         [Fact]
-        public void SpanInputStream_RandomSeek_Parity()
+        public void CharSpanInputStream_RandomSeek_Parity()
         {
             string input = "abcdefghijklmnopqrstuvwxyz";
             var antlr = new AntlrInputStream(input);
-            var span = new SpanInputStream(input);
+            var span = S(input);
 
             int[] positions = { 10, 5, 25, 0, 13, 26 };
             foreach (int pos in positions)
@@ -75,9 +81,9 @@ namespace PerfOptimizations
         }
 
         [Fact]
-        public void OptimizedToken_WithSpanInputStream_TextMaterialization()
+        public void OptimizedToken_WithCharSpanInputStream_TextMaterialization()
         {
-            var input = new SpanInputStream("function foo(bar, baz) { return 42; }");
+            var input = S("function foo(bar, baz) { return 42; }");
             var factory = new OptimizedTokenFactory();
             var source = Tuple.Create<ITokenSource, ICharStream>(null, (ICharStream)input);
 
@@ -91,7 +97,7 @@ namespace PerfOptimizations
         [Fact]
         public void OptimizedToken_MultipleDeferredTokens_SameStream()
         {
-            var input = new SpanInputStream("int x = 42;");
+            var input = S("int x = 42;");
             var source = Tuple.Create<ITokenSource, ICharStream>(null, (ICharStream)input);
             var factory = new OptimizedTokenFactory();
 
@@ -132,28 +138,28 @@ namespace PerfOptimizations
             Assert.Equal(common.Text, opt.Text);
         }
 
-        // ── GetText on interval with SpanInputStream ─────────────────────
+        // ── GetText on interval with CharSpanInputStream ─────────────────────
 
         [Theory]
         [InlineData("abcdefghij", 0, 4, "abcde")]
         [InlineData("abcdefghij", 5, 9, "fghij")]
         [InlineData("abcdefghij", 3, 3, "d")]
         [InlineData("a", 0, 0, "a")]
-        public void SpanInputStream_GetText_Intervals(string input, int start, int stop, string expected)
+        public void CharSpanInputStream_GetText_Intervals(string input, int start, int stop, string expected)
         {
-            var stream = new SpanInputStream(input);
+            var stream = S(input);
             Assert.Equal(expected, stream.GetText(Interval.Of(start, stop)));
         }
 
         // ── Unicode BMP parity ───────────────────────────────────────────
 
         [Fact]
-        public void SpanInputStream_UnicodeBMP_Parity()
+        public void CharSpanInputStream_UnicodeBMP_Parity()
         {
             // BMP: latin, greek, CJK, math symbols
             string input = "\u00E9\u03B1\u4E16\u2200\u2203";
             var antlr = new AntlrInputStream(input);
-            var span = new SpanInputStream(input);
+            var span = S(input);
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -176,7 +182,7 @@ namespace PerfOptimizations
         public void EmptyInput_BothStreams_EOF()
         {
             var antlr = new AntlrInputStream("");
-            var span = new SpanInputStream("");
+            var span = S("");
 
             Assert.Equal(IntStreamConstants.EOF, antlr.LA(1));
             Assert.Equal(IntStreamConstants.EOF, span.LA(1));
@@ -211,11 +217,12 @@ namespace PerfOptimizations
         // ── Large input stress test ──────────────────────────────────────
 
         [Fact]
-        public void SpanInputStream_LargeInput_DoesNotCorrupt()
+        public void CharSpanInputStream_LargeInput_DoesNotCorrupt()
         {
             // 100KB of repeating chars
             string input = new string('x', 100_000) + "END";
-            var stream = new SpanInputStream(input);
+            var inputChars = input.ToCharArray();
+            var stream = new CharSpanInputStream(inputChars, inputChars.Length);
 
             Assert.Equal(100_003, stream.Size);
 

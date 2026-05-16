@@ -11,7 +11,7 @@ namespace Antlr4.Benchmarks;
 [MemoryDiagnoser]
 public class TokenBenchmarks
 {
-    private SpanInputStream _stream = null!;
+    private CharSpanInputStream _stream = null!;
     private string _input = null!;
 
     [GlobalSetup]
@@ -22,7 +22,7 @@ public class TokenBenchmarks
         for (int i = 0; i < chars.Length; i++)
             chars[i] = (char)rng.Next(32, 127);
         _input = new string(chars);
-        _stream = new SpanInputStream(_input);
+        _stream = new CharSpanInputStream(chars, chars.Length);
     }
 
     [Benchmark(Baseline = true)]
