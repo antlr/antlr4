@@ -3,9 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
+using System.Buffers;
+#endif
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -653,6 +655,7 @@ namespace Antlr4.Runtime
             }
             // Use stack-allocated ValueStringBuilder to avoid StringBuilder heap alloc.
             // 512 chars covers most token spans without renting from ArrayPool.
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
             Span<char> initialBuffer = stackalloc char[512];
             var buf = new ValueStringBuilder(initialBuffer);
             for (int i = start; i <= stop; i++)
@@ -665,6 +668,19 @@ namespace Antlr4.Runtime
                 buf.Append(t.Text);
             }
             return buf.ToString();
+#else
+            var buf = new System.Text.StringBuilder();
+            for (int i = start; i <= stop; i++)
+            {
+                IToken t = tokens[i];
+                if (t.Type == TokenConstants.EOF)
+                {
+                    break;
+                }
+                buf.Append(t.Text);
+            }
+            return buf.ToString();
+#endif
         }
 
         [return: NotNull]

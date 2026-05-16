@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+using System;
 using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime
@@ -26,6 +27,22 @@ namespace Antlr4.Runtime
     public class OptimizedToken : IWritableToken
     {
         /// <summary>
+        /// Explicit struct to hold the token source pair, avoiding ValueTuple
+        /// which is unavailable on net45.
+        /// </summary>
+        private struct TokenSourcePair
+        {
+            public ITokenSource Source;
+            public ICharStream Stream;
+
+            public TokenSourcePair(ITokenSource source, ICharStream stream)
+            {
+                Source = source;
+                Stream = stream;
+            }
+        }
+
+        /// <summary>
         /// An empty source pair for tokens that have no source.
         /// </summary>
         public static readonly (ITokenSource, ICharStream) EmptySource = (null, null);
@@ -39,9 +56,9 @@ namespace Antlr4.Runtime
         private int _stop;
 
         /// <summary>
-        /// Uses ValueTuple instead of Tuple — a struct, so no heap allocation per token.
+        /// Uses a struct instead of Tuple — no heap allocation per token.
         /// </summary>
-        private (ITokenSource Source, ICharStream Stream) _source;
+        private TokenSourcePair _source;
 
         /// <summary>
         /// Cached text. Null means "not yet materialized" — will be lazily
@@ -59,12 +76,12 @@ namespace Antlr4.Runtime
         public OptimizedToken(int type)
         {
             _type = type;
-            _source = EmptySource;
+            _source = new TokenSourcePair(null, null);
         }
 
         public OptimizedToken((ITokenSource, ICharStream) source, int type, int channel, int start, int stop)
         {
-            _source = source;
+            _source = new TokenSourcePair(source.Item1, source.Item2);
             _type = type;
             _channel = channel;
             _start = start;
@@ -83,7 +100,7 @@ namespace Antlr4.Runtime
             _channel = TokenConstants.DefaultChannel;
             _text = text;
             _textExplicitlySet = true;
-            _source = EmptySource;
+            _source = new TokenSourcePair(null, null);
         }
 
         /// <summary>
@@ -111,13 +128,13 @@ namespace Antlr4.Runtime
             {
                 // Access the protected field directly to avoid materializing
                 _text = ct.source.Item2 != null ? null : oldToken.Text;
-                _source = (ct.source.Item1, ct.source.Item2);
+                _source = new TokenSourcePair(ct.source.Item1, ct.source.Item2);
             }
             else
             {
                 _text = oldToken.Text;
                 _textExplicitlySet = true;
-                _source = (oldToken.TokenSource, oldToken.InputStream);
+                _source = new TokenSourcePair(oldToken.TokenSource, oldToken.InputStream);
             }
         }
 

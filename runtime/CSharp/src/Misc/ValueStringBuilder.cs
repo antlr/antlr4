@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
@@ -141,3 +142,4 @@ namespace Antlr4.Runtime.Misc
         }
     }
 }
+#endif
