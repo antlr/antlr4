@@ -8,41 +8,6 @@ https://github.com/antlr/antlr4/releases/tag/4.2.1
 
 ANTLR v4 Honey Badger
 
-May 15, 2026 (C# Runtime Performance - HarryCordewener/antlr4 fork)
-
-* Added SpanInputStream: a string-backed ICharStream that avoids the char[]
-  copy performed by AntlrInputStream. Opt-in, additive class.
-
-* Added OptimizedToken / OptimizedTokenFactory: deferred text materialization
-  using ValueTuple<int,int> source intervals instead of eagerly slicing
-  strings. Opt-in via lexer.TokenFactory = OptimizedTokenFactory.Default.
-
-* Added ObjectPool<T>: generic thread-local pool used internally by
-  ParserATNSimulator to reuse ATNConfigSet, HashSet<ATNConfig>, and
-  MergeCache instances across adaptivePredict calls.
-
-* Added ValueStringBuilder (internal ref struct): stack-allocated (512 char)
-  string builder with ArrayPool<char> fallback, used in
-  BufferedTokenStream.GetText to replace System.Text.StringBuilder.
-
-* UnbufferedCharStream: buffer growth now rents from ArrayPool<int> instead
-  of allocating new arrays on every expansion.
-
-* ATNDeserializer: added Deserialize(ReadOnlySpan<int>) overload gated
-  behind NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER.
-
-* ATNConfigSet: added PoolReset() and virtual CreateLookup() to support
-  pooled reuse; OrderedATNConfigSet overrides CreateLookup().
-
-* MergeCache: added Clear() to support pooled reuse.
-
-* Multi-targeted Antlr4.csproj: netstandard2.0 + netstandard2.1 + net8.0.
-  net45 preserved on Windows via OS-conditional. System.Memory and
-  System.Buffers polyfill packages added for netstandard2.0.
-
-* No public API breakage. All new types are additive. Existing types
-  (CommonToken, CommonTokenFactory, AntlrInputStream) are unchanged.
-
 January 15, 2014
 
 * Unit tests for lexer actions from yesterday.
