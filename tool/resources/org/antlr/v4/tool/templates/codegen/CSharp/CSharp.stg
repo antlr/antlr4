@@ -292,7 +292,11 @@ public partial class <parser.name> : <superClass; null="Parser"> {
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
+#if NET8_0_OR_GREATER
+	public override int[] SerializedAtn { get { return _serializedATN.ToArray(); } }
+#else
 	public override int[] SerializedAtn { get { return _serializedATN; } }
+#endif
 
 	static <parser.name>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1032,7 +1036,11 @@ public partial class <lexer.name> : <superClass; null="Lexer"> {
 
 	public override string[] ModeNames { get { return modeNames; } }
 
+#if NET8_0_OR_GREATER
+	public override int[] SerializedAtn { get { return _serializedATN.ToArray(); } }
+#else
 	public override int[] SerializedAtn { get { return _serializedATN; } }
+#endif
 
 	static <lexer.name>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1046,9 +1054,15 @@ public partial class <lexer.name> : <superClass; null="Lexer"> {
 >>
 
 SerializedATN(model) ::= <<
+#if NET8_0_OR_GREATER
+private static ReadOnlySpan\<int> _serializedATN => new int[] {
+	<model.serialized: {s | <s>}; separator=",", wrap>
+};
+#else
 private static int[] _serializedATN = {
 	<model.serialized: {s | <s>}; separator=",", wrap>
 };
+#endif
 
 public static readonly ATN _ATN =
 	new ATNDeserializer().Deserialize(_serializedATN);
