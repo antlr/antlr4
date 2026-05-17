@@ -24,7 +24,7 @@ namespace Antlr4.Runtime.Atn
 			}
 
 			public bool Equals(PredictionContextPair other)
-				=> ReferenceEquals(A, other.A) && ReferenceEquals(B, other.B);
+				=> Equals(A, other.A) && Equals(B, other.B);
 
 			public override bool Equals(object obj)
 				=> obj is PredictionContextPair other && Equals(other);
@@ -32,8 +32,8 @@ namespace Antlr4.Runtime.Atn
 			public override int GetHashCode()
 			{
 				int h = 17;
-				h = h * 31 + (A != null ? System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(A) : 0);
-				h = h * 31 + (B != null ? System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(B) : 0);
+				h = h * 31 + (A != null ? A.GetHashCode() : 0);
+				h = h * 31 + (B != null ? B.GetHashCode() : 0);
 				return h;
 			}
 		}
