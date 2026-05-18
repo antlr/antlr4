@@ -54,7 +54,7 @@ namespace Antlr4.Runtime
         /// <see langword="true"/>
         /// .
         /// </remarks>
-        protected internal IList<IToken> tokens = new List<IToken>(1024);
+        protected internal IList<IToken> tokens = new List<IToken>(256);
 
         /// <summary>
         /// The index into

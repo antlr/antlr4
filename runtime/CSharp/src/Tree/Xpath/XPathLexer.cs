@@ -84,7 +84,8 @@ public partial class XPathLexer : Lexer {
 	public override string[] ModeNames { get { return modeNames; } }
 
 #if NET8_0_OR_GREATER
-	public override int[] SerializedAtn { get { return _serializedATN.ToArray(); } }
+	private int[] _cachedSerializedATN;
+	public override int[] SerializedAtn { get { return _cachedSerializedATN ??= _serializedATN.ToArray(); } }
 #else
 	public override int[] SerializedAtn { get { return _serializedATN; } }
 #endif
@@ -113,7 +114,7 @@ public partial class XPathLexer : Lexer {
 	}
 
 #if NET8_0_OR_GREATER
-	private static ReadOnlySpan<int> _serializedATN => new int[] {
+	private static ReadOnlySpan<int> _serializedATN => [
 #else
 	private static int[] _serializedATN = {
 #endif
@@ -134,7 +135,11 @@ public partial class XPathLexer : Lexer {
 		0,0,41,45,5,39,0,0,42,44,9,0,0,0,43,42,1,0,0,0,44,47,1,0,0,0,45,46,1,0,
 		0,0,45,43,1,0,0,0,46,48,1,0,0,0,47,45,1,0,0,0,48,49,5,39,0,0,49,16,1,0,
 		0,0,4,0,30,37,45,1,1,4,0
+#if NET8_0_OR_GREATER
+	];
+#else
 	};
+#endif
 
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN);
