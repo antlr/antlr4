@@ -39,15 +39,12 @@ namespace Antlr4.Runtime.Misc
 		{
 			if (this.Count != o.Count)
 				return false;
-			IEnumerator<T> thisItems = this.GetEnumerator();
-			IEnumerator<T> otherItems = o.GetEnumerator();
-			while (thisItems.MoveNext() && otherItems.MoveNext())
+			for (int i = 0; i < Count; i++)
 			{
-				if (!thisItems.Current.Equals(otherItems.Current))
+				if (!EqualityComparer<T>.Default.Equals(this[i], o[i]))
 					return false;
 			}
 			return true;
-
 		}
 
 	}

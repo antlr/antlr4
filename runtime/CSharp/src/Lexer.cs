@@ -271,7 +271,6 @@ outer_continue: ;
         public virtual void SetInputStream(ICharStream input)
         {
             this._input = null;
-            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
             Reset();
             this._input = input;
             this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);

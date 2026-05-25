@@ -83,7 +83,12 @@ public partial class XPathLexer : Lexer {
 
 	public override string[] ModeNames { get { return modeNames; } }
 
+#if NET8_0_OR_GREATER
+	private int[] _cachedSerializedATN;
+	public override int[] SerializedAtn { get { return _cachedSerializedATN ??= _serializedATN.ToArray(); } }
+#else
 	public override int[] SerializedAtn { get { return _serializedATN; } }
+#endif
 
 	static XPathLexer() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -108,7 +113,11 @@ public partial class XPathLexer : Lexer {
 		}
 	}
 
+#if NET8_0_OR_GREATER
+	private static ReadOnlySpan<int> _serializedATN => [
+#else
 	private static int[] _serializedATN = {
+#endif
 		4,0,8,50,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,
 		2,7,7,7,1,0,1,0,1,0,1,1,1,1,1,2,1,2,1,3,1,3,1,4,1,4,5,4,29,8,4,10,4,12,
 		4,32,9,4,1,4,1,4,1,5,1,5,3,5,38,8,5,1,6,1,6,1,7,1,7,5,7,44,8,7,10,7,12,
@@ -126,7 +135,11 @@ public partial class XPathLexer : Lexer {
 		0,0,41,45,5,39,0,0,42,44,9,0,0,0,43,42,1,0,0,0,44,47,1,0,0,0,45,46,1,0,
 		0,0,45,43,1,0,0,0,46,48,1,0,0,0,47,45,1,0,0,0,48,49,5,39,0,0,49,16,1,0,
 		0,0,4,0,30,37,45,1,1,4,0
+#if NET8_0_OR_GREATER
+	];
+#else
 	};
+#endif
 
 	public static readonly ATN _ATN =
 		new ATNDeserializer().Deserialize(_serializedATN);

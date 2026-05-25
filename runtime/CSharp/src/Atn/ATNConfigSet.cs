@@ -281,6 +281,36 @@ namespace Antlr4.Runtime.Atn
 			configLookup.Clear();
 		}
 
+		/// <summary>
+		/// Fully resets this config set to a clean, reusable state.
+		/// Unlike <see cref="Clear"/>, this also resets all auxiliary fields
+		/// and restores the lookup table if it was nulled by <see cref="IsReadOnly"/>.
+		/// Intended for use by object pooling.
+		/// </summary>
+		internal void PoolReset()
+		{
+			configs.Clear();
+			cachedHashCode = -1;
+			uniqueAlt = 0;
+			conflictingAlts = null;
+			hasSemanticContext = false;
+			dipsIntoOuterContext = false;
+			readOnly = false;
+			if (configLookup == null)
+				configLookup = CreateLookup();
+			else
+				configLookup.Clear();
+		}
+
+		/// <summary>
+		/// Creates the appropriate lookup table for this config set type.
+		/// Overridden by <see cref="OrderedATNConfigSet"/> to use a different comparer.
+		/// </summary>
+		protected virtual ConfigHashSet CreateLookup()
+		{
+			return new ConfigHashSet();
+		}
+
 		public bool IsReadOnly
 		{
 			get
@@ -334,17 +364,23 @@ namespace Antlr4.Runtime.Atn
 			this.configLookup = new LexerConfigHashSet();
 		}
 
+		protected override ConfigHashSet CreateLookup()
+		{
+			return new LexerConfigHashSet();
+		}
+
 		public class LexerConfigHashSet : ConfigHashSet
 		{
 			public LexerConfigHashSet()
-				: base(new ObjectEqualityComparator())
+				: base(ObjectEqualityComparator.Instance)
 			{
 			}
 		}
 	}
 
-	public class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
+	public sealed class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
 	{
+		public static readonly ObjectEqualityComparator Instance = new ObjectEqualityComparator();
 
 
 		public int GetHashCode(ATNConfig o)
@@ -379,7 +415,7 @@ namespace Antlr4.Runtime.Atn
 
 
 		public ConfigHashSet()
-			: base(new ConfigEqualityComparator())
+			: base(ConfigEqualityComparator.Instance)
 		{
 		}
 
@@ -397,17 +433,22 @@ namespace Antlr4.Runtime.Atn
 
 	}
 
-	public class ConfigEqualityComparator : IEqualityComparer<ATNConfig>
+	public sealed class ConfigEqualityComparator : IEqualityComparer<ATNConfig>
 	{
+		public static readonly ConfigEqualityComparator Instance = new ConfigEqualityComparator();
 
 
 		public int GetHashCode(ATNConfig o)
 		{
+#if NET8_0_OR_GREATER
+			return System.HashCode.Combine(o.state.stateNumber, o.alt, o.semanticContext);
+#else
 			int hashCode = 7;
 			hashCode = 31 * hashCode + o.state.stateNumber;
 			hashCode = 31 * hashCode + o.alt;
 			hashCode = 31 * hashCode + o.semanticContext.GetHashCode();
 			return hashCode;
+#endif
 		}
 
 		public bool Equals(ATNConfig a, ATNConfig b)
