@@ -3,10 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <sstream>
 #include <string>
-#include <cstddef>
+
 #include "atn/ATNConfigSet.h"
 #include "atn/SemanticContext.h"
 #include "atn/ATNConfig.h"
@@ -16,6 +18,39 @@
 
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
+
+DFAState::~DFAState() {
+  delete[] _edges.load(std::memory_order_relaxed);
+}
+
+void DFAState::setEdge(size_t index, size_t minSize, DFAState *target) {
+  std::atomic<DFAState *> *edges = _edges.load(std::memory_order_relaxed);
+  size_t count = _edgeCount.load(std::memory_order_relaxed);
+
+  if (edges == nullptr || index >= count) {
+    size_t newCount = std::max(minSize, index + 1);
+    auto *newEdges = new std::atomic<DFAState *>[newCount];
+    for (size_t i = 0; i < count; ++i) {
+      newEdges[i].store(edges[i].load(std::memory_order_relaxed), std::memory_order_relaxed);
+    }
+    for (size_t i = count; i < newCount; ++i) {
+      newEdges[i].store(nullptr, std::memory_order_relaxed);
+    }
+    // Publish the (fully initialized) table: a lock-free getEdge() that
+    // observes this pointer with acquire is guaranteed to see the slot
+    // contents and the updated count.
+    _edgeCount.store(newCount, std::memory_order_release);
+    _edges.store(newEdges, std::memory_order_release);
+    // Only the precedence start state ever reaches this with a non-null
+    // `edges`, and it is read exclusively under ATN::_edgeMutex (never via the
+    // lock-free getEdge path), so freeing the old table here cannot race a
+    // concurrent reader.
+    delete[] edges;
+    edges = newEdges;
+  }
+
+  edges[index].store(target, std::memory_order_release);
+}
 
 std::string DFAState::PredPrediction::toString() const {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
