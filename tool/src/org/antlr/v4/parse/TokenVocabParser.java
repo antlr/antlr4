@@ -137,7 +137,7 @@ public class TokenVocabParser {
 						  File.separator +
 						  vocabName +
 						  CodeGenerator.VOCAB_FILE_EXTENSION);
-		if (f.exists()) {
+		if (isContainedIn(g.tool.libDirectory, f) && f.exists()) {
 			return f;
 		}
 
@@ -146,10 +146,10 @@ public class TokenVocabParser {
 		// files are generated (in the base, not relative to the input
 		// location.)
 		f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
-		if ( f.exists() ) {
+		if ( isContainedIn(g.tool.outputDirectory, f) && f.exists() ) {
 			return f;
 		}
-		
+
 		// Still not found? Use the grammar's subfolder then.
 		String fileDirectory;
 
@@ -162,6 +162,29 @@ public class TokenVocabParser {
 		else {
 			fileDirectory = g.fileName.substring(0, g.fileName.lastIndexOf(File.separatorChar));
 		}
-		return new File(fileDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+		f = new File(fileDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+		if ( isContainedIn(fileDirectory, f) ) {
+			return f;
+		}
+		// tokenVocab is the value of a grammar option and can be any string,
+		// so a value like "../../foo" would resolve the .tokens file outside
+		// the search directory. Confine it to the directory's own file name
+		// so the load reports the vocab as missing rather than reading an
+		// arbitrary file.
+		return new File(fileDirectory, new File(vocabName).getName() + CodeGenerator.VOCAB_FILE_EXTENSION);
+	}
+
+	/** Is {@code f} the search {@code directory} itself or a descendant of it,
+	 *  after resolving any {@code ..} segments and symbolic links?
+	 */
+	private static boolean isContainedIn(String directory, File f) {
+		try {
+			String base = new File(directory).getCanonicalPath();
+			String target = new File(f.getCanonicalPath()).getCanonicalPath();
+			return target.equals(base) || target.startsWith(base + File.separator);
+		}
+		catch (IOException ioe) {
+			return false;
+		}
 	}
 }
