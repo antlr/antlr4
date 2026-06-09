@@ -9,6 +9,8 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 import org.junit.jupiter.api.Test;
 
+import java.nio.CharBuffer;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCodePointCharStream {
@@ -299,5 +301,28 @@ public class TestCodePointCharStream {
 		CodePointCharStream s = CharStreams.fromString("hello \uD83C\uDF0D");
 		assertTrue(s.getInternalStorage() instanceof int[]);
 		assertEquals(7, s.size());
+	}
+
+	@Test
+	public void splitSurrogatePairAcrossAppendsProducesOneCodePoint() {
+		// An emoji (U+1F4A9) whose UTF-16 surrogate pair is delivered in two
+		// separate append() calls, as happens when CharStreams.fromReader hits a
+		// chunk boundary in the middle of the pair.
+		CodePointBuffer.Builder builder = CodePointBuffer.builder(8);
+		builder.append(CharBuffer.wrap(new char[] { '\uD83D' }));
+		builder.append(CharBuffer.wrap(new char[] { '\uDCA9' }));
+		CodePointCharStream s = CodePointCharStream.fromBuffer(builder.build());
+		assertEquals(1, s.size());
+		assertEquals(0x1F4A9, s.LA(1));
+		assertEquals("\uD83D\uDCA9", s.toString());
+	}
+
+	@Test
+	public void danglingHighSurrogateAtEndOfInputIsPreserved() {
+		CodePointBuffer.Builder builder = CodePointBuffer.builder(8);
+		builder.append(CharBuffer.wrap(new char[] { 'a', '\uD83D' }));
+		CodePointCharStream s = CodePointCharStream.fromBuffer(builder.build());
+		assertEquals(2, s.size());
+		assertEquals(0xD83D, s.LA(2));
 	}
 }
