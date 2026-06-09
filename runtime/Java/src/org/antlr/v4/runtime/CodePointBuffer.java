@@ -171,6 +171,12 @@ public class CodePointBuffer {
 					charBuffer.flip();
 					break;
 				case INT:
+					if (prevHighSurrogate != -1) {
+						// Flush a high surrogate left dangling at the end of the input.
+						ensureRemaining(1);
+						intBuffer.put(prevHighSurrogate);
+						prevHighSurrogate = -1;
+					}
 					intBuffer.flip();
 					break;
 			}
@@ -340,11 +346,10 @@ public class CodePointBuffer {
 				}
 			}
 
-			if (prevHighSurrogate != -1) {
-				// Dangling high surrogate
-				outInt[outOffset] = prevHighSurrogate & 0xFFFF;
-				outOffset++;
-			}
+			// A high surrogate at the end of this chunk stays pending in
+			// prevHighSurrogate so the next append() can pair it with a low
+			// surrogate split across the chunk boundary. build() flushes it if no
+			// low surrogate ever arrives.
 
 			utf16In.position(inOffset - utf16In.arrayOffset());
 			intBuffer.position(outOffset - intBuffer.arrayOffset());
