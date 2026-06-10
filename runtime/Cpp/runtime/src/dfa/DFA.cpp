@@ -73,9 +73,9 @@ DFAState* DFA::getPrecedenceStartState(int precedence) const {
     return nullptr;
   }
 
-  // Read under ATN::_edgeMutex (held by the caller); the precedence start-state
-  // table is the only edge table that grows, and it is never read via the
-  // lock-free getEdge path used by the lexer/parser simulators.
+  // Read under this DFA's edgeMutex() (held by the caller); the precedence
+  // start-state table is the only edge table that grows, and it is never read
+  // via the lock-free getEdge path used by the lexer/parser simulators.
   return s0->getEdge(static_cast<size_t>(precedence));
 }
 

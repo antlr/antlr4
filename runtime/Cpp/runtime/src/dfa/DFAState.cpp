@@ -42,9 +42,9 @@ void DFAState::setEdge(size_t index, size_t minSize, DFAState *target) {
     _edgeCount.store(newCount, std::memory_order_release);
     _edges.store(newEdges, std::memory_order_release);
     // Only the precedence start state ever reaches this with a non-null
-    // `edges`, and it is read exclusively under ATN::_edgeMutex (never via the
-    // lock-free getEdge path), so freeing the old table here cannot race a
-    // concurrent reader.
+    // `edges`, and it is read exclusively under the owning DFA's edgeMutex()
+    // (never via the lock-free getEdge path), so freeing the old table here
+    // cannot race a concurrent reader.
     delete[] edges;
     edges = newEdges;
   }

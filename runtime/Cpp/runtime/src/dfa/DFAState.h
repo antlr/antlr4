@@ -116,8 +116,8 @@ namespace dfa {
     /// {@code edges[symbol]} points to the target state for that symbol. The
     /// table is allocated lazily at a fixed size and its slots are published
     /// with release/read with acquire, so getEdge() needs no lock. Allocation,
-    /// growth and stores (setEdge) must be serialized by the caller through
-    /// ATN::_edgeMutex.
+    /// growth and stores (setEdge) must be serialized by the caller through the
+    /// owning DFA's edgeMutex() (dfa::DFA::edgeMutex).
 
     /// Lock-free read of the edge for the given (already offset) index, or
     /// nullptr if there is no such edge yet. Safe to call without any lock.
@@ -135,8 +135,8 @@ namespace dfa {
     /// Store an edge. `minSize` is the natural full size of the table for this
     /// DFA kind (the lexer char range, or maxTokenType+2 for the parser, whose
     /// edges are indexed by t+1 so EOF lands in slot 0); the table is
-    /// grown to at least `index + 1` if needed. The caller MUST hold the
-    /// ATN::_edgeMutex write lock. Lexer/parser tables are allocated once at
+    /// grown to at least `index + 1` if needed. The caller MUST hold the owning
+    /// DFA's edgeMutex() write lock. Lexer/parser tables are allocated once at
     /// `minSize` and never reallocated, so concurrent lock-free getEdge() calls
     /// never observe a moved table; only the precedence start state grows, and
     /// it is read exclusively under the lock.
