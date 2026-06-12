@@ -62,10 +62,10 @@ public class Interpreter {
 
 	public Interpreter(String[] args) throws Exception {
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.gui.Intrepreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
-					"  [-tokens] [-tree] [-gui] [-encoding encodingname]\n" +
-					"  [-trace] [-profile filename.csv] [input-filename(s)]");
-			System.err.println("Omitting input-filename makes rig read from stdin.");
+			System.err.println("java org.antlr.v4.gui.Interpreter [X.g4|XParser.g4 XLexer.g4] startRuleName\n" +
+				"  [-tokens] [-tree] [-gui] [-encoding encodingname]\n" +
+				"  [-trace] [-profile filename.csv] [source-code-file(s)]");
+			System.err.println("Omitting source-code-file makes the tool read from stdin.");
 			return;
 		}
 		int i=0;
