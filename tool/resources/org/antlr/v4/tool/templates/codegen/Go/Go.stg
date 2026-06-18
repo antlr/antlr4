@@ -1564,6 +1564,10 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	l.LiteralNames = staticData.LiteralNames
 	l.SymbolicNames = staticData.SymbolicNames
 	l.GrammarFileName = "<lexer.grammarFileName>"
+	<if(namedActions.structconstruction)>
+	// Grammar author supplied struct members construction code.
+	<namedActions.structconstruction>
+	<endif>
 	// TODO: l.EOF = antlr.TokenEOF
 
 	return l
