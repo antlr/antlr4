@@ -1,6 +1,8 @@
 #[rustfmt::skip]
 mod gen {
     #![allow(non_snake_case)]
+    // Generated parsers/lexers: lint with the codegen template, not here.
+    #![allow(clippy::all)]
     pub mod csvlexer;
     pub mod csvlistener;
     pub mod csvparser;
@@ -169,7 +171,7 @@ fn test_should_not_visit_eof() {
             }
         }
         let mut visitor_unit = TestVisitorUnit(String::new());
-        let _ = visitor_unit.visit(root).unwrap();
+        visitor_unit.visit(root).unwrap();
         assert_eq!(
             visitor_unit.0,
             "[@0,0:0='A',<1>,1:0][@1,1:0='<EOF>',<-1>,1:1]"
@@ -237,15 +239,15 @@ fn test_visitor_with_return() {
             &mut self,
             ctx: &SContext<'input, 'arena, Tok>,
         ) -> Result<Self::Return, ANTLRError> {
-            self.visit(&*ctx.expr().unwrap())
+            self.visit(ctx.expr().unwrap())
         }
 
         fn visit_add(
             &mut self,
             ctx: &AddContext<'input, 'arena, Tok>,
         ) -> Result<Self::Return, ANTLRError> {
-            let left = self.visit(&*ctx.expr(0).unwrap())?;
-            let right = self.visit(&*ctx.expr(1).unwrap())?;
+            let left = self.visit(ctx.expr(0).unwrap())?;
+            let right = self.visit(ctx.expr(1).unwrap())?;
             if ctx.ADD().is_some() {
                 Ok(left + right)
             } else {
@@ -264,8 +266,8 @@ fn test_visitor_with_return() {
             &mut self,
             ctx: &MultiplyContext<'input, 'arena, Tok>,
         ) -> Result<Self::Return, ANTLRError> {
-            let left = self.visit(&*ctx.expr(0).unwrap())?;
-            let right = self.visit(&*ctx.expr(1).unwrap())?;
+            let left = self.visit(ctx.expr(0).unwrap())?;
+            let right = self.visit(ctx.expr(1).unwrap())?;
             if ctx.MUL().is_some() {
                 Ok(left * right)
             } else {
@@ -360,7 +362,7 @@ fn test_visitor_retrieve_reference() {
         }
     }
 
-    fn parse<'a>(input: &'a str) -> i32 {
+    fn parse(input: &str) -> i32 {
         Arena::with(|arena| {
             let lexer = CSVLexer::<_, CommonTokenFactory>::new(arena, InputStream::new(input));
             let token_source = CommonTokenStream::new(lexer);

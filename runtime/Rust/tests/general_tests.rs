@@ -9,6 +9,8 @@
 
 #[rustfmt::skip]
 mod gen {
+    // Generated parsers/lexers: lint with the codegen template, not here.
+    #![allow(clippy::all)]
     pub mod csvlexer;
     pub mod csvlistener;
     pub mod csvparser;
@@ -544,7 +546,7 @@ fn test_recursion_limit() {
         let mut parser = LabelsParser::new(arena, token_source);
         parser.set_recursion_limit(100);
         let result = parser.s().unwrap_err();
-        eprintln!("result: {}", result.to_string());
+        eprintln!("result: {}", result);
         assert!(result
             .to_string()
             .contains("Recursion limit of 100 exceeded"));
