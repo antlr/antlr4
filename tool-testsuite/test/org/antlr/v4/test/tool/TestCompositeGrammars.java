@@ -383,6 +383,26 @@ public class TestCompositeGrammars {
 		assertEquals(0, equeue.size());
 	}
 
+	@Test public void testTokenVocabWithPathIsRejected(@TempDir Path tempDir) {
+		String tempDirPath = tempDir.toString();
+		FileUtils.mkdir(tempDirPath);
+		String outsideDir = tempDirPath + "/outside";
+		FileUtils.mkdir(outsideDir);
+		writeFile(outsideDir, "secret.tokens", "NOT_A_TOKEN_FILE=hunter2\n");
+
+		String workDir = tempDirPath + "/work";
+		FileUtils.mkdir(workDir);
+		String parser =
+			"parser grammar P;\n" +
+			"options {tokenVocab='../outside/secret';}\n" +
+			"s : A ;\n";
+		writeFile(workDir, "P.g4", parser);
+
+		ErrorQueue equeue = Generator.antlrOnString(workDir, "Java", "P.g4", false);
+		assertEquals(1, equeue.errors.size());
+		assertEquals(ErrorType.INVALID_TOKEN_VOCAB_NAME, equeue.errors.get(0).getErrorType());
+	}
+
 	@Test public void testImportedTokenVocabIgnoredWithWarning(@TempDir Path tempDir) throws RecognitionException {
 		String tempDirPath = tempDir.toString();
 		ErrorQueue equeue = new ErrorQueue();
