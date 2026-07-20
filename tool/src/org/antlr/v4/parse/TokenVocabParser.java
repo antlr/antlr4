@@ -36,11 +36,24 @@ public class TokenVocabParser {
 	public Map<String,Integer> load() {
 		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
 		int maxTokenType = -1;
+		Tool tool = g.tool;
+		String vocabName = g.getOptionString("tokenVocab");
+		if ( !isPlainVocabName(vocabName) ) {
+			GrammarAST inTree = g.ast.getOptionAST("tokenVocab");
+			if ( inTree!=null ) {
+				tool.errMgr.grammarError(ErrorType.INVALID_TOKEN_VOCAB_NAME,
+										 g.fileName,
+										 inTree.getToken(),
+										 vocabName);
+			}
+			else { // must be from -D option on cmd-line not token in tree
+				tool.errMgr.toolError(ErrorType.INVALID_TOKEN_VOCAB_NAME, vocabName);
+			}
+			return tokens;
+		}
 		File fullFile = getImportedVocabFile();
 		FileInputStream fis = null;
 		BufferedReader br = null;
-		Tool tool = g.tool;
-		String vocabName = g.getOptionString("tokenVocab");
 		try {
 			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
 			fis = new FileInputStream(fullFile);
@@ -120,6 +133,16 @@ public class TokenVocabParser {
 			}
 		}
 		return tokens;
+	}
+
+	/** A {@code tokenVocab} value names a grammar, and {@link #getImportedVocabFile}
+	 *  resolves it against the lib, output and grammar directories.  A name
+	 *  carrying a path separator escapes all three, so only plain names are
+	 *  accepted here.
+	 */
+	public static boolean isPlainVocabName(String vocabName) {
+		return vocabName!=null && !vocabName.isEmpty() &&
+			   vocabName.indexOf('/')<0 && vocabName.indexOf('\\')<0;
 	}
 
 	/** Return a File descriptor for vocab file.  Look in library or
