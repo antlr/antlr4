@@ -393,16 +393,20 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     }
     // look for replaces where iop.index is in range; error
     std::vector<ReplaceOp*> prevReplaces = getKindOfOps<ReplaceOp>(rewrites, i);
+    bool dropIop = false;
     for (auto *rop : prevReplaces) {
       if (iop->index == rop->index) {
         rop->text = catOpText(&iop->text, &rop->text);
-        delete rewrites[i];
-        rewrites[i] = nullptr; // delete current insert
+        dropIop = true; // delete current insert
         continue;
       }
       if (iop->index >= rop->index && iop->index <= rop->lastIndex) {
         throw IllegalArgumentException("insert op " + iop->toString() + " within boundaries of previous " + rop->toString());
       }
+    }
+    if (dropIop) {
+      delete rewrites[i];
+      rewrites[i] = nullptr;
     }
   }
 
