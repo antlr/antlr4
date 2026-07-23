@@ -18,8 +18,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -283,7 +286,7 @@ class GrammarDependencies {
             log.debug("Load grammars dependency status: " + statusFile);
 
             try {
-                ObjectInputStream in = new ObjectInputStream(new FileInputStream(
+                ObjectInputStream in = createRestrictedInputStream(new FileInputStream(
                             statusFile));
 
                 try {
@@ -302,6 +305,36 @@ class GrammarDependencies {
         }
 
         return new HashMap<File, Map.Entry<byte[], Collection<String>>>();
+    }
+
+    /** Classes that legitimately appear in a serialized dependency status file. */
+    private static final Set<String> ALLOWED_STATUS_CLASSES = new HashSet<String>(Arrays.asList(
+        "java.util.HashMap",
+        "java.util.HashSet",
+        "java.util.ArrayList",
+        "java.util.AbstractMap$SimpleImmutableEntry",
+        "java.io.File",
+        "java.lang.String",
+        "java.lang.Number",
+        "[B"));
+
+    /**
+     * Reads the dependency status file while refusing any class outside
+     * {@link #ALLOWED_STATUS_CLASSES}. The status file lives in the build output
+     * directory, so a crafted copy would otherwise let arbitrary serializable
+     * classes be instantiated during the build.
+     */
+    static ObjectInputStream createRestrictedInputStream(InputStream in) throws IOException {
+        return new ObjectInputStream(in) {
+            @Override
+            protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                String name = desc.getName();
+                if (!ALLOWED_STATUS_CLASSES.contains(name)) {
+                    throw new InvalidClassException("Unsupported class in dependency status", name);
+                }
+                return super.resolveClass(desc);
+            }
+        };
     }
 
     private String stripPath(String str) {
