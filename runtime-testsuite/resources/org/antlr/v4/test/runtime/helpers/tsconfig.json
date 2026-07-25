@@ -4,8 +4,5 @@
     "moduleResolution": "node",
     "target": "ES6",
     "noImplicitAny": true,
-  },
-  "ts-node": {
-    "esm": true
   }
 }
