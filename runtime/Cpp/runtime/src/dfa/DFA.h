@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 #include <vector>
 #include <string>
 #include <cstddef>
 #include "antlr4-common.h"
 #include "dfa/DFAState.h"
+#include "internal/Synchronization.h"
 
 namespace antlr4 {
 namespace dfa {
@@ -89,12 +91,31 @@ namespace dfa {
 
     std::string toLexerString() const;
 
+    /// Locks guarding writes to THIS DFA: stateMutex() serializes state-set
+    /// insertion (addDFAState), edgeMutex() serializes edge-table allocation and
+    /// stores (DFAState::setEdge). Lock-free DFAState::getEdge() reads need
+    /// neither. These live on the DFA — not the ATN — so independent DFAs (each
+    /// interpreter owns its own decisionToDFA) never serialize against one
+    /// another; a DFA shared across threads (generated recognizers' static
+    /// decisionToDFA) still serializes its own writers, as before, but now at
+    /// per-decision rather than per-ATN granularity.
+    internal::SharedMutex &stateMutex() const noexcept { return *_stateMutex; }
+    internal::SharedMutex &edgeMutex() const noexcept { return *_edgeMutex; }
+
   private:
     /**
      * {@code true} if this DFA is for a precedence decision; otherwise,
      * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
      */
     bool _precedenceDfa;
+
+    // Heap-allocated so DFA stays movable (SharedMutex is neither movable nor
+    // copyable). A moved-into DFA gets fresh locks via these initializers; DFAs
+    // are only moved empty during decisionToDFA construction, before any parse.
+    std::unique_ptr<internal::SharedMutex> _stateMutex =
+        std::make_unique<internal::SharedMutex>();
+    std::unique_ptr<internal::SharedMutex> _edgeMutex =
+        std::make_unique<internal::SharedMutex>();
   };
 
 } // namespace atn

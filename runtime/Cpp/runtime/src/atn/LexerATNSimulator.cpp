@@ -80,7 +80,7 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   const dfa::DFA &dfa = _decisionToDFA[mode];
   dfa::DFAState* s0;
   {
-    SharedLock<SharedMutex> stateLock(atn._stateMutex);
+    SharedLock<SharedMutex> stateLock(dfa.stateMutex());
     s0 = dfa.s0;
   }
   if (s0 == nullptr) {
@@ -181,19 +181,18 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
 }
 
 dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_t t) {
-  dfa::DFAState* retval = nullptr;
-  SharedLock<SharedMutex> edgeLock(atn._edgeMutex);
-  if (t <= MAX_DFA_EDGE) {
-    auto iterator = s->edges.find(t - MIN_DFA_EDGE);
-#if LEXER_DEBUG_ATN == 1
-    if (iterator != s->edges.end()) {
-      std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
-    }
-#endif
-
-    if (iterator != s->edges.end())
-      retval = iterator->second;
+  if (t > MAX_DFA_EDGE) {
+    return nullptr;
   }
+  // Lock-free: the edge table is published with release in addDFAEdge and read
+  // here with acquire (see DFAState::getEdge). A benign miss (null) just causes
+  // the target to be recomputed, mirroring the Java runtime.
+  dfa::DFAState *retval = s->getEdge(t - MIN_DFA_EDGE);
+#if LEXER_DEBUG_ATN == 1
+  if (retval != nullptr) {
+    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << retval->stateNumber << std::endl;
+  }
+#endif
   return retval;
 }
 
@@ -528,8 +527,8 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  UniqueLock<SharedMutex> edgeLock(atn._edgeMutex);
-  p->edges[t - MIN_DFA_EDGE] = q; // connect
+  UniqueLock<SharedMutex> edgeLock(_decisionToDFA[_mode].edgeMutex());
+  p->setEdge(t - MIN_DFA_EDGE, MAX_DFA_EDGE - MIN_DFA_EDGE + 1, q); // connect
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
@@ -560,7 +559,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
   {
-    UniqueLock<SharedMutex> stateLock(atn._stateMutex);
+    UniqueLock<SharedMutex> stateLock(dfa.stateMutex());
     auto [existing, inserted] = dfa.states.insert(proposed);
     if (!inserted) {
       delete proposed;

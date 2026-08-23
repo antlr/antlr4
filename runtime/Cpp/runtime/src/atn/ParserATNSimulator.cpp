@@ -127,11 +127,11 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
 
   dfa::DFAState *s0;
   {
-    SharedLock<SharedMutex> stateLock(atn._stateMutex);
+    SharedLock<SharedMutex> stateLock(dfa.stateMutex());
     if (dfa.isPrecedenceDfa()) {
       // the start state for a precedence DFA depends on the current
       // parser precedence, and is provided by a DFA method.
-      SharedLock<SharedMutex> edgeLock(atn._edgeMutex);
+      SharedLock<SharedMutex> edgeLock(dfa.edgeMutex());
       s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
     } else {
       // the start state for a "regular" DFA is just s0
@@ -143,7 +143,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     auto s0_closure = computeStartState(dfa.atnStartState, &ParserRuleContext::EMPTY, false);
     std::unique_ptr<dfa::DFAState> newState;
     std::unique_ptr<dfa::DFAState> oldState;
-    UniqueLock<SharedMutex> stateLock(atn._stateMutex);
+    UniqueLock<SharedMutex> stateLock(dfa.stateMutex());
     dfa::DFAState* ds0 = dfa.s0;
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
@@ -155,7 +155,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       ds0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
       newState = std::make_unique<dfa::DFAState>(applyPrecedenceFilter(ds0->configs.get()));
       s0 = addDFAState(dfa, newState.get());
-      UniqueLock<SharedMutex> edgeLock(atn._edgeMutex);
+      UniqueLock<SharedMutex> edgeLock(dfa.edgeMutex());
       dfa.setPrecedenceStartState(parser->getPrecedence(), s0);
     } else {
       newState = std::make_unique<dfa::DFAState>(std::move(s0_closure));
@@ -292,11 +292,10 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
-  dfa::DFAState* retval;
-  SharedLock<SharedMutex> edgeLock(atn._edgeMutex);
-  auto iterator = previousD->edges.find(t);
-  retval = (iterator == previousD->edges.end()) ? nullptr : iterator->second;
-  return retval;
+  // Lock-free acquire read (see DFAState::getEdge). Edges are indexed by t + 1 so
+  // EOF (t == SIZE_MAX) maps to slot 0, matching the generated parser; a miss
+  // yields nullptr and the target is recomputed.
+  return previousD->getEdge(t + 1);
 }
 
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) {
@@ -1294,16 +1293,18 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   {
-    UniqueLock<SharedMutex> stateLock(atn._stateMutex);
+    UniqueLock<SharedMutex> stateLock(dfa.stateMutex());
     to = addDFAState(dfa, to); // used existing if possible not incoming
   }
-  if (from == nullptr || t > (int)atn.maxTokenType) {
+  if (from == nullptr || t < -1 || t > (int)atn.maxTokenType) {
     return to;
   }
 
   {
-    UniqueLock<SharedMutex> edgeLock(atn._edgeMutex);
-    from->edges[t] = to; // connect
+    UniqueLock<SharedMutex> edgeLock(dfa.edgeMutex());
+    // Edges are indexed by t + 1 so EOF (t == -1) lands in slot 0; the table
+    // therefore needs maxTokenType + 2 slots.
+    from->setEdge(t + 1, atn.maxTokenType + 2, to); // connect
   }
 
 #if DFA_DEBUG == 1

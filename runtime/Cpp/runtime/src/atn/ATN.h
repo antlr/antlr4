@@ -130,9 +130,11 @@ namespace atn {
     friend class LexerATNSimulator;
     friend class ParserATNSimulator;
 
+    // Guards the lazy nextTokens cache (ATNState::_nextTokenWithinRule). The
+    // DFA state/edge write locks formerly here were moved onto the DFA itself
+    // (see dfa::DFA::stateMutex/edgeMutex) so concurrent parses with independent
+    // DFAs no longer serialize on a single per-ATN lock.
     mutable internal::Mutex _mutex;
-    mutable internal::SharedMutex _stateMutex;
-    mutable internal::SharedMutex _edgeMutex;
   };
 
 } // namespace atn
