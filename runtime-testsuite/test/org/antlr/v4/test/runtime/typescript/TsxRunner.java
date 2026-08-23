@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import static org.antlr.v4.test.runtime.FileUtils.writeFile;
 import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
 
-public class TsNodeRunner extends RuntimeRunner {
+public class TsxRunner extends RuntimeRunner {
 
 	/* TypeScript runtime is the same as JavaScript runtime */
 	private final static String NORMALIZED_JAVASCRIPT_RUNTIME_PATH = getRuntimePath("JavaScript").replace('\\', '/');
@@ -30,12 +30,12 @@ public class TsNodeRunner extends RuntimeRunner {
 
 	@Override
 	protected void initRuntime(RunOptions runOptions) throws Exception {
-		npmInstallTsNodeAndWebpack();
+		npmInstallTsxAndWebpack();
 		npmLinkRuntime();
 	}
 
-	private void npmInstallTsNodeAndWebpack() throws Exception {
-		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "typescript", "ts-node", "webpack", "webpack-cli"}, null);
+	private void npmInstallTsxAndWebpack() throws Exception {
+		Processor.run(new String[] {NPM_EXEC, "--silent", "install", "-g", "tsx", "webpack", "webpack-cli"}, null);
 	}
 
 	private void npmLinkRuntime() throws Exception {
@@ -57,7 +57,7 @@ public class TsNodeRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "ts-node"  + (isWindows() ? ".cmd" : ""); }
+	public String getRuntimeToolName() { return "tsx" + (isWindows() ? ".cmd" : ""); }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {

@@ -292,11 +292,10 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
-  dfa::DFAState* retval;
-  SharedLock<SharedMutex> edgeLock(atn._edgeMutex);
-  auto iterator = previousD->edges.find(t);
-  retval = (iterator == previousD->edges.end()) ? nullptr : iterator->second;
-  return retval;
+  // Lock-free acquire read (see DFAState::getEdge). Edges are indexed by t + 1 so
+  // EOF (t == SIZE_MAX) maps to slot 0, matching the generated parser; a miss
+  // yields nullptr and the target is recomputed.
+  return previousD->getEdge(t + 1);
 }
 
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) {
@@ -1297,13 +1296,15 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
     UniqueLock<SharedMutex> stateLock(atn._stateMutex);
     to = addDFAState(dfa, to); // used existing if possible not incoming
   }
-  if (from == nullptr || t > (int)atn.maxTokenType) {
+  if (from == nullptr || t < -1 || t > (int)atn.maxTokenType) {
     return to;
   }
 
   {
     UniqueLock<SharedMutex> edgeLock(atn._edgeMutex);
-    from->edges[t] = to; // connect
+    // Edges are indexed by t + 1 so EOF (t == -1) lands in slot 0; the table
+    // therefore needs maxTokenType + 2 slots.
+    from->setEdge(t + 1, atn.maxTokenType + 2, to); // connect
   }
 
 #if DFA_DEBUG == 1

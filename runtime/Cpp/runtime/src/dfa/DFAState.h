@@ -12,8 +12,9 @@
 #include <cstddef>
 #include "antlr4-common.h"
 
+#include <atomic>
+
 #include "atn/ATNConfigSet.h"
-#include "FlatHashMap.h"
 
 namespace antlr4 {
 namespace dfa {
@@ -65,12 +66,6 @@ namespace dfa {
 
     std::unique_ptr<atn::ATNConfigSet> configs;
 
-    /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
-    ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
-    // ml: this is a sparse list, so we use a map instead of a vector.
-    //     Watch out: we no longer have the -1 offset, as it isn't needed anymore.
-    FlatHashMap<size_t, DFAState*> edges;
-
     /// if accept state, what ttype do we match or alt do we predict?
     /// This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
     /// <seealso cref="#requiresFullContext"/>.
@@ -112,6 +107,41 @@ namespace dfa {
 
     explicit DFAState(std::unique_ptr<atn::ATNConfigSet> configs) : configs(std::move(configs)) {}
 
+    DFAState(const DFAState&) = delete;
+    DFAState& operator=(const DFAState&) = delete;
+
+    ~DFAState();
+
+    /// Outgoing DFA edges, mirroring Java's {@code DFAState.edges} array:
+    /// {@code edges[symbol]} points to the target state for that symbol. The
+    /// table is allocated lazily at a fixed size and its slots are published
+    /// with release/read with acquire, so getEdge() needs no lock. Allocation,
+    /// growth and stores (setEdge) must be serialized by the caller through
+    /// ATN::_edgeMutex.
+
+    /// Lock-free read of the edge for the given (already offset) index, or
+    /// nullptr if there is no such edge yet. Safe to call without any lock.
+    DFAState *getEdge(size_t index) const noexcept {
+      std::atomic<DFAState *> *edges = _edges.load(std::memory_order_acquire);
+      if (edges == nullptr || index >= _edgeCount.load(std::memory_order_acquire)) {
+        return nullptr;
+      }
+      return edges[index].load(std::memory_order_acquire);
+    }
+
+    /// Number of edge slots currently allocated (for serialization/iteration).
+    size_t edgeCount() const noexcept { return _edgeCount.load(std::memory_order_acquire); }
+
+    /// Store an edge. `minSize` is the natural full size of the table for this
+    /// DFA kind (the lexer char range, or maxTokenType+2 for the parser, whose
+    /// edges are indexed by t+1 so EOF lands in slot 0); the table is
+    /// grown to at least `index + 1` if needed. The caller MUST hold the
+    /// ATN::_edgeMutex write lock. Lexer/parser tables are allocated once at
+    /// `minSize` and never reallocated, so concurrent lock-free getEdge() calls
+    /// never observe a moved table; only the precedence start state grows, and
+    /// it is read exclusively under the lock.
+    void setEdge(size_t index, size_t minSize, DFAState *target);
+
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this
     ///  DFA state.
@@ -134,6 +164,12 @@ namespace dfa {
     bool equals(const DFAState &other) const;
 
     std::string toString() const;
+
+  private:
+    // Array of `_edgeCount` atomic edge slots, or nullptr before the first
+    // edge is added. Owned by this state and freed in the destructor.
+    std::atomic<std::atomic<DFAState *> *> _edges{nullptr};
+    std::atomic<size_t> _edgeCount{0};
   };
 
   inline bool operator==(const DFAState &lhs, const DFAState &rhs) {

@@ -69,11 +69,14 @@ bool DFA::isPrecedenceDfa() const {
 DFAState* DFA::getPrecedenceStartState(int precedence) const {
   assert(_precedenceDfa); // Only precedence DFAs may contain a precedence start state.
 
-  auto iterator = s0->edges.find(precedence);
-  if (iterator == s0->edges.end())
+  if (precedence < 0) {
     return nullptr;
+  }
 
-  return iterator->second;
+  // Read under ATN::_edgeMutex (held by the caller); the precedence start-state
+  // table is the only edge table that grows, and it is never read via the
+  // lock-free getEdge path used by the lexer/parser simulators.
+  return s0->getEdge(static_cast<size_t>(precedence));
 }
 
 void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
@@ -85,7 +88,7 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
     return;
   }
 
-  s0->edges[precedence] = startState;
+  s0->setEdge(static_cast<size_t>(precedence), static_cast<size_t>(precedence) + 1, startState);
 }
 
 std::vector<DFAState *> DFA::getStates() const {
