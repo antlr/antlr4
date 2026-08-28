@@ -1,0 +1,61 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Inclusive interval a..b, matching org.antlr.v4.runtime.misc.Interval.
+
+(defrecord Interval [a :i64 b :i64])
+
+(defn interval-of [a :i64 b :i64] [:ref :antlr4.runtime/Interval]
+  (->Interval a b))
+
+(defn interval-invalid [] [:ref :antlr4.runtime/Interval]
+  (->Interval -1 -2))
+
+(defn i64-min [x :i64 y :i64] :i64
+  (if (< x y) x y))
+
+(defn i64-max [x :i64 y :i64] :i64
+  (if (< x y) y x))
+
+(defn interval-length [i [:ref :antlr4.runtime/Interval]] :i64
+  (if (< (:b i) (:a i))
+    0
+    (inc (- (:b i) (:a i)))))
+
+(defn interval-equals [i [:ref :antlr4.runtime/Interval]
+                       o [:ref :antlr4.runtime/Interval]] :bool
+  (and (= (:a i) (:a o)) (= (:b i) (:b o))))
+
+(defn interval-hash [i [:ref :antlr4.runtime/Interval]] :i64
+  (+ (* (+ (* 23 31) (:a i)) 31) (:b i)))
+
+(defn interval-starts-before-disjoint [i [:ref :antlr4.runtime/Interval]
+                                       o [:ref :antlr4.runtime/Interval]] :bool
+  (and (< (:a i) (:a o)) (< (:b i) (:a o))))
+
+(defn interval-starts-after-disjoint [i [:ref :antlr4.runtime/Interval]
+                                      o [:ref :antlr4.runtime/Interval]] :bool
+  (> (:a i) (:b o)))
+
+(defn interval-disjoint [i [:ref :antlr4.runtime/Interval]
+                         o [:ref :antlr4.runtime/Interval]] :bool
+  (or (interval-starts-before-disjoint i o)
+      (interval-starts-after-disjoint i o)))
+
+(defn interval-adjacent [i [:ref :antlr4.runtime/Interval]
+                         o [:ref :antlr4.runtime/Interval]] :bool
+  (or (= (:a i) (inc (:b o)))
+      (= (:b i) (dec (:a o)))))
+
+(defn interval-contains [i [:ref :antlr4.runtime/Interval]
+                         o [:ref :antlr4.runtime/Interval]] :bool
+  (and (>= (:a o) (:a i)) (<= (:b o) (:b i))))
+
+(defn interval-union [i [:ref :antlr4.runtime/Interval]
+                      o [:ref :antlr4.runtime/Interval]] [:ref :antlr4.runtime/Interval]
+  (->Interval (i64-min (:a i) (:a o)) (i64-max (:b i) (:b o))))
+
+(defn interval-intersection [i [:ref :antlr4.runtime/Interval]
+                             o [:ref :antlr4.runtime/Interval]] [:ref :antlr4.runtime/Interval]
+  (->Interval (i64-max (:a i) (:a o)) (i64-min (:b i) (:b o))))

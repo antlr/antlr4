@@ -1,0 +1,118 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; ATN-less lexer state. nextToken lives in tiny_lexer.kotoba and
+;; implements the vendored Tiny.g4 fixture by direct scanning.
+
+(defrecord Lexer
+  [input [:ref :antlr4.runtime/CharStream]
+   line :i64
+   column :i64
+   tokenIndex :i64])
+
+(defrecord TokenResult
+  [token [:ref :antlr4.runtime/CommonToken]
+   lexer [:ref :antlr4.runtime/Lexer]])
+
+(defn lexer-from-string [data :string] [:ref :antlr4.runtime/Lexer]
+  (->Lexer (from-string data) 1 0 0))
+
+(defn lexer-input [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/CharStream]
+  (:input lex))
+
+(defn lexer-la [lex [:ref :antlr4.runtime/Lexer] offset :i64] :i64
+  (stream-la (:input lex) offset))
+
+(defn code-at [data :string size :i64 pos :i64] :i64
+  (if (or (< pos 0) (>= pos size))
+    token-eof
+    (string-code-point-at data pos)))
+
+(defn is-ws [c :i64] :bool
+  (or (= c 32) (or (= c 9) (or (= c 10) (= c 13)))))
+
+(defn is-letter [c :i64] :bool
+  (or (and (>= c 65) (<= c 90))
+      (or (and (>= c 97) (<= c 122))
+          (= c 95))))
+
+(defn is-digit [c :i64] :bool
+  (and (>= c 48) (<= c 57)))
+
+(defn is-id-part [c :i64] :bool
+  (or (is-letter c) (is-digit c)))
+
+(defn end-while-ws [data :string size :i64 start :i64] :i64
+  (loop [i start]
+    (if (is-ws (code-at data size i))
+      (recur (inc i))
+      i)))
+
+(defn end-while-id [data :string size :i64 start :i64] :i64
+  (loop [i start]
+    (if (is-id-part (code-at data size i))
+      (recur (inc i))
+      i)))
+
+(defn end-while-digit [data :string size :i64 start :i64] :i64
+  (loop [i start]
+    (if (is-digit (code-at data size i))
+      (recur (inc i))
+      i)))
+
+(defn count-newlines [data :string start :i64 end :i64] :i64
+  (loop [i start n 0]
+    (if (>= i end)
+      n
+      (recur (inc i)
+             (if (= (string-code-point-at data i) 10) (inc n) n)))))
+
+(defn column-after [data :string start :i64 end :i64 start-col :i64] :i64
+  (loop [i start col start-col]
+    (if (>= i end)
+      col
+      (recur (inc i)
+             (if (= (string-code-point-at data i) 10) 0 (inc col))))))
+
+(defn lexer-advance [lex [:ref :antlr4.runtime/Lexer] idx :i64] [:ref :antlr4.runtime/Lexer]
+  (let [inp (:input lex)
+        n (- idx (:index inp))]
+    (->Lexer (stream-seek inp idx) (:line lex) (+ (:column lex) n) (:tokenIndex lex))))
+
+(defn lexer-skip-to [lex [:ref :antlr4.runtime/Lexer] idx :i64] [:ref :antlr4.runtime/Lexer]
+  (let [inp (:input lex)
+        start (:index inp)
+        line (+ (:line lex) (count-newlines (:data inp) start idx))
+        col (column-after (:data inp) start idx (:column lex))]
+    (->Lexer (stream-seek inp idx) line col (:tokenIndex lex))))
+
+(defn lexer-consume [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/Lexer]
+  (lexer-advance lex (inc (:index (:input lex)))))
+
+(defn lexer-bump [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/Lexer]
+  (->Lexer (:input lex) (:line lex) (:column lex) (inc (:tokenIndex lex))))
+
+(defn skip-ws [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/Lexer]
+  (let [inp (:input lex)]
+    (lexer-skip-to lex (end-while-ws (:data inp) (:size inp) (:index inp)))))
+
+(defn consume-id [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/Lexer]
+  (let [inp (:input lex)]
+    (lexer-advance lex (end-while-id (:data inp) (:size inp) (:index inp)))))
+
+(defn consume-int [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/Lexer]
+  (let [inp (:input lex)]
+    (lexer-advance lex (end-while-digit (:data inp) (:size inp) (:index inp)))))
+
+(defn emit-token [lex [:ref :antlr4.runtime/Lexer]
+                  start :i64
+                  type :i64
+                  start-line :i64] [:ref :antlr4.runtime/TokenResult]
+  (let [inp (:input lex)
+        stop (dec (:index inp))
+        start-col (- (:column lex) (inc (- stop start)))
+        tok (->CommonToken type token-default-channel start stop
+                           start-line start-col (:tokenIndex lex)
+                           (stream-get-text inp start stop))]
+    (->TokenResult tok (lexer-bump lex))))

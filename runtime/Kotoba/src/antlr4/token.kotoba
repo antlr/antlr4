@@ -1,0 +1,50 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Token constants and CommonToken. Assembled into ns antlr4.runtime.
+
+(def token-invalid-type 0)
+(def token-epsilon -2)
+(def token-min-user-token-type 1)
+(def token-eof -1)
+(def token-default-channel 0)
+(def token-hidden-channel 1)
+(def token-min-user-channel-value 2)
+
+(defrecord CommonToken
+  [type :i64
+   channel :i64
+   start :i64
+   stop :i64
+   line :i64
+   column :i64
+   tokenIndex :i64
+   text :string])
+
+(defn token-type [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:type t))
+
+(defn token-channel [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:channel t))
+
+(defn token-start [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:start t))
+
+(defn token-stop [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:stop t))
+
+(defn token-line [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:line t))
+
+(defn token-column [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:column t))
+
+(defn token-index [t [:ref :antlr4.runtime/CommonToken]] :i64
+  (:tokenIndex t))
+
+(defn token-text [t [:ref :antlr4.runtime/CommonToken]] :string
+  (:text t))
+
+(defn make-common-token [type :i64 start :i64 stop :i64 text :string] [:ref :antlr4.runtime/CommonToken]
+  (->CommonToken type token-default-channel start stop 1 0 -1 text))
