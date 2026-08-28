@@ -1,0 +1,38 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Vocabulary for the vendored Tiny lexer fixture. A general
+;; VocabularyImpl with string-vector fields is a follow-up: typed
+;; Wasm does not yet admit untyped collection record fields.
+
+(def tiny-max-token-type 7)
+
+(defn tiny-literal-name [token-type :i64] :string
+  (case token-type
+    3 "+"
+    4 "*"
+    5 "("
+    6 ")"
+    ""))
+
+(defn tiny-symbolic-name [token-type :i64] :string
+  (case token-type
+    -1 "EOF"
+    1 "ID"
+    2 "INT"
+    3 "PLUS"
+    4 "STAR"
+    5 "LPAREN"
+    6 "RPAREN"
+    7 "WS"
+    ""))
+
+(defn tiny-display-name [token-type :i64] :string
+  (let [lit (tiny-literal-name token-type)]
+    (if (string=? lit "")
+      (let [sym (tiny-symbolic-name token-type)]
+        (if (string=? sym "")
+          (string-from-i64 token-type)
+          sym))
+      lit)))

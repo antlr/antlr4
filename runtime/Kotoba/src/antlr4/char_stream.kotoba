@@ -1,0 +1,61 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Immutable CharStream over a UTF-8 string. Indexing is by UTF-8
+;; byte offset. ASCII fixtures therefore behave like Java's
+;; code-point stream. consume / seek return a new stream.
+
+(defrecord CharStream [data :string index :i64 size :i64])
+
+(defn from-string [data :string] [:ref :antlr4.runtime/CharStream]
+  (->CharStream data 0 (string-length data)))
+
+(defn stream-index [s [:ref :antlr4.runtime/CharStream]] :i64
+  (:index s))
+
+(defn stream-size [s [:ref :antlr4.runtime/CharStream]] :i64
+  (:size s))
+
+(defn stream-la [s [:ref :antlr4.runtime/CharStream] offset :i64] :i64
+  (if (= offset 0)
+    0
+    (let [off (if (< offset 0) (inc offset) offset)
+          pos (+ (:index s) (dec off))]
+      (if (or (< pos 0) (>= pos (:size s)))
+        token-eof
+        (string-code-point-at (:data s) pos)))))
+
+(defn stream-lt [s [:ref :antlr4.runtime/CharStream] offset :i64] :i64
+  (stream-la s offset))
+
+(defn stream-consume [s [:ref :antlr4.runtime/CharStream]] [:ref :antlr4.runtime/CharStream]
+  (if (>= (:index s) (:size s))
+    (->CharStream (:data s) (:index s) (:size s))
+    (->CharStream (:data s) (inc (:index s)) (:size s))))
+
+(defn stream-seek [s [:ref :antlr4.runtime/CharStream] idx :i64] [:ref :antlr4.runtime/CharStream]
+  (let [n (:size s)
+        i (if (< idx 0) 0 (if (> idx n) n idx))]
+    (->CharStream (:data s) i n)))
+
+(defn stream-reset [s [:ref :antlr4.runtime/CharStream]] [:ref :antlr4.runtime/CharStream]
+  (->CharStream (:data s) 0 (:size s)))
+
+(defn stream-mark [s [:ref :antlr4.runtime/CharStream]] :i64
+  -1)
+
+(defn stream-release [s [:ref :antlr4.runtime/CharStream] marker :i64] :i64
+  marker)
+
+(defn stream-get-text [s [:ref :antlr4.runtime/CharStream] start :i64 stop :i64] :string
+  (let [n (:size s)
+        a (if (< start 0) 0 start)
+        b (if (>= stop n) (dec n) stop)]
+    (if (or (< n 1) (> a b))
+      ""
+      (string-substring (:data s) a (inc b)))))
+
+(defn stream-get-interval [s [:ref :antlr4.runtime/CharStream]
+                           i [:ref :antlr4.runtime/Interval]] :string
+  (stream-get-text s (:a i) (:b i)))

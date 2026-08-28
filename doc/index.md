@@ -51,7 +51,7 @@ For those using Java, here's a great [set of ANTLR in Intellij notes](https://do
 
 * [ANTLR Tool Command Line Options](tool-options.md)
 
-* [Runtime Libraries and Code Generation Targets](targets.md)
+* [Runtime Libraries and Code Generation Targets](targets.md) (includes the [Kotoba](kotoba-target.md) v1 subset)
 
 * [Unicode U+FFFF, U+10FFFF character streams](unicode.md)
 

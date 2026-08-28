@@ -1,0 +1,52 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Hand-written scanner for fixtures/Tiny.g4. Token numbers follow
+;; ANTLR's first-rule-is-1 assignment for that grammar.
+
+(def tiny-id 1)
+(def tiny-int 2)
+(def tiny-plus 3)
+(def tiny-star 4)
+(def tiny-lparen 5)
+(def tiny-rparen 6)
+(def tiny-ws 7)
+
+(defn eof-result [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/TokenResult]
+  (let [idx (:index (:input lex))
+        tok (->CommonToken token-eof token-default-channel idx idx
+                           (:line lex) (:column lex) (:tokenIndex lex)
+                           "<EOF>")]
+    (->TokenResult tok lex)))
+
+(defn match-id [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/TokenResult]
+  (let [start (:index (:input lex))
+        start-line (:line lex)
+        lex2 (consume-id lex)]
+    (emit-token lex2 start tiny-id start-line)))
+
+(defn match-int [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/TokenResult]
+  (let [start (:index (:input lex))
+        start-line (:line lex)
+        lex2 (consume-int lex)]
+    (emit-token lex2 start tiny-int start-line)))
+
+(defn match-one [lex [:ref :antlr4.runtime/Lexer] type :i64] [:ref :antlr4.runtime/TokenResult]
+  (let [start (:index (:input lex))
+        start-line (:line lex)
+        lex2 (lexer-consume lex)]
+    (emit-token lex2 start type start-line)))
+
+(defn next-token [lex [:ref :antlr4.runtime/Lexer]] [:ref :antlr4.runtime/TokenResult]
+  (let [lex (skip-ws lex)
+        c (stream-la (:input lex) 1)]
+    (cond
+      (= c token-eof) (eof-result lex)
+      (is-letter c) (match-id lex)
+      (is-digit c) (match-int lex)
+      (= c 43) (match-one lex tiny-plus)
+      (= c 42) (match-one lex tiny-star)
+      (= c 40) (match-one lex tiny-lparen)
+      (= c 41) (match-one lex tiny-rparen)
+      :else (match-one lex token-invalid-type))))

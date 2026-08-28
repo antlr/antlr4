@@ -77,7 +77,7 @@ ANTLR project lead and supreme dictator for life
 * [Official site](http://www.antlr.org/)
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
-* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python3, JavaScript, TypeScript, Go, C++, Swift, Dart, PHP)
+* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python3, JavaScript, TypeScript, Go, C++, Swift, Dart, PHP; Kotoba v1 is a runtime-only subset — see [Kotoba target](doc/kotoba-target.md))
 * _Note: As of version 4.14, we are dropping support for Python 2. We love the Python
 community, but Python 2 support was officially halted in Jan 2020. More recently,
 GitHub also dropped support for Python 2, which has made it impossible for us to

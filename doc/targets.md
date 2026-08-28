@@ -12,6 +12,7 @@ This page lists the available and upcoming ANTLR runtimes. Please note that you 
 * [Swift](swift-target.md)
 * [PHP](php-target.md)
 * [Dart](dart-target.md)
+* [Kotoba](kotoba-target.md) (v1 subset: Token / CharStream / ATN-less Tiny lexer; no Java-tool codegen yet)
 
 ## Target feature parity
 
