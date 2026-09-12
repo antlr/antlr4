@@ -38,6 +38,18 @@ function(antlr4_generate
 
   set( Antlr4_GeneratedSrcDir ${ANTLR4_GENERATED_SRC_DIR}/${Antlr4_ProjectTarget} )
 
+  # the header directory is needed before the list of generated targets is built
+  if ( (ARGC GREATER_EQUAL 9 ) AND (NOT "${ARGV8}" STREQUAL "") )
+    get_filename_component(Antlr4_GeneratedHeaderDir "${ARGV8}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    set(Antlr4_HeaderDirOption "-header-dir;${Antlr4_GeneratedHeaderDir}")
+    # created next to the source directory, but never removed as it may be shared
+    set(Antlr4_AdditionalOutputDirs "${Antlr4_GeneratedHeaderDir}")
+  else()
+    set(Antlr4_GeneratedHeaderDir ${Antlr4_GeneratedSrcDir})
+    set(Antlr4_HeaderDirOption "")
+    set(Antlr4_AdditionalOutputDirs "")
+  endif ()
+
   get_filename_component(Antlr4_InputFileBaseName ${Antlr4_InputFile} NAME_WE )
 
   list( APPEND Antlr4_GeneratorStatusMessage "Common Include-, Source- and Tokenfiles" )
@@ -65,12 +77,12 @@ function(antlr4_generate
   list( APPEND DependentTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.tokens" )
 
   if ( NOT ${Antlr4_LexerBaseName} STREQUAL "" )
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_LexerBaseName}.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_LexerBaseName}.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_LexerBaseName}.cpp" )
   endif ()
 
   if ( NOT ${Antlr4_ParserBaseName} STREQUAL "" )
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_ParserBaseName}.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_ParserBaseName}.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_ParserBaseName}.cpp" )
   endif ()
 
@@ -79,9 +91,9 @@ function(antlr4_generate
   if ( ( ARGC GREATER_EQUAL 4 ) AND ARGV3 )
     set(Antlr4_BuildListenerOption "-listener")
 
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseListener.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_InputFileBaseName}BaseListener.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseListener.cpp" )
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}Listener.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_InputFileBaseName}Listener.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}Listener.cpp" )
 
     list( APPEND Antlr4_GeneratorStatusMessage ", Listener Include- and Sourcefiles" )
@@ -92,9 +104,9 @@ function(antlr4_generate
   if ( ( ARGC GREATER_EQUAL 5 ) AND ARGV4 )
     set(Antlr4_BuildVisitorOption "-visitor")
 
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseVisitor.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_InputFileBaseName}BaseVisitor.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseVisitor.cpp" )
-    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}Visitor.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedHeaderDir}/${Antlr4_InputFileBaseName}Visitor.h" )
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}Visitor.cpp" )
 
     list( APPEND Antlr4_GeneratorStatusMessage ", Visitor Include- and Sourcefiles" )
@@ -124,6 +136,10 @@ function(antlr4_generate
     set(Antlr4_LibOption "")
   endif ()
 
+  if ( NOT "${Antlr4_HeaderDirOption}" STREQUAL "" )
+    list( APPEND Antlr4_GeneratorStatusMessage ", Headers in ${Antlr4_GeneratedHeaderDir}" )
+  endif ()
+
   if(NOT Java_FOUND)
     message(FATAL_ERROR "Java is required to process grammar or lexer files! - Use 'FIND_PACKAGE(Java COMPONENTS Runtime REQUIRED)'")
   endif()
@@ -140,17 +156,17 @@ function(antlr4_generate
     ${CMAKE_COMMAND} -E remove_directory ${Antlr4_GeneratedSrcDir}
     # Create target directory
     COMMAND
-    ${CMAKE_COMMAND} -E make_directory ${Antlr4_GeneratedSrcDir}
+    ${CMAKE_COMMAND} -E make_directory ${Antlr4_GeneratedSrcDir} ${Antlr4_AdditionalOutputDirs}
     COMMAND
     # Generate files
-    "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR4_JAR_LOCATION}" -Werror -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
+    "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR4_JAR_LOCATION}" -Werror -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_HeaderDirOption} ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     MAIN_DEPENDENCY "${Antlr4_InputFile}"
     DEPENDS ${Antlr4_AdditionalDependencies}
     )
 
   # set output variables in parent scope
-  set( ANTLR4_INCLUDE_DIR_${Antlr4_ProjectTarget} ${Antlr4_GeneratedSrcDir} PARENT_SCOPE)
+  set( ANTLR4_INCLUDE_DIR_${Antlr4_ProjectTarget} ${Antlr4_GeneratedHeaderDir} PARENT_SCOPE)
   set( ANTLR4_SRC_FILES_${Antlr4_ProjectTarget} ${Antlr4_GeneratedTargets} PARENT_SCOPE)
   set( ANTLR4_TOKEN_FILES_${Antlr4_ProjectTarget} ${DependentTargets} PARENT_SCOPE)
   set( ANTLR4_TOKEN_DIRECTORY_${Antlr4_ProjectTarget} ${Antlr4_GeneratedSrcDir} PARENT_SCOPE)

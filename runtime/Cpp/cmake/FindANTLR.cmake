@@ -25,7 +25,7 @@ if(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
 
   macro(ANTLR_TARGET Name InputFile)
     set(ANTLR_OPTIONS LEXER PARSER LISTENER VISITOR)
-    set(ANTLR_ONE_VALUE_ARGS PACKAGE OUTPUT_DIRECTORY DEPENDS_ANTLR)
+    set(ANTLR_ONE_VALUE_ARGS PACKAGE OUTPUT_DIRECTORY HEADER_OUTPUT_DIRECTORY DEPENDS_ANTLR)
     set(ANTLR_MULTI_VALUE_ARGS COMPILE_FLAGS DEPENDS)
     cmake_parse_arguments(ANTLR_TARGET
                           "${ANTLR_OPTIONS}"
@@ -44,21 +44,29 @@ if(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
           ${CMAKE_CURRENT_BINARY_DIR}/antlr4cpp_generated_src/${ANTLR_INPUT})
     endif()
 
+    if(ANTLR_TARGET_HEADER_OUTPUT_DIRECTORY)
+      set(ANTLR_${Name}_HEADER_OUTPUT_DIR ${ANTLR_TARGET_HEADER_OUTPUT_DIRECTORY})
+      list(APPEND ANTLR_TARGET_COMPILE_FLAGS
+           -header-dir ${ANTLR_TARGET_HEADER_OUTPUT_DIRECTORY})
+    else()
+      set(ANTLR_${Name}_HEADER_OUTPUT_DIR ${ANTLR_${Name}_OUTPUT_DIR})
+    endif()
+
     unset(ANTLR_${Name}_CXX_OUTPUTS)
 
     if((ANTLR_TARGET_LEXER AND NOT ANTLR_TARGET_PARSER) OR
        (ANTLR_TARGET_PARSER AND NOT ANTLR_TARGET_LEXER))
       list(APPEND ANTLR_${Name}_CXX_OUTPUTS
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.cpp)
       set(ANTLR_${Name}_OUTPUTS
           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.interp
           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.tokens)
     else()
       list(APPEND ANTLR_${Name}_CXX_OUTPUTS
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.cpp
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Parser.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}Parser.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Parser.cpp)
       list(APPEND ANTLR_${Name}_OUTPUTS
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.interp
@@ -67,18 +75,18 @@ if(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
 
     if(ANTLR_TARGET_LISTENER)
       list(APPEND ANTLR_${Name}_CXX_OUTPUTS
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseListener.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}BaseListener.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseListener.cpp
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Listener.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}Listener.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Listener.cpp)
       list(APPEND ANTLR_TARGET_COMPILE_FLAGS -listener)
     endif()
 
     if(ANTLR_TARGET_VISITOR)
       list(APPEND ANTLR_${Name}_CXX_OUTPUTS
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseVisitor.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}BaseVisitor.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseVisitor.cpp
-           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Visitor.h
+           ${ANTLR_${Name}_HEADER_OUTPUT_DIR}/${ANTLR_INPUT}Visitor.h
            ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Visitor.cpp)
       list(APPEND ANTLR_TARGET_COMPILE_FLAGS -visitor)
     endif()

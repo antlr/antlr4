@@ -119,6 +119,20 @@ public abstract class Target {
 		getCodeGenerator().write(outputFileST, fileName);
 	}
 
+	/** A header file goes to the -header-dir directory when that option is set,
+	 *  without passing through overrides of {@link #genFile(Grammar, ST, String)}.
+	 *  Every other file is written by that method.
+	 */
+	protected void genFile(Grammar g, ST outputFileST, String fileName, SourceType sourceType)
+	{
+		if ( sourceType!=SourceType.HEADER || getCodeGenerator().tool.headerOutputDirectory==null ) {
+			genFile(g, outputFileST, fileName);
+		}
+		else {
+			getCodeGenerator().write(outputFileST, fileName, sourceType);
+		}
+	}
+
 	/** Get a meaningful name for a token type useful during code generation.
 	 *  Literals without associated names are converted to the string equivalent
 	 *  of their integer values. Used to generate x==ID and x==34 type comparisons

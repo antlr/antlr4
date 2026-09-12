@@ -6,6 +6,7 @@ If you invoke the ANTLR tool without command line arguments, you’ll get a help
 $ antlr4
 ANTLR Parser Generator  Version 4.7.1
  -o ___              specify output directory where all output is generated
+ -header-dir ___     specify output directory for generated header files (default: -o dir)
  -lib ___            specify location of grammars, tokens files
  -atn                generate rule augmented transition network diagrams
  -encoding ___       specify grammar file encoding; e.g., euc-jp
@@ -38,6 +39,25 @@ $ ls /tmp/T*
 /tmp/T.tokens /tmp/TListener.java
 /tmp/TBaseListener.java /tmp/TParser.java
 ```
+
+## `-header-dir headerdir`
+
+Only targets that generate header files use this option, which currently means the C++ target. Header files go to this directory, while source files, tokens files and every other output file stay in the `-o` directory. Without the option, header files go to the `-o` directory as well. Other targets ignore the option.
+
+The directory is resolved in the same way as `-o`. A grammar in a subdirectory gets the same subdirectory under the header directory, unless `-Xexact-output-dir` is given.
+
+```bash
+$ antlr4 -Dlanguage=Cpp -o /tmp/src -header-dir /tmp/include T.g4
+$ ls /tmp/src /tmp/include
+/tmp/include:
+TBaseListener.h TLexer.h        TListener.h     TParser.h
+
+/tmp/src:
+T.interp          TBaseListener.cpp TLexer.interp     TListener.cpp
+T.tokens          TLexer.cpp        TLexer.tokens     TParser.cpp
+```
+
+Generated source files include the headers by their bare file names, so add the header directory to the include path when compiling them.
 
 ## `-lib libdir`
 

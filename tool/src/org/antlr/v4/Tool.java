@@ -18,6 +18,7 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -96,6 +97,7 @@ public class Tool {
 
 	public File inputDirectory; // used by mvn plugin but not set by tool itself.
 	public String outputDirectory;
+	public String headerOutputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
@@ -116,6 +118,7 @@ public class Tool {
 
     public final static Option[] optionDefs = {
 		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+		new Option("headerOutputDirectory",       "-header-dir", OptionArgType.STRING, "specify output directory for generated header files (default: -o dir)"),
 		new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
 		new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",             "-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
@@ -251,6 +254,18 @@ public class Tool {
 		}
 		else {
 			outputDirectory = ".";
+		}
+		if ( headerOutputDirectory!=null ) {
+			if (headerOutputDirectory.endsWith("/") ||
+				headerOutputDirectory.endsWith("\\")) {
+				headerOutputDirectory =
+					headerOutputDirectory.substring(0, headerOutputDirectory.length() - 1);
+			}
+			File headerDir = new File(headerOutputDirectory);
+			if (headerDir.exists() && !headerDir.isDirectory()) {
+				errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, headerOutputDirectory);
+				headerOutputDirectory = null;
+			}
 		}
 		if ( libDirectory!=null ) {
 			if (libDirectory.endsWith("/") ||
@@ -770,7 +785,25 @@ public class Tool {
 		}
 		// output directory is a function of where the grammar file lives
 		// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
-		File outputDir = getOutputDirectory(g.fileName);
+		return openOutputFileWriter(getOutputDirectory(g.fileName), fileName);
+	}
+
+	/**
+	 * Like {@link #getOutputFileWriter(Grammar, String)}, but a header file
+	 * goes to the -header-dir directory when that option is set. That header
+	 * file does not pass through overrides of the two-argument method.
+	 */
+	public Writer getOutputFileWriter(Grammar g, String fileName, SourceType sourceType) throws IOException {
+		if ( sourceType!=SourceType.HEADER || headerOutputDirectory==null ) {
+			return getOutputFileWriter(g, fileName);
+		}
+		if (outputDirectory == null) {
+			return new StringWriter();
+		}
+		return openOutputFileWriter(getHeaderOutputDirectory(g.fileName), fileName);
+	}
+
+	private Writer openOutputFileWriter(File outputDir, String fileName) throws IOException {
 		File outputFile = new File(outputDir, fileName);
 
 		if (!outputDir.exists()) {
@@ -815,7 +848,33 @@ public class Tool {
 		if ( exact_output_dir ) {
 			return new_getOutputDirectory(fileNameWithPath);
 		}
+		return resolveOutputDirectory(fileNameWithPath, outputDirectory, haveOutputDir);
+	}
 
+	/**
+	 * Return the location where ANTLR will generate header files for a given
+	 * file. The -header-dir value is resolved with the same rules as -o
+	 * in {@link #getOutputDirectory}. Without -header-dir this is the
+	 * output directory.
+	 *
+	 * @param fileNameWithPath path to input source
+	 */
+	public File getHeaderOutputDirectory(String fileNameWithPath) {
+		if ( headerOutputDirectory==null ) {
+			return getOutputDirectory(fileNameWithPath);
+		}
+		if ( exact_output_dir ) {
+			return resolveExactOutputDirectory(fileNameWithPath, headerOutputDirectory, true);
+		}
+		return resolveOutputDirectory(fileNameWithPath, headerOutputDirectory, true);
+	}
+
+	/** @since 4.7.1 in response to -Xexact-output-dir */
+	public File new_getOutputDirectory(String fileNameWithPath) {
+		return resolveExactOutputDirectory(fileNameWithPath, outputDirectory, haveOutputDir);
+	}
+
+	private static File resolveOutputDirectory(String fileNameWithPath, String baseDirectory, boolean haveBaseDirectory) {
 		File outputDir;
 		String fileDirectory;
 
@@ -835,7 +894,7 @@ public class Tool {
 		else {
 			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
 		}
-		if ( haveOutputDir ) {
+		if ( haveBaseDirectory ) {
 			// -o /tmp /var/lib/t.g4 => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
 			// -o . /usr/lib/t.g4 => ./T.java
@@ -843,15 +902,15 @@ public class Tool {
 				(new File(fileDirectory).isAbsolute() ||
 					fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
 				// somebody set the dir, it takes precendence; write new file there
-				outputDir = new File(outputDirectory);
+				outputDir = new File(baseDirectory);
 			}
 			else {
 				// -o /tmp subdir/t.g4 => /tmp/subdir/T.java
 				if (fileDirectory != null) {
-					outputDir = new File(outputDirectory, fileDirectory);
+					outputDir = new File(baseDirectory, fileDirectory);
 				}
 				else {
-					outputDir = new File(outputDirectory);
+					outputDir = new File(baseDirectory);
 				}
 			}
 		}
@@ -865,8 +924,7 @@ public class Tool {
 		return outputDir;
 	}
 
-	/** @since 4.7.1 in response to -Xexact-output-dir */
-	public File new_getOutputDirectory(String fileNameWithPath) {
+	private static File resolveExactOutputDirectory(String fileNameWithPath, String baseDirectory, boolean haveBaseDirectory) {
 		File outputDir;
 		String fileDirectory;
 
@@ -879,12 +937,12 @@ public class Tool {
 		else {
 			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
 		}
-		if ( haveOutputDir ) {
+		if ( haveBaseDirectory ) {
 			// -o /tmp /var/lib/t.g4 => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
 			// -o . /usr/lib/t.g4 => ./T.java
 			// -o /tmp subdir/t.g4 => /tmp/T.java
-			outputDir = new File(outputDirectory);
+			outputDir = new File(baseDirectory);
 		}
 		else {
 			// they didn't specify a -o dir so just write to location

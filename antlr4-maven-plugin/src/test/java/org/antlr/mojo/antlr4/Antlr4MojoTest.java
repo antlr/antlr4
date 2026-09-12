@@ -313,6 +313,32 @@ public class Antlr4MojoTest {
     }
 
     @Test
+    public void cppHeadersInHeaderOutputDirectory() throws Exception {
+        Path baseDir = resources.getBasedir("cppHeaderDir").toPath();
+        Path generatedSources = baseDir.resolve("target/generated-sources/antlr4");
+        Path generatedHeaders = baseDir.resolve("target/generated-sources/antlr4-include");
+
+        Xpp3Dom headerOutputDirectory = TestMavenRuntime.newParameter("headerOutputDirectory",
+                "target/generated-sources/antlr4-include");
+        Xpp3Dom arguments = new Xpp3Dom("arguments");
+        arguments.addChild(TestMavenRuntime.newParameter("argument", "-Dlanguage=Cpp"));
+
+        MavenProject project = maven.readMavenProject(baseDir.toFile());
+        MavenSession session = maven.newMavenSession(project);
+        MojoExecution exec = maven.newMojoExecution("antlr4", headerOutputDirectory, arguments);
+
+        maven.executeMojo(session, project, exec);
+
+        for (String name : Arrays.asList("TLexer", "TParser", "TListener", "TBaseListener")) {
+            assertTrue(Files.exists(generatedHeaders.resolve("test/" + name + ".h")));
+            assertFalse(Files.exists(generatedHeaders.resolve("test/" + name + ".cpp")));
+            assertTrue(Files.exists(generatedSources.resolve("test/" + name + ".cpp")));
+            assertFalse(Files.exists(generatedSources.resolve("test/" + name + ".h")));
+        }
+        assertTrue(Files.exists(generatedSources.resolve("T.tokens")));
+    }
+
+    @Test
     public void processWhenDependencyRemoved() throws Exception {
         Path baseDir = resources.getBasedir("dependencyRemoved").toPath();
         Path antlrDir = baseDir.resolve("src/main/antlr4");
