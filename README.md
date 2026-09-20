@@ -32,11 +32,11 @@ As such, ANTLR versioning does not strictly follow semver semantics:
 * minor version updates may include minor breaking changes, the policy is to regenerate parsers with every release (4.11 -> 4.12)
 * backwards compatibility is only guaranteed for patch version bumps (4.11.1 -> 4.11.2)
 
-If you use a semver verifier in your CI, you probably want to apply special rules for ANTLR, such as treating minor change as a major change.
+If you use a semver verifier in your CI, you probably want to apply special rules for ANTLR, such as treating minor changes as a major changes.
 
 ## Repo branch structure
 
-The default branch for this repo is [`master`](https://github.com/antlr/antlr4/tree/master), which is the latest stable release and has tags for the various releases; e.g., see release tag [4.9.3](https://github.com/antlr/antlr4/tree/4.9.3).  Branch [`dev`](https://github.com/antlr/antlr4/tree/dev) is where development occurs between releases and all pull requests should be derived from that branch. The `dev` branch is merged back into `master` to cut a release and the release state is tagged (e.g., with `4.10-rc1` or `4.10`.) Visually our process looks roughly like this:
+The default branch for this repo is [`master`](https://github.com/antlr/antlr4/tree/master), which is the latest stable release and has tags for the various releases; e.g., see release tag [4.9.3](https://github.com/antlr/antlr4/tree/4.9.3).  Branch [`dev`](https://github.com/antlr/antlr4/tree/dev) is where development occurs between releases and all pull requests should be derived from that branch. The `dev` branch is merged back into `master` to cut a release and the release state is tagged (e.g., with `4.10-rc1` or `4.10`) Visually our process looks roughly like this:
 
 <img src="doc/images/new-antlr-branches.png" width="500">
 
@@ -54,7 +54,7 @@ The dedicated Go repo is for `go get` and `import` only. Go runtime development 
 ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 * [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and original C# target)
-* [Eric Vergnaud](https://github.com/ericvergnaud) (Javascript, TypeScript, Python2, Python3 targets and maintenance of C# target)
+* [Eric Vergnaud](https://github.com/ericvergnaud) (JavaScript, TypeScript, Python2, Python3 targets and maintenance of C# target)
 * [Peter Boyer](https://github.com/pboyer) (Go target)
 * [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
 * Dan McLaughlin (C++ initial target)
@@ -64,7 +64,7 @@ ANTLR project lead and supreme dictator for life
 * [Ben Hamilton](https://github.com/bhamiltoncx) (Full Unicode support in serialized ATN and all languages' runtimes for code points > U+FFFF)
 * [Marcos Passos](https://github.com/marcospassos) (PHP target)
 * [Lingyu Li](https://github.com/lingyv-li) (Dart target)
-* [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and Target performance.
+* [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and target performance.
 * [Justin King](https://github.com/jcking) has done a huge amount of work across multiple targets, but especially for C++.
 * [Ken Domino](https://github.com/kaby76) has a knack for finding bugs/issues and analysis; also a major contributor on the [grammars-v4 repo](https://github.com/antlr/grammars-v4).
 * [Jim Idle](https://github.com/jimidle) has contributed to previous versions of ANTLR and recently jumped back in to solve a major problem with the Go target.
@@ -96,7 +96,7 @@ You might also find the following pages useful, particularly if you want to mess
 
 Programmers run into parsing problems all the time. Whether it’s a data format like JSON, a network protocol like SMTP, a server configuration file for Apache, a PostScript/PDF file, or a simple spreadsheet macro language—ANTLR v4 and this book will demystify the process. ANTLR v4 has been rewritten from scratch to make it easier than ever to build parsers and the language applications built on top. This completely rewritten new edition of the bestselling Definitive ANTLR Reference shows you how to take advantage of these new features.
 
-You can buy the book [The Definitive ANTLR 4 Reference](http://amzn.com/dp/1934356999) at amazon or an [electronic version at the publisher's site](https://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference).
+You can buy the book [The Definitive ANTLR 4 Reference](http://amzn.com/dp/1934356999) at Amazon or an [electronic version at the publisher's site](https://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference).
 
 You will find the [Book source code](http://pragprog.com/titles/tpantlr2/source_code) useful.
 
