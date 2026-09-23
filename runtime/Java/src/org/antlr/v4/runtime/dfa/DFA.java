@@ -97,11 +97,12 @@ public class DFA {
 		}
 
 		// s0.edges is never null for a precedence DFA
-		if (precedence < 0 || precedence >= s0.edges.length) {
+		DFAState[] edges = s0.edges;
+		if (precedence < 0 || precedence >= edges.length) {
 			return null;
 		}
 
-		return s0.edges[precedence];
+		return DFAState.EDGES_ELEMENT.getAcquire(edges, precedence);
 	}
 
 	/**
@@ -132,7 +133,7 @@ public class DFA {
 				s0.edges = Arrays.copyOf(s0.edges, precedence + 1);
 			}
 
-			s0.edges[precedence] = startState;
+			DFAState.EDGES_ELEMENT.setRelease(s0.edges, precedence, startState);
 		}
 	}
 
