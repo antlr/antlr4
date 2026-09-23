@@ -535,7 +535,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			return null;
 		}
 
-		return edges[t + 1];
+		return DFAState.EDGES_ELEMENT.getAcquire(edges, t + 1);
 	}
 
 	/**
@@ -2066,13 +2066,17 @@ public class ParserATNSimulator extends ATNSimulator {
 			return to;
 		}
 
-		synchronized (from) {
-			if ( from.edges==null ) {
-				from.edges = new DFAState[atn.maxTokenType+1+1];
+		DFAState[] edges = from.edges;
+		if (edges == null) {
+			synchronized (from) {
+				edges = from.edges;
+				if (edges == null) {
+					edges = new DFAState[atn.maxTokenType+1+1];
+					from.edges = edges;
+				}
 			}
-
-			from.edges[t+1] = to; // connect
 		}
+		DFAState.EDGES_ELEMENT.setRelease(edges, t + 1, to);
 
 		if ( debug ) {
 			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
