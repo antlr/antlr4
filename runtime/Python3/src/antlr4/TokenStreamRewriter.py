@@ -158,11 +158,12 @@ class TokenStreamRewriter(object):
                     rewrites[prevRop.instructionIndex] = None
                     continue
                 isDisjoint = any((prevRop.last_index<rop.index, prevRop.index>rop.last_index))
-                if all((prevRop.text is None, rop.text is None, not isDisjoint)):
+                # Delete special case of replace (text is empty):
+                # D.i-j.u D.x-y.v | boundaries overlap    combine to max(min)..max(right)
+                if all((not prevRop.text, not rop.text, not isDisjoint)):
                     rewrites[prevRop.instructionIndex] = None
                     rop.index = min(prevRop.index, rop.index)
-                    rop.last_index = min(prevRop.last_index, rop.last_index)
-                    print('New rop {}'.format(rop))
+                    rop.last_index = max(prevRop.last_index, rop.last_index)
                 elif (not(isDisjoint)):
                     raise ValueError("replace op boundaries of {} overlap with previous {}".format(rop, prevRop))
 
@@ -171,13 +172,13 @@ class TokenStreamRewriter(object):
             if any((iop is None, not isinstance(iop, TokenStreamRewriter.InsertBeforeOp))):
                 continue
             prevInserts = [op for op in rewrites[:i] if isinstance(op, TokenStreamRewriter.InsertBeforeOp)]
-            for prev_index, prevIop in enumerate(prevInserts):
+            for prevIop in prevInserts:
                 if prevIop.index == iop.index and type(prevIop) is TokenStreamRewriter.InsertBeforeOp:
                     iop.text += prevIop.text
-                    rewrites[prev_index] = None
+                    rewrites[prevIop.instructionIndex] = None
                 elif prevIop.index == iop.index and type(prevIop) is TokenStreamRewriter.InsertAfterOp:
                     iop.text = prevIop.text + iop.text
-                    rewrites[prev_index] = None
+                    rewrites[prevIop.instructionIndex] = None
             # look for replaces where iop.index is in range; error
             prevReplaces = [op for op in rewrites[:i] if isinstance(op, TokenStreamRewriter.ReplaceOp)]
             for rop in prevReplaces:
@@ -253,3 +254,4 @@ class TokenStreamRewriter(object):
             if self.text:
                 return '<ReplaceOp@{}..{}:"{}">'.format(self.tokens.get(self.index), self.tokens.get(self.last_index),
                                                         self.text)
+            return '<DeleteOp@{}..{}>'.format(self.tokens.get(self.index), self.tokens.get(self.last_index))
