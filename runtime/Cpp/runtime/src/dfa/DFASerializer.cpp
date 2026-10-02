@@ -3,7 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <algorithm>
 #include <sstream>
+#include <utility>
 #include <vector>
 #include <string>
 #include <cstddef>
@@ -23,13 +25,19 @@ std::string DFASerializer::toString() const {
   }
 
   std::stringstream ss;
-  std::vector<DFAState *> states = _dfa->getStates();
+  const std::vector<DFAState *> states = _dfa->getStates();
   for (auto *s : states) {
-    for (size_t i = 0; i < s->edges.size(); i++) {
-      DFAState *t = s->edges[i];
+    // Every runtime emits a state's edges in ascending symbol order, and the
+    // shared runtime tests compare the text. The edges are a hash map here, so
+    // the order has to be put back.
+    std::vector<std::pair<size_t, DFAState *>> edges(s->edges.begin(), s->edges.end());
+    std::sort(edges.begin(), edges.end(),
+              [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
+
+    for (const auto &[symbol, t] : edges) {
       if (t != nullptr && t->stateNumber != INT32_MAX) {
         ss << getStateString(s);
-        std::string label = getEdgeLabel(i);
+        std::string label = getEdgeLabel(symbol);
         ss << "-" << label << "->" << getStateString(t) << "\n";
       }
     }
