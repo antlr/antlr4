@@ -73,6 +73,12 @@ Ref<const PredictionContext> PredictionContextMergeCache::put(
 Ref<const PredictionContext> PredictionContextMergeCache::get(
     const Ref<const PredictionContext> &key1,
     const Ref<const PredictionContext> &key2) const {
+  return get(key1.get(), key2.get());
+}
+
+Ref<const PredictionContext> PredictionContextMergeCache::get(
+    const PredictionContext *key1,
+    const PredictionContext *key2) const {
   assert(key1);
   assert(key2);
 
@@ -81,7 +87,7 @@ Ref<const PredictionContext> PredictionContextMergeCache::get(
     return nullptr;
   }
 
-  auto iterator = _entries.find(std::make_pair(key1.get(), key2.get()));
+  auto iterator = _entries.find(std::make_pair(key1, key2));
   if (iterator == _entries.end()) {
     return nullptr;
   }

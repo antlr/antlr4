@@ -54,6 +54,9 @@ namespace atn {
                                      const Ref<const PredictionContext> &key2,
                                      Ref<const PredictionContext> value);
 
+    Ref<const PredictionContext> get(const PredictionContext *key1,
+                                     const PredictionContext *key2) const;
+
     Ref<const PredictionContext> get(const Ref<const PredictionContext> &key1,
                                      const Ref<const PredictionContext> &key2) const;
 

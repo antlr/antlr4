@@ -225,11 +225,11 @@ Ref<const PredictionContext> PredictionContext::mergeSingletons(Ref<const Single
                                                                 bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache) {
-    auto existing = mergeCache->get(a, b);
+    auto existing = mergeCache->get(a.get(), b.get());
     if (existing) {
       return existing;
     }
-    existing = mergeCache->get(b, a);
+    existing = mergeCache->get(b.get(), a.get());
     if (existing) {
       return existing;
     }
@@ -337,14 +337,14 @@ Ref<const PredictionContext> PredictionContext::mergeRoot(Ref<const SingletonPre
 Ref<const PredictionContext> PredictionContext::mergeArrays(Ref<const ArrayPredictionContext> a, Ref<const ArrayPredictionContext> b,
                                                             bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
   if (mergeCache) {
-    auto existing = mergeCache->get(a, b);
+    auto existing = mergeCache->get(a.get(), b.get());
     if (existing) {
 #if TRACE_ATN_SIM == 1
       std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> previous" << std::endl;
 #endif
       return existing;
     }
-    existing = mergeCache->get(b, a);
+    existing = mergeCache->get(b.get(), a.get());
     if (existing) {
 #if TRACE_ATN_SIM == 1
         std::cout << "mergeArrays a=" << a->toString() << ",b=" << b->toString() << " -> previous" << std::endl;
