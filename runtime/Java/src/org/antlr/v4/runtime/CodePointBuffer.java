@@ -163,6 +163,13 @@ public class CodePointBuffer {
 		}
 
 		public CodePointBuffer build() {
+			if (type == Type.INT && prevHighSurrogate != -1) {
+				// A high surrogate held back across append() calls is only truly
+				// dangling once the whole input has been consumed. Flush it here.
+				ensureRemaining(1);
+				intBuffer.put(prevHighSurrogate & 0xFFFF);
+				prevHighSurrogate = -1;
+			}
 			switch (type) {
 				case BYTE:
 					byteBuffer.flip();
@@ -340,11 +347,9 @@ public class CodePointBuffer {
 				}
 			}
 
-			if (prevHighSurrogate != -1) {
-				// Dangling high surrogate
-				outInt[outOffset] = prevHighSurrogate & 0xFFFF;
-				outOffset++;
-			}
+			// A trailing high surrogate is not necessarily dangling: its low
+			// surrogate may arrive in the next append() chunk. Keep it pending in
+			// prevHighSurrogate and let build() flush it at true end of input.
 
 			utf16In.position(inOffset - utf16In.arrayOffset());
 			intBuffer.position(outOffset - intBuffer.arrayOffset());
