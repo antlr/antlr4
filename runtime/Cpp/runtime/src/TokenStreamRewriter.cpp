@@ -398,7 +398,9 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         rop->text = catOpText(&iop->text, &rop->text);
         delete rewrites[i];
         rewrites[i] = nullptr; // delete current insert
-        continue;
+        // iop is gone; the surviving replaces are disjoint, so none of the
+        // remaining ones can hold iop->index either.
+        break;
       }
       if (iop->index >= rop->index && iop->index <= rop->lastIndex) {
         throw IllegalArgumentException("insert op " + iop->toString() + " within boundaries of previous " + rop->toString());
