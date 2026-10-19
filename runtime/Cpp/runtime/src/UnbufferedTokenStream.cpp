@@ -101,6 +101,7 @@ void UnbufferedTokenStream::consume()
 
   // if we're at last token and no markers, opportunity to flush buffer
   if (_p == _tokens.size() - 1 && _numMarkers == 0) {
+    _lastTokenOwner = std::move(_tokens[_p]); // keep LT(-1) alive across the flush
     _tokens.clear();
     _p = 0;
     _lastTokenBufferStart = _lastToken;
@@ -183,6 +184,7 @@ void UnbufferedTokenStream::release(ssize_t marker)
     if (_p > 0) {
       // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
       // p is last valid token; move nothing if p==n as we have no valid char
+      _lastTokenOwner = std::move(_tokens[_p - 1]); // tokens[p-1] is LT(-1); keep it alive
       _tokens.erase(_tokens.begin(), _tokens.begin() + static_cast<ssize_t>(_p));
       _p = 0;
     }
