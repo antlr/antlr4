@@ -190,9 +190,13 @@ class PredictionMode(Enum):
             if configs.hasSemanticContext:
                 # dup configs, tossing out semantic predicates
                 dup = ATNConfigSet()
+                # Merge with a cache, as every other config-set merge does: without one, merging the
+                # contexts of configs that differ only by predicate re-merges every shared subgraph once
+                # per path, which grows exponentially with nesting depth.
+                mergeCache = dict()
                 for c in configs:
                     c = ATNConfig(config=c, semantic=SemanticContext.NONE)
-                    dup.add(c)
+                    dup.add(c, mergeCache)
                 configs = dup
             # now we have combined contexts for configs with dissimilar preds
 
