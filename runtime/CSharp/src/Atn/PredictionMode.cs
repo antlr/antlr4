@@ -256,9 +256,13 @@ namespace Antlr4.Runtime.Atn
                 {
                     // dup configs, tossing out semantic predicates
                     ATNConfigSet dup = new ATNConfigSet();
+                    // Merge with a cache, as every other config-set merge does: without one, merging the
+                    // contexts of configs that differ only by predicate re-merges every shared subgraph once
+                    // per path, which grows exponentially with nesting depth.
+                    MergeCache mergeCache = new MergeCache();
 					foreach (ATNConfig c in configSet.configs)
                     {
-						dup.Add(new ATNConfig(c, SemanticContext.Empty.Instance));
+						dup.Add(new ATNConfig(c, SemanticContext.Empty.Instance), mergeCache);
                     }
                     configSet = dup;
                 }

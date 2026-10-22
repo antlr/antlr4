@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
@@ -227,9 +228,14 @@ public enum PredictionMode {
 			if ( configs.hasSemanticContext ) {
 				// dup configs, tossing out semantic predicates
 				ATNConfigSet dup = new ATNConfigSet();
+				// Merge with a cache, as every other config-set merge does: without one, merging the
+				// contexts of configs that differ only by predicate re-merges every shared subgraph once
+				// per path, which grows exponentially with nesting depth.
+				DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache =
+					new DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext>();
 				for (ATNConfig c : configs) {
 					c = new ATNConfig(c,SemanticContext.Empty.Instance);
-					dup.add(c);
+					dup.add(c, mergeCache);
 				}
 				configs = dup;
 			}

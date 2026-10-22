@@ -184,11 +184,15 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 		if configs.hasSemanticContext {
 			// dup configs, tossing out semantic predicates
 			dup := NewATNConfigSet(false)
+			// Merge with a cache, as every other config-set merge does: without one, merging the
+			// contexts of configs that differ only by predicate re-merges every shared subgraph once
+			// per path, which grows exponentially with nesting depth.
+			mergeCache := NewJPCMap(ReachSetCollection, "Merge cache for hasSLLConflictTerminatingPrediction()")
 			for _, c := range configs.configs {
 
 				//				NewATNConfig({semanticContext:}, c)
 				c = NewATNConfig2(c, SemanticContextNone)
-				dup.Add(c, nil)
+				dup.Add(c, mergeCache)
 			}
 			configs = dup
 		}
