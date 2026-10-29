@@ -203,6 +203,39 @@ public abstract class SemanticContext {
 		 */
 
 		public abstract Collection<SemanticContext> getOperands();
+
+		/**
+		 * The operands come from a set, so an operator is the same whichever order
+		 * its operands were combined in. The hash code combines the operands' hash
+		 * codes in sorted order, which makes it independent of that order too.
+		 */
+		static int unorderedHashCode(SemanticContext[] opnds, int seed) {
+			int[] hashCodes = new int[opnds.length];
+			for (int i = 0; i < opnds.length; i++) {
+				hashCodes[i] = opnds[i].hashCode();
+			}
+			Arrays.sort(hashCodes);
+			int hash = MurmurHash.initialize(seed);
+			for (int hashCode : hashCodes) {
+				hash = MurmurHash.update(hash, hashCode);
+			}
+			return MurmurHash.finish(hash, hashCodes.length);
+		}
+
+		static boolean sameOperands(SemanticContext[] a, SemanticContext[] b) {
+			if ( a.length != b.length ) return false;
+			for (SemanticContext x : a) {
+				boolean found = false;
+				for (SemanticContext y : b) {
+					if ( x.equals(y) ) {
+						found = true;
+						break;
+					}
+				}
+				if ( !found ) return false;
+			}
+			return true;
+		}
 	}
 
 	/**
@@ -211,6 +244,7 @@ public abstract class SemanticContext {
 	 */
     public static class AND extends Operator {
 		public final SemanticContext[] opnds;
+		private final int hashCode;
 
 		public AND(SemanticContext a, SemanticContext b) {
 			Set<SemanticContext> operands = new HashSet<SemanticContext>();
@@ -227,6 +261,7 @@ public abstract class SemanticContext {
 			}
 
 			opnds = operands.toArray(new SemanticContext[0]);
+			hashCode = unorderedHashCode(opnds, AND.class.hashCode());
         }
 
 		@Override
@@ -239,12 +274,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof AND) ) return false;
 			AND other = (AND)obj;
-			return Arrays.equals(this.opnds, other.opnds);
+			return hashCode == other.hashCode && sameOperands(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return MurmurHash.hashCode(opnds, AND.class.hashCode());
+			return hashCode;
 		}
 
 		/**
@@ -308,6 +343,7 @@ public abstract class SemanticContext {
 	 */
     public static class OR extends Operator {
 		public final SemanticContext[] opnds;
+		private final int hashCode;
 
 		public OR(SemanticContext a, SemanticContext b) {
 			Set<SemanticContext> operands = new HashSet<SemanticContext>();
@@ -324,6 +360,7 @@ public abstract class SemanticContext {
 			}
 
 			this.opnds = operands.toArray(new SemanticContext[0]);
+			hashCode = unorderedHashCode(opnds, OR.class.hashCode());
         }
 
 		@Override
@@ -336,12 +373,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof OR) ) return false;
 			OR other = (OR)obj;
-			return Arrays.equals(this.opnds, other.opnds);
+			return hashCode == other.hashCode && sameOperands(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return MurmurHash.hashCode(opnds, OR.class.hashCode());
+			return hashCode;
 		}
 
 		/**
