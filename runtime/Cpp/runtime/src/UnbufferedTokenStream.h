@@ -94,6 +94,13 @@ namespace antlr4 {
     Token *_lastTokenBufferStart;
 
     /// <summary>
+    /// Owns the {@code LT(-1)} token once it has been dropped from <seealso cref="#tokens"/>
+    /// (buffer flush in consume() or release()), so <seealso cref="#_lastToken"/> and
+    /// <seealso cref="#_lastTokenBufferStart"/> never point at a destroyed token.
+    /// </summary>
+    std::unique_ptr<Token> _lastTokenOwner;
+
+    /// <summary>
     /// Absolute token index. It's the index of the token about to be read via
     /// {@code LT(1)}. Goes from 0 to the number of tokens in the entire stream,
     /// although the stream size is unknown before the end is reached.
