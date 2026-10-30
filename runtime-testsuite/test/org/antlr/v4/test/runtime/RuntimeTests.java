@@ -167,6 +167,8 @@ public abstract class RuntimeTests {
 				Stage.Execute,
 				targetName,
 				superClass,
+				null,
+				null,
 				descriptor.predictionMode,
 				descriptor.buildParseTree
 		);

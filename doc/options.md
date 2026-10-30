@@ -36,6 +36,86 @@ $ antlr4 -Dlanguage=C MyGrammar.g4
 error(31):  ANTLR cannot generate C code as of version 4.0
 ```
 
+### `actionTemplates`
+
+This option uses the provided [StringTemplate](https://www.stringtemplate.org/) group file (`*.stg`) to render templates inside the action blocks of an ANTLR grammar.
+
+This enables you to provide target-specific action logic by providing different `.stg` files for each target language.
+
+The syntax of group files is [described](https://github.com/antlr/stringtemplate4/blob/master/doc/groups.md) in the StringTemplate documentation.
+
+For example, if you provide the following group file when generating Java code:
+
+`ActionTemplates.stg`:
+```string-template
+normalize(s) ::= <<Normalizer.normalize(<s>, Form.NFKC)>>
+setText(s) ::= <<setText(<s>);>>
+getText() ::= <<getText()>>
+normalizerImports ::= <<
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+>>
+```
+
+You can use the templates like so in your ANTLR grammar:
+
+```antlrv4
+ID:
+    (ID_START ID_CONTINUE* | '_' ID_CONTINUE+) {
+        <setText(normalize(getText())>
+    };
+```
+
+The ANTLR tool must be invoked by providing the target language and StringTemplate group file:
+
+```bash
+$ antlr4 -Dlanguage=Java -DactionTemplates=ActionTemplates.stg MyGrammar.g4
+```
+
+The templates will be expanded into the following before the grammar is used to generate the target code:
+
+```antlrv4
+ID:
+    (ID_START ID_CONTINUE* | '_' ID_CONTINUE+) {
+        setText(Normalizer.normalize(getText(), Form.NFKC));
+    };
+```
+
+Templates can also be used in named actions, such as the `@header` or `@members` block, for example:
+
+```antlrv4
+@lexer::header {
+  <normalizerImports()>
+}
+```
+
+To use the same grammar to generate a different target language, you can provide a different StringTemplate group file.
+
+For example, to generate JavaScript code equivalent to the previous example the following group file could be used instead:
+
+`ActionTemplates.stg`:
+```string-template
+normalize(s) ::= <<<s>.normalize("NFKC")>>
+setText(s) ::= <<this.text = <s>;>>
+getText() ::= <<this.text>>
+normalizerImports ::= ""
+```
+
+Now you can invoke the ANTLR tool with the new target language and your alternate StringTemplate group file:
+
+```bash
+$ antlr4 -Dlanguage=JavaScript -DactionTemplates=ActionTemplates.stg MyGrammar.g4
+```
+
+These templates will expand into the following before the grammar is used to generate the target code:
+
+```antlrv4
+ID:
+    (ID_START ID_CONTINUE* | '_' ID_CONTINUE+) {
+        this.text = this.text.normalize("NFKC");
+    };
+```
+
 ### `tokenVocab`
 
 ANTLR assigns token type numbers to the tokens as it encounters them in a file. To use different token type values, such as with a separate lexer, use this option to have ANTLR pull in the <fileextension>tokens</fileextension> file. ANTLR generates a <fileextension>tokens</fileextension> file from each grammar.
