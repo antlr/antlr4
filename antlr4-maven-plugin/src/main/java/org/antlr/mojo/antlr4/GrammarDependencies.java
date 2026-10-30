@@ -18,8 +18,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -283,7 +286,7 @@ class GrammarDependencies {
             log.debug("Load grammars dependency status: " + statusFile);
 
             try {
-                ObjectInputStream in = new ObjectInputStream(new FileInputStream(
+                ObjectInputStream in = new RestrictedObjectInputStream(new FileInputStream(
                             statusFile));
 
                 try {
@@ -310,5 +313,38 @@ class GrammarDependencies {
 
     private String stripQuotes(String str) {
         return str.replaceAll("\\A'|'\\Z", "");
+    }
+
+    /**
+     * The status file is written only by {@link #save()} and always holds a
+     * {@code Map<File, Map.Entry<byte[], Collection<String>>>}. A plain
+     * {@link ObjectInputStream} would instantiate whatever classes a crafted
+     * status file names (the generic cast runs only after the graph is already
+     * built), so a hostile {@code dependencies.ser} left in the build directory
+     * can reach any deserialization gadget on the plugin classpath. Restrict
+     * resolution to the few types that legitimately appear in that graph.
+     */
+    static final class RestrictedObjectInputStream extends ObjectInputStream {
+        private static final Set<String> ALLOWED_CLASSES = new HashSet<String>(Arrays.asList(
+            HashMap.class.getName(),
+            AbstractMap.SimpleImmutableEntry.class.getName(),
+            ArrayList.class.getName(),
+            File.class.getName(),
+            String.class.getName(),
+            "[B"));
+
+        RestrictedObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            if (!ALLOWED_CLASSES.contains(desc.getName())) {
+                throw new InvalidClassException(desc.getName(),
+                    "unexpected class in grammar dependency status");
+            }
+
+            return super.resolveClass(desc);
+        }
     }
 }
