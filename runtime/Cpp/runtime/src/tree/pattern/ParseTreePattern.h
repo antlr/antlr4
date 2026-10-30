@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <string>
 #include "antlr4-common.h"
@@ -28,8 +29,10 @@ namespace pattern {
     /// <param name="patternRuleIndex"> The parser rule which serves as the root of the
     /// tree pattern. </param>
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
+    /// <param name="patternParser"> The parser that created {@code patternTree}. It owns that tree
+    /// and the tokens in it, so the pattern keeps it alive for as long as the pattern exists. </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
-                     ParseTree *patternTree);
+                     ParseTree *patternTree, std::shared_ptr<Parser> patternParser = nullptr);
     ParseTreePattern(ParseTreePattern const&) = default;
     virtual ~ParseTreePattern();
 
@@ -97,6 +100,9 @@ namespace pattern {
 
     /// This is the backing field for <seealso cref="#getPatternTree()"/>.
     ParseTree *_patternTree;
+
+    /// Owns _patternTree and the tokens it refers to; see the constructor.
+    std::shared_ptr<Parser> _patternParser;
 
     /// This is the backing field for <seealso cref="#getMatcher()"/>.
     ParseTreePatternMatcher *const _matcher;

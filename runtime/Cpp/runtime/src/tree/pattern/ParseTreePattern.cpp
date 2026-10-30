@@ -20,8 +20,9 @@ using namespace antlr4::tree::pattern;
 using namespace antlrcpp;
 
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex_,
-                                   ParseTree *patternTree)
-  : patternRuleIndex(patternRuleIndex_), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
+                                   ParseTree *patternTree, std::shared_ptr<Parser> patternParser)
+  : patternRuleIndex(patternRuleIndex_), _pattern(pattern), _patternTree(patternTree),
+    _patternParser(std::move(patternParser)), _matcher(matcher) {
 }
 
 ParseTreePattern::~ParseTreePattern() {
