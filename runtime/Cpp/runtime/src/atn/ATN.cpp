@@ -61,8 +61,9 @@ void ATN::addState(ATNState *state) {
 }
 
 void ATN::removeState(ATNState *state) {
-  delete states.at(state->stateNumber);// just free mem, don't shift states in list
-  states.at(state->stateNumber) = nullptr;
+  const auto stateNumber = state->stateNumber;
+  delete states.at(stateNumber);// just free mem, don't shift states in list
+  states.at(stateNumber) = nullptr;
 }
 
 int ATN::defineDecisionState(DecisionState *s) {
