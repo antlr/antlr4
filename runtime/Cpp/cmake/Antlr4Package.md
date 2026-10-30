@@ -23,6 +23,7 @@ Argument# | Required  | Default | Use
 6 | No  | none | C++ namespace in which the generated classes should be placed
 7 | No  | none | Additional files on which the input depends
 8 | No  | none | Library path to use during generation
+9 | No  | none | Directory for the generated header files, passed to ANTLR as `-header-dir`. A relative path is resolved against the current binary directory. Without it, header files go with the source files
 
 The `ANTLR4_JAR_LOCATION` CMake variable must be set to the location where the `antlr-4*-complete.jar` generator is located. You can download the file from [here](http://www.antlr.org/download.html).
 
@@ -38,6 +39,8 @@ Output variable  | Meaning
 `ANTLR4_TOKEN_FILES_<Target name>`       | List of generated token files
 `ANTLR4_TOKEN_DIRECTORY_<Target name>`  | Directory containing the generated token files
 
+When argument 9 is given, `ANTLR4_INCLUDE_DIR_<Target name>` names that header directory. The directory is created if needed, but unlike the source directory it is not emptied before generation, so it can be shared with other headers.
+
 #### Sample:
 ```cmake
  # generate parser with visitor classes.
@@ -49,6 +52,20 @@ Output variable  | Meaning
    FALSE
    TRUE
    "antlrcpptest"
+   )
+
+ # generate parser with listener classes,
+ # writing the header files to a separate include directory
+ antlr4_generate(
+   antlrcpptest_grammar
+   ${CMAKE_CURRENT_SOURCE_DIR}/T.g4
+   BOTH
+   TRUE
+   FALSE
+   ""
+   ""
+   ""
+   ${CMAKE_CURRENT_BINARY_DIR}/include
    )
 ```
 

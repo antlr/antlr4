@@ -139,23 +139,23 @@ public class CodeGenerator {
 	}
 
 	public void writeRecognizer(ST outputFileST, SourceType sourceType) {
-		target.genFile(g, outputFileST, getRecognizerFileName(sourceType));
+		target.genFile(g, outputFileST, getRecognizerFileName(sourceType), sourceType);
 	}
 
 	public void writeListener(ST outputFileST, SourceType sourceType) {
-		target.genFile(g, outputFileST, getListenerFileName(sourceType));
+		target.genFile(g, outputFileST, getListenerFileName(sourceType), sourceType);
 	}
 
 	public void writeBaseListener(ST outputFileST, SourceType sourceType) {
-		target.genFile(g, outputFileST, getBaseListenerFileName(sourceType));
+		target.genFile(g, outputFileST, getBaseListenerFileName(sourceType), sourceType);
 	}
 
 	public void writeVisitor(ST outputFileST, SourceType sourceType) {
-		target.genFile(g, outputFileST, getVisitorFileName(sourceType));
+		target.genFile(g, outputFileST, getVisitorFileName(sourceType), sourceType);
 	}
 
 	public void writeBaseVisitor(ST outputFileST, SourceType sourceType) {
-		target.genFile(g, outputFileST, getBaseVisitorFileName(sourceType));
+		target.genFile(g, outputFileST, getBaseVisitorFileName(sourceType), sourceType);
 	}
 
 	public void writeVocabFile() {
@@ -169,9 +169,13 @@ public class CodeGenerator {
 	}
 
 	public void write(ST code, String fileName) {
+		write(code, fileName, SourceType.SOURCE);
+	}
+
+	public void write(ST code, String fileName, SourceType sourceType) {
 		try {
 //			long start = System.currentTimeMillis();
-			Writer w = tool.getOutputFileWriter(g, fileName);
+			Writer w = tool.getOutputFileWriter(g, fileName, sourceType);
 			STWriter wr = new AutoIndentWriter(w);
 			wr.setLineWidth(lineWidth);
 			code.write(wr);

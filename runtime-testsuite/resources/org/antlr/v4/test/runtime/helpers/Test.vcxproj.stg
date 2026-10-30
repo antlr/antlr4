@@ -30,7 +30,7 @@
 
   \<PropertyGroup>
     \<LinkIncremental>false\</LinkIncremental>
-    \<IncludePath><runtimeSourcePath>;$(IncludePath)\</IncludePath>
+    \<IncludePath><if(headerDirPath)><headerDirPath>;<endif><runtimeSourcePath>;$(IncludePath)\</IncludePath>
     \<ReferencePath>$(VC_ReferencesPath_x64);<runtimeBinaryPath>\</ReferencePath>
     \<OutDir>$(SolutionDir)\</OutDir>
   \</PropertyGroup>
@@ -56,25 +56,25 @@
   \</ItemDefinitionGroup>
 
   \<ItemGroup>
-    \<ClInclude Include="<lexerName>.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><lexerName>.h" />
     \<ClCompile Include="<lexerName>.cpp" />
 
 <if(parserName)>
-    \<ClInclude Include="<parserName>.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><parserName>.h" />
     \<ClCompile Include="<parserName>.cpp" />
 <endif>
 
 <if(useListener)>
-    \<ClInclude Include="<grammarName>BaseListener.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><grammarName>BaseListener.h" />
     \<ClCompile Include="<grammarName>BaseListener.cpp" />
-    \<ClInclude Include="<grammarName>Listener.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><grammarName>Listener.h" />
     \<ClCompile Include="<grammarName>Listener.cpp" />
 <endif>
 
 <if(useVisitor)>
-    \<ClInclude Include="<grammarName>BaseVisitor.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><grammarName>BaseVisitor.h" />
     \<ClCompile Include="<grammarName>BaseVisitor.cpp" />
-    \<ClInclude Include="<grammarName>Visitor.h" />
+    \<ClInclude Include="<if(headerDirPath)><headerDirPath>\\<endif><grammarName>Visitor.h" />
     \<ClCompile Include="<grammarName>Visitor.cpp" />
 <endif>
 

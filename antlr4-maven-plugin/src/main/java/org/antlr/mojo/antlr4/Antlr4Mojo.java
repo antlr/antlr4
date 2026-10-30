@@ -8,6 +8,7 @@ package org.antlr.mojo.antlr4;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
@@ -170,6 +171,15 @@ public class Antlr4Mojo extends AbstractMojo {
     private File outputDirectory;
 
     /**
+     * Specify output directory where header files are generated, for targets
+     * that generate them, such as C++. Other files stay in
+     * {@link #outputDirectory}. Headers go to {@link #outputDirectory} when
+     * this is not set.
+     */
+	@Parameter(property = "antlr4.headerOutputDirectory")
+    private File headerOutputDirectory;
+
+    /**
      * Specify location of imported grammars and tokens files.
      */
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
@@ -320,6 +330,11 @@ public class Antlr4Mojo extends AbstractMojo {
 		if (getOutputDirectory() != null) {
 			args.add("-o");
 			args.add(outputDirectory.getAbsolutePath());
+		}
+
+		if (headerOutputDirectory != null) {
+			args.add("-header-dir");
+			args.add(headerOutputDirectory.getAbsolutePath());
 		}
 
 		// Where do we want ANTLR to look for .tokens and import grammars?
@@ -536,6 +551,22 @@ public class Antlr4Mojo extends AbstractMojo {
 				outputDir = getOutputDirectory(g.fileName);
 			}
 
+			return openOutputFileWriter(outputDir, fileName);
+		}
+
+		@Override
+		public Writer getOutputFileWriter(Grammar g, String fileName, SourceType sourceType) throws IOException {
+			// headerOutputDirectory here is the Tool option, which is null without -header-dir
+			if (sourceType != SourceType.HEADER || headerOutputDirectory == null) {
+				return getOutputFileWriter(g, fileName);
+			}
+			if (outputDirectory == null) {
+				return new StringWriter();
+			}
+			return openOutputFileWriter(getHeaderOutputDirectory(g.fileName), fileName);
+		}
+
+		private Writer openOutputFileWriter(File outputDir, String fileName) throws IOException {
 			File outputFile = new File(outputDir, fileName);
 			if (!outputDir.exists()) {
 				outputDir.mkdirs();

@@ -12,6 +12,7 @@ import org.stringtemplate.v4.ST;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,17 @@ import static org.antlr.v4.test.runtime.RuntimeTestUtils.isWindows;
  * (lldb) thread backtrace
  */
 public class CppRunner extends RuntimeRunner {
+	private final String headerDirName;
+
+	public CppRunner() {
+		this(null);
+	}
+
+	/** Generated headers go to the named subdirectory of the test directory, through -header-dir. */
+	public CppRunner(String headerDirName) {
+		this.headerDirName = headerDirName;
+	}
+
 	@Override
 	public String getLanguage() {
 		return "Cpp";
@@ -79,6 +91,18 @@ public class CppRunner extends RuntimeRunner {
 		} else {
 			visualStudioProjectContent = null;
 		}
+	}
+
+	private String getHeaderDirPath() {
+		return headerDirName == null ? null : Paths.get(getTempDirPath(), headerDirName).toString();
+	}
+
+	@Override
+	protected List<String> getTargetToolOptions(RunOptions ro) {
+		if (headerDirName == null) {
+			return null;
+		}
+		return Arrays.asList("-header-dir", getHeaderDirPath());
 	}
 
 	@Override
@@ -142,6 +166,10 @@ public class CppRunner extends RuntimeRunner {
 				buildCommand.add("-std=c++17");
 				buildCommand.add("-I");
 				buildCommand.add(runtimeSourcePath);
+				if (headerDirName != null) {
+					buildCommand.add("-I");
+					buildCommand.add(getHeaderDirPath());
+				}
 				buildCommand.add("-L.");
 				buildCommand.add("-lantlr4-runtime");
 				buildCommand.add("-pthread");
@@ -169,6 +197,7 @@ public class CppRunner extends RuntimeRunner {
 		projectFileST.add("parserName", parserName);
 		projectFileST.add("useListener", useListener);
 		projectFileST.add("useVisitor", useVisitor);
+		projectFileST.add("headerDirPath", getHeaderDirPath());
 		writeFile(getTempDirPath(), "Test.vcxproj", projectFileST.render());
 	}
 
