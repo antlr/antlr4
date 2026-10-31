@@ -14,11 +14,7 @@ import org.antlr.v4.runtime.misc.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /** A tree structure used to record the semantic context in which
  *  an ATN configuration is valid.  It's either a single predicate,
@@ -203,6 +199,86 @@ public abstract class SemanticContext {
 		 */
 
 		public abstract Collection<SemanticContext> getOperands();
+
+		/**
+		 * Orders contexts by kind and then by their fields, so an operator holds
+		 * its operands in one order whichever order they were combined in.
+		 */
+		static int compare(SemanticContext a, SemanticContext b) {
+			int kind = Integer.compare(kind(a), kind(b));
+			if ( kind!=0 ) return kind;
+			if ( a instanceof Predicate ) {
+				Predicate p = (Predicate)a;
+				Predicate q = (Predicate)b;
+				if ( p.ruleIndex!=q.ruleIndex ) return Integer.compare(p.ruleIndex, q.ruleIndex);
+				if ( p.predIndex!=q.predIndex ) return Integer.compare(p.predIndex, q.predIndex);
+				return Boolean.compare(p.isCtxDependent, q.isCtxDependent);
+			}
+			if ( a instanceof PrecedencePredicate ) {
+				return Integer.compare(((PrecedencePredicate)a).precedence, ((PrecedencePredicate)b).precedence);
+			}
+			if ( a instanceof AND || a instanceof OR ) {
+				SemanticContext[] x = a instanceof AND ? ((AND)a).opnds : ((OR)a).opnds;
+				SemanticContext[] y = b instanceof AND ? ((AND)b).opnds : ((OR)b).opnds;
+				if ( x.length!=y.length ) return Integer.compare(x.length, y.length);
+				for (int i = 0; i < x.length; i++) {
+					int c = compare(x[i], y[i]);
+					if ( c!=0 ) return c;
+				}
+				return 0;
+			}
+			return Integer.compare(a.hashCode(), b.hashCode());
+		}
+
+		/**
+		 * Merges two operand arrays, each already in {@link #compare} order, into
+		 * one list in that order without duplicates.
+		 */
+		static List<SemanticContext> merge(SemanticContext[] x, SemanticContext[] y) {
+			List<SemanticContext> merged = new ArrayList<SemanticContext>(x.length + y.length);
+			int i = 0;
+			int j = 0;
+			while ( i < x.length && j < y.length ) {
+				int c = compare(x[i], y[j]);
+				// compare orders contexts of other kinds by hash code, so it can tie two unequal ones
+				if ( c<0 || c==0 && !x[i].equals(y[j]) ) merged.add(x[i++]);
+				else if ( c>0 ) merged.add(y[j++]);
+				else {
+					merged.add(x[i++]);
+					j++;
+				}
+			}
+			while ( i < x.length ) merged.add(x[i++]);
+			while ( j < y.length ) merged.add(y[j++]);
+			return merged;
+		}
+
+		/**
+		 * Removes all precedence predicates but the one with the lowest or highest
+		 * precedence. They sort next to each other, by precedence.
+		 */
+		static void keepOnePrecedencePredicate(List<SemanticContext> operands, boolean lowest) {
+			int first = -1;
+			int last = -1;
+			for (int i = 0; i < operands.size(); i++) {
+				if ( operands.get(i) instanceof PrecedencePredicate ) {
+					if ( first<0 ) first = i;
+					last = i;
+				}
+			}
+			if ( first<0 ) return;
+			SemanticContext kept = operands.get(lowest ? first : last);
+			operands.subList(first, last + 1).clear();
+			operands.add(first, kept);
+		}
+
+		private static int kind(SemanticContext context) {
+			if ( context instanceof Predicate ) return 0;
+			if ( context instanceof PrecedencePredicate ) return 1;
+			if ( context instanceof AND ) return 2;
+			if ( context instanceof OR ) return 3;
+			return 4;
+		}
 	}
 
 	/**
@@ -211,22 +287,16 @@ public abstract class SemanticContext {
 	 */
     public static class AND extends Operator {
 		public final SemanticContext[] opnds;
+		private final int hashCode;
 
 		public AND(SemanticContext a, SemanticContext b) {
-			Set<SemanticContext> operands = new HashSet<SemanticContext>();
-			if ( a instanceof AND ) operands.addAll(Arrays.asList(((AND)a).opnds));
-			else operands.add(a);
-			if ( b instanceof AND ) operands.addAll(Arrays.asList(((AND)b).opnds));
-			else operands.add(b);
-
-			List<PrecedencePredicate> precedencePredicates = filterPrecedencePredicates(operands);
-			if (!precedencePredicates.isEmpty()) {
-				// interested in the transition with the lowest precedence
-				PrecedencePredicate reduced = Collections.min(precedencePredicates);
-				operands.add(reduced);
-			}
-
+			List<SemanticContext> operands = merge(
+				a instanceof AND ? ((AND)a).opnds : new SemanticContext[] {a},
+				b instanceof AND ? ((AND)b).opnds : new SemanticContext[] {b});
+			// interested in the transition with the lowest precedence
+			keepOnePrecedencePredicate(operands, true);
 			opnds = operands.toArray(new SemanticContext[0]);
+			hashCode = MurmurHash.hashCode(opnds, AND.class.hashCode());
         }
 
 		@Override
@@ -239,12 +309,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof AND) ) return false;
 			AND other = (AND)obj;
-			return Arrays.equals(this.opnds, other.opnds);
+			return hashCode == other.hashCode && Arrays.equals(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return MurmurHash.hashCode(opnds, AND.class.hashCode());
+			return hashCode;
 		}
 
 		/**
@@ -308,22 +378,16 @@ public abstract class SemanticContext {
 	 */
     public static class OR extends Operator {
 		public final SemanticContext[] opnds;
+		private final int hashCode;
 
 		public OR(SemanticContext a, SemanticContext b) {
-			Set<SemanticContext> operands = new HashSet<SemanticContext>();
-			if ( a instanceof OR ) operands.addAll(Arrays.asList(((OR)a).opnds));
-			else operands.add(a);
-			if ( b instanceof OR ) operands.addAll(Arrays.asList(((OR)b).opnds));
-			else operands.add(b);
-
-			List<PrecedencePredicate> precedencePredicates = filterPrecedencePredicates(operands);
-			if (!precedencePredicates.isEmpty()) {
-				// interested in the transition with the highest precedence
-				PrecedencePredicate reduced = Collections.max(precedencePredicates);
-				operands.add(reduced);
-			}
-
+			List<SemanticContext> operands = merge(
+				a instanceof OR ? ((OR)a).opnds : new SemanticContext[] {a},
+				b instanceof OR ? ((OR)b).opnds : new SemanticContext[] {b});
+			// interested in the transition with the highest precedence
+			keepOnePrecedencePredicate(operands, false);
 			this.opnds = operands.toArray(new SemanticContext[0]);
+			hashCode = MurmurHash.hashCode(opnds, OR.class.hashCode());
         }
 
 		@Override
@@ -336,12 +400,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof OR) ) return false;
 			OR other = (OR)obj;
-			return Arrays.equals(this.opnds, other.opnds);
+			return hashCode == other.hashCode && Arrays.equals(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return MurmurHash.hashCode(opnds, OR.class.hashCode());
+			return hashCode;
 		}
 
 		/**
@@ -421,27 +485,6 @@ public abstract class SemanticContext {
 		OR result = new OR(a, b);
 		if (result.opnds.length == 1) {
 			return result.opnds[0];
-		}
-
-		return result;
-	}
-
-	private static List<PrecedencePredicate> filterPrecedencePredicates(Collection<? extends SemanticContext> collection) {
-		ArrayList<PrecedencePredicate> result = null;
-		for (Iterator<? extends SemanticContext> iterator = collection.iterator(); iterator.hasNext(); ) {
-			SemanticContext context = iterator.next();
-			if (context instanceof PrecedencePredicate) {
-				if (result == null) {
-					result = new ArrayList<PrecedencePredicate>();
-				}
-
-				result.add((PrecedencePredicate)context);
-				iterator.remove();
-			}
-		}
-
-		if (result == null) {
-			return Collections.emptyList();
 		}
 
 		return result;
