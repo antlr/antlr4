@@ -83,7 +83,6 @@
 						<phase>process-classes</phase>
 						<configuration>
 							<instructions>
-								<Automatic-Module-Name>org.antlr.antlr4.runtime</Automatic-Module-Name>
 								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
 								<Import-Package>org.antlr.v4.gui;resolution:=optional, *</Import-Package>
 							</instructions>
@@ -116,6 +115,36 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.Final</version>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <jvmVersion>9</jvmVersion>
+                            <module>
+                                <moduleInfo>
+                                    <name>org.antlr.antlr4.runtime</name>
+                                    <exports>
+                                        org.antlr.v4.runtime;
+                                        org.antlr.v4.runtime.atn;
+                                        org.antlr.v4.runtime.misc;
+                                        org.antlr.v4.runtime.tree;
+                                        org.antlr.v4.runtime.tree.pattern;
+                                        org.antlr.v4.runtime.tree.xpath;
+                                    </exports>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
