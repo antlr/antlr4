@@ -157,30 +157,91 @@ class PrecedencePredicate(SemanticContext):
         return "{" + str(self.precedence) + ">=prec}?"
 
 
+def _kind(context:SemanticContext):
+    if isinstance(context, Predicate):
+        return 0
+    if isinstance(context, PrecedencePredicate):
+        return 1
+    if isinstance(context, AND):
+        return 2
+    if isinstance(context, OR):
+        return 3
+    return 4
+
+def _cmp(x, y):
+    return (x > y) - (x < y)
+
+# Orders contexts by kind and then by their fields, so an operator holds its
+# operands in one order whichever order they were combined in.
+def _compare(a:SemanticContext, b:SemanticContext):
+    kind = _cmp(_kind(a), _kind(b))
+    if kind != 0:
+        return kind
+    if isinstance(a, Predicate):
+        return _cmp((a.ruleIndex, a.predIndex, a.isCtxDependent),
+                    (b.ruleIndex, b.predIndex, b.isCtxDependent))
+    if isinstance(a, PrecedencePredicate):
+        return _cmp(a.precedence, b.precedence)
+    if isinstance(a, (AND, OR)):
+        if len(a.opnds) != len(b.opnds):
+            return _cmp(len(a.opnds), len(b.opnds))
+        for x, y in zip(a.opnds, b.opnds):
+            c = _compare(x, y)
+            if c != 0:
+                return c
+        return 0
+    return _cmp(hash(a), hash(b))
+
+# Merges two operand lists, each already in _compare order, into one list in
+# that order without duplicates.
+def _merge(x:list, y:list):
+    merged = []
+    i = 0
+    j = 0
+    while i < len(x) and j < len(y):
+        c = _compare(x[i], y[j])
+        # _compare orders contexts of other kinds by hash code, so it can tie two unequal ones
+        if c < 0 or c == 0 and x[i] != y[j]:
+            merged.append(x[i])
+            i += 1
+        elif c > 0:
+            merged.append(y[j])
+            j += 1
+        else:
+            merged.append(x[i])
+            i += 1
+            j += 1
+    merged.extend(x[i:])
+    merged.extend(y[j:])
+    return merged
+
+# Removes all precedence predicates but the one with the lowest or highest
+# precedence. They sort next to each other, by precedence.
+def _keepOnePrecedencePredicate(operands:list, lowest:bool):
+    indexes = [i for i, o in enumerate(operands) if isinstance(o, PrecedencePredicate)]
+    if len(indexes) == 0:
+        return
+    first = indexes[0]
+    last = indexes[-1]
+    operands[first:last + 1] = [operands[first if lowest else last]]
+
+
 # A semantic context which is true whenever none of the contained contexts
 # is false.
 del AND
 class AND(SemanticContext):
-    __slots__ = 'opnds'
+    __slots__ = ('opnds', 'hashCode')
 
     def __init__(self, a:SemanticContext, b:SemanticContext):
-        operands = set()
-        if isinstance( a, AND ):
-            operands.update(a.opnds)
-        else:
-            operands.add(a)
-        if isinstance( b, AND ):
-            operands.update(b.opnds)
-        else:
-            operands.add(b)
-
-        precedencePredicates = filterPrecedencePredicates(operands)
-        if len(precedencePredicates)>0:
-            # interested in the transition with the lowest precedence
-            reduced = min(precedencePredicates)
-            operands.add(reduced)
-
-        self.opnds = list(operands)
+        operands = _merge(a.opnds if isinstance(a, AND) else [a],
+                          b.opnds if isinstance(b, AND) else [b])
+        # interested in the transition with the lowest precedence
+        _keepOnePrecedencePredicate(operands, True)
+        self.opnds = operands
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        self.hashCode = hash((h, "AND"))
 
     def __eq__(self, other):
         if self is other:
@@ -188,13 +249,10 @@ class AND(SemanticContext):
         elif not isinstance(other, AND):
             return False
         else:
-            return self.opnds == other.opnds
+            return self.hashCode == other.hashCode and self.opnds == other.opnds
 
     def __hash__(self):
-        h = 0
-        for o in self.opnds:
-            h = hash((h, o))
-        return hash((h, "AND"))
+        return self.hashCode
 
     #
     # {@inheritDoc}
@@ -247,27 +305,18 @@ class AND(SemanticContext):
 # contexts is true.
 del OR
 class OR (SemanticContext):
-    __slots__ = 'opnds'
+    __slots__ = ('opnds', 'hashCode')
 
     def __init__(self, a:SemanticContext, b:SemanticContext):
-        operands = set()
-        if isinstance( a, OR ):
-            operands.update(a.opnds)
-        else:
-            operands.add(a)
-        if isinstance( b, OR ):
-            operands.update(b.opnds)
-        else:
-            operands.add(b)
-
-        precedencePredicates = filterPrecedencePredicates(operands)
-        if len(precedencePredicates)>0:
-            # interested in the transition with the highest precedence
-            s = sorted(precedencePredicates)
-            reduced = s[-1]
-            operands.add(reduced)
-
-        self.opnds = list(operands)
+        operands = _merge(a.opnds if isinstance(a, OR) else [a],
+                          b.opnds if isinstance(b, OR) else [b])
+        # interested in the transition with the highest precedence
+        _keepOnePrecedencePredicate(operands, False)
+        self.opnds = operands
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        self.hashCode = hash((h, "OR"))
 
     def __eq__(self, other):
         if self is other:
@@ -275,13 +324,10 @@ class OR (SemanticContext):
         elif not isinstance(other, OR):
             return False
         else:
-            return self.opnds == other.opnds
+            return self.hashCode == other.hashCode and self.opnds == other.opnds
 
     def __hash__(self):
-        h = 0
-        for o in self.opnds:
-            h = hash((h, o))
-        return hash((h, "OR"))
+        return self.hashCode
 
     # <p>
     # The evaluation of predicates by this context is short-circuiting, but
