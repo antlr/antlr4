@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
@@ -161,6 +160,143 @@ namespace Antlr4.Runtime.Atn
             {
                 get;
             }
+
+            /// <summary>
+            /// Orders contexts by kind and then by their fields, so an operator holds
+            /// its operands in one order whichever order they were combined in.
+            /// </summary>
+            internal static int Compare(SemanticContext a, SemanticContext b)
+            {
+                int kind = Kind(a).CompareTo(Kind(b));
+                if (kind != 0)
+                {
+                    return kind;
+                }
+                if (a is SemanticContext.Predicate)
+                {
+                    SemanticContext.Predicate p = (SemanticContext.Predicate)a;
+                    SemanticContext.Predicate q = (SemanticContext.Predicate)b;
+                    if (p.ruleIndex != q.ruleIndex)
+                    {
+                        return p.ruleIndex.CompareTo(q.ruleIndex);
+                    }
+                    if (p.predIndex != q.predIndex)
+                    {
+                        return p.predIndex.CompareTo(q.predIndex);
+                    }
+                    return p.isCtxDependent.CompareTo(q.isCtxDependent);
+                }
+                if (a is SemanticContext.PrecedencePredicate)
+                {
+                    return ((SemanticContext.PrecedencePredicate)a).precedence.CompareTo(((SemanticContext.PrecedencePredicate)b).precedence);
+                }
+                if (a is SemanticContext.AND || a is SemanticContext.OR)
+                {
+                    SemanticContext[] x = a is SemanticContext.AND ? ((AND)a).opnds : ((OR)a).opnds;
+                    SemanticContext[] y = b is SemanticContext.AND ? ((AND)b).opnds : ((OR)b).opnds;
+                    if (x.Length != y.Length)
+                    {
+                        return x.Length.CompareTo(y.Length);
+                    }
+                    for (int i = 0; i < x.Length; i++)
+                    {
+                        int c = Compare(x[i], y[i]);
+                        if (c != 0)
+                        {
+                            return c;
+                        }
+                    }
+                    return 0;
+                }
+                return a.GetHashCode().CompareTo(b.GetHashCode());
+            }
+
+            /// <summary>
+            /// Merges two operand arrays, each already in <see cref="Compare"/> order, into
+            /// one list in that order without duplicates.
+            /// </summary>
+            internal static List<SemanticContext> Merge(SemanticContext[] x, SemanticContext[] y)
+            {
+                List<SemanticContext> merged = new List<SemanticContext>(x.Length + y.Length);
+                int i = 0;
+                int j = 0;
+                while (i < x.Length && j < y.Length)
+                {
+                    int c = Compare(x[i], y[j]);
+                    // Compare orders contexts of other kinds by hash code, so it can tie two unequal ones.
+                    if (c < 0 || c == 0 && !x[i].Equals(y[j]))
+                    {
+                        merged.Add(x[i++]);
+                    }
+                    else if (c > 0)
+                    {
+                        merged.Add(y[j++]);
+                    }
+                    else
+                    {
+                        merged.Add(x[i++]);
+                        j++;
+                    }
+                }
+                while (i < x.Length)
+                {
+                    merged.Add(x[i++]);
+                }
+                while (j < y.Length)
+                {
+                    merged.Add(y[j++]);
+                }
+                return merged;
+            }
+
+            /// <summary>
+            /// Removes all precedence predicates but the one with the lowest or highest
+            /// precedence. They sort next to each other, by precedence.
+            /// </summary>
+            internal static void KeepOnePrecedencePredicate(List<SemanticContext> operands, bool lowest)
+            {
+                int first = -1;
+                int last = -1;
+                for (int i = 0; i < operands.Count; i++)
+                {
+                    if (operands[i] is SemanticContext.PrecedencePredicate)
+                    {
+                        if (first < 0)
+                        {
+                            first = i;
+                        }
+                        last = i;
+                    }
+                }
+                if (first < 0)
+                {
+                    return;
+                }
+                SemanticContext kept = operands[lowest ? first : last];
+                operands.RemoveRange(first, last - first + 1);
+                operands.Insert(first, kept);
+            }
+
+            private static int Kind(SemanticContext context)
+            {
+                if (context is SemanticContext.Predicate)
+                {
+                    return 0;
+                }
+                if (context is SemanticContext.PrecedencePredicate)
+                {
+                    return 1;
+                }
+                if (context is SemanticContext.AND)
+                {
+                    return 2;
+                }
+                if (context is SemanticContext.OR)
+                {
+                    return 3;
+                }
+                return 4;
+            }
         }
 
         public class AND : SemanticContext.Operator
@@ -168,33 +304,17 @@ namespace Antlr4.Runtime.Atn
             [NotNull]
             public readonly SemanticContext[] opnds;
 
+            private readonly int hashCode;
+
             public AND(SemanticContext a, SemanticContext b)
             {
-                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is SemanticContext.AND)
-                {
-                    operands.UnionWith(((AND)a).opnds);
-                }
-                else
-                {
-                    operands.Add(a);
-                }
-                if (b is SemanticContext.AND)
-                {
-                    operands.UnionWith(((AND)b).opnds);
-                }
-                else
-                {
-                    operands.Add(b);
-                }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
-                if (precedencePredicates.Count > 0)
-                {
-                    // interested in the transition with the lowest precedence
-                    SemanticContext.PrecedencePredicate reduced = precedencePredicates.Min();
-                    operands.Add(reduced);
-                }
+                List<SemanticContext> operands = Merge(
+                    a is SemanticContext.AND ? ((AND)a).opnds : new SemanticContext[] { a },
+                    b is SemanticContext.AND ? ((AND)b).opnds : new SemanticContext[] { b });
+                // interested in the transition with the lowest precedence
+                KeepOnePrecedencePredicate(operands, true);
                 opnds = operands.ToArray();
+                hashCode = MurmurHash.HashCode(opnds, typeof(SemanticContext.AND).GetHashCode());
             }
 
             public override ICollection<SemanticContext> Operands
@@ -216,12 +336,12 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
                 SemanticContext.AND other = (SemanticContext.AND)obj;
-                return Arrays.Equals(this.opnds, other.opnds);
+                return hashCode == other.hashCode && Arrays.Equals(this.opnds, other.opnds);
             }
 
             public override int GetHashCode()
             {
-                return MurmurHash.HashCode(opnds, typeof(SemanticContext.AND).GetHashCode());
+                return hashCode;
             }
 
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext parserCallStack)
@@ -286,33 +406,17 @@ namespace Antlr4.Runtime.Atn
             [NotNull]
             public readonly SemanticContext[] opnds;
 
+            private readonly int hashCode;
+
             public OR(SemanticContext a, SemanticContext b)
             {
-                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
-                if (a is SemanticContext.OR)
-                {
-                    operands.UnionWith(((OR)a).opnds);
-                }
-                else
-                {
-                    operands.Add(a);
-                }
-                if (b is SemanticContext.OR)
-                {
-                    operands.UnionWith(((OR)b).opnds);
-                }
-                else
-                {
-                    operands.Add(b);
-                }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
-                if (precedencePredicates.Count > 0)
-                {
-                    // interested in the transition with the highest precedence
-                    SemanticContext.PrecedencePredicate reduced = precedencePredicates.Max();
-                    operands.Add(reduced);
-                }
+                List<SemanticContext> operands = Merge(
+                    a is SemanticContext.OR ? ((OR)a).opnds : new SemanticContext[] { a },
+                    b is SemanticContext.OR ? ((OR)b).opnds : new SemanticContext[] { b });
+                // interested in the transition with the highest precedence
+                KeepOnePrecedencePredicate(operands, false);
                 this.opnds = operands.ToArray();
+                hashCode = MurmurHash.HashCode(opnds, typeof(SemanticContext.OR).GetHashCode());
             }
 
             public override ICollection<SemanticContext> Operands
@@ -334,12 +438,12 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
                 SemanticContext.OR other = (SemanticContext.OR)obj;
-                return Arrays.Equals(this.opnds, other.opnds);
+                return hashCode == other.hashCode && Arrays.Equals(this.opnds, other.opnds);
             }
 
             public override int GetHashCode()
             {
-                return MurmurHash.HashCode(opnds, typeof(SemanticContext.OR).GetHashCode());
+                return hashCode;
             }
 
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext parserCallStack)
@@ -436,16 +540,6 @@ namespace Antlr4.Runtime.Atn
             {
                 return result.opnds[0];
             }
-            return result;
-        }
-
-        private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates(HashSet<SemanticContext> collection)
-        {
-            if (!collection.OfType<PrecedencePredicate>().Any())
-                Collections.EmptyList<PrecedencePredicate>();
-
-            List<PrecedencePredicate> result = collection.OfType<PrecedencePredicate>().ToList();
-            collection.ExceptWith(result);
             return result;
         }
     }
