@@ -1,0 +1,43 @@
+[notes]
+SLL prediction in stmts follows its global FOLLOW through the predicates of
+both a and b, in either order. Both orders must make the same semantic context,
+so the prediction evaluates that context once. The filler rules give the
+predicates of a and b indexes whose hash codes share a bucket of a small hash
+set, so operands kept in a hash set's iteration order fail the test too.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+@parser::members {
+<Declare_pred()>
+}
+f0 : {<False():Invoke_pred()>}? 'z' | {<False():Invoke_pred()>}? 'z' ;
+f1 : {<False():Invoke_pred()>}? 'z' ;
+f2 : {<False():Invoke_pred()>}? 'z' ;
+a : 'a' stmts ('x' | {<False():Invoke_pred()>}?) ;
+stmts : stmt* ;
+b : 'b' stmts ('y' | {<False():Invoke_pred()>}?) ;
+s
+@after {<ToStringTree("$ctx"):writeln()>}
+  : stmts EOF ;
+stmt : a | b | ID ;
+ID : 'i' ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+i
+
+[output]
+"""eval=false
+eval=false
+eval=false
+(s (stmts (stmt i)) <EOF>)
+"""
+
+[skip]
+PHP
