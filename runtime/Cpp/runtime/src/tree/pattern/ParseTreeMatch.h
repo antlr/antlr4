@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include "antlr4-common.h"
+#include "tree/pattern/ParseTreePattern.h"
 
 namespace antlr4 {
 namespace tree {
@@ -20,8 +21,9 @@ namespace pattern {
     /// This is the backing field for getTree().
     ParseTree *_tree;
 
-    /// This is the backing field for getPattern().
-    const ParseTreePattern &_pattern;
+    /// This is the backing field for getPattern(). A copy, so that a match made from a temporary
+    /// pattern (ParseTreePatternMatcher::match(ParseTree *, const std::string &, int)) outlives it.
+    ParseTreePattern _pattern;
 
     /// This is the backing field for getLabels().
     std::map<std::string, std::vector<ParseTree *>> _labels;
