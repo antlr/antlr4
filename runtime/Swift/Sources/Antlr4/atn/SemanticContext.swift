@@ -175,6 +175,104 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         public func getOperands() -> Array<SemanticContext> {
             fatalError(#function + " must be overridden")
         }
+
+        ///
+        /// Orders contexts by kind and then by their fields, so an operator holds
+        /// its operands in one order whichever order they were combined in.
+        ///
+        static func compare(_ a: SemanticContext, _ b: SemanticContext) -> Int {
+            let kinds = compareInts(kind(a), kind(b))
+            if kinds != 0 {
+                return kinds
+            }
+            switch (a, b) {
+            case let (p as Predicate, q as Predicate):
+                if p.ruleIndex != q.ruleIndex {
+                    return compareInts(p.ruleIndex, q.ruleIndex)
+                }
+                if p.predIndex != q.predIndex {
+                    return compareInts(p.predIndex, q.predIndex)
+                }
+                return compareInts(p.isCtxDependent ? 1 : 0, q.isCtxDependent ? 1 : 0)
+            case let (p as PrecedencePredicate, q as PrecedencePredicate):
+                return compareInts(p.precedence, q.precedence)
+            case let (x as AND, y as AND):
+                return compareOperands(x.opnds, y.opnds)
+            case let (x as OR, y as OR):
+                return compareOperands(x.opnds, y.opnds)
+            default:
+                return compareInts(a.hashValue, b.hashValue)
+            }
+        }
+
+        ///
+        /// Merges two operand arrays, each already in `compare` order, into
+        /// one array in that order without duplicates.
+        ///
+        static func merge(_ x: [SemanticContext], _ y: [SemanticContext]) -> [SemanticContext] {
+            var merged = [SemanticContext]()
+            merged.reserveCapacity(x.count + y.count)
+            var i = 0
+            var j = 0
+            while i < x.count && j < y.count {
+                let c = compare(x[i], y[j])
+                // compare orders contexts of other kinds by hash value, so it can tie two unequal ones
+                if c < 0 || c == 0 && x[i] != y[j] {
+                    merged.append(x[i])
+                    i += 1
+                } else if c > 0 {
+                    merged.append(y[j])
+                    j += 1
+                } else {
+                    merged.append(x[i])
+                    i += 1
+                    j += 1
+                }
+            }
+            merged.append(contentsOf: x[i...])
+            merged.append(contentsOf: y[j...])
+            return merged
+        }
+
+        ///
+        /// Removes all precedence predicates but the one with the lowest or highest
+        /// precedence. They sort next to each other, by precedence.
+        ///
+        static func keepOnePrecedencePredicate(_ operands: inout [SemanticContext], lowest: Bool) {
+            guard let first = operands.firstIndex(where: { $0 is PrecedencePredicate }),
+                  let last = operands.lastIndex(where: { $0 is PrecedencePredicate }) else {
+                return
+            }
+            let kept = operands[lowest ? first : last]
+            operands.replaceSubrange(first...last, with: [kept])
+        }
+
+        private static func kind(_ context: SemanticContext) -> Int {
+            switch context {
+            case is Predicate: return 0
+            case is PrecedencePredicate: return 1
+            case is AND: return 2
+            case is OR: return 3
+            default: return 4
+            }
+        }
+
+        private static func compareOperands(_ x: [SemanticContext], _ y: [SemanticContext]) -> Int {
+            if x.count != y.count {
+                return compareInts(x.count, y.count)
+            }
+            for (p, q) in zip(x, y) {
+                let c = compare(p, q)
+                if c != 0 {
+                    return c
+                }
+            }
+            return 0
+        }
+
+        private static func compareInts(_ x: Int, _ y: Int) -> Int {
+            return x < y ? -1 : (x > y ? 1 : 0)
+        }
     }
 
     ///
@@ -186,29 +284,10 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         public let opnds: [SemanticContext]
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
-            var operands = Set<SemanticContext>()
-            if let aAnd = a as? AND {
-                operands.formUnion(aAnd.opnds)
-            } else {
-                operands.insert(a)
-            }
-            if let bAnd = b as? AND {
-                operands.formUnion(bAnd.opnds)
-            } else {
-                operands.insert(b)
-            }
-
-            let precedencePredicates = SemanticContext.filterPrecedencePredicates(&operands)
-            if !precedencePredicates.isEmpty {
-                // interested in the transition with the lowest precedence
-
-                let reduced = precedencePredicates.sorted {
-                    $0.precedence < $1.precedence
-                }
-                operands.insert(reduced[0])
-            }
-
-            opnds = Array(operands)
+            var operands = Operator.merge((a as? AND)?.opnds ?? [a], (b as? AND)?.opnds ?? [b])
+            // interested in the transition with the lowest precedence
+            Operator.keepOnePrecedencePredicate(&operands, lowest: true)
+            opnds = operands
         }
 
         override
@@ -281,29 +360,10 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         public final var opnds: [SemanticContext]
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
-            var operands: Set<SemanticContext> = Set<SemanticContext>()
-            if let aOr = a as? OR {
-                operands.formUnion(aOr.opnds)
-            } else {
-                operands.insert(a)
-            }
-            if let bOr = b as? OR {
-                operands.formUnion(bOr.opnds)
-            } else {
-                operands.insert(b)
-            }
-
-            let precedencePredicates = SemanticContext.filterPrecedencePredicates(&operands)
-            if !precedencePredicates.isEmpty {
-                // interested in the transition with the highest precedence
-
-                let reduced = precedencePredicates.sorted {
-                    $0.precedence > $1.precedence
-                }
-                operands.insert(reduced[0])
-            }
-
-            self.opnds = Array(operands)
+            var operands = Operator.merge((a as? OR)?.opnds ?? [a], (b as? OR)?.opnds ?? [b])
+            // interested in the transition with the highest precedence
+            Operator.keepOnePrecedencePredicate(&operands, lowest: false)
+            self.opnds = operands
         }
 
         override
@@ -397,16 +457,6 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return result.opnds[0]
         }
 
-        return result
-    }
-
-    private static func filterPrecedencePredicates(_ collection: inout Set<SemanticContext>) -> [PrecedencePredicate] {
-        let result = collection.compactMap {
-            $0 as? PrecedencePredicate
-        }
-        collection = Set<SemanticContext>(collection.filter {
-            !($0 is PrecedencePredicate)
-        })
         return result
     }
 }
