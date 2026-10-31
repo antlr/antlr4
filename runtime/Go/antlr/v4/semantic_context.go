@@ -188,69 +188,160 @@ func PrecedencePredicatefilterPrecedencePredicates(set *JStore[SemanticContext, 
 	return result
 }
 
+// compareSemanticContexts orders contexts by kind and then by their fields, so an operator
+// holds its operands in one order whichever order they were combined in.
+func compareSemanticContexts(a, b SemanticContext) int {
+	if c := compareInts(semanticContextKind(a), semanticContextKind(b)); c != 0 {
+		return c
+	}
+	var x, y []SemanticContext
+	switch p := a.(type) {
+	case *Predicate:
+		q := b.(*Predicate)
+		if p.ruleIndex != q.ruleIndex {
+			return compareInts(p.ruleIndex, q.ruleIndex)
+		}
+		if p.predIndex != q.predIndex {
+			return compareInts(p.predIndex, q.predIndex)
+		}
+		if p.isCtxDependent == q.isCtxDependent {
+			return 0
+		}
+		if q.isCtxDependent {
+			return -1
+		}
+		return 1
+	case *PrecedencePredicate:
+		return compareInts(p.precedence, b.(*PrecedencePredicate).precedence)
+	case *AND:
+		x, y = p.opnds, b.(*AND).opnds
+	case *OR:
+		x, y = p.opnds, b.(*OR).opnds
+	default:
+		return compareInts(a.Hash(), b.Hash())
+	}
+	if len(x) != len(y) {
+		return compareInts(len(x), len(y))
+	}
+	for i := range x {
+		if c := compareSemanticContexts(x[i], y[i]); c != 0 {
+			return c
+		}
+	}
+	return 0
+}
+
+func semanticContextKind(c SemanticContext) int {
+	switch c.(type) {
+	case *Predicate:
+		return 0
+	case *PrecedencePredicate:
+		return 1
+	case *AND:
+		return 2
+	case *OR:
+		return 3
+	}
+	return 4
+}
+
+func compareInts(a, b int) int {
+	if a < b {
+		return -1
+	}
+	if a > b {
+		return 1
+	}
+	return 0
+}
+
+// mergeSemanticContexts merges two operand slices, each already in compareSemanticContexts
+// order, into one slice in that order without duplicates.
+func mergeSemanticContexts(x, y []SemanticContext) []SemanticContext {
+	merged := make([]SemanticContext, 0, len(x)+len(y))
+	i, j := 0, 0
+	for i < len(x) && j < len(y) {
+		// compareSemanticContexts orders contexts of other kinds by hash code, so it can tie two unequal ones.
+		switch c := compareSemanticContexts(x[i], y[j]); {
+		case c < 0, c == 0 && !x[i].Equals(y[j]):
+			merged = append(merged, x[i])
+			i++
+		case c > 0:
+			merged = append(merged, y[j])
+			j++
+		default:
+			merged = append(merged, x[i])
+			i++
+			j++
+		}
+	}
+	merged = append(merged, x[i:]...)
+	return append(merged, y[j:]...)
+}
+
+// keepOnePrecedencePredicate removes all precedence predicates but the one with the lowest
+// or highest precedence. They sort next to each other, by precedence.
+func keepOnePrecedencePredicate(operands []SemanticContext, lowest bool) []SemanticContext {
+	first, last := -1, -1
+	for i, o := range operands {
+		if _, ok := o.(*PrecedencePredicate); ok {
+			if first < 0 {
+				first = i
+			}
+			last = i
+		}
+	}
+	if first < 0 {
+		return operands
+	}
+	if !lowest {
+		operands[first] = operands[last]
+	}
+	return append(operands[:first+1], operands[last+1:]...)
+}
+
 // A semantic context which is true whenever none of the contained contexts
 // is false.`
 
 type AND struct {
 	opnds []SemanticContext
+	hash  int
 }
 
 func NewAND(a, b SemanticContext) *AND {
-
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst, SemanticContextCollection, "NewAND() operands")
+	x := []SemanticContext{a}
 	if aa, ok := a.(*AND); ok {
-		for _, o := range aa.opnds {
-			operands.Put(o)
-		}
-	} else {
-		operands.Put(a)
+		x = aa.opnds
 	}
-
+	y := []SemanticContext{b}
 	if ba, ok := b.(*AND); ok {
-		for _, o := range ba.opnds {
-			operands.Put(o)
-		}
-	} else {
-		operands.Put(b)
+		y = ba.opnds
 	}
-	precedencePredicates := PrecedencePredicatefilterPrecedencePredicates(operands)
-	if len(precedencePredicates) > 0 {
-		// interested in the transition with the lowest precedence
-		var reduced *PrecedencePredicate
+	// interested in the transition with the lowest precedence
+	opnds := keepOnePrecedencePredicate(mergeSemanticContexts(x, y), true)
 
-		for _, p := range precedencePredicates {
-			if reduced == nil || p.precedence < reduced.precedence {
-				reduced = p
-			}
-		}
-
-		operands.Put(reduced)
+	h := murmurInit(37) // Init with a value different from OR
+	for _, op := range opnds {
+		h = murmurUpdate(h, op.Hash())
 	}
 
-	vs := operands.Values()
-	opnds := make([]SemanticContext, len(vs))
-	copy(opnds, vs)
-
-	and := new(AND)
-	and.opnds = opnds
-
-	return and
+	return &AND{opnds: opnds, hash: murmurFinish(h, len(opnds))}
 }
 
 func (a *AND) Equals(other Collectable[SemanticContext]) bool {
 	if a == other {
 		return true
 	}
-	if _, ok := other.(*AND); !ok {
+	o, ok := other.(*AND)
+	if !ok || a.hash != o.hash || len(a.opnds) != len(o.opnds) {
 		return false
-	} else {
-		for i, v := range other.(*AND).opnds {
-			if !a.opnds[i].Equals(v) {
-				return false
-			}
-		}
-		return true
 	}
+	for i, v := range o.opnds {
+		if !a.opnds[i].Equals(v) {
+			return false
+		}
+	}
+	return true
 }
 
 // {@inheritDoc}
@@ -306,19 +397,11 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 }
 
 func (a *AND) Hash() int {
-	h := murmurInit(37) // Init with a value different from OR
-	for _, op := range a.opnds {
-		h = murmurUpdate(h, op.Hash())
-	}
-	return murmurFinish(h, len(a.opnds))
+	return a.hash
 }
 
 func (o *OR) Hash() int {
-	h := murmurInit(41) // Init with o value different from AND
-	for _, op := range o.opnds {
-		h = murmurUpdate(h, op.Hash())
-	}
-	return murmurFinish(h, len(o.opnds))
+	return o.hash
 }
 
 func (a *AND) String() string {
@@ -342,64 +425,43 @@ func (a *AND) String() string {
 
 type OR struct {
 	opnds []SemanticContext
+	hash  int
 }
 
 func NewOR(a, b SemanticContext) *OR {
-
-	operands := NewJStore[SemanticContext, Comparator[SemanticContext]](semctxEqInst, SemanticContextCollection, "NewOR() operands")
+	x := []SemanticContext{a}
 	if aa, ok := a.(*OR); ok {
-		for _, o := range aa.opnds {
-			operands.Put(o)
-		}
-	} else {
-		operands.Put(a)
+		x = aa.opnds
 	}
-
+	y := []SemanticContext{b}
 	if ba, ok := b.(*OR); ok {
-		for _, o := range ba.opnds {
-			operands.Put(o)
-		}
-	} else {
-		operands.Put(b)
+		y = ba.opnds
 	}
-	precedencePredicates := PrecedencePredicatefilterPrecedencePredicates(operands)
-	if len(precedencePredicates) > 0 {
-		// interested in the transition with the lowest precedence
-		var reduced *PrecedencePredicate
+	// interested in the transition with the highest precedence
+	opnds := keepOnePrecedencePredicate(mergeSemanticContexts(x, y), false)
 
-		for _, p := range precedencePredicates {
-			if reduced == nil || p.precedence > reduced.precedence {
-				reduced = p
-			}
-		}
-
-		operands.Put(reduced)
+	h := murmurInit(41) // Init with a value different from AND
+	for _, op := range opnds {
+		h = murmurUpdate(h, op.Hash())
 	}
 
-	vs := operands.Values()
-
-	opnds := make([]SemanticContext, len(vs))
-	copy(opnds, vs)
-
-	o := new(OR)
-	o.opnds = opnds
-
-	return o
+	return &OR{opnds: opnds, hash: murmurFinish(h, len(opnds))}
 }
 
 func (o *OR) Equals(other Collectable[SemanticContext]) bool {
 	if o == other {
 		return true
-	} else if _, ok := other.(*OR); !ok {
-		return false
-	} else {
-		for i, v := range other.(*OR).opnds {
-			if !o.opnds[i].Equals(v) {
-				return false
-			}
-		}
-		return true
 	}
+	p, ok := other.(*OR)
+	if !ok || o.hash != p.hash || len(o.opnds) != len(p.opnds) {
+		return false
+	}
+	for i, v := range p.opnds {
+		if !o.opnds[i].Equals(v) {
+			return false
+		}
+	}
+	return true
 }
 
 // <p>

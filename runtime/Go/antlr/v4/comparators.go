@@ -29,7 +29,6 @@ var (
 	aConfCompInst   = &ATNConfigComparator[*ATNConfig]{}
 	atnConfCompInst = &BaseATNConfigComparator[*ATNConfig]{}
 	dfaStateEqInst  = &ObjEqComparator[*DFAState]{}
-	semctxEqInst    = &ObjEqComparator[SemanticContext]{}
 	atnAltCfgEqInst = &ATNAltConfigComparator[*ATNConfig]{}
 	pContextEqInst  = &ObjEqComparator[*PredictionContext]{}
 )
