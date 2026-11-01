@@ -11,7 +11,7 @@ import {ParseTree} from "./ParseTree.js";
  * @param Result The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-export declare interface ParseTreeVisitor<Result> {
+export declare interface IParseTreeVisitor<Result> {
 	/**
 	 * Visit a parse tree, and return a user-defined result of the operation.
 	 *

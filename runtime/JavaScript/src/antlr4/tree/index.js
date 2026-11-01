@@ -8,7 +8,8 @@ import RuleNode from './RuleNode.js';
 import ErrorNode from './ErrorNode.js';
 import TerminalNode from './TerminalNode.js';
 import ParseTreeListener from './ParseTreeListener.js';
+import ParseTreeVisitor from './ParseTreeVisitor.js'
 import ParseTreeWalker from './ParseTreeWalker.js';
 import { default as Trees } from './Trees.js';
 
-export default { AbstractParseTreeVisitor, Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeWalker }
+export default { AbstractParseTreeVisitor, Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker }
