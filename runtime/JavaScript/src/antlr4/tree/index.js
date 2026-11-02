@@ -4,6 +4,7 @@
  */
 
 import AbstractParseTreeVisitor from './AbstractParseTreeVisitor.js';
+import AbstractParseTreeListener from "./tree/AbstractParseTreeListener.js";
 import RuleNode from './RuleNode.js';
 import ErrorNode from './ErrorNode.js';
 import TerminalNode from './TerminalNode.js';
@@ -12,4 +13,4 @@ import ParseTreeVisitor from './ParseTreeVisitor.js'
 import ParseTreeWalker from './ParseTreeWalker.js';
 import { default as Trees } from './Trees.js';
 
-export default { AbstractParseTreeVisitor, Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker }
+export default { AbstractParseTreeVisitor, AbstractParseTreeListener, Trees, RuleNode, ErrorNode, TerminalNode, ParseTreeListener, ParseTreeVisitor, ParseTreeWalker }

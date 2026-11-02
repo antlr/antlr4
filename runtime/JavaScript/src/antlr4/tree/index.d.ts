@@ -1,4 +1,5 @@
 export * from './AbstractParseTreeVisitor.js';
+export * from './AbstractParseTreeListener.js';
 export * from "./RuleNode.js";
 export * from "./ErrorNode.js";
 export * from "./TerminalNode.js";

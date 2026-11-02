@@ -38,6 +38,7 @@ import DefaultErrorStrategy from "./error/DefaultErrorStrategy.js";
 import Interval from './misc/Interval.js';
 import IntervalSet from './misc/IntervalSet.js';
 import AbstractParseTreeVisitor from "./tree/AbstractParseTreeVisitor.js";
+import AbstractParseTreeListener from "./tree/AbstractParseTreeListener.js";
 import ParseTreeListener from "./tree/ParseTreeListener.js";
 import ParseTreeVisitor from "./tree/ParseTreeVisitor.js"
 import ParseTreeWalker from "./tree/ParseTreeWalker.js";
@@ -57,7 +58,7 @@ export default {
 export {
     Token, CommonToken, CharStreams, CharStream, InputStream, FileStream, CommonTokenStream, Lexer, Parser,
     RuleNode, TerminalNode, ParseTreeWalker, RuleContext, ParserRuleContext, Interval, IntervalSet,
-    PredictionMode, LL1Analyzer, AbstractParseTreeVisitor, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
+    PredictionMode, LL1Analyzer, AbstractParseTreeVisitor, AbstractParseTreeListener, ParseTreeListener, ParseTreeVisitor, ATN, ATNDeserializer, PredictionContextCache, LexerATNSimulator, ParserATNSimulator, DFA,
     RecognitionException, NoViableAltException, FailedPredicateException, ErrorListener, DiagnosticErrorListener, BailErrorStrategy, DefaultErrorStrategy,
     arrayToString, TokenStreamRewriter, InputMismatchException
 }
