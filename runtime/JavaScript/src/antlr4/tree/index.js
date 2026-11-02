@@ -4,7 +4,7 @@
  */
 
 import AbstractParseTreeVisitor from './AbstractParseTreeVisitor.js';
-import AbstractParseTreeListener from "./tree/AbstractParseTreeListener.js";
+import AbstractParseTreeListener from "./AbstractParseTreeListener.js";
 import RuleNode from './RuleNode.js';
 import ErrorNode from './ErrorNode.js';
 import TerminalNode from './TerminalNode.js';
