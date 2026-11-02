@@ -44,7 +44,7 @@ type int = number;
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-import {ParseTreeListener} from "antlr4";
+import {IParseTreeListener} from "antlr4";
 
 <header>
 
@@ -56,7 +56,7 @@ import {ParseTreeListener} from "antlr4";
  * This interface defines a complete listener for a parse tree produced by
  * `<file.parserName>`.
  */
-export default interface <file.grammarName>Listener extends ParseTreeListener {
+export default interface <file.grammarName>Listener extends IParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -179,13 +179,13 @@ import type {
 } from "./<file.parserName>";
 import <file.grammarName>Visitor from "./<file.grammarName>Visitor";
 
-export default class <file.grammarName>BaseVisitor\<Result, DefaultType = null> extends AbstractParseTreeVisitor\<Result, DefaultType> implements <file.grammarName>Visitor\<Result | DefaultType> {
+export default class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 /**
  * The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.
  */
-	visit<lname; format="cap"> = (ctx: <lname; format="cap">Context) => this.visitChildren(ctx); }; separator="\n">
+	visit<lname; format="cap">(ctx: <lname; format="cap">Context): Result { return this.visitChildren(ctx); \}}; separator="\n">
 }
 >>
 

@@ -8,16 +8,16 @@ import { TerminalNode } from "./TerminalNode";
  * Use is of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-export declare abstract class AbstractParseTreeVisitor<VisitType, DefaultType = null> implements IParseTreeVisitor<VisitType | DefaultType> {
-    visit(tree: ParseTree) : VisitType | DefaultType;
+export declare abstract class AbstractParseTreeVisitor<VisitType> implements IParseTreeVisitor<VisitType> {
+    visit(tree: ParseTree) : VisitType;
 
-    visitChildren(node: RuleNode) : VisitType | DefaultType;
+    visitChildren(node: RuleNode) : VisitType;
 
-    visitTerminal(node: TerminalNode) : VisitType | DefaultType;
+    visitTerminal(node: TerminalNode) : VisitType;
 
-    visitErrorNode(node: ErrorNode) : VisitType | DefaultType;
+    visitErrorNode(node: ErrorNode) : VisitType;
 
-		protected defaultResult(): DefaultType;
-		protected aggregateResult(aggregate: VisitType | DefaultType, nextResult: VisitType | DefaultType): VisitType | DefaultType;
-		protected shouldVisitNextChild(node: RuleNode, currentResult: VisitType | DefaultType) : boolean;
+		protected defaultResult(): VisitType;
+		protected aggregateResult(aggregate: VisitType, nextResult: VisitType): VisitType;
+		protected shouldVisitNextChild(node: RuleNode, currentResult: VisitType) : boolean;
 }
