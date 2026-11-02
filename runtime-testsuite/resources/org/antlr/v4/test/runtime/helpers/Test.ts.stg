@@ -3,7 +3,7 @@ import {
 	CommonTokenStream,
 	DiagnosticErrorListener,
 	Lexer,
-	ParseTreeListener,
+	AbstractParseTreeListener,
 	ParseTreeWalker,
 	RuleContext,
 	ParserRuleContext,
@@ -20,7 +20,7 @@ import <grammarName>Listener from './<grammarName>Listener.js';
 import <grammarName>Visitor from './<grammarName>Visitor.js';
 <endif>
 
-class TreeShapeListener extends ParseTreeListener {
+class TreeShapeListener extends AbstractParseTreeListener {
     enterEveryRule(ctx: ParserRuleContext) {
         for (let i = 0; i \< ctx.getChildCount(); i++) {
             const child = ctx.getChild(i) as RuleContext;

@@ -23,12 +23,14 @@ import {
 	RuleContext, ParserRuleContext, PredictionMode, PredictionContextCache,
 	TerminalNode, RuleNode,
 	Token, TokenStream,
-	Interval, IntervalSet
+	Interval, IntervalSet, ParseTreeVisitor,
 } from 'antlr4';
 <if(file.genListener)>
+import <file.grammarName>BaseListener from "./<file.grammarName>BaseListener.js";
 import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
 <endif>
 <if(file.genVisitor)>
+import <file.grammarName>BaseVisitor from "./<file.grammarName>BaseVisitor.js";
 import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
@@ -56,7 +58,7 @@ import {ParseTreeListener} from "antlr4";
  * This interface defines a complete listener for a parse tree produced by
  * `<file.parserName>`.
  */
-export default class <file.grammarName>Listener extends ParseTreeListener {
+export default interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -67,7 +69,7 @@ export default class <file.grammarName>Listener extends ParseTreeListener {
 <endif>
  * @param ctx the parse tree
  */
-enter<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;
+enter<lname; format="cap">(ctx: <lname; format="cap">Context): void;
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the `<lname>`
@@ -77,10 +79,61 @@ enter<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;
 <endif>
  * @param ctx the parse tree
  */
-exit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => void;}; separator="\n">
+exit<lname; format="cap">(ctx: <lname; format="cap">Context): void;}; separator="\n">
 }
 
 <namedActions.afterListener>
+>>
+
+BaseListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+import type { ErrorNode, ParserRuleContext, TerminalNode } from "antlr4";
+import type {
+	<file.listenerNames:{lname | <lname; format="cap">Context,}; separator="\n">
+} from "./<file.parserName>";
+import <file.grammarName>Listener from "./<file.grammarName>Listener";
+
+/**
+ * This class provides an empty implementation of {@link <file.grammarName>Listener},
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
+export default class <file.grammarName>BaseListener implements <file.grammarName>Listener {
+	<file.listenerNames:{lname |
+	/**
+	*
+	* The default implementation does nothing.
+	*/
+	enter<lname; format="cap">(ctx: <lname; format="cap">Context) { \}
+	/**
+	*
+	* The default implementation does nothing.
+	*/
+	exit<lname; format="cap"> (ctx: <lname; format="cap">Context) { \}}; separator="\n">
+
+	/**
+	 *
+	 * The default implementation does nothing.
+	 */
+	enterEveryRule(ctx: ParserRuleContext) { }
+	/**
+	 *
+	 * The default implementation does nothing.
+	 */
+	exitEveryRule(ctx: ParserRuleContext) { }
+	/**
+	 *
+	 * The default implementation does nothing.
+	 */
+	visitTerminal(node: TerminalNode) { }
+	/**
+	 *
+	 * The default implementation does nothing.
+	 */
+	visitErrorNode(node: ErrorNode) { }
+}
+
 >>
 
 VisitorFile(file, header, namedActions) ::= <<
@@ -101,7 +154,7 @@ import {ParseTreeVisitor} from 'antlr4';
  * @param \<Result> The return type of the visit operation. Use `void` for
  * operations with no return type.
  */
-export default class <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
+export default interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
 <if(file.visitorLabelRuleNames.(lname))>
@@ -113,10 +166,29 @@ export default class <file.grammarName>Visitor\<Result> extends ParseTreeVisitor
  * @param ctx the parse tree
  * @return the visitor result
  */
-visit<lname; format="cap">?: (ctx: <lname; format="cap">Context) => Result;}; separator="\n">
+visit<lname; format="cap">(ctx: <lname; format="cap">Context): Result;}; separator="\n">
 }
 
 <namedActions.afterVisitor>
+>>
+
+BaseVisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+import { AbstractParseTreeVisitor } from "antlr4";
+import type {
+	<file.visitorNames:{lname | <lname; format="cap">Context,}; separator="\n">
+} from "./<file.parserName>";
+import <file.grammarName>Visitor from "./<file.grammarName>Visitor";
+
+export default class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
+	<file.visitorNames:{lname |
+/**
+ * The default implementation returns the result of calling
+ * {@link #visitChildren\} on {@code ctx\}.
+ */
+	visit<lname; format="cap">(ctx: <lname; format="cap">Context): Result { return this.visitChildren(ctx); \}}; separator="\n">
+}
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
@@ -782,12 +854,16 @@ public <if(method.isEnter)>enter<else>exit<endif>Rule(listener: <parser.grammarN
 
 VisitorDispatchMethod(method) ::= <<
 // @Override
-public accept\<Result>(visitor: <parser.grammarName>Visitor\<Result>): Result {
-	if (visitor.visit<struct.derivedFromName; format="cap">) {
+public accept\<Result>(visitor: ParseTreeVisitor\<Result>): Result {
+	if (this.IsTypedVisitor(visitor)) {
 		return visitor.visit<struct.derivedFromName; format="cap">(this);
 	} else {
 		return visitor.visitChildren(this);
 	}
+}
+
+private IsTypedVisitor\<Result>(visitor: ParseTreeVisitor\<Result>) : visitor is <parser.grammarName>Visitor\<Result> {
+	return (visitor as <parser.grammarName>Visitor\<Result>).visit<struct.derivedFromName; format="cap"> !== undefined;
 }
 >>
 
