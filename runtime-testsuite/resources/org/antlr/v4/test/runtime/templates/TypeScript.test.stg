@@ -164,7 +164,7 @@ BasicListener(X) ::= <<
 @parser::header {
 import { ParseTreeWalker } from 'antlr4';
 
-class LeafListener extends <X>Listener {
+class LeafListener extends <X>BaseListener {
 	visitTerminal(node: TerminalNode) {
 		console.log(node.symbol.text);
 	}
@@ -205,7 +205,7 @@ TokenGetterListener(X) ::= <<
 @parser::header {
 import { arrayToString, ParseTreeWalker } from 'antlr4';
 
-class LeafListener extends <X>Listener {
+class LeafListener extends <X>BaseListener {
 
 	exitA? = (ctx: AContext) => {
     	var str;
@@ -226,7 +226,7 @@ RuleGetterListener(X) ::= <<
 @parser::header {
 import { ParseTreeWalker } from 'antlr4';
 
-class LeafListener extends <X>Listener {
+class LeafListener extends <X>BaseListener {
 	exitA? = (ctx: AContext) => {
     	var str;
         if(ctx.getChildCount()===2) {
@@ -245,7 +245,7 @@ LRListener(X) ::= <<
 @parser::header {
 import { ParseTreeWalker } from 'antlr4';
 
-class LeafListener extends <X>Listener {
+class LeafListener extends <X>BaseListener {
 
 	exitE? = (ctx: EContext) => {
     	var str;
@@ -265,7 +265,7 @@ LRWithLabelsListener(X) ::= <<
 @parser::header {
 import { ParseTreeWalker } from 'antlr4';
 
-class LeafListener extends <X>Listener {
+class LeafListener extends <X>BaseListener {
 
     exitCall? = (ctx: CallContext) => {
     	var str = ctx.e().start.text + ' ' + ctx.eList();
