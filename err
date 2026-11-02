@@ -1,0 +1,75 @@
+[INFO] Scanning for projects...
+[INFO] Loaded 24338 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[INFO] Loaded 64 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)
+[WARNING] The project org.antlr:antlr4-master:pom:4.13.3-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[WARNING] The project org.antlr:antlr4-runtime:jar:4.13.3-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[WARNING] The project org.antlr:antlr4:jar:4.13.3-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[WARNING] The project org.antlr:antlr4-runtime-testsuite:jar:4.13.3-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[WARNING] The project org.antlr:antlr4-tool-testsuite:jar:4.13.3-SNAPSHOT uses prerequisites which is only intended for maven-plugin projects but not for non maven-plugin projects. For such purposes you should use the maven-enforcer-plugin. See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] ANTLR 4                                                            [pom]
+[INFO] ANTLR 4 Runtime                                                    [jar]
+[INFO] ANTLR 4 Tool                                                       [jar]
+[INFO] ANTLR 4 Maven plugin                                      [maven-plugin]
+[INFO] ANTLR 4 Runtime Tests (4th generation)                             [jar]
+[INFO] ANTLR 4 Tool Tests                                                 [jar]
+[INFO] 
+[INFO] ----------------------< org.antlr:antlr4-master >-----------------------
+[INFO] Building ANTLR 4 4.13.3-SNAPSHOT                                   [1/6]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:1.2:enforce (enforce-maven) @ antlr4-master ---
+[INFO] 
+[INFO] ----------------------< org.antlr:antlr4-runtime >----------------------
+[INFO] Building ANTLR 4 Runtime 4.13.3-SNAPSHOT                           [2/6]
+[INFO]   from runtime/Java/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:1.2:enforce (enforce-maven) @ antlr4-runtime ---
+[INFO] 
+[INFO] --- graphviz:1.0:dot (default) @ antlr4-runtime ---
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ antlr4-runtime ---
+[INFO] skip non existing resourceDirectory /data/Projects/rotal/antlr4/runtime/Java/resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ antlr4-runtime ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- bundle:5.1.9:manifest (bundle-manifest) @ antlr4-runtime ---
+[INFO] Writing manifest: /data/Projects/rotal/antlr4/runtime/Java/target/classes/META-INF/MANIFEST.MF
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ antlr4-runtime ---
+[INFO] skip non existing resourceDirectory /data/Projects/rotal/antlr4/runtime/Java/test
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ antlr4-runtime ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.6.0:test (default-test) @ antlr4-runtime ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for ANTLR 4 4.13.3-SNAPSHOT:
+[INFO] 
+[INFO] ANTLR 4 Tool ....................................... SKIPPED
+[INFO] ANTLR 4 Maven plugin ............................... SKIPPED
+[INFO] ANTLR 4 Runtime Tests (4th generation) ............. SKIPPED
+[INFO] ANTLR 4 Tool Tests ................................. SKIPPED
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.142 s]
+[ERROR] ANTLR 4 Runtime .................................... FAILURE [  1.566 s]
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.075 s
+[INFO] Finished at: 2026-11-02T12:50:41-08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.6.0:test (default-test) on project antlr4-runtime: No tests matching pattern "typescript.**" were executed! (Set -Dsurefire.failIfNoSpecifiedTests=false to ignore this error.) -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :antlr4-runtime
