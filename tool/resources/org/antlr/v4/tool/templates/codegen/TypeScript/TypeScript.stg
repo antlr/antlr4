@@ -23,7 +23,7 @@ import {
 	RuleContext, ParserRuleContext, PredictionMode, PredictionContextCache,
 	TerminalNode, RuleNode,
 	Token, TokenStream,
-	Interval, IntervalSet, IParseTreeVisitor,
+	Interval, IntervalSet, ParseTreeVisitor,
 } from 'antlr4';
 <if(file.genListener)>
 import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
@@ -44,7 +44,7 @@ type int = number;
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-import {IParseTreeListener} from "antlr4";
+import {ParseTreeListener} from "antlr4";
 
 <header>
 
@@ -56,7 +56,7 @@ import {IParseTreeListener} from "antlr4";
  * This interface defines a complete listener for a parse tree produced by
  * `<file.parserName>`.
  */
-export default interface <file.grammarName>Listener extends IParseTreeListener {
+export default interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -137,7 +137,7 @@ export default class <file.grammarName>BaseListener implements <file.grammarName
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-import {IParseTreeVisitor} from 'antlr4';
+import {ParseTreeVisitor} from 'antlr4';
 
 <header>
 
@@ -152,7 +152,7 @@ import {IParseTreeVisitor} from 'antlr4';
  * @param \<Result> The return type of the visit operation. Use `void` for
  * operations with no return type.
  */
-export default interface <file.grammarName>Visitor\<Result> extends IParseTreeVisitor\<Result> {
+export default interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
 <if(file.visitorLabelRuleNames.(lname))>
@@ -852,7 +852,7 @@ public <if(method.isEnter)>enter<else>exit<endif>Rule(listener: <parser.grammarN
 
 VisitorDispatchMethod(method) ::= <<
 // @Override
-public accept\<Result>(visitor: IParseTreeVisitor\<Result>): Result {
+public accept\<Result>(visitor: ParseTreeVisitor\<Result>): Result {
 	if (this.IsTypedVisitor(visitor)) {
 		return visitor.visit<struct.derivedFromName; format="cap">(this);
 	} else {
@@ -860,7 +860,7 @@ public accept\<Result>(visitor: IParseTreeVisitor\<Result>): Result {
 	}
 }
 
-private IsTypedVisitor\<Result>(visitor: IParseTreeVisitor\<Result>) : visitor is <parser.grammarName>Visitor\<Result> {
+private IsTypedVisitor\<Result>(visitor: ParseTreeVisitor\<Result>) : visitor is <parser.grammarName>Visitor\<Result> {
 	return (visitor as <parser.grammarName>Visitor\<Result>).visit<struct.derivedFromName; format="cap"> !== undefined;
 }
 >>

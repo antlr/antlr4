@@ -1,8 +1,8 @@
-import {IParseTreeListener} from "./IParseTreeListener.js";
-import {ParseTree} from "./ParseTree.js";
+import { ParseTreeListener } from "./ParseTreeListener.js";
+import { ParseTree } from "./ParseTree.js";
 
 export declare class ParseTreeWalker {
     static DEFAULT: ParseTreeWalker;
 
-    walk<T extends IParseTreeListener>(listener: T, t: ParseTree): void;
+    walk<T extends ParseTreeListener>(listener: T, t: ParseTree): void;
 }
