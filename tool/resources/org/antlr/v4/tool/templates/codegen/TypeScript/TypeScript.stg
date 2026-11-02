@@ -26,9 +26,11 @@ import {
 	Interval, IntervalSet, ParseTreeVisitor,
 } from 'antlr4';
 <if(file.genListener)>
+import <file.grammarName>BaseListener from "./<file.grammarName>BaseListener.js";
 import <file.grammarName>Listener from "./<file.grammarName>Listener.js";
 <endif>
 <if(file.genVisitor)>
+import <file.grammarName>BaseVisitor from "./<file.grammarName>BaseVisitor.js";
 import <file.grammarName>Visitor from "./<file.grammarName>Visitor.js";
 <endif>
 
