@@ -1,0 +1,7 @@
+ID:foo
+INT:42
+STAR:*
+LPAREN:(
+ID:bar
+RPAREN:)
+EOF:<EOF>

@@ -1,0 +1,62 @@
+;; Copyright (c) 2012-2026 The ANTLR Project. All rights reserved.
+;; Use of this file is governed by the BSD 3-clause license that
+;; can be found in the LICENSE.txt file in the project root.
+;;
+;; Assembled after the runtime fragments. main returns 1 when every
+;; check passes, otherwise 0. Keep this suite small: kotoba 0.7.2
+;; web execution is fuel-bounded at 512.
+
+(defn ok-i64 [got :i64 expected :i64] :i64
+  (if (= got expected) 1 0))
+
+(defn ok-str [got :string expected :string] :i64
+  (if (string=? got expected) 1 0))
+
+(defn core-checks [] :i64
+  (let [t (make-common-token 7 0 2 "ab")
+        i (interval-of 2 5)
+        j (interval-of 4 8)
+        s0 (from-string "ab")
+        s1 (stream-consume s0)]
+    (+ (ok-i64 (:type t) 7)
+       (ok-str (:text t) "ab")
+       (ok-i64 token-eof -1)
+       (ok-i64 (interval-length i) 4)
+       (ok-i64 (:a (interval-union i j)) 2)
+       (ok-i64 (:b (interval-intersection i j)) 5)
+       (ok-str (tiny-symbolic-name 1) "ID")
+       (ok-str (tiny-display-name 3) "+")
+       (ok-i64 (stream-la s0 1) 97)
+       (ok-i64 (stream-la s1 1) 98)
+       (ok-str (stream-get-text s0 0 1) "ab"))))
+
+(defn tiny-fixture [] :i64
+  (let [r0 (next-token (lexer-from-string "foo 42 * (bar)"))
+        r1 (next-token (:lexer r0))
+        r2 (next-token (:lexer r1))
+        r3 (next-token (:lexer r2))
+        r4 (next-token (:lexer r3))
+        r5 (next-token (:lexer r4))
+        r6 (next-token (:lexer r5))]
+    (+ (ok-i64 (:type (:token r0)) tiny-id)
+       (ok-str (:text (:token r0)) "foo")
+       (ok-i64 (:start (:token r0)) 0)
+       (ok-i64 (:stop (:token r0)) 2)
+       (ok-i64 (:type (:token r1)) tiny-int)
+       (ok-str (:text (:token r1)) "42")
+       (ok-i64 (:type (:token r2)) tiny-star)
+       (ok-str (:text (:token r2)) "*")
+       (ok-i64 (:type (:token r3)) tiny-lparen)
+       (ok-i64 (:type (:token r4)) tiny-id)
+       (ok-str (:text (:token r4)) "bar")
+       (ok-i64 (:type (:token r5)) tiny-rparen)
+       (ok-i64 (:type (:token r6)) token-eof))))
+
+(defn tiny-ws-only [] :i64
+  (let [r (next-token (lexer-from-string "   "))]
+    (ok-i64 (:type (:token r)) token-eof)))
+
+(defn main [] :i64
+  (let [n (+ (core-checks) (tiny-fixture) (tiny-ws-only))
+        expected 25]
+    (if (= n expected) 1 0)))

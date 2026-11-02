@@ -1,0 +1,4 @@
+build/
+*.wasm
+*.mjs
+/tmp/
