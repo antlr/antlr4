@@ -5,7 +5,6 @@
 
 import equalArrays from "../utils/equalArrays.js";
 import HashCode from "../misc/HashCode.js";
-import HashSet from "../misc/HashSet.js";
 
 /**
  * A tree structure used to record the semantic context in which
@@ -103,33 +102,13 @@ class AND extends SemanticContext {
 	 */
 	constructor(a, b) {
 		super();
-		const operands = new HashSet();
-		if (a instanceof AND) {
-			a.opnds.map(function(o) {
-				operands.add(o);
-			});
-		} else {
-			operands.add(a);
-		}
-		if (b instanceof AND) {
-			b.opnds.map(function(o) {
-				operands.add(o);
-			});
-		} else {
-			operands.add(b);
-		}
-		const precedencePredicates = filterPrecedencePredicates(operands);
-		if (precedencePredicates.length > 0) {
-			// interested in the transition with the lowest precedence
-			let reduced = null;
-			precedencePredicates.map( function(p) {
-				if(reduced===null || p.precedence<reduced.precedence) {
-					reduced = p;
-				}
-			});
-			operands.add(reduced);
-		}
-		this.opnds = Array.from(operands.values());
+		const operands = merge(
+			a instanceof AND ? a.opnds : [a],
+			b instanceof AND ? b.opnds : [b]);
+		// interested in the transition with the lowest precedence
+		keepOnePrecedencePredicate(operands, true);
+		this.opnds = operands;
+		this.cachedHashCode = HashCode.hashStuff(this.opnds, "AND");
 	}
 
 	equals(other) {
@@ -138,12 +117,16 @@ class AND extends SemanticContext {
 		} else if (!(other instanceof AND)) {
 			return false;
 		} else {
-			return equalArrays(this.opnds, other.opnds);
+			return this.cachedHashCode === other.cachedHashCode && equalArrays(this.opnds, other.opnds);
 		}
 	}
 
+	hashCode() {
+		return this.cachedHashCode;
+	}
+
 	updateHashCode(hash) {
-		hash.update(this.opnds, "AND");
+		hash.update(this.cachedHashCode);
 	}
 
 	/**
@@ -205,32 +188,13 @@ class OR extends SemanticContext {
 	 */
 	constructor(a, b) {
 		super();
-		const operands = new HashSet();
-		if (a instanceof OR) {
-			a.opnds.map(function(o) {
-				operands.add(o);
-			});
-		} else {
-			operands.add(a);
-		}
-		if (b instanceof OR) {
-			b.opnds.map(function(o) {
-				operands.add(o);
-			});
-		} else {
-			operands.add(b);
-		}
-
-		const precedencePredicates = filterPrecedencePredicates(operands);
-		if (precedencePredicates.length > 0) {
-			// interested in the transition with the highest precedence
-			const s = precedencePredicates.sort(function(a, b) {
-				return a.compareTo(b);
-			});
-			const reduced = s[s.length-1];
-			operands.add(reduced);
-		}
-		this.opnds = Array.from(operands.values());
+		const operands = merge(
+			a instanceof OR ? a.opnds : [a],
+			b instanceof OR ? b.opnds : [b]);
+		// interested in the transition with the highest precedence
+		keepOnePrecedencePredicate(operands, false);
+		this.opnds = operands;
+		this.cachedHashCode = HashCode.hashStuff(this.opnds, "OR");
 	}
 
 	equals(other) {
@@ -239,12 +203,16 @@ class OR extends SemanticContext {
 		} else if (!(other instanceof OR)) {
 			return false;
 		} else {
-			return equalArrays(this.opnds, other.opnds);
+			return this.cachedHashCode === other.cachedHashCode && equalArrays(this.opnds, other.opnds);
 		}
 	}
 
+	hashCode() {
+		return this.cachedHashCode;
+	}
+
 	updateHashCode(hash) {
-		hash.update(this.opnds, "OR");
+		hash.update(this.cachedHashCode);
 	}
 
 	/**
@@ -296,12 +264,95 @@ class OR extends SemanticContext {
 	}
 }
 
-function filterPrecedencePredicates(set) {
-	const result = [];
-	set.values().map( function(context) {
-		if (context instanceof SemanticContext.PrecedencePredicate) {
-			result.push(context);
+/**
+ * Orders contexts by kind and then by their fields, so an operator holds
+ * its operands in one order whichever order they were combined in.
+ */
+function compare(a, b) {
+	const k = kind(a) - kind(b);
+	if (k !== 0) {
+		return k;
+	}
+	if (a instanceof SemanticContext.Predicate) {
+		if (a.ruleIndex !== b.ruleIndex) {
+			return a.ruleIndex - b.ruleIndex;
 		}
-	});
-	return result;
+		if (a.predIndex !== b.predIndex) {
+			return a.predIndex - b.predIndex;
+		}
+		return Number(a.isCtxDependent) - Number(b.isCtxDependent);
+	}
+	if (a instanceof SemanticContext.PrecedencePredicate) {
+		return a.precedence - b.precedence;
+	}
+	if (a instanceof AND || a instanceof OR) {
+		if (a.opnds.length !== b.opnds.length) {
+			return a.opnds.length - b.opnds.length;
+		}
+		for (let i = 0; i < a.opnds.length; i++) {
+			const c = compare(a.opnds[i], b.opnds[i]);
+			if (c !== 0) {
+				return c;
+			}
+		}
+		return 0;
+	}
+	return a.hashCode() - b.hashCode();
+}
+
+/**
+ * Merges two operand arrays, each already in {@link compare} order, into
+ * one array in that order without duplicates.
+ */
+function merge(x, y) {
+	const merged = [];
+	let i = 0;
+	let j = 0;
+	while (i < x.length && j < y.length) {
+		const c = compare(x[i], y[j]);
+		// compare orders contexts of other kinds by hash code, so it can tie two unequal ones
+		if (c < 0 || c === 0 && !x[i].equals(y[j])) {
+			merged.push(x[i++]);
+		} else if (c > 0) {
+			merged.push(y[j++]);
+		} else {
+			merged.push(x[i++]);
+			j++;
+		}
+	}
+	return merged.concat(x.slice(i), y.slice(j));
+}
+
+/**
+ * Removes all precedence predicates but the one with the lowest or highest
+ * precedence. They sort next to each other, by precedence.
+ */
+function keepOnePrecedencePredicate(operands, lowest) {
+	let first = -1;
+	let last = -1;
+	for (let i = 0; i < operands.length; i++) {
+		if (operands[i] instanceof SemanticContext.PrecedencePredicate) {
+			if (first < 0) {
+				first = i;
+			}
+			last = i;
+		}
+	}
+	if (first >= 0) {
+		operands.splice(first, last - first + 1, operands[lowest ? first : last]);
+	}
+}
+
+function kind(context) {
+	if (context instanceof SemanticContext.Predicate) {
+		return 0;
+	} else if (context instanceof SemanticContext.PrecedencePredicate) {
+		return 1;
+	} else if (context instanceof AND) {
+		return 2;
+	} else if (context instanceof OR) {
+		return 3;
+	} else {
+		return 4;
+	}
 }

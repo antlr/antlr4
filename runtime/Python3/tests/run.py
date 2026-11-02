@@ -8,5 +8,6 @@ from TestFileStream import TestFileStream
 from TestInputStream import TestInputStream
 from TestIntervalSet import TestIntervalSet
 from TestRecognizer import TestRecognizer
+from TestSemanticContext import TestSemanticContext
 import unittest
 unittest.main()

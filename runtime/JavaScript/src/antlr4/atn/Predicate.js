@@ -44,3 +44,5 @@ export default class Predicate extends SemanticContext {
  * a predicate of the form {@code {true}?}
  */
 SemanticContext.NONE = new Predicate();
+
+SemanticContext.Predicate = Predicate;

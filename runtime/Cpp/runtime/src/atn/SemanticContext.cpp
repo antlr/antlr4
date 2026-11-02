@@ -3,13 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 #include <vector>
 #include <string>
 #include <cstddef>
-#include <functional>
-#include <unordered_set>
 
 #include "misc/MurmurHash.h"
 #include "antlr4-common.h"
@@ -25,71 +24,115 @@ using namespace antlrcpp;
 
 namespace {
 
-  struct SemanticContextHasher final {
-    size_t operator()(const SemanticContext *semanticContext) const {
-      return semanticContext->hashCode();
-    }
-  };
-
-  struct SemanticContextComparer final {
-    bool operator()(const SemanticContext *lhs, const SemanticContext *rhs) const {
-      return *lhs == *rhs;
-    }
-  };
-
-  template <typename Comparer>
-  void insertSemanticContext(const Ref<const SemanticContext> &semanticContext,
-                             std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> &operandSet,
-                             std::vector<Ref<const SemanticContext>> &operandList,
-                             Ref<const SemanticContext::PrecedencePredicate> &precedencePredicate,
-                             Comparer comparer) {
-    if (semanticContext != nullptr) {
-      if (semanticContext->getContextType() == SemanticContextType::PRECEDENCE) {
-        if (precedencePredicate == nullptr || comparer(downCast<const SemanticContext::PrecedencePredicate*>(semanticContext.get())->precedence, precedencePredicate->precedence)) {
-          precedencePredicate = std::static_pointer_cast<const SemanticContext::PrecedencePredicate>(semanticContext);
-        }
-      } else {
-        auto [existing, inserted] = operandSet.insert(semanticContext.get());
-        if (inserted) {
-          operandList.push_back(semanticContext);
-        }
-      }
-    }
+  template <typename T>
+  int compareValues(const T &lhs, const T &rhs) {
+    return lhs < rhs ? -1 : (rhs < lhs ? 1 : 0);
   }
 
-  template <typename Comparer>
-  void insertSemanticContext(Ref<const SemanticContext> &&semanticContext,
-                             std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> &operandSet,
-                             std::vector<Ref<const SemanticContext>> &operandList,
-                             Ref<const SemanticContext::PrecedencePredicate> &precedencePredicate,
-                             Comparer comparer) {
-    if (semanticContext != nullptr) {
-      if (semanticContext->getContextType() == SemanticContextType::PRECEDENCE) {
-        if (precedencePredicate == nullptr || comparer(downCast<const SemanticContext::PrecedencePredicate*>(semanticContext.get())->precedence, precedencePredicate->precedence)) {
-          precedencePredicate = std::static_pointer_cast<const SemanticContext::PrecedencePredicate>(std::move(semanticContext));
-        }
-      } else {
-        auto [existing, inserted] = operandSet.insert(semanticContext.get());
-        if (inserted) {
-          operandList.push_back(std::move(semanticContext));
-        }
-      }
-    }
-  }
-
-  size_t predictOperandCapacity(const Ref<const SemanticContext> &x) {
-    switch (x->getContextType()) {
-      case SemanticContextType::AND:
-        return downCast<const SemanticContext::AND&>(*x).getOperands().size();
-      case SemanticContextType::OR:
-        return downCast<const SemanticContext::OR&>(*x).getOperands().size();
-      default:
+  int kind(const SemanticContext &context) {
+    switch (context.getContextType()) {
+      case SemanticContextType::PREDICATE:
+        return 0;
+      case SemanticContextType::PRECEDENCE:
         return 1;
+      case SemanticContextType::AND:
+        return 2;
+      case SemanticContextType::OR:
+        return 3;
+      default:
+        return 4;
     }
   }
 
-  size_t predictOperandCapacity(const Ref<const SemanticContext> &a, const Ref<const SemanticContext> &b) {
-    return predictOperandCapacity(a) + predictOperandCapacity(b);
+  // Orders contexts by kind and then by their fields, so an operator holds
+  // its operands in one order whichever order they were combined in.
+  int compare(const SemanticContext &a, const SemanticContext &b) {
+    int c = compareValues(kind(a), kind(b));
+    if (c != 0) {
+      return c;
+    }
+    switch (a.getContextType()) {
+      case SemanticContextType::PREDICATE: {
+        const auto &p = downCast<const SemanticContext::Predicate&>(a);
+        const auto &q = downCast<const SemanticContext::Predicate&>(b);
+        if (p.ruleIndex != q.ruleIndex) {
+          return compareValues(p.ruleIndex, q.ruleIndex);
+        }
+        if (p.predIndex != q.predIndex) {
+          return compareValues(p.predIndex, q.predIndex);
+        }
+        return compareValues(p.isCtxDependent, q.isCtxDependent);
+      }
+      case SemanticContextType::PRECEDENCE:
+        return compareValues(downCast<const SemanticContext::PrecedencePredicate&>(a).precedence,
+                             downCast<const SemanticContext::PrecedencePredicate&>(b).precedence);
+      case SemanticContextType::AND:
+      case SemanticContextType::OR: {
+        const auto &x = downCast<const SemanticContext::Operator&>(a).getOperands();
+        const auto &y = downCast<const SemanticContext::Operator&>(b).getOperands();
+        if (x.size() != y.size()) {
+          return compareValues(x.size(), y.size());
+        }
+        for (size_t i = 0; i < x.size(); ++i) {
+          c = compare(*x[i], *y[i]);
+          if (c != 0) {
+            return c;
+          }
+        }
+        return 0;
+      }
+      default:
+        return compareValues(a.hashCode(), b.hashCode());
+    }
+  }
+
+  std::pair<const Ref<const SemanticContext>*, const Ref<const SemanticContext>*> operandsOf(
+    const Ref<const SemanticContext> &context, SemanticContextType type) {
+    if (context->getContextType() == type) {
+      const auto &operands = downCast<const SemanticContext::Operator&>(*context).getOperands();
+      return {operands.data(), operands.data() + operands.size()};
+    }
+    return {&context, &context + 1};
+  }
+
+  // Merges the operands of a and b, each already in compare order, into one
+  // list in that order without duplicates.
+  void mergeOperands(const Ref<const SemanticContext> &a, const Ref<const SemanticContext> &b, SemanticContextType type,
+                     std::vector<Ref<const SemanticContext>> &merged) {
+    auto [x, xEnd] = operandsOf(a, type);
+    auto [y, yEnd] = operandsOf(b, type);
+    merged.reserve(static_cast<size_t>((xEnd - x) + (yEnd - y)));
+    while (x != xEnd && y != yEnd) {
+      int c = compare(**x, **y);
+      // compare orders contexts of other kinds by hash code, so it can tie two unequal ones
+      if (c < 0 || (c == 0 && **x != **y)) {
+        merged.push_back(*x++);
+      } else if (c > 0) {
+        merged.push_back(*y++);
+      } else {
+        merged.push_back(*x++);
+        ++y;
+      }
+    }
+    merged.insert(merged.end(), x, xEnd);
+    merged.insert(merged.end(), y, yEnd);
+  }
+
+  // Precedence predicates sort next to each other by precedence, so the first
+  // has the lowest and the last the highest.
+  void keepOnePrecedencePredicate(std::vector<Ref<const SemanticContext>> &operands, bool lowest) {
+    auto isPrecedencePredicate = [](const Ref<const SemanticContext> &operand) {
+      return SemanticContext::PrecedencePredicate::is(*operand);
+    };
+    auto first = std::find_if(operands.begin(), operands.end(), isPrecedencePredicate);
+    auto last = std::find_if_not(first, operands.end(), isPrecedencePredicate);
+    if (first == last) {
+      return;
+    }
+    if (!lowest) {
+      std::iter_swap(first, last - 1);
+    }
+    operands.erase(first + 1, last);
   }
 
 }
@@ -173,34 +216,9 @@ std::string SemanticContext::PrecedencePredicate::toString() const {
 //------------------ AND -----------------------------------------------------------------------------------------------
 
 SemanticContext::AND::AND(Ref<const SemanticContext> a, Ref<const SemanticContext> b) : Operator(SemanticContextType::AND) {
-  std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> operands;
-  Ref<const SemanticContext::PrecedencePredicate> precedencePredicate;
-
-  _opnds.reserve(predictOperandCapacity(a, b) + 1);
-
-  if (a->getContextType() == SemanticContextType::AND) {
-    for (const auto &operand : downCast<const AND*>(a.get())->getOperands()) {
-      insertSemanticContext(operand, operands, _opnds, precedencePredicate, std::less<int>{});
-    }
-  } else {
-    insertSemanticContext(std::move(a), operands, _opnds, precedencePredicate, std::less<int>{});
-  }
-
-  if (b->getContextType() == SemanticContextType::AND) {
-    for (const auto &operand : downCast<const AND*>(b.get())->getOperands()) {
-      insertSemanticContext(operand, operands, _opnds, precedencePredicate, std::less<int>{});
-    }
-  } else {
-    insertSemanticContext(std::move(b), operands, _opnds, precedencePredicate, std::less<int>{});
-  }
-
-  if (precedencePredicate != nullptr) {
-    // interested in the transition with the lowest precedence
-    auto [existing, inserted] = operands.insert(precedencePredicate.get());
-    if (inserted) {
-      _opnds.push_back(std::move(precedencePredicate));
-    }
-  }
+  mergeOperands(a, b, SemanticContextType::AND, _opnds);
+  // interested in the transition with the lowest precedence
+  keepOnePrecedencePredicate(_opnds, true);
 }
 
 const std::vector<Ref<const SemanticContext>>& SemanticContext::AND::getOperands() const {
@@ -277,34 +295,9 @@ std::string SemanticContext::AND::toString() const {
 //------------------ OR ------------------------------------------------------------------------------------------------
 
 SemanticContext::OR::OR(Ref<const SemanticContext> a, Ref<const SemanticContext> b) : Operator(SemanticContextType::OR) {
-  std::unordered_set<const SemanticContext*, SemanticContextHasher, SemanticContextComparer> operands;
-  Ref<const SemanticContext::PrecedencePredicate> precedencePredicate;
-
-  _opnds.reserve(predictOperandCapacity(a, b) + 1);
-
-  if (a->getContextType() == SemanticContextType::OR) {
-    for (const auto &operand : downCast<const OR*>(a.get())->getOperands()) {
-      insertSemanticContext(operand, operands, _opnds, precedencePredicate, std::greater<int>{});
-    }
-  } else {
-    insertSemanticContext(std::move(a), operands, _opnds, precedencePredicate, std::greater<int>{});
-  }
-
-  if (b->getContextType() == SemanticContextType::OR) {
-    for (const auto &operand : downCast<const OR*>(b.get())->getOperands()) {
-      insertSemanticContext(operand, operands, _opnds, precedencePredicate, std::greater<int>{});
-    }
-  } else {
-    insertSemanticContext(std::move(b), operands, _opnds, precedencePredicate, std::greater<int>{});
-  }
-
-  if (precedencePredicate != nullptr) {
-    // interested in the transition with the highest precedence
-    auto [existing, inserted] = operands.insert(precedencePredicate.get());
-    if (inserted) {
-      _opnds.push_back(std::move(precedencePredicate));
-    }
-  }
+  mergeOperands(a, b, SemanticContextType::OR, _opnds);
+  // interested in the transition with the highest precedence
+  keepOnePrecedencePredicate(_opnds, false);
 }
 
 const std::vector<Ref<const SemanticContext>>& SemanticContext::OR::getOperands() const {
