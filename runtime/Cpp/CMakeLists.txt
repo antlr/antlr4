@@ -132,13 +132,12 @@ else()
     message(FATAL_ERROR "Your C++ compiler does not support C++17.")
 endif()
 
+include(GNUInstallDirs)
 
 add_subdirectory(runtime)
 if(WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
-
-include(GNUInstallDirs)
 
 # Generate CMake Package Files only if install is active
 if (ANTLR4_INSTALL)
