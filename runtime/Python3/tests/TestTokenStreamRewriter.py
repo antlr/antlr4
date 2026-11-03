@@ -5,7 +5,8 @@
 import unittest
 
 
-from mocks.TestLexer import TestLexer, TestLexer2
+from mocks.TestLexer import TestLexer
+from mocks.TestLexer2 import TestLexer2
 from antlr4.TokenStreamRewriter import TokenStreamRewriter
 from antlr4.InputStream import InputStream
 from antlr4.CommonTokenStream import CommonTokenStream
@@ -519,6 +520,64 @@ class TestTokenStreamRewriter(unittest.TestCase):
         rewriter.insertAfter(1, '</b>')
 
         self.assertEqual('<b>a</b><b>a</b>', rewriter.getDefaultText())
+
+    def testCombineInsertsAfterUnrelatedReplace(self):
+        """
+        Test for fix for: https://github.com/antlr/antlr4/issues/4818
+
+        Combining the two inserts must not disturb the unrelated ReplaceOp
+        that precedes them in the instruction list.
+        """
+        input = InputStream('abc')
+        lexer = TestLexer(input)
+        stream = CommonTokenStream(lexer=lexer)
+        stream.fill()
+        rewriter = TokenStreamRewriter(tokens=stream)
+
+        rewriter.replaceIndex(2, 'R')
+        rewriter.insertBeforeIndex(0, 'x')
+        rewriter.insertBeforeIndex(0, 'y')
+
+        self.assertEqual('yxabR', rewriter.getDefaultText())
+
+    def testCombineOverlappingDeletes(self):
+        input = InputStream('abcc')
+        lexer = TestLexer(input)
+        stream = CommonTokenStream(lexer=lexer)
+        stream.fill()
+        rewriter = TokenStreamRewriter(tokens=stream)
+
+        rewriter.delete(TokenStreamRewriter.DEFAULT_PROGRAM_NAME, 0, 1)
+        rewriter.delete(TokenStreamRewriter.DEFAULT_PROGRAM_NAME, 1, 3)
+
+        self.assertEqual('', rewriter.getDefaultText())
+
+    def testCombineOverlappingDeletesReversed(self):
+        input = InputStream('abcc')
+        lexer = TestLexer(input)
+        stream = CommonTokenStream(lexer=lexer)
+        stream.fill()
+        rewriter = TokenStreamRewriter(tokens=stream)
+
+        rewriter.delete(TokenStreamRewriter.DEFAULT_PROGRAM_NAME, 1, 3)
+        rewriter.delete(TokenStreamRewriter.DEFAULT_PROGRAM_NAME, 0, 2)
+
+        self.assertEqual('', rewriter.getDefaultText())
+
+    def testDeleteOpToString(self):
+        input = InputStream('abc')
+        lexer = TestLexer(input)
+        stream = CommonTokenStream(lexer=lexer)
+        stream.fill()
+        rewriter = TokenStreamRewriter(tokens=stream)
+
+        rewriter.deleteIndex(1)
+
+        op = rewriter.getProgram(TokenStreamRewriter.DEFAULT_PROGRAM_NAME)[0]
+        self.assertEqual(
+            '<DeleteOp@[@1,1:1=\'b\',<2>,1:1]..[@1,1:1=\'b\',<2>,1:1]>',
+            str(op)
+        )
 
 
 if __name__ == '__main__':
