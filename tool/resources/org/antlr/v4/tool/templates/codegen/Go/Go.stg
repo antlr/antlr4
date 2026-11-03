@@ -166,7 +166,7 @@ type <parser.name> struct {
 	<endif>
 }
 
-var <parser.grammarName; format="cap">ParserStaticData struct {
+type <parser.grammarName; format="cap">ParserStaticData struct {
   once                   sync.Once
   serializedATN          []int32
   LiteralNames           []string
@@ -177,8 +177,7 @@ var <parser.grammarName; format="cap">ParserStaticData struct {
   decisionToDFA          []*antlr.DFA
 }
 
-func <parser.grammarName; format="lower">ParserInit() {
-  staticData := &<parser.grammarName; format="cap">ParserStaticData
+func <parser.grammarName; format="lower">ParserInit(staticData *<parser.grammarName; format="cap">ParserStaticData) {
 <if(parser.literalNames)>
   staticData.LiteralNames = []string{
     <parser.literalNames; null="\"\"", separator=", ", wrap>,
@@ -198,10 +197,9 @@ func <parser.grammarName; format="lower">ParserInit() {
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
   staticData.atn = deserializer.Deserialize(staticData.serializedATN)
-  atn := staticData.atn
-  staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
+  staticData.decisionToDFA = make([]*antlr.DFA, len(staticData.atn.DecisionToState))
   decisionToDFA := staticData.decisionToDFA
-  for index, state := range atn.DecisionToState {
+  for index, state := range staticData.atn.DecisionToState {
     decisionToDFA[index] = antlr.NewDFA(state, index)
   }
 }
@@ -210,17 +208,17 @@ func <parser.grammarName; format="lower">ParserInit() {
 // static state used to implement the parser is lazily initialized during the first call to
 // New<parser.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
-func <parser.name; format="cap">Init() {
-  staticData := &<parser.grammarName; format="cap">ParserStaticData
-  staticData.once.Do(<parser.grammarName; format="lower">ParserInit)
+func <parser.name; format="cap">Init() *<parser.grammarName; format="cap">ParserStaticData {
+  staticData := &<parser.grammarName; format="cap">ParserStaticData{}
+  <parser.grammarName; format="lower">ParserInit(staticData)
+  return staticData
 }
 
 // New<parser.name> produces a new parser instance for the optional input antlr.TokenStream.
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
-	<parser.name; format="cap">Init()
+	staticData := <parser.name; format="cap">Init()
 	this := new(<parser.name>)
 	this.BaseParser = antlr.NewBaseParser(input)
-  staticData := &<parser.grammarName; format="cap">ParserStaticData
 	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
 	this.RuleNames = staticData.RuleNames
 	this.LiteralNames = staticData.LiteralNames
@@ -1494,7 +1492,7 @@ type <lexer.name> struct {
 	// TODO: EOF string
 }
 
-var <lexer.grammarName; format="cap">LexerStaticData struct {
+type <lexer.grammarName; format="cap">LexerStaticData struct {
   once                   sync.Once
   serializedATN          []int32
   ChannelNames           []string
@@ -1507,8 +1505,7 @@ var <lexer.grammarName; format="cap">LexerStaticData struct {
   decisionToDFA          []*antlr.DFA
 }
 
-func <lexer.grammarName; format="lower">LexerInit() {
-  staticData := &<lexer.grammarName; format="cap">LexerStaticData
+func <lexer.grammarName; format="lower">LexerInit(staticData *<lexer.grammarName; format="cap">LexerStaticData) {
   staticData.ChannelNames = []string{
     "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
   }
@@ -1534,10 +1531,9 @@ func <lexer.grammarName; format="lower">LexerInit() {
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
   staticData.atn = deserializer.Deserialize(staticData.serializedATN)
-  atn := staticData.atn
-  staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
+  staticData.decisionToDFA = make([]*antlr.DFA, len(staticData.atn.DecisionToState))
   decisionToDFA := staticData.decisionToDFA
-  for index, state := range atn.DecisionToState {
+  for index, state := range staticData.atn.DecisionToState {
     decisionToDFA[index] = antlr.NewDFA(state, index)
   }
 }
@@ -1546,17 +1542,17 @@ func <lexer.grammarName; format="lower">LexerInit() {
 // static state used to implement the lexer is lazily initialized during the first call to
 // New<lexer.name>(). You can call this function if you wish to initialize the static state ahead
 // of time.
-func <lexer.name; format="cap">Init() {
-  staticData := &<lexer.grammarName; format="cap">LexerStaticData
-  staticData.once.Do(<lexer.grammarName; format="lower">LexerInit)
+func <lexer.name; format="cap">Init() *<lexer.grammarName; format="cap">LexerStaticData {
+  staticData := &<lexer.grammarName; format="cap">LexerStaticData{}
+  <lexer.grammarName; format="lower">LexerInit(staticData)
+  return staticData
 }
 
 // New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
 func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
-  <lexer.name; format="cap">Init()
 	l := new(<lexer.name>)
 	l.BaseLexer = antlr.NewBaseLexer(input)
-  staticData := &<lexer.grammarName; format="cap">LexerStaticData
+    staticData := <lexer.grammarName; format="cap">Init()
 	l.Interpreter = antlr.NewLexerATNSimulator(l, staticData.atn, staticData.decisionToDFA, staticData.PredictionContextCache)
 	l.channelNames = staticData.ChannelNames
 	l.modeNames = staticData.ModeNames
