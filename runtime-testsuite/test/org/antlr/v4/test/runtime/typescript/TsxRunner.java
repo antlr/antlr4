@@ -57,7 +57,7 @@ public class TsxRunner extends RuntimeRunner {
 	public String getBaseVisitorSuffix() { return null; }
 
 	@Override
-	public String getRuntimeToolName() { return "ts-node"  + (isWindows() ? ".cmd" : ""); }
+	public String getRuntimeToolName() { return "tsx"  + (isWindows() ? ".cmd" : ""); }
 
 	@Override
 	protected CompiledState compile(RunOptions runOptions, GeneratedState generatedState) {
