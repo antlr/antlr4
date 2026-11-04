@@ -46,14 +46,20 @@ import java.util.Set;
 public class DFAState {
 	public int stateNumber = -1;
 
+	/** Accessor for acquire/release access to elements of the {@link #edges} array. */
+	public static final EdgeElementAccessor EDGES_ELEMENT = EdgeElementAccessor.create();
 
 	public ATNConfigSet configs = new ATNConfigSet();
 
 	/** {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
 	 *  {@link Token#EOF} maps to {@code edges[0]}.
+	 *
+	 *  <p>This field is volatile to ensure safe publication of the array reference
+	 *  across threads. Individual array element access must use
+	 *  {@link #EDGES_ELEMENT} with acquire/release semantics.</p>
 	 */
 
-	public DFAState[] edges;
+	public volatile DFAState[] edges;
 
 	public boolean isAcceptState = false;
 

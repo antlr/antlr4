@@ -243,11 +243,12 @@ public class LexerATNSimulator extends ATNSimulator {
 	 */
 
 	protected DFAState getExistingTargetState(DFAState s, int t) {
-		if (s.edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
+		DFAState[] edges = s.edges;
+		if (edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
 			return null;
 		}
 
-		DFAState target = s.edges[t - MIN_DFA_EDGE];
+		DFAState target = DFAState.EDGES_ELEMENT.getAcquire(edges, t - MIN_DFA_EDGE);
 		if (debug && target != null) {
 			System.out.println("reuse state "+s.stateNumber+
 							   " edge to "+target.stateNumber);
@@ -650,13 +651,17 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.println("EDGE "+p+" -> "+q+" upon "+((char)t));
 		}
 
-		synchronized (p) {
-			if ( p.edges==null ) {
-				//  make room for tokens 1..n and -1 masquerading as index 0
-				p.edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
+		DFAState[] edges = p.edges;
+		if (edges == null) {
+			synchronized (p) {
+				edges = p.edges;
+				if (edges == null) {
+					edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
+					p.edges = edges;
+				}
 			}
-			p.edges[t - MIN_DFA_EDGE] = q; // connect
 		}
+		DFAState.EDGES_ELEMENT.setRelease(edges, t - MIN_DFA_EDGE, q);
 	}
 
 	/** Add a new DFA state if there isn't one with this set of
