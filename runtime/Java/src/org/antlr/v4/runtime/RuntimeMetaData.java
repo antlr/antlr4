@@ -143,27 +143,51 @@ public class RuntimeMetaData {
 	 */
 	public static void checkVersion(String generatingToolVersion, String compileTimeVersion) {
 		String runtimeVersion = VERSION;
-		boolean runtimeConflictsWithGeneratingTool = false;
-		boolean runtimeConflictsWithCompileTimeTool = false;
 
-		if ( generatingToolVersion!=null ) {
-			runtimeConflictsWithGeneratingTool =
-				!runtimeVersion.equals(generatingToolVersion) &&
-				!getMajorMinorVersion(runtimeVersion).equals(getMajorMinorVersion(generatingToolVersion));
-		}
-
-		runtimeConflictsWithCompileTimeTool =
-			!runtimeVersion.equals(compileTimeVersion) &&
-			!getMajorMinorVersion(runtimeVersion).equals(getMajorMinorVersion(compileTimeVersion));
-
-		if ( runtimeConflictsWithGeneratingTool ) {
+		if ( runtimeConflictsWithGeneratingTool(runtimeVersion, generatingToolVersion) ) {
 			System.err.printf("ANTLR Tool version %s used for code generation does not match the current runtime version %s%n",
 							  generatingToolVersion, runtimeVersion);
 		}
-		if ( runtimeConflictsWithCompileTimeTool ) {
+		if ( runtimeConflictsWithCompileTimeTool(runtimeVersion, compileTimeVersion) ) {
 			System.err.printf("ANTLR Runtime version %s used for parser compilation does not match the current runtime version %s%n",
 							  compileTimeVersion, runtimeVersion);
 		}
+	}
+
+	/**
+	 * Asserts that the runtime version matches the generating tool and compile-time versions.
+	 *
+	 * <p>See {@link #checkVersion(String, String)} for behavior and details.</p>
+	 *
+	 * @throws IllegalStateException if the runtime version does not match the generating tool or compile-time versions.
+	 */
+	public static void assertVersionMatches(String generatingToolVersion, String compileTimeVersion) {
+		String runtimeVersion = VERSION;
+
+		StringBuilder errorMessage = new StringBuilder();
+
+		if ( runtimeConflictsWithGeneratingTool(runtimeVersion, generatingToolVersion) ) {
+			errorMessage.append(String.format("ANTLR Tool version %s used for code generation does not match the current runtime version %s",
+					generatingToolVersion, runtimeVersion));
+		}
+		if ( runtimeConflictsWithCompileTimeTool(runtimeVersion, compileTimeVersion) ) {
+			errorMessage.append(String.format("ANTLR Runtime version %s used for parser compilation does not match the current runtime version %s",
+					compileTimeVersion, runtimeVersion));
+		}
+		if ( errorMessage.length() > 0 ) {
+			throw new IllegalStateException(errorMessage.toString());
+		}
+	}
+
+	private static boolean runtimeConflictsWithGeneratingTool(String runtimeVersion, String generatingToolVersion) {
+		return generatingToolVersion != null
+				&& !runtimeVersion.equals(generatingToolVersion)
+				&& !getMajorMinorVersion(runtimeVersion).equals(getMajorMinorVersion(generatingToolVersion));
+	}
+
+	private static boolean runtimeConflictsWithCompileTimeTool(String runtimeVersion, String compileTimeVersion) {
+		return !runtimeVersion.equals(compileTimeVersion)
+				&& !getMajorMinorVersion(runtimeVersion).equals(getMajorMinorVersion(compileTimeVersion));
 	}
 
 	/**
