@@ -516,7 +516,6 @@ public class TokenStreamRewriter {
 					rewrites.set(prevRop.instructionIndex, null); // kill first delete
 					rop.index = Math.min(prevRop.index, rop.index);
 					rop.lastIndex = Math.max(prevRop.lastIndex, rop.lastIndex);
-					System.out.println("new rop "+rop);
 				}
 				else if ( !disjoint ) {
 					throw new IllegalArgumentException("replace op boundaries of "+rop+" overlap with previous "+prevRop);
