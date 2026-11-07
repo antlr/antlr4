@@ -39,11 +39,11 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>The list of sorted, disjoint intervals.</summary>
         /// <remarks>The list of sorted, disjoint intervals.</remarks>
-        protected internal IList<Interval> intervals;
+        protected internal List<Interval> intervals;
 
         protected internal bool @readonly;
 
-        public IntervalSet(IList<Interval> intervals)
+        public IntervalSet(List<Interval> intervals)
         {
             this.intervals = intervals;
         }
@@ -379,8 +379,8 @@ namespace Antlr4.Runtime.Misc
                 return null;
             }
             // nothing in common with null set
-            IList<Interval> myIntervals = this.intervals;
-            IList<Interval> theirIntervals = ((Antlr4.Runtime.Misc.IntervalSet)other).intervals;
+            List<Interval> myIntervals = this.intervals;
+            List<Interval> theirIntervals = ((Antlr4.Runtime.Misc.IntervalSet)other).intervals;
             Antlr4.Runtime.Misc.IntervalSet intersection = null;
             int mySize = myIntervals.Count;
             int theirSize = theirIntervals.Count;

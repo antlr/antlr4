@@ -263,6 +263,43 @@ namespace Antlr4.Runtime.Atn
 		 */
 		protected MergeCache mergeCache;
 
+		// Object pools to reduce GC pressure during prediction.
+		// These are instance-level because a parser/ATN sim cannot be shared across threads.
+		private readonly Misc.ObjectPool<ATNConfigSet> _fullCtxConfigSetPool =
+			new Misc.ObjectPool<ATNConfigSet>(() => new ATNConfigSet(true), cs => cs.PoolReset());
+		private readonly Misc.ObjectPool<ATNConfigSet> _sllConfigSetPool =
+			new Misc.ObjectPool<ATNConfigSet>(() => new ATNConfigSet(false), cs => cs.PoolReset());
+		private readonly Misc.ObjectPool<HashSet<ATNConfig>> _closureBusyPool =
+			new Misc.ObjectPool<HashSet<ATNConfig>>(() => new HashSet<ATNConfig>(), hs => hs.Clear());
+		private readonly Misc.ObjectPool<MergeCache> _mergeCachePool =
+			new Misc.ObjectPool<MergeCache>(() => new MergeCache(), mc => mc.Clear(), 2);
+
+		internal ATNConfigSet GetPooledConfigSet(bool fullCtx)
+		{
+			return fullCtx ? _fullCtxConfigSetPool.Get() : _sllConfigSetPool.Get();
+		}
+
+		internal void ReturnConfigSet(ATNConfigSet configSet)
+		{
+			if (configSet == null) return;
+			// Don't return sets that have been made read-only (they're owned by DFA states)
+			if (configSet.IsReadOnly) return;
+			if (configSet.fullCtx)
+				_fullCtxConfigSetPool.Return(configSet);
+			else
+				_sllConfigSetPool.Return(configSet);
+		}
+
+		internal HashSet<ATNConfig> GetPooledClosureBusy()
+		{
+			return _closureBusyPool.Get();
+		}
+
+		internal void ReturnClosureBusy(HashSet<ATNConfig> closureBusy)
+		{
+			_closureBusyPool.Return(closureBusy);
+		}
+
 		// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 		protected ITokenStream input;
 		protected int startIndex;
@@ -378,6 +415,10 @@ namespace Antlr4.Runtime.Atn
 			}
 			finally
 			{
+				if (mergeCache != null)
+				{
+					_mergeCachePool.Return(mergeCache);
+				}
 				mergeCache = null; // wack cache after each prediction
 				thisDfa = null;
 				input.Seek(index);
@@ -790,10 +831,10 @@ namespace Antlr4.Runtime.Atn
 
 			if (mergeCache == null)
 			{
-				mergeCache = new MergeCache();
+				mergeCache = _mergeCachePool.Get();
 			}
 
-			ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
+			ATNConfigSet intermediate = GetPooledConfigSet(fullCtx);
 
 			/* Configurations already in a rule stop state indicate reaching the end
 			 * of the decision rule (local context) or end of the start rule (full
@@ -875,13 +916,14 @@ namespace Antlr4.Runtime.Atn
 			 */
 			if (reach == null)
 			{
-				reach = new ATNConfigSet(fullCtx);
-				HashSet<ATNConfig> closureBusy = new HashSet<ATNConfig>();
+				reach = GetPooledConfigSet(fullCtx);
+				HashSet<ATNConfig> closureBusy = GetPooledClosureBusy();
 				bool treatEofAsEpsilon = t == TokenConstants.EOF;
 				foreach (ATNConfig c in intermediate.configs)
 				{
 					Closure(c, reach, closureBusy, false, fullCtx, treatEofAsEpsilon);
 				}
+				ReturnClosureBusy(closureBusy);
 			}
 
 			if (t == IntStreamConstants.EOF)
@@ -999,8 +1041,9 @@ namespace Antlr4.Runtime.Atn
 			{
 				ATNState target = p.Transition(i).target;
 				ATNConfig c = new ATNConfig(target, i + 1, initialContext);
-				HashSet<ATNConfig> closureBusy = new HashSet<ATNConfig>();
+				HashSet<ATNConfig> closureBusy = GetPooledClosureBusy();
 				Closure(c, configs, closureBusy, true, fullCtx, false);
+				ReturnClosureBusy(closureBusy);
 			}
 
 			return configs;

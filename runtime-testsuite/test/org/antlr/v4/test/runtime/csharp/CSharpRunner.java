@@ -48,7 +48,8 @@ public class CSharpRunner extends RuntimeRunner {
 		String cachePath = getCachePath();
 		mkdir(cachePath);
 		String projectPath = Paths.get(getRuntimePath(), "src", "Antlr4.csproj").toString();
-		String[] args = new String[]{getRuntimeToolPath(), "build", projectPath, "-c", "Release", "-o", cachePath};
+		String[] args = new String[]{getRuntimeToolPath(), "build", projectPath, "-c", "Release", "-o", cachePath,
+				"/p:UseSharedCompilation=false", "/p:CopyRetryCount=3", "/p:CopyRetryDelayMilliseconds=500"};
 		runCommand(args, cachePath, "build " + getTitleName() + " ANTLR runtime");
 	}
 
@@ -57,7 +58,8 @@ public class CSharpRunner extends RuntimeRunner {
 		Exception exception = null;
 		try {
 			writeFile(getTempDirPath(), testProjectFileName, cSharpTestProjectContent);
-			runCommand(new String[]{getRuntimeToolPath(), "build", testProjectFileName, "-c", "Release"}, getTempDirPath(),
+			runCommand(new String[]{getRuntimeToolPath(), "build", testProjectFileName, "-c", "Release",
+					"/p:UseSharedCompilation=false", "/p:CopyRetryCount=3", "/p:CopyRetryDelayMilliseconds=500"}, getTempDirPath(),
 					"build C# test binary");
 		} catch (Exception e) {
 			exception = e;

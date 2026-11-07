@@ -7,7 +7,7 @@ using Antlr4.Runtime.Misc;
 
 namespace Antlr4.Runtime.Atn
 {
-	public class LexerATNConfig : ATNConfig
+	public sealed class LexerATNConfig : ATNConfig
 	{
 
 		/**
@@ -75,6 +75,16 @@ namespace Antlr4.Runtime.Atn
 
 		public override int GetHashCode()
 		{
+#if NET8_0_OR_GREATER
+			var hc = new System.HashCode();
+			hc.Add(state.stateNumber);
+			hc.Add(alt);
+			hc.Add(context);
+			hc.Add(semanticContext);
+			hc.Add(passedThroughNonGreedyDecision);
+			hc.Add(lexerActionExecutor);
+			return hc.ToHashCode();
+#else
 			int hashCode = MurmurHash.Initialize(7);
 			hashCode = MurmurHash.Update(hashCode, state.stateNumber);
 			hashCode = MurmurHash.Update(hashCode, alt);
@@ -84,6 +94,7 @@ namespace Antlr4.Runtime.Atn
 			hashCode = MurmurHash.Update(hashCode, lexerActionExecutor);
 			hashCode = MurmurHash.Finish(hashCode, 6);
 			return hashCode;
+#endif
 		}
 
 		public override bool Equals(ATNConfig other)

@@ -11,7 +11,7 @@ namespace Antlr4.Runtime.Atn
 
 
 	#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
-	public class ArrayPredictionContext : PredictionContext
+	public sealed class ArrayPredictionContext : PredictionContext
 	{
 		/** Parent can be null only if full ctx mode and we make an array
 		 *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and

@@ -3,8 +3,9 @@
     <Company>The ANTLR Organization</Company>
     <Version>4.13.2</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFramework>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1580;CS1570;NU5048</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
@@ -43,4 +44,10 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
   </PropertyGroup>
+
+  <!-- System.Memory polyfill for netstandard2.0 (Span, Memory, ArrayPool, etc.) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.6.0" />
+    <PackageReference Include="System.Buffers" Version="4.6.0" />
+  </ItemGroup>
 </Project>

@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
+using System.Buffers;
+#endif
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
@@ -120,7 +123,11 @@ namespace Antlr4.Runtime
         public UnbufferedCharStream(int bufferSize)
         {
             n = 0;
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
+            data = ArrayPool<int>.Shared.Rent(bufferSize);
+#else
             data = new int[bufferSize];
+#endif
         }
 
         public UnbufferedCharStream(Stream input)
@@ -277,7 +284,19 @@ namespace Antlr4.Runtime
         {
             if (n >= data.Length)
             {
-                data = Arrays.CopyOf(data, data.Length * 2);
+                // Rent from ArrayPool instead of raw alloc + copy
+                int newSize = data.Length * 2;
+#if NETSTANDARD2_0_OR_GREATER || NET8_0_OR_GREATER
+                int[] newData = ArrayPool<int>.Shared.Rent(newSize);
+                Array.Copy(data, 0, newData, 0, data.Length);
+                // Return old buffer to pool. ArrayPool.Return is already a no-op
+                // if the array didn't come from the pool.
+                ArrayPool<int>.Shared.Return(data);
+#else
+                int[] newData = new int[newSize];
+                Array.Copy(data, 0, newData, 0, data.Length);
+#endif
+                data = newData;
             }
             data[n++] = c;
         }
