@@ -13,6 +13,8 @@
 
 namespace antlr4 {
 
+  class WritableToken;
+
   /// A token has properties: text, type, line, character position in the line
   /// (so we can ignore tabs), token channel, index, and source from which
   /// we obtained this token.
@@ -91,6 +93,9 @@ namespace antlr4 {
     virtual CharStream *getInputStream() const = 0;
 
     virtual std::string toString() const = 0;
+
+    /// Returns this token if it can be written to, and null otherwise.
+    virtual WritableToken* asWritable() { return nullptr; }
   };
 
 } // namespace antlr4

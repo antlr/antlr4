@@ -21,6 +21,8 @@ namespace antlr4 {
     virtual void setCharPositionInLine(size_t pos) = 0;
     virtual void setChannel(size_t channel) = 0;
     virtual void setTokenIndex(size_t index) = 0;
+
+    WritableToken* asWritable() override { return this; }
   };
 
 } // namespace antlr4
