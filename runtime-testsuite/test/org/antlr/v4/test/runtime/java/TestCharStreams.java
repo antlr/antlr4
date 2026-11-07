@@ -14,6 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -195,6 +196,28 @@ public class TestCharStreams {
 			assertEquals(7, s.size());
 			assertEquals(0, s.index());
 			assertEquals("hello \uD83C\uDF0E", s.toString());
+		}
+	}
+
+	@Test
+	public void fromReaderSMPSequenceStraddlingBufferBoundary() throws Exception {
+		// fromReader consumes the reader in 4096-char chunks. Arrange a
+		// supplementary code point whose surrogate pair straddles that boundary:
+		// the high surrogate is the last code unit of the first chunk and the low
+		// surrogate the first of the next. The two halves must still combine into a
+		// single code point rather than leaking a lone surrogate into the stream.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 4095; i++) {
+			sb.append('a');
+		}
+		sb.append("🌎");
+		sb.append('b');
+		String input = sb.toString();
+		try (Reader r = new StringReader(input)) {
+			CharStream s = CharStreams.fromReader(r);
+			assertEquals(4097, s.size());
+			assertEquals(0, s.index());
+			assertEquals(input, s.toString());
 		}
 	}
 
