@@ -11,8 +11,10 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /** This interface describes the minimal core of methods triggered
  *  by {@link ParseTreeWalker}. E.g.,
  *
+ *  <pre>
  *  	ParseTreeWalker walker = new ParseTreeWalker();
- *		walker.walk(myParseTreeListener, myParseTree); <-- triggers events in your listener
+ *		walker.walk(myParseTreeListener, myParseTree); &lt;-- triggers events in your listener
+ *  </pre>
  *
  *  If you want to trigger events in multiple listeners during a single
  *  tree walk, you can use the ParseTreeDispatcher object available at

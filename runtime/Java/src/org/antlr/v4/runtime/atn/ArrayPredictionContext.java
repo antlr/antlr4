@@ -10,7 +10,8 @@ import java.util.Arrays;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
-	 *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
+	 *  from {@link org.antlr.v4.runtime.ParserRuleContext#EMPTY} and non-empty. 
+	 *  We merge {@link org.antlr.v4.runtime.ParserRuleContext#EMPTY} by using null parent and
 	 *  returnState == {@link #EMPTY_RETURN_STATE}.
 	 */
 	public final PredictionContext[] parents;
