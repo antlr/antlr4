@@ -2430,9 +2430,14 @@ extension PredictionModeExtension on PredictionMode {
       if (configs.hasSemanticContext) {
 // dup configs, tossing out semantic predicates
         final dup = ATNConfigSet();
+        // Merge with a cache, as every other config-set merge does: without one, merging the
+        // contexts of configs that differ only by predicate re-merges every shared subgraph once
+        // per path, which grows exponentially with nesting depth.
+        final mergeCache =
+            <Pair<PredictionContext, PredictionContext>, PredictionContext>{};
         for (var c in configs) {
           c = ATNConfig.dup(c, semanticContext: EmptySemanticContext.Instance);
-          dup.add(c);
+          dup.add(c, mergeCache);
         }
         configs = dup;
       }

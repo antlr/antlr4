@@ -11,6 +11,7 @@
 #include "antlr4-common.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
+#include "atn/PredictionContextMergeCache.h"
 #include "misc/MurmurHash.h"
 #include "SemanticContext.h"
 
@@ -66,9 +67,13 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
   } else {
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
+    // Merge with a cache, as every other config-set merge does: without one, merging the
+    // contexts of configs that differ only by predicate re-merges every shared subgraph once
+    // per path, which grows exponentially with nesting depth.
+    PredictionContextMergeCache mergeCache;
     for (auto &config : configs->configs) {
       Ref<ATNConfig> c = std::make_shared<ATNConfig>(*config, SemanticContext::Empty::Instance);
-      dup.add(c);
+      dup.add(c, &mergeCache);
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);
     heuristic = hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(&dup);

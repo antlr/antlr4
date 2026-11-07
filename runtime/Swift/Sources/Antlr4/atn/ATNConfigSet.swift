@@ -519,9 +519,14 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
 
     public func dupConfigsWithoutSemanticPredicates() -> ATNConfigSet {
         let dup = ATNConfigSet()
+        // Merge with a cache, as every other config-set merge does: without one, merging the
+        // contexts of configs that differ only by predicate re-merges every shared subgraph once
+        // per path, which grows exponentially with nesting depth.
+        var mergeCache: DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>? =
+            DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>()
         for config in configs {
             let c = ATNConfig(config, SemanticContext.Empty.Instance)
-            try! dup.add(c)
+            try! dup.add(c, &mergeCache)
         }
         return dup
     }

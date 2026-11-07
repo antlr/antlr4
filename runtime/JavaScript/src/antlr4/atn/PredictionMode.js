@@ -10,6 +10,7 @@ import ATNConfig from './ATNConfig.js';
 import SemanticContext from './SemanticContext.js';
 import BitSet from "../misc/BitSet.js";
 import AltDict from "../misc/AltDict.js";
+import DoubleDict from "../utils/DoubleDict.js";
 import HashCode from "../misc/HashCode.js";
 import HashMap from "../misc/HashMap.js";
 
@@ -192,10 +193,14 @@ const PredictionMode = {
             if (configs.hasSemanticContext) {
                 // dup configs, tossing out semantic predicates
                 const dup = new ATNConfigSet();
+                // Merge with a cache, as every other config-set merge does: without one, merging the
+                // contexts of configs that differ only by predicate re-merges every shared subgraph once
+                // per path, which grows exponentially with nesting depth.
+                const mergeCache = new DoubleDict();
                 for(let i=0;i<configs.items.length;i++) {
                     let c = configs.items[i];
                     c = new ATNConfig({semanticContext:SemanticContext.NONE}, c);
-                    dup.add(c);
+                    dup.add(c, mergeCache);
                 }
                 configs = dup;
             }
