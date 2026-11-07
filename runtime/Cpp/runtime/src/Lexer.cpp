@@ -37,7 +37,9 @@ Lexer::Lexer(CharStream *input) : Recognizer(), _input(input) {
 
 void Lexer::reset() {
   // wack Lexer state variables
-  _input->seek(0); // rewind the input
+  if (_input != nullptr) {
+    _input->seek(0); // rewind the input
+  }
 
   _syntaxErrors = 0;
   token.reset();
@@ -147,6 +149,7 @@ TokenFactory<CommonToken>* Lexer::getTokenFactory() {
 }
 
 void Lexer::setInputStream(IntStream *input) {
+  _input = nullptr; // Just a reference we don't own.
   reset();
   _input = dynamic_cast<CharStream*>(input);
 }
