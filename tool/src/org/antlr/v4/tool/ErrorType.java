@@ -525,6 +525,12 @@ public enum ErrorType {
 	 */
 	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
 	/**
+	 * Compiler Error 188.
+	 *
+	 * <p>tokenVocab option <em>name</em> must not contain a path</p>
+	 */
+	INVALID_TOKEN_VOCAB_NAME(188, "tokenVocab option <arg> must be a grammar name, not a path", ErrorSeverity.ERROR),
+	/**
 	 * Compiler Error 135.
 	 *
 	 * <p>cannot assign a value to list label <em>label</em></p>
