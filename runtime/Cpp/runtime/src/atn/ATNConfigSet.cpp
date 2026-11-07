@@ -57,9 +57,8 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
     dipsIntoOuterContext = true;
   }
 
-  auto existing = _configLookup.find(config.get());
-  if (existing == _configLookup.end()) {
-    _configLookup.insert(config.get());
+  auto [existing, inserted] = _configLookup.insert(config.get());
+  if (inserted) {
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
 
