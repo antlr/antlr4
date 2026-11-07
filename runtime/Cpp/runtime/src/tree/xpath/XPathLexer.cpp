@@ -164,7 +164,7 @@ void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionInd
 void XPathLexer::IDAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
     case 0: 
-    				if (isupper(getText()[0]))
+    				if (isupper(static_cast<unsigned char>(getText()[0])))
     				  setType(TOKEN_REF);
     				else
     				  setType(RULE_REF);

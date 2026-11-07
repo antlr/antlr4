@@ -26,7 +26,7 @@ BANG	 : '!' ;
 
 ID			:	NameStartChar NameChar*
 				{
-				if (isupper(getText()[0]))
+				if (isupper(static_cast<unsigned char>(getText()[0])))
 				  setType(TOKEN_REF);
 				else
 				  setType(RULE_REF);
