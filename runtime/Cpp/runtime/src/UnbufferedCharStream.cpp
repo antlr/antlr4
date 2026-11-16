@@ -18,6 +18,14 @@ using namespace antlrcpp;
 using namespace antlr4;
 using namespace antlr4::misc;
 
+namespace {
+
+// End of input as stored in _data: nextChar() widens the WEOF from std::wistream::get() to char32_t.
+// With a 32-bit wchar_t this is 0xFFFFFFFF, so U+FFFF is an ordinary character and must not end the stream.
+constexpr char32_t END_OF_INPUT = static_cast<char32_t>(std::char_traits<wchar_t>::eof());
+
+}
+
 UnbufferedCharStream::UnbufferedCharStream(std::wistream &input)
     : _p(0), _numMarkers(0), _lastChar(0), _lastCharBufferStart(0), _currentCharIndex(0), _input(input) {
   // The vector's size is what used to be n in Java code.
@@ -56,7 +64,7 @@ void UnbufferedCharStream::sync(size_t want) {
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && _data.back() == 0xFFFF) {
+    if (_data.size() > 0 && _data.back() == END_OF_INPUT) {
       return i;
     }
 
@@ -103,7 +111,7 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  if (_data[static_cast<size_t>(index)] == std::char_traits<wchar_t>::eof()) {
+  if (_data[static_cast<size_t>(index)] == END_OF_INPUT) {
     return EOF;
   }
 
@@ -185,7 +193,7 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   }
 
   size_t bufferStartIndex = getBufferStartIndex();
-  if (!_data.empty() && _data.back() == 0xFFFF) {
+  if (!_data.empty() && _data.back() == END_OF_INPUT) {
     if (interval.a + interval.length() > bufferStartIndex + _data.size()) {
       throw IllegalArgumentException("the interval extends past the end of the stream");
     }
