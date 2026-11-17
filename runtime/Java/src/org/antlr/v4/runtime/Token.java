@@ -59,6 +59,12 @@ public interface Token {
 	 */
 	int getLine();
 
+	/** The file (or other source name) this token came from. The default
+	 *  implementation returns the empty string for backwards compatibility
+	 *  with implementations that predate this method.
+	 */
+	default String getFile() { return ""; }
+
 	/** The index of the first character of this token relative to the
 	 *  beginning of the line at which it occurs, 0..n-1
 	 */
