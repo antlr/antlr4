@@ -168,13 +168,18 @@ public class CodeGenerator {
 		}
 	}
 
+	// Don't inline: used in https://github.com/antlr/antlr4/issues/3874
+	protected void writeToWriter(ST code, Writer w) throws IOException{
+		STWriter wr = new AutoIndentWriter(w);
+		wr.setLineWidth(lineWidth);
+		code.write(wr);
+	}
+
 	public void write(ST code, String fileName) {
 		try {
 //			long start = System.currentTimeMillis();
 			Writer w = tool.getOutputFileWriter(g, fileName);
-			STWriter wr = new AutoIndentWriter(w);
-			wr.setLineWidth(lineWidth);
-			code.write(wr);
+			writeToWriter(code, w);
 			w.close();
 //			long stop = System.currentTimeMillis();
 		}
