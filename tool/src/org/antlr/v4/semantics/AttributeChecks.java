@@ -7,6 +7,7 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.ActionSplitterListener;
@@ -39,8 +40,8 @@ public class AttributeChecks implements ActionSplitterListener {
         this.alt = alt;
         this.node = node;
         this.actionToken = actionToken;
-		this.errMgr = g.tool.errMgr;
-    }
+		this.errMgr = new ActionErrorManager(actionToken, g.tool.errMgr);
+	}
 
     public static void checkAllAttributeExpressions(Grammar g) {
         for (ActionAST act : g.namedActions.values()) {
