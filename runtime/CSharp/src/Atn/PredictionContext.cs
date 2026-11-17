@@ -498,7 +498,7 @@ namespace Antlr4.Runtime.Atn
 				PredictionContext p = this;
 				int stateNumber = currentState;
 				StringBuilder localBuffer = new StringBuilder();
-				localBuffer.Append("[");
+				localBuffer.Append('[');
 				while (!p.IsEmpty && p != stop)
 				{
 					int index = 0;
@@ -548,7 +548,7 @@ namespace Antlr4.Runtime.Atn
 					stateNumber = p.GetReturnState(index);
 					p = p.GetParent(index);
 				}
-				localBuffer.Append("]");
+				localBuffer.Append(']');
 				result.Add(localBuffer.ToString());
 				if (last)
 				{

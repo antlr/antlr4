@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Dfa
 						{
 							buf.Append(GetStateString(s));
 							String label = GetEdgeLabel(i);
-							buf.Append("-");
+							buf.Append('-');
 							buf.Append(label);
 							buf.Append("->");
 							buf.Append(GetStateString(t));
