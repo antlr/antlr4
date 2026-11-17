@@ -199,7 +199,7 @@ func (i *IntervalSet) removeRange(v Interval) {
 func (i *IntervalSet) removeOne(v int) {
 	if i.intervals != nil {
 		for k := 0; k < len(i.intervals); k++ {
-			ki := i.intervals[k]
+			ki := &i.intervals[k]
 			// intervals i ordered
 			if v < ki.Start {
 				return
