@@ -478,7 +478,7 @@ public class IntervalSet implements IntSet {
 			return "{}";
 		}
 		if ( this.size()>1 ) {
-			buf.append("{");
+			buf.append('{');
 		}
 		Iterator<Interval> iter = this.intervals.iterator();
 		while (iter.hasNext()) {
@@ -486,20 +486,35 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				if ( a==Token.EOF ) buf.append("<EOF>");
-				else if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'");
-				else buf.append(a);
+				if ( a==Token.EOF ) {
+					buf.append("<EOF>");
+				} else if ( elemAreChar ) {
+					buf.append('\'');
+					buf.append(CharSupport.getPrintable(a, false));
+					buf.append('\'');
+				}
+				else {
+					buf.append(a);
+				}
 			}
 			else {
-				if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'..'").appendCodePoint(b).append("'");
-				else buf.append(a).append("..").append(b);
+				if ( elemAreChar ) {
+					buf.append('\'');
+					buf.append(CharSupport.getPrintable(a, false));
+					buf.append("'..'");
+					buf.append(CharSupport.getPrintable(b, false));
+					buf.append('\'');
+				}
+				else {
+					buf.append(a).append("..").append(b);
+				}
 			}
 			if ( iter.hasNext() ) {
 				buf.append(", ");
 			}
 		}
 		if ( this.size()>1 ) {
-			buf.append("}");
+			buf.append('}');
 		}
 		return buf.toString();
 	}

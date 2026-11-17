@@ -6,7 +6,6 @@
 
 package org.antlr.v4.automata;
 
-import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AtomTransition;
@@ -47,8 +46,9 @@ public class ATNOptimizer {
 		int removedStates = 0;
 		List<DecisionState> decisions = atn.decisionToState;
 		for (DecisionState decision : decisions) {
+			Rule rule = null;
 			if (decision.ruleIndex >= 0) {
-				Rule rule = g.getRule(decision.ruleIndex);
+				rule = g.getRule(decision.ruleIndex);
 				if (Character.isLowerCase(rule.name.charAt(0))) {
 					// parser codegen doesn't currently support SetTransition
 					continue;
@@ -99,25 +99,13 @@ public class ATNOptimizer {
 						throw new UnsupportedOperationException("Not yet implemented.");
 					}
 					IntervalSet set =  matchTransition.label();
-					List<Interval> intervals = set.getIntervals();
-					int n = intervals.size();
-					for (int k = 0; k < n; k++) {
-						Interval setInterval = intervals.get(k);
-						int a = setInterval.a;
-						int b = setInterval.b;
-						if (a != -1 && b != -1) {
-							for (int v = a; v <= b; v++) {
-								if (matchSet.contains(v)) {
-									// TODO: Token is missing (i.e. position in source is not displayed).
-									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
-											null,
-											CharSupport.getANTLRCharLiteralForChar(v),
-											CharSupport.getIntervalSetEscapedString(matchSet));
-									break;
-								}
-							}
-						}
+					IntervalSet intersection = matchSet.and(set);
+					if (!intersection.isNil()) {
+						g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
+							rule != null ? rule.ast.token : null, intersection.toString(true),
+							matchSet.toString(true));
 					}
+
 					matchSet.addAll(set);
 				}
 
