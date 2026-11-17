@@ -5,8 +5,7 @@
 
 import RuleContext from './RuleContext.js';
 import TerminalNode from '../tree/TerminalNode.js';
-import TerminalNodeImpl from '../tree/TerminalNodeImpl.js';
-import ErrorNodeImpl from '../tree/ErrorNodeImpl.js';
+import ErrorNode from '../tree/ErrorNode.js';
 import Interval from "../misc/Interval.js";
 
 /**
@@ -67,7 +66,7 @@ export default class ParserRuleContext extends RuleContext {
 			this.children = [];
 			// reset parent pointer for any error nodes
 			ctx.children.map(function(child) {
-				if (child instanceof ErrorNodeImpl) {
+				if (child instanceof ErrorNode) {
 					this.children.push(child);
 					child.parentCtx = this;
 				}
@@ -102,14 +101,14 @@ export default class ParserRuleContext extends RuleContext {
 	}
 
 	addTokenNode(token) {
-		const node = new TerminalNodeImpl(token);
+		const node = new TerminalNode(token);
 		this.addChild(node);
 		node.parentCtx = this;
 		return node;
 	}
 
 	addErrorNode(badToken) {
-		const node = new ErrorNodeImpl(badToken);
+		const node = new ErrorNode(badToken);
 		this.addChild(node);
 		node.parentCtx = this;
 		return node;

@@ -5,4 +5,8 @@
 import SyntaxTree from "./SyntaxTree.js";
 
 export default class ParseTree extends SyntaxTree {
+
+    accept(visitor) {
+        throw new Error("missing interface implementation")
+    }
 }

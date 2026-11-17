@@ -3,6 +3,57 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import ParseTree from "./ParseTree.js";
+import Interval from "../misc/Interval.js";
+import Token from "../Token.js";
 
 export default class TerminalNode extends ParseTree {
+    constructor(symbol) {
+        super();
+        this.parentCtx = null;
+        this.symbol = symbol;
+    }
+
+    getChild(i) {
+        return null;
+    }
+
+    getSymbol() {
+        return this.symbol;
+    }
+
+    getParent() {
+        return this.parentCtx;
+    }
+
+    getPayload() {
+        return this.symbol;
+    }
+
+    getSourceInterval() {
+        if (this.symbol === null) {
+            return Interval.INVALID_INTERVAL;
+        }
+        const tokenIndex = this.symbol.tokenIndex;
+        return new Interval(tokenIndex, tokenIndex);
+    }
+
+    getChildCount() {
+        return 0;
+    }
+
+    accept(visitor) {
+        return visitor.visitTerminal(this);
+    }
+
+    getText() {
+        return this.symbol.text;
+    }
+
+    toString() {
+        if (this.symbol.type === Token.EOF) {
+            return "<EOF>";
+        } else {
+            return this.symbol.text;
+        }
+    }
 }

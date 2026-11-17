@@ -16,9 +16,7 @@ export default class ParseTreeWalker {
      * @param t The parse tree to be walked on
      */
     walk(listener, t) {
-        const errorNode = t instanceof ErrorNode ||
-            (t.isErrorNode !== undefined && t.isErrorNode());
-        if (errorNode) {
+        if (t instanceof ErrorNode) {
             listener.visitErrorNode(t);
         } else if (t instanceof TerminalNode) {
             listener.visitTerminal(t);

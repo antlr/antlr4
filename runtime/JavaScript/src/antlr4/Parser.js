@@ -355,7 +355,7 @@ export default class Parser extends Recognizer {
             node.invokingState = this.state;
             if (hasListener) {
                 this._parseListeners.forEach(function (listener) {
-                    if (node instanceof ErrorNode || (node.isErrorNode !== undefined && node.isErrorNode())) {
+                    if (node instanceof ErrorNode) {
                         listener.visitErrorNode(node);
                     } else if (node instanceof TerminalNode) {
                         listener.visitTerminal(node);
