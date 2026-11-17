@@ -1472,7 +1472,7 @@ func (p *ParserATNSimulator) GetTokenName(t int) string {
 		return p.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
 	}
 
-	if p.parser != nil && p.parser.GetLiteralNames() != nil && t < len(p.parser.GetSymbolicNames()) {
+	if p.parser != nil && p.parser.GetSymbolicNames() != nil && t < len(p.parser.GetSymbolicNames()) {
 		return p.parser.GetSymbolicNames()[t] + "<" + strconv.Itoa(t) + ">"
 	}
 
