@@ -176,12 +176,20 @@ if (ANTLR_BUILD_CPP_TESTS)
   endif()
 endif()
 
+include(GNUInstallDirs)
+
 if (TARGET antlr4_shared)
   install(TARGETS antlr4_shared
           EXPORT antlr4-targets
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+  if(MSVC)
+    install(FILES $<TARGET_PDB_FILE:antlr4_shared>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            OPTIONAL)
+  endif()
 endif()
 
 if (TARGET antlr4_static)
@@ -190,6 +198,12 @@ if (TARGET antlr4_static)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+  if(MSVC)
+    install(FILES $<TARGET_FILE_DIR:antlr4_static>/$<TARGET_PROPERTY:antlr4_static,COMPILE_PDB_NAME>.pdb
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            OPTIONAL)
+  endif()
 endif()
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
