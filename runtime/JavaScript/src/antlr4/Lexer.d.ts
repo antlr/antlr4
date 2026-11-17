@@ -7,7 +7,11 @@ export declare class Lexer extends Recognizer<number> {
 
     static DEFAULT_MODE: number;
 
+    /**
+     * Use inputStream property instead
+     */
     _input: CharStream;
+    inputStream: CharStream;
     _interp: LexerATNSimulator;
     text: string;
     line: number;
@@ -15,7 +19,11 @@ export declare class Lexer extends Recognizer<number> {
     _tokenStartCharIndex: number;
     _tokenStartLine: number;
     _tokenStartColumn: number;
+    /**
+     * Use type property instead
+     */
     _type: number;
+    type: number;
 
     constructor(input: CharStream);
     reset(): void;
