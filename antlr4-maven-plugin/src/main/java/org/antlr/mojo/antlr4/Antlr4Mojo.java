@@ -181,6 +181,12 @@ public class Antlr4Mojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/maven-status/antlr4", readonly=true)
     private File statusDirectory;
 
+	/**
+	 * Whether to skip the execution
+	 */
+	@Parameter(name = "antlr4.skip", defaultValue = "false")
+	private boolean skip;
+
 	@Component
 	private BuildContext buildContext;
 
@@ -223,6 +229,11 @@ public class Antlr4Mojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         Log log = getLog();
+
+		if (skip) {
+			log.info("Skipping the execution");
+			return;
+		}
 
 		outputEncoding = validateEncoding(outputEncoding);
 

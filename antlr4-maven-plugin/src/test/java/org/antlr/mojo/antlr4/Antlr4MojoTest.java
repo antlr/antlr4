@@ -336,6 +336,16 @@ public class Antlr4MojoTest {
         }
     }
 
+	@Test
+	public void skipsExecution() throws Exception {
+		Path baseDir = resources.getBasedir("skips").toPath();
+		MavenProject project = maven.readMavenProject(baseDir.toFile());
+		MavenSession session = maven.newMavenSession(project);
+		MojoExecution exec = maven.newMojoExecution("antlr4");
+
+		maven.executeMojo(session, project, exec);
+	}
+
     private byte[] checksum(Path path) throws IOException {
         return MojoUtils.checksum(path.toFile());
     }
