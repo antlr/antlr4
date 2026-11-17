@@ -155,7 +155,13 @@ std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
       }
     }
     i++;
-    work = next;
+    // remove duplicated element
+    work.clear();
+    for (unsigned int i=0; i < next.size(); i++ ){
+        if (std::find(work.begin(),work.end(),next[i]) == std::end(work)) {
+          work.push_back(next[i]);
+	}
+    }
   }
 
   return work;
