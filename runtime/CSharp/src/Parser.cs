@@ -857,7 +857,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        [Obsolete(@"UseEnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
+        [Obsolete(@"Use EnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
         public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex)
         {
             EnterRecursionRule(localctx, Atn.ruleToStartState[ruleIndex].stateNumber, ruleIndex, 0);
