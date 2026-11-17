@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 /**
  * The following images show the relation of states and
@@ -118,7 +119,7 @@ public abstract class ATNState {
 
 	public int ruleIndex; // at runtime, we don't have Rule objects
 
-	public boolean epsilonOnlyTransitions = false;
+	private Boolean epsilonOnlyTransitions = null;
 
 	/** Track the transitions emanating from this ATN state. */
 	protected final List<Transition> transitions =
@@ -159,12 +160,8 @@ public abstract class ATNState {
 	}
 
 	public void addTransition(int index, Transition e) {
-		if (transitions.isEmpty()) {
-			epsilonOnlyTransitions = e.isEpsilon();
-		}
-		else if (epsilonOnlyTransitions != e.isEpsilon()) {
+		if (epsilonOnlyTransitions != null && epsilonOnlyTransitions != e.isEpsilon()) {
 			System.err.format(Locale.getDefault(), "ATN state %d has both epsilon and non-epsilon transitions.\n", stateNumber);
-			epsilonOnlyTransitions = false;
 		}
 
 		boolean alreadyPresent = false;
@@ -184,24 +181,59 @@ public abstract class ATNState {
 		}
 		if ( !alreadyPresent ) {
 			transitions.add(index, e);
+			recalculateEpsilonOnlyTransitions();
 		}
 	}
 
 	public Transition transition(int i) { return transitions.get(i); }
 
 	public void setTransition(int i, Transition e) {
-		transitions.set(i, e);
+		transitions.remove(i);
+		recalculateEpsilonOnlyTransitions();
+		if (epsilonOnlyTransitions != null && epsilonOnlyTransitions != e.isEpsilon()) {
+			System.err.format(Locale.getDefault(), "ATN state %d has both epsilon and non-epsilon transitions.\n", stateNumber);
+		}
+		transitions.add(i, e);
+		recalculateEpsilonOnlyTransitions();
 	}
 
 	public Transition removeTransition(int index) {
-		return transitions.remove(index);
+		Transition result = transitions.remove(index);
+		recalculateEpsilonOnlyTransitions();
+		return result;
+	}
+
+	public boolean removeTransition(Transition transition) {
+		boolean result = transitions.remove(transition);
+		recalculateEpsilonOnlyTransitions();
+		return result;
+	}
+
+	public Transition getTransition(Predicate<Transition> predicate) {
+		return transitions.stream().filter(predicate).findFirst().orElse(null);
+	}
+
+	public int getTransitionIndex(Transition transition) {
+		return transitions.indexOf(transition);
 	}
 
 	public abstract int getStateType();
 
 	public final boolean onlyHasEpsilonTransitions() {
-		return epsilonOnlyTransitions;
+		return epsilonOnlyTransitions != null && epsilonOnlyTransitions;
+	}
+
+	private void recalculateEpsilonOnlyTransitions() {
+		if (transitions.size() == 0) {
+			epsilonOnlyTransitions = null;
+		} else {
+			epsilonOnlyTransitions = transitions.stream().allMatch(Transition::isEpsilon);
+		}
 	}
 
 	public void setRuleIndex(int ruleIndex) { this.ruleIndex = ruleIndex; }
+
+	public void clearTransitions() {
+		transitions.clear();
+	}
 }

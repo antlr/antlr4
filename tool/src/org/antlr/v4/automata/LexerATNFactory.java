@@ -9,6 +9,7 @@ package org.antlr.v4.automata;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.v4.automata.optimization.ATNOptimizer;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.EscapeSequenceParsing;

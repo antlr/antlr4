@@ -37,7 +37,7 @@ export default class RuleContext extends RuleNode {
          * The "return address" is the followState of invokingState
          * If parent is null, this should be -1.
          */
-        this.invokingState = invokingState || -1;
+        this.invokingState = parent != null ? invokingState : -1;
     }
 
     depth() {
