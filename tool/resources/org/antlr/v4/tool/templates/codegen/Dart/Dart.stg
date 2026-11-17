@@ -684,6 +684,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = tokenStream.LA(1)!;"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures)
   ::= <<
 class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+  <ctorAttrs:{a | <a>;}; separator="\n">
   <attrs:{a | <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.escapedName>([ParserRuleContext? parent, int? invokingState<ctorAttrs:{a | , <a>}>]) : super(parent, invokingState)<if(struct.ctorAttrs)> {
@@ -696,6 +697,7 @@ class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><el
   @override
   void copyFrom(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif> ctx) {
     super.copyFrom(ctx);
+    <struct.ctorAttrs:{a | if((ctx as <struct.escapedName>).<a.escapedName> != null) this.<a.escapedName> = (ctx as <struct.escapedName>).<a.escapedName>;}; separator="\n">
     <struct.attrs:{a | if((ctx as <struct.escapedName>).<a.escapedName> != null) this.<a.escapedName> = (ctx as <struct.escapedName>).<a.escapedName>;}; separator="\n">
   }
 <endif>

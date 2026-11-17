@@ -861,6 +861,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,signatures,
            superClass={ParserRuleContext}) ::= <<
 public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+	<ctorAttrs:{a | public <a>;}; separator="\n">
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<if(ctorAttrs)>public <struct.escapedName>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
@@ -874,6 +875,7 @@ public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuper
 	public <struct.escapedName>() { }
 	public virtual void CopyFrom(<struct.escapedName> context) {
 		base.CopyFrom(context);
+		<struct.ctorAttrs:{a | this.<a.escapedName> = context.<a.escapedName>;}; separator="\n">
 		<struct.attrs:{a | this.<a.escapedName> = context.<a.escapedName>;}; separator="\n">
 	}
 <endif>

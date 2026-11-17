@@ -1121,12 +1121,22 @@ Get<a.escapedName; format="cap">() []I<a.ctxName>}; separator="\n\n">
 Set<a.escapedName; format="cap">([]I<a.ctxName>) }; separator="\n\n">
 	<endif>
 
+	<if(struct.ctorAttrs)>
+
+	<struct.ctorAttrs:{a | // Get<a.escapedName; format="cap"> returns the <a.escapedName> attribute.
+Get<a.escapedName; format="cap">() <a.type>}; separator="\n\n">
+	<endif>
 	<if(struct.attributeDecls)>
 
 	<struct.attributeDecls:{a | // Get<a.escapedName; format="cap"> returns the <a.escapedName> attribute.
 Get<a.escapedName; format="cap">() <a.type>}; separator="\n\n">
 	<endif>
 
+	<if(struct.ctorAttrs)>
+
+	<struct.ctorAttrs:{a | // Set<a.escapedName; format="cap"> sets the <a.escapedName> attribute.
+Set<a.escapedName; format="cap">(<a.type>)}; separator="\n\n">
+	<endif>
 	<if(struct.attributeDecls)>
 
 	<struct.attributeDecls:{a | // Set<a.escapedName; format="cap"> sets the <a.escapedName> attribute.
@@ -1146,6 +1156,9 @@ Set<a.escapedName; format="cap">(<a.type>)}; separator="\n\n">
 type <struct.escapedName> struct {
 	<if(contextSuperClass)>*<contextSuperClass><else>antlr.BaseParserRuleContext<endif>
 	parser antlr.Parser
+	<if(ctorAttrs)>
+	<ctorAttrs; separator="\n">
+	<endif>
 	<if(attrs)>
 	<attrs; separator="\n">
 	<endif>
@@ -1243,11 +1256,19 @@ func (s *<struct.escapedName>) GetParser() antlr.Parser { return s.parser }
 <struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Set<a.escapedName; format="cap">(v []I<a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
+<if(struct.ctorAttrs)>
+
+<struct.ctorAttrs:{a | func (s *<struct.escapedName>) Get<a.escapedName; format="cap">() <a.type> { return s.<a.escapedName> \}}; separator="\n\n">
+<endif>
 <if(struct.attributeDecls)>
 
 <struct.attributeDecls:{a | func (s *<struct.escapedName>) Get<a.escapedName; format="cap">() <a.type> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
+<if(struct.ctorAttrs)>
+
+<struct.ctorAttrs:{a | func (s *<struct.escapedName>) Set<a.escapedName; format="cap">(v <a.type>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<endif>
 <if(struct.attributeDecls)>
 
 <struct.attributeDecls:{a | func (s *<struct.escapedName>) Set<a.escapedName; format="cap">(v <a.type>) { s.<a.escapedName> = v \}}; separator="\n\n">
@@ -1262,6 +1283,7 @@ func (s *<struct.escapedName>) GetParser() antlr.Parser { return s.parser }
 
 func (s *<struct.escapedName>) CopyAll(ctx *<struct.escapedName>) {
 	s.CopyFrom(&ctx.BaseParserRuleContext)
+	<struct.ctorAttrs:{a | s.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 	<struct.attrs:{a | s.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 }
 <endif>

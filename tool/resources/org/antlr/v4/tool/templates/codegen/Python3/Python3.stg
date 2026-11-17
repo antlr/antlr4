@@ -668,6 +668,7 @@ class <struct.escapedName>(<if(contextSuperClass)><contextSuperClass><else>Parse
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
     def copyFrom(self, ctx:ParserRuleContext):
         super().copyFrom(ctx)
+        <struct.ctorAttrs:{a | self.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
         <struct.attrs:{a | self.<a.escapedName> = ctx.<a.escapedName>}; separator="\n">
 
 <endif>
