@@ -1,0 +1,10 @@
+grammar JSONMini;
+json: value ;
+value: STRING | NUMBER | obj | array | 'true' | 'false' | 'null' ;
+obj: '{' pair (',' pair)* '}' ;
+pair: STRING ':' value ;
+array: '[' value (',' value)* ']' ;
+STRING: '"' (~["\\] | '\\' .)* '"' ;
+NUMBER: '-'? INT ('.' [0-9]+)? ;
+fragment INT: '0' | [1-9][0-9]* ;
+WS: [ \t\r\n]+ -> skip ;

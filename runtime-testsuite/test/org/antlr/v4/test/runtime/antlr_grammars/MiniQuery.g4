@@ -1,0 +1,12 @@
+grammar MiniQuery;
+query: 'SELECT' columns 'FROM' table ('WHERE' condition)? EOF ;
+columns: '*' | column (',' column)* ;
+column: ID ;
+table: ID ;
+condition: column op value ;
+op: '=' | '<' | '>' ;
+value: STRING | NUMBER ;
+ID: [a-zA-Z_][a-zA-Z0-9_]* ;
+STRING: '\'' (~['\r\n])* '\'' ;
+NUMBER: [0-9]+ ;
+WS: [ \t\r\n]+ -> skip ;
