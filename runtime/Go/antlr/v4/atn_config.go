@@ -313,7 +313,7 @@ func (a *ATNConfig) LEquals(other Collectable[*ATNConfig]) bool {
 
 	switch {
 	case a.lexerActionExecutor == nil && otherT.lexerActionExecutor == nil:
-		return true
+		//return true
 	case a.lexerActionExecutor != nil && otherT.lexerActionExecutor != nil:
 		if !a.lexerActionExecutor.Equals(otherT.lexerActionExecutor) {
 			return false
