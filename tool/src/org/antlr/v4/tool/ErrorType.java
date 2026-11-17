@@ -417,7 +417,7 @@ public enum ErrorType {
 	 * The following sets of rules are mutually left-recursive
 	 * <em>[rules]</em></p>
 	 */
-	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
+	LEFT_RECURSION_CYCLES(119, "The following set of rules are mutually left-recursive [<arg:{r|<r.name>}; separator=\", \">]", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 120.
 	 *

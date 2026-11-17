@@ -19,11 +19,11 @@ public class TestToolSyntaxErrors {
 		"grammar A;\n" +
 		"",
 		// YIELDS
-		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4:1:0: grammar A has no rules\n",
 
 		"lexer grammar A;\n" +
 		"",
-		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4:1:6: grammar A has no rules\n",
 
 		"A;",
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",

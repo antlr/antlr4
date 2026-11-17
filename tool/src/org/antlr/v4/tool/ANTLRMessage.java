@@ -14,7 +14,6 @@ import java.util.Arrays;
 public class ANTLRMessage {
 	private static final Object[] EMPTY_ARGS = new Object[0];
 
-
     private final ErrorType errorType;
 
     private final Object[] args;
@@ -22,31 +21,37 @@ public class ANTLRMessage {
     private final Throwable e;
 
     // used for location template
-    public String fileName;
-    public int line = -1;
-    public int charPosition = -1;
+    public final String fileName;
+    public final int line;
+    public final int charPosition;
 
-	public Grammar g;
 	/** Most of the time, we'll have a token such as an undefined rule ref
      *  and so this will be set.
      */
-    public Token offendingToken;
+    public final Token offendingToken;
 
 	public ANTLRMessage(ErrorType errorType) {
-        this(errorType, (Throwable)null, Token.INVALID_TOKEN);
+        this(errorType, (Throwable)null, null, null);
     }
 
-    public ANTLRMessage(ErrorType errorType, Token offendingToken, Object... args) {
-        this(errorType, null, offendingToken, args);
+    public ANTLRMessage(ErrorType errorType, String fileName, Token offendingToken, Object... args) {
+        this(errorType, null, fileName, offendingToken, args);
 	}
 
-    public ANTLRMessage(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
+    public ANTLRMessage(ErrorType errorType, Throwable e, String fileName, Token offendingToken, Object... args) {
         this.errorType = errorType;
         this.e = e;
+        this.fileName = fileName;
         this.args = args;
 		this.offendingToken = offendingToken;
+		if (offendingToken != null) {
+			this.line = offendingToken.getLine();
+			this.charPosition = offendingToken.getCharPositionInLine();
+		} else {
+			this.line = -1;
+			this.charPosition = -1;
+		}
     }
-
 
     public ErrorType getErrorType() {
         return errorType;
@@ -75,14 +80,13 @@ public class ANTLRMessage {
 		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 
 		Throwable cause = getCause();
-		if ( cause!=null ) {
-			messageST.add("exception", cause);
-			messageST.add("stackTrace", cause.getStackTrace());
+		StackTraceElement[] stackTrace = null;
+		if (cause!=null) {
+			stackTrace = cause.getStackTrace();
 		}
-		else {
-			messageST.add("exception", null); // avoid ST error msg
-			messageST.add("stackTrace", null);
-		}
+
+		messageST.add("exception", cause);
+		messageST.add("stackTrace", stackTrace);
 
 		return messageST;
 	}

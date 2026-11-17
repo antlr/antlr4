@@ -19,13 +19,7 @@ public class GrammarSyntaxMessage extends ANTLRMessage {
 								RecognitionException antlrException,
 								Object... args)
 	{
-		super(etype, antlrException, offendingToken, args);
-		this.fileName = fileName;
-		this.offendingToken = offendingToken;
-		if ( offendingToken!=null ) {
-			line = offendingToken.getLine();
-			charPosition = offendingToken.getCharPositionInLine();
-		}
+		super(etype, antlrException, fileName, offendingToken, args);
 	}
 
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
