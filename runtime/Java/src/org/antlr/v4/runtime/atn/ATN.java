@@ -180,7 +180,12 @@ public class ATN {
 		expected.remove(Token.EPSILON);
 		while (ctx != null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
 			ATNState invokingState = states.get(ctx.invokingState);
-			RuleTransition rt = (RuleTransition)invokingState.transition(0);
+			Transition t = invokingState.transition(0);
+			while (t instanceof EpsilonTransition) {
+				EpsilonTransition et = (EpsilonTransition) t;
+				t = et.target.transition(0);
+			}
+			RuleTransition rt = (RuleTransition) t;
 			following = nextTokens(rt.followState);
 			expected.addAll(following);
 			expected.remove(Token.EPSILON);
