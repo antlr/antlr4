@@ -110,8 +110,8 @@ function(antlr4_generate
     set(Antlr4_NamespaceOption "")
   endif ()
 
-  if ( (ARGC GREATER_EQUAL 7 ) AND (NOT ${ARGV6} STREQUAL "") )
-    set(Antlr4_AdditionalDependencies ${ARGV6})
+  if ( (ARGC GREATER_EQUAL 7 ) AND (NOT "${ARGV6}" STREQUAL "") )
+    set(Antlr4_AdditionalDependencies "${ARGV6}")
   else()
     set(Antlr4_AdditionalDependencies "")
   endif ()
