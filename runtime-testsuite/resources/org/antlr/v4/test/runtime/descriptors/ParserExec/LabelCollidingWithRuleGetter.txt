@@ -1,0 +1,21 @@
+[notes]
+Regression test for Go: a labeled rule reference whose label name equals the
+auto-generated rule-getter method name (after first-letter capitalization)
+must not produce a struct where field and method share the same identifier.
+This is illegal in Go because method receivers and struct fields share
+a single namespace.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : B=b ;
+b : 'x' ;
+
+[start]
+a
+
+[input]
+x
+

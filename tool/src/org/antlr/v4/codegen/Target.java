@@ -9,6 +9,7 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -112,6 +113,14 @@ public abstract class Target {
 
 	protected String escapeWord(String word) {
 		return word + "_";
+	}
+
+	/** Called once per StructDecl after all of its decls are added,
+	 *  giving targets a chance to resolve cross-decl name collisions
+	 *  (e.g., the Go target's field-vs-method namespace overlap on a
+	 *  struct receiver). Default: no-op.
+	 */
+	public void finalizeStruct(StructDecl struct) {
 	}
 
 	protected void genFile(Grammar g, ST outputFileST, String fileName)

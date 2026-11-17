@@ -1,0 +1,21 @@
+[notes]
+Regression test for Go: when a label collides with the auto-generated
+rule-getter on its struct AND a separate label already occupies the
+escaped name, the Go target must escape both to keep them distinct
+within the struct's single field+method namespace.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : B=b B_=c ;
+b : 'x' ;
+c : 'y' ;
+
+[start]
+a
+
+[input]
+xy
+

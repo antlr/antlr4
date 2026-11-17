@@ -12,7 +12,7 @@ import org.antlr.v4.codegen.model.SrcOp;
 /** */
 public class Decl extends SrcOp {
 	public final String name;
-	public final String escapedName;
+	public String escapedName;
 	public final String decl; 	// whole thing if copied from action
 	public boolean isLocal; // if local var (not in RuleContext struct)
 	public StructDecl ctx;  // which context contains us? set by addDecl

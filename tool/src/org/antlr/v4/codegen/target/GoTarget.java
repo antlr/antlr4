@@ -9,6 +9,9 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.decl.StructDecl;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
@@ -65,6 +68,41 @@ public class GoTarget extends Target {
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
+	}
+
+	/** In Go, struct fields and methods on the same receiver share a single
+	 *  namespace, so a labeled rule reference like {@code Expression=expression}
+	 *  produces a struct field {@code Expression} that collides with the
+	 *  auto-generated rule-getter method {@code Expression()} (the rule name
+	 *  capitalized).
+	 */
+	@Override
+	public void finalizeStruct(StructDecl struct) {
+		if (struct == null) return;
+
+		Set<String> taken = new HashSet<>();
+		for (Decl g : struct.getters) {
+			String n = g.escapedName;
+			if (n != null && !n.isEmpty()) {
+				taken.add(Utils.capitalize(n));
+			}
+		}
+
+		renameCollidingFields(struct.ruleContextDecls,     taken);
+		renameCollidingFields(struct.ruleContextListDecls, taken);
+		renameCollidingFields(struct.tokenDecls,           taken);
+		renameCollidingFields(struct.tokenListDecls,       taken);
+	}
+
+	private void renameCollidingFields(Iterable<Decl> fields, Set<String> taken) {
+		for (Decl f : fields) {
+			String name = f.escapedName;
+			while (taken.contains(name)) {
+				name = escapeWord(name);
+			}
+			f.escapedName = name;
+			taken.add(name);
+		}
 	}
 
 	@Override

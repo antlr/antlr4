@@ -30,6 +30,7 @@ import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.StarBlock;
 import org.antlr.v4.codegen.model.VisitorFile;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -170,6 +171,15 @@ public class OutputModelController {
 		}
 		else {
 			buildNormalRuleFunction(r, function);
+		}
+
+		// All Decls are now in place: give the target a chance to resolve cross-decl name collisions.
+		Target target = delegate.getGenerator().getTarget();
+		target.finalizeStruct(function.ruleCtx);
+		if (function.altToContext != null) {
+			for (StructDecl alt : function.altToContext) {
+				if (alt != null) target.finalizeStruct(alt);
+			}
 		}
 
 		Grammar g = getGrammar();
