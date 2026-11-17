@@ -37,7 +37,7 @@ public class CodeGenerator {
 
 	public final String language;
 
-	private Target target;
+	protected Target target;
 
 	public int lineWidth = 72;
 
@@ -60,7 +60,7 @@ public class CodeGenerator {
 		}
 	}
 
-	private CodeGenerator(Tool tool, Grammar g, String language) {
+	protected CodeGenerator(Tool tool, Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
 		this.language = language;
