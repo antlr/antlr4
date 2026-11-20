@@ -41,7 +41,12 @@ public class IntervalSet implements IntSet {
 	}
 
 	/** The list of sorted, disjoint intervals. */
-    protected List<Interval> intervals;
+    /**
+	 * Final so that a set whose list is complete when its constructor returns
+	 * can be handed to other threads without synchronization; see
+	 * {@code ATN.nextTokens(ATNState)}.
+	 */
+    protected final List<Interval> intervals;
 
     protected boolean readonly;
 
