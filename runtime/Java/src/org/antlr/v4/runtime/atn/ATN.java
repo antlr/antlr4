@@ -9,6 +9,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
@@ -91,12 +92,24 @@ public class ATN {
 	 * Compute the set of valid tokens that can occur starting in {@code s} and
 	 * staying in same rule. {@link Token#EPSILON} is in set if we reach end of
 	 * rule.
+	 *
+	 * <p>The result is cached in {@link ATNState#nextTokenWithinRule}. An ATN
+	 * is shared by every recognizer instance of a grammar, so several threads
+	 * can reach an uncached state at once, and the field is read without
+	 * synchronization. What is stored is therefore a copy whose interval list
+	 * is complete before the copy's constructor assigns it to the final field
+	 * {@code IntervalSet.intervals}. A thread that reads the field then sees
+	 * either {@code null} or a complete set. Two threads may each compute the
+	 * set; the results are equal.</p>
      */
     public IntervalSet nextTokens(ATNState s) {
-        if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
-        s.nextTokenWithinRule = nextTokens(s, null);
-        s.nextTokenWithinRule.setReadonly(true);
-        return s.nextTokenWithinRule;
+        IntervalSet next = s.nextTokenWithinRule;
+        if ( next != null ) return next;
+        IntervalSet computed = nextTokens(s, null);
+        next = new IntervalSet(new ArrayList<Interval>(computed.getIntervals()));
+        next.setReadonly(true);
+        s.nextTokenWithinRule = next;
+        return next;
     }
 
 	public void addState(ATNState state) {
