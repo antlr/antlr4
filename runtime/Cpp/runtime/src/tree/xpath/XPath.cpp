@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -128,14 +129,13 @@ std::unique_ptr<XPathElement> XPath::getXPathElement(Token *wordToken, bool anyw
   }
 }
 
-static ParserRuleContext dummyRoot;
-
 std::vector<ParseTree *> XPath::findAll(ParseTree *tree, std::string const& xpath, Parser *parser) {
   XPath p(parser, xpath);
   return p.evaluate(tree);
 }
 
 std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
+  ParserRuleContext dummyRoot;
   dummyRoot.children = { t }; // don't set t's parent.
 
   std::vector<ParseTree *> work = { &dummyRoot };
@@ -158,5 +158,7 @@ std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
     work = next;
   }
 
+  // dummyRoot is local to this call, so it must not be handed back (e.g. for "//*").
+  work.erase(std::remove(work.begin(), work.end(), &dummyRoot), work.end());
   return work;
 }
