@@ -22,9 +22,13 @@ public class Decl extends SrcOp {
 	}
 
 	public Decl(OutputModelFactory factory, String name, String decl) {
+		this(factory, name, decl, factory.getGenerator().getTarget().escapeIfNeeded(name));
+	}
+
+	protected Decl(OutputModelFactory factory, String name, String decl, String escapedName) {
 		super(factory);
 		this.name = name;
-		this.escapedName = factory.getGenerator().getTarget().escapeIfNeeded(name);
+		this.escapedName = escapedName;
 		this.decl = decl;
 	}
 

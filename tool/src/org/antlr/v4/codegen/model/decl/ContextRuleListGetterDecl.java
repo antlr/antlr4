@@ -22,8 +22,14 @@ public class ContextRuleListGetterDecl extends ContextGetterDecl {
 		this.ctxName = ctxName;
 	}
 
+	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String escapedName, String ctxName,
+									 boolean signature) {
+		super(factory, name, escapedName, signature);
+		this.ctxName = ctxName;
+	}
+
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextRuleListGetterDecl(factory, name, ctxName, true);
+		return new ContextRuleListGetterDecl(factory, name, escapedName, ctxName, true);
 	}
 }

@@ -9,6 +9,7 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
@@ -65,6 +66,26 @@ public class GoTarget extends Target {
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
+	}
+
+	/**
+	 * Go getters are capitalized to make them public, so a reference to rule
+	 * {@code identifier} and one to token {@code Identifier} in the same context
+	 * would both produce {@code Identifier()}. The rule getter is the one renamed
+	 * because the token getter's name is also used for the token type constant.
+	 * Contexts without a clash keep their existing getter names.
+	 */
+	@Override
+	public String escapeRuleContextGetterName(String ruleName, Set<String> tokenNames) {
+		String escapedName = escapeIfNeeded(ruleName);
+		Set<String> tokenGetterNames = new HashSet<>();
+		for (String tokenName : tokenNames) {
+			tokenGetterNames.add(Utils.capitalize(escapeIfNeeded(tokenName)));
+		}
+		while (tokenGetterNames.contains(Utils.capitalize(escapedName))) {
+			escapedName = escapeWord(escapedName);
+		}
+		return escapedName;
 	}
 
 	@Override

@@ -19,6 +19,11 @@ public abstract class ContextGetterDecl extends Decl {
 		this.signature = signature;
 	}
 
+	protected ContextGetterDecl(OutputModelFactory factory, String name, String escapedName, boolean signature) {
+		super(factory, name, null, escapedName);
+		this.signature = signature;
+	}
+
 	/** Not used for output; just used to distinguish between decl types
 	 *  to avoid dups.
 	 */

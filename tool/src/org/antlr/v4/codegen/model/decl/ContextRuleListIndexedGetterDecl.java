@@ -17,6 +17,11 @@ public class ContextRuleListIndexedGetterDecl extends ContextRuleListGetterDecl 
 		super(factory, name, ctxName, signature);
 	}
 
+	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String escapedName, String ctxName,
+											boolean signature) {
+		super(factory, name, escapedName, ctxName, signature);
+	}
+
 	@Override
 	public String getArgType() {
 		return "int";
@@ -24,6 +29,6 @@ public class ContextRuleListIndexedGetterDecl extends ContextRuleListGetterDecl 
 
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextRuleListIndexedGetterDecl(factory, name, ctxName, true);
+		return new ContextRuleListIndexedGetterDecl(factory, name, escapedName, ctxName, true);
 	}
 }

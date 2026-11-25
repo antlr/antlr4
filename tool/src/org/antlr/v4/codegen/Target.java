@@ -114,6 +114,17 @@ public abstract class Target {
 		return word + "_";
 	}
 
+	/**
+	 * Returns the escaped name of the context getter generated for a reference
+	 * to parser rule {@code ruleName}. {@code tokenNames} are the tokens
+	 * referenced from the same context, each of which also gets a getter. Most
+	 * targets keep the case of the name, so a rule getter (lowercase first
+	 * letter) cannot clash with a token getter (uppercase first letter).
+	 */
+	public String escapeRuleContextGetterName(String ruleName, Set<String> tokenNames) {
+		return escapeIfNeeded(ruleName);
+	}
+
 	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);

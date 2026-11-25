@@ -1,0 +1,53 @@
+[notes]
+A parser rule and a token whose names differ only in the case of the first
+letter (identifier and Identifier) are referenced from the same rule. Targets
+that capitalize getter names (Go) must still generate distinct getters.
+PHP method names are case-insensitive, so the PHP target cannot yet generate
+both identifier() and Identifier().
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+s
+    : windowCall listCall mixedCall labeled EOF {<writeln("$text")>}
+    ;
+
+windowCall
+    : funcName=identifier '(' ')' frameRef=Identifier
+    ;
+
+listCall
+    : identifier identifier Identifier Identifier
+    ;
+
+mixedCall
+    : identifier Identifier Identifier
+    ;
+
+labeled
+    : '[' identifier Identifier ']' #bracketed
+    | '{' identifier identifier Identifier '}' #braced
+    ;
+
+identifier
+    : Identifier
+    ;
+
+Identifier : [a-z]+ ;
+WS : [ \t\r\n]+ -> skip ;
+
+[start]
+s
+
+[input]
+f()w a b c d e f g [h i]
+
+[output]
+"""f()wabcdefg[hi]
+"""
+
+[skip]
+PHP

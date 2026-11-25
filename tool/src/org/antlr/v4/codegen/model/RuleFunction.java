@@ -10,6 +10,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.AttributeDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
@@ -37,6 +38,7 @@ import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -204,6 +206,14 @@ public class RuleFunction extends OutputModelObject {
 
 			firstAlt = false;
 		}
+		Set<String> tokenNames = new HashSet<String>();
+		for (GrammarAST t : allRefs) {
+			String refLabelName = getName(t);
+			if (refLabelName != null && t.getType() != RULE_REF) {
+				tokenNames.add(refLabelName);
+			}
+		}
+
 		Set<Decl> decls = new LinkedHashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = getName(t);
@@ -215,7 +225,8 @@ public class RuleFunction extends OutputModelObject {
 			List<Decl> d = getDeclForAltElement(t,
 												refLabelName,
 												needsList.contains(refLabelName),
-												!nonOptional.contains(refLabelName));
+												!nonOptional.contains(refLabelName),
+												tokenNames);
 			decls.addAll(d);
 		}
 		return decls;
@@ -269,18 +280,27 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList, boolean optional) {
+		return getDeclForAltElement(t, refLabelName, needList, optional, Collections.<String>emptySet());
+	}
+
+	/** {@code tokenNames} are the tokens referenced from the same context; see
+	 *  {@link Target#escapeRuleContextGetterName}.
+	 */
+	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList, boolean optional,
+										   Set<String> tokenNames) {
 		List<Decl> decls = new ArrayList<Decl>();
 		if ( t.getType()==RULE_REF ) {
+			Target target = factory.getGenerator().getTarget();
 			Rule rref = factory.getGrammar().getRule(t.getText());
-			String ctxName = factory.getGenerator().getTarget()
-							 .getRuleFunctionContextStructName(rref);
+			String ctxName = target.getRuleFunctionContextStructName(rref);
+			String escapedName = target.escapeRuleContextGetterName(refLabelName, tokenNames);
 			if ( needList) {
-				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
-					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
-				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
+				if(target.supportsOverloadedMethods())
+					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, escapedName, ctxName, false) );
+				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, escapedName, ctxName, false) );
 			}
 			else {
-				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, optional) );
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, escapedName, ctxName, optional, false) );
 			}
 		}
 		else {
