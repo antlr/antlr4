@@ -9,6 +9,7 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.SourceType;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,6 +68,22 @@ public class GoTarget extends Target {
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
+	}
+
+	/**
+	 * Go getters are capitalized to make them public and, without method
+	 * overloading, the getter for a whole list gets an {@code All} prefix. Rule
+	 * {@code identifier} and token {@code Identifier} therefore both want
+	 * {@code Identifier()}, and one {@code allItem} and a list of {@code item}
+	 * both want {@code AllItem()}.
+	 */
+	@Override
+	public Collection<String> getContextGetterMethodNames(String getterName, boolean isList) {
+		String methodName = Utils.capitalize(getterName);
+		if (isList) {
+			return Arrays.asList("All" + methodName, methodName);
+		}
+		return Collections.singletonList(methodName);
 	}
 
 	@Override

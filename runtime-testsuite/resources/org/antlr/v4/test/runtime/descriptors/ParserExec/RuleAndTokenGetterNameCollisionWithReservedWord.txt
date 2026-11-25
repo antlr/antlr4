@@ -1,0 +1,42 @@
+[notes]
+In Go both rule string and token String escape to the getter String_(), which
+also collides once the rule getter is capitalized. The grammar is specific to
+the Go target's reserved words so the other targets are skipped.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+s
+    : 'x' string String EOF {<writeln("$text")>}
+    ;
+
+string
+    : String
+    ;
+
+String : '"' ~'"'* '"' ;
+WS : [ \t\r\n]+ -> skip ;
+
+[start]
+s
+
+[input]
+x "a" "b"
+
+[output]
+"""x"a""b"
+"""
+
+[skip]
+Cpp
+CSharp
+Dart
+Java
+JavaScript
+TypeScript
+PHP
+Python3
+Swift

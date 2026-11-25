@@ -21,6 +21,8 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -112,6 +114,28 @@ public abstract class Target {
 
 	protected String escapeWord(String word) {
 		return word + "_";
+	}
+
+	/**
+	 * Returns the name of the context getter for the rule or token
+	 * {@code name} as long as no other getter needs it; see
+	 * {@link ContextGetterNames}.
+	 */
+	public String getContextGetterName(String name) {
+		return escapeIfNeeded(name);
+	}
+
+	/**
+	 * Returns the names of the methods generated in a context for the getter
+	 * {@code getterName}, such that two getters cannot share a context exactly
+	 * when they have a method name in common. {@code isList} tells whether the
+	 * context can hold more than one of the rule or token.
+	 *
+	 * <p>Most targets keep the name as is, so the getters of different rules
+	 * and tokens never clash.</p>
+	 */
+	public Collection<String> getContextGetterMethodNames(String getterName, boolean isList) {
+		return Collections.singletonList(getterName);
 	}
 
 	protected void genFile(Grammar g, ST outputFileST, String fileName)

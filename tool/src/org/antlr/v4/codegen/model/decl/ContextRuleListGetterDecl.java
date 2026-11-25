@@ -13,17 +13,17 @@ import org.antlr.v4.codegen.OutputModelFactory;
  */
 public class ContextRuleListGetterDecl extends ContextGetterDecl {
 	public String ctxName;
-	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String ctxName) {
-		this(factory, name, ctxName, false);
+	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName) {
+		this(factory, name, getterName, ctxName, false);
 	}
 
-	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean signature) {
-		super(factory, name, signature);
+	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName, boolean signature) {
+		super(factory, name, getterName, signature);
 		this.ctxName = ctxName;
 	}
 
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextRuleListGetterDecl(factory, name, ctxName, true);
+		return new ContextRuleListGetterDecl(factory, name, getterName, ctxName, true);
 	}
 }

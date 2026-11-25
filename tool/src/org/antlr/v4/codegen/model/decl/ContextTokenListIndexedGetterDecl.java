@@ -9,12 +9,12 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 public class ContextTokenListIndexedGetterDecl extends ContextTokenListGetterDecl {
-	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name) {
-		this(factory, name, false);
+	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name, String getterName) {
+		this(factory, name, getterName, false);
 	}
 
-	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name, boolean signature) {
-		super(factory, name, signature);
+	public ContextTokenListIndexedGetterDecl(OutputModelFactory factory, String name, String getterName, boolean signature) {
+		super(factory, name, getterName, signature);
 	}
 
 	@Override
@@ -24,6 +24,6 @@ public class ContextTokenListIndexedGetterDecl extends ContextTokenListGetterDec
 
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextTokenListIndexedGetterDecl(factory, name, true);
+		return new ContextTokenListIndexedGetterDecl(factory, name, getterName, true);
 	}
 }

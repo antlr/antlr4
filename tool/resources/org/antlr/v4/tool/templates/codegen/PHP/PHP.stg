@@ -861,7 +861,7 @@ public $<d.name><if(d.initValue)> = <d.initValue><endif>;}; separator="\n\n">
 >>
 
 ContextTokenGetterDecl(t) ::= <<
-public function <t.name>(): ?TerminalNode
+public function <t.getterName>(): ?TerminalNode
 {
     return $this->getToken(<parser.name>::<t.name>, 0);
 }
@@ -874,7 +874,7 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 /**
  * @return array\<TerminalNode>|TerminalNode|null
  */
-public function <t.name>(?int $index = null)
+public function <t.getterName>(?int $index = null)
 {
 	if ($index === null) {
 		return $this->getTokens(<parser.name>::<t.name>);
@@ -885,7 +885,7 @@ public function <t.name>(?int $index = null)
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-public function <r.name>(): ?<r.ctxName>
+public function <r.getterName>(): ?<r.ctxName>
 {
 	return $this->getTypedRuleContext(<r.ctxName>::class, 0);
 }
@@ -898,7 +898,7 @@ ContextRuleListIndexedGetterDecl(r)   ::= <<
 /**
  * @return array\<<r.ctxName>\>|<r.ctxName>|null
  */
-public function <r.name>(?int $index = null)
+public function <r.getterName>(?int $index = null)
 {
 	if ($index === null) {
 		return $this->getTypedRuleContexts(<r.ctxName>::class);

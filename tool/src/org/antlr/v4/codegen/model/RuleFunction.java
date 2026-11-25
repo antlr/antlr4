@@ -9,7 +9,9 @@ package org.antlr.v4.codegen.model;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.codegen.ContextGetterNames;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.AttributeDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
@@ -29,6 +31,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -39,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -166,11 +170,23 @@ public class RuleFunction extends OutputModelObject {
 		}
 	}
 
+	/** Make the getters for the rules and tokens referenced from the alts,
+	 *  which all share one context.
+	 */
+	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
+		ContextGetterNames getterNames = factory.getController().getContextGetterNames();
+		Set<Decl> decls = new LinkedHashSet<Decl>();
+		for (ContextElement element : getContextElements(factory.getGrammar(), altASTs)) {
+			decls.addAll(getDeclForAltElement(element, getterNames.getName(element.name)));
+		}
+		return decls;
+	}
+
 	/** for all alts, find which ref X or r needs List
 	   Must see across alts. If any alt needs X or r as list, then
 	   define as list.
 	 */
-	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
+	public static List<ContextElement> getContextElements(Grammar g, List<AltAST> altASTs) {
 		Set<String> needsList = new HashSet<String>();
 		Set<String> nonOptional = new HashSet<String>();
 		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
@@ -179,7 +195,7 @@ public class RuleFunction extends OutputModelObject {
 		for (AltAST ast : altASTs) {
 			List<GrammarAST> refs = getRuleTokens(ast.getNodesWithType(reftypes));
 			allRefs.addAll(refs);
-			Pair<FrequencySet<String>, FrequencySet<String>> minAndAltFreq = getElementFrequenciesForAlt(ast);
+			Pair<FrequencySet<String>, FrequencySet<String>> minAndAltFreq = getElementFrequenciesForAlt(g, ast);
 			FrequencySet<String> minFreq = minAndAltFreq.a;
 			FrequencySet<String> altFreq = minAndAltFreq.b;
 			for (GrammarAST t : refs) {
@@ -204,24 +220,25 @@ public class RuleFunction extends OutputModelObject {
 
 			firstAlt = false;
 		}
-		Set<Decl> decls = new LinkedHashSet<Decl>();
+		// Every reference to a name is to the same rule or token, so one
+		// element stands for them all.
+		Map<String, ContextElement> elements = new LinkedHashMap<String, ContextElement>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = getName(t);
 
-			if (refLabelName == null) {
+			if (refLabelName == null || elements.containsKey(refLabelName)) {
 				continue;
 			}
 
-			List<Decl> d = getDeclForAltElement(t,
-												refLabelName,
-												needsList.contains(refLabelName),
-												!nonOptional.contains(refLabelName));
-			decls.addAll(d);
+			elements.put(refLabelName, new ContextElement(refLabelName,
+														  t.getType() == RULE_REF,
+														  needsList.contains(refLabelName),
+														  !nonOptional.contains(refLabelName)));
 		}
-		return decls;
+		return new ArrayList<ContextElement>(elements.values());
 	}
 
-	private List<GrammarAST> getRuleTokens(List<GrammarAST> refs) {
+	private static List<GrammarAST> getRuleTokens(List<GrammarAST> refs) {
 		List<GrammarAST> result = new ArrayList<>(refs.size());
 		for (GrammarAST ref : refs) {
 			CommonTree r = ref;
@@ -244,53 +261,56 @@ public class RuleFunction extends OutputModelObject {
 		return result;
 	}
 
-	private String getName(GrammarAST token) {
+	private static String getName(GrammarAST token) {
 		String tokenText = token.getText();
 		String tokenName = token.getType() != STRING_LITERAL ? tokenText : token.g.getTokenName(tokenText);
 		return tokenName == null || tokenName.startsWith("T__") ? null : tokenName; // Do not include tokens with auto generated names
 	}
 
 	/** Given list of X and r refs in alt, compute how many of each there are */
-	protected Pair<FrequencySet<String>, FrequencySet<String>> getElementFrequenciesForAlt(AltAST ast) {
+	protected static Pair<FrequencySet<String>, FrequencySet<String>> getElementFrequenciesForAlt(Grammar g, AltAST ast) {
 		try {
 			ElementFrequenciesVisitor visitor = new ElementFrequenciesVisitor(new CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
 			visitor.outerAlternative();
 			if (visitor.frequencies.size() != 1) {
-				factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR);
+				g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR);
 				return new Pair<>(new FrequencySet<String>(), new FrequencySet<String>());
 			}
 
 			return new Pair<>(visitor.getMinFrequencies(), visitor.frequencies.peek());
 		}
 		catch (RecognitionException ex) {
-			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 			return new Pair<>(new FrequencySet<String>(), new FrequencySet<String>());
 		}
 	}
 
-	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList, boolean optional) {
+	/** Make the getters for {@code element}; {@code getterName} comes from
+	 *  {@link ContextGetterNames}.
+	 */
+	public List<Decl> getDeclForAltElement(ContextElement element, String getterName) {
+		Target target = factory.getGenerator().getTarget();
 		List<Decl> decls = new ArrayList<Decl>();
-		if ( t.getType()==RULE_REF ) {
-			Rule rref = factory.getGrammar().getRule(t.getText());
-			String ctxName = factory.getGenerator().getTarget()
-							 .getRuleFunctionContextStructName(rref);
-			if ( needList) {
-				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
-					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
-				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
+		if ( element.isRule ) {
+			Rule rref = factory.getGrammar().getRule(element.name);
+			String ctxName = target.getRuleFunctionContextStructName(rref);
+			if ( element.needsList ) {
+				if(target.supportsOverloadedMethods())
+					decls.add( new ContextRuleListGetterDecl(factory, element.name, getterName, ctxName) );
+				decls.add( new ContextRuleListIndexedGetterDecl(factory, element.name, getterName, ctxName) );
 			}
 			else {
-				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, optional) );
+				decls.add( new ContextRuleGetterDecl(factory, element.name, getterName, ctxName, element.optional) );
 			}
 		}
 		else {
-			if ( needList ) {
-				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
-					decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
-				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
+			if ( element.needsList ) {
+				if(target.supportsOverloadedMethods())
+					decls.add( new ContextTokenListGetterDecl(factory, element.name, getterName) );
+				decls.add( new ContextTokenListIndexedGetterDecl(factory, element.name, getterName) );
 			}
 			else {
-				decls.add( new ContextTokenGetterDecl(factory, refLabelName, optional) );
+				decls.add( new ContextTokenGetterDecl(factory, element.name, getterName, element.optional) );
 			}
 		}
 		return decls;
