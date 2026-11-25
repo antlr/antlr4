@@ -1,9 +1,8 @@
 [notes]
 A parser rule and a token whose names differ only in the case of the first
 letter (identifier and Identifier) are referenced from the same rule. Targets
-that capitalize getter names (Go) must still generate distinct getters.
-PHP method names are case-insensitive, so the PHP target cannot yet generate
-both identifier() and Identifier().
+that capitalize getter names (Go) or whose method names are case-insensitive
+(PHP) must still generate distinct getters.
 
 [type]
 Parser
@@ -48,6 +47,3 @@ f()w a b c d e f g [h i]
 [output]
 """f()wabcdefg[hi]
 """
-
-[skip]
-PHP

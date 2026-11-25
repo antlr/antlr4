@@ -77,6 +77,29 @@ public class PHPTarget extends Target {
 		return false;
 	}
 
+	/** PHP getters are generated under the name of the rule or token as is. */
+	@Override
+	public String getContextGetterName(String name) {
+		return name;
+	}
+
+	/**
+	 * PHP method names are case-insensitive in their ASCII letters, so rule
+	 * {@code identifier} and token {@code Identifier} both want
+	 * {@code identifier()}.
+	 */
+	@Override
+	public Collection<String> getContextGetterMethodNames(String getterName, boolean isList) {
+		StringBuilder methodName = new StringBuilder(getterName);
+		for (int i = 0; i < methodName.length(); i++) {
+			char c = methodName.charAt(i);
+			if (c >= 'A' && c <= 'Z') {
+				methodName.setCharAt(i, Character.toLowerCase(c));
+			}
+		}
+		return Collections.singletonList(methodName.toString());
+	}
+
 	@Override
 	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
 															   boolean escapeSpecial) {

@@ -4,8 +4,8 @@ a list of foo both want AllFoo(), whether they are rules or tokens. Renaming a
 getter to avoid a clash must also not land on the getter of another rule (foo
 renamed to foo_ next to rule foo_), and a rule must keep one getter name in all
 the contexts that reference it.
-PHP method names are case-insensitive, so the PHP target cannot yet generate
-both foo() and Foo().
+PHP method names are case-insensitive, so there foo() clashes with Foo() and
+allFoo() with AllFoo().
 
 [type]
 Parser
@@ -67,6 +67,3 @@ a b c d e f g h all i j k all l m [n o] {p}
 [output]
 """abcdefghallijkalllm[no]{p}
 """
-
-[skip]
-PHP
