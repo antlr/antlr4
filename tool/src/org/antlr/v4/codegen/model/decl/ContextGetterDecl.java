@@ -10,17 +10,17 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
 public abstract class ContextGetterDecl extends Decl {
-	public ContextGetterDecl(OutputModelFactory factory, String name) {
-		this(factory, name, false);
-	}
+	/** The name to generate the getter under; it differs from the name of the
+	 *  rule or token where that would clash with another getter. Targets whose
+	 *  getters cannot clash generate them under the name of the rule or token.
+	 *
+	 *  @see org.antlr.v4.codegen.ContextGetterNames
+	 */
+	public final String getterName;
 
-	public ContextGetterDecl(OutputModelFactory factory, String name, boolean signature) {
+	public ContextGetterDecl(OutputModelFactory factory, String name, String getterName, boolean signature) {
 		super(factory, name);
-		this.signature = signature;
-	}
-
-	protected ContextGetterDecl(OutputModelFactory factory, String name, String escapedName, boolean signature) {
-		super(factory, name, null, escapedName);
+		this.getterName = getterName;
 		this.signature = signature;
 	}
 

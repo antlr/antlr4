@@ -9,17 +9,12 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 public class ContextRuleListIndexedGetterDecl extends ContextRuleListGetterDecl {
-	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String ctxName) {
-		this(factory, name, ctxName, false);
+	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName) {
+		this(factory, name, getterName, ctxName, false);
 	}
 
-	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean signature) {
-		super(factory, name, ctxName, signature);
-	}
-
-	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String escapedName, String ctxName,
-											boolean signature) {
-		super(factory, name, escapedName, ctxName, signature);
+	public ContextRuleListIndexedGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName, boolean signature) {
+		super(factory, name, getterName, ctxName, signature);
 	}
 
 	@Override
@@ -29,6 +24,6 @@ public class ContextRuleListIndexedGetterDecl extends ContextRuleListGetterDecl 
 
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextRuleListIndexedGetterDecl(factory, name, escapedName, ctxName, true);
+		return new ContextRuleListIndexedGetterDecl(factory, name, getterName, ctxName, true);
 	}
 }

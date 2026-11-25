@@ -13,25 +13,18 @@ public class ContextRuleGetterDecl extends ContextGetterDecl {
 	public String ctxName;
 	public boolean optional;
 
-	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean optional) {
-		this(factory, name, ctxName, optional, false);
+	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName, boolean optional) {
+		this(factory, name, getterName, ctxName, optional, false);
 	}
 
-	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean optional, boolean signature) {
-		super(factory, name, signature);
-		this.ctxName = ctxName;
-		this.optional = optional;
-	}
-
-	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String escapedName, String ctxName,
-								 boolean optional, boolean signature) {
-		super(factory, name, escapedName, signature);
+	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String getterName, String ctxName, boolean optional, boolean signature) {
+		super(factory, name, getterName, signature);
 		this.ctxName = ctxName;
 		this.optional = optional;
 	}
 
 	@Override
 	public ContextGetterDecl getSignatureDecl() {
-		return new ContextRuleGetterDecl(factory, name, escapedName, ctxName, optional, true);
+		return new ContextRuleGetterDecl(factory, name, getterName, ctxName, optional, true);
 	}
 }

@@ -72,9 +72,18 @@ public class OutputModelController {
 	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
 	public CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock;
+	private ContextGetterNames contextGetterNames;
 
 	public OutputModelController(OutputModelFactory factory) {
 		this.delegate = factory;
+	}
+
+	/** The names of the context getters, picked once for the whole grammar. */
+	public ContextGetterNames getContextGetterNames() {
+		if ( contextGetterNames==null ) {
+			contextGetterNames = new ContextGetterNames(delegate.getGenerator().getTarget(), delegate.getGrammar());
+		}
+		return contextGetterNames;
 	}
 
 	public void addExtension(CodeGeneratorExtension ext) { extensions.add(ext); }

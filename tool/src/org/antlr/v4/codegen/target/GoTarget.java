@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,23 +71,19 @@ public class GoTarget extends Target {
 	}
 
 	/**
-	 * Go getters are capitalized to make them public, so a reference to rule
-	 * {@code identifier} and one to token {@code Identifier} in the same context
-	 * would both produce {@code Identifier()}. The rule getter is the one renamed
-	 * because the token getter's name is also used for the token type constant.
-	 * Contexts without a clash keep their existing getter names.
+	 * Go getters are capitalized to make them public and, without method
+	 * overloading, the getter for a whole list gets an {@code All} prefix. Rule
+	 * {@code identifier} and token {@code Identifier} therefore both want
+	 * {@code Identifier()}, and one {@code allItem} and a list of {@code item}
+	 * both want {@code AllItem()}.
 	 */
 	@Override
-	public String escapeRuleContextGetterName(String ruleName, Set<String> tokenNames) {
-		String escapedName = escapeIfNeeded(ruleName);
-		Set<String> tokenGetterNames = new HashSet<>();
-		for (String tokenName : tokenNames) {
-			tokenGetterNames.add(Utils.capitalize(escapeIfNeeded(tokenName)));
+	public Collection<String> getContextGetterMethodNames(String getterName, boolean isList) {
+		String methodName = Utils.capitalize(getterName);
+		if (isList) {
+			return Arrays.asList("All" + methodName, methodName);
 		}
-		while (tokenGetterNames.contains(Utils.capitalize(escapedName))) {
-			escapedName = escapeWord(escapedName);
-		}
-		return escapedName;
+		return Collections.singletonList(methodName);
 	}
 
 	@Override

@@ -959,25 +959,25 @@ RuleContextListDecl(rdecl) ::= "<rdecl.escapedName> []I<rdecl.ctxName>"
 AttributeDecl(d) ::= "<d.escapedName> <GoTypeMap.(d.type)><if(d.initValue)>// TODO = <d.initValue><endif>"
 
 ContextTokenGetterDecl(t) ::= <<
-<t.escapedName; format="cap">() antlr.TerminalNode<if(!t.signature)> {
+<t.getterName; format="cap">() antlr.TerminalNode<if(!t.signature)> {
 	return s.GetToken(<parser.name><t.escapedName>, 0)
 }<endif>
 >>
 
 ContextTokenListGetterDecl(t) ::= <<
-All<t.escapedName; format="cap">() []antlr.TerminalNode<if(!t.signature)> {
+All<t.getterName; format="cap">() []antlr.TerminalNode<if(!t.signature)> {
 	return s.GetTokens(<parser.name><t.escapedName>)
 }<endif>
 >>
 
 ContextTokenListIndexedGetterDecl(t) ::= <<
-<t.escapedName; format="cap">(i int) antlr.TerminalNode<if(!t.signature)> {
+<t.getterName; format="cap">(i int) antlr.TerminalNode<if(!t.signature)> {
 	return s.GetToken(<parser.name><t.escapedName>, i)
 }<endif>
 >>
 
 ContextRuleGetterDecl(r) ::= <<
-<r.escapedName; format="cap">() I<r.ctxName><if(!r.signature)> {
+<r.getterName; format="cap">() I<r.ctxName><if(!r.signature)> {
 	var t antlr.RuleContext;
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(I<r.ctxName>); ok {
@@ -995,7 +995,7 @@ ContextRuleGetterDecl(r) ::= <<
 >>
 
 ContextRuleListGetterDecl(r) ::= <<
-All<r.escapedName; format="cap">() []I<r.ctxName><if(!r.signature)> {
+All<r.getterName; format="cap">() []I<r.ctxName><if(!r.signature)> {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -1018,7 +1018,7 @@ All<r.escapedName; format="cap">() []I<r.ctxName><if(!r.signature)> {
 >>
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
-<r.escapedName; format="cap">(i int) I<r.ctxName><if(!r.signature)> {
+<r.getterName; format="cap">(i int) I<r.ctxName><if(!r.signature)> {
 	var t antlr.RuleContext;
 	j := 0
 	for _, ctx := range s.GetChildren() {
